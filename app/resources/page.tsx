@@ -552,6 +552,7 @@ export default function Resources() {
           </div>
         </form>
       </div>
+      </div>
     </AppLayout>
   )
 }
