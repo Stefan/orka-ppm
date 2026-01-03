@@ -70,28 +70,31 @@ graph TB
 ### Technology Stack
 
 **Frontend:**
-- Next.js 14 with TypeScript for the web application
-- Tailwind CSS for styling and responsive design
-- Chart.js/D3.js for data visualizations
+- Next.js 16.1.1 with TypeScript for the web application
+- React 19.2.3 for UI components and interactions
+- Tailwind CSS 4 for styling and responsive design
+- Recharts for data visualizations and analytics
 - React Query for state management and caching
+- Lucide React for consistent iconography
 
 **Backend:**
 - FastAPI (Python) for the main API gateway and services
 - Supabase for authentication, database, and real-time subscriptions
-- PostgreSQL (via Supabase) for primary data storage
+- PostgreSQL (via Supabase) for primary data storage with Row Level Security
 - Redis for caching and session management
 
 **AI/ML Stack:**
 - OpenAI GPT-4 for natural language processing and generation
 - LangChain for RAG implementation and agent orchestration
-- Pinecone or Weaviate for vector database (embeddings storage)
+- Vector database (integrated with Supabase) for embeddings storage
 - scikit-learn for traditional ML models and risk forecasting
+- Model performance monitoring and A/B testing framework
 
 **Infrastructure:**
-- Vercel for frontend deployment
-- Railway or AWS for backend services
-- Supabase for managed database and auth
-- Docker for containerization
+- Vercel for frontend deployment with Edge Network CDN
+- Railway/AWS for backend API hosting
+- Supabase for managed backend services
+- Docker for containerization and deployment
 
 ## Components and Interfaces
 
@@ -157,7 +160,77 @@ interface Risk {
 }
 ```
 
-### AI Agent Interfaces
+#### Issue Entity
+```typescript
+interface Issue {
+  id: string;
+  projectId: string;
+  relatedRiskId?: string;
+  title: string;
+  description: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  status: 'open' | 'in-progress' | 'resolved' | 'closed';
+  assignedTo: string;
+  reportedBy: string;
+  resolutionNotes?: string;
+  createdAt: Date;
+  resolvedAt?: Date;
+  updatedAt: Date;
+}
+```
+
+#### Workflow Entities
+```typescript
+interface ApprovalProcess {
+  id: string;
+  workflowTemplateId: string;
+  requesterId: string;
+  status: 'pending' | 'in-progress' | 'approved' | 'rejected' | 'cancelled';
+  currentStep: number;
+  context: any;
+  approvals: ApprovalResponse[];
+  createdAt: Date;
+  completedAt?: Date;
+}
+
+interface ApprovalResponse {
+  stepId: string;
+  approverId: string;
+  decision: 'approved' | 'rejected' | 'delegated';
+  comments?: string;
+  respondedAt: Date;
+}
+```
+
+#### Financial Entities
+```typescript
+interface BudgetVariance {
+  projectId: string;
+  budgetAmount: number;
+  actualCost: number;
+  variance: number;
+  variancePercentage: number;
+  status: 'under' | 'on-track' | 'over';
+  currency: string;
+  calculatedAt: Date;
+}
+
+interface CostUpdate {
+  category: string;
+  amount: number;
+  currency: string;
+  date: Date;
+  description?: string;
+  approvedBy?: string;
+}
+
+interface ExchangeRate {
+  fromCurrency: string;
+  toCurrency: string;
+  rate: number;
+  updatedAt: Date;
+}
+```
 
 #### Resource Optimizer Agent
 ```typescript
@@ -200,22 +273,59 @@ interface RiskForecast {
 }
 ```
 
-#### RAG Reporter Agent
+#### Hallucination Validator
 ```typescript
-interface RAGReporter {
-  generateReport(query: string, context: ReportContext): Promise<GeneratedReport>;
-  retrieveRelevantData(query: string): Promise<RelevantData[]>;
+interface HallucinationValidator {
   validateReport(report: GeneratedReport): Promise<ValidationResult>;
-  supportedQueryTypes(): string[];
+  crossReferenceData(content: string, sources: DataSource[]): Promise<ValidationResult>;
+  flagInconsistencies(content: string): Promise<Inconsistency[]>;
+  getValidationMetrics(): Promise<ValidationMetrics>;
 }
 
-interface GeneratedReport {
-  title: string;
-  content: string;
-  visualizations: Visualization[];
-  sources: DataSource[];
+interface ValidationResult {
+  isValid: boolean;
   confidence: number;
-  generatedAt: Date;
+  inconsistencies: Inconsistency[];
+  sources: DataSource[];
+  validatedAt: Date;
+}
+```
+
+#### AI Model Management
+```typescript
+interface AIModelManager {
+  logModelOperation(operation: ModelOperation): Promise<void>;
+  monitorPerformance(modelId: string): Promise<PerformanceMetrics>;
+  runABTest(testConfig: ABTestConfig): Promise<ABTestResult>;
+  captureUserFeedback(feedback: UserFeedback): Promise<void>;
+  alertPerformanceDegradation(modelId: string, metrics: PerformanceMetrics): Promise<void>;
+}
+
+interface ModelOperation {
+  modelId: string;
+  operation: string;
+  inputs: any;
+  outputs: any;
+  confidence: number;
+  timestamp: Date;
+  userId?: string;
+}
+
+interface PerformanceMetrics {
+  accuracy: number;
+  responseTime: number;
+  confidenceDistribution: number[];
+  errorRate: number;
+  userSatisfaction: number;
+}
+
+interface ABTestConfig {
+  testName: string;
+  modelA: string;
+  modelB: string;
+  trafficSplit: number;
+  successMetrics: string[];
+  duration: number;
 }
 ```
 
@@ -234,14 +344,69 @@ interface ProjectManagementService {
 }
 ```
 
-#### Financial Tracking Service
+#### Workflow Management Service
 ```typescript
-interface FinancialTrackingService {
-  updateProjectCosts(projectId: string, costs: CostUpdate[]): Promise<void>;
-  calculateBudgetVariance(projectId: string): Promise<BudgetVariance>;
-  generateFinancialReport(filters: FinancialFilters): Promise<FinancialReport>;
-  trackExchangeRates(): Promise<void>;
-  alertBudgetThresholds(): Promise<BudgetAlert[]>;
+interface WorkflowManagementService {
+  createWorkflowTemplate(template: WorkflowTemplate): Promise<WorkflowTemplate>;
+  submitApprovalRequest(request: ApprovalRequest): Promise<ApprovalProcess>;
+  routeApproval(processId: string): Promise<void>;
+  processApprovalResponse(response: ApprovalResponse): Promise<void>;
+  sendReminders(processId: string): Promise<void>;
+  completeWorkflow(processId: string): Promise<WorkflowCompletion>;
+}
+
+interface WorkflowTemplate {
+  id: string;
+  name: string;
+  steps: WorkflowStep[];
+  routingRules: RoutingRule[];
+  timeoutSettings: TimeoutSettings;
+  notificationSettings: NotificationSettings;
+}
+
+interface WorkflowStep {
+  id: string;
+  name: string;
+  type: 'approval' | 'notification' | 'condition';
+  approvers: string[];
+  isParallel: boolean;
+  requiredApprovals: number;
+  timeoutHours: number;
+}
+
+interface ApprovalRequest {
+  workflowTemplateId: string;
+  requesterId: string;
+  context: any;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  dueDate?: Date;
+}
+```
+
+#### API Management Service
+```typescript
+interface APIManagementService {
+  authenticateRequest(token: string): Promise<AuthenticationResult>;
+  authorizeAccess(userId: string, resource: string, action: string): Promise<boolean>;
+  rateLimit(userId: string, endpoint: string): Promise<RateLimitResult>;
+  logAPIAccess(request: APIRequest): Promise<void>;
+  handleBulkOperation(operation: BulkOperation): Promise<BulkResult>;
+  maintainAPIVersioning(version: string): Promise<VersionInfo>;
+}
+
+interface BulkOperation {
+  type: 'import' | 'export';
+  entityType: string;
+  data?: any[];
+  filters?: any;
+  format: 'json' | 'csv' | 'xlsx';
+}
+
+interface RateLimitResult {
+  allowed: boolean;
+  remaining: number;
+  resetTime: Date;
+  retryAfter?: number;
 }
 ```
 
@@ -306,22 +471,127 @@ CREATE TABLE risks (
 );
 ```
 
-### Vector Database Schema
+#### Workflows Table
+```sql
+CREATE TABLE workflow_templates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  steps JSONB NOT NULL,
+  routing_rules JSONB DEFAULT '[]',
+  timeout_settings JSONB DEFAULT '{}',
+  notification_settings JSONB DEFAULT '{}',
+  is_active BOOLEAN DEFAULT true,
+  created_by UUID REFERENCES auth.users(id),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-For RAG functionality, embeddings are stored in a vector database:
+CREATE TABLE approval_processes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  workflow_template_id UUID REFERENCES workflow_templates(id),
+  requester_id UUID REFERENCES auth.users(id),
+  status approval_status DEFAULT 'pending',
+  current_step INTEGER DEFAULT 0,
+  context JSONB DEFAULT '{}',
+  priority priority_level DEFAULT 'medium',
+  due_date TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  completed_at TIMESTAMP WITH TIME ZONE
+);
 
-```typescript
-interface DocumentEmbedding {
-  id: string;
-  content: string;
-  embedding: number[];
-  metadata: {
-    type: 'project' | 'report' | 'risk' | 'resource';
-    projectId?: string;
-    createdAt: Date;
-    tags: string[];
-  };
-}
+CREATE TABLE approval_responses (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  process_id UUID REFERENCES approval_processes(id) ON DELETE CASCADE,
+  step_id VARCHAR(100) NOT NULL,
+  approver_id UUID REFERENCES auth.users(id),
+  decision approval_decision NOT NULL,
+  comments TEXT,
+  responded_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+#### Financial Tracking Tables
+```sql
+CREATE TABLE budget_variances (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  budget_amount DECIMAL(12,2) NOT NULL,
+  actual_cost DECIMAL(12,2) NOT NULL,
+  variance DECIMAL(12,2) GENERATED ALWAYS AS (actual_cost - budget_amount) STORED,
+  variance_percentage DECIMAL(5,2) GENERATED ALWAYS AS (
+    CASE WHEN budget_amount > 0 
+    THEN ((actual_cost - budget_amount) / budget_amount) * 100 
+    ELSE 0 END
+  ) STORED,
+  currency VARCHAR(3) DEFAULT 'USD',
+  calculated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE cost_updates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  category VARCHAR(100) NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,
+  currency VARCHAR(3) DEFAULT 'USD',
+  date DATE NOT NULL,
+  description TEXT,
+  approved_by UUID REFERENCES auth.users(id),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE exchange_rates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  from_currency VARCHAR(3) NOT NULL,
+  to_currency VARCHAR(3) NOT NULL,
+  rate DECIMAL(10,6) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(from_currency, to_currency)
+);
+```
+
+#### Issues Table
+```sql
+CREATE TABLE issues (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  related_risk_id UUID REFERENCES risks(id),
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  severity issue_severity NOT NULL DEFAULT 'medium',
+  status issue_status DEFAULT 'open',
+  assigned_to UUID REFERENCES auth.users(id),
+  reported_by UUID REFERENCES auth.users(id),
+  resolution_notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  resolved_at TIMESTAMP WITH TIME ZONE,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+#### AI Model Operations Table
+```sql
+CREATE TABLE ai_model_operations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  model_id VARCHAR(100) NOT NULL,
+  operation VARCHAR(100) NOT NULL,
+  inputs JSONB,
+  outputs JSONB,
+  confidence DECIMAL(3,2),
+  user_id UUID REFERENCES auth.users(id),
+  execution_time_ms INTEGER,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE ai_performance_metrics (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  model_id VARCHAR(100) NOT NULL,
+  accuracy DECIMAL(5,4),
+  response_time_ms INTEGER,
+  error_rate DECIMAL(5,4),
+  user_satisfaction DECIMAL(3,2),
+  measured_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 ```
 
 ## Correctness Properties
