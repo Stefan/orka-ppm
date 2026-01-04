@@ -1,0 +1,13 @@
+# Vercel ignore file for frontend
+node_modules
+.next
+.env.local
+.env
+*.log
+.DS_Store
+coverage
+.nyc_output
+.cache
+dist
+build
+*.tsbuildinfo
