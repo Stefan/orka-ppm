@@ -954,3 +954,4 @@ Traceback (most recent call last):
   File "/Users/stefan/Projects/PPM/backend/performance.py", line 11, in <module>
     import redis
 ModuleNotFoundError: No module named 'redis'
+WARNING:  StatReload detected changes in '/Users/stefan/Projects/PPM/backend/resource_management_enhanced.py'. Reloading...
