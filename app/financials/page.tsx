@@ -153,16 +153,21 @@ export default function Financials() {
   async function fetchProjects() {
     if (!session?.access_token) return
     
-    const response = await fetch(getApiUrl('/projects/'), {
-      headers: {
-        'Authorization': `Bearer ${session.access_token}`,
-        'Content-Type': 'application/json',
-      }
-    })
-    
-    if (!response.ok) throw new Error('Failed to fetch projects')
-    const data = await response.json()
-    setProjects(Array.isArray(data) ? data as Project[] : [])
+    try {
+      const response = await fetch(getApiUrl('/projects/'), {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        }
+      })
+      
+      if (!response.ok) throw new Error('Failed to fetch projects')
+      const data = await response.json()
+      setProjects(Array.isArray(data) ? data as Project[] : [])
+    } catch (error: unknown) {
+      console.error('Error fetching projects:', error)
+      setError(error instanceof Error ? error.message : 'Failed to fetch projects')
+    }
   }
 
   async function fetchBudgetVariances() {

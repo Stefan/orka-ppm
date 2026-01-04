@@ -18,13 +18,30 @@ export function getApiUrl(endpoint: string): string {
     return `http://localhost:8000${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`
   }
   
+  // Validate URL format
+  try {
+    new URL(baseUrl)
+  } catch (error) {
+    console.error('Invalid API_URL format:', baseUrl)
+    throw new Error(`Invalid API URL: ${baseUrl}`)
+  }
+  
   // Ensure endpoint starts with /
   const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
   
   // Remove trailing slash from baseUrl and combine
   const cleanBaseUrl = baseUrl.replace(/\/$/, '')
   
-  return `${cleanBaseUrl}${normalizedEndpoint}`
+  const fullUrl = `${cleanBaseUrl}${normalizedEndpoint}`
+  
+  // Validate final URL
+  try {
+    new URL(fullUrl)
+    return fullUrl
+  } catch (error) {
+    console.error('Invalid final URL:', fullUrl)
+    throw new Error(`Invalid final URL: ${fullUrl}`)
+  }
 }
 
 // Fetch wrapper with error handling

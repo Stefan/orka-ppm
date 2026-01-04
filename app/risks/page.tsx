@@ -4,7 +4,7 @@ import { useAuth } from '../providers/SupabaseAuthProvider'
 import { useEffect, useState, useMemo } from 'react'
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
-  PieChart, Pie, Cell, ScatterChart, Scatter, LineChart, Line, Area, AreaChart,
+  PieChart as RechartsPieChart, Pie, Cell, ScatterChart, Scatter, LineChart, Line, Area, AreaChart,
   ComposedChart
 } from 'recharts'
 import AppLayout from '../../components/AppLayout'
@@ -185,19 +185,20 @@ export default function Risks() {
   async function fetchProjects() {
     if (!session?.access_token) return
     
-    // Fetch projects first to get project names
-    const projectsResponse = await fetch(getApiUrl('/projects/'), {
-      headers: {
-        'Authorization': `Bearer ${session.access_token}`
-      }
-    })
-    
-    if (!projectsResponse.ok) throw new Error('Failed to fetch projects')
-    const projects = await projectsResponse.json()
-    
-    // Create project lookup
-    const projectLookup = projects.reduce((acc: any, project: any) => {
-      acc[project.id] = project.name
+    try {
+      // Fetch projects first to get project names
+      const projectsResponse = await fetch(getApiUrl('/projects/'), {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
+      
+      if (!projectsResponse.ok) throw new Error('Failed to fetch projects')
+      const projects = await projectsResponse.json()
+      
+      // Create project lookup
+      const projectLookup = projects.reduce((acc: any, project: any) => {
+        acc[project.id] = project.name
       return acc
     }, {})
     
@@ -345,6 +346,10 @@ export default function Risks() {
       average_risk_score: avgRiskScore,
       trend_data: trendData
     })
+    } catch (error: unknown) {
+      console.error('Error fetching projects:', error)
+      setError(error instanceof Error ? error.message : 'Failed to fetch projects')
+    }
   }
 
   async function fetchRiskAlerts() {

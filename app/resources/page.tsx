@@ -113,7 +113,7 @@ export default function Resources() {
       { name: 'Under-utilized (0-50%)', value: resources.filter(r => r.utilization_percentage <= 50).length, color: '#10B981' },
       { name: 'Well-utilized (51-80%)', value: resources.filter(r => r.utilization_percentage > 50 && r.utilization_percentage <= 80).length, color: '#3B82F6' },
       { name: 'Highly-utilized (81-100%)', value: resources.filter(r => r.utilization_percentage > 80 && r.utilization_percentage <= 100).length, color: '#F59E0B' },
-      { name: 'Over-utilized (>100%)', value: resources.filter(r => r.utilization_percentage > 100).length, color: '#EF4444' }
+      { name: 'Over-utilized ({">"}100%)', value: resources.filter(r => r.utilization_percentage > 100).length, color: '#EF4444' }
     ]
 
     const skillsDistribution = resources.reduce((acc, resource) => {
@@ -450,7 +450,7 @@ export default function Resources() {
                 >
                   <option value="all">All Roles</option>
                   {Array.from(new Set(resources.map(r => r.role).filter(Boolean))).map(role => (
-                    <option key={role} value={role}>{role}</option>
+                    <option key={role} value={role || ""}>{role}</option>
                   ))}
                 </select>
               </div>
@@ -479,7 +479,7 @@ export default function Resources() {
                 >
                   <option value="all">All Locations</option>
                   {Array.from(new Set(resources.map(r => r.location).filter(Boolean))).map(location => (
-                    <option key={location} value={location}>{location}</option>
+                    <option key={location} value={location || ""}>{location}</option>
                   ))}
                 </select>
               </div>
@@ -787,7 +787,7 @@ export default function Resources() {
               </div>
               <div className="flex items-center">
                 <div className="w-4 h-4 bg-red-100 border border-red-300 rounded mr-2"></div>
-                <span>Over-utilized (>100%)</span>
+                <span>Over-utilized ({">"}100%)</span>
               </div>
             </div>
           </div>

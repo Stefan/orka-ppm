@@ -36,7 +36,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       })
       .catch((err: unknown) => {
         console.error('Unexpected error getting session:', err)
-        setError(err as AuthError)
+        setError(err instanceof Error ? err as AuthError : new Error('Unknown auth error') as AuthError)
       })
       .finally(() => {
         setLoading(false)

@@ -11,14 +11,11 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
 
-  // TypeScript strict mode
+  // TypeScript - ignore build errors for deployment
   typescript: {
     ignoreBuildErrors: false,
   },
 
-  // Output configuration for Vercel
-  output: 'standalone',
-  
   // Image optimization
   images: {
     domains: [],
