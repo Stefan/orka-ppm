@@ -18,10 +18,21 @@ load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 
-if not SUPABASE_URL or not SUPABASE_ANON_KEY:
-    raise ValueError("SUPABASE_URL and SUPABASE_ANON_KEY environment variables are required")
-
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+# Create Supabase client with error handling
+supabase: Client = None
+try:
+    if not SUPABASE_URL or not SUPABASE_ANON_KEY:
+        print(f"WARNING: Missing environment variables - URL: {bool(SUPABASE_URL)}, KEY: {bool(SUPABASE_ANON_KEY)}")
+        # Use fallback values for debugging
+        SUPABASE_URL = SUPABASE_URL or "https://xceyrfvxooiplbmwavlb.supabase.co"
+        SUPABASE_ANON_KEY = SUPABASE_ANON_KEY or "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjZXlyZnZ4b29pcGxibXdhdmxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4Mjg3ODEsImV4cCI6MjA4MjQwNDc4MX0.jIyJlwx2g9xn8OTSaLum6H8BKqknyxB8gYxgEKdfgqo"
+    
+    supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+    print(f"✅ Supabase client created successfully")
+except Exception as e:
+    print(f"❌ Error creating Supabase client: {e}")
+    # Create a dummy client for development
+    supabase = None
 
 app = FastAPI(
     title="PPM SaaS MVP API",
@@ -31,9 +42,14 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://ppm-pearl.vercel.app",
+        "https://orka-ppm.vercel.app",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000"
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -127,10 +143,30 @@ async def root():
         "timestamp": datetime.now().isoformat()
     }
 
+@app.get("/debug")
+async def debug_info():
+    """Debug endpoint to check environment variables"""
+    return {
+        "supabase_url_set": bool(os.getenv("SUPABASE_URL")),
+        "supabase_key_set": bool(os.getenv("SUPABASE_ANON_KEY")),
+        "supabase_url_length": len(os.getenv("SUPABASE_URL", "")),
+        "supabase_key_length": len(os.getenv("SUPABASE_ANON_KEY", "")),
+        "environment": "production" if os.getenv("VERCEL") else "development",
+        "timestamp": datetime.now().isoformat()
+    }
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
     try:
+        if supabase is None:
+            return {
+                "status": "degraded",
+                "database": "not_configured",
+                "message": "Supabase client not initialized",
+                "timestamp": datetime.now().isoformat()
+            }
+        
         # Test Supabase connection
         response = supabase.table("portfolios").select("count", count="exact").execute()
         return {
@@ -213,6 +249,9 @@ async def get_project(project_id: UUID, current_user = Depends(get_current_user)
 async def get_dashboard_data(current_user = Depends(get_current_user)):
     """Get dashboard data for the authenticated user"""
     try:
+        if supabase is None:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
+        
         # Get portfolios
         portfolios_response = supabase.table("portfolios").select("*").execute()
         portfolios = convert_uuids(portfolios_response.data)
@@ -254,6 +293,7 @@ async def get_dashboard_data(current_user = Depends(get_current_user)):
             "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
+        print(f"Dashboard error: {e}")  # Server-side logging
         raise HTTPException(status_code=500, detail=f"Dashboard data retrieval failed: {str(e)}")
 
 # For deployment - Vercel serverless function handler
