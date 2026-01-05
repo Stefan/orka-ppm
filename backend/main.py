@@ -779,7 +779,12 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 # ---------- Endpoints ----------
 @app.get("/")
 async def root():
-    return {"message": "Willkommen zur PPM SaaS API – Deine Cora-Alternative mit agentic AI 🚀"}
+    return {
+        "message": "Willkommen zur PPM SaaS API – Deine Cora-Alternative mit agentic AI 🚀",
+        "status": "healthy",
+        "version": "1.0.0",
+        "timestamp": datetime.now().isoformat()
+    }
 
 @app.post("/projects/", response_model=ProjectResponse, status_code=status.HTTP_201_CREATED)
 async def create_project(project: ProjectCreate, current_user = Depends(get_current_user)):
@@ -1796,27 +1801,54 @@ async def generate_rag_response(query: str, context_data: Dict[str, Any]) -> RAG
     """
     
     try:
-        # Use OpenAI to generate response
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {
-                    "role": "system",
-                    "content": """You are an AI assistant for a Project Portfolio Management system. 
-                    Analyze the provided data and answer questions about projects, resources, budgets, risks, and utilization.
-                    Provide specific, data-driven answers based on the context provided.
-                    If you cannot find specific information, clearly state that."""
-                },
-                {
-                    "role": "user",
-                    "content": f"Context: {context_text}\n\nQuestion: {query}"
-                }
-            ],
-            max_tokens=1000,
-            temperature=0.3
-        )
-        
-        answer = response.choices[0].message.content
+        if not OPENAI_AVAILABLE:
+            raise Exception("OpenAI API not available")
+            
+        # Use OpenAI to generate response (with fallback for API changes)
+        try:
+            # Try new OpenAI client syntax first
+            from openai import OpenAI
+            client = OpenAI(api_key=openai.api_key)
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": """You are an AI assistant for a Project Portfolio Management system. 
+                        Analyze the provided data and answer questions about projects, resources, budgets, risks, and utilization.
+                        Provide specific, data-driven answers based on the context provided.
+                        If you cannot find specific information, clearly state that."""
+                    },
+                    {
+                        "role": "user",
+                        "content": f"Context: {context_text}\n\nQuestion: {query}"
+                    }
+                ],
+                max_tokens=1000,
+                temperature=0.3
+            )
+            answer = response.choices[0].message.content
+        except Exception:
+            # Fallback to old syntax
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": """You are an AI assistant for a Project Portfolio Management system. 
+                        Analyze the provided data and answer questions about projects, resources, budgets, risks, and utilization.
+                        Provide specific, data-driven answers based on the context provided.
+                        If you cannot find specific information, clearly state that."""
+                    },
+                    {
+                        "role": "user",
+                        "content": f"Context: {context_text}\n\nQuestion: {query}"
+                    }
+                ],
+                max_tokens=1000,
+                temperature=0.3
+            )
+            answer = response.choices[0].message.content
         
         # Determine query type
         query_type = "general"
@@ -1848,11 +1880,11 @@ async def generate_rag_response(query: str, context_data: Dict[str, Any]) -> RAG
     except Exception as e:
         # Fallback response if OpenAI fails
         return RAGResponse(
-            answer=f"I apologize, but I'm unable to process your query at the moment. Error: {str(e)}",
+            answer=f"I can provide basic information about your portfolio data. Based on the available data: {len(context_data.get('projects', []))} projects, {len(context_data.get('resources', []))} resources. However, AI-powered analysis is currently unavailable. Error: {str(e)}",
             sources=[],
-            confidence=0.0,
-            query_type="error",
-            generated_at="2024-01-01T00:00:00Z"
+            confidence=0.5,
+            query_type="fallback",
+            generated_at=datetime.now().isoformat()
         )
 
 def analyze_report_query(query: str) -> Dict[str, bool]:
@@ -1905,28 +1937,54 @@ async def generate_ai_report(query: str, data: Dict[str, Any], format: str) -> s
     """
     
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {
-                    "role": "system",
-                    "content": f"""You are a business analyst creating comprehensive reports for a PPM system.
-                    Generate a detailed report in {format} format based on the user's request and available data.
-                    Include relevant metrics, insights, and recommendations."""
-                },
-                {
-                    "role": "user",
-                    "content": f"Data: {data_summary}\n\nGenerate a report for: {query}"
-                }
-            ],
-            max_tokens=2000,
-            temperature=0.3
-        )
-        
-        return response.choices[0].message.content
+        if not OPENAI_AVAILABLE:
+            return f"Report generation unavailable (OpenAI not configured). Available data: {len(data)} data sources."
+            
+        # Try new OpenAI client syntax first
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=openai.api_key)
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": f"""You are a business analyst creating comprehensive reports for a PPM system.
+                        Generate a detailed report in {format} format based on the user's request and available data.
+                        Include relevant metrics, insights, and recommendations."""
+                    },
+                    {
+                        "role": "user",
+                        "content": f"Data: {data_summary}\n\nGenerate a report for: {query}"
+                    }
+                ],
+                max_tokens=2000,
+                temperature=0.3
+            )
+            return response.choices[0].message.content
+        except Exception:
+            # Fallback to old syntax
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": f"""You are a business analyst creating comprehensive reports for a PPM system.
+                        Generate a detailed report in {format} format based on the user's request and available data.
+                        Include relevant metrics, insights, and recommendations."""
+                    },
+                    {
+                        "role": "user",
+                        "content": f"Data: {data_summary}\n\nGenerate a report for: {query}"
+                    }
+                ],
+                max_tokens=2000,
+                temperature=0.3
+            )
+            return response.choices[0].message.content
         
     except Exception as e:
-        return f"Report generation failed: {str(e)}"
+        return f"Report generation failed: {str(e)}. Available data summary: {data_summary[:500]}..."
 
 
 
@@ -3670,38 +3728,77 @@ async def generate_ai_response(query: str, context_summary: str, output_format: 
     """
     
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Context:\n{context_summary}\n\nQuestion: {query}"}
-            ],
-            max_tokens=1500,
-            temperature=0.3
-        )
-        
-        return response.choices[0].message.content
+        if not OPENAI_AVAILABLE:
+            return f"AI analysis unavailable. Based on available data: {context_summary[:200]}..."
+            
+        # Try new OpenAI client syntax first
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=openai.api_key)
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": f"Context:\n{context_summary}\n\nQuestion: {query}"}
+                ],
+                max_tokens=1500,
+                temperature=0.3
+            )
+            return response.choices[0].message.content
+        except Exception:
+            # Fallback to old syntax
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": f"Context:\n{context_summary}\n\nQuestion: {query}"}
+                ],
+                max_tokens=1500,
+                temperature=0.3
+            )
+            return response.choices[0].message.content
         
     except Exception as e:
-        return f"AI response generation failed: {str(e)}"
+        return f"AI response generation failed: {str(e)}. Context summary: {context_summary[:300]}..."
 
 async def generate_executive_summary(query: str, context_summary: str) -> str:
     """Generate executive summary"""
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {
-                    "role": "system", 
-                    "content": "Generate a concise executive summary (2-3 sentences) highlighting the most critical insights."
-                },
-                {"role": "user", "content": f"Context:\n{context_summary}\n\nQuery: {query}"}
-            ],
-            max_tokens=200,
-            temperature=0.2
-        )
-        
-        return response.choices[0].message.content
+        if not OPENAI_AVAILABLE:
+            return "Executive summary: AI analysis unavailable. Please review the data manually."
+            
+        # Try new OpenAI client syntax first
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=openai.api_key)
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {
+                        "role": "system", 
+                        "content": "Generate a concise executive summary (2-3 sentences) highlighting the most critical insights."
+                    },
+                    {"role": "user", "content": f"Context:\n{context_summary}\n\nQuery: {query}"}
+                ],
+                max_tokens=200,
+                temperature=0.2
+            )
+            return response.choices[0].message.content
+        except Exception:
+            # Fallback to old syntax
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {
+                        "role": "system", 
+                        "content": "Generate a concise executive summary (2-3 sentences) highlighting the most critical insights."
+                    },
+                    {"role": "user", "content": f"Context:\n{context_summary}\n\nQuery: {query}"}
+                ],
+                max_tokens=200,
+                temperature=0.2
+            )
+            return response.choices[0].message.content
         
     except Exception:
         return "Executive summary generation unavailable"
