@@ -81,13 +81,13 @@ export default function PerformanceDashboard() {
     try {
       const [statsResponse, healthResponse, cacheResponse] = await Promise.all([
         fetch(getApiUrl('/admin/performance/stats'), {
-          headers: { 'Authorization': `Bearer ${session.access_token}` }
+          headers: { 'Authorization': `Bearer ${session?.access_token || ''}` }
         }),
         fetch(getApiUrl('/admin/performance/health'), {
-          headers: { 'Authorization': `Bearer ${session.access_token}` }
+          headers: { 'Authorization': `Bearer ${session?.access_token || ''}` }
         }),
         fetch(getApiUrl('/admin/cache/stats'), {
-          headers: { 'Authorization': `Bearer ${session.access_token}` }
+          headers: { 'Authorization': `Bearer ${session?.access_token || ''}` }
         })
       ])
 
@@ -122,7 +122,7 @@ export default function PerformanceDashboard() {
       const response = await fetch(getApiUrl('/admin/cache/clear'), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${session?.access_token || ''}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ patterns })

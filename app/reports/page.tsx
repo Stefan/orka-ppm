@@ -16,11 +16,12 @@ interface ChatMessage {
 }
 
 interface RAGResponse {
-  answer: string
-  sources: Array<{type: string, count?: number, data?: string}>
-  confidence: number
-  query_type: string
-  generated_at: string
+  response: string
+  sources: Array<{type: string, id: string, similarity: number}>
+  confidence_score: number
+  conversation_id: string
+  response_time_ms: number
+  status?: string
 }
 
 export default function Reports() {
@@ -38,6 +39,7 @@ export default function Reports() {
   const [isLoading, setIsLoading] = useState(false)
   const [reportFormat, setReportFormat] = useState('text')
   const [showReportOptions, setShowReportOptions] = useState(false)
+  const [conversationId, setConversationId] = useState<string | null>(null)
 
   const handleSendMessage = async () => {
     if (!currentQuery.trim() || !session?.access_token) return
@@ -54,15 +56,15 @@ export default function Reports() {
     setIsLoading(true)
 
     try {
-      const response = await fetch(getApiUrl('/reports/query'), {
+      const response = await fetch(getApiUrl('/ai/rag-query'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
+          'Authorization': `Bearer ${session?.access_token || ''}`
         },
         body: JSON.stringify({
           query: currentQuery,
-          context_type: null
+          conversation_id: conversationId
         })
       })
 
@@ -70,69 +72,43 @@ export default function Reports() {
 
       const data: RAGResponse = await response.json()
 
+      // Store conversation ID for context
+      if (data.conversation_id && !conversationId) {
+        setConversationId(data.conversation_id)
+      }
+
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: data.answer,
+        content: data.response,
         timestamp: new Date(),
-        sources: data.sources,
-        confidence: data.confidence
+        sources: data.sources.map(s => ({
+          type: s.type,
+          count: 1,
+          data: `${s.type}:${s.id} (${(s.similarity * 100).toFixed(1)}% match)`
+        })),
+        confidence: data.confidence_score
       }
 
       setMessages(prev => [...prev, assistantMessage])
+      
+      // Show AI status if in mock mode
+      if (data.status === 'ai_unavailable') {
+        const statusMessage: ChatMessage = {
+          id: (Date.now() + 2).toString(),
+          type: 'assistant',
+          content: '⚠️ Note: AI features are currently in mock mode. For full functionality, ensure OpenAI API key is configured.',
+          timestamp: new Date(),
+          confidence: 1.0
+        }
+        setMessages(prev => [...prev, statusMessage])
+      }
+      
     } catch (error: unknown) {
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
         content: 'I apologize, but I encountered an error processing your request. Please try again.',
-        timestamp: new Date(),
-        confidence: 0
-      }
-      setMessages(prev => [...prev, errorMessage])
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleGenerateReport = async () => {
-    if (!currentQuery.trim() || !session?.access_token) return
-
-    setIsLoading(true)
-
-    try {
-      const response = await fetch(getApiUrl('/reports/generate'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify({
-          query: currentQuery,
-          include_charts: false,
-          format: reportFormat
-        })
-      })
-
-      if (!response.ok) throw new Error('Report generation failed')
-
-      const data = await response.json()
-
-      const reportMessage: ChatMessage = {
-        id: Date.now().toString(),
-        type: 'assistant',
-        content: `**Generated Report:**\n\n${data.report}`,
-        timestamp: new Date(),
-        confidence: 0.9
-      }
-
-      setMessages(prev => [...prev, reportMessage])
-      setCurrentQuery('')
-      setShowReportOptions(false)
-    } catch (error: unknown) {
-      const errorMessage: ChatMessage = {
-        id: Date.now().toString(),
-        type: 'assistant',
-        content: 'Failed to generate report. Please try again.',
         timestamp: new Date(),
         confidence: 0
       }
@@ -199,7 +175,7 @@ export default function Reports() {
               <option value="json">JSON</option>
             </select>
             <button
-              onClick={handleGenerateReport}
+              onClick={handleSendMessage}
               disabled={!currentQuery.trim() || isLoading}
               className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50"
             >

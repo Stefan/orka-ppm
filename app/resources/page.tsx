@@ -45,12 +45,15 @@ interface ResourceFilters {
 }
 
 interface OptimizationSuggestion {
+  type: string
   resource_id: string
   resource_name: string
-  match_score: number
-  matching_skills: string[]
-  availability: number
-  reasoning: string
+  match_score?: number
+  current_utilization?: number
+  available_hours?: number
+  matching_skills?: string[]
+  recommendation: string
+  priority: string
 }
 
 export default function Resources() {
@@ -165,7 +168,7 @@ export default function Resources() {
       
       const response = await fetch(getApiUrl('/resources/'), {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${session?.access_token || ''}`,
           'Content-Type': 'application/json',
         }
       })
@@ -190,18 +193,20 @@ export default function Resources() {
       const response = await fetch(getApiUrl('/ai/resource-optimizer'), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${session?.access_token || ''}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          optimization_goals: ['skill_match', 'availability', 'cost_efficiency'],
-          time_horizon_days: 30
-        })
+        body: JSON.stringify({})
       })
       
       if (response.ok) {
         const data = await response.json()
         setOptimizationSuggestions(data.suggestions || [])
+        
+        // Show status message if AI is in mock mode
+        if (data.status === 'ai_unavailable') {
+          console.log('AI Resource Optimizer is in mock mode - configure OPENAI_API_KEY for full functionality')
+        }
       }
     } catch (error) {
       console.error('Failed to fetch optimization suggestions:', error)
@@ -395,11 +400,11 @@ export default function Resources() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <h4 className="font-medium text-gray-900">{suggestion.resource_name}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{suggestion.reasoning}</p>
+                        <p className="text-sm text-gray-600 mt-1">{suggestion.recommendation}</p>
                         <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
-                          <span>Match Score: {(suggestion.match_score * 100).toFixed(0)}%</span>
-                          <span>Available: {suggestion.availability}h/week</span>
-                          <span>Skills: {suggestion.matching_skills.join(', ')}</span>
+                          <span>Match Score: {((suggestion.match_score || 0) * 100).toFixed(0)}%</span>
+                          <span>Available: {suggestion.available_hours || 0}h/week</span>
+                          <span>Skills: {(suggestion.matching_skills || []).join(', ')}</span>
                         </div>
                       </div>
                       <div className="flex space-x-2">

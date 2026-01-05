@@ -12,7 +12,7 @@ import {
   Filter, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Clock, DollarSign,
   RefreshCw, Eye, EyeOff, Maximize2, Minimize2, Download, Settings, Bell
 } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
+import { supabase } from '../../lib/supabase-minimal'
 
 interface Project {
   id: string
@@ -240,7 +240,7 @@ export default function Dashboards() {
     try {
       const response = await fetch(getApiUrl('/projects/'), {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${session?.access_token || ''}`,
           'Content-Type': 'application/json',
         }
       })
@@ -264,7 +264,7 @@ export default function Dashboards() {
       const portfolioParam = filters.portfolio_id !== 'all' ? `?portfolio_id=${filters.portfolio_id}` : ''
       const response = await fetch(getApiUrl(`/portfolio/metrics${portfolioParam}`), {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${session?.access_token || ''}`,
           'Content-Type': 'application/json',
         }
       })
@@ -288,7 +288,7 @@ export default function Dashboards() {
       const portfolioParam = filters.portfolio_id !== 'all' ? `?portfolio_id=${filters.portfolio_id}` : ''
       const response = await fetch(getApiUrl(`/portfolio/kpis${portfolioParam}`), {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${session?.access_token || ''}`,
           'Content-Type': 'application/json',
         }
       })
@@ -310,7 +310,7 @@ export default function Dashboards() {
     try {
       const response = await fetch(getApiUrl('/portfolio/trends?days=30'), {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${session?.access_token || ''}`,
           'Content-Type': 'application/json',
         }
       })
@@ -346,7 +346,7 @@ export default function Dashboards() {
       // Budget alerts
       const budgetResponse = await fetch(getApiUrl('/financial-tracking/budget-alerts?threshold_percentage=80'), {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${session?.access_token || ''}`,
           'Content-Type': 'application/json',
         }
       })

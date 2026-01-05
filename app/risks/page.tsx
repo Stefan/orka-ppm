@@ -189,7 +189,7 @@ export default function Risks() {
       // Fetch projects first to get project names
       const projectsResponse = await fetch(getApiUrl('/projects/'), {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`
+          'Authorization': `Bearer ${session?.access_token || ''}`
         }
       })
       

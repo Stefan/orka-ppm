@@ -156,7 +156,7 @@ export default function Financials() {
     try {
       const response = await fetch(getApiUrl('/projects/'), {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${session?.access_token || ''}`,
           'Content-Type': 'application/json',
         }
       })
@@ -179,7 +179,7 @@ export default function Financials() {
       try {
         const response = await fetch(getApiUrl(`/projects/${project.id}/budget-variance?currency=${selectedCurrency}`), {
           headers: {
-            'Authorization': `Bearer ${session.access_token}`,
+            'Authorization': `Bearer ${session?.access_token || ''}`,
             'Content-Type': 'application/json',
           }
         })
@@ -202,7 +202,7 @@ export default function Financials() {
     try {
       const response = await fetch(getApiUrl('/financial-tracking/budget-alerts?threshold_percentage=80'), {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${session?.access_token || ''}`,
           'Content-Type': 'application/json',
         }
       })
