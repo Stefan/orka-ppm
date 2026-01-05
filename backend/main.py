@@ -89,7 +89,7 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Enhanced CORS configuration for monorepo deployment
+# Enhanced CORS configuration for Render deployment
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[

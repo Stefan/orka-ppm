@@ -1,2 +1,28 @@
+# Deployment
 .vercel
 .env*.local
+
+# Backend
+backend/.env
+backend/venv/
+backend/__pycache__/
+backend/*.log
+
+# Frontend
+frontend/.next/
+frontend/node_modules/
+frontend/.env*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
