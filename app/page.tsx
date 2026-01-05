@@ -37,40 +37,46 @@ function LoginForm() {
     setError(null)
 
     try {
-      // First try Supabase JS SDK
-      const { data, error } = isSignup
-        ? await supabase.auth.signUp({ email, password })
-        : await supabase.auth.signInWithPassword({ email, password })
+      // Use direct authentication as primary method
+      const { directSignUp, directSignIn } = await import('../lib/auth-direct')
       
-      if (error) {
-        console.error('Supabase JS Auth error:', error)
-        throw new Error(`Supabase JS Error: ${error.message}`)
-      } else if (isSignup && data) {
-        setError('Please check your email to confirm your account.')
+      const result = isSignup 
+        ? await directSignUp(email, password)
+        : await directSignIn(email, password)
+      
+      if (result.success) {
+        setError(result.message || (isSignup ? 'Account created successfully!' : 'Login successful!'))
+        
+        // If login was successful, you might want to redirect or update app state
+        if (!isSignup && result.data) {
+          // Handle successful login - could trigger a page refresh or state update
+          setTimeout(() => {
+            window.location.reload()
+          }, 1000)
+        }
+      } else {
+        setError(result.error || 'Authentication failed')
       }
     } catch (err: unknown) {
-      console.error('Supabase JS failed, trying safe fallback:', err)
+      console.error('Direct authentication failed, trying Supabase JS fallback:', err)
       
-      // Import and use safe fallback
+      // Fallback to Supabase JS SDK
       try {
-        const { safeSupabaseSignUp, safeSupabaseSignIn } = await import('../lib/supabase-safe')
+        const { data, error } = isSignup
+          ? await supabase.auth.signUp({ email, password })
+          : await supabase.auth.signInWithPassword({ email, password })
         
-        const result = isSignup 
-          ? await safeSupabaseSignUp(email, password)
-          : await safeSupabaseSignIn(email, password)
-        
-        if (result.error) {
-          setError(`Authentication failed: ${result.error.message}`)
+        if (error) {
+          setError(`Fallback auth error: ${error.message}`)
         } else if (isSignup) {
-          setError('Account created successfully! Please check your email to confirm.')
+          setError('Account created via fallback! Please check your email.')
         } else {
-          setError('Login successful! Redirecting...')
-          // Handle successful login - you might want to redirect or update state
+          setError('Login successful via fallback!')
         }
       } catch (fallbackError: unknown) {
         const fallbackMessage = fallbackError instanceof Error ? fallbackError.message : 'Unknown error'
         const originalMessage = err instanceof Error ? err.message : 'Unknown error'
-        setError(`Both authentication methods failed. Original: ${originalMessage}. Fallback: ${fallbackMessage}`)
+        setError(`All authentication methods failed. Direct: ${originalMessage}. Fallback: ${fallbackMessage}`)
       }
     }
     

@@ -1,8 +1,17 @@
 // Environment variables validation and fallbacks
 function cleanEnvVar(value: string | undefined): string {
   if (!value) return '';
-  // Remove quotes and trim whitespace
-  return value.replace(/^["']|["']$/g, '').trim();
+  // Remove quotes, trim whitespace, and remove any invisible characters
+  return value.replace(/^["']|["']$/g, '').trim().replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+}
+
+function validateUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' && parsed.hostname.length > 0;
+  } catch {
+    return false;
+  }
 }
 
 export const env = {
@@ -32,22 +41,14 @@ export function validateEnv() {
   }
 
   // Validate URL formats
-  if (env.NEXT_PUBLIC_SUPABASE_URL) {
-    try {
-      new URL(env.NEXT_PUBLIC_SUPABASE_URL);
-    } catch (error) {
-      console.error('Invalid NEXT_PUBLIC_SUPABASE_URL format:', env.NEXT_PUBLIC_SUPABASE_URL);
-      throw new Error(`Invalid NEXT_PUBLIC_SUPABASE_URL format: ${env.NEXT_PUBLIC_SUPABASE_URL}`);
-    }
+  if (env.NEXT_PUBLIC_SUPABASE_URL && !validateUrl(env.NEXT_PUBLIC_SUPABASE_URL)) {
+    console.error('Invalid NEXT_PUBLIC_SUPABASE_URL format:', env.NEXT_PUBLIC_SUPABASE_URL);
+    throw new Error(`Invalid NEXT_PUBLIC_SUPABASE_URL format: ${env.NEXT_PUBLIC_SUPABASE_URL}`);
   }
 
-  if (env.NEXT_PUBLIC_API_URL) {
-    try {
-      new URL(env.NEXT_PUBLIC_API_URL);
-    } catch (error) {
-      console.error('Invalid NEXT_PUBLIC_API_URL format:', env.NEXT_PUBLIC_API_URL);
-      throw new Error(`Invalid NEXT_PUBLIC_API_URL format: ${env.NEXT_PUBLIC_API_URL}`);
-    }
+  if (env.NEXT_PUBLIC_API_URL && !validateUrl(env.NEXT_PUBLIC_API_URL)) {
+    console.error('Invalid NEXT_PUBLIC_API_URL format:', env.NEXT_PUBLIC_API_URL);
+    throw new Error(`Invalid NEXT_PUBLIC_API_URL format: ${env.NEXT_PUBLIC_API_URL}`);
   }
   
   return env;

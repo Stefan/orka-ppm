@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { env } from '../lib/env'
-import { testSupabaseAuth, testSupabaseLogin } from '../lib/auth-test'
-import { testSupabaseConnection, safeSupabaseSignUp } from '../lib/supabase-safe'
+import { directSignUp, testConnection } from '../lib/auth-direct'
 
 export default function AuthDebugger() {
   const [debugInfo, setDebugInfo] = useState<string>('')
@@ -53,43 +52,31 @@ export default function AuthDebugger() {
     }
   }
 
-  const testConnection = async () => {
+  const testDirectConnection = async () => {
     try {
-      setTestResult('Testing Supabase connection...')
+      setTestResult('Testing direct connection...')
       
-      const result = await testSupabaseConnection()
-      setTestResult(`Connection test: ${result.success ? 'SUCCESS' : 'FAILED'}\nStatus: ${result.status}\nMessage: ${result.message}\nURL: ${result.url}`)
+      const result = await testConnection()
+      setTestResult(`Direct connection: ${result.success ? 'SUCCESS' : 'FAILED'}\nMessage: ${result.message}\nData: ${JSON.stringify(result.data, null, 2)}`)
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error'
-      setTestResult(`Connection test error: ${errorMessage}`)
-    }
-  }
-
-  const testSafeAuth = async () => {
-    try {
-      setTestResult('Testing safe authentication...')
-      
-      const result = await safeSupabaseSignUp(testEmail, testPassword)
-      if (result.error) {
-        setTestResult(`Safe auth failed: ${result.error.message}`)
-      } else {
-        setTestResult(`Safe auth successful: ${JSON.stringify(result.data, null, 2)}`)
-      }
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error'
-      setTestResult(`Safe auth error: ${errorMessage}`)
+      setTestResult(`Direct connection error: ${errorMessage}`)
     }
   }
 
   const testDirectAuth = async () => {
     try {
-      setTestResult('Testing direct API authentication...')
+      setTestResult('Testing direct authentication...')
       
-      const result = await testSupabaseAuth(testEmail, testPassword)
-      setTestResult(`Direct API test successful: ${JSON.stringify(result, null, 2)}`)
+      const result = await directSignUp(testEmail, testPassword)
+      if (result.success) {
+        setTestResult(`Direct auth successful: ${result.message}\nData: ${JSON.stringify(result.data, null, 2)}`)
+      } else {
+        setTestResult(`Direct auth failed: ${result.error}`)
+      }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error'
-      setTestResult(`Direct API test failed: ${errorMessage}`)
+      setTestResult(`Direct auth error: ${errorMessage}`)
     }
   }
 
@@ -115,7 +102,7 @@ export default function AuthDebugger() {
         </button>
         
         <button
-          onClick={testConnection}
+          onClick={testDirectConnection}
           className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
         >
           🌐 Test Connection
@@ -129,10 +116,10 @@ export default function AuthDebugger() {
         </button>
 
         <button
-          onClick={testSafeAuth}
+          onClick={testDirectAuth}
           className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
         >
-          🛡️ Test Safe Auth
+          🛡️ Test Direct Auth
         </button>
       </div>
 
