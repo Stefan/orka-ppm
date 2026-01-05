@@ -93,8 +93,8 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://ppm-pearl.vercel.app",
-        "https://orka-ppm.vercel.app", 
+        "https://orka-ppm.vercel.app",
+        "https://ppm-pearl.vercel.app", 
         "https://orka-*.vercel.app",  # Allow all Vercel preview deployments
         "http://localhost:3000",
         "http://127.0.0.1:3000",
