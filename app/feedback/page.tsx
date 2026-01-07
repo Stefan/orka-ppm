@@ -1,7 +1,7 @@
 'use client'
 
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { useState, useEffect } from 'react'
 import { 
   MessageSquare, Plus, ThumbsUp, ThumbsDown, Bug, Lightbulb, 
   Filter, Search, Bell, CheckCircle, Clock, AlertCircle, 
@@ -388,14 +388,15 @@ export default function Feedback() {
         {activeTab === 'features' && (
           <div className="space-y-6">
             {/* Filters */}
-            <div className="bg-white p-4 rounded-lg border border-gray-200">
+            <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Filter Feature Requests</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                   <select
                     value={featureFilters.status}
                     onChange={(e) => setFeatureFilters(prev => ({ ...prev, status: e.target.value }))}
-                    className="w-full p-2 border border-gray-300 rounded-md"
+                    className="w-full"
                   >
                     <option value="">All Statuses</option>
                     <option value="submitted">Submitted</option>
@@ -411,19 +412,19 @@ export default function Feedback() {
                   <select
                     value={featureFilters.priority}
                     onChange={(e) => setFeatureFilters(prev => ({ ...prev, priority: e.target.value }))}
-                    className="w-full p-2 border border-gray-300 rounded-md"
+                    className="w-full"
                   >
                     <option value="">All Priorities</option>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
+                    <option value="low">Low Priority</option>
+                    <option value="medium">Medium Priority</option>
+                    <option value="high">High Priority</option>
                   </select>
                 </div>
                 
                 <div className="flex items-end">
                   <button
                     onClick={fetchFeatures}
-                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
                   >
                     Apply Filters
                   </button>
@@ -504,14 +505,15 @@ export default function Feedback() {
         {activeTab === 'bugs' && (
           <div className="space-y-6">
             {/* Filters */}
-            <div className="bg-white p-4 rounded-lg border border-gray-200">
+            <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Filter Bug Reports</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                   <select
                     value={bugFilters.status}
                     onChange={(e) => setBugFilters(prev => ({ ...prev, status: e.target.value }))}
-                    className="w-full p-2 border border-gray-300 rounded-md"
+                    className="w-full"
                   >
                     <option value="">All Statuses</option>
                     <option value="submitted">Submitted</option>
@@ -527,20 +529,20 @@ export default function Feedback() {
                   <select
                     value={bugFilters.priority}
                     onChange={(e) => setBugFilters(prev => ({ ...prev, priority: e.target.value }))}
-                    className="w-full p-2 border border-gray-300 rounded-md"
+                    className="w-full"
                   >
                     <option value="">All Priorities</option>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                    <option value="critical">Critical</option>
+                    <option value="low">Low Priority</option>
+                    <option value="medium">Medium Priority</option>
+                    <option value="high">High Priority</option>
+                    <option value="critical">Critical Priority</option>
                   </select>
                 </div>
                 
                 <div className="flex items-end">
                   <button
                     onClick={fetchBugs}
-                    className="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                    className="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors"
                   >
                     Apply Filters
                   </button>
@@ -606,38 +608,42 @@ export default function Feedback() {
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 required">Feature Title</label>
                   <input
                     type="text"
                     value={featureForm.title}
                     onChange={(e) => setFeatureForm(prev => ({ ...prev, title: e.target.value }))}
-                    className="w-full p-3 border border-gray-300 rounded-md"
-                    placeholder="Brief description of the feature"
+                    className="input-field w-full"
+                    placeholder="Brief description of the feature you'd like to see"
+                    required
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 required">Detailed Description</label>
                   <textarea
                     value={featureForm.description}
                     onChange={(e) => setFeatureForm(prev => ({ ...prev, description: e.target.value }))}
                     rows={4}
-                    className="w-full p-3 border border-gray-300 rounded-md"
-                    placeholder="Detailed description of the feature and why it would be valuable"
+                    className="textarea-field w-full"
+                    placeholder="Explain the feature in detail and why it would be valuable to you and other users"
+                    required
                   />
+                  <p className="text-sm text-gray-500 mt-1">Please be as specific as possible to help us understand your needs</p>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Priority Level</label>
                   <select
                     value={featureForm.priority}
                     onChange={(e) => setFeatureForm(prev => ({ ...prev, priority: e.target.value }))}
-                    className="w-full p-3 border border-gray-300 rounded-md"
+                    className="w-full"
                   >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
+                    <option value="low">Low - Nice to have</option>
+                    <option value="medium">Medium - Would improve workflow</option>
+                    <option value="high">High - Important for productivity</option>
                   </select>
+                  <p className="text-sm text-gray-500 mt-1">How important is this feature to your work?</p>
                 </div>
                 
                 <div className="flex justify-end space-x-3">
@@ -676,25 +682,28 @@ export default function Feedback() {
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 required">Bug Title</label>
                   <input
                     type="text"
                     value={bugForm.title}
                     onChange={(e) => setBugForm(prev => ({ ...prev, title: e.target.value }))}
-                    className="w-full p-3 border border-gray-300 rounded-md"
-                    placeholder="Brief description of the bug"
+                    className="input-field w-full"
+                    placeholder="Brief description of the bug or issue"
+                    required
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 required">Bug Description</label>
                   <textarea
                     value={bugForm.description}
                     onChange={(e) => setBugForm(prev => ({ ...prev, description: e.target.value }))}
                     rows={3}
-                    className="w-full p-3 border border-gray-300 rounded-md"
-                    placeholder="Detailed description of the bug"
+                    className="textarea-field w-full"
+                    placeholder="Describe what went wrong and what you expected to happen"
+                    required
                   />
+                  <p className="text-sm text-gray-500 mt-1">Include any error messages you saw</p>
                 </div>
                 
                 <div>
@@ -703,53 +712,54 @@ export default function Feedback() {
                     value={bugForm.steps_to_reproduce}
                     onChange={(e) => setBugForm(prev => ({ ...prev, steps_to_reproduce: e.target.value }))}
                     rows={3}
-                    className="w-full p-3 border border-gray-300 rounded-md"
-                    placeholder="1. Go to...\n2. Click on...\n3. See error"
+                    className="textarea-field w-full"
+                    placeholder="1. Go to...&#10;2. Click on...&#10;3. Bug occurs when..."
                   />
+                  <p className="text-sm text-gray-500 mt-1">Help us reproduce the issue by listing the exact steps</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Priority Level</label>
                     <select
                       value={bugForm.priority}
                       onChange={(e) => setBugForm(prev => ({ ...prev, priority: e.target.value }))}
-                      className="w-full p-3 border border-gray-300 rounded-md"
+                      className="w-full"
                     >
-                      <option value="low">Low</option>
-                      <option value="medium">Medium</option>
-                      <option value="high">High</option>
-                      <option value="critical">Critical</option>
+                      <option value="low">Low - Minor inconvenience</option>
+                      <option value="medium">Medium - Affects workflow</option>
+                      <option value="high">High - Blocks important tasks</option>
+                      <option value="critical">Critical - System unusable</option>
                     </select>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Severity</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Severity Level</label>
                     <select
                       value={bugForm.severity}
                       onChange={(e) => setBugForm(prev => ({ ...prev, severity: e.target.value }))}
-                      className="w-full p-3 border border-gray-300 rounded-md"
+                      className="w-full"
                     >
-                      <option value="minor">Minor</option>
-                      <option value="major">Major</option>
-                      <option value="critical">Critical</option>
-                      <option value="blocker">Blocker</option>
+                      <option value="minor">Minor - Small visual issue</option>
+                      <option value="major">Major - Feature not working</option>
+                      <option value="critical">Critical - Data loss risk</option>
+                      <option value="blocker">Blocker - Cannot continue</option>
                     </select>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Bug Category</label>
                     <select
                       value={bugForm.category}
                       onChange={(e) => setBugForm(prev => ({ ...prev, category: e.target.value }))}
-                      className="w-full p-3 border border-gray-300 rounded-md"
+                      className="w-full"
                     >
-                      <option value="ui">UI</option>
-                      <option value="functionality">Functionality</option>
-                      <option value="performance">Performance</option>
-                      <option value="security">Security</option>
-                      <option value="data">Data</option>
-                      <option value="integration">Integration</option>
+                      <option value="ui">User Interface</option>
+                      <option value="functionality">Core Functionality</option>
+                      <option value="performance">Performance Issue</option>
+                      <option value="security">Security Concern</option>
+                      <option value="data">Data Problem</option>
+                      <option value="integration">Integration Issue</option>
                     </select>
                   </div>
                 </div>

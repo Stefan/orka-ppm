@@ -1,7 +1,7 @@
 'use client'
 
+import React, { useEffect, useState, useMemo } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { useEffect, useState, useMemo } from 'react'
 import AppLayout from '../../components/AppLayout'
 import { getApiUrl } from '../../lib/api'
 import { 
@@ -304,15 +304,18 @@ export default function UltraFastDashboard() {
                   <div 
                     className="bg-green-500" 
                     style={{ width: `${healthPercentages.healthy}%` }}
-                  ></div>
+                  >
+                  </div>
                   <div 
                     className="bg-yellow-500" 
                     style={{ width: `${healthPercentages.atRisk}%` }}
-                  ></div>
+                  >
+                  </div>
                   <div 
                     className="bg-red-500" 
                     style={{ width: `${healthPercentages.critical}%` }}
-                  ></div>
+                  >
+                  </div>
                 </div>
               </div>
             </div>
@@ -356,7 +359,9 @@ export default function UltraFastDashboard() {
                       <div className={`w-3 h-3 rounded-full ${
                         project.health === 'green' ? 'bg-green-500' :
                         project.health === 'yellow' ? 'bg-yellow-500' : 'bg-red-500'
-                      }`}></div>
+                      }`}
+                      >
+                      </div>
                       <div>
                         <h4 className="text-sm font-medium text-gray-900">{project.name}</h4>
                         <p className="text-sm text-gray-500 capitalize">{project.status.replace('-', ' ')}</p>

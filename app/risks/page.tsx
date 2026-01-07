@@ -1,7 +1,7 @@
 'use client'
 
+import React, { useEffect, useState, useMemo } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { useEffect, useState, useMemo } from 'react'
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
   PieChart as RechartsPieChart, Pie, Cell, ScatterChart, Scatter, LineChart, Line, Area, AreaChart,
@@ -539,7 +539,7 @@ export default function Risks() {
                 </div>
               )}
             </div>
-            <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
+            <div className="flex items-center space-x-4 mt-2 text-sm text-gray-700">
               {metrics && (
                 <>
                   <span>Total Risks: {metrics.total_risks}</span>
@@ -618,7 +618,8 @@ export default function Risks() {
                       alert.alert_type === 'new_high_risk' ? 'bg-red-100 text-red-800' : 
                       alert.alert_type === 'escalated' ? 'bg-orange-100 text-orange-800' :
                       'bg-yellow-100 text-yellow-800'
-                    }`}>
+                    }`}
+                    >
                       {alert.alert_type.replace('_', ' ')}
                     </div>
                   </div>
@@ -641,7 +642,7 @@ export default function Risks() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Search risks..."
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="input-field pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -721,7 +722,7 @@ export default function Risks() {
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Risks</p>
+                <p className="text-sm font-medium text-gray-700">Total Risks</p>
                 <p className="text-2xl font-bold text-blue-600">
                   {metrics?.total_risks || 0}
                 </p>
@@ -736,7 +737,7 @@ export default function Risks() {
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">High Risk</p>
+                <p className="text-sm font-medium text-gray-700">High Risk</p>
                 <p className="text-2xl font-bold text-red-600">
                   {metrics?.high_risk_count || 0}
                 </p>
@@ -751,7 +752,7 @@ export default function Risks() {
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Medium Risk</p>
+                <p className="text-sm font-medium text-gray-700">Medium Risk</p>
                 <p className="text-2xl font-bold text-yellow-600">
                   {metrics?.medium_risk_count || 0}
                 </p>
@@ -766,7 +767,7 @@ export default function Risks() {
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Avg Risk Score</p>
+                <p className="text-sm font-medium text-gray-700">Avg Risk Score</p>
                 <p className={`text-2xl font-bold ${getRiskLevelColor(metrics?.average_risk_score || 0)}`}>
                   {((metrics?.average_risk_score || 0) * 100).toFixed(0)}%
                 </p>
@@ -1041,7 +1042,8 @@ export default function Risks() {
                 } catch (error) {
                   alert(error instanceof Error ? error.message : 'Failed to create risk')
                 }
-              }} className="space-y-4">
+              }} className="space-y-4"
+              >
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
                   <input
@@ -1101,7 +1103,7 @@ export default function Risks() {
                       min="0"
                       max="100"
                       defaultValue="50"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="input-field w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                   
@@ -1114,7 +1116,7 @@ export default function Risks() {
                       min="0"
                       max="100"
                       defaultValue="50"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="input-field w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -1125,7 +1127,7 @@ export default function Risks() {
                     name="mitigation"
                     rows={2}
                     placeholder="Describe how this risk will be mitigated..."
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="textarea-field p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 
@@ -1135,7 +1137,7 @@ export default function Risks() {
                     type="text"
                     name="owner"
                     placeholder="Risk owner name"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="input-field p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 

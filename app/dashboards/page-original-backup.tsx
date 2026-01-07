@@ -1,7 +1,7 @@
 'use client'
 
+import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { useEffect, useState, useMemo, useCallback } from 'react'
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line, Area, AreaChart, ComposedChart
@@ -867,7 +867,8 @@ export default function Dashboards() {
                           project.status === 'on-hold' ? 'bg-yellow-100 text-yellow-800' :
                           project.status === 'cancelled' ? 'bg-red-100 text-red-800' :
                           'bg-gray-100 text-gray-800'
-                        }`}>
+                        }`}
+                        >
                           {project.status.charAt(0).toUpperCase() + project.status.slice(1).replace('-', ' ')}
                         </span>
                       </td>
@@ -877,7 +878,9 @@ export default function Dashboards() {
                             project.health === 'green' ? 'bg-green-500' :
                             project.health === 'yellow' ? 'bg-yellow-500' :
                             'bg-red-500'
-                          }`}></div>
+                          }`}
+                          >
+                          </div>
                           <span className="text-sm text-gray-900 capitalize">{project.health}</span>
                         </div>
                       </td>

@@ -1,8 +1,8 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import { supabase, ENV_CONFIG } from '../../lib/supabase-minimal'
-import { Session, User, AuthError } from '@supabase/supabase-js'
+import type { Session, User, AuthError } from '@supabase/supabase-js'
 
 interface AuthContextType {
   session: Session | null

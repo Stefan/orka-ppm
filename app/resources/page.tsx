@@ -1,7 +1,7 @@
 'use client'
 
+import React, { useEffect, useState, useMemo } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { useEffect, useState, useMemo } from 'react'
 import { 
   Users, Plus, Search, Filter, TrendingUp, AlertCircle, Eye, Settings,
   BarChart3, PieChart, Calendar, Clock, DollarSign, Target, Zap,
@@ -404,46 +404,47 @@ export default function Resources() {
 
   return (
     <AppLayout>
-      <div className="p-8 space-y-6">
+      <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
         {/* Enhanced Header */}
-        <div className="flex justify-between items-start">
-          <div>
-            <div className="flex items-center space-x-4">
-              <h1 className="text-3xl font-bold text-gray-900">Resource Management</h1>
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start space-y-4 lg:space-y-0">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">Resource Management</h1>
               {analyticsData.overallocatedResources > 0 && (
-                <div className="flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
-                  <AlertCircle className="h-4 w-4 mr-1" />
-                  {analyticsData.overallocatedResources} Overallocated
+                <div className="flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium w-fit">
+                  <AlertCircle className="h-4 w-4 mr-1 flex-shrink-0" />
+                  <span className="whitespace-nowrap">{analyticsData.overallocatedResources} Overallocated</span>
                 </div>
               )}
               {autoRefresh && (
-                <div className="flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                  <RefreshCw className="h-4 w-4 mr-1 animate-spin" />
-                  Auto-refresh
+                <div className="flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium w-fit">
+                  <RefreshCw className="h-4 w-4 mr-1 animate-spin flex-shrink-0" />
+                  <span className="whitespace-nowrap">Auto-refresh</span>
                 </div>
               )}
             </div>
-            <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
-              <span>{filteredResources.length} of {resources.length} resources</span>
-              <span>Avg. utilization: {analyticsData.averageUtilization.toFixed(1)}%</span>
-              <span>{analyticsData.availableResources} available for new work</span>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-sm text-gray-700">
+              <span className="whitespace-nowrap">{filteredResources.length} of {resources.length} resources</span>
+              <span className="whitespace-nowrap">Avg. utilization: {analyticsData.averageUtilization.toFixed(1)}%</span>
+              <span className="whitespace-nowrap">{analyticsData.availableResources} available for new work</span>
               {lastRefresh && (
-                <span>Last updated: {lastRefresh.toLocaleTimeString()}</span>
+                <span className="whitespace-nowrap">Last updated: {lastRefresh.toLocaleTimeString()}</span>
               )}
             </div>
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setAutoRefresh(!autoRefresh)}
-              className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+              className={`flex items-center px-3 py-2 rounded-lg transition-colors text-sm ${
                 autoRefresh 
                   ? 'bg-green-100 text-green-700 hover:bg-green-200' 
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              <RefreshCw className={`h-4 w-4 mr-2 ${autoRefresh ? 'animate-spin' : ''}`} />
-              {autoRefresh ? 'Auto-refresh On' : 'Auto-refresh Off'}
+              <RefreshCw className={`h-4 w-4 mr-2 flex-shrink-0 ${autoRefresh ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">{autoRefresh ? 'Auto-refresh On' : 'Auto-refresh Off'}</span>
+              <span className="sm:hidden">Auto</span>
             </button>
             
             <button
@@ -451,20 +452,22 @@ export default function Resources() {
                 fetchResources()
                 if (showOptimization) fetchOptimizationSuggestions()
               }}
-              className="flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+              className="flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm"
             >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
+              <RefreshCw className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="hidden sm:inline">Refresh</span>
             </button>
             
             <button
               onClick={() => setViewMode(viewMode === 'cards' ? 'table' : viewMode === 'table' ? 'heatmap' : 'cards')}
-              className="flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+              className="flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm"
             >
-              {viewMode === 'cards' ? <BarChart3 className="h-4 w-4 mr-2" /> : 
-               viewMode === 'table' ? <PieChart className="h-4 w-4 mr-2" /> : 
-               <Users className="h-4 w-4 mr-2" />}
-              {viewMode === 'cards' ? 'Table View' : viewMode === 'table' ? 'Heatmap' : 'Cards'}
+              {viewMode === 'cards' ? <BarChart3 className="h-4 w-4 mr-2 flex-shrink-0" /> : 
+               viewMode === 'table' ? <PieChart className="h-4 w-4 mr-2 flex-shrink-0" /> : 
+               <Users className="h-4 w-4 mr-2 flex-shrink-0" />}
+              <span className="hidden sm:inline">
+                {viewMode === 'cards' ? 'Table View' : viewMode === 'table' ? 'Heatmap' : 'Cards'}
+              </span>
             </button>
             
             <button
@@ -472,77 +475,79 @@ export default function Resources() {
                 setShowOptimization(!showOptimization)
                 if (!showOptimization) fetchOptimizationSuggestions()
               }}
-              className="flex items-center px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200"
+              className="flex items-center px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 text-sm"
             >
-              <Zap className="h-4 w-4 mr-2" />
-              AI Optimize
+              <Zap className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="hidden sm:inline">AI Optimize</span>
+              <span className="sm:hidden">AI</span>
             </button>
             
             <button
               onClick={exportResourceData}
-              className="flex items-center px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200"
+              className="flex items-center px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 text-sm"
             >
-              <Download className="h-4 w-4 mr-2" />
-              Export
+              <Download className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="hidden sm:inline">Export</span>
             </button>
             
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
             >
-              <Filter className="h-4 w-4 mr-2" />
-              Filters
+              <Filter className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="hidden sm:inline">Filters</span>
             </button>
             
             <button 
               onClick={() => setShowAddModal(true)}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
             >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Resource
+              <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="hidden sm:inline">Add Resource</span>
+              <span className="sm:hidden">Add</span>
             </button>
           </div>
         </div>
 
         {/* Analytics Dashboard */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Resources</p>
-                <p className="text-2xl font-bold text-blue-600">{analyticsData.totalResources}</p>
+                <p className="text-sm font-medium text-gray-700">Total Resources</p>
+                <p className="text-xl sm:text-2xl font-bold text-blue-600">{analyticsData.totalResources}</p>
               </div>
-              <Users className="h-8 w-8 text-blue-600" />
+              <Users className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Avg. Utilization</p>
-                <p className="text-2xl font-bold text-green-600">{analyticsData.averageUtilization.toFixed(1)}%</p>
+                <p className="text-sm font-medium text-gray-700">Avg. Utilization</p>
+                <p className="text-xl sm:text-2xl font-bold text-green-600">{analyticsData.averageUtilization.toFixed(1)}%</p>
               </div>
-              <TrendingUp className="h-8 w-8 text-green-600" />
+              <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 flex-shrink-0" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Available</p>
-                <p className="text-2xl font-bold text-purple-600">{analyticsData.availableResources}</p>
+                <p className="text-sm font-medium text-gray-700">Available</p>
+                <p className="text-xl sm:text-2xl font-bold text-purple-600">{analyticsData.availableResources}</p>
               </div>
-              <Target className="h-8 w-8 text-purple-600" />
+              <Target className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600 flex-shrink-0" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Overallocated</p>
-                <p className="text-2xl font-bold text-red-600">{analyticsData.overallocatedResources}</p>
+                <p className="text-sm font-medium text-gray-700">Overallocated</p>
+                <p className="text-xl sm:text-2xl font-bold text-red-600">{analyticsData.overallocatedResources}</p>
               </div>
-              <AlertCircle className="h-8 w-8 text-red-600" />
+              <AlertCircle className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 flex-shrink-0" />
             </div>
           </div>
         </div>
@@ -572,7 +577,8 @@ export default function Resources() {
                 {optimizationSuggestions.slice(0, 5).map((suggestion, index) => (
                   <div key={index} className={`bg-white p-4 rounded-lg border-2 ${
                     suggestion.conflict_detected ? 'border-red-300 bg-red-50' : 'border-purple-200'
-                  }`}>
+                  }`}
+                  >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
@@ -581,7 +587,8 @@ export default function Resources() {
                             suggestion.priority === 'high' ? 'bg-red-100 text-red-800' :
                             suggestion.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
                             'bg-green-100 text-green-800'
-                          }`}>
+                          }`}
+                          >
                             {suggestion.priority} priority
                           </span>
                           {suggestion.conflict_detected && (
@@ -715,8 +722,8 @@ export default function Resources() {
                     type="text"
                     value={filters.search}
                     onChange={(e) => handleFilterChange('search', e.target.value)}
-                    placeholder="Name or email..."
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Name oder E-Mail..."
+                    className="input-field w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -728,7 +735,7 @@ export default function Resources() {
                   onChange={(e) => handleFilterChange('role', e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="all">All Roles</option>
+                  <option value="all">Alle Rollen</option>
                   {Array.from(new Set(resources.map(r => r.role).filter(Boolean))).map(role => (
                     <option key={role} value={role || ""}>{role}</option>
                   ))}
@@ -742,11 +749,11 @@ export default function Resources() {
                   onChange={(e) => handleFilterChange('availability_status', e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="all">All Statuses</option>
-                  <option value="available">Available</option>
-                  <option value="partially_allocated">Partially Allocated</option>
-                  <option value="mostly_allocated">Mostly Allocated</option>
-                  <option value="fully_allocated">Fully Allocated</option>
+                  <option value="all">Alle Status</option>
+                  <option value="available">Verfügbar</option>
+                  <option value="partially_allocated">Teilweise zugewiesen</option>
+                  <option value="mostly_allocated">Größtenteils zugewiesen</option>
+                  <option value="fully_allocated">Vollständig zugewiesen</option>
                 </select>
               </div>
               
@@ -757,7 +764,7 @@ export default function Resources() {
                   onChange={(e) => handleFilterChange('location', e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="all">All Locations</option>
+                  <option value="all">Alle Standorte</option>
                   {Array.from(new Set(resources.map(r => r.location).filter(Boolean))).map(location => (
                     <option key={location} value={location || ""}>{location}</option>
                   ))}
@@ -771,7 +778,7 @@ export default function Resources() {
                     type="number"
                     value={filters.utilization_range[0]}
                     onChange={(e) => handleFilterChange('utilization_range', [parseInt(e.target.value), filters.utilization_range[1]])}
-                    className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                    className="input-field w-full p-2 border border-gray-300 rounded-md text-sm"
                     min="0"
                     max="200"
                   />
@@ -779,7 +786,7 @@ export default function Resources() {
                     type="number"
                     value={filters.utilization_range[1]}
                     onChange={(e) => handleFilterChange('utilization_range', [filters.utilization_range[0], parseInt(e.target.value)])}
-                    className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                    className="input-field w-full p-2 border border-gray-300 rounded-md text-sm"
                     min="0"
                     max="200"
                   />
@@ -791,7 +798,7 @@ export default function Resources() {
                   onClick={clearFilters}
                   className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
                 >
-                  Clear Filters
+                  Filter löschen
                 </button>
               </div>
             </div>
@@ -865,7 +872,7 @@ export default function Resources() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-900">{resource.name}</h3>
-                    <p className="text-sm text-gray-600">{resource.role || 'No role specified'}</p>
+                    <p className="text-sm text-gray-700">{resource.role || 'No role specified'}</p>
                     <p className="text-sm text-gray-500">{resource.email}</p>
                     {resource.location && (
                       <div className="flex items-center mt-1 text-sm text-gray-500">
@@ -879,13 +886,14 @@ export default function Resources() {
                     resource.availability_status === 'partially_allocated' ? 'bg-yellow-100 text-yellow-800' :
                     resource.availability_status === 'mostly_allocated' ? 'bg-orange-100 text-orange-800' :
                     'bg-red-100 text-red-800'
-                  }`}>
+                  }`}
+                  >
                     {resource.availability_status.replace('_', ' ')}
                   </div>
                 </div>
                 
                 <div className="mt-4">
-                  <div className="flex justify-between text-sm text-gray-600 mb-1">
+                  <div className="flex justify-between text-sm text-gray-700 mb-1">
                     <span>Utilization</span>
                     <span>{resource.utilization_percentage.toFixed(1)}%</span>
                   </div>
@@ -898,30 +906,31 @@ export default function Resources() {
                         'bg-red-500'
                       }`}
                       style={{ width: `${Math.min(100, resource.utilization_percentage)}%` }}
-                    ></div>
+                    >
+                    </div>
                   </div>
                 </div>
 
                 <div className="mt-4 space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Available Hours:</span>
-                    <span className="font-medium">{resource.available_hours.toFixed(1)}h/week</span>
+                    <span className="text-gray-700">Available Hours:</span>
+                    <span className="font-medium text-gray-900">{resource.available_hours.toFixed(1)}h/week</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Current Projects:</span>
-                    <span className="font-medium">{resource.current_projects.length}</span>
+                    <span className="text-gray-700">Current Projects:</span>
+                    <span className="font-medium text-gray-900">{resource.current_projects.length}</span>
                   </div>
                   {resource.hourly_rate && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Hourly Rate:</span>
-                      <span className="font-medium">${resource.hourly_rate}/hr</span>
+                      <span className="text-gray-700">Hourly Rate:</span>
+                      <span className="font-medium text-gray-900">${resource.hourly_rate}/hr</span>
                     </div>
                   )}
                 </div>
 
                 {resource.skills.length > 0 && (
                   <div className="mt-4">
-                    <p className="text-sm text-gray-600 mb-2">Skills:</p>
+                    <p className="text-sm text-gray-700 mb-2">Skills:</p>
                     <div className="flex flex-wrap gap-1">
                       {resource.skills.slice(0, 3).map((skill, index) => (
                         <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
@@ -985,7 +994,8 @@ export default function Resources() {
                                   'bg-red-500'
                                 }`}
                                 style={{ width: `${Math.min(100, resource.utilization_percentage)}%` }}
-                              ></div>
+                              >
+                              </div>
                             </div>
                           </div>
                           <span className="text-sm text-gray-900">{resource.utilization_percentage.toFixed(1)}%</span>
@@ -1017,7 +1027,8 @@ export default function Resources() {
                           resource.availability_status === 'partially_allocated' ? 'bg-yellow-100 text-yellow-800' :
                           resource.availability_status === 'mostly_allocated' ? 'bg-orange-100 text-orange-800' :
                           'bg-red-100 text-red-800'
-                        }`}>
+                        }`}
+                        >
                           {resource.availability_status.replace('_', ' ')}
                         </span>
                       </td>
@@ -1033,7 +1044,7 @@ export default function Resources() {
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Resource Utilization Heatmap</h3>
-              <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <div className="flex items-center space-x-4 text-sm text-gray-700">
                 <span>Total: {filteredResources.length} resources</span>
                 <span>Avg: {analyticsData.averageUtilization.toFixed(1)}%</span>
               </div>
@@ -1062,7 +1073,7 @@ export default function Resources() {
                   >
                     <div className="text-center">
                       <div className="text-sm font-medium text-gray-900 truncate">{resource.name}</div>
-                      <div className="text-xs text-gray-600 truncate">{resource.role || 'Unassigned'}</div>
+                      <div className="text-xs text-gray-700 truncate">{resource.role || 'Unassigned'}</div>
                       
                       {/* Enhanced utilization display */}
                       <div className="mt-2">
@@ -1076,7 +1087,8 @@ export default function Resources() {
                               'bg-red-500'
                             }`}
                             style={{ width: `${Math.min(100, resource.utilization_percentage)}%` }}
-                          ></div>
+                          >
+                          </div>
                         </div>
                       </div>
                       
@@ -1107,7 +1119,9 @@ export default function Resources() {
                       <div className="mt-2">
                         <span className={`inline-block w-2 h-2 rounded-full ${
                           resource.can_take_more_work ? 'bg-green-500' : 'bg-red-500'
-                        }`} title={resource.can_take_more_work ? 'Available for more work' : 'At capacity'}></span>
+                        }`} title={resource.can_take_more_work ? 'Available for more work' : 'At capacity'}
+                        >
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -1197,7 +1211,8 @@ export default function Resources() {
                 } catch (error) {
                   alert(error instanceof Error ? error.message : 'Failed to create resource')
                 }
-              }} className="space-y-4">
+              }} className="space-y-4"
+              >
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
                   <input
@@ -1223,8 +1238,8 @@ export default function Resources() {
                   <input
                     type="text"
                     name="role"
-                    placeholder="e.g., Developer, Designer, Manager"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="z.B. Entwickler, Designer, Manager"
+                    className="input-field w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 
@@ -1237,7 +1252,7 @@ export default function Resources() {
                       defaultValue="40"
                       min="1"
                       max="80"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="input-field w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                   
@@ -1249,7 +1264,7 @@ export default function Resources() {
                       defaultValue="100"
                       min="0"
                       max="100"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="input-field w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -1262,7 +1277,7 @@ export default function Resources() {
                     step="0.01"
                     min="0"
                     placeholder="Optional"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="input-field w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 
@@ -1271,8 +1286,8 @@ export default function Resources() {
                   <input
                     type="text"
                     name="skills"
-                    placeholder="e.g., React, Python, Design (comma-separated)"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="z.B. React, Python, Design (kommagetrennt)"
+                    className="input-field w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 
@@ -1281,8 +1296,8 @@ export default function Resources() {
                   <input
                     type="text"
                     name="location"
-                    placeholder="e.g., New York, Remote"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="z.B. Berlin, Remote"
+                    className="input-field w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 

@@ -1,7 +1,7 @@
 'use client'
 
+import React, { useState } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { useState } from 'react'
 import { MessageCircle, FileText, Download, Loader, Send, Bot, User, AlertTriangle, RefreshCw } from 'lucide-react'
 import AppLayout from '../../components/AppLayout'
 import { getApiUrl } from '../../lib/api'
@@ -46,7 +46,7 @@ export default function Reports() {
     {
       id: '1',
       type: 'assistant',
-      content: 'Hello! I\'m your AI assistant for project portfolio management. I can help you analyze projects, resources, budgets, risks, and generate custom reports. What would you like to know?',
+      content: 'Hallo! Ich bin Ihr KI-Assistent für Projekt-Portfolio-Management. Ich kann Ihnen bei der Analyse von Projekten, Ressourcen, Budgets, Risiken helfen und benutzerdefinierte Berichte erstellen. Was möchten Sie wissen?',
       timestamp: new Date(),
       confidence: 1.0
     }
@@ -73,20 +73,20 @@ export default function Reports() {
 
     if (error instanceof TypeError && error.message.includes('fetch')) {
       errorType = 'network'
-      message = 'Network connection failed. Please check your internet connection.'
+      message = 'Netzwerkverbindung fehlgeschlagen. Bitte überprüfen Sie Ihre Internetverbindung.'
     } else if (statusCode === 401 || statusCode === 403) {
       errorType = 'auth'
-      message = 'Authentication failed. Please refresh the page and try again.'
+      message = 'Authentifizierung fehlgeschlagen. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut.'
       retryable = false
     } else if (statusCode === 408 || statusCode === 504) {
       errorType = 'timeout'
-      message = 'Request timed out. The server is taking too long to respond.'
+      message = 'Anfrage-Zeitüberschreitung. Der Server braucht zu lange zum Antworten.'
     } else if (statusCode && statusCode >= 500) {
       errorType = 'server'
-      message = 'Server error occurred. Our team has been notified.'
+      message = 'Serverfehler aufgetreten. Unser Team wurde benachrichtigt.'
     } else if (statusCode && statusCode >= 400) {
       errorType = 'server'
-      message = 'Request failed. Please check your input and try again.'
+      message = 'Anfrage fehlgeschlagen. Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.'
       retryable = false
     }
 
@@ -133,11 +133,11 @@ export default function Reports() {
 
   const suggestAlternatives = (): string[] => {
     const alternatives = [
-      "Try asking a simpler question",
-      "Check the dashboard for current project status",
-      "Review the financial tracking page for budget information",
-      "Visit the resources page for team allocation details",
-      "Contact support if the issue persists"
+      "Versuchen Sie eine einfachere Frage zu stellen",
+      "Überprüfen Sie das Dashboard für den aktuellen Projektstatus",
+      "Schauen Sie auf der Finanztracking-Seite für Budgetinformationen",
+      "Besuchen Sie die Ressourcen-Seite für Team-Zuweisungsdetails",
+      "Kontaktieren Sie den Support, wenn das Problem weiterhin besteht"
     ]
 
     // Add specific suggestions based on error history
@@ -230,7 +230,7 @@ export default function Reports() {
         const errorMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'assistant',
-          content: `${chatError.message} ${chatError.retryable ? 'You can try again or contact support if the issue persists.' : 'Please contact support for assistance.'}`,
+          content: `${chatError.message} ${chatError.retryable ? 'Sie können es erneut versuchen oder den Support kontaktieren, wenn das Problem weiterhin besteht.' : 'Bitte kontaktieren Sie den Support für Unterstützung.'}`,
           timestamp: new Date(),
           confidence: 0
         }
@@ -279,22 +279,23 @@ export default function Reports() {
     <AppLayout>
       <div className="h-full flex flex-col">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Bot className="w-8 h-8 text-blue-600" />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">AI-Powered Reports</h1>
-                <p className="text-sm text-gray-600">Ask questions about your portfolio, get instant insights</p>
+        <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+            <div className="flex items-center space-x-3 min-w-0">
+              <Bot className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 flex-shrink-0" />
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">AI-Powered Reports</h1>
+                <p className="text-sm text-gray-700 hidden sm:block">Ask questions about your portfolio, get instant insights</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <button
                 onClick={() => setShowReportOptions(!showReportOptions)}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
               >
-                <FileText className="w-4 h-4" />
-                <span>Generate Report</span>
+                <FileText className="w-4 h-4 flex-shrink-0" />
+                <span className="hidden sm:inline">Bericht erstellen</span>
+                <span className="sm:hidden">Bericht</span>
               </button>
             </div>
           </div>
@@ -302,51 +303,53 @@ export default function Reports() {
 
       {/* Report Options Panel */}
       {showReportOptions && (
-        <div className="bg-blue-50 border-b border-blue-200 px-6 py-4">
-          <div className="flex items-center space-x-4">
-            <span className="text-sm font-medium text-blue-900">Report Format:</span>
-            <select
-              value={reportFormat}
-              onChange={(e) => setReportFormat(e.target.value)}
-              className="px-3 py-1 border border-blue-300 rounded text-sm"
-            >
-              <option value="text">Text</option>
-              <option value="markdown">Markdown</option>
-              <option value="json">JSON</option>
-            </select>
-            <button
-              onClick={handleSendMessage}
-              disabled={!currentQuery.trim() || isLoading}
-              className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50"
-            >
-              Generate
-            </button>
-            <button
-              onClick={() => setShowReportOptions(false)}
-              className="text-blue-600 text-sm hover:text-blue-800"
-            >
-              Cancel
-            </button>
+        <div className="bg-blue-50 border-b border-blue-200 px-4 sm:px-6 py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+            <span className="text-sm font-medium text-blue-900">Berichtsformat:</span>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <select
+                value={reportFormat}
+                onChange={(e) => setReportFormat(e.target.value)}
+                className="px-3 py-1 border border-blue-300 rounded text-sm flex-1 sm:flex-none text-gray-900 bg-white"
+              >
+                <option value="text">Text</option>
+                <option value="markdown">Markdown</option>
+                <option value="json">JSON</option>
+              </select>
+              <button
+                onClick={handleSendMessage}
+                disabled={!currentQuery.trim() || isLoading}
+                className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50"
+              >
+                Erstellen
+              </button>
+              <button
+                onClick={() => setShowReportOptions(false)}
+                className="text-blue-600 text-sm hover:text-blue-800"
+              >
+                Abbrechen
+              </button>
+            </div>
           </div>
         </div>
       )}
 
         {/* Error Recovery Panel */}
         {showError && currentError && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-4 mx-6 mb-4">
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 mx-4 sm:mx-6 mb-4">
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <AlertTriangle className="h-5 w-5 text-red-400" />
               </div>
-              <div className="ml-3 flex-1">
+              <div className="ml-3 flex-1 min-w-0">
                 <h3 className="text-sm font-medium text-red-800">
-                  {currentError.errorType === 'network' ? 'Connection Error' :
-                   currentError.errorType === 'auth' ? 'Authentication Error' :
-                   currentError.errorType === 'timeout' ? 'Timeout Error' :
-                   currentError.errorType === 'server' ? 'Server Error' : 'Error'}
+                  {currentError.errorType === 'network' ? 'Verbindungsfehler' :
+                   currentError.errorType === 'auth' ? 'Authentifizierungsfehler' :
+                   currentError.errorType === 'timeout' ? 'Zeitüberschreitung' :
+                   currentError.errorType === 'server' ? 'Serverfehler' : 'Fehler'}
                 </h3>
                 <div className="mt-2 text-sm text-red-700">
-                  <p>{currentError.message}</p>
+                  <p className="break-words">{currentError.message}</p>
                   {errorRecovery.retryCount > 0 && (
                     <p className="mt-1">Retry attempt {errorRecovery.retryCount} of {errorRecovery.maxRetries}</p>
                   )}
@@ -358,25 +361,25 @@ export default function Reports() {
                       disabled={isLoading}
                       className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
                     >
-                      <RefreshCw className={`h-4 w-4 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
-                      Try Again
+                      <RefreshCw className={`h-4 w-4 mr-1 flex-shrink-0 ${isLoading ? 'animate-spin' : ''}`} />
+                      <span>Erneut versuchen</span>
                     </button>
                   )}
                   <button
                     onClick={() => setShowError(false)}
                     className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                   >
-                    Dismiss
+                    Schließen
                   </button>
                 </div>
                 {errorRecovery.retryCount >= errorRecovery.maxRetries && (
                   <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                    <h4 className="text-sm font-medium text-yellow-800 mb-2">Alternative Actions:</h4>
+                    <h4 className="text-sm font-medium text-yellow-800 mb-2">Alternative Aktionen:</h4>
                     <ul className="text-sm text-yellow-700 space-y-1">
                       {suggestAlternatives().map((suggestion, index) => (
                         <li key={index} className="flex items-start">
-                          <span className="mr-2">•</span>
-                          <span>{suggestion}</span>
+                          <span className="mr-2 flex-shrink-0">•</span>
+                          <span className="break-words">{suggestion}</span>
                         </li>
                       ))}
                     </ul>
@@ -388,35 +391,35 @@ export default function Reports() {
         )}
 
         {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-4">
         {messages.map((message) => (
           <div
             key={message.id}
             className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
           >
-            <div className={`max-w-3xl ${message.type === 'user' ? 'order-2' : 'order-1'}`}>
-              <div className="flex items-start space-x-3">
+            <div className={`max-w-full sm:max-w-3xl ${message.type === 'user' ? 'order-2' : 'order-1'}`}>
+              <div className="flex items-start space-x-2 sm:space-x-3">
                 {message.type === 'assistant' && (
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <Bot className="w-4 h-4 text-white" />
+                  <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                    <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
                 )}
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <div
-                    className={`px-4 py-3 rounded-lg ${
+                    className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg ${
                       message.type === 'user'
                         ? 'bg-blue-600 text-white'
                         : 'bg-white border border-gray-200'
                     }`}
                   >
-                    <div className="whitespace-pre-wrap">{message.content}</div>
+                    <div className="whitespace-pre-wrap break-words text-sm sm:text-base text-gray-900">{message.content}</div>
                     
                     {/* Sources and Confidence for Assistant Messages */}
                     {message.type === 'assistant' && (message.sources || message.confidence !== undefined) && (
                       <div className="mt-3 pt-3 border-t border-gray-100">
                         {message.confidence !== undefined && (
                           <div className="flex items-center space-x-2 text-xs">
-                            <span className="text-gray-500">Confidence:</span>
+                            <span className="text-gray-700">Confidence:</span>
                             <span className={`font-medium ${getConfidenceColor(message.confidence)}`}>
                               {Math.round(message.confidence * 100)}%
                             </span>
@@ -424,7 +427,7 @@ export default function Reports() {
                         )}
                         {message.sources && message.sources.length > 0 && (
                           <div className="mt-2">
-                            <span className="text-xs text-gray-500">Sources:</span>
+                            <span className="text-xs text-gray-700">Sources:</span>
                             <div className="flex flex-wrap gap-1 mt-1">
                               {message.sources.map((source, index) => (
                                 <span
@@ -440,13 +443,13 @@ export default function Reports() {
                       </div>
                     )}
                   </div>
-                  <div className="mt-1 text-xs text-gray-500">
+                  <div className="mt-1 text-xs text-gray-600">
                     {formatTimestamp(message.timestamp)}
                   </div>
                 </div>
                 {message.type === 'user' && (
-                  <div className="flex-shrink-0 w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-white" />
+                  <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-gray-600 rounded-full flex items-center justify-center">
+                    <User className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
                 )}
               </div>
@@ -456,14 +459,14 @@ export default function Reports() {
         
         {isLoading && (
           <div className="flex justify-start">
-            <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                <Bot className="w-4 h-4 text-white" />
+            <div className="flex items-start space-x-2 sm:space-x-3">
+              <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
               </div>
-              <div className="bg-white border border-gray-200 rounded-lg px-4 py-3">
+              <div className="bg-white border border-gray-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3">
                 <div className="flex items-center space-x-2">
-                  <Loader className="w-4 h-4 animate-spin text-blue-600" />
-                  <span className="text-gray-600">Analyzing your request...</span>
+                  <Loader className="w-4 h-4 animate-spin text-blue-600 flex-shrink-0" />
+                  <span className="text-gray-700 text-sm sm:text-base">Analysiere Ihre Anfrage...</span>
                 </div>
               </div>
             </div>
@@ -472,44 +475,44 @@ export default function Reports() {
       </div>
 
       {/* Input Area */}
-      <div className="bg-white border-t border-gray-200 px-6 py-4">
-        <div className="flex items-end space-x-4">
+      <div className="bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
+        <div className="flex flex-col sm:flex-row sm:items-end space-y-3 sm:space-y-0 sm:space-x-4">
           <div className="flex-1">
             <textarea
               value={currentQuery}
               onChange={(e) => setCurrentQuery(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask about your projects, resources, budgets, risks, or request a custom report..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              rows={3}
+              placeholder="Fragen Sie nach Ihren Projekten, Ressourcen, Budgets, Risiken oder fordern Sie einen benutzerdefinierten Bericht an..."
+              className="textarea-field w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+              rows={window.innerWidth < 640 ? 2 : 3}
               disabled={isLoading}
             />
           </div>
           <button
             onClick={handleSendMessage}
             disabled={!currentQuery.trim() || isLoading}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+            className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm sm:text-base"
           >
-            <Send className="w-4 h-4" />
-            <span>Send</span>
+            <Send className="w-4 h-4 flex-shrink-0" />
+            <span>Senden</span>
           </button>
         </div>
         
         {/* Quick Examples */}
         <div className="mt-4">
-          <p className="text-xs text-gray-500 mb-2">Try asking:</p>
+          <p className="text-xs text-gray-500 mb-2">Versuchen Sie zu fragen:</p>
           <div className="flex flex-wrap gap-2">
             {[
-              "What's the current status of all projects?",
-              "Which resources are overallocated?",
-              "Show me budget utilization across projects",
-              "Generate a risk assessment report",
-              "What skills are most in demand?"
+              "Wie ist der aktuelle Status aller Projekte?",
+              "Welche Ressourcen sind überbelastet?",
+              "Zeige mir die Budgetnutzung aller Projekte",
+              "Erstelle einen Risikobewertungsbericht",
+              "Welche Fähigkeiten sind am meisten gefragt?"
             ].map((example, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentQuery(example)}
-                className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded hover:bg-gray-200"
+                className="px-2 sm:px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded hover:bg-gray-200 break-words text-left"
                 disabled={isLoading}
               >
                 {example}

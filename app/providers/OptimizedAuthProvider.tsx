@@ -1,8 +1,9 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase-minimal'
-import { Session, User, AuthError } from '@supabase/supabase-js'
+import type { Session, User } from '@supabase/supabase-js'
+import { AuthError } from '@supabase/supabase-js'
 
 interface AuthContextType {
   session: Session | null
@@ -58,9 +59,9 @@ export function OptimizedAuthProvider({ children }: { children: React.ReactNode 
       try {
         // Quick session check with timeout
         const sessionPromise = supabase.auth.getSession()
-        const timeoutPromise = new Promise((_, reject) => 
+        const timeoutPromise = new Promise((_, reject) => {
           setTimeout(() => reject(new Error('Session check timeout')), 5000)
-        )
+        })
         
         const { data: { session }, error } = await Promise.race([
           sessionPromise,

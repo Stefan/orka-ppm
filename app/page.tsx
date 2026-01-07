@@ -1,9 +1,8 @@
 'use client'
 
+import React, { useState } from 'react'
 import { useAuth } from './providers/SupabaseAuthProvider'
 import Sidebar from '../components/Sidebar'
-import { useState } from 'react'
-import React from 'react'
 import { supabase, ENV_CONFIG } from '../lib/supabase-minimal'
 
 export default function Home() {
@@ -195,9 +194,9 @@ function LoginForm() {
         </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleAuth}>
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 required">
                 Email Address
               </label>
               <input
@@ -208,13 +207,13 @@ function LoginForm() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Enter your email"
+                className="mt-2 input-field w-full"
+                placeholder="Enter your email address"
               />
             </div>
             
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 required">
                 Password
               </label>
               <input
@@ -225,9 +224,12 @@ function LoginForm() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Enter your password"
+                className="mt-2 input-field w-full"
+                placeholder={isSignup ? "Create a secure password (min. 6 characters)" : "Enter your password"}
               />
+              {isSignup && (
+                <p className="text-sm text-gray-500 mt-1">Password must be at least 6 characters long</p>
+              )}
             </div>
           </div>
 

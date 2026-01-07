@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase-minimal'
 import { AlertTriangle, CheckCircle, Mail, ArrowLeft } from 'lucide-react'
@@ -52,10 +52,10 @@ export default function ForgotPassword() {
               Check Your Email
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              We've sent a password reset link to <strong>{email}</strong>
+              We&apos;ve sent a password reset link to <strong>{email}</strong>
             </p>
             <p className="mt-2 text-xs text-gray-500">
-              If you don't see the email, check your spam folder.
+              If you don&apos;t see the email, check your spam folder.
             </p>
             <div className="mt-6 space-y-3">
               <button
@@ -91,16 +91,16 @@ export default function ForgotPassword() {
             Forgot Your Password?
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Enter your email address and we'll send you a link to reset your password.
+            Enter your email address and we&apos;ll send you a link to reset your password.
           </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handlePasswordReset}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 required">
               Email Address
             </label>
-            <div className="mt-1">
+            <div className="mt-2">
               <input
                 id="email"
                 name="email"
@@ -109,10 +109,11 @@ export default function ForgotPassword() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Enter your email address"
+                className="input-field w-full"
+                placeholder="Enter the email address for your account"
               />
             </div>
+            <p className="text-sm text-gray-500 mt-2">We&apos;ll send you a secure link to reset your password</p>
           </div>
 
           {error && (

@@ -1,7 +1,7 @@
 'use client'
 
+import React, { useEffect, useState, useMemo, useCallback, Suspense, lazy } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { useEffect, useState, useMemo, useCallback, Suspense, lazy } from 'react'
 import AppLayout from '../../components/AppLayout'
 import { getApiUrl } from '../../lib/api'
 import { 
@@ -197,7 +197,8 @@ export default function DashboardsOptimized() {
                      loadingStage === 'Loading projects...' ? '60%' :
                      loadingStage === 'Loading portfolio data...' ? '90%' : '100%'
             }}
-          ></div>
+          >
+          </div>
         </div>
       </div>
     </AppLayout>
@@ -347,7 +348,8 @@ export default function DashboardsOptimized() {
                 <span className="text-gray-600">Loading charts...</span>
               </div>
             </div>
-          }>
+          }
+          >
             <LazyCharts 
               projects={projects} 
               portfolioMetrics={portfolioMetrics}
@@ -371,7 +373,9 @@ export default function DashboardsOptimized() {
                     <div className={`w-3 h-3 rounded-full ${
                       project.health === 'green' ? 'bg-green-500' :
                       project.health === 'yellow' ? 'bg-yellow-500' : 'bg-red-500'
-                    }`}></div>
+                    }`}
+                    >
+                    </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-900">{project.name}</h4>
                       <p className="text-sm text-gray-500">{project.status}</p>

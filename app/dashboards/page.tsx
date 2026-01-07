@@ -1,13 +1,17 @@
 'use client'
 
+import React, { useEffect, useState, useMemo } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { useEffect, useState, useMemo } from 'react'
 import AppLayout from '../../components/AppLayout'
 import { getApiUrl } from '../../lib/api'
+import VarianceKPIs from './components/VarianceKPIs'
+import VarianceTrends from './components/VarianceTrends'
+import VarianceAlerts from './components/VarianceAlerts'
 import { 
   TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Clock, DollarSign,
   RefreshCw, Eye, Users, BarChart3
 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 interface QuickStats {
   total_projects: number
@@ -37,12 +41,14 @@ interface Project {
 
 export default function UltraFastDashboard() {
   const { session } = useAuth()
+  const router = useRouter()
   const [quickStats, setQuickStats] = useState<QuickStats | null>(null)
   const [kpis, setKPIs] = useState<KPIs | null>(null)
   const [recentProjects, setRecentProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+  const [varianceAlertCount, setVarianceAlertCount] = useState(0)
 
   // Ultra-fast loading - with fallback to existing endpoints
   useEffect(() => {
@@ -250,26 +256,32 @@ export default function UltraFastDashboard() {
 
   return (
     <AppLayout>
-      <div className="p-8 space-y-6">
+      <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
         {/* Ultra-fast Header */}
-        <div className="flex justify-between items-start">
-          <div>
-            <div className="flex items-center space-x-4">
-              <h1 className="text-3xl font-bold text-gray-900">Portfolio Dashboard</h1>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">Portfolio Dashboard</h1>
               {quickStats && quickStats.critical_alerts > 0 && (
-                <div className="flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
-                  <AlertTriangle className="h-4 w-4 mr-1" />
-                  {quickStats.critical_alerts} Critical
+                <div className="flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium w-fit">
+                  <AlertTriangle className="h-4 w-4 mr-1 flex-shrink-0" />
+                  <span className="whitespace-nowrap">{quickStats.critical_alerts} Critical</span>
+                </div>
+              )}
+              {varianceAlertCount > 0 && (
+                <div className="flex items-center px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium w-fit">
+                  <DollarSign className="h-4 w-4 mr-1 flex-shrink-0" />
+                  <span className="whitespace-nowrap">{varianceAlertCount} Budget Alert{varianceAlertCount !== 1 ? 's' : ''}</span>
                 </div>
               )}
             </div>
-            <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
-              {quickStats && <span>{quickStats.total_projects} projects</span>}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-sm text-gray-600">
+              {quickStats && <span className="whitespace-nowrap">{quickStats.total_projects} projects</span>}
               {lastUpdated && (
-                <span>Updated: {lastUpdated.toLocaleTimeString()}</span>
+                <span className="whitespace-nowrap">Updated: {lastUpdated.toLocaleTimeString()}</span>
               )}
-              <span className="flex items-center text-green-600">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+              <span className="flex items-center text-green-600 whitespace-nowrap">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-1 flex-shrink-0"></div>
                 Live
               </span>
             </div>
@@ -277,19 +289,19 @@ export default function UltraFastDashboard() {
           
           <button
             onClick={quickRefresh}
-            className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center justify-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full sm:w-auto"
           >
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
+            <RefreshCw className="h-4 w-4 mr-2 flex-shrink-0" />
+            <span>Refresh</span>
           </button>
         </div>
 
         {/* Error Banner (if any) */}
         {error && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-            <div className="flex items-center">
-              <AlertTriangle className="h-5 w-5 text-yellow-400 mr-2" />
-              <span className="text-sm text-yellow-800">
+            <div className="flex items-start">
+              <AlertTriangle className="h-5 w-5 text-yellow-400 mr-2 flex-shrink-0 mt-0.5" />
+              <span className="text-sm text-yellow-800 break-words">
                 Using fallback data - {error}
               </span>
             </div>
@@ -298,84 +310,87 @@ export default function UltraFastDashboard() {
 
         {/* Ultra-fast KPI Cards */}
         {kpis && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Success Rate</p>
-                  <p className="text-2xl font-bold text-green-600">{kpis.project_success_rate}%</p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-600">{kpis.project_success_rate}%</p>
                 </div>
-                <CheckCircle className="h-8 w-8 text-green-600" />
+                <CheckCircle className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
               </div>
             </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Budget Performance</p>
-                  <p className="text-2xl font-bold text-blue-600">{kpis.budget_performance}%</p>
+                  <p className="text-xl sm:text-2xl font-bold text-blue-600">{kpis.budget_performance}%</p>
                 </div>
-                <DollarSign className="h-8 w-8 text-blue-600" />
+                <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
               </div>
             </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Timeline Performance</p>
-                  <p className="text-2xl font-bold text-purple-600">{kpis.timeline_performance}%</p>
+                  <p className="text-xl sm:text-2xl font-bold text-purple-600">{kpis.timeline_performance}%</p>
                 </div>
-                <Clock className="h-8 w-8 text-purple-600" />
+                <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600" />
               </div>
             </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Active Projects</p>
-                  <p className="text-2xl font-bold text-indigo-600">{kpis.active_projects_ratio}%</p>
+                  <p className="text-xl sm:text-2xl font-bold text-indigo-600">{kpis.active_projects_ratio}%</p>
                 </div>
-                <TrendingUp className="h-8 w-8 text-indigo-600" />
+                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-600" />
               </div>
             </div>
           </div>
         )}
 
+        {/* Variance KPIs Integration */}
+        <VarianceKPIs session={session} selectedCurrency="USD" />
+
         {/* Quick Health Overview */}
         {quickStats && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
             {/* Health Distribution */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Project Health</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                  <div className="flex items-center min-w-0">
+                    <div className="w-3 h-3 bg-green-500 rounded-full mr-3 flex-shrink-0"></div>
                     <span className="text-sm font-medium text-gray-700">Healthy</span>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 flex-shrink-0">
                     <span className="text-sm font-bold text-gray-900">{quickStats.health_distribution.green}</span>
                     <span className="text-xs text-gray-500">({healthPercentages.healthy}%)</span>
                   </div>
                 </div>
                 
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
+                  <div className="flex items-center min-w-0">
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full mr-3 flex-shrink-0"></div>
                     <span className="text-sm font-medium text-gray-700">At Risk</span>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 flex-shrink-0">
                     <span className="text-sm font-bold text-gray-900">{quickStats.health_distribution.yellow}</span>
                     <span className="text-xs text-gray-500">({healthPercentages.atRisk}%)</span>
                   </div>
                 </div>
                 
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-red-500 rounded-full mr-3"></div>
+                  <div className="flex items-center min-w-0">
+                    <div className="w-3 h-3 bg-red-500 rounded-full mr-3 flex-shrink-0"></div>
                     <span className="text-sm font-medium text-gray-700">Critical</span>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 flex-shrink-0">
                     <span className="text-sm font-bold text-gray-900">{quickStats.health_distribution.red}</span>
                     <span className="text-xs text-gray-500">({healthPercentages.critical}%)</span>
                   </div>
@@ -388,37 +403,40 @@ export default function UltraFastDashboard() {
                   <div 
                     className="bg-green-500" 
                     style={{ width: `${healthPercentages.healthy}%` }}
-                  ></div>
+                  >
+                  </div>
                   <div 
                     className="bg-yellow-500" 
                     style={{ width: `${healthPercentages.atRisk}%` }}
-                  ></div>
+                  >
+                  </div>
                   <div 
                     className="bg-red-500" 
                     style={{ width: `${healthPercentages.critical}%` }}
-                  ></div>
+                  >
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Quick Stats */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Stats</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{quickStats.total_projects}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-blue-600">{quickStats.total_projects}</div>
                   <div className="text-sm text-gray-600">Total Projects</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{quickStats.active_projects}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-green-600">{quickStats.active_projects}</div>
                   <div className="text-sm text-gray-600">Active Projects</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-red-600">{quickStats.critical_alerts}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-red-600">{quickStats.critical_alerts}</div>
                   <div className="text-sm text-gray-600">Critical Alerts</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-yellow-600">{quickStats.at_risk_projects}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-yellow-600">{quickStats.at_risk_projects}</div>
                   <div className="text-sm text-gray-600">At Risk</div>
                 </div>
               </div>
@@ -426,27 +444,35 @@ export default function UltraFastDashboard() {
           </div>
         )}
 
+        {/* Variance Trends */}
+        <VarianceTrends session={session} selectedCurrency="USD" />
+
+        {/* Variance Alerts */}
+        <VarianceAlerts session={session} onAlertCount={setVarianceAlertCount} />
+
         {/* Recent Projects (Loaded in background) */}
         {recentProjects.length > 0 && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200">
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900">Recent Projects</h3>
             </div>
             <div className="divide-y divide-gray-200">
               {recentProjects.map((project) => (
-                <div key={project.id} className="px-6 py-4 hover:bg-gray-50">
+                <div key={project.id} className="px-4 sm:px-6 py-4 hover:bg-gray-50">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-3 h-3 rounded-full ${
+                    <div className="flex items-center space-x-3 min-w-0 flex-1">
+                      <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
                         project.health === 'green' ? 'bg-green-500' :
                         project.health === 'yellow' ? 'bg-yellow-500' : 'bg-red-500'
-                      }`}></div>
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-900">{project.name}</h4>
+                      }`}
+                      >
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-sm font-medium text-gray-900 truncate">{project.name}</h4>
                         <p className="text-sm text-gray-500 capitalize">{project.status.replace('-', ' ')}</p>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right flex-shrink-0">
                       {project.budget && (
                         <p className="text-sm font-medium text-gray-900">
                           ${project.budget.toLocaleString()}
@@ -464,26 +490,45 @@ export default function UltraFastDashboard() {
         )}
 
         {/* Quick Actions */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <button 
+              onClick={() => router.push('/dashboards')}
+              className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+            >
               <div className="text-center">
-                <BarChart3 className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400 mx-auto mb-2" />
                 <span className="text-sm font-medium text-gray-700">View Detailed Charts</span>
               </div>
             </button>
             
-            <button className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors">
+            <button 
+              onClick={() => router.push('/resources')}
+              className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors"
+            >
               <div className="text-center">
-                <Users className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                <Users className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400 mx-auto mb-2" />
                 <span className="text-sm font-medium text-gray-700">Manage Resources</span>
               </div>
             </button>
             
-            <button className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors">
+            <button 
+              onClick={() => router.push('/financials')}
+              className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors"
+            >
               <div className="text-center">
-                <Eye className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400 mx-auto mb-2" />
+                <span className="text-sm font-medium text-gray-700">Financial Analysis</span>
+              </div>
+            </button>
+            
+            <button 
+              onClick={() => router.push('/reports')}
+              className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors"
+            >
+              <div className="text-center">
+                <Eye className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400 mx-auto mb-2" />
                 <span className="text-sm font-medium text-gray-700">Generate Report</span>
               </div>
             </button>

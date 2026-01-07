@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
+import withPWA from 'next-pwa';
 
 const nextConfig: NextConfig = {
+  // Turbopack configuration for Next.js 16
+  turbopack: {},
+  
   // Monorepo configuration - trace files from project root
   outputFileTracingRoot: process.cwd(),
   
@@ -66,4 +70,12 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// PWA Configuration - simplified for development
+const pwaConfig = withPWA({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === 'development', // Disable PWA in development
+});
+
+export default pwaConfig(nextConfig as any);

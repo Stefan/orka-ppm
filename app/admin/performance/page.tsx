@@ -1,7 +1,7 @@
 'use client'
 
+import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../providers/SupabaseAuthProvider'
-import { useEffect, useState } from 'react'
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
   LineChart, Line, Area, AreaChart, PieChart, Pie, Cell
@@ -340,7 +340,8 @@ export default function PerformanceDashboard() {
                   name === 'avg_duration' ? 'Avg Duration' : 
                   name === 'requests' ? 'Total Requests' : 
                   name === 'error_rate' ? 'Error Rate %' : 'RPM'
-                ]} />
+                ]}
+                />
                 <Legend />
                 <Bar dataKey="avg_duration" fill="#3B82F6" name="Avg Duration (ms)" />
                 <Bar dataKey="error_rate" fill="#EF4444" name="Error Rate %" />
