@@ -3,7 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client, Client
 from dotenv import load_dotenv
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, validator
 from uuid import UUID
 import os
 import jwt
@@ -642,6 +642,139 @@ class UserRoleResponse(BaseModel):
     permissions: List[str]
     assigned_at: datetime
 
+# User Management Models
+class UserStatus(str, Enum):
+    active = "active"
+    inactive = "inactive"
+    pending = "pending"
+    deactivated = "deactivated"
+
+# UserRole enum is defined earlier in the file (line ~554)
+
+class UserCreateRequest(BaseModel):
+    email: EmailStr
+    role: UserRole = UserRole.team_member
+    send_invite: bool = True
+    
+    @validator('email')
+    def validate_email(cls, v):
+        if not v or '@' not in v:
+            raise ValueError('Valid email address is required')
+        return v.lower()
+
+class UserUpdateRequest(BaseModel):
+    role: Optional[UserRole] = None
+    is_active: Optional[bool] = None
+    deactivation_reason: Optional[str] = None
+    
+    @validator('deactivation_reason')
+    def validate_deactivation_reason(cls, v, values):
+        if values.get('is_active') is False and not v:
+            raise ValueError('Deactivation reason is required when deactivating user')
+        return v
+
+class UserResponse(BaseModel):
+    id: str
+    email: str
+    role: str
+    status: str
+    is_active: bool
+    last_login: Optional[datetime]
+    created_at: datetime
+    updated_at: Optional[datetime]
+    deactivated_at: Optional[datetime]
+    deactivated_by: Optional[str]
+    deactivation_reason: Optional[str]
+    sso_provider: Optional[str]
+
+class UserListResponse(BaseModel):
+    users: List[UserResponse]
+    total_count: int
+    page: int
+    per_page: int
+    total_pages: int
+
+class UserActivityLogCreate(BaseModel):
+    user_id: UUID
+    action: str
+    details: Optional[Dict[str, Any]] = None
+    ip_address: Optional[str] = None
+    user_agent: Optional[str] = None
+
+class UserActivityLogResponse(BaseModel):
+    id: str
+    user_id: str
+    action: str
+    details: Optional[Dict[str, Any]]
+    ip_address: Optional[str]
+    user_agent: Optional[str]
+    created_at: datetime
+
+class AdminAuditLogCreate(BaseModel):
+    admin_user_id: UUID
+    target_user_id: UUID
+    action: str
+    details: Optional[Dict[str, Any]] = None
+
+class AdminAuditLogResponse(BaseModel):
+    id: str
+    admin_user_id: str
+    target_user_id: str
+    action: str
+    details: Optional[Dict[str, Any]]
+    created_at: datetime
+
+class ChatErrorLogCreate(BaseModel):
+    user_id: UUID
+    session_id: Optional[str] = None
+    error_type: str
+    error_message: str
+    status_code: Optional[int] = None
+    query_text: Optional[str] = None
+    retry_count: int = 0
+
+class ChatErrorLogResponse(BaseModel):
+    id: str
+    user_id: str
+    session_id: Optional[str]
+    error_type: str
+    error_message: str
+    status_code: Optional[int]
+    query_text: Optional[str]
+    retry_count: int
+    resolved: bool
+    created_at: datetime
+
+class UserDeactivationRequest(BaseModel):
+    reason: str
+    notify_user: bool = True
+    
+    @validator('reason')
+    def validate_reason(cls, v):
+        if not v or len(v.strip()) < 3:
+            raise ValueError('Deactivation reason must be at least 3 characters')
+        return v.strip()
+
+class BulkUserActionRequest(BaseModel):
+    user_ids: List[UUID]
+    action: str  # 'deactivate', 'activate', 'delete'
+    reason: Optional[str] = None
+    
+    @validator('user_ids')
+    def validate_user_ids(cls, v):
+        if not v or len(v) == 0:
+            raise ValueError('At least one user ID is required')
+        if len(v) > 100:
+            raise ValueError('Cannot process more than 100 users at once')
+        return v
+    
+    @validator('reason')
+    def validate_reason(cls, v, values):
+        action = values.get('action')
+        if action in ['deactivate', 'delete'] and not v:
+            raise ValueError(f'Reason is required for {action} action')
+        return v
+
 # AI Request Models
 class RAGQueryRequest(BaseModel):
     query: str
@@ -1019,6 +1152,20 @@ def require_any_permission(required_permissions: List[Permission]):
         return current_user
     
     return permission_checker
+
+def require_admin():
+    """Dependency to require admin role"""
+    async def admin_checker(current_user = Depends(get_current_user)):
+        user_id = current_user.get("user_id")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Authentication required")
+        
+        # Check if user has admin permissions
+        has_admin = await rbac.has_permission(user_id, Permission.user_manage)
+        if not has_admin:
+            raise HTTPException(status_code=403, detail="Admin privileges required")
+        return current_user
+    return admin_checker
 
 # ---------- Utility Functions ----------
 def convert_uuids(data):
@@ -1588,6 +1735,390 @@ async def delete_role(role_id: UUID, current_user = Depends(require_permission(P
     except Exception as e:
         print(f"Delete role error: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to delete role: {str(e)}")
+
+# User Management Endpoints
+@app.get("/admin/users", response_model=UserListResponse)
+@limiter.limit("30/minute")
+@cached(ttl=60)  # Cache for 1 minute
+async def list_users(
+    request: Request,
+    page: int = Query(1, ge=1, description="Page number"),
+    per_page: int = Query(20, ge=1, le=100, description="Items per page"),
+    search: Optional[str] = Query(None, description="Search by email"),
+    status: Optional[UserStatus] = Query(None, description="Filter by status"),
+    role: Optional[UserRole] = Query(None, description="Filter by role"),
+    current_user = Depends(require_admin())
+):
+    """Get all users with pagination, search, and filtering - optimized version"""
+    try:
+        if supabase is None:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
+        
+        # Build optimized query with proper joins and indexing
+        base_query = """
+            SELECT 
+                up.user_id,
+                up.role,
+                up.is_active,
+                up.created_at,
+                up.updated_at,
+                up.deactivated_at,
+                up.deactivated_by,
+                up.deactivation_reason,
+                up.sso_provider,
+                au.email,
+                au.last_sign_in_at
+            FROM user_profiles up
+            LEFT JOIN auth.users au ON up.user_id = au.id::text
+        """
+        
+        conditions = []
+        params = {}
+        
+        # Apply filters with proper indexing
+        if status:
+            if status == UserStatus.active:
+                conditions.append("up.is_active = true")
+            elif status == UserStatus.inactive:
+                conditions.append("up.is_active = false")
+            elif status == UserStatus.deactivated:
+                conditions.append("up.deactivated_at IS NOT NULL")
+        
+        if role:
+            conditions.append("up.role = %(role)s")
+            params['role'] = role.value
+        
+        if search and search.strip():
+            conditions.append("au.email ILIKE %(search)s")
+            params['search'] = f"%{search.strip()}%"
+        
+        # Build WHERE clause
+        where_clause = ""
+        if conditions:
+            where_clause = "WHERE " + " AND ".join(conditions)
+        
+        # Get total count efficiently
+        count_query = f"""
+            SELECT COUNT(*) as total
+            FROM user_profiles up
+            LEFT JOIN auth.users au ON up.user_id = au.id::text
+            {where_clause}
+        """
+        
+        # Execute count query
+        count_result = supabase.rpc('execute_sql', {
+            'query': count_query,
+            'params': params
+        }).execute()
+        
+        total_count = count_result.data[0]['total'] if count_result.data else 0
+        
+        # Calculate pagination
+        offset = (page - 1) * per_page
+        total_pages = (total_count + per_page - 1) // per_page
+        
+        # Build main query with pagination
+        main_query = f"""
+            {base_query}
+            {where_clause}
+            ORDER BY up.created_at DESC
+            LIMIT %(limit)s OFFSET %(offset)s
+        """
+        
+        params.update({
+            'limit': per_page,
+            'offset': offset
+        })
+        
+        # Execute main query
+        result = supabase.rpc('execute_sql', {
+            'query': main_query,
+            'params': params
+        }).execute()
+        
+        users = []
+        for row in result.data or []:
+            user_response = UserResponse(
+                id=row["user_id"],
+                email=row.get("email", ""),
+                role=row.get("role", "user"),
+                status="active" if row.get("is_active") else "inactive",
+                is_active=row.get("is_active", True),
+                last_login=row.get("last_sign_in_at"),
+                created_at=row.get("created_at"),
+                updated_at=row.get("updated_at"),
+                deactivated_at=row.get("deactivated_at"),
+                deactivated_by=row.get("deactivated_by"),
+                deactivation_reason=row.get("deactivation_reason"),
+                sso_provider=row.get("sso_provider")
+            )
+            users.append(user_response)
+        
+        return UserListResponse(
+            users=users,
+            total_count=total_count,
+            page=page,
+            per_page=per_page,
+            total_pages=total_pages
+        )
+        
+    except Exception as e:
+        print(f"List users error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to list users: {str(e)}")
+
+@app.post("/admin/users", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def create_user(
+    user_data: UserCreateRequest,
+    current_user = Depends(require_admin())
+):
+    """Create a new user account"""
+    try:
+        if supabase is None:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
+        
+        # Check if user already exists
+        existing_user = supabase.table("user_profiles").select("*").eq("email", user_data.email).execute()
+        if existing_user.data:
+            raise HTTPException(status_code=400, detail="User with this email already exists")
+        
+        # Create user in Supabase Auth (this would typically be done via admin API)
+        # For now, we'll create a placeholder profile
+        user_profile_data = {
+            "user_id": str(UUID()),  # This should be the actual auth user ID
+            "role": user_data.role.value,
+            "is_active": True
+        }
+        
+        profile_response = supabase.table("user_profiles").insert(user_profile_data).execute()
+        
+        if not profile_response.data:
+            raise HTTPException(status_code=400, detail="Failed to create user profile")
+        
+        profile = profile_response.data[0]
+        
+        # Log admin action
+        await log_admin_action(
+            current_user.get("user_id"),
+            profile["user_id"],
+            "create_user",
+            {"email": user_data.email, "role": user_data.role.value}
+        )
+        
+        return UserResponse(
+            id=profile["user_id"],
+            email=user_data.email,
+            role=profile["role"],
+            status="active",
+            is_active=True,
+            last_login=None,
+            created_at=profile["created_at"],
+            updated_at=profile.get("updated_at"),
+            deactivated_at=None,
+            deactivated_by=None,
+            deactivation_reason=None,
+            sso_provider=None
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Create user error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to create user: {str(e)}")
+
+@app.put("/admin/users/{user_id}", response_model=UserResponse)
+async def update_user(
+    user_id: UUID,
+    user_data: UserUpdateRequest,
+    current_user = Depends(require_admin())
+):
+    """Update user information"""
+    try:
+        if supabase is None:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
+        
+        # Get existing user profile
+        profile_response = supabase.table("user_profiles").select("*").eq("user_id", str(user_id)).execute()
+        if not profile_response.data:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        profile = profile_response.data[0]
+        
+        # Prepare update data
+        update_data = {}
+        if user_data.role is not None:
+            update_data["role"] = user_data.role.value
+        
+        if user_data.is_active is not None:
+            update_data["is_active"] = user_data.is_active
+            if not user_data.is_active:
+                update_data["deactivated_at"] = datetime.now().isoformat()
+                update_data["deactivated_by"] = current_user.get("user_id")
+                update_data["deactivation_reason"] = user_data.deactivation_reason
+            else:
+                # Reactivating user
+                update_data["deactivated_at"] = None
+                update_data["deactivated_by"] = None
+                update_data["deactivation_reason"] = None
+        
+        if update_data:
+            update_response = supabase.table("user_profiles").update(update_data).eq("user_id", str(user_id)).execute()
+            if not update_response.data:
+                raise HTTPException(status_code=400, detail="Failed to update user")
+            
+            updated_profile = update_response.data[0]
+        else:
+            updated_profile = profile
+        
+        # Log admin action
+        await log_admin_action(
+            current_user.get("user_id"),
+            str(user_id),
+            "update_user",
+            update_data
+        )
+        
+        # Get auth user data for email
+        auth_response = supabase.table("auth.users").select("email").eq("id", str(user_id)).execute()
+        email = auth_response.data[0]["email"] if auth_response.data else ""
+        
+        return UserResponse(
+            id=str(user_id),
+            email=email,
+            role=updated_profile["role"],
+            status="active" if updated_profile["is_active"] else "inactive",
+            is_active=updated_profile["is_active"],
+            last_login=None,  # Would need to get from auth.users
+            created_at=updated_profile["created_at"],
+            updated_at=updated_profile.get("updated_at"),
+            deactivated_at=updated_profile.get("deactivated_at"),
+            deactivated_by=updated_profile.get("deactivated_by"),
+            deactivation_reason=updated_profile.get("deactivation_reason"),
+            sso_provider=updated_profile.get("sso_provider")
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Update user error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to update user: {str(e)}")
+
+@app.delete("/admin/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(
+    user_id: UUID,
+    current_user = Depends(require_admin())
+):
+    """Delete a user account"""
+    try:
+        if supabase is None:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
+        
+        # Check if user exists
+        profile_response = supabase.table("user_profiles").select("*").eq("user_id", str(user_id)).execute()
+        if not profile_response.data:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Prevent self-deletion
+        if str(user_id) == current_user.get("user_id"):
+            raise HTTPException(status_code=400, detail="Cannot delete your own account")
+        
+        # Delete user profile (auth.users deletion would be handled by Supabase Auth admin API)
+        supabase.table("user_profiles").delete().eq("user_id", str(user_id)).execute()
+        
+        # Log admin action
+        await log_admin_action(
+            current_user.get("user_id"),
+            str(user_id),
+            "delete_user",
+            {"reason": "Admin deletion"}
+        )
+        
+        return None
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Delete user error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete user: {str(e)}")
+
+@app.post("/admin/users/{user_id}/deactivate", response_model=UserResponse)
+async def deactivate_user(
+    user_id: UUID,
+    deactivation_data: UserDeactivationRequest,
+    current_user = Depends(require_admin())
+):
+    """Deactivate a user account"""
+    try:
+        if supabase is None:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
+        
+        # Prevent self-deactivation
+        if str(user_id) == current_user.get("user_id"):
+            raise HTTPException(status_code=400, detail="Cannot deactivate your own account")
+        
+        # Update user profile
+        update_data = {
+            "is_active": False,
+            "deactivated_at": datetime.now().isoformat(),
+            "deactivated_by": current_user.get("user_id"),
+            "deactivation_reason": deactivation_data.reason
+        }
+        
+        response = supabase.table("user_profiles").update(update_data).eq("user_id", str(user_id)).execute()
+        if not response.data:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        updated_profile = response.data[0]
+        
+        # Log admin action
+        await log_admin_action(
+            current_user.get("user_id"),
+            str(user_id),
+            "deactivate_user",
+            {"reason": deactivation_data.reason, "notify_user": deactivation_data.notify_user}
+        )
+        
+        # Get auth user data for email
+        auth_response = supabase.table("auth.users").select("email").eq("id", str(user_id)).execute()
+        email = auth_response.data[0]["email"] if auth_response.data else ""
+        
+        return UserResponse(
+            id=str(user_id),
+            email=email,
+            role=updated_profile["role"],
+            status="deactivated",
+            is_active=False,
+            last_login=None,
+            created_at=updated_profile["created_at"],
+            updated_at=updated_profile.get("updated_at"),
+            deactivated_at=updated_profile.get("deactivated_at"),
+            deactivated_by=updated_profile.get("deactivated_by"),
+            deactivation_reason=updated_profile.get("deactivation_reason"),
+            sso_provider=updated_profile.get("sso_provider")
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Deactivate user error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to deactivate user: {str(e)}")
+
+# Helper function for logging admin actions
+async def log_admin_action(admin_user_id: str, target_user_id: str, action: str, details: Dict[str, Any]):
+    """Log administrative actions for audit trail"""
+    try:
+        if supabase is None:
+            return
+        
+        log_data = {
+            "admin_user_id": admin_user_id,
+            "target_user_id": target_user_id,
+            "action": action,
+            "details": details
+        }
+        
+        supabase.table("admin_audit_log").insert(log_data).execute()
+    except Exception as e:
+        print(f"Failed to log admin action: {e}")
 
 # User Role Assignment Endpoints
 @app.post("/users/{user_id}/roles/{role_id}", response_model=UserRoleResponse, status_code=status.HTTP_201_CREATED)
@@ -6090,7 +6621,7 @@ async def get_variance_trends(
 @app.post("/variance/alerts/rules")
 async def create_threshold_rule(
     rule: VarianceThresholdRule,
-    current_user = Depends(require_permission(Permission.financial_admin))
+    current_user = Depends(require_permission(Permission.financial_update))
 ):
     """Create a new variance threshold rule"""
     try:
@@ -6148,7 +6679,7 @@ async def get_threshold_rules(
 async def update_threshold_rule(
     rule_id: str,
     updates: Dict[str, Any],
-    current_user = Depends(require_permission(Permission.financial_admin))
+    current_user = Depends(require_permission(Permission.financial_update))
 ):
     """Update an existing threshold rule"""
     try:
@@ -6293,7 +6824,7 @@ async def resolve_alert(
 @app.post("/variance/alerts/initialize-defaults")
 async def initialize_default_rules(
     organization_id: str,
-    current_user = Depends(require_permission(Permission.financial_admin))
+    current_user = Depends(require_permission(Permission.financial_update))
 ):
     """Initialize default threshold rules for an organization"""
     try:
