@@ -146,7 +146,8 @@ class RAGReporterAgent(AIAgentBase):
             
             # Build the query with proper vector similarity search
             if content_types:
-                content_filter = f"content_type IN ({','.join([f"'{ct}'" for ct in content_types])})"
+                quoted_types = [f"'{ct}'" for ct in content_types]
+                content_filter = f"content_type IN ({','.join(quoted_types)})"
             else:
                 content_filter = "TRUE"
             
