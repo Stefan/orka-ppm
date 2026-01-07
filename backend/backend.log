@@ -1,0 +1,957 @@
+INFO:     Will watch for changes in these directories: ['/Users/stefan/Projects/PPM/backend']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [2620] using StatReload
+INFO:     Started server process [2661]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64707 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64708 - "GET /portfolio/metrics HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64709 - "GET /portfolio/kpis HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64707 - "GET /portfolio/metrics HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64708 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64711 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64715 - "GET /portfolio/metrics HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64716 - "GET /portfolio/kpis HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64708 - "GET /portfolio/metrics HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64717 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64715 - "GET /portfolio/kpis HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64715 - "GET /resources/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64717 - "GET /resources/utilization HTTP/1.1" 422 Unprocessable Content
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64708 - "GET /resources/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64715 - "GET /resources/utilization HTTP/1.1" 422 Unprocessable Content
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64734 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64737 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64836 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64838 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64867 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64871 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64871 - "GET /resources/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64867 - "GET /resources/utilization HTTP/1.1" 422 Unprocessable Content
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64871 - "GET /resources/utilization HTTP/1.1" 422 Unprocessable Content
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64872 - "GET /resources/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64872 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64871 - "GET /portfolio/metrics HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64867 - "GET /portfolio/kpis HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64872 - "GET /portfolio/metrics HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64871 - "GET /portfolio/kpis HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64875 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65066 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65071 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65071 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65066 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65066 - "GET /resources/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65071 - "GET /resources/utilization HTTP/1.1" 422 Unprocessable Content
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65079 - "GET /resources/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65066 - "GET /resources/utilization HTTP/1.1" 422 Unprocessable Content
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65066 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65079 - "GET /portfolio/metrics HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65071 - "GET /portfolio/kpis HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65066 - "GET /portfolio/metrics HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65082 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65079 - "GET /portfolio/kpis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65239 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65240 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65239 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767475920, 'iat': 1767472320, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65240 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52012 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767479400, 'iat': 1767475800, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:52012 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54530 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767482880, 'iat': 1767479280, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:54530 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56349 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767486361, 'iat': 1767482761, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:56349 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58564 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767489870, 'iat': 1767486270, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:58564 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60555 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767493350, 'iat': 1767489750, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:60555 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62392 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767496830, 'iat': 1767493230, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:62392 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64600 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767500310, 'iat': 1767496710, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64600 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50384 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767503790, 'iat': 1767500190, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:50384 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53274 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767507271, 'iat': 1767503671, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:53274 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55228 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767510780, 'iat': 1767507180, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:55228 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56917 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767514260, 'iat': 1767510660, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:56917 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58613 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767517740, 'iat': 1767514140, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:58613 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60323 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767521220, 'iat': 1767517620, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:60323 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62021 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767524700, 'iat': 1767521100, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:62021 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63738 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767528181, 'iat': 1767524581, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:63738 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65468 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767531690, 'iat': 1767528090, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767472320}], 'session_id': '6407d653-1c8f-4d1c-a464-1e6f0539fbf4', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:65468 - "GET /projects/ HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [2661]
+INFO:     Started server process [58253]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [58253]
+INFO:     Started server process [58497]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [58497]
+INFO:     Started server process [58939]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [58939]
+INFO:     Started server process [58958]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:64022 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64023 - "OPTIONS /portfolio/metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64024 - "OPTIONS /portfolio/kpis HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767554499, 'iat': 1767550899, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767550899}], 'session_id': 'feef293d-922c-4db1-b07d-bb928ac66dfe', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64022 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767554499, 'iat': 1767550899, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767550899}], 'session_id': 'feef293d-922c-4db1-b07d-bb928ac66dfe', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64024 - "GET /portfolio/metrics HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767554499, 'iat': 1767550899, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767550899}], 'session_id': 'feef293d-922c-4db1-b07d-bb928ac66dfe', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64023 - "GET /portfolio/kpis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64034 - "OPTIONS /resources/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64035 - "OPTIONS /resources/utilization HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767554499, 'iat': 1767550899, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767550899}], 'session_id': 'feef293d-922c-4db1-b07d-bb928ac66dfe', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64035 - "GET /resources/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767554499, 'iat': 1767550899, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767550899}], 'session_id': 'feef293d-922c-4db1-b07d-bb928ac66dfe', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64034 - "GET /resources/utilization HTTP/1.1" 422 Unprocessable Content
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767554499, 'iat': 1767550899, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767550899}], 'session_id': 'feef293d-922c-4db1-b07d-bb928ac66dfe', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64034 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767554499, 'iat': 1767550899, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767550899}], 'session_id': 'feef293d-922c-4db1-b07d-bb928ac66dfe', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64034 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767554499, 'iat': 1767550899, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767550899}], 'session_id': 'feef293d-922c-4db1-b07d-bb928ac66dfe', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64050 - "GET /resources/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767554499, 'iat': 1767550899, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767550899}], 'session_id': 'feef293d-922c-4db1-b07d-bb928ac66dfe', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64051 - "GET /resources/utilization HTTP/1.1" 422 Unprocessable Content
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767554499, 'iat': 1767550899, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767550899}], 'session_id': 'feef293d-922c-4db1-b07d-bb928ac66dfe', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64051 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767554499, 'iat': 1767550899, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767550899}], 'session_id': 'feef293d-922c-4db1-b07d-bb928ac66dfe', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64050 - "GET /portfolio/metrics HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767554499, 'iat': 1767550899, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767550899}], 'session_id': 'feef293d-922c-4db1-b07d-bb928ac66dfe', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64056 - "GET /portfolio/kpis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64542 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64543 - "OPTIONS /portfolio/metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64544 - "OPTIONS /portfolio/kpis HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64542 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64544 - "GET /portfolio/metrics HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64543 - "GET /portfolio/kpis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64612 - "OPTIONS /resources/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64613 - "OPTIONS /resources/utilization HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64612 - "GET /resources/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64613 - "GET /resources/utilization HTTP/1.1" 422 Unprocessable Content
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64613 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64613 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64632 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64633 - "GET /portfolio/metrics HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64634 - "GET /portfolio/kpis HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64641 - "GET /resources/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64642 - "GET /resources/utilization HTTP/1.1" 422 Unprocessable Content
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64655 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64660 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64995 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:64995 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49434 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:49434 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:49434 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:49434 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:49460 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50239 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50239 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50402 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767555813, 'iat': 1767552213, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'otp', 'timestamp': 1767552213}], 'session_id': 'a478294a-589b-47a7-a284-bb8a09fc8d7b', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:50402 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767559287, 'iat': 1767555687, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767555687}], 'session_id': 'e2a0be87-375e-44b3-ac15-a3bfd87cad8d', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:50408 - "GET /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50408 - "OPTIONS /projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50414 - "OPTIONS /portfolio/metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50415 - "OPTIONS /portfolio/kpis HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767559287, 'iat': 1767555687, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767555687}], 'session_id': 'e2a0be87-375e-44b3-ac15-a3bfd87cad8d', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:50408 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767559287, 'iat': 1767555687, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767555687}], 'session_id': 'e2a0be87-375e-44b3-ac15-a3bfd87cad8d', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:50414 - "GET /portfolio/metrics HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767559287, 'iat': 1767555687, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767555687}], 'session_id': 'e2a0be87-375e-44b3-ac15-a3bfd87cad8d', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:50415 - "GET /portfolio/kpis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50415 - "OPTIONS /resources/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50414 - "OPTIONS /resources/utilization HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767559287, 'iat': 1767555687, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767555687}], 'session_id': 'e2a0be87-375e-44b3-ac15-a3bfd87cad8d', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:50414 - "GET /resources/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767559287, 'iat': 1767555687, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767555687}], 'session_id': 'e2a0be87-375e-44b3-ac15-a3bfd87cad8d', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:50415 - "GET /resources/utilization HTTP/1.1" 422 Unprocessable Content
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767559287, 'iat': 1767555687, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767555687}], 'session_id': 'e2a0be87-375e-44b3-ac15-a3bfd87cad8d', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:50415 - "GET /projects/ HTTP/1.1" 200 OK
+DEBUG: Received token: eyJhbGciOiJFUzI1NiIsImtpZCI6IjE5NzA3MTQyLWYwZDEtNG...
+DEBUG: Decoded payload (unverified): {'iss': 'https://xceyrfvxooiplbmwavlb.supabase.co/auth/v1', 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f', 'aud': 'authenticated', 'exp': 1767559287, 'iat': 1767555687, 'email': 'stefan.krause@gmail.com', 'phone': '', 'app_metadata': {'provider': 'email', 'providers': ['email']}, 'user_metadata': {'email': 'stefan.krause@gmail.com', 'email_verified': True, 'phone_verified': False, 'sub': 'db6fc8fd-0ce3-42ed-baae-1b5f9421da4f'}, 'role': 'authenticated', 'aal': 'aal1', 'amr': [{'method': 'password', 'timestamp': 1767555687}], 'session_id': 'e2a0be87-375e-44b3-ac15-a3bfd87cad8d', 'is_anonymous': False}
+DEBUG: Authentication successful for user: db6fc8fd-0ce3-42ed-baae-1b5f9421da4f
+INFO:     127.0.0.1:50415 - "GET /projects/ HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [58958]
+INFO:     Started server process [72213]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [72213]
+INFO:     Started server process [72226]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [72226]
+INFO:     Started server process [72237]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [72237]
+INFO:     Started server process [72262]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [72262]
+INFO:     Started server process [72647]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [72647]
+INFO:     Started server process [72663]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'performance.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [72663]
+INFO:     Started server process [73550]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [73550]
+Process SpawnProcess-13:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 719, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 71, in serve
+    await self._serve(sockets)
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 78, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/config.py", line 439, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 22, in import_from_string
+    raise exc from None
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/stefan/Projects/PPM/backend/main.py", line 17, in <module>
+    from performance import (
+    ...<2 lines>...
+    )
+  File "/Users/stefan/Projects/PPM/backend/performance.py", line 11, in <module>
+    import redis
+ModuleNotFoundError: No module named 'redis'
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+Process SpawnProcess-14:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 719, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 71, in serve
+    await self._serve(sockets)
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 78, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/config.py", line 439, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 22, in import_from_string
+    raise exc from None
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/stefan/Projects/PPM/backend/main.py", line 17, in <module>
+    from performance import (
+    ...<2 lines>...
+    )
+  File "/Users/stefan/Projects/PPM/backend/performance.py", line 11, in <module>
+    import redis
+ModuleNotFoundError: No module named 'redis'
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+Process SpawnProcess-15:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 719, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 71, in serve
+    await self._serve(sockets)
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 78, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/config.py", line 439, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 22, in import_from_string
+    raise exc from None
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/stefan/Projects/PPM/backend/main.py", line 17, in <module>
+    from performance import (
+    ...<2 lines>...
+    )
+  File "/Users/stefan/Projects/PPM/backend/performance.py", line 11, in <module>
+    import redis
+ModuleNotFoundError: No module named 'redis'
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+Process SpawnProcess-16:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 719, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 71, in serve
+    await self._serve(sockets)
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 78, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/config.py", line 439, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 22, in import_from_string
+    raise exc from None
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/stefan/Projects/PPM/backend/main.py", line 17, in <module>
+    from performance import (
+    ...<2 lines>...
+    )
+  File "/Users/stefan/Projects/PPM/backend/performance.py", line 11, in <module>
+    import redis
+ModuleNotFoundError: No module named 'redis'
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+Process SpawnProcess-17:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 719, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 71, in serve
+    await self._serve(sockets)
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 78, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/config.py", line 439, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 22, in import_from_string
+    raise exc from None
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/stefan/Projects/PPM/backend/main.py", line 17, in <module>
+    from performance import (
+    ...<2 lines>...
+    )
+  File "/Users/stefan/Projects/PPM/backend/performance.py", line 11, in <module>
+    import redis
+ModuleNotFoundError: No module named 'redis'
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+Process SpawnProcess-18:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 719, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 71, in serve
+    await self._serve(sockets)
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 78, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/config.py", line 439, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 22, in import_from_string
+    raise exc from None
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/stefan/Projects/PPM/backend/main.py", line 17, in <module>
+    from performance import (
+    ...<2 lines>...
+    )
+  File "/Users/stefan/Projects/PPM/backend/performance.py", line 11, in <module>
+    import redis
+ModuleNotFoundError: No module named 'redis'
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+Process SpawnProcess-19:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 719, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 71, in serve
+    await self._serve(sockets)
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 78, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/config.py", line 439, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 22, in import_from_string
+    raise exc from None
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/stefan/Projects/PPM/backend/main.py", line 17, in <module>
+    from performance import (
+    ...<2 lines>...
+    )
+  File "/Users/stefan/Projects/PPM/backend/performance.py", line 11, in <module>
+    import redis
+ModuleNotFoundError: No module named 'redis'
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
+Process SpawnProcess-20:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/base_events.py", line 719, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 71, in serve
+    await self._serve(sockets)
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/server.py", line 78, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/config.py", line 439, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 22, in import_from_string
+    raise exc from None
+  File "/Users/stefan/Projects/PPM/backend/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/stefan/Projects/PPM/backend/main.py", line 17, in <module>
+    from performance import (
+    ...<2 lines>...
+    )
+  File "/Users/stefan/Projects/PPM/backend/performance.py", line 11, in <module>
+    import redis
+ModuleNotFoundError: No module named 'redis'
+WARNING:  StatReload detected changes in '/Users/stefan/Projects/PPM/backend/resource_management_enhanced.py'. Reloading...

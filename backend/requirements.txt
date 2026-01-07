@@ -1,0 +1,31 @@
+# Core FastAPI dependencies
+fastapi==0.128.0
+uvicorn[standard]==0.39.0
+pydantic==2.12.5
+gunicorn==21.2.0
+
+# Supabase and database - using stable version without pyiceberg
+supabase==2.25.0
+pgvector==0.2.4
+
+# Authentication and security
+PyJWT==2.10.1
+cryptography==46.0.3
+
+# HTTP and utilities
+requests==2.32.5
+python-dotenv==1.2.1
+python-multipart==0.0.6
+
+# AI and ML
+openai==1.3.0
+numpy==1.24.3
+
+# Performance and monitoring
+redis==5.0.1
+slowapi==0.1.9
+prometheus-client==0.19.0
+aiofiles==23.2.1
+
+# Add cachetools explicitly with compatible version
+cachetools>=5.5,<7.0
