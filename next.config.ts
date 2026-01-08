@@ -64,7 +64,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL || 'https://backend-six-inky-90.vercel.app'}/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_API_URL || 'https://orka-ppm.onrender.com'}/:path*`,
       },
     ];
   },
