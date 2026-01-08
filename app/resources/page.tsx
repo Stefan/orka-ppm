@@ -85,6 +85,8 @@ export default function Resources() {
       clearInterval(refreshInterval)
       setRefreshInterval(null)
     }
+    // Return undefined for other cases
+    return undefined
   }, [autoRefresh, session])
 
   const [filters, setFilters] = useState<ResourceFilters>({

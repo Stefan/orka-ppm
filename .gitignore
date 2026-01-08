@@ -63,3 +63,5 @@ test_data/
 
 # Development artifacts
 .swc/
+.vercel
+.env*.local

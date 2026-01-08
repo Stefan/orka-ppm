@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowLeft, Edit, Download, MessageSquare, Clock, CheckCircle, XCircle, AlertCircle, FileText, User, Calendar, DollarSign, Activity, Eye, Send, Upload } from 'lucide-react'
+import { ArrowLeft, Edit, Download, MessageSquare, Clock, CheckCircle, XCircle, AlertCircle, FileText, User, Calendar, DollarSign, Activity, Eye, Send, Upload, Link as LinkIcon } from 'lucide-react'
 import { ChangeRequest, mockDataService } from '../lib/mockData'
 import { useAsyncData, LoadingState } from '../lib/loadingStates'
 
@@ -106,13 +106,14 @@ export default function ChangeRequestDetail({
               onClick={onBack}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
             >
-              Go Back
+              Back to List
             </button>
           </div>
         </div>
       }
     >
-    <div className="max-w-6xl mx-auto space-y-6">
+      {changeRequest && (
+        <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="px-6 py-4">
@@ -555,6 +556,7 @@ export default function ChangeRequestDetail({
         </div>
       </div>
       </div>
+      )}
     </LoadingState>
   )
 }

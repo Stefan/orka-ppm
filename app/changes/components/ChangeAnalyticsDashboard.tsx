@@ -96,14 +96,21 @@ export default function ChangeAnalyticsDashboard({
 
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#84CC16', '#F97316']
 
+  if (isLoading) {
+    return <SkeletonChart height="h-96" />
+  }
+
+  if (isError || !analyticsData) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-gray-500">{error || 'No analytics data available'}</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <LoadingState
-      state={isLoading ? 'loading' : isError ? 'error' : analyticsData ? 'success' : 'error'}
-      message="Loading analytics data..."
-      error={error || (!analyticsData ? 'No analytics data available' : '')}
-      fallback={<SkeletonChart height="h-96" />}
-    >
-      {analyticsData && (
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -564,7 +571,6 @@ export default function ChangeAnalyticsDashboard({
           </div>
         </div>
       </div>
-      )}
-    </LoadingState>
+    </div>
   )
 }

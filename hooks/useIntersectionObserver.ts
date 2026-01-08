@@ -5,9 +5,9 @@ import { useEffect, useRef, useState } from 'react'
  */
 export function useIntersectionObserver(
   options: IntersectionObserverInit = {}
-): [React.RefObject<HTMLElement>, boolean] {
+): [React.RefObject<HTMLElement | null>, boolean] {
   const [isIntersecting, setIsIntersecting] = useState(false)
-  const ref = useRef<HTMLElement>(null)
+  const ref = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     if (!ref.current) return
@@ -32,7 +32,7 @@ export function useIntersectionObserver(
 export function useLazyLoad(threshold = 0.1) {
   const [isVisible, setIsVisible] = useState(false)
   const [hasLoaded, setHasLoaded] = useState(false)
-  const ref = useRef<HTMLElement>(null)
+  const ref = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     if (!ref.current || hasLoaded) return

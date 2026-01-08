@@ -223,6 +223,8 @@ export default function ImplementationMonitoringDashboard({
 
       return () => clearInterval(interval)
     }
+    // Return undefined for the else case
+    return undefined
   }, [refreshInterval])
 
   const handleAlertAction = (alertId: string, action: 'acknowledge' | 'resolve' | 'dismiss') => {

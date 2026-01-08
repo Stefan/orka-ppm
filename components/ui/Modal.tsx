@@ -47,6 +47,8 @@ export const Modal: React.FC<ModalProps> = ({
         document.body.style.overflow = 'unset'
       }
     }
+    // Return undefined for the else case
+    return undefined
   }, [isOpen])
 
   // Focus management

@@ -48,70 +48,75 @@ export default function ImpactAnalysisDashboard({
     console.log('Exporting impact analysis data')
   }
 
+  if (isLoading) {
+    return <SkeletonChart height="h-96" />
+  }
+
+  if (isError || !impactData) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-gray-500">{error || 'No impact analysis available'}</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Prepare chart data
+  const costBreakdownData = Object.entries(impactData.cost_breakdown).map(([key, value]) => ({
+    name: key.charAt(0).toUpperCase() + key.slice(1),
+    value,
+    percentage: ((value / impactData.total_cost_impact) * 100).toFixed(1)
+  }))
+
+  const scenarioComparisonData = [
+    {
+      scenario: 'Best Case',
+      cost: impactData.scenarios.best_case.cost_impact,
+      schedule: impactData.scenarios.best_case.schedule_impact,
+      probability: impactData.scenarios.best_case.probability * 100
+    },
+    {
+      scenario: 'Most Likely',
+      cost: impactData.scenarios.most_likely.cost_impact,
+      schedule: impactData.scenarios.most_likely.schedule_impact,
+      probability: impactData.scenarios.most_likely.probability * 100
+    },
+    {
+      scenario: 'Worst Case',
+      cost: impactData.scenarios.worst_case.cost_impact,
+      schedule: impactData.scenarios.worst_case.schedule_impact,
+      probability: impactData.scenarios.worst_case.probability * 100
+    }
+  ]
+
+  const scheduleImpactData = impactData.affected_activities.map(activity => ({
+    name: activity.name,
+    original: activity.original_duration,
+    new: activity.new_duration,
+    delay: activity.delay_days
+  }))
+
+  const riskImpactData = [
+    ...impactData.new_risks.map(risk => ({
+      name: risk.description.substring(0, 30) + '...',
+      type: 'New Risk',
+      probability: risk.probability * 100,
+      impact: risk.impact_score,
+      mitigation: risk.mitigation_cost
+    })),
+    ...impactData.modified_risks.map(risk => ({
+      name: risk.description.substring(0, 30) + '...',
+      type: 'Modified Risk',
+      probability: risk.new_probability * 100,
+      impact: risk.new_impact,
+      mitigation: 0
+    }))
+  ]
+
+  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4']
+
   return (
-    <LoadingState
-      state={isLoading ? 'loading' : isError ? 'error' : impactData ? 'success' : 'error'}
-      message="Loading impact analysis data..."
-      error={error || (!impactData ? 'No impact analysis available' : undefined)}
-      fallback={<SkeletonChart height="h-96" />}
-    >
-      {impactData && (() => {
-        // Prepare chart data
-        const costBreakdownData = Object.entries(impactData.cost_breakdown).map(([key, value]) => ({
-          name: key.charAt(0).toUpperCase() + key.slice(1),
-          value,
-          percentage: ((value / impactData.total_cost_impact) * 100).toFixed(1)
-        }))
-
-        const scenarioComparisonData = [
-          {
-            scenario: 'Best Case',
-            cost: impactData.scenarios.best_case.cost_impact,
-            schedule: impactData.scenarios.best_case.schedule_impact_days,
-            probability: impactData.scenarios.best_case.probability * 100
-          },
-          {
-            scenario: 'Most Likely',
-            cost: impactData.scenarios.most_likely.cost_impact,
-            schedule: impactData.scenarios.most_likely.schedule_impact_days,
-            probability: impactData.scenarios.most_likely.probability * 100
-          },
-          {
-            scenario: 'Worst Case',
-            cost: impactData.scenarios.worst_case.cost_impact,
-            schedule: impactData.scenarios.worst_case.schedule_impact_days,
-            probability: impactData.scenarios.worst_case.probability * 100
-          }
-        ]
-
-        const scheduleImpactData = impactData.affected_activities.map(activity => ({
-          name: activity.name,
-          original: activity.original_duration,
-          new: activity.new_duration,
-          delay: activity.delay_days,
-          critical: activity.is_critical
-        }))
-
-        const riskImpactData = [
-          ...impactData.new_risks.map(risk => ({
-            name: risk.description.substring(0, 30) + '...',
-            type: 'New Risk',
-            probability: risk.probability * 100,
-            impact: risk.impact_score,
-            mitigation: risk.mitigation_cost
-          })),
-          ...impactData.modified_risks.map(risk => ({
-            name: risk.description.substring(0, 30) + '...',
-            type: 'Modified Risk',
-            probability: risk.new_probability * 100,
-            impact: risk.new_impact,
-            mitigation: 0
-          }))
-        ]
-
-        const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4']
-
-        return (
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -353,7 +358,7 @@ export default function ImpactAnalysisDashboard({
               </div>
 
               <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Critical Path Activities</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Affected Activities</h3>
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
@@ -371,7 +376,7 @@ export default function ImpactAnalysisDashboard({
                           Delay
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Critical Path
+                          Resource Impact
                         </th>
                       </tr>
                     </thead>
@@ -390,16 +395,8 @@ export default function ImpactAnalysisDashboard({
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">
                             +{activity.delay_days} days
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {activity.is_critical ? (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                Critical
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                Non-Critical
-                              </span>
-                            )}
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {activity.resource_impact}
                           </td>
                         </tr>
                       ))}
@@ -424,12 +421,12 @@ export default function ImpactAnalysisDashboard({
                           <div>
                             <h4 className="font-medium text-gray-900">{resource.resource_type}</h4>
                             <p className="text-sm text-gray-600">
-                              Quantity: {resource.quantity} | Duration: {resource.duration_weeks} weeks
+                              Quantity: {resource.quantity} | Duration: {resource.duration_days} days
                             </p>
                           </div>
                           <div className="text-right">
                             <p className="font-medium text-gray-900">
-                              ${(resource.quantity * resource.cost_per_unit * resource.duration_weeks * 5).toLocaleString()}
+                              ${(resource.quantity * resource.cost_per_unit * resource.duration_days).toLocaleString()}
                             </p>
                             <p className="text-sm text-gray-600">
                               ${resource.cost_per_unit}/day
@@ -505,7 +502,7 @@ export default function ImpactAnalysisDashboard({
                           </div>
                           <div>
                             <span className="text-gray-600">Impact:</span>
-                            <p className="font-medium">${risk.impact.toLocaleString()}</p>
+                            <p className="font-medium">${risk.impact_score.toLocaleString()}</p>
                           </div>
                           <div>
                             <span className="text-gray-600">Mitigation:</span>
@@ -585,7 +582,7 @@ export default function ImpactAnalysisDashboard({
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Schedule Impact:</span>
-                        <span className="font-medium">{scenario.schedule_impact_days} days</span>
+                        <span className="font-medium">{scenario.schedule_impact} days</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Probability:</span>
@@ -617,8 +614,6 @@ export default function ImpactAnalysisDashboard({
           )}
         </div>
       </div>
-        )
-      })()}
-    </LoadingState>
+    </div>
   )
 }

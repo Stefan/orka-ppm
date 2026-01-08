@@ -61,16 +61,6 @@ export default function Financials() {
     financialAlerts
   })
 
-  // Tab configuration
-  const tabConfig = React.useMemo(() => [
-    { key: 'overview', label: 'Übersicht', icon: 'BarChart3', description: 'Gesamtüberblick und KPIs' },
-    { key: 'detailed', label: 'Detailliert', icon: 'TrendingUp', description: 'Detaillierte Kategorieanalyse' },
-    { key: 'trends', label: 'Trends', icon: 'PieChart', description: 'Zeitliche Entwicklung und Prognosen' },
-    { key: 'analysis', label: 'Analyse', icon: 'Target', description: 'Erweiterte Kostenanalyse' },
-    { key: 'csv-import', label: 'CSV Import', icon: 'Upload', description: 'Daten importieren', highlight: true },
-    { key: 'commitments-actuals', label: 'Commitments vs Actuals', icon: 'FileText', description: 'Geplant vs. Ist-Vergleich' }
-  ], [])
-
   const exportFinancialData = () => {
     const exportData = {
       metrics,
@@ -135,7 +125,6 @@ export default function Financials() {
 
         {/* Navigation Tabs */}
         <TabNavigation
-          tabConfig={tabConfig}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
         />
@@ -144,7 +133,6 @@ export default function Financials() {
         {metrics && (
           <FinancialMetrics
             metrics={metrics}
-            analyticsData={analyticsData}
             selectedCurrency={selectedCurrency}
           />
         )}
@@ -241,7 +229,6 @@ export default function Financials() {
             budgetPerformance={budgetPerformance}
             costAnalysis={costAnalysis}
             analyticsData={analyticsData}
-            budgetVariances={budgetVariances}
             selectedCurrency={selectedCurrency}
           />
         )}

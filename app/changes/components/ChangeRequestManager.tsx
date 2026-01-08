@@ -104,6 +104,8 @@ export default function ChangeRequestManager() {
   }
 
   const handleSelectAll = () => {
+    if (!changeRequests) return
+    
     if (selectedItems.size === changeRequests.length) {
       setSelectedItems(new Set())
     } else {
