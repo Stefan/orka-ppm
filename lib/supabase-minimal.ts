@@ -4,7 +4,9 @@ import { createClient } from '@supabase/supabase-js'
 // This bypasses ALL Vercel environment variables entirely
 const PRODUCTION_SUPABASE_URL = 'https://xceyrfvxooiplbmwavlb.supabase.co'
 const PRODUCTION_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjZXlyZnZ4b29pcGxibXdhdmxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4Mjg3ODEsImV4cCI6MjA4MjQwNDc4MX0.jIyJlwx2g9xn8OTSaLum6H8BKqknyxB8gYxgEKdfgqo'
-const PRODUCTION_API_URL = 'https://orka-ppm.onrender.com'
+
+// For local development, use environment variable if available, otherwise use production
+const PRODUCTION_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://orka-ppm.onrender.com'
 
 console.log('✅ Creating Supabase client with minimal config - Production Ready')
 console.log('🔧 Force Override Active: Bypassing ALL environment variables')
@@ -69,4 +71,5 @@ export const API_URL = PRODUCTION_API_URL
 
 console.log('✅ Supabase client created successfully (minimal) - Ready for production')
 console.log('🎯 Configuration: URL length:', PRODUCTION_SUPABASE_URL.length, 'Key length:', PRODUCTION_SUPABASE_ANON_KEY.length)
+console.log('🔗 API URL:', PRODUCTION_API_URL)
 console.log('🚀 Production mode: Environment variables completely bypassed')

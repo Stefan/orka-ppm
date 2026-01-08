@@ -1,1 +1,4 @@
+# Heroku Procfile with pre-startup testing integration
+# Note: Pre-startup tests are integrated into the FastAPI application startup
+# for production environments to avoid deployment timeouts
 web: uvicorn main:app --host 0.0.0.0 --port $PORT

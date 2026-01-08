@@ -29,3 +29,8 @@ aiofiles==23.2.1
 
 # Add cachetools explicitly with compatible version
 cachetools>=5.5,<7.0
+
+# Testing dependencies
+pytest==7.4.3
+pytest-asyncio==0.21.1
+hypothesis==6.88.1

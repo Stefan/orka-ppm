@@ -17,3 +17,10 @@ services:
         value: 1gOt/5k2/ulAmo33xbMm/XFqLD9UBIy1UzCxV+f6VxS4Wo9tZJVARZlggjn1BTGjnc+UuxpDap1+JsfbZ3nZZA==
       - key: PYTHON_VERSION
         value: 3.11.0
+      # Pre-startup testing configuration
+      - key: ENVIRONMENT
+        value: production
+      - key: SKIP_PRE_STARTUP_TESTS
+        value: false
+      - key: BASE_URL
+        value: https://ppm-saas-backend.onrender.com

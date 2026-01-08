@@ -35,3 +35,24 @@ backend/.hypothesis/
 backend/.pytest_cache/
 frontend/.hypothesis/
 frontend/.pytest_cache/
+node_modules
+
+# Build artifacts and cache files
+.next/
+*.tsbuildinfo
+.pre_startup_test_cache.json
+backend/.pre_startup_test_cache.json
+backend/.coverage
+
+# Temporary and backup files
+*_backup_*.py
+*.bak
+*.tmp
+*.temp
+
+# Test data files
+test_*.csv
+*.test.json
+
+# Development environment files
+.env.production.example

@@ -74,6 +74,15 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             </li>
             <li>
               <Link 
+                href="/scenarios" 
+                className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors"
+                onClick={handleLinkClick}
+              >
+                What-If Scenarios
+              </Link>
+            </li>
+            <li>
+              <Link 
                 href="/resources" 
                 className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors"
                 onClick={handleLinkClick}
@@ -163,6 +172,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
       
       <ul className="space-y-2 flex-1">
         <li><Link href="/dashboards" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors">Portfolio Dashboards</Link></li>
+        <li><Link href="/scenarios" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors">What-If Scenarios</Link></li>
         <li><Link href="/resources" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors">Resource Management</Link></li>
         <li><Link href="/reports" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors">AI Reports & Analytics</Link></li>
         <li><Link href="/financials" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors">Financial Tracking</Link></li>

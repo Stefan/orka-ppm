@@ -9,7 +9,7 @@ import VarianceTrends from './components/VarianceTrends'
 import VarianceAlerts from './components/VarianceAlerts'
 import { 
   TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Clock, DollarSign,
-  RefreshCw, Eye, Users, BarChart3
+  RefreshCw, Eye, Users, BarChart3, GitBranch
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -492,7 +492,17 @@ export default function UltraFastDashboard() {
         {/* Quick Actions */}
         <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <button 
+              onClick={() => router.push('/scenarios')}
+              className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+            >
+              <div className="text-center">
+                <GitBranch className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400 mx-auto mb-2" />
+                <span className="text-sm font-medium text-gray-700">What-If Scenarios</span>
+              </div>
+            </button>
+            
             <button 
               onClick={() => router.push('/dashboards')}
               className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
