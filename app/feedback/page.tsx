@@ -1,12 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { 
-  MessageSquare, Plus, ThumbsUp, ThumbsDown, Bug, Lightbulb, 
-  Filter, Search, Bell, CheckCircle, Clock, AlertCircle, 
-  User, Calendar, Tag, Send, X, Star, TrendingUp
-} from 'lucide-react'
+import { ThumbsUp, ThumbsDown, Bug, Lightbulb, Filter, Bell, AlertCircle, User, Calendar, Tag, X, TrendingUp } from 'lucide-react'
 import AppLayout from '../../components/AppLayout'
 import { getApiUrl } from '../../lib/api'
 

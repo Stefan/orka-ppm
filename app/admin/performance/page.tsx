@@ -1,16 +1,14 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../../providers/SupabaseAuthProvider'
 import { 
-  BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
-  LineChart, Line, Area, AreaChart, PieChart, Pie, Cell
+  BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer
 } from 'recharts'
 import AppLayout from '../../../components/AppLayout'
 import { 
-  Activity, Clock, AlertTriangle, CheckCircle, 
-  RefreshCw, Trash2, Database, Zap, TrendingUp,
-  Server, Users, Globe, Shield
+  Clock, AlertTriangle, CheckCircle, 
+  RefreshCw, Trash2, Database, Globe
 } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
 
@@ -73,6 +71,7 @@ export default function PerformanceDashboard() {
       const interval = setInterval(fetchPerformanceData, 30000)
       return () => clearInterval(interval)
     }
+    return undefined
   }, [session])
 
   async function fetchPerformanceData() {

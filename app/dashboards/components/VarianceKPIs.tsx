@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { TrendingUp, TrendingDown, AlertTriangle, Target, DollarSign } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { TrendingUp, TrendingDown, AlertTriangle, Target } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
 
 interface VarianceKPIs {

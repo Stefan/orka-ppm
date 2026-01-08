@@ -1,12 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../../providers/SupabaseAuthProvider'
-import { 
-  Users, UserPlus, UserMinus, UserX, Search, Filter, 
-  MoreVertical, Shield, Mail, Calendar, AlertTriangle,
-  CheckCircle, XCircle, Clock, RefreshCw, Download
-} from 'lucide-react'
+import { Users, UserPlus, UserMinus, UserX, Search, Filter, Shield, AlertTriangle, CheckCircle, XCircle, RefreshCw } from 'lucide-react'
 import AppLayout from '../../../components/AppLayout'
 import { getApiUrl } from '../../../lib/api'
 
@@ -155,14 +151,19 @@ export default function AdminUsers() {
           break
       }
       
-      const response = await fetch(getApiUrl(endpoint), {
+      const fetchOptions: RequestInit = {
         method,
         headers: {
           'Authorization': `Bearer ${session?.access_token || ''}`,
           'Content-Type': 'application/json',
-        },
-        body: method !== 'DELETE' ? JSON.stringify(body) : undefined
-      })
+        }
+      }
+      
+      if (method !== 'DELETE' && body) {
+        fetchOptions.body = JSON.stringify(body)
+      }
+      
+      const response = await fetch(getApiUrl(endpoint), fetchOptions)
       
       if (!response.ok) {
         throw new Error(`Failed to ${action} user: ${response.statusText}`)

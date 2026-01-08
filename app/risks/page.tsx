@@ -1,18 +1,10 @@
 'use client'
 
-import React, { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { 
-  BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
-  PieChart as RechartsPieChart, Pie, Cell, ScatterChart, Scatter, LineChart, Line, Area, AreaChart,
-  ComposedChart
-} from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, ScatterChart, Scatter, Area, AreaChart } from 'recharts'
 import AppLayout from '../../components/AppLayout'
-import { 
-  AlertTriangle, Shield, TrendingUp, Activity, 
-  Clock, User, Calendar, Target, Filter, Download, RefreshCw,
-  Eye, EyeOff, Zap, BarChart3, Plus, Search, SortAsc, SortDesc
-} from 'lucide-react'
+import { AlertTriangle, Shield, TrendingUp, Activity, Clock, User, Calendar, Target, Filter, Download, RefreshCw, BarChart3, Plus, Search, SortAsc, SortDesc } from 'lucide-react'
 import { getApiUrl } from '../../lib/api'
 
 interface Risk {
@@ -803,7 +795,7 @@ export default function Risks() {
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Risk Status Distribution</h3>
               <ResponsiveContainer width="100%" height={300}>
-                <RechartsPieChart>
+                <PieChart>
                   <Pie
                     data={statusData}
                     cx="50%"
@@ -819,7 +811,7 @@ export default function Risks() {
                     ))}
                   </Pie>
                   <Tooltip />
-                </RechartsPieChart>
+                </PieChart>
               </ResponsiveContainer>
             </div>
           </div>

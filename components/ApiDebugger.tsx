@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { getApiUrl } from '../lib/api'
 import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react'
 

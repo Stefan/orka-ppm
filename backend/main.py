@@ -32,6 +32,7 @@ from routers.ai import router as ai_router
 from routers.csv_import import router as csv_import_router
 from routers.variance import router as variance_router
 from routers.admin import router as admin_router
+from routers.change_management_simple import router as change_management_router
 
 # Import AI agents and services
 try:
@@ -165,6 +166,7 @@ app.include_router(ai_router)
 app.include_router(csv_import_router)
 app.include_router(variance_router)
 app.include_router(admin_router)
+app.include_router(change_management_router)
 
 # Basic endpoints
 @app.get("/")

@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell

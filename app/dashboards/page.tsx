@@ -1,16 +1,13 @@
 'use client'
 
-import React, { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import AppLayout from '../../components/AppLayout'
 import { getApiUrl } from '../../lib/api'
 import VarianceKPIs from './components/VarianceKPIs'
 import VarianceTrends from './components/VarianceTrends'
 import VarianceAlerts from './components/VarianceAlerts'
-import { 
-  TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Clock, DollarSign,
-  RefreshCw, Eye, Users, BarChart3, GitBranch
-} from 'lucide-react'
+import { TrendingUp, AlertTriangle, CheckCircle, Clock, DollarSign, RefreshCw, Eye, Users, BarChart3, GitBranch } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 interface QuickStats {

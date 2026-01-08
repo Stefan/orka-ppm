@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { HelpCircle, Users, Shield, Book, ExternalLink } from 'lucide-react'
 import { getApiUrl } from '../../lib/api'
 

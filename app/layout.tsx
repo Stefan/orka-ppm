@@ -3,6 +3,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { SupabaseAuthProvider } from './providers/SupabaseAuthProvider'
+import ErrorBoundary from '../components/ErrorBoundary'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -60,9 +61,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2563eb" />
       </head>
       <body className="font-sans antialiased" suppressHydrationWarning={true}>
-        <SupabaseAuthProvider>
-          {children}
-        </SupabaseAuthProvider>
+        <ErrorBoundary>
+          <SupabaseAuthProvider>
+            {children}
+          </SupabaseAuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   )

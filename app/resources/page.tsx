@@ -1,18 +1,11 @@
 'use client'
 
-import React, { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { 
-  Users, Plus, Search, Filter, TrendingUp, AlertCircle, Eye, Settings,
-  BarChart3, PieChart, Calendar, Clock, DollarSign, Target, Zap,
-  ChevronDown, ChevronUp, RefreshCw, Download, Bell, MapPin
-} from 'lucide-react'
+import { Users, Plus, Search, Filter, TrendingUp, AlertCircle, BarChart3, PieChart as PieChartIcon, Target, Zap, ChevronUp, RefreshCw, Download, MapPin } from 'lucide-react'
 import AppLayout from '../../components/AppLayout'
 import { getApiUrl } from '../../lib/api'
-import { 
-  BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
-  PieChart as RechartsPieChart, Pie, Cell, LineChart, Line, Area, AreaChart
-} from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 
 interface Resource {
   id: string
@@ -463,7 +456,7 @@ export default function Resources() {
               className="flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm"
             >
               {viewMode === 'cards' ? <BarChart3 className="h-4 w-4 mr-2 flex-shrink-0" /> : 
-               viewMode === 'table' ? <PieChart className="h-4 w-4 mr-2 flex-shrink-0" /> : 
+               viewMode === 'table' ? <PieChartIcon className="h-4 w-4 mr-2 flex-shrink-0" /> : 
                <Users className="h-4 w-4 mr-2 flex-shrink-0" />}
               <span className="hidden sm:inline">
                 {viewMode === 'cards' ? 'Table View' : viewMode === 'table' ? 'Heatmap' : 'Cards'}
@@ -810,7 +803,7 @@ export default function Resources() {
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Utilization Distribution</h3>
             <ResponsiveContainer width="100%" height={200}>
-              <RechartsPieChart>
+              <PieChart>
                 <Pie
                   data={analyticsData.utilizationDistribution}
                   cx="50%"
@@ -825,7 +818,7 @@ export default function Resources() {
                   ))}
                 </Pie>
                 <Tooltip />
-              </RechartsPieChart>
+              </PieChart>
             </ResponsiveContainer>
           </div>
 
@@ -844,7 +837,7 @@ export default function Resources() {
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Role Distribution</h3>
             <ResponsiveContainer width="100%" height={200}>
-              <RechartsPieChart>
+              <PieChart>
                 <Pie
                   data={analyticsData.roleDistribution}
                   cx="50%"
@@ -859,7 +852,7 @@ export default function Resources() {
                   ))}
                 </Pie>
                 <Tooltip />
-              </RechartsPieChart>
+              </PieChart>
             </ResponsiveContainer>
           </div>
         </div>

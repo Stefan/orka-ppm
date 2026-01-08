@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { AlertTriangle, CheckCircle, Clock, X } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
 

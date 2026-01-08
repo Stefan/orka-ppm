@@ -1,9 +1,9 @@
 'use client'
 
-import React from 'react'
+
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { LogOut, Activity, MessageSquare, Menu, X, Users } from 'lucide-react'
+import { LogOut, Activity, MessageSquare, X, Users } from 'lucide-react'
 import { useAuth } from '../app/providers/SupabaseAuthProvider'
 
 interface SidebarProps {
@@ -119,6 +119,15 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             </li>
             <li>
               <Link 
+                href="/changes" 
+                className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors"
+                onClick={handleLinkClick}
+              >
+                Change Management
+              </Link>
+            </li>
+            <li>
+              <Link 
                 href="/feedback" 
                 className="flex items-center py-3 px-4 rounded hover:bg-gray-700 transition-colors"
                 onClick={handleLinkClick}
@@ -177,6 +186,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
         <li><Link href="/reports" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors">AI Reports & Analytics</Link></li>
         <li><Link href="/financials" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors">Financial Tracking</Link></li>
         <li><Link href="/risks" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors">Risk/Issue Registers</Link></li>
+        <li><Link href="/changes" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors">Change Management</Link></li>
         <li>
           <Link href="/feedback" className="flex items-center py-2 px-4 rounded hover:bg-gray-700 transition-colors">
             <MessageSquare className="mr-2 h-4 w-4" />

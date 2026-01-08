@@ -1,10 +1,7 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
-import { 
-  BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
-  LineChart, Line, ComposedChart, Area, AreaChart
-} from 'recharts'
+import { useState, useEffect, useMemo } from 'react'
+import { Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Line, ComposedChart } from 'recharts'
 import { 
   TrendingUp, TrendingDown, Filter, Download, RefreshCw, 
   AlertTriangle, DollarSign, Target, PieChart, FileText

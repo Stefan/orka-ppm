@@ -1,0 +1,442 @@
+'use client'
+
+import React, { useState, useEffect } from 'react'
+import { Upload, Download, CheckCircle, XCircle, Clock, RefreshCw, FileText, History } from 'lucide-react'
+import { CSVImportHistory, CSVUploadResult } from '../../types'
+import { getApiUrl } from '../../../../lib/api'
+
+interface CSVImportViewProps {
+  accessToken: string | undefined
+}
+
+export default function CSVImportView({ accessToken }: CSVImportViewProps) {
+  const [csvImportHistory, setCsvImportHistory] = useState<CSVImportHistory[]>([])
+  const [uploadingFile, setUploadingFile] = useState(false)
+  const [uploadResult, setUploadResult] = useState<CSVUploadResult | null>(null)
+  const [dragActive, setDragActive] = useState(false)
+
+  useEffect(() => {
+    if (accessToken) {
+      fetchCSVImportHistory()
+    }
+  }, [accessToken])
+
+  const fetchCSVImportHistory = async () => {
+    if (!accessToken) return
+    
+    try {
+      const response = await fetch(getApiUrl('/csv-import/history'), {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setCsvImportHistory(data.imports || [])
+      }
+    } catch (error) {
+      console.error('Failed to fetch CSV import history:', error)
+    }
+  }
+
+  const handleFileUpload = async (file: File, importType: 'commitments' | 'actuals') => {
+    if (!accessToken) return
+    
+    setUploadingFile(true)
+    setUploadResult(null)
+    
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      
+      const response = await fetch(getApiUrl(`/csv-import/upload?import_type=${importType}`), {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: formData
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        setUploadResult(result)
+        fetchCSVImportHistory() // Refresh history
+      } else {
+        const error = await response.json()
+        setUploadResult({
+          success: false,
+          records_processed: 0,
+          records_imported: 0,
+          errors: [{ row: 0, field: 'file', message: error.detail || 'Upload failed' }],
+          warnings: [],
+          import_id: ''
+        })
+      }
+    } catch (error) {
+      setUploadResult({
+        success: false,
+        records_processed: 0,
+        records_imported: 0,
+        errors: [{ row: 0, field: 'file', message: error instanceof Error ? error.message : 'Upload failed' }],
+        warnings: [],
+        import_id: ''
+      })
+    } finally {
+      setUploadingFile(false)
+    }
+  }
+
+  const downloadTemplate = async (importType: 'commitments' | 'actuals') => {
+    if (!accessToken) return
+    
+    try {
+      const response = await fetch(getApiUrl(`/csv-import/template/${importType}`), {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        }
+      })
+      
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${importType}_template.csv`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Failed to download template:', error)
+    }
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragActive(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragActive(false)
+  }
+
+  const handleDrop = (e: React.DragEvent, importType: 'commitments' | 'actuals') => {
+    e.preventDefault()
+    setDragActive(false)
+    
+    const files = e.dataTransfer.files
+    if (files.length > 0) {
+      const file = files[0]
+      if (file.name.toLowerCase().endsWith('.csv')) {
+        handleFileUpload(file, importType)
+      } else {
+        alert('Bitte wählen Sie eine CSV-Datei aus.')
+      }
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* CSV Import Header */}
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">CSV Datenimport</h3>
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <FileText className="h-4 w-4" />
+            <span>Unterstützte Formate: CSV</span>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Commitments Upload */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="text-md font-medium text-gray-800">Commitments (Bestellungen)</h4>
+              <button
+                onClick={() => downloadTemplate('commitments')}
+                className="flex items-center px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+              >
+                <Download className="h-4 w-4 mr-1" />
+                Vorlage
+              </button>
+            </div>
+            
+            <div
+              className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+              }`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, 'commitments')}
+            >
+              <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+              <p className="text-sm text-gray-600 mb-2">
+                CSV-Datei hier ablegen oder klicken zum Auswählen
+              </p>
+              <input
+                type="file"
+                accept=".csv"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) handleFileUpload(file, 'commitments')
+                }}
+                className="hidden"
+                id="commitments-upload"
+              />
+              <label
+                htmlFor="commitments-upload"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Datei auswählen
+              </label>
+            </div>
+            
+            <div className="text-xs text-gray-500">
+              <p>• Maximale Dateigröße: 50MB</p>
+              <p>• Unterstützte Spalten: PO-Nummer, Betrag, Währung, Projekt, WBS</p>
+            </div>
+          </div>
+
+          {/* Actuals Upload */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="text-md font-medium text-gray-800">Actuals (Ist-Kosten)</h4>
+              <button
+                onClick={() => downloadTemplate('actuals')}
+                className="flex items-center px-3 py-1 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200"
+              >
+                <Download className="h-4 w-4 mr-1" />
+                Vorlage
+              </button>
+            </div>
+            
+            <div
+              className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                dragActive ? 'border-green-500 bg-green-50' : 'border-gray-300 hover:border-gray-400'
+              }`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, 'actuals')}
+            >
+              <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+              <p className="text-sm text-gray-600 mb-2">
+                CSV-Datei hier ablegen oder klicken zum Auswählen
+              </p>
+              <input
+                type="file"
+                accept=".csv"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) handleFileUpload(file, 'actuals')
+                }}
+                className="hidden"
+                id="actuals-upload"
+              />
+              <label
+                htmlFor="actuals-upload"
+                className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 cursor-pointer"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Datei auswählen
+              </label>
+            </div>
+            
+            <div className="text-xs text-gray-500">
+              <p>• Maximale Dateigröße: 50MB</p>
+              <p>• Unterstützte Spalten: FI-Dokument, Betrag, Währung, Projekt, WBS</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Upload Progress */}
+      {uploadingFile && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
+            <span className="text-blue-800">Datei wird verarbeitet...</span>
+          </div>
+        </div>
+      )}
+
+      {/* Upload Result */}
+      {uploadResult && (
+        <div className={`border rounded-lg p-4 ${
+          uploadResult.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+        }`}
+        >
+          <div className="flex items-start">
+            {uploadResult.success ? (
+              <CheckCircle className="h-5 w-5 text-green-600 mr-3 mt-0.5" />
+            ) : (
+              <XCircle className="h-5 w-5 text-red-600 mr-3 mt-0.5" />
+            )}
+            <div className="flex-1">
+              <h4 className={`font-medium ${
+                uploadResult.success ? 'text-green-800' : 'text-red-800'
+              }`}
+              >
+                {uploadResult.success ? 'Import erfolgreich' : 'Import fehlgeschlagen'}
+              </h4>
+              
+              <div className="mt-2 text-sm">
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <span className="text-gray-600">Verarbeitet:</span>
+                    <span className="font-medium ml-1">{uploadResult.records_processed}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Importiert:</span>
+                    <span className="font-medium ml-1 text-green-600">{uploadResult.records_imported}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Fehler:</span>
+                    <span className="font-medium ml-1 text-red-600">{uploadResult.errors.length}</span>
+                  </div>
+                </div>
+              </div>
+
+              {uploadResult.errors.length > 0 && (
+                <div className="mt-3">
+                  <h5 className="text-sm font-medium text-red-800 mb-2">Fehler:</h5>
+                  <div className="max-h-32 overflow-y-auto">
+                    {uploadResult.errors.slice(0, 5).map((error, index) => (
+                      <div key={index} className="text-xs text-red-700 mb-1">
+                        Zeile {error.row}: {error.message}
+                      </div>
+                    ))}
+                    {uploadResult.errors.length > 5 && (
+                      <div className="text-xs text-red-600">
+                        ... und {uploadResult.errors.length - 5} weitere Fehler
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {uploadResult.warnings.length > 0 && (
+                <div className="mt-3">
+                  <h5 className="text-sm font-medium text-yellow-800 mb-2">Warnungen:</h5>
+                  <div className="max-h-32 overflow-y-auto">
+                    {uploadResult.warnings.slice(0, 3).map((warning, index) => (
+                      <div key={index} className="text-xs text-yellow-700 mb-1">
+                        Zeile {warning.row}: {warning.message}
+                      </div>
+                    ))}
+                    {uploadResult.warnings.length > 3 && (
+                      <div className="text-xs text-yellow-600">
+                        ... und {uploadResult.warnings.length - 3} weitere Warnungen
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Import History */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-gray-900">Import-Verlauf</h3>
+            <button
+              onClick={fetchCSVImportHistory}
+              className="flex items-center px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+            >
+              <RefreshCw className="h-4 w-4 mr-1" />
+              Aktualisieren
+            </button>
+          </div>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Typ</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datei</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datensätze</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Größe</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {csvImportHistory.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                    <History className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                    Noch keine Imports durchgeführt
+                  </td>
+                </tr>
+              ) : (
+                csvImportHistory.map((importRecord) => (
+                  <tr key={importRecord.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        importRecord.import_type === 'commitments' 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : 'bg-green-100 text-green-800'
+                      }`}
+                      >
+                        {importRecord.import_type === 'commitments' ? 'Commitments' : 'Actuals'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {importRecord.file_name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        {importRecord.import_status === 'completed' ? (
+                          <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
+                        ) : importRecord.import_status === 'failed' ? (
+                          <XCircle className="h-4 w-4 text-red-500 mr-1" />
+                        ) : (
+                          <Clock className="h-4 w-4 text-yellow-500 mr-1" />
+                        )}
+                        <span className={`text-sm ${
+                          importRecord.import_status === 'completed' ? 'text-green-800' :
+                          importRecord.import_status === 'failed' ? 'text-red-800' : 'text-yellow-800'
+                        }`}
+                        >
+                          {importRecord.import_status === 'completed' ? 'Abgeschlossen' :
+                           importRecord.import_status === 'failed' ? 'Fehlgeschlagen' : 'In Bearbeitung'}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-green-600">{importRecord.records_imported}</span>
+                        <span className="text-gray-400">/</span>
+                        <span>{importRecord.records_processed}</span>
+                        {importRecord.records_failed > 0 && (
+                          <>
+                            <span className="text-gray-400">•</span>
+                            <span className="text-red-600">{importRecord.records_failed} Fehler</span>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(importRecord.started_at).toLocaleString('de-DE')}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {(importRecord.file_size / 1024).toFixed(1)} KB
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )
+}

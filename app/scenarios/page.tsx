@@ -1,15 +1,11 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import AppLayout from '../../components/AppLayout'
 import { getApiUrl } from '../../lib/api'
 import CreateScenarioModal from './components/CreateScenarioModal'
-import { 
-  Plus, Play, BarChart3, TrendingUp, TrendingDown, Calendar, DollarSign,
-  Clock, Users, AlertTriangle, CheckCircle, RefreshCw, Trash2, Edit3,
-  GitBranch, Zap, Target, Settings
-} from 'lucide-react'
+import { Plus, BarChart3, TrendingUp, TrendingDown, DollarSign, Clock, Users, AlertTriangle, RefreshCw, Trash2, Edit3, GitBranch, Zap, Target } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 interface Project {

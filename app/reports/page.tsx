@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { MessageCircle, FileText, Download, Loader, Send, Bot, User, AlertTriangle, RefreshCw } from 'lucide-react'
+import { FileText, Loader, Send, Bot, User, AlertTriangle, RefreshCw } from 'lucide-react'
 import AppLayout from '../../components/AppLayout'
 import { getApiUrl } from '../../lib/api'
 

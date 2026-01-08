@@ -1,11 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { 
-  LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
-  BarChart, Bar, ComposedChart
-} from 'recharts'
-import { TrendingUp, TrendingDown, Calendar, Filter } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Bar, ComposedChart } from 'recharts'
+import { Calendar, Filter } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
 
 interface VarianceTrend {

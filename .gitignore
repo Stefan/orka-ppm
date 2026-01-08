@@ -1,51 +1,57 @@
-# Deployment
-.vercel
-.env*.local
-
-# Backend
-backend/.env
+# Dependencies
+node_modules/
 backend/venv/
-backend/__pycache__/
-backend/*.log
-backend/tests/__pycache__/
 
-# Frontend
-frontend/.next/
-frontend/node_modules/
-frontend/.env*.local
+# Environment files
+.env
+.env.local
+.env.production
+.env.development
+backend/.env
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
+# Build artifacts
+.next/
+.vercel/
+*.tsbuildinfo
 
-# OS
-.DS_Store
-Thumbs.db
+# Cache and temporary files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.hypothesis/
+.pytest_cache/
+.coverage
+.pre_startup_test_cache.json
 
 # Logs
 *.log
 logs/
+backend/*.log
 
-# Testing artifacts
-.hypothesis/
-.pytest_cache/
-backend/.hypothesis/
-backend/.pytest_cache/
-frontend/.hypothesis/
-frontend/.pytest_cache/
-node_modules
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# Build artifacts and cache files
-.next/
-*.tsbuildinfo
-.pre_startup_test_cache.json
-backend/.pre_startup_test_cache.json
-backend/.coverage
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Temporary and backup files
-*_backup_*.py
+# Backup and temporary files
+*_backup_*
+*-backup.*
+*-original.*
+*-optimized.*
+*-ultra-fast.*
 *.bak
 *.tmp
 *.temp
@@ -53,6 +59,7 @@ backend/.coverage
 # Test data files
 test_*.csv
 *.test.json
+test_data/
 
-# Development environment files
-.env.production.example
+# Development artifacts
+.swc/
