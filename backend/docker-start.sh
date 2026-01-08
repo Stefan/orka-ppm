@@ -36,4 +36,4 @@ fi
 
 # Start the server with production settings
 echo "🚀 Starting FastAPI server in Docker..."
-exec uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${WORKERS:-1}
+exec uvicorn simple_server:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${WORKERS:-1}
