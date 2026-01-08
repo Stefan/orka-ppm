@@ -1,1 +1,1 @@
-Deployment trigger for simplified backend server - 2026-01-08 Fixed Docker chmod error for missing scripts
+Deployment trigger for simplified backend server - 2026-01-08 Fixed Docker to use simple_server instead of main
