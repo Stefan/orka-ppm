@@ -32,7 +32,12 @@ export const metadata: Metadata = {
   icons: {
     shortcut: '/favicon.ico',
     apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
       { url: '/apple-touch-icon.svg', sizes: '180x180', type: 'image/svg+xml' },
+    ],
+    other: [
+      { rel: 'icon', type: 'image/svg+xml', sizes: '32x32', url: '/favicon-32x32.svg' },
+      { rel: 'icon', type: 'image/svg+xml', sizes: '16x16', url: '/favicon-16x16.svg' },
     ],
   },
 }
@@ -55,9 +60,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="application-name" content="Orka PPM" />
         <meta name="msapplication-TileColor" content="#2563eb" />
         <meta name="msapplication-tap-highlight" content="no" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/svg+xml" sizes="32x32" href="/favicon-32x32.svg" />
+        <link rel="icon" type="image/svg+xml" sizes="16x16" href="/favicon-16x16.svg" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2563eb" />
       </head>
       <body className="font-sans antialiased" suppressHydrationWarning={true}>
