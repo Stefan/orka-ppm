@@ -2,21 +2,15 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Performance optimizations
-  swcMinify: true,
   compress: true,
   
   // Bundle optimization
   experimental: {
     optimizePackageImports: ['lucide-react', 'recharts'],
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
-    },
   },
+  
+  // Turbopack configuration (empty to silence warnings)
+  turbopack: {},
   
   // Compiler optimizations
   compiler: {
@@ -47,26 +41,6 @@ const nextConfig: NextConfig = {
       },
     ],
     unoptimized: false,
-  },
-
-  // Output optimization
-  output: 'standalone',
-  
-  // Webpack optimizations
-  webpack: (config, { dev, isServer }) => {
-    if (!dev && !isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-          },
-        },
-      };
-    }
-    return config;
   },
 
   // Redirects for API calls

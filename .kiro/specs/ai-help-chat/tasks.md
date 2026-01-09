@@ -94,7 +94,7 @@ This document outlines the implementation tasks for the AI-powered In-App Help C
     - Ensure accessibility compliance (ARIA labels, keyboard navigation)
     - _Requirements: 1.1, 1.3_
 
-  - [ ] 6.3 Write unit tests for UI components
+  - [-] 6.3 Write unit tests for UI components
     - Test responsive behavior and interactions
     - Test accessibility features
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
