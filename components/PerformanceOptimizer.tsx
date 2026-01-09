@@ -54,15 +54,19 @@ export default function PerformanceOptimizer() {
 
     // Preload critical resources
     const preloadCriticalResources = () => {
+      // Use actual backend endpoints that exist
       const criticalResources = [
-        '/api/optimized/dashboard/quick-stats',
-        '/api/projects'
+        '/projects',
+        '/resources/',
+        '/feedback/features',
+        '/optimized/dashboard/quick-stats',
+        '/portfolios/metrics'
       ]
       
       criticalResources.forEach((resource) => {
         const link = document.createElement('link')
         link.rel = 'prefetch'
-        link.href = resource
+        link.href = `https://orka-ppm.onrender.com${resource}`
         document.head.appendChild(link)
       })
     }
