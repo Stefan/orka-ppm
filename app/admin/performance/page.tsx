@@ -8,7 +8,7 @@ import {
 import AppLayout from '../../../components/AppLayout'
 import { 
   Clock, AlertTriangle, CheckCircle, 
-  RefreshCw, Trash2, Database, Globe
+  RefreshCw, Trash2, Database, Globe, X
 } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
 
@@ -62,6 +62,7 @@ export default function PerformanceDashboard() {
   const [cacheStats, setCacheStats] = useState<CacheStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
@@ -74,7 +75,7 @@ export default function PerformanceDashboard() {
     return undefined
   }, [session])
 
-  async function fetchPerformanceData() {
+  async function fetchPerformanceData(isManualRefresh = false) {
     if (!session?.access_token) return
     
     try {
@@ -92,24 +93,46 @@ export default function PerformanceDashboard() {
 
       if (statsResponse.ok) {
         const statsData = await statsResponse.json()
-        setStats(statsData)
+        // Validate the data structure before setting state
+        if (statsData && typeof statsData === 'object') {
+          setStats(statsData)
+        } else {
+          console.warn('Invalid stats data structure received:', statsData)
+        }
+      } else {
+        console.error(`Stats API error: ${statsResponse.status} ${statsResponse.statusText}`)
       }
 
       if (healthResponse.ok) {
         const healthData = await healthResponse.json()
-        setHealth(healthData)
+        if (healthData && typeof healthData === 'object') {
+          setHealth(healthData)
+        } else {
+          console.warn('Invalid health data structure received:', healthData)
+        }
+      } else {
+        console.error(`Health API error: ${healthResponse.status} ${healthResponse.statusText}`)
       }
 
       if (cacheResponse.ok) {
         const cacheData = await cacheResponse.json()
-        setCacheStats(cacheData)
+        if (cacheData && typeof cacheData === 'object') {
+          setCacheStats(cacheData)
+        } else {
+          console.warn('Invalid cache data structure received:', cacheData)
+        }
+      } else {
+        console.error(`Cache API error: ${cacheResponse.status} ${cacheResponse.statusText}`)
       }
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch performance data')
     } finally {
       setLoading(false)
-      setRefreshing(false)
+      // Only manage refreshing state if this is not a manual refresh
+      if (!isManualRefresh) {
+        setRefreshing(false)
+      }
     }
   }
 
@@ -118,6 +141,9 @@ export default function PerformanceDashboard() {
     
     try {
       setRefreshing(true)
+      setError(null)
+      setSuccessMessage(null)
+      
       const response = await fetch(getApiUrl('/admin/cache/clear'), {
         method: 'POST',
         headers: {
@@ -128,31 +154,53 @@ export default function PerformanceDashboard() {
       })
 
       if (response.ok) {
-        await fetchPerformanceData()
+        const result = await response.json()
+        console.log('Cache cleared successfully:', result)
+        
+        // Show success message
+        setSuccessMessage('Cache cleared successfully!')
+        
+        // Refresh data after clearing cache
+        await fetchPerformanceData(true)
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => setSuccessMessage(null), 3000)
+      } else {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Failed to clear cache: ${response.status}`)
       }
     } catch (err) {
+      console.error('Cache clear error:', err)
       setError(err instanceof Error ? err.message : 'Failed to clear cache')
     } finally {
       setRefreshing(false)
     }
   }
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setRefreshing(true)
-    fetchPerformanceData()
+    setError(null)
+    try {
+      await fetchPerformanceData(true) // Pass true to indicate manual refresh
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to refresh data')
+    } finally {
+      setRefreshing(false)
+    }
   }
 
   // Prepare chart data
-  const endpointData = stats ? Object.entries(stats.endpoint_stats).map(([endpoint, data]) => ({
-    endpoint: endpoint.replace(/^(GET|POST|PUT|PATCH|DELETE)\s+/, '').substring(0, 20) + '...',
+  const endpointData = stats && stats.endpoint_stats ? Object.entries(stats.endpoint_stats).map(([endpoint, data]) => ({
+    endpoint: endpoint.length > 30 ? endpoint.substring(0, 30) + '...' : endpoint,
+    fullEndpoint: endpoint, // Keep full endpoint for tooltips
     avg_duration: Math.round(data.avg_duration * 1000), // Convert to ms
     requests: data.total_requests,
     error_rate: data.error_rate,
     rpm: data.requests_per_minute
   })).slice(0, 10) : []
 
-  const slowQueriesData = stats?.recent_slow_queries.map(query => ({
-    endpoint: query.endpoint.replace(/^(GET|POST|PUT|PATCH|DELETE)\s+/, '').substring(0, 15) + '...',
+  const slowQueriesData = stats?.recent_slow_queries?.map(query => ({
+    endpoint: query.endpoint,
     duration: Math.round(query.duration * 1000),
     time: new Date(query.timestamp).toLocaleTimeString()
   })) || []
@@ -179,22 +227,6 @@ export default function PerformanceDashboard() {
     <AppLayout>
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    </AppLayout>
-  )
-
-  if (error) return (
-    <AppLayout>
-      <div className="p-8">
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <div className="flex">
-            <AlertTriangle className="h-5 w-5 text-red-400" />
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error loading performance data</h3>
-              <p className="mt-1 text-sm text-red-700">{error}</p>
-            </div>
-          </div>
-        </div>
       </div>
     </AppLayout>
   )
@@ -230,24 +262,54 @@ export default function PerformanceDashboard() {
           </div>
         </div>
 
+        {/* Success Message */}
+        {successMessage && (
+          <div className="bg-green-50 border border-green-200 rounded-md p-4">
+            <div className="flex">
+              <CheckCircle className="h-5 w-5 text-green-400" />
+              <div className="ml-3">
+                <p className="text-sm text-green-700">{successMessage}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="flex">
+              <AlertTriangle className="h-5 w-5 text-red-400" />
+              <div className="ml-3">
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+              <button
+                onClick={() => setError(null)}
+                className="ml-auto text-red-400 hover:text-red-600"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Health Status */}
         {health && (
-          <div className={`p-6 rounded-lg border ${getHealthBg(health.status)}`}>
+          <div className={`p-6 rounded-lg border ${getHealthBg(health?.status || 'unknown')}`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                {health.status === 'healthy' ? (
+                {health?.status === 'healthy' ? (
                   <CheckCircle className="h-8 w-8 text-green-600" />
-                ) : health.status === 'degraded' ? (
+                ) : health?.status === 'degraded' ? (
                   <AlertTriangle className="h-8 w-8 text-yellow-600" />
                 ) : (
                   <AlertTriangle className="h-8 w-8 text-red-600" />
                 )}
                 <div>
-                  <h3 className={`text-lg font-semibold ${getHealthColor(health.status)}`}>
-                    System Status: {health.status.charAt(0).toUpperCase() + health.status.slice(1)}
+                  <h3 className={`text-lg font-semibold ${getHealthColor(health?.status || 'unknown')}`}>
+                    System Status: {health?.status ? (health.status.charAt(0).toUpperCase() + health.status.slice(1)) : 'Unknown'}
                   </h3>
                   <p className="text-sm text-gray-600">
-                    Last updated: {new Date(health.timestamp).toLocaleString()}
+                    Last updated: {health?.timestamp ? new Date(health.timestamp).toLocaleString() : 'Never'}
                   </p>
                 </div>
               </div>
@@ -255,19 +317,19 @@ export default function PerformanceDashboard() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-gray-600">Total Requests:</span>
-                  <span className="ml-2 font-medium">{health.metrics.total_requests.toLocaleString()}</span>
+                  <span className="ml-2 font-medium">{health?.metrics?.total_requests?.toLocaleString() || '0'}</span>
                 </div>
                 <div>
                   <span className="text-gray-600">Error Rate:</span>
-                  <span className="ml-2 font-medium">{health.metrics.error_rate}%</span>
+                  <span className="ml-2 font-medium">{health?.metrics?.error_rate || '0'}%</span>
                 </div>
                 <div>
                   <span className="text-gray-600">Slow Queries:</span>
-                  <span className="ml-2 font-medium">{health.metrics.slow_queries}</span>
+                  <span className="ml-2 font-medium">{health?.metrics?.slow_queries || '0'}</span>
                 </div>
                 <div>
                   <span className="text-gray-600">Cache:</span>
-                  <span className="ml-2 font-medium">{health.cache_status}</span>
+                  <span className="ml-2 font-medium">{health?.cache_status || 'Unknown'}</span>
                 </div>
               </div>
             </div>
@@ -281,7 +343,7 @@ export default function PerformanceDashboard() {
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Requests</p>
                 <p className="text-2xl font-bold text-blue-600">
-                  {stats?.total_requests.toLocaleString() || 0}
+                  {stats?.total_requests?.toLocaleString() || '0'}
                 </p>
               </div>
               <Globe className="h-8 w-8 text-blue-600" />
@@ -334,12 +396,17 @@ export default function PerformanceDashboard() {
               <BarChart data={endpointData}>
                 <XAxis dataKey="endpoint" />
                 <YAxis />
-                <Tooltip formatter={(value, name) => [
-                  name === 'avg_duration' ? `${value}ms` : value,
-                  name === 'avg_duration' ? 'Avg Duration' : 
-                  name === 'requests' ? 'Total Requests' : 
-                  name === 'error_rate' ? 'Error Rate %' : 'RPM'
-                ]}
+                <Tooltip 
+                  formatter={(value, name) => [
+                    name === 'avg_duration' ? `${value}ms` : value,
+                    name === 'avg_duration' ? 'Avg Duration' : 
+                    name === 'requests' ? 'Total Requests' : 
+                    name === 'error_rate' ? 'Error Rate %' : 'RPM'
+                  ]}
+                  labelFormatter={(label, payload) => {
+                    const data = payload?.[0]?.payload;
+                    return data?.fullEndpoint || label;
+                  }}
                 />
                 <Legend />
                 <Bar dataKey="avg_duration" fill="#3B82F6" name="Avg Duration (ms)" />
@@ -355,7 +422,12 @@ export default function PerformanceDashboard() {
               <BarChart data={endpointData}>
                 <XAxis dataKey="endpoint" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip 
+                  labelFormatter={(label, payload) => {
+                    const data = payload?.[0]?.payload;
+                    return data?.fullEndpoint || label;
+                  }}
+                />
                 <Legend />
                 <Bar dataKey="requests" fill="#10B981" name="Total Requests" />
                 <Bar dataKey="rpm" fill="#F59E0B" name="Requests/Min" />
@@ -372,13 +444,13 @@ export default function PerformanceDashboard() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/2">
                       Endpoint
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
                       Duration
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
                       Time
                     </th>
                   </tr>
@@ -386,8 +458,13 @@ export default function PerformanceDashboard() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {slowQueriesData.map((query, index) => (
                     <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {query.endpoint}
+                      <td className="px-6 py-4 text-sm text-gray-900 break-words max-w-0">
+                        <div 
+                          className="font-mono text-xs bg-gray-100 px-2 py-1 rounded cursor-help" 
+                          title={query.endpoint}
+                        >
+                          {query.endpoint}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-medium">
                         {query.duration}ms
@@ -410,22 +487,22 @@ export default function PerformanceDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">
-                  {cacheStats.type.toUpperCase()}
+                  {cacheStats?.type?.toUpperCase() || 'UNKNOWN'}
                 </div>
                 <div className="text-sm text-gray-600">Cache Type</div>
               </div>
               
-              {cacheStats.type === 'redis' ? (
+              {cacheStats?.type === 'redis' ? (
                 <>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">
-                      {cacheStats.hit_rate || 0}%
+                      {cacheStats?.hit_rate || 0}%
                     </div>
                     <div className="text-sm text-gray-600">Hit Rate</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-purple-600">
-                      {cacheStats.used_memory || 'N/A'}
+                      {cacheStats?.used_memory || 'N/A'}
                     </div>
                     <div className="text-sm text-gray-600">Memory Used</div>
                   </div>
@@ -434,13 +511,13 @@ export default function PerformanceDashboard() {
                 <>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">
-                      {cacheStats.entries || 0}
+                      {cacheStats?.entries || 0}
                     </div>
                     <div className="text-sm text-gray-600">Cache Entries</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-purple-600">
-                      {cacheStats.timestamps || 0}
+                      {cacheStats?.timestamps || 0}
                     </div>
                     <div className="text-sm text-gray-600">Timestamps</div>
                   </div>
