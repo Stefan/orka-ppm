@@ -101,18 +101,18 @@ class ChartGenerationRequest(BaseModel):
     """Request model for generating charts."""
     simulation_id: str
     chart_types: List[str] = Field(default=["distribution", "tornado", "cdf"], description="Types of charts to generate")
-    outcome_type: str = Field(default="cost", regex="^(cost|schedule)$")
-    format: str = Field(default="png", regex="^(png|pdf|svg|html)$")
-    theme: str = Field(default="professional", regex="^(default|professional|presentation|colorblind_friendly)$")
+    outcome_type: str = Field(default="cost", pattern="^(cost|schedule)$")
+    format: str = Field(default="png", pattern="^(png|pdf|svg|html)$")
+    theme: str = Field(default="professional", pattern="^(default|professional|presentation|colorblind_friendly)$")
     include_risk_heat_map: bool = False
 
 class VisualizationExportRequest(BaseModel):
     """Request model for exporting visualization suite."""
     simulation_id: str
     scenario_ids: List[str] = []
-    export_format: str = Field(default="png", regex="^(png|pdf|svg|html)$")
+    export_format: str = Field(default="png", pattern="^(png|pdf|svg|html)$")
     include_interactive: bool = False
-    layout_type: str = Field(default="standard", regex="^(standard|executive|detailed)$")
+    layout_type: str = Field(default="standard", pattern="^(standard|executive|detailed)$")
 
 # Custom exception handler decorator
 def handle_monte_carlo_exceptions(func):
@@ -710,7 +710,7 @@ async def compare_scenarios(
 
 @router.post("/export")
 async def export_results(
-    request: ExportRequest,
+    request: VisualizationExportRequest,
     current_user = Depends(require_permission(Permission.risk_read))
 ):
     """Export simulation results in various formats."""
@@ -911,17 +911,17 @@ async def get_simulation_result_legacy(
 class ChartGenerationRequest(BaseModel):
     """Request model for generating charts."""
     chart_types: List[str] = Field(default=["distribution", "tornado", "cdf"], description="Types of charts to generate")
-    outcome_type: str = Field(default="cost", regex="^(cost|schedule)$")
-    format: str = Field(default="png", regex="^(png|pdf|svg|html)$")
-    theme: str = Field(default="professional", regex="^(default|professional|presentation|colorblind_friendly)$")
+    outcome_type: str = Field(default="cost", pattern="^(cost|schedule)$")
+    format: str = Field(default="png", pattern="^(png|pdf|svg|html)$")
+    theme: str = Field(default="professional", pattern="^(default|professional|presentation|colorblind_friendly)$")
     include_risk_heat_map: bool = False
 
 class VisualizationExportRequest(BaseModel):
     """Request model for exporting visualization suite."""
     scenario_ids: List[str] = []
-    export_format: str = Field(default="png", regex="^(png|pdf|svg|html)$")
+    export_format: str = Field(default="png", pattern="^(png|pdf|svg|html)$")
     include_interactive: bool = False
-    layout_type: str = Field(default="standard", regex="^(standard|executive|detailed)$")
+    layout_type: str = Field(default="standard", pattern="^(standard|executive|detailed)$")
 
 @router.post("/simulations/{simulation_id}/visualizations/generate")
 @handle_monte_carlo_exceptions

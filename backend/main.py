@@ -32,8 +32,9 @@ from routers.ai import router as ai_router
 from routers.csv_import import router as csv_import_router
 from routers.variance import router as variance_router
 from routers.admin import router as admin_router
-from routers.change_management_simple import router as change_management_router
+# from routers.change_management_simple import router as change_management_router
 from routers.schedules import router as schedules_router
+from routers.help_chat import router as help_chat_router
 
 # Import AI agents and services
 try:
@@ -46,6 +47,18 @@ try:
 except ImportError as e:
     print(f"⚠️ AI agents not available: {e}")
     ai_agents = None
+
+# Import and initialize help chat performance service
+try:
+    from services.help_chat_performance import initialize_help_chat_performance
+    help_chat_performance = initialize_help_chat_performance(supabase) if supabase else None
+    if help_chat_performance:
+        print("✅ Help chat performance service initialized")
+    else:
+        print("⚠️ Help chat performance service not available - database not configured")
+except ImportError as e:
+    print(f"⚠️ Help chat performance service not available: {e}")
+    help_chat_performance = None
 
 # Import performance optimization components
 try:
@@ -167,8 +180,9 @@ app.include_router(ai_router)
 app.include_router(csv_import_router)
 app.include_router(variance_router)
 app.include_router(admin_router)
-app.include_router(change_management_router)
+# app.include_router(change_management_router)
 app.include_router(schedules_router)
+app.include_router(help_chat_router)
 
 # Basic endpoints
 @app.get("/")

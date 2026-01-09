@@ -2,9 +2,13 @@
 
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../app/providers/SupabaseAuthProvider'
+import { HelpChatProvider } from '../app/providers/HelpChatProvider'
 import { useRouter } from 'next/navigation'
 import { Menu } from 'lucide-react'
 import Sidebar from './Sidebar'
+import HelpChat from './HelpChat'
+import HelpChatToggle from './HelpChatToggle'
+import ProactiveTips from './ProactiveTips'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -55,40 +59,54 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Desktop Sidebar */}
-      <Sidebar isOpen={!isMobile} />
-      
-      {/* Mobile Sidebar */}
-      {isMobile && (
-        <Sidebar 
-          isOpen={sidebarOpen} 
-          onToggle={() => setSidebarOpen(!sidebarOpen)}
-          isMobile={true}
-        />
-      )}
-      
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Mobile Header */}
+    <HelpChatProvider>
+      <div className="flex h-screen bg-gray-50">
+        {/* Desktop Sidebar */}
+        <Sidebar isOpen={!isMobile} />
+        
+        {/* Mobile Sidebar */}
         {isMobile && (
-          <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between lg:hidden">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
-            <h1 className="text-lg font-semibold text-gray-900">PPM Dashboard</h1>
-            <div className="w-10" /> {/* Spacer for centering */}
-          </header>
+          <Sidebar 
+            isOpen={sidebarOpen} 
+            onToggle={() => setSidebarOpen(!sidebarOpen)}
+            isMobile={true}
+          />
         )}
         
-        {/* Main Content Area */}
-        <main className="flex-1 overflow-auto">
-          {children}
-        </main>
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Mobile Header */}
+          {isMobile && (
+            <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between lg:hidden">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+              >
+                <Menu className="h-6 w-6" />
+              </button>
+              <h1 className="text-lg font-semibold text-gray-900">PPM Dashboard</h1>
+              <div className="w-10" /> {/* Spacer for centering */}
+            </header>
+          )}
+          
+          {/* Main Content Area */}
+          <main className="flex-1 overflow-auto">
+            {children}
+          </main>
+        </div>
+
+        {/* Help Chat Integration - Proper z-index layering */}
+        {/* Help Chat: z-40 for desktop sidebar, z-50 for mobile overlay */}
+        <HelpChat />
+        {/* Help Chat Toggle: z-30 to stay below chat but above main content */}
+        <HelpChatToggle />
+        {/* Proactive Tips: z-45 to stay above main content but below help chat */}
+        <ProactiveTips 
+          position="bottom-right"
+          maxVisible={3}
+          autoHide={false}
+        />
       </div>
-    </div>
+    </HelpChatProvider>
   )
 }

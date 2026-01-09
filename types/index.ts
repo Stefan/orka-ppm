@@ -3,6 +3,9 @@
  * Centralized type definitions for the entire application
  */
 
+// Re-export help chat types
+export * from './help-chat'
+
 // Base Types
 export interface BaseEntity {
   id: string

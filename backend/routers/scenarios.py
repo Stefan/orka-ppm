@@ -10,7 +10,7 @@ from datetime import datetime
 from auth.rbac import require_permission, Permission
 from auth.dependencies import get_current_user
 from config.database import supabase
-from roche_construction_services import ScenarioAnalyzer
+from services.roche_construction_services import ScenarioAnalyzer
 from roche_construction_models import (
     ScenarioCreate, ScenarioAnalysis, ScenarioComparison, ScenarioConfig
 )

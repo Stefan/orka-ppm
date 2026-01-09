@@ -4,7 +4,13 @@
   "private": true,
   "description": "AI-powered Project Portfolio Management System",
   "author": "Stefan",
-  "keywords": ["ppm", "project-management", "ai", "nextjs", "typescript"],
+  "keywords": [
+    "ppm",
+    "project-management",
+    "ai",
+    "nextjs",
+    "typescript"
+  ],
   "scripts": {
     "dev": "next dev",
     "dev:webpack": "next dev --webpack",
@@ -26,13 +32,18 @@
     "quick-fix": "npm run fix-critical && npm run lint:fix"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@supabase/supabase-js": "^2.89.0",
+    "html2canvas": "^1.4.1",
     "lucide-react": "^0.562.0",
-    "next": "16.1.1",
+    "next": "^16.1.1",
     "next-pwa": "^5.6.0",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "recharts": "^3.6.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^10.1.0",
+    "recharts": "^3.6.0",
+    "rehype-highlight": "^7.0.2",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

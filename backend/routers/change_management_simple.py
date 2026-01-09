@@ -13,11 +13,7 @@ from auth.dependencies import get_current_user
 from auth.rbac import require_permission, Permission
 from models.change_management import (
     ChangeRequestCreate, ChangeRequestUpdate, ChangeRequestResponse,
-    ChangeRequestFilters, ApprovalDecisionRequest, ApprovalResponse,
-    ImpactAnalysisRequest, ImpactAnalysisResponse, ImplementationPlan,
-    ImplementationProgress, ImplementationResponse, ChangeAnalytics,
-    PendingApproval, AuditLogEntry, ChangeTemplateCreate, ChangeTemplateResponse,
-    ChangeStatus, ChangeType, PriorityLevel, ApprovalDecision
+    ApprovalDecisionRequest, ChangeStatus, ChangeType, PriorityLevel, ApprovalDecision
 )
 
 router = APIRouter(prefix="/changes", tags=["Change Management"])
@@ -233,7 +229,8 @@ async def submit_for_approval(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to submit for approval: {str(e)}")
 
-@router.get("/approvals/pending", response_model=List[PendingApproval])
+# Commented out due to missing PendingApproval model
+# @router.get("/approvals/pending", response_model=List[PendingApproval])
 async def get_pending_approvals(
     current_user = Depends(get_current_user)
 ):
