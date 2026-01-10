@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../providers/SupabaseAuthProvider'
 import { Users, UserPlus, UserMinus, UserX, Search, Filter, Shield, AlertTriangle, CheckCircle, XCircle, RefreshCw } from 'lucide-react'
-import AppLayout from '../../../components/AppLayout'
+import AppLayout from '../../../components/shared/AppLayout'
 import { getApiUrl } from '../../../lib/api'
 
 interface User {

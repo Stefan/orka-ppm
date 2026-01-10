@@ -6,6 +6,42 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
+    languageOptions: {
+      globals: {
+        // Jest globals
+        jest: "readonly",
+        describe: "readonly",
+        it: "readonly",
+        test: "readonly",
+        expect: "readonly",
+        beforeEach: "readonly",
+        afterEach: "readonly",
+        beforeAll: "readonly",
+        afterAll: "readonly",
+        // Node.js globals
+        global: "readonly",
+        process: "readonly",
+        Buffer: "readonly",
+        NodeJS: "readonly",
+        // Browser globals
+        window: "readonly",
+        document: "readonly",
+        navigator: "readonly",
+        console: "readonly",
+        // Browser API types
+        IDBTransactionMode: "readonly",
+        IDBObjectStoreParameters: "readonly",
+        IDBIndexParameters: "readonly",
+        RequestInit: "readonly",
+        NotificationPermission: "readonly",
+        NotificationOptions: "readonly",
+        BufferSource: "readonly",
+        IntersectionObserverInit: "readonly",
+        // React globals
+        React: "readonly",
+        JSX: "readonly"
+      }
+    },
     rules: {
       // Catch common JSX syntax issues
       "react/jsx-no-undef": "error",

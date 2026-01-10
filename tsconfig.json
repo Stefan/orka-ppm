@@ -1,13 +1,18 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": true,
     "noEmit": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
@@ -15,11 +20,17 @@
     "jsx": "react-jsx",
     "incremental": true,
     "forceConsistentCasingInFileNames": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "exactOptionalPropertyTypes": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
     "plugins": [
       {
         "name": "next"
@@ -27,14 +38,84 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "@/components/*": ["./components/*"],
-      "@/lib/*": ["./lib/*"],
-      "@/app/*": ["./app/*"],
-      "@/types/*": ["./types/*"],
-      "@/hooks/*": ["./hooks/*"],
-      "@/utils/*": ["./utils/*"]
-    }
+      "@/*": [
+        "./*"
+      ],
+      "@/components/*": [
+        "./components/*"
+      ],
+      "@/components/ai": [
+        "./components/ai"
+      ],
+      "@/components/navigation": [
+        "./components/navigation"
+      ],
+      "@/components/offline": [
+        "./components/offline"
+      ],
+      "@/components/onboarding": [
+        "./components/onboarding"
+      ],
+      "@/components/shared": [
+        "./components/shared"
+      ],
+      "@/lib/*": [
+        "./lib/*"
+      ],
+      "@/lib/ai": [
+        "./lib/ai"
+      ],
+      "@/lib/api": [
+        "./lib/api"
+      ],
+      "@/lib/monitoring": [
+        "./lib/monitoring"
+      ],
+      "@/lib/offline": [
+        "./lib/offline"
+      ],
+      "@/lib/sync": [
+        "./lib/sync"
+      ],
+      "@/lib/utils": [
+        "./lib/utils"
+      ],
+      "@/lib/services": [
+        "./lib/services"
+      ],
+      "@/lib/help-chat": [
+        "./lib/help-chat"
+      ],
+      "@/lib/design-system": [
+        "./lib/utils/design-system"
+      ],
+      "@/lib/performance": [
+        "./lib/monitoring/performance-utils"
+      ],
+      "@/app/*": [
+        "./app/*"
+      ],
+      "@/types/*": [
+        "./types/*"
+      ],
+      "@/hooks/*": [
+        "./hooks/*"
+      ],
+      "@/utils/*": [
+        "./utils/*"
+      ]
+    },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ],
+    "types": [
+      "node",
+      "react",
+      "react-dom",
+      "jest",
+      "jest-axe"
+    ]
   },
   "include": [
     "next-env.d.ts",
@@ -44,5 +125,8 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "node_modules/@types/next-pwa"
+  ]
 }

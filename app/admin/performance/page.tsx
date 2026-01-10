@@ -5,26 +5,12 @@ import { useAuth } from '../../providers/SupabaseAuthProvider'
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer
 } from 'recharts'
-import AppLayout from '../../../components/AppLayout'
+import AppLayout from '../../../components/shared/AppLayout'
 import { 
   Clock, AlertTriangle, CheckCircle, 
   RefreshCw, Trash2, Database, Globe, X
 } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
-import dynamic from 'next/dynamic'
-
-// Lazy load charts to reduce initial bundle size
-const LazyBarChart = dynamic(() => import('recharts').then(mod => ({ default: mod.BarChart })), {
-  ssr: false,
-  loading: () => <div className="h-[300px] bg-gray-100 animate-pulse rounded" />
-})
-
-const LazyBar = dynamic(() => import('recharts').then(mod => ({ default: mod.Bar })), { ssr: false })
-const LazyXAxis = dynamic(() => import('recharts').then(mod => ({ default: mod.XAxis })), { ssr: false })
-const LazyYAxis = dynamic(() => import('recharts').then(mod => ({ default: mod.YAxis })), { ssr: false })
-const LazyTooltip = dynamic(() => import('recharts').then(mod => ({ default: mod.Tooltip })), { ssr: false })
-const LazyLegend = dynamic(() => import('recharts').then(mod => ({ default: mod.Legend })), { ssr: false })
-const LazyResponsiveContainer = dynamic(() => import('recharts').then(mod => ({ default: mod.ResponsiveContainer })), { ssr: false })
 
 interface PerformanceStats {
   endpoint_stats: Record<string, {

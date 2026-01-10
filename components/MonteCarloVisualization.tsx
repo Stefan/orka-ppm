@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { BarChart3, TrendingUp, Download, RefreshCw, Settings, AlertTriangle } from 'lucide-react'
-import { getApiUrl } from '../lib/api'
+import { getApiUrl } from '../lib/api/client'
 
 interface MonteCarloChart {
   title: string

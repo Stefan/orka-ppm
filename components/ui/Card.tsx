@@ -13,10 +13,15 @@ export const Card: React.FC<CardProps> = ({
   ...props
 }) => {
   const paddingClasses = {
-    none: '',
+    xs: 'p-2',
     sm: 'p-4',
     md: 'p-6',
     lg: 'p-8',
+    xl: 'p-10',
+    '2xl': 'p-12',
+    '3xl': 'p-16',
+    '4xl': 'p-20',
+    '5xl': 'p-24',
   }
 
   return (

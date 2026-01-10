@@ -1,7 +1,9 @@
 /**
  * ORKA-PPM Type Definitions
- * Centralized type definitions for the entire application
+ * Enhanced with mobile-first design system types
  */
+
+import React from 'react'
 
 // Re-export help chat types
 export * from './help-chat'
@@ -30,6 +32,15 @@ export interface UserPreferences {
   timezone: string
   notifications: NotificationSettings
   dashboard: DashboardPreferences
+  accessibility: AccessibilitySettings
+}
+
+export interface AccessibilitySettings {
+  highContrast: boolean
+  reducedMotion: boolean
+  fontSize: 'small' | 'medium' | 'large'
+  screenReader: boolean
+  keyboardNavigation: boolean
 }
 
 export interface NotificationSettings {
@@ -122,82 +133,272 @@ export interface AIOptimizationSuggestion {
   alternative_strategies?: string[]
 }
 
-// UI Component Types
+// Enhanced Design System Types
+
+// Color System Types
+export type ColorScale = {
+  50: string
+  100: string
+  200: string
+  300: string
+  400: string
+  500: string
+  600: string
+  700: string
+  800: string
+  900: string
+  950?: string
+}
+
+export type ColorVariant = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'gray'
+
+// Typography Types
+export type FontSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl'
+export type FontWeight = 'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold'
+export type LineHeight = 'tight' | 'normal' | 'relaxed'
+
+// Spacing Types
+export type Spacing = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl'
+
+// Breakpoint Types
+export type Breakpoint = 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+
+// Touch Target Types
+export type TouchTargetSize = 'minimum' | 'comfortable' | 'large' | 'xlarge'
+
+// Component Size Types
+export type ComponentSize = 'sm' | 'md' | 'lg' | 'xl'
+
+// Component Variant Types
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success' | 'warning'
+export type InputVariant = 'default' | 'error' | 'success' | 'warning'
+export type CardVariant = 'default' | 'elevated' | 'interactive' | 'outlined' | 'filled'
+export type BadgeVariant = 'primary' | 'secondary' | 'success' | 'warning' | 'error'
+export type AlertVariant = 'info' | 'success' | 'warning' | 'error'
+
+// Enhanced UI Component Types
 export interface ComponentProps {
   className?: string
   children?: React.ReactNode
+  id?: string
+  'data-testid'?: string
 }
 
-export interface ButtonProps extends ComponentProps {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
-  size?: 'sm' | 'md' | 'lg'
+export interface ResponsiveProps {
+  mobile?: string
+  tablet?: string
+  desktop?: string
+  wide?: string
+}
+
+export interface AccessibleProps {
+  'aria-label'?: string
+  'aria-labelledby'?: string
+  'aria-describedby'?: string
+  'aria-expanded'?: boolean
+  'aria-hidden'?: boolean
+  role?: string
+  tabIndex?: number
+}
+
+export interface ButtonProps extends ComponentProps, AccessibleProps {
+  variant?: ButtonVariant
+  size?: ComponentSize
   disabled?: boolean
   loading?: boolean
-  onClick?: () => void
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
+  onFocus?: (event: React.FocusEvent<HTMLButtonElement>) => void
+  onBlur?: (event: React.FocusEvent<HTMLButtonElement>) => void
   type?: 'button' | 'submit' | 'reset'
+  fullWidth?: boolean
+  leftIcon?: React.ReactNode
+  rightIcon?: React.ReactNode
+  touchTarget?: TouchTargetSize
 }
 
-export interface InputProps extends ComponentProps {
-  type?: string
+export interface InputProps extends ComponentProps, AccessibleProps {
+  type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'date' | 'time' | 'datetime-local'
   value?: string
+  defaultValue?: string
   placeholder?: string
   disabled?: boolean
+  readOnly?: boolean
+  required?: boolean
+  variant?: InputVariant
+  size?: ComponentSize
   error?: string
-  onChange?: (value: string) => void
-  onBlur?: () => void
-  onFocus?: () => void
+  helperText?: string
+  label?: string
+  leftIcon?: React.ReactNode
+  rightIcon?: React.ReactNode
+  onChange?: (value: string, event: React.ChangeEvent<HTMLInputElement>) => void
+  onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void
+  onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void
+  autoComplete?: string
+  autoFocus?: boolean
+  maxLength?: number
+  minLength?: number
+  pattern?: string
+  step?: number
+  min?: number
+  max?: number
+}
+
+export interface TextareaProps extends Omit<InputProps, 'type' | 'leftIcon' | 'rightIcon' | 'onChange' | 'onBlur' | 'onFocus' | 'onKeyDown'> {
+  rows?: number
+  cols?: number
+  resize?: 'none' | 'vertical' | 'horizontal' | 'both'
+  onChange?: (value: string, event: React.ChangeEvent<HTMLTextAreaElement>) => void
+  onBlur?: (event: React.FocusEvent<HTMLTextAreaElement>) => void
+  onFocus?: (event: React.FocusEvent<HTMLTextAreaElement>) => void
+  onKeyDown?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void
 }
 
 export interface CardProps extends ComponentProps {
-  variant?: 'default' | 'elevated' | 'interactive'
-  padding?: 'none' | 'sm' | 'md' | 'lg'
+  variant?: CardVariant
+  padding?: Spacing
+  shadow?: 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+  rounded?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
+  interactive?: boolean
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void
 }
 
-// API Types
-export interface ApiResponse<T = unknown> {
-  data: T
-  message?: string
-  success: boolean
+export interface ModalProps extends ComponentProps, AccessibleProps {
+  isOpen: boolean
+  onClose: () => void
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  closeOnOverlayClick?: boolean
+  closeOnEscape?: boolean
+  showCloseButton?: boolean
+  title?: string
+  description?: string
+  footer?: React.ReactNode
+  initialFocus?: React.RefObject<HTMLElement>
 }
 
-export interface ApiError {
-  message: string
-  code?: string
-  details?: unknown
-}
-
-export interface PaginatedResponse<T> {
-  data: T[]
-  pagination: {
-    page: number
-    limit: number
-    total: number
-    totalPages: number
-  }
-}
-
-// Form Types
-export interface FormField {
-  name: string
-  label: string
-  type: 'text' | 'email' | 'password' | 'number' | 'select' | 'textarea' | 'checkbox'
-  required?: boolean
+export interface SelectProps extends ComponentProps, AccessibleProps {
+  value?: string | string[]
+  defaultValue?: string | string[]
   placeholder?: string
-  options?: { value: string; label: string }[]
-  validation?: {
-    min?: number
-    max?: number
-    pattern?: string
-    message?: string
+  disabled?: boolean
+  required?: boolean
+  multiple?: boolean
+  variant?: InputVariant
+  size?: ComponentSize
+  error?: string
+  helperText?: string
+  label?: string
+  options: SelectOption[]
+  onChange?: (value: string | string[], event: React.ChangeEvent<HTMLSelectElement>) => void
+  onBlur?: (event: React.FocusEvent<HTMLSelectElement>) => void
+  onFocus?: (event: React.FocusEvent<HTMLSelectElement>) => void
+}
+
+export interface SelectOption {
+  value: string
+  label: string
+  disabled?: boolean
+  group?: string
+}
+
+export interface BadgeProps extends ComponentProps {
+  variant?: BadgeVariant
+  size?: 'sm' | 'md' | 'lg'
+  rounded?: boolean
+  dot?: boolean
+}
+
+export interface AlertProps extends ComponentProps {
+  variant?: AlertVariant
+  title?: string
+  description?: string
+  icon?: React.ReactNode
+  closable?: boolean
+  onClose?: () => void
+}
+
+export interface TooltipProps extends ComponentProps {
+  content: React.ReactNode
+  placement?: 'top' | 'bottom' | 'left' | 'right'
+  trigger?: 'hover' | 'click' | 'focus'
+  delay?: number
+  disabled?: boolean
+}
+
+// Responsive Design Types
+export interface ResponsiveValue<T> {
+  mobile: T
+  tablet?: T
+  desktop?: T
+  wide?: T
+}
+
+export interface BreakpointConfig {
+  mobile: { min: number; max: number }
+  tablet: { min: number; max: number }
+  desktop: { min: number; max: number }
+  wide: { min: number; max: number }
+}
+
+// Theme Types
+export interface Theme {
+  colors: {
+    primary: ColorScale
+    secondary: ColorScale
+    success: ColorScale
+    warning: ColorScale
+    error: ColorScale
+    gray: ColorScale
+  }
+  typography: {
+    fontFamily: {
+      sans: string[]
+      mono: string[]
+    }
+    fontSize: Record<FontSize, [string, { lineHeight: string }]>
+    fontWeight: Record<FontWeight, string>
+  }
+  spacing: Record<Spacing, string>
+  borderRadius: Record<string, string>
+  boxShadow: Record<string, string>
+  breakpoints: Record<Breakpoint, string>
+  animation: {
+    duration: Record<string, string>
+    easing: Record<string, string>
   }
 }
 
-export interface FormState {
-  values: Record<string, unknown>
-  errors: Record<string, string>
-  touched: Record<string, boolean>
-  isSubmitting: boolean
-  isValid: boolean
+export interface ThemeConfig {
+  theme: 'light' | 'dark' | 'auto'
+  primaryColor: ColorVariant
+  borderRadius: 'none' | 'sm' | 'md' | 'lg' | 'xl'
+  fontScale: 'sm' | 'md' | 'lg'
+  animations: boolean
+  reducedMotion: boolean
+}
+
+// Layout Types
+export interface LayoutProps extends ComponentProps {
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'
+  padding?: Spacing
+  margin?: Spacing
+  centered?: boolean
+}
+
+export interface GridProps extends ComponentProps {
+  columns?: ResponsiveValue<number>
+  gap?: Spacing
+  alignItems?: 'start' | 'center' | 'end' | 'stretch'
+  justifyContent?: 'start' | 'center' | 'end' | 'between' | 'around' | 'evenly'
+}
+
+export interface FlexProps extends ComponentProps {
+  direction?: ResponsiveValue<'row' | 'column'>
+  wrap?: 'wrap' | 'nowrap' | 'wrap-reverse'
+  alignItems?: 'start' | 'center' | 'end' | 'stretch' | 'baseline'
+  justifyContent?: 'start' | 'center' | 'end' | 'between' | 'around' | 'evenly'
+  gap?: Spacing
 }
 
 // Navigation Types
@@ -209,17 +410,27 @@ export interface NavigationItem {
   badge?: number
   children?: NavigationItem[]
   permissions?: UserRole[]
+  external?: boolean
+  disabled?: boolean
+}
+
+export interface BreadcrumbItem {
+  label: string
+  href?: string
+  current?: boolean
 }
 
 // Dashboard Types
 export interface DashboardWidget {
   id: string
-  type: 'metric' | 'chart' | 'table' | 'list'
+  type: 'metric' | 'chart' | 'table' | 'list' | 'ai-insight'
   title: string
   data: unknown
   size: 'small' | 'medium' | 'large'
   position: { x: number; y: number }
   refreshInterval?: number
+  aiRecommended?: boolean
+  priority?: number
 }
 
 // Chart Types
@@ -255,19 +466,58 @@ export interface FilterState {
   sortOrder: 'asc' | 'desc'
 }
 
-// Responsive Types
-export interface ResponsiveValue<T> {
-  mobile: T
-  tablet?: T
-  desktop?: T
-  wide?: T
+// API Types
+export interface ApiResponse<T = unknown> {
+  data: T
+  message?: string
+  success: boolean
 }
 
-export interface BreakpointConfig {
-  mobile: { min: number; max: number }
-  tablet: { min: number; max: number }
-  desktop: { min: number; max: number }
-  wide: { min: number; max: number }
+export interface ApiError {
+  message: string
+  code?: string
+  details?: unknown
+}
+
+export interface PaginatedResponse<T> {
+  data: T[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}
+
+// Form Types
+export interface FormField {
+  name: string
+  label: string
+  type: 'text' | 'email' | 'password' | 'number' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'date' | 'time'
+  required?: boolean
+  placeholder?: string
+  options?: SelectOption[]
+  validation?: {
+    min?: number
+    max?: number
+    minLength?: number
+    maxLength?: number
+    pattern?: string
+    message?: string
+  }
+  helperText?: string
+  disabled?: boolean
+  size?: ComponentSize
+  variant?: InputVariant
+}
+
+export interface FormState {
+  values: Record<string, unknown>
+  errors: Record<string, string>
+  touched: Record<string, boolean>
+  isSubmitting: boolean
+  isValid: boolean
+  isDirty: boolean
 }
 
 // Utility Types

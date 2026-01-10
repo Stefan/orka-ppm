@@ -611,3 +611,709 @@ describe('Configuration', () => {
     expect(HELP_CHAT_CONFIG.rateLimits).toBeDefined()
   })
 })
+
+describe('API Calls with Various Contexts', () => {
+  let apiService: HelpChatAPIService
+  const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>
+
+  beforeEach(() => {
+    apiService = new HelpChatAPIService()
+    mockFetch.mockClear()
+    apiService.clearLocalCache()
+  })
+
+  describe('Context Variations', () => {
+    it('should handle project context correctly', async () => {
+      const mockRequest: HelpQueryRequest = {
+        query: 'How do I manage project resources?',
+        context: {
+          route: '/projects/123',
+          pageTitle: 'Project Management',
+          userRole: 'project_manager',
+          currentProject: 'project-123',
+          relevantData: {
+            projectStatus: 'active',
+            teamSize: 15,
+            budget: 100000
+          }
+        },
+        language: 'en'
+      }
+
+      const mockResponse: HelpQueryResponse = {
+        response: 'To manage project resources...',
+        sessionId: 'session-123',
+        sources: [],
+        confidence: 0.9,
+        responseTimeMs: 150
+      }
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+        headers: new Headers()
+      } as Response)
+
+      const result = await apiService.submitQuery(mockRequest)
+
+      expect(result).toEqual(expect.objectContaining(mockResponse))
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          body: JSON.stringify(mockRequest)
+        })
+      )
+    })
+
+    it('should handle portfolio context correctly', async () => {
+      const mockRequest: HelpQueryRequest = {
+        query: 'Show me portfolio analytics',
+        context: {
+          route: '/portfolios/456',
+          pageTitle: 'Portfolio Dashboard',
+          userRole: 'portfolio_manager',
+          currentPortfolio: 'portfolio-456',
+          relevantData: {
+            portfolioType: 'strategic',
+            projectCount: 8,
+            totalBudget: 500000
+          }
+        },
+        language: 'de'
+      }
+
+      const mockResponse: HelpQueryResponse = {
+        response: 'Hier sind die Portfolio-Analysen...',
+        sessionId: 'session-456',
+        sources: [],
+        confidence: 0.85,
+        responseTimeMs: 200
+      }
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+        headers: new Headers()
+      } as Response)
+
+      const result = await apiService.submitQuery(mockRequest)
+
+      expect(result).toEqual(expect.objectContaining(mockResponse))
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          body: JSON.stringify(mockRequest)
+        })
+      )
+    })
+
+    it('should handle admin context correctly', async () => {
+      const mockRequest: HelpQueryRequest = {
+        query: 'How do I configure system settings?',
+        context: {
+          route: '/admin/settings',
+          pageTitle: 'System Administration',
+          userRole: 'admin',
+          relevantData: {
+            systemVersion: '2.1.0',
+            userCount: 150,
+            activeProjects: 25
+          }
+        },
+        language: 'en'
+      }
+
+      const mockResponse: HelpQueryResponse = {
+        response: 'To configure system settings...',
+        sessionId: 'session-admin',
+        sources: [],
+        confidence: 0.95,
+        responseTimeMs: 120
+      }
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+        headers: new Headers()
+      } as Response)
+
+      const result = await apiService.submitQuery(mockRequest)
+
+      expect(result).toEqual(expect.objectContaining(mockResponse))
+    })
+
+    it('should handle minimal context correctly', async () => {
+      const mockRequest: HelpQueryRequest = {
+        query: 'General help question',
+        context: {
+          route: '/dashboard',
+          pageTitle: 'Dashboard',
+          userRole: 'user'
+        },
+        language: 'en'
+      }
+
+      const mockResponse: HelpQueryResponse = {
+        response: 'Here is general help...',
+        sessionId: 'session-minimal',
+        sources: [],
+        confidence: 0.7,
+        responseTimeMs: 180
+      }
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+        headers: new Headers()
+      } as Response)
+
+      const result = await apiService.submitQuery(mockRequest)
+
+      expect(result).toEqual(expect.objectContaining(mockResponse))
+    })
+
+    it('should handle different language contexts', async () => {
+      const languages: Array<'en' | 'de' | 'fr'> = ['en', 'de', 'fr']
+      
+      for (const language of languages) {
+        const mockRequest: HelpQueryRequest = {
+          query: 'Test query',
+          context: {
+            route: '/test',
+            pageTitle: 'Test',
+            userRole: 'user'
+          },
+          language
+        }
+
+        const mockResponse: HelpQueryResponse = {
+          response: `Response in ${language}`,
+          sessionId: `session-${language}`,
+          sources: [],
+          confidence: 0.8,
+          responseTimeMs: 150
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockResponse,
+          headers: new Headers()
+        } as Response)
+
+        const result = await apiService.submitQuery(mockRequest)
+
+        expect(result.response).toBe(`Response in ${language}`)
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({
+            body: JSON.stringify(mockRequest)
+          })
+        )
+
+        mockFetch.mockClear()
+      }
+    })
+  })
+
+  describe('Context-Specific API Endpoints', () => {
+    it('should call context endpoint with proper parameters', async () => {
+      const mockContext: HelpContextResponse = {
+        context: {
+          route: '/projects/123',
+          pageTitle: 'Project Details',
+          userRole: 'project_manager'
+        },
+        availableActions: [
+          {
+            id: 'edit-project',
+            label: 'Edit Project',
+            action: () => {}
+          }
+        ],
+        relevantTips: []
+      }
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockContext,
+        headers: new Headers()
+      } as Response)
+
+      const result = await apiService.getHelpContext('/projects/123')
+
+      expect(result).toEqual(mockContext)
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/ai/help/context?page_route=%2Fprojects%2F123'),
+        expect.objectContaining({
+          method: 'GET'
+        })
+      )
+    })
+
+    it('should call proactive tips endpoint with context', async () => {
+      const mockTips: ProactiveTipsResponse = {
+        tips: [
+          {
+            id: 'tip-context-1',
+            type: 'feature_discovery',
+            title: 'Context-specific tip',
+            content: 'This tip is relevant to your current context',
+            priority: 'medium',
+            triggerContext: ['/projects'],
+            dismissible: true,
+            showOnce: false,
+            isRead: false
+          }
+        ],
+        context: {
+          route: '/projects',
+          pageTitle: 'Projects',
+          userRole: 'user'
+        }
+      }
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockTips,
+        headers: new Headers()
+      } as Response)
+
+      const result = await apiService.getProactiveTips('/projects')
+
+      expect(result).toEqual(mockTips)
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/ai/help/tips?context=%2Fprojects'),
+        expect.objectContaining({
+          method: 'GET'
+        })
+      )
+    })
+  })
+})
+
+describe('Enhanced Error Handling and Retry Logic', () => {
+  let apiService: HelpChatAPIService
+  const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>
+
+  beforeEach(() => {
+    apiService = new HelpChatAPIService()
+    mockFetch.mockClear()
+    apiService.clearLocalCache()
+  })
+
+  describe('Network Error Scenarios', () => {
+    it('should retry on network timeout errors', async () => {
+      const mockRequest: HelpQueryRequest = {
+        query: 'test query',
+        context: {
+          route: '/test',
+          pageTitle: 'Test',
+          userRole: 'user'
+        },
+        language: 'en'
+      }
+
+      // First two calls timeout, third succeeds
+      mockFetch
+        .mockRejectedValueOnce(new Error('Request timeout'))
+        .mockRejectedValueOnce(new Error('Request timeout'))
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            response: 'Success after timeout retries',
+            sessionId: 'session-timeout',
+            sources: [],
+            confidence: 0.8,
+            responseTimeMs: 300
+          }),
+          headers: new Headers()
+        } as Response)
+
+      const result = await apiService.submitQuery(mockRequest)
+
+      expect(result.response).toBe('Success after timeout retries')
+      expect(mockFetch).toHaveBeenCalledTimes(3)
+    })
+
+    it('should retry on connection refused errors', async () => {
+      const mockRequest: HelpQueryRequest = {
+        query: 'test query',
+        context: {
+          route: '/test',
+          pageTitle: 'Test',
+          userRole: 'user'
+        },
+        language: 'en'
+      }
+
+      // Connection refused, then success
+      mockFetch
+        .mockRejectedValueOnce(new Error('ECONNREFUSED'))
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            response: 'Success after connection retry',
+            sessionId: 'session-conn',
+            sources: [],
+            confidence: 0.8,
+            responseTimeMs: 250
+          }),
+          headers: new Headers()
+        } as Response)
+
+      const result = await apiService.submitQuery(mockRequest)
+
+      expect(result.response).toBe('Success after connection retry')
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should handle DNS resolution errors with retry', async () => {
+      const mockRequest: HelpQueryRequest = {
+        query: 'test query',
+        context: {
+          route: '/test',
+          pageTitle: 'Test',
+          userRole: 'user'
+        },
+        language: 'en'
+      }
+
+      // DNS error, then success
+      mockFetch
+        .mockRejectedValueOnce(new Error('ENOTFOUND'))
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            response: 'Success after DNS retry',
+            sessionId: 'session-dns',
+            sources: [],
+            confidence: 0.8,
+            responseTimeMs: 400
+          }),
+          headers: new Headers()
+        } as Response)
+
+      const result = await apiService.submitQuery(mockRequest)
+
+      expect(result.response).toBe('Success after DNS retry')
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  describe('HTTP Error Status Codes', () => {
+    it('should retry on 500 Internal Server Error', async () => {
+      const mockRequest: HelpQueryRequest = {
+        query: 'test query',
+        context: {
+          route: '/test',
+          pageTitle: 'Test',
+          userRole: 'user'
+        },
+        language: 'en'
+      }
+
+      // 500 error, then success
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 500,
+          statusText: 'Internal Server Error',
+          headers: new Headers()
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            response: 'Success after 500 retry',
+            sessionId: 'session-500',
+            sources: [],
+            confidence: 0.8,
+            responseTimeMs: 200
+          }),
+          headers: new Headers()
+        } as Response)
+
+      const result = await apiService.submitQuery(mockRequest)
+
+      expect(result.response).toBe('Success after 500 retry')
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should retry on 502 Bad Gateway', async () => {
+      const mockRequest: HelpQueryRequest = {
+        query: 'test query',
+        context: {
+          route: '/test',
+          pageTitle: 'Test',
+          userRole: 'user'
+        },
+        language: 'en'
+      }
+
+      // 502 error, then success
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 502,
+          statusText: 'Bad Gateway',
+          headers: new Headers()
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            response: 'Success after 502 retry',
+            sessionId: 'session-502',
+            sources: [],
+            confidence: 0.8,
+            responseTimeMs: 180
+          }),
+          headers: new Headers()
+        } as Response)
+
+      const result = await apiService.submitQuery(mockRequest)
+
+      expect(result.response).toBe('Success after 502 retry')
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should retry on 503 Service Unavailable', async () => {
+      const mockRequest: HelpQueryRequest = {
+        query: 'test query',
+        context: {
+          route: '/test',
+          pageTitle: 'Test',
+          userRole: 'user'
+        },
+        language: 'en'
+      }
+
+      // 503 error, then success
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 503,
+          statusText: 'Service Unavailable',
+          headers: new Headers()
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            response: 'Success after 503 retry',
+            sessionId: 'session-503',
+            sources: [],
+            confidence: 0.8,
+            responseTimeMs: 220
+          }),
+          headers: new Headers()
+        } as Response)
+
+      const result = await apiService.submitQuery(mockRequest)
+
+      expect(result.response).toBe('Success after 503 retry')
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should not retry on 400 Bad Request', async () => {
+      const mockRequest: HelpQueryRequest = {
+        query: 'test query',
+        context: {
+          route: '/test',
+          pageTitle: 'Test',
+          userRole: 'user'
+        },
+        language: 'en'
+      }
+
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        statusText: 'Bad Request',
+        headers: new Headers()
+      } as Response)
+
+      await expect(apiService.submitQuery(mockRequest)).rejects.toThrow('HTTP 400: Bad Request')
+      expect(mockFetch).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not retry on 401 Unauthorized', async () => {
+      const mockRequest: HelpQueryRequest = {
+        query: 'test query',
+        context: {
+          route: '/test',
+          pageTitle: 'Test',
+          userRole: 'user'
+        },
+        language: 'en'
+      }
+
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        statusText: 'Unauthorized',
+        headers: new Headers()
+      } as Response)
+
+      await expect(apiService.submitQuery(mockRequest)).rejects.toThrow('HTTP 401: Unauthorized')
+      expect(mockFetch).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not retry on 403 Forbidden', async () => {
+      const mockRequest: HelpQueryRequest = {
+        query: 'test query',
+        context: {
+          route: '/test',
+          pageTitle: 'Test',
+          userRole: 'user'
+        },
+        language: 'en'
+      }
+
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        statusText: 'Forbidden',
+        headers: new Headers()
+      } as Response)
+
+      await expect(apiService.submitQuery(mockRequest)).rejects.toThrow('HTTP 403: Forbidden')
+      expect(mockFetch).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('Exponential Backoff', () => {
+    it('should implement exponential backoff between retries', async () => {
+      const mockRequest: HelpQueryRequest = {
+        query: 'test query',
+        context: {
+          route: '/test',
+          pageTitle: 'Test',
+          userRole: 'user'
+        },
+        language: 'en'
+      }
+
+      const startTime = Date.now()
+
+      // All calls fail to test full retry sequence
+      mockFetch
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockRejectedValueOnce(new Error('Network error'))
+
+      await expect(apiService.submitQuery(mockRequest)).rejects.toThrow('failed after 3 attempts')
+
+      const endTime = Date.now()
+      const totalTime = endTime - startTime
+
+      // Should take at least base delay (1000ms) + exponential backoff (2000ms) = 3000ms
+      expect(totalTime).toBeGreaterThan(3000)
+      expect(mockFetch).toHaveBeenCalledTimes(3)
+    })
+  })
+
+  describe('Error Context and Logging', () => {
+    it('should preserve error context through retries', async () => {
+      const mockRequest: HelpQueryRequest = {
+        query: 'test query',
+        context: {
+          route: '/test',
+          pageTitle: 'Test',
+          userRole: 'user'
+        },
+        language: 'en'
+      }
+
+      mockFetch
+        .mockRejectedValueOnce(new Error('First error'))
+        .mockRejectedValueOnce(new Error('Second error'))
+        .mockRejectedValueOnce(new Error('Final error'))
+
+      try {
+        await apiService.submitQuery(mockRequest)
+      } catch (error: any) {
+        expect(error.code).toBe('NETWORK_ERROR')
+        expect(error.context).toHaveProperty('attempts', 3)
+        expect(error.context).toHaveProperty('originalError')
+      }
+    })
+
+    it('should create appropriate error types for different scenarios', () => {
+      const networkError = createHelpChatError('Network failed', 'NETWORK_ERROR', { status: 500 })
+      const validationError = createHelpChatError('Invalid input', 'VALIDATION_ERROR', {}, false)
+      const rateLimitError = createHelpChatError('Rate limited', 'RATE_LIMIT_ERROR')
+
+      expect(networkError.code).toBe('NETWORK_ERROR')
+      expect(networkError.retryable).toBe(true)
+
+      expect(validationError.code).toBe('VALIDATION_ERROR')
+      expect(validationError.retryable).toBe(false)
+
+      expect(rateLimitError.code).toBe('RATE_LIMIT_ERROR')
+      expect(rateLimitError.retryable).toBe(true)
+    })
+  })
+
+  describe('Retry Logic for Different Endpoints', () => {
+    it('should retry context endpoint failures', async () => {
+      mockFetch
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            context: { route: '/test', pageTitle: 'Test', userRole: 'user' },
+            availableActions: [],
+            relevantTips: []
+          }),
+          headers: new Headers()
+        } as Response)
+
+      const result = await apiService.getHelpContext('/test')
+
+      expect(result.context.route).toBe('/test')
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should retry feedback submission failures', async () => {
+      const mockFeedback: HelpFeedbackRequest = {
+        messageId: 'msg-123',
+        rating: 5,
+        feedbackText: 'Great help!',
+        feedbackType: 'helpful'
+      }
+
+      mockFetch
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            success: true,
+            message: 'Feedback submitted',
+            trackingId: 'feedback-123'
+          }),
+          headers: new Headers()
+        } as Response)
+
+      const result = await apiService.submitFeedback(mockFeedback)
+
+      expect(result.success).toBe(true)
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should retry proactive tips endpoint failures', async () => {
+      mockFetch
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            tips: [],
+            context: { route: '/test', pageTitle: 'Test', userRole: 'user' }
+          }),
+          headers: new Headers()
+        } as Response)
+
+      const result = await apiService.getProactiveTips('/test')
+
+      expect(result.tips).toEqual([])
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+    })
+  })
+})

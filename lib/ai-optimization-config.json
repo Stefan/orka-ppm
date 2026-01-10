@@ -1,0 +1,21 @@
+{
+  "modelCaching": {
+    "enabled": true,
+    "maxSize": 52428800,
+    "ttl": 3600000
+  },
+  "predictionBatching": {
+    "enabled": true,
+    "batchSize": 10,
+    "timeout": 5000
+  },
+  "confidenceFiltering": {
+    "enabled": true,
+    "threshold": 0.7
+  },
+  "performanceMetrics": {
+    "trackPredictionTime": true,
+    "trackAccuracy": true,
+    "trackCacheHitRate": true
+  }
+}

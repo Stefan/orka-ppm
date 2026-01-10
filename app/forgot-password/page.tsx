@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '../../lib/supabase-minimal'
+import { supabase } from '../../lib/api/supabase-minimal'
 import { AlertTriangle, CheckCircle, Mail, ArrowLeft } from 'lucide-react'
 
 export default function ForgotPassword() {

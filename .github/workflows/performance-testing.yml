@@ -1,0 +1,291 @@
+name: Performance Testing
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run performance tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  lighthouse-ci:
+    name: Lighthouse CI
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build application
+        run: npm run build
+        
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli
+          lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          
+      - name: Upload Lighthouse results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+          retention-days: 30
+
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        device: [desktop, mobile, tablet]
+        
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+        
+      - name: Build application
+        run: npm run build
+        
+      - name: Run performance tests
+        run: |
+          case "${{ matrix.device }}" in
+            desktop)
+              npx playwright test __tests__/e2e/performance.spec.ts --project=chromium-desktop
+              ;;
+            mobile)
+              npx playwright test __tests__/e2e/performance.spec.ts --project=mobile-chrome-pixel-5
+              ;;
+            tablet)
+              npx playwright test __tests__/e2e/performance.spec.ts --project=tablet-chrome
+              ;;
+          esac
+        env:
+          CI: true
+          
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-results-${{ matrix.device }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 30
+
+  cross-device-tests:
+    name: Cross-Device Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+        
+      - name: Build application
+        run: npm run build
+        
+      - name: Run cross-device tests
+        run: npm run test:cross-device
+        env:
+          CI: true
+          
+      - name: Upload cross-device test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cross-device-results
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 30
+
+  visual-regression:
+    name: Visual Regression Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+        
+      - name: Build application
+        run: npm run build
+        
+      - name: Run visual regression tests
+        run: npm run test:visual
+        env:
+          CI: true
+          
+      - name: Upload visual regression results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-regression-results
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 30
+
+  performance-monitoring:
+    name: Performance Monitoring
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'push'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build application
+        run: npm run build
+        
+      - name: Run comprehensive performance monitoring
+        run: |
+          # Run Lighthouse CI with extended configuration
+          npm install -g @lhci/cli
+          lhci autorun --config=lighthouserc.monitoring.js
+          
+          # Generate performance report
+          node scripts/generate-performance-report.js
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          
+      - name: Upload monitoring results
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-monitoring-${{ github.run_number }}
+          path: |
+            .lighthouseci/
+            performance-reports/
+          retention-days: 90
+          
+      - name: Comment PR with performance results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Read performance report
+            const reportPath = path.join(process.cwd(), 'performance-reports', 'summary.json');
+            if (fs.existsSync(reportPath)) {
+              const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+              
+              const comment = `## 📊 Performance Test Results
+              
+              | Metric | Score | Status |
+              |--------|-------|--------|
+              | Performance | ${report.performance}% | ${report.performance >= 80 ? '✅' : '❌'} |
+              | Accessibility | ${report.accessibility}% | ${report.accessibility >= 90 ? '✅' : '❌'} |
+              | Best Practices | ${report.bestPractices}% | ${report.bestPractices >= 80 ? '✅' : '❌'} |
+              | SEO | ${report.seo}% | ${report.seo >= 80 ? '✅' : '❌'} |
+              
+              ### Core Web Vitals
+              - **LCP**: ${report.lcp}ms ${report.lcp <= 2500 ? '✅' : '❌'}
+              - **FID**: ${report.fid}ms ${report.fid <= 100 ? '✅' : '❌'}
+              - **CLS**: ${report.cls} ${report.cls <= 0.1 ? '✅' : '❌'}
+              
+              [View detailed report](${report.reportUrl})
+              `;
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
+
+  performance-budget-check:
+    name: Performance Budget Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build application
+        run: npm run build
+        
+      - name: Check performance budgets
+        run: |
+          npm install -g @lhci/cli
+          lhci autorun --assert
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          
+      - name: Fail if performance budgets exceeded
+        run: |
+          if [ $? -ne 0 ]; then
+            echo "❌ Performance budgets exceeded!"
+            exit 1
+          else
+            echo "✅ Performance budgets met!"
+          fi

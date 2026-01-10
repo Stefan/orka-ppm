@@ -12,9 +12,9 @@ import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 
 // Import components
-import { HelpChat } from '../components/HelpChat'
-import { HelpChatToggle } from '../components/HelpChatToggle'
-import { ProactiveTips } from '../components/ProactiveTips'
+import { HelpChat } from '../components/help-chat/HelpChat'
+import { HelpChatToggle } from '../components/help-chat/HelpChatToggle'
+import { ProactiveTips } from '../components/onboarding/ProactiveTips'
 import { HelpChatProvider } from '../app/providers/HelpChatProvider'
 
 // Import types

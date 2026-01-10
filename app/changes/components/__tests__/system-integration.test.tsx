@@ -83,6 +83,7 @@ describe('Change Management System Integration', () => {
       const mockProps = {
         changeId: 'test-id',
         userRole: 'approver',
+        currentUserId: 'test-user-123',
         onApprovalDecision: jest.fn()
       }
       
@@ -97,9 +98,55 @@ describe('Change Management System Integration', () => {
         changeId: 'test-id',
         impactData: {
           changeId: 'test-id',
-          scheduleImpact: { days: 14, criticalPath: true },
-          costImpact: { total: 25000, direct: 20000, indirect: 5000 },
-          riskImpact: { newRisks: 2, modifiedRisks: 1 }
+          critical_path_affected: true,
+          schedule_impact_days: 14,
+          affected_activities: [
+            {
+              id: 'act-1',
+              name: 'Foundation Work',
+              original_duration: 5,
+              new_duration: 8,
+              delay_days: 3,
+              resource_impact: 'Additional crew needed'
+            }
+          ],
+          total_cost_impact: 25000,
+          direct_costs: 20000,
+          indirect_costs: 5000,
+          cost_savings: 0,
+          cost_breakdown: {
+            materials: 12000,
+            labor: 8000,
+            equipment: 3000,
+            overhead: 1500,
+            contingency: 500
+          },
+          additional_resources_needed: [],
+          resource_reallocation: [],
+          new_risks: [],
+          modified_risks: [],
+          scenarios: {
+            best_case: {
+              cost_impact: 20000,
+              schedule_impact: 10,
+              probability: 0.3,
+              description: 'Best case'
+            },
+            worst_case: {
+              cost_impact: 30000,
+              schedule_impact: 20,
+              probability: 0.2,
+              description: 'Worst case'
+            },
+            most_likely: {
+              cost_impact: 25000,
+              schedule_impact: 14,
+              probability: 0.5,
+              description: 'Most likely'
+            }
+          },
+          analyzed_by: 'Test Analyst',
+          analyzed_at: '2024-01-15T10:30:00Z'
         }
       }
       
@@ -111,6 +158,10 @@ describe('Change Management System Integration', () => {
 
     it('should render ChangeAnalyticsDashboard without errors', () => {
       const mockProps = {
+        dateRange: {
+          from: new Date('2024-01-01'),
+          to: new Date('2024-01-31')
+        },
         analyticsData: {
           total_changes: 150,
           changes_by_status: { approved: 80, pending: 45, rejected: 25 },
@@ -139,7 +190,9 @@ describe('Change Management System Integration', () => {
         }
       }
       
-      render(<ChangeAnalyticsDashboard {...mockProps} />)
+      render(<ChangeAnalyticsDashboard 
+        dateRange={mockProps.dateRange}
+      />)
       
       // Should show analytics
       expect(screen.getByText('Change Analytics')).toBeInTheDocument()
@@ -227,6 +280,10 @@ describe('Change Management System Integration', () => {
     it('should handle empty states gracefully', () => {
       // Test with no data
       const mockProps = {
+        dateRange: {
+          from: new Date('2024-01-01'),
+          to: new Date('2024-01-31')
+        },
         analyticsData: {
           total_changes: 0,
           changes_by_status: {},
@@ -244,7 +301,9 @@ describe('Change Management System Integration', () => {
         }
       }
       
-      render(<ChangeAnalyticsDashboard {...mockProps} />)
+      render(<ChangeAnalyticsDashboard 
+        dateRange={mockProps.dateRange}
+      />)
       
       // Should handle empty data gracefully
       expect(screen.getByText('Change Analytics')).toBeInTheDocument()

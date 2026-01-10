@@ -35,6 +35,7 @@ from routers.admin import router as admin_router
 # from routers.change_management_simple import router as change_management_router
 from routers.schedules import router as schedules_router
 from routers.help_chat import router as help_chat_router
+from routers.ai_resource_optimizer import router as ai_resource_optimizer_router
 
 # Import AI agents and services
 try:
@@ -183,6 +184,7 @@ app.include_router(admin_router)
 # app.include_router(change_management_router)
 app.include_router(schedules_router)
 app.include_router(help_chat_router)
+app.include_router(ai_resource_optimizer_router)
 
 # Basic endpoints
 @app.get("/")

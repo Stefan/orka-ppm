@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import { FileText, Loader, Send, Bot, User, AlertTriangle, RefreshCw } from 'lucide-react'
-import AppLayout from '../../components/AppLayout'
-import { getApiUrl } from '../../lib/api'
+import AppLayout from '../../components/shared/AppLayout'
+import { getApiUrl } from '../../lib/api/client'
 
 interface ChatMessage {
   id: string

@@ -87,11 +87,21 @@ class TestEnhancedUserAPIProperties:
         assert response.sso_provider == profile_data.get("sso_provider")
         
         # Verify timestamps are properly handled
+        # The UserResponse model converts ISO strings to datetime objects via Pydantic
         expected_created_at = profile_data.get("created_at") or auth_data.get("created_at")
         expected_updated_at = profile_data.get("updated_at") or auth_data.get("updated_at")
         
-        assert response.created_at == expected_created_at
-        assert response.updated_at == expected_updated_at
+        if expected_created_at:
+            # Convert expected string to datetime for comparison if it's a string
+            if isinstance(expected_created_at, str):
+                expected_created_at = datetime.fromisoformat(expected_created_at.replace('Z', '+00:00'))
+            assert response.created_at == expected_created_at
+        
+        if expected_updated_at:
+            # Convert expected string to datetime for comparison if it's a string
+            if isinstance(expected_updated_at, str):
+                expected_updated_at = datetime.fromisoformat(expected_updated_at.replace('Z', '+00:00'))
+            assert response.updated_at == expected_updated_at
 
     @settings(max_examples=100)
     @given(auth_data=auth_user_strategy())

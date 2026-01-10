@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import AppLayout from '../../components/AppLayout'
+import AppLayout from '../../components/shared/AppLayout'
 import { getApiUrl } from '../../lib/api'
 import CreateScenarioModal from './components/CreateScenarioModal'
 import { Plus, BarChart3, TrendingUp, TrendingDown, DollarSign, Clock, Users, AlertTriangle, RefreshCw, Trash2, Edit3, GitBranch, Zap, Target } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { ResponsiveContainer } from '../../components/ui/molecules/ResponsiveContainer'
+import { AdaptiveGrid } from '../../components/ui/molecules/AdaptiveGrid'
+import { TouchButton } from '../../components/ui/atoms/TouchButton'
 
 interface Project {
   id: string
@@ -100,11 +103,12 @@ export default function ScenariosPage() {
       if (!response.ok) throw new Error('Failed to fetch projects')
       
       const projectsData = await response.json()
-      setProjects(projectsData)
+      const projectsArray = projectsData.projects || projectsData || []
+      setProjects(projectsArray)
       
       // Auto-select first project if available
-      if (projectsData.length > 0 && !selectedProject) {
-        setSelectedProject(projectsData[0])
+      if (projectsArray.length > 0 && !selectedProject) {
+        setSelectedProject(projectsArray[0])
       }
       
     } catch (err) {
@@ -227,7 +231,7 @@ export default function ScenariosPage() {
 
   return (
     <AppLayout>
-      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+      <ResponsiveContainer padding="md" className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
           <div>
@@ -239,23 +243,26 @@ export default function ScenariosPage() {
           
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
             {selectedScenarios.length >= 2 && (
-              <button
+              <TouchButton
                 onClick={compareScenarios}
-                className="flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                variant="secondary"
+                size="md"
+                className="bg-purple-600 text-white hover:bg-purple-700"
+                leftIcon={BarChart3}
               >
-                <BarChart3 className="h-4 w-4 mr-2" />
                 Compare ({selectedScenarios.length})
-              </button>
+              </TouchButton>
             )}
             
-            <button
+            <TouchButton
               onClick={() => setShowCreateModal(true)}
               disabled={!selectedProject}
-              className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              variant="primary"
+              size="md"
+              leftIcon={Plus}
             >
-              <Plus className="h-4 w-4 mr-2" />
               New Scenario
-            </button>
+            </TouchButton>
           </div>
         </div>
 
@@ -269,14 +276,17 @@ export default function ScenariosPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <AdaptiveGrid 
+          columns={{ mobile: 1, tablet: 1, desktop: 3 }}
+          gap="md"
+        >
           {/* Project Selection */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900">Select Project</h3>
             </div>
             <div className="p-6">
-              {projects.length === 0 ? (
+              {!Array.isArray(projects) || projects.length === 0 ? (
                 <div className="text-center py-8">
                   <GitBranch className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500">No projects available</p>
@@ -343,7 +353,7 @@ export default function ScenariosPage() {
                   <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500">Select a project to view scenarios</p>
                 </div>
-              ) : scenarios.length === 0 ? (
+              ) : !Array.isArray(scenarios) || scenarios.length === 0 ? (
                 <div className="text-center py-12">
                   <Zap className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500 mb-4">No scenarios created yet</p>
@@ -461,7 +471,7 @@ export default function ScenariosPage() {
               )}
             </div>
           </div>
-        </div>
+        </AdaptiveGrid>
 
         {/* Comparison View */}
         {showComparisonView && comparison && (
@@ -498,7 +508,7 @@ export default function ScenariosPage() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {comparison.scenarios.map((scenario) => (
+                    {(comparison?.scenarios || []).map((scenario) => (
                       <tr key={scenario.id}>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="font-medium text-gray-900">{scenario.name}</div>
@@ -542,11 +552,11 @@ export default function ScenariosPage() {
                 </table>
               </div>
               
-              {comparison.recommendations.length > 0 && (
+              {(comparison?.recommendations || []).length > 0 && (
                 <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                   <h4 className="font-medium text-blue-900 mb-2">Recommendations</h4>
                   <ul className="space-y-1">
-                    {comparison.recommendations.map((rec, index) => (
+                    {(comparison?.recommendations || []).map((rec, index) => (
                       <li key={index} className="text-sm text-blue-800">• {rec}</li>
                     ))}
                   </ul>
@@ -555,7 +565,6 @@ export default function ScenariosPage() {
             </div>
           </div>
         )}
-      </div>
 
       {/* Create Scenario Modal */}
       {showCreateModal && selectedProject && (
@@ -571,6 +580,7 @@ export default function ScenariosPage() {
           }}
         />
       )}
+      </ResponsiveContainer>
     </AppLayout>
   )
 }

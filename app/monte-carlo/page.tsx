@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import AppLayout from '../../components/AppLayout'
+import AppLayout from '../../components/shared/AppLayout'
 import MonteCarloVisualization from '../../components/MonteCarloVisualization'
-import { getApiUrl } from '../../lib/api'
+import { getApiUrl } from '../../lib/api/client'
+import { ResponsiveContainer } from '../../components/ui/molecules/ResponsiveContainer'
+import { AdaptiveGrid } from '../../components/ui/molecules/AdaptiveGrid'
+import { TouchButton } from '../../components/ui/atoms/TouchButton'
 import { 
   BarChart3, 
   TrendingUp, 
@@ -241,7 +244,7 @@ export default function MonteCarloPage() {
 
   return (
     <AppLayout>
-      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+      <ResponsiveContainer padding="md" className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
           <div>
@@ -252,22 +255,25 @@ export default function MonteCarloPage() {
           </div>
           
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-            <button
+            <TouchButton
               onClick={() => setShowConfig(!showConfig)}
-              className="flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              variant="secondary"
+              size="md"
+              leftIcon={Settings}
             >
-              <Settings className="h-4 w-4 mr-2" />
               Configure
-            </button>
+            </TouchButton>
             
-            <button
+            <TouchButton
               onClick={runSimulation}
               disabled={loading || config.risks.length === 0}
-              className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              variant="primary"
+              size="md"
+              leftIcon={Play}
+              loading={loading}
             >
-              <Play className="h-4 w-4 mr-2" />
               {loading ? 'Running...' : 'Run Simulation'}
-            </button>
+            </TouchButton>
           </div>
         </div>
 
@@ -400,7 +406,10 @@ export default function MonteCarloPage() {
 
         {/* Simulation Results Summary */}
         {activeSimulation && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <AdaptiveGrid 
+            columns={{ mobile: 1, tablet: 2, desktop: 4 }}
+            gap="md"
+          >
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
@@ -460,7 +469,7 @@ export default function MonteCarloPage() {
                 <TrendingUp className="h-8 w-8 text-orange-600" />
               </div>
             </div>
-          </div>
+          </AdaptiveGrid>
         )}
 
         {/* Monte Carlo Visualization Component */}
@@ -574,7 +583,7 @@ export default function MonteCarloPage() {
             </button>
           </div>
         )}
-      </div>
+      </ResponsiveContainer>
     </AppLayout>
   )
 }

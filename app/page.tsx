@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react'
 import { useAuth } from './providers/SupabaseAuthProvider'
-import Sidebar from '../components/Sidebar'
-import { supabase, ENV_CONFIG } from '../lib/supabase-minimal'
+import Sidebar from '../components/navigation/Sidebar'
+import { supabase, ENV_CONFIG } from '../lib/api/supabase-minimal'
 
 export default function Home() {
   const { session } = useAuth()
@@ -37,21 +37,21 @@ function LoginForm() {
     console.log('- Supabase client available:', !!supabase)
     console.log('- Auth methods available:', !!supabase?.auth)
     console.log('- Validation source:', ENV_CONFIG.validationSource || 'unknown')
-    console.log('- Force override active:', ENV_CONFIG.forceOverride)
-    console.log('- Production mode:', ENV_CONFIG.productionMode)
-    console.log('- Environment bypass:', ENV_CONFIG.environmentBypass)
-    console.log('- API URL:', ENV_CONFIG.apiUrl)
+    console.log('- Force override active:', ENV_CONFIG.isDevelopment)
+    console.log('- Production mode:', ENV_CONFIG.isProduction)
+    console.log('- Environment bypass:', ENV_CONFIG.isDevelopment)
+    console.log('- API URL:', ENV_CONFIG.supabaseUrl)
     
     // Additional environment diagnostics
     console.log('🔧 Environment Diagnostics (Production v2):')
     console.log('- Using minimal config:', true)
-    console.log('- Hardcoded URL length:', ENV_CONFIG.url.length)
-    console.log('- Hardcoded key length:', ENV_CONFIG.keyLength)
-    console.log('- Key preview:', ENV_CONFIG.keyPreview)
+    console.log('- Hardcoded URL length:', ENV_CONFIG.supabaseUrl.length)
+    console.log('- Hardcoded key length:', ENV_CONFIG.supabaseAnonKey.length)
+    console.log('- Key preview:', ENV_CONFIG.supabaseAnonKey.substring(0, 10) + '...')
     console.log('- Supabase client config:', {
-      url: ENV_CONFIG.url,
-      keyLength: ENV_CONFIG.keyLength,
-      isValid: ENV_CONFIG.isValid
+      url: ENV_CONFIG.supabaseUrl,
+      keyLength: ENV_CONFIG.supabaseAnonKey.length,
+      isValid: !!(ENV_CONFIG.supabaseUrl && ENV_CONFIG.supabaseAnonKey)
     })
   }, [])
 
@@ -86,9 +86,19 @@ function LoginForm() {
     console.log('🚀 Starting authentication...')
     console.log('- Email:', trimmedEmail)
     console.log('- Is Signup:', isSignup)
-    console.log('- ENV Config Valid:', ENV_CONFIG.isValid)
-    console.log('- Force Override Active:', ENV_CONFIG.forceOverride)
-    console.log('- Key Length:', ENV_CONFIG.keyLength)
+    console.log('- ENV Config Valid:', !!(ENV_CONFIG.supabaseUrl && ENV_CONFIG.supabaseAnonKey))
+    console.log('- Development Mode:', ENV_CONFIG.isDevelopment)
+    console.log('- Key Length:', ENV_CONFIG.supabaseAnonKey.length)
+
+    // Check if Supabase is properly configured
+    if (!ENV_CONFIG.supabaseUrl || !ENV_CONFIG.supabaseAnonKey || 
+        ENV_CONFIG.supabaseUrl === 'https://placeholder.supabase.co' ||
+        ENV_CONFIG.supabaseAnonKey === 'placeholder-anon-key') {
+      setError('❌ CONFIGURATION ERROR: Supabase environment variables are not configured. Authentication is disabled in development mode.')
+      console.warn('💡 SOLUTION: Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to your .env.local file')
+      setLoading(false)
+      return
+    }
 
     try {
       console.log('🔐 Calling Supabase auth...')
@@ -121,7 +131,7 @@ function LoginForm() {
         } else if (authError.message.includes('Invalid API key') || authError.message.includes('JWT')) {
           setError('❌ CONFIGURATION ERROR: Invalid API key detected. Environment variables need to be fixed.')
           console.error('💡 SOLUTION: Check Vercel environment variables - ANON_KEY may be corrupted')
-          console.error('💡 Expected key length: ~208 chars, Current:', ENV_CONFIG.keyLength)
+          console.error('💡 Expected key length: ~208 chars, Current:', ENV_CONFIG.supabaseAnonKey.length)
         } else if (authError.message.includes('NetworkError') || authError.message.includes('fetch') || authError.message.includes('CORS')) {
           setError('❌ NETWORK ERROR: Cannot connect to authentication service. CORS or network issue.')
           console.error('💡 SOLUTION: Check backend CORS configuration and network connectivity')
@@ -160,7 +170,7 @@ function LoginForm() {
         if (err.message.includes('Failed to execute \'fetch\'') || err.message.includes('Invalid value')) {
           setError('❌ CRITICAL ERROR: Invalid fetch configuration. Environment variables are corrupted.')
           console.error('💡 SOLUTION: Check browser console for validation errors')
-          console.error('💡 Raw key length should be ~208, current ENV length:', ENV_CONFIG.keyLength)
+          console.error('💡 Raw key length should be ~208, current ENV length:', ENV_CONFIG.supabaseAnonKey.length)
           console.error('💡 Fix: Delete and re-add NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel dashboard')
         } else if (err.message.includes('COPY-PASTE ERROR') || err.message.includes('variable names')) {
           setError('❌ COPY-PASTE ERROR: Environment variable contains variable names instead of values.')

@@ -3,7 +3,8 @@
 import React, { lazy, Suspense } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import { AlertTriangle } from 'lucide-react'
-import AppLayout from '../../components/AppLayout'
+import AppLayout from '../../components/shared/AppLayout'
+import { ResponsiveContainer } from '../../components/ui/molecules/ResponsiveContainer'
 
 // Import modular components
 import FinancialHeader from './components/FinancialHeader'
@@ -110,7 +111,7 @@ export default function Financials() {
 
   return (
     <AppLayout>
-      <div className="p-8 space-y-6">
+      <ResponsiveContainer padding="md" className="space-y-6">
         {/* Header */}
         <FinancialHeader
           metrics={metrics}
@@ -274,7 +275,7 @@ export default function Financials() {
           selectedCurrency={selectedCurrency}
           analyticsData={analyticsData}
         />
-      </div>
+      </ResponsiveContainer>
     </AppLayout>
   )
 }

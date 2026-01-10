@@ -33,7 +33,7 @@ export default function DashboardCharts({ projects, portfolioMetrics }: Dashboar
     { name: 'Critical', value: portfolioMetrics.health_distribution.red || 0, color: '#EF4444' }
   ] : []
 
-  const statusChartData = projects.length > 0 ? (() => {
+  const statusChartData = Array.isArray(projects) && projects.length > 0 ? (() => {
     const statusCounts = projects.reduce((acc, project) => {
       acc[project.status] = (acc[project.status] || 0) + 1
       return acc

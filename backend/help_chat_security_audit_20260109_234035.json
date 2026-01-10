@@ -1,0 +1,104 @@
+{
+  "report_type": "Security Vulnerability Assessment",
+  "timestamp": "2026-01-09T23:40:33.497108",
+  "summary": {
+    "total_tests": 12,
+    "passed_tests": 4,
+    "failed_tests": 8,
+    "pass_rate": 33.33333333333333
+  },
+  "severity_breakdown": {
+    "critical": 1,
+    "high": 4,
+    "medium": 3,
+    "low": 0
+  },
+  "issues": {
+    "critical": [
+      {
+        "test_name": "SQL Injection",
+        "severity": "critical",
+        "description": "Failed to test SQL injection",
+        "details": {
+          "error": "All connection attempts failed"
+        },
+        "remediation": "Fix test infrastructure and retry"
+      }
+    ],
+    "high": [
+      {
+        "test_name": "Authentication Bypass",
+        "severity": "high",
+        "description": "Failed to test authentication bypass",
+        "details": {
+          "error": "All connection attempts failed"
+        },
+        "remediation": "Fix test infrastructure and retry"
+      },
+      {
+        "test_name": "Authorization Escalation",
+        "severity": "high",
+        "description": "Failed to test authorization escalation",
+        "details": {
+          "error": "All connection attempts failed"
+        },
+        "remediation": "Fix test infrastructure and retry"
+      },
+      {
+        "test_name": "XSS Protection",
+        "severity": "high",
+        "description": "Failed to test XSS protection",
+        "details": {
+          "error": "All connection attempts failed"
+        },
+        "remediation": "Fix test infrastructure and retry"
+      },
+      {
+        "test_name": "Sensitive Data Exposure",
+        "severity": "high",
+        "description": "Failed to test sensitive data exposure",
+        "details": {
+          "error": "All connection attempts failed"
+        },
+        "remediation": "Fix test infrastructure and retry"
+      }
+    ],
+    "medium": [
+      {
+        "test_name": "Input Validation",
+        "severity": "medium",
+        "description": "Failed to test input validation",
+        "details": {
+          "error": "All connection attempts failed"
+        },
+        "remediation": "Fix test infrastructure and retry"
+      },
+      {
+        "test_name": "Rate Limiting",
+        "severity": "medium",
+        "description": "Failed to test rate limiting",
+        "details": {
+          "error": "All connection attempts failed"
+        },
+        "remediation": "Fix test infrastructure and retry"
+      },
+      {
+        "test_name": "Error Information Leakage",
+        "severity": "medium",
+        "description": "Failed to test error information leakage",
+        "details": {
+          "error": "All connection attempts failed"
+        },
+        "remediation": "Fix test infrastructure and retry"
+      }
+    ],
+    "low": []
+  },
+  "recommendations": [
+    "URGENT: Address critical security vulnerabilities immediately",
+    "Implement comprehensive input validation and parameterized queries",
+    "Strengthen authentication and authorization mechanisms",
+    "Implement proper rate limiting and DoS protection"
+  ],
+  "compliance_status": "NON_COMPLIANT - Critical vulnerabilities detected"
+}

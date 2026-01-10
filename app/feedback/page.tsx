@@ -3,8 +3,11 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import { ThumbsUp, ThumbsDown, Bug, Lightbulb, Filter, Bell, AlertCircle, User, Calendar, Tag, X, TrendingUp } from 'lucide-react'
-import AppLayout from '../../components/AppLayout'
-import { getApiUrl } from '../../lib/api'
+import AppLayout from '../../components/shared/AppLayout'
+import { getApiUrl } from '../../lib/api/client'
+import { ResponsiveContainer } from '../../components/ui/molecules/ResponsiveContainer'
+import { AdaptiveGrid } from '../../components/ui/molecules/AdaptiveGrid'
+import { TouchButton } from '../../components/ui/atoms/TouchButton'
 
 interface FeatureRequest {
   id: string
@@ -314,15 +317,15 @@ export default function Feedback() {
 
   return (
     <AppLayout>
-      <div className="p-8 space-y-6">
+      <ResponsiveContainer padding="md" className="space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-start">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Feedback & Ideas</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Feedback & Ideas</h1>
             <p className="text-gray-600 mt-2">Share your ideas and report issues to help improve the platform</p>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
             {/* Notifications */}
             {notifications.length > 0 && (
               <div className="relative">
@@ -333,21 +336,24 @@ export default function Feedback() {
               </div>
             )}
             
-            <button
+            <TouchButton
               onClick={() => setShowFeatureForm(true)}
-              className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors shadow-sm"
+              variant="primary"
+              size="md"
+              leftIcon={Lightbulb}
             >
-              <Lightbulb className="h-5 w-5 mr-2" />
               Suggest Feature
-            </button>
+            </TouchButton>
             
-            <button
+            <TouchButton
               onClick={() => setShowBugForm(true)}
-              className="flex items-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold transition-colors shadow-sm"
+              variant="primary"
+              size="md"
+              className="bg-red-600 hover:bg-red-700"
+              leftIcon={Bug}
             >
-              <Bug className="h-5 w-5 mr-2" />
               Report Bug
-            </button>
+            </TouchButton>
           </div>
         </div>
 
@@ -401,12 +407,15 @@ export default function Feedback() {
         {activeTab === 'features' && (
           <div className="space-y-6">
             {/* Filters */}
-            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <Filter className="h-5 w-5 mr-2 text-blue-600" />
                 Filter Feature Requests
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <AdaptiveGrid 
+                columns={{ mobile: 1, tablet: 2, desktop: 3 }}
+                gap="md"
+              >
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-3">Status</label>
                   <select
@@ -438,14 +447,16 @@ export default function Feedback() {
                 </div>
                 
                 <div className="flex items-end">
-                  <button
+                  <TouchButton
                     onClick={fetchFeatures}
-                    className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors shadow-sm"
+                    variant="primary"
+                    size="md"
+                    fullWidth
                   >
                     Apply Filters
-                  </button>
+                  </TouchButton>
                 </div>
-              </div>
+              </AdaptiveGrid>
             </div>
 
             {/* Feature List */}
@@ -521,12 +532,15 @@ export default function Feedback() {
         {activeTab === 'bugs' && (
           <div className="space-y-6">
             {/* Filters */}
-            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <Filter className="h-5 w-5 mr-2 text-red-600" />
                 Filter Bug Reports
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <AdaptiveGrid 
+                columns={{ mobile: 1, tablet: 2, desktop: 3 }}
+                gap="md"
+              >
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-3">Status</label>
                   <select
@@ -559,14 +573,17 @@ export default function Feedback() {
                 </div>
                 
                 <div className="flex items-end">
-                  <button
+                  <TouchButton
                     onClick={fetchBugs}
-                    className="w-full px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold transition-colors shadow-sm"
+                    variant="primary"
+                    size="md"
+                    className="bg-red-600 hover:bg-red-700"
+                    fullWidth
                   >
                     Apply Filters
-                  </button>
+                  </TouchButton>
                 </div>
-              </div>
+              </AdaptiveGrid>
             </div>
 
             {/* Bug List */}
@@ -808,7 +825,7 @@ export default function Feedback() {
             </div>
           </div>
         )}
-      </div>
+      </ResponsiveContainer>
     </AppLayout>
   )
 }

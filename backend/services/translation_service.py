@@ -340,7 +340,7 @@ class TranslationService:
         """Get list of supported languages with metadata"""
         return [
             {
-                "code": lang.value,
+                "code": lang,
                 "name": config["name"],
                 "native_name": config["native_name"],
                 "formal_tone": config["formal_tone"]

@@ -14,7 +14,7 @@ import {
 import { useHelpChat } from '../hooks/useHelpChat'
 import { useMediaQuery } from '../hooks/useMediaQuery'
 import type { HelpFeedbackRequest } from '../types/help-chat'
-import { cn } from '../lib/design-system'
+import { cn } from '../lib/utils/design-system'
 import { MessageRenderer } from './help-chat/MessageRenderer'
 import { LanguageSelector } from './help-chat/LanguageSelector'
 import type { ChatMessage, QuickAction } from '../types/help-chat'

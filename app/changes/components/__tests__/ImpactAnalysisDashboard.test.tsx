@@ -6,7 +6,7 @@ import ImpactAnalysisDashboard from '../ImpactAnalysisDashboard'
 const mockOnDataUpdate = jest.fn()
 
 const mockImpactData = {
-  change_request_id: 'test-change-1',
+  changeId: 'test-change-1',
   critical_path_affected: true,
   schedule_impact_days: 14,
   affected_activities: [
@@ -16,7 +16,7 @@ const mockImpactData = {
       original_duration: 5,
       new_duration: 8,
       delay_days: 3,
-      is_critical: true
+      resource_impact: 'Additional excavator time required'
     },
     {
       id: 'act-2',
@@ -24,7 +24,7 @@ const mockImpactData = {
       original_duration: 3,
       new_duration: 5,
       delay_days: 2,
-      is_critical: true
+      resource_impact: 'Extended crew time needed'
     }
   ],
   total_cost_impact: 25000,
@@ -42,8 +42,9 @@ const mockImpactData = {
     {
       resource_type: 'Excavator Operator',
       quantity: 2,
+      duration_days: 14,
       cost_per_unit: 150,
-      duration_weeks: 2
+      total_cost: 4200
     }
   ],
   resource_reallocation: [
@@ -51,7 +52,8 @@ const mockImpactData = {
       from_activity: 'Site Preparation',
       to_activity: 'Foundation Work',
       resource_type: 'General Laborer',
-      quantity: 4
+      quantity: 4,
+      impact_description: 'Reallocating crew to support extended foundation work'
     }
   ],
   new_risks: [
@@ -59,8 +61,9 @@ const mockImpactData = {
       id: 'risk-1',
       description: 'Weather delays during extended foundation work',
       probability: 0.3,
-      impact: 5000,
-      mitigation_cost: 1000
+      impact_score: 5000,
+      mitigation_cost: 1000,
+      category: 'Schedule'
     }
   ],
   modified_risks: [
@@ -70,24 +73,28 @@ const mockImpactData = {
       old_probability: 0.2,
       new_probability: 0.4,
       old_impact: 10000,
-      new_impact: 20000
+      new_impact: 20000,
+      change_reason: 'Extended foundation work increases schedule risk'
     }
   ],
   scenarios: {
     best_case: {
       cost_impact: 18000,
-      schedule_impact_days: 10,
-      probability: 0.2
+      schedule_impact: 10,
+      probability: 0.2,
+      description: 'Optimal weather and resource availability'
     },
     worst_case: {
       cost_impact: 35000,
-      schedule_impact_days: 21,
-      probability: 0.1
+      schedule_impact: 21,
+      probability: 0.1,
+      description: 'Weather delays and resource constraints'
     },
     most_likely: {
       cost_impact: 25000,
-      schedule_impact_days: 14,
-      probability: 0.7
+      schedule_impact: 14,
+      probability: 0.7,
+      description: 'Normal conditions with some delays'
     }
   },
   analyzed_by: 'Test Analyst',
@@ -311,11 +318,11 @@ describe('ImpactAnalysisDashboard', () => {
     expect(screen.getByRole('button', { name: /update analysis/i })).toBeInTheDocument()
   })
 
-  it('displays no impact analysis message when data is null', () => {
+  it('displays no impact analysis message when data is undefined', () => {
     render(
       <ImpactAnalysisDashboard
         changeId="test-change-1"
-        impactData={null}
+        impactData={undefined}
         onDataUpdate={mockOnDataUpdate}
       />
     )

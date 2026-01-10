@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react'
 import { cn, componentVariants } from '@/lib/design-system'
-import type { InputProps } from '@/types'
+import type { InputProps, TextareaProps } from '@/types'
 
 /**
  * Enhanced Input component with design system integration
@@ -16,11 +16,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
   onFocus,
   className,
   children,
+  size: componentSize = 'md',
+  variant = 'default',
   ...props
 }, ref) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (onChange) {
-      onChange(e.target.value)
+      onChange(e.target.value, e)
     }
   }
 
@@ -64,7 +66,7 @@ Input.displayName = 'Input'
 /**
  * Textarea component with similar styling
  */
-export const Textarea = forwardRef<HTMLTextAreaElement, Omit<InputProps, 'type'> & {
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps & {
   rows?: number
 }>(({
   value,
@@ -80,7 +82,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, Omit<InputProps, 'type'>
 }, ref) => {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (onChange) {
-      onChange(e.target.value)
+      onChange(e.target.value, e)
     }
   }
 

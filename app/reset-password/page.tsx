@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { supabase } from '../../lib/supabase-minimal'
+import { supabase } from '../../lib/api/supabase-minimal'
 import { AlertTriangle, CheckCircle, Eye, EyeOff, Lock } from 'lucide-react'
 
 function ResetPasswordForm() {

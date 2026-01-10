@@ -3,9 +3,10 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, ScatterChart, Scatter, Area, AreaChart } from 'recharts'
-import AppLayout from '../../components/AppLayout'
+import AppLayout from '../../components/shared/AppLayout'
+import AIRiskManagement from '../../components/ai/AIRiskManagement'
 import { AlertTriangle, Shield, TrendingUp, Activity, Clock, User, Calendar, Target, Filter, Download, RefreshCw, BarChart3, Plus, Search, SortAsc, SortDesc, Zap } from 'lucide-react'
-import { getApiUrl } from '../../lib/api'
+import { getApiUrl } from '../../lib/api/client'
 
 interface Risk {
   id: string
@@ -67,6 +68,7 @@ export default function Risks() {
   const [showFilters, setShowFilters] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
   const [showMonteCarloModal, setShowMonteCarloModal] = useState(false)
+  const [showAIAnalysis, setShowAIAnalysis] = useState(true)
 
   // Enhanced analytics data
   const analyticsData = useMemo(() => {
@@ -226,13 +228,16 @@ export default function Risks() {
       })
       
       if (!projectsResponse.ok) throw new Error('Failed to fetch projects')
-      const projects = await projectsResponse.json()
+      const projectsData = await projectsResponse.json()
+      
+      // Extract projects array from response
+      const projects = Array.isArray(projectsData) ? projectsData : (projectsData.projects || [])
       
       // Create project lookup
       const projectLookup = projects.reduce((acc: any, project: any) => {
         acc[project.id] = project.name
-      return acc
-    }, {})
+        return acc
+      }, {})
     
     // Enhanced sample risk data with more realistic scenarios
     const sampleRisks: Risk[] = [
@@ -520,80 +525,105 @@ export default function Risks() {
   return (
     <AppLayout>
       <div className="p-8 space-y-6">
-        {/* Enhanced Header */}
-        <div className="flex justify-between items-start">
-          <div>
-            <div className="flex items-center space-x-4">
-              <h1 className="text-3xl font-bold text-gray-900">Risk Management</h1>
-              {alerts.length > 0 && (
-                <div className="flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
-                  <AlertTriangle className="h-4 w-4 mr-1" />
-                  {alerts.length} Alert{alerts.length !== 1 ? 's' : ''}
+        {/* Enhanced Mobile-First Header */}
+        <div className="flex flex-col space-y-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-col space-y-2">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Risk Management</h1>
+                <div className="flex flex-wrap items-center gap-2">
+                  {alerts.length > 0 && (
+                    <div className="flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                      <AlertTriangle className="h-4 w-4 mr-1 flex-shrink-0" />
+                      <span>{alerts.length} Alert{alerts.length !== 1 ? 's' : ''}</span>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-sm text-gray-600">
+                {metrics && (
+                  <>
+                    <span>Total: {metrics.total_risks}</span>
+                    <span>High Risk: {metrics.high_risk_count}</span>
+                    <span>Avg: {(metrics.average_risk_score * 100).toFixed(1)}%</span>
+                    <span>{filteredRisks.length} filtered</span>
+                  </>
+                )}
+              </div>
             </div>
-            <div className="flex items-center space-x-4 mt-2 text-sm text-gray-700">
-              {metrics && (
-                <>
-                  <span>Total Risks: {metrics.total_risks}</span>
-                  <span>High Risk: {metrics.high_risk_count}</span>
-                  <span>Avg Score: {(metrics.average_risk_score * 100).toFixed(1)}%</span>
-                  <span>{filteredRisks.length} filtered</span>
-                </>
-              )}
+            
+            {/* Mobile-Optimized Action Buttons */}
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setViewMode(
+                  viewMode === 'overview' ? 'matrix' : 
+                  viewMode === 'matrix' ? 'trends' : 
+                  viewMode === 'trends' ? 'detailed' : 'overview'
+                )}
+                className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 text-sm font-medium"
+              >
+                {viewMode === 'overview' ? <BarChart3 className="h-4 w-4 mr-2 flex-shrink-0" /> : 
+                 viewMode === 'matrix' ? <Target className="h-4 w-4 mr-2 flex-shrink-0" /> : 
+                 viewMode === 'trends' ? <TrendingUp className="h-4 w-4 mr-2 flex-shrink-0" /> :
+                 <Activity className="h-4 w-4 mr-2 flex-shrink-0" />}
+                <span className="hidden sm:inline">
+                  {viewMode === 'overview' ? 'Matrix' : 
+                   viewMode === 'matrix' ? 'Trends' : 
+                   viewMode === 'trends' ? 'Detailed' : 'Overview'}
+                </span>
+              </button>
+              
+              <button
+                onClick={() => setShowAIAnalysis(!showAIAnalysis)}
+                className={`flex items-center justify-center min-h-[44px] px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
+                  showAIAnalysis 
+                    ? 'bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800' 
+                    : 'bg-purple-100 text-purple-700 hover:bg-purple-200 active:bg-purple-300'
+                }`}
+              >
+                <Zap className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="hidden sm:inline">AI Analysis</span>
+                <span className="sm:hidden">AI</span>
+              </button>
+              
+              <button
+                onClick={() => setShowMonteCarloModal(true)}
+                disabled={filteredRisks.length === 0}
+                className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 active:bg-purple-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              >
+                <Zap className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="hidden sm:inline">Monte Carlo</span>
+                <span className="sm:hidden">MC</span>
+              </button>
+              
+              <button
+                onClick={exportRiskData}
+                className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 active:bg-green-300 text-sm font-medium"
+              >
+                <Download className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="hidden sm:inline">Export</span>
+              </button>
+              
+              <button
+                onClick={fetchRisks}
+                className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 active:bg-blue-300 text-sm font-medium"
+              >
+                <RefreshCw className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="hidden sm:inline">Refresh</span>
+              </button>
+              
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`flex items-center justify-center min-h-[44px] px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
+                  showFilters 
+                    ? 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800' 
+                    : 'bg-blue-100 text-blue-700 hover:bg-blue-200 active:bg-blue-300'
+                }`}
+              >
+                <Filter className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="hidden sm:inline">Filters</span>
+              </button>
             </div>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setViewMode(
-                viewMode === 'overview' ? 'matrix' : 
-                viewMode === 'matrix' ? 'trends' : 
-                viewMode === 'trends' ? 'detailed' : 'overview'
-              )}
-              className="flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
-            >
-              {viewMode === 'overview' ? <BarChart3 className="h-4 w-4 mr-2" /> : 
-               viewMode === 'matrix' ? <Target className="h-4 w-4 mr-2" /> : 
-               viewMode === 'trends' ? <TrendingUp className="h-4 w-4 mr-2" /> :
-               <Activity className="h-4 w-4 mr-2" />}
-              {viewMode === 'overview' ? 'Matrix' : 
-               viewMode === 'matrix' ? 'Trends' : 
-               viewMode === 'trends' ? 'Detailed' : 'Overview'}
-            </button>
-            
-            <button
-              onClick={() => setShowMonteCarloModal(true)}
-              disabled={filteredRisks.length === 0}
-              className="flex items-center px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Zap className="h-4 w-4 mr-2" />
-              Monte Carlo
-            </button>
-            
-            <button
-              onClick={exportRiskData}
-              className="flex items-center px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </button>
-            
-            <button
-              onClick={fetchRisks}
-              className="flex items-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200"
-            >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </button>
-            
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              <Filter className="h-4 w-4 mr-2" />
-              Filters
-            </button>
           </div>
         </div>
 
@@ -631,11 +661,11 @@ export default function Risks() {
           </div>
         )}
 
-        {/* Enhanced Filter Panel */}
+        {/* Enhanced Mobile-First Filter Panel */}
         {showFilters && (
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              <div>
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="sm:col-span-2 lg:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -644,7 +674,7 @@ export default function Risks() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Search risks..."
-                    className="input-field pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="input-field w-full min-h-[44px] pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   />
                 </div>
               </div>
@@ -654,7 +684,7 @@ export default function Risks() {
                 <select
                   value={filterCategory}
                   onChange={(e) => setFilterCategory(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full min-h-[44px] p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                 >
                   <option value="all">All Categories</option>
                   <option value="technical">Technical</option>
@@ -670,7 +700,7 @@ export default function Risks() {
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full min-h-[44px] p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                 >
                   <option value="all">All Statuses</option>
                   <option value="identified">Identified</option>
@@ -686,7 +716,7 @@ export default function Risks() {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as any)}
-                    className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="flex-1 min-h-[44px] p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   >
                     <option value="risk_score">Risk Score</option>
                     <option value="created_at">Created Date</option>
@@ -694,7 +724,7 @@ export default function Risks() {
                   </select>
                   <button
                     onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                    className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                    className="min-h-[44px] px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 active:bg-gray-100"
                   >
                     {sortOrder === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
                   </button>
@@ -710,7 +740,7 @@ export default function Risks() {
                     setSortBy('risk_score')
                     setSortOrder('desc')
                   }}
-                  className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                  className="w-full min-h-[44px] px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 active:bg-gray-300 font-medium"
                 >
                   Clear Filters
                 </button>
@@ -719,68 +749,93 @@ export default function Risks() {
           </div>
         )}
 
-        {/* Enhanced Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        {/* Mobile-First Summary Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-700">Total Risks</p>
-                <p className="text-2xl font-bold text-blue-600">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-700 truncate">Total Risks</p>
+                <p className="text-lg sm:text-2xl font-bold text-blue-600">
                   {metrics?.total_risks || 0}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
                   {filteredRisks.length} filtered
                 </p>
               </div>
-              <Shield className="h-8 w-8 text-blue-600" />
+              <Shield className="h-5 w-5 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-700">High Risk</p>
-                <p className="text-2xl font-bold text-red-600">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-700 truncate">High Risk</p>
+                <p className="text-lg sm:text-2xl font-bold text-red-600">
                   {metrics?.high_risk_count || 0}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
                   {metrics?.total_risks ? ((metrics.high_risk_count / metrics.total_risks) * 100).toFixed(1) : 0}% of total
                 </p>
               </div>
-              <AlertTriangle className="h-8 w-8 text-red-600" />
+              <AlertTriangle className="h-5 w-5 sm:h-8 sm:w-8 text-red-600 flex-shrink-0" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-700">Medium Risk</p>
-                <p className="text-2xl font-bold text-yellow-600">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-700 truncate">Medium Risk</p>
+                <p className="text-lg sm:text-2xl font-bold text-yellow-600">
                   {metrics?.medium_risk_count || 0}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
                   Active mitigation
                 </p>
               </div>
-              <Activity className="h-8 w-8 text-yellow-600" />
+              <Activity className="h-5 w-5 sm:h-8 sm:w-8 text-yellow-600 flex-shrink-0" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-700">Avg Risk Score</p>
-                <p className={`text-2xl font-bold ${getRiskLevelColor(metrics?.average_risk_score || 0)}`}>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-700 truncate">Avg Risk Score</p>
+                <p className={`text-lg sm:text-2xl font-bold ${getRiskLevelColor(metrics?.average_risk_score || 0)}`}>
                   {((metrics?.average_risk_score || 0) * 100).toFixed(0)}%
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
                   Portfolio average
                 </p>
               </div>
-              <Target className="h-8 w-8 text-purple-600" />
+              <Target className="h-5 w-5 sm:h-8 sm:w-8 text-purple-600 flex-shrink-0" />
             </div>
           </div>
         </div>
+
+        {/* AI Risk Management System */}
+        {showAIAnalysis && (
+          <AIRiskManagement 
+            risks={risks.map(risk => ({
+              id: risk.id,
+              title: risk.title,
+              category: risk.category,
+              risk_score: risk.risk_score,
+              project_id: risk.project_id,
+              project_name: risk.project_name,
+              status: risk.status,
+              created_at: risk.created_at
+            }))}
+            onRiskUpdate={(riskId, updates) => {
+              setRisks(prev => prev.map(risk => 
+                risk.id === riskId ? { ...risk, ...updates } : risk
+              ))
+            }}
+            onAlertGenerated={(alert) => {
+              // Add alert to the alerts state if needed
+              console.log('New AI alert generated:', alert)
+            }}
+          />
+        )}
 
         {/* View Mode Content */}
         {viewMode === 'overview' && (
@@ -916,49 +971,51 @@ export default function Risks() {
           </div>
         )}
 
-        {/* Enhanced Risk Details Table */}
+        {/* Enhanced Mobile-First Risk Details Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
             <h3 className="text-lg font-semibold text-gray-900">
               Risk Register ({filteredRisks.length} risks)
             </h3>
             <button 
               onClick={() => setShowAddModal(true)}
-              className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="flex items-center justify-center min-h-[44px] px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 font-medium"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
               Add Risk
             </button>
           </div>
+          
+          {/* Mobile-optimized table with horizontal scroll */}
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Risk
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Project
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Category
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Risk Score
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Probability
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Impact
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Owner
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Due Date
                   </th>
                 </tr>
@@ -966,7 +1023,7 @@ export default function Risks() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredRisks.map((risk) => (
                   <tr key={risk.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
+                    <td className="px-4 sm:px-6 py-4">
                       <div>
                         <div className="text-sm font-medium text-gray-900">{risk.title}</div>
                         <div className="text-sm text-gray-500 mt-1 max-w-xs truncate">{risk.description}</div>
@@ -977,10 +1034,10 @@ export default function Risks() {
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {risk.project_name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         {getCategoryIcon(risk.category)}
                         <span className="ml-2 text-sm text-gray-900 capitalize">
@@ -988,29 +1045,29 @@ export default function Risks() {
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRiskLevelBg(risk.risk_score)}`}>
                         {(risk.risk_score * 100).toFixed(0)}%
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {(risk.probability * 100).toFixed(0)}%
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {(risk.impact * 100).toFixed(0)}%
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(risk.status)}`}>
                         {risk.status.replace('_', ' ')}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {risk.owner}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div className="flex items-center">
-                        <Calendar className="h-4 w-4 text-gray-400 mr-1" />
-                        {new Date(risk.due_date).toLocaleDateString()}
+                        <Calendar className="h-4 w-4 text-gray-400 mr-1 flex-shrink-0" />
+                        <span className="truncate">{new Date(risk.due_date).toLocaleDateString()}</span>
                       </div>
                     </td>
                   </tr>
@@ -1121,11 +1178,13 @@ export default function Risks() {
           </div>
         )}
 
-        {/* Add Risk Modal */}
+        {/* Enhanced Mobile-First Add Risk Modal */}
         {showAddModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Risk</h3>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6">
+                <h3 className="text-lg font-semibold text-gray-900">Add New Risk</h3>
+              </div>
               <form onSubmit={async (e) => {
                 e.preventDefault()
                 const formData = new FormData(e.currentTarget)
@@ -1145,33 +1204,35 @@ export default function Risks() {
                 } catch (error) {
                   alert(error instanceof Error ? error.message : 'Failed to create risk')
                 }
-              }} className="space-y-4"
+              }} className="p-4 sm:p-6 space-y-4"
               >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
                   <input
                     type="text"
                     name="title"
                     required
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    placeholder="Enter risk title"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                   <textarea
                     name="description"
                     rows={3}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full min-h-[88px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base resize-none"
+                    placeholder="Describe the risk in detail"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Project *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Project *</label>
                   <select
                     name="project_id"
                     required
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   >
                     <option value="">Select a project</option>
                     <option value="1">Sample Project</option>
@@ -1181,11 +1242,11 @@ export default function Risks() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
                   <select
                     name="category"
                     required
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   >
                     <option value="">Select category</option>
                     <option value="technical">Technical</option>
@@ -1198,7 +1259,7 @@ export default function Risks() {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Probability (%)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Probability (%)</label>
                     <input
                       type="number"
                       name="probability"
@@ -1206,12 +1267,12 @@ export default function Risks() {
                       min="0"
                       max="100"
                       defaultValue="50"
-                      className="input-field w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="input-field w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Impact (%)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Impact (%)</label>
                     <input
                       type="number"
                       name="impact"
@@ -1219,51 +1280,51 @@ export default function Risks() {
                       min="0"
                       max="100"
                       defaultValue="50"
-                      className="input-field w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="input-field w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                     />
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Mitigation Strategy</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Mitigation Strategy</label>
                   <textarea
                     name="mitigation"
                     rows={2}
                     placeholder="Describe how this risk will be mitigated..."
-                    className="textarea-field p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="textarea-field w-full min-h-[66px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base resize-none"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Owner</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Owner</label>
                   <input
                     type="text"
                     name="owner"
                     placeholder="Risk owner name"
-                    className="input-field p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="input-field w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
                   <input
                     type="date"
                     name="due_date"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   />
                 </div>
                 
-                <div className="flex justify-end space-x-3 pt-4">
+                <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4 border-t border-gray-200">
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                    className="w-full sm:w-auto min-h-[44px] px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 active:bg-gray-300 font-medium"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    className="w-full sm:w-auto min-h-[44px] px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 active:bg-blue-800 font-medium"
                   >
                     Add Risk
                   </button>

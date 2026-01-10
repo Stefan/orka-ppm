@@ -87,3 +87,39 @@ class ComprehensiveFinancialReport(BaseModel):
     alerts: List[dict]
     trends: dict
     generated_at: datetime
+
+# Project Controls Integration Models
+class ProjectControlsFinancialData(BaseModel):
+    """Extended financial data for project controls integration"""
+    project_id: UUID
+    budgeted_cost_of_work_scheduled: float  # BCWS/PV
+    budgeted_cost_of_work_performed: float  # BCWP/EV
+    actual_cost_of_work_performed: float    # ACWP/AC
+    budget_at_completion: float             # BAC
+    management_reserve: Optional[float] = None
+    contingency_reserve: Optional[float] = None
+    approved_change_orders: float = 0.0
+    pending_change_orders: float = 0.0
+
+class EnhancedFinancialSummary(FinancialSummary):
+    """Enhanced financial summary with project controls metrics"""
+    earned_value: float
+    planned_value: float
+    cost_performance_index: float
+    schedule_performance_index: float
+    estimate_at_completion: float
+    estimate_to_complete: float
+    variance_at_completion: float
+    to_complete_performance_index: float
+    performance_measurement_baseline: float
+
+class FinancialForecast(BaseModel):
+    """Financial forecasting model for project controls"""
+    project_id: UUID
+    forecast_period: str  # "monthly", "quarterly", "annual"
+    forecast_data: List[dict]  # Time-series forecast data
+    confidence_intervals: Dict[str, float]
+    assumptions: List[str]
+    risk_adjustments: Dict[str, float]
+    generated_at: datetime
+    generated_by: UUID

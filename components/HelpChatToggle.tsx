@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { MessageSquare, HelpCircle, Lightbulb, X } from 'lucide-react'
 import { useHelpChat } from '../hooks/useHelpChat'
 import { useMediaQuery } from '../hooks/useMediaQuery'
-import { cn } from '../lib/design-system'
+import { cn } from '../lib/utils/design-system'
 
 // Accessibility constants
 const TOGGLE_ARIA_LABELS = {

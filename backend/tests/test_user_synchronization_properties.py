@@ -23,12 +23,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import only what we need to avoid email validator dependency
 try:
-    from user_synchronization_service import UserSynchronizationService, SyncResult
-    # Define UserRole enum locally to avoid model dependency
-    class UserRole:
-        team_member = "team_member"
-        admin = "admin"
-        project_manager = "project_manager"
+    from services.user_synchronization_service import UserSynchronizationService, SyncResult
+    from models.users import UserRole
 except ImportError as e:
     # If import fails, we'll skip the tests
     pytest.skip(f"Cannot import required modules: {e}", allow_module_level=True)
@@ -82,6 +78,8 @@ class TestUserSynchronizationProperties:
     def setup_method(self):
         """Set up test environment before each test"""
         self.mock_client = Mock()
+        # Reset the mock completely for each test method
+        self.mock_client.reset_mock()
         
     @settings(max_examples=100)
     @given(
@@ -109,8 +107,8 @@ class TestUserSynchronizationProperties:
         ]
         
         # Create service with mocked client
-        with patch('user_synchronization_service.service_supabase', self.mock_client):
-            with patch('user_synchronization_service.supabase', self.mock_client):
+        with patch('services.user_synchronization_service.service_supabase', self.mock_client):
+            with patch('services.user_synchronization_service.supabase', self.mock_client):
                 service = UserSynchronizationService()
                 service.client = self.mock_client
                 
@@ -147,35 +145,45 @@ class TestUserSynchronizationProperties:
         """
         assume(len(missing_users) > 0)  # Only test when there are users to create profiles for
         
-        # Mock successful insertions
-        insert_responses = []
-        for user in missing_users:
-            response = Mock()
-            response.data = [{
-                "user_id": user["id"],
-                "role": UserRole.team_member,
-                "is_active": True,
-                "created_at": datetime.now().isoformat(),
-                "updated_at": datetime.now().isoformat()
-            }]
-            insert_responses.append(response)
-        
-        # Set up mock client for profile creation
-        self.mock_client.table.return_value.select.return_value.eq.return_value.execute.return_value.data = []  # No existing profiles
-        self.mock_client.table.return_value.insert.return_value.execute.side_effect = insert_responses
+        # Reset mock for each hypothesis example
+        self.mock_client.reset_mock()
         
         # Create service with mocked client
-        with patch('user_synchronization_service.service_supabase', self.mock_client):
-            with patch('user_synchronization_service.supabase', self.mock_client):
+        with patch('services.user_synchronization_service.service_supabase', self.mock_client):
+            with patch('services.user_synchronization_service.supabase', self.mock_client):
                 service = UserSynchronizationService()
                 service.client = self.mock_client
                 
+                # Mock profile existence checks - return empty for all users (no existing profiles)
+                def mock_profile_check(*args, **kwargs):
+                    response = Mock()
+                    response.data = []
+                    return response
+                
+                self.mock_client.table.return_value.select.return_value.eq.return_value.execute.side_effect = mock_profile_check
+                
+                # Mock successful profile insertions - one response per user
+                def mock_insert_execute():
+                    # Get the profile data from the insert call
+                    insert_call_args = self.mock_client.table.return_value.insert.call_args
+                    if insert_call_args and len(insert_call_args[0]) > 0:
+                        profile_data = insert_call_args[0][0]
+                        response = Mock()
+                        response.data = [profile_data]  # Return the inserted data
+                        return response
+                    else:
+                        response = Mock()
+                        response.data = []
+                        return response
+                
+                self.mock_client.table.return_value.insert.return_value.execute.side_effect = mock_insert_execute
+                
                 # Call the method under test
-                result = service.create_missing_profiles(missing_users)
+                result = service.create_missing_profiles(missing_users, preserve_existing=False)
                 
                 # Verify the property: profiles should be created for all missing users
                 assert result.created_profiles == len(missing_users), \
-                    "Should create profiles for all missing users"
+                    f"Should create profiles for all {len(missing_users)} missing users, got {result.created_profiles}"
                 
                 assert result.failed_creations == 0, \
                     "Should not have any failed creations with valid data"
@@ -189,15 +197,15 @@ class TestUserSynchronizationProperties:
                 assert actual_user_ids == expected_user_ids, \
                     "Should track exactly the expected user IDs"
                 
-                # Verify default values are used
-                # This is validated by checking that the mock was called with correct data
+                # Verify insert was called for each user
                 insert_calls = self.mock_client.table.return_value.insert.call_args_list
                 assert len(insert_calls) == len(missing_users), \
-                    "Should make insert call for each user"
+                    f"Should make insert call for each user: expected {len(missing_users)}, got {len(insert_calls)}"
                 
-                for call in insert_calls:
+                # Verify default values are used in each insert call
+                for i, call in enumerate(insert_calls):
                     profile_data = call[0][0]  # First argument to insert()
-                    assert profile_data["role"] == UserRole.team_member, \
+                    assert profile_data["role"] == UserRole.team_member.value, \
                         "Should use default role"
                     assert profile_data["is_active"] == True, \
                         "Should set default active status"
@@ -276,8 +284,8 @@ class TestUserSynchronizationProperties:
         self.mock_client.table.return_value.insert.return_value.execute.side_effect = insert_responses
         
         # Create service with mocked client
-        with patch('user_synchronization_service.service_supabase', self.mock_client):
-            with patch('user_synchronization_service.supabase', self.mock_client):
+        with patch('services.user_synchronization_service.service_supabase', self.mock_client):
+            with patch('services.user_synchronization_service.supabase', self.mock_client):
                 service = UserSynchronizationService()
                 service.client = self.mock_client
                 
@@ -369,8 +377,8 @@ class TestUserSynchronizationProperties:
         self.mock_client.table.return_value.select.return_value.eq.return_value.execute.return_value = detailed_response
         
         # Create service with mocked client
-        with patch('user_synchronization_service.service_supabase', self.mock_client):
-            with patch('user_synchronization_service.supabase', self.mock_client):
+        with patch('services.user_synchronization_service.service_supabase', self.mock_client):
+            with patch('services.user_synchronization_service.supabase', self.mock_client):
                 service = UserSynchronizationService()
                 service.client = self.mock_client
                 
@@ -418,51 +426,74 @@ class TestUserSynchronizationProperties:
         should match the actual number of profiles created
         **Validates: Requirements 3.4**
         """
-        # Set up mock responses
-        auth_response = Mock()
-        auth_response.data = auth_users
-        auth_response.count = len(auth_users)
-        
-        profiles_response = Mock()
-        profiles_response.data = existing_profiles
-        profiles_response.count = len(existing_profiles)
-        
-        # Calculate expected missing users
-        existing_user_ids = {profile["user_id"] for profile in existing_profiles}
-        missing_users = [user for user in auth_users if user["id"] not in existing_user_ids]
-        
-        # Mock successful profile creation for missing users
-        insert_responses = []
-        for user in missing_users:
-            response = Mock()
-            response.data = [{
-                "user_id": user["id"],
-                "role": UserRole.team_member,
-                "is_active": True
-            }]
-            insert_responses.append(response)
-        
-        # Set up mock client
-        self.mock_client.table.return_value.select.return_value.execute.side_effect = [
-            auth_response,  # For get_sync_statistics - auth users count
-            profiles_response,  # For get_sync_statistics - profiles count
-            auth_response,  # For identify_missing_profiles - auth users
-            profiles_response,  # For identify_missing_profiles - profiles
-            auth_response,  # For identify_missing_profiles in perform_full_sync
-            profiles_response   # For identify_missing_profiles in perform_full_sync
-        ]
-        
-        # Mock profile existence checks (return empty for all)
-        self.mock_client.table.return_value.select.return_value.eq.return_value.execute.return_value.data = []
-        
-        # Mock profile insertions
-        self.mock_client.table.return_value.insert.return_value.execute.side_effect = insert_responses
+        # Reset mock for each hypothesis example
+        self.mock_client.reset_mock()
         
         # Create service with mocked client
-        with patch('user_synchronization_service.service_supabase', self.mock_client):
-            with patch('user_synchronization_service.supabase', self.mock_client):
+        with patch('services.user_synchronization_service.service_supabase', self.mock_client):
+            with patch('services.user_synchronization_service.supabase', self.mock_client):
                 service = UserSynchronizationService()
                 service.client = self.mock_client
+                
+                # Calculate expected missing users
+                existing_user_ids = {profile["user_id"] for profile in existing_profiles}
+                missing_users = [user for user in auth_users if user["id"] not in existing_user_ids]
+                
+                # Set up mock responses for get_sync_statistics
+                auth_response = Mock()
+                auth_response.data = auth_users if auth_users else []  # Ensure empty list when auth_users is empty
+                auth_response.count = len(auth_users)
+                
+                profiles_response = Mock()
+                profiles_response.data = existing_profiles if existing_profiles else []  # Ensure empty list when existing_profiles is empty
+                profiles_response.count = len(existing_profiles)
+                
+                # Mock the identify_missing_profiles calls
+                missing_response = Mock()
+                missing_response.data = missing_users
+                
+                # Set up mock client for multiple calls - use a cycling approach
+                responses_cycle = [auth_response, profiles_response]
+                
+                def mock_select_execute():
+                    # Cycle through responses based on table being queried
+                    # This is a simplified approach - return auth_response for auth.users, profiles_response for user_profiles
+                    table_call = self.mock_client.table.call_args
+                    if table_call and len(table_call[0]) > 0:
+                        table_name = table_call[0][0]
+                        if "auth.users" in table_name:
+                            return auth_response
+                        elif "user_profiles" in table_name:
+                            return profiles_response
+                    
+                    # Default fallback
+                    return auth_response
+                
+                self.mock_client.table.return_value.select.return_value.execute.side_effect = mock_select_execute
+                
+                # Mock profile existence checks (return empty for all)
+                def mock_profile_check(*args, **kwargs):
+                    response = Mock()
+                    response.data = []
+                    return response
+                
+                self.mock_client.table.return_value.select.return_value.eq.return_value.execute.side_effect = mock_profile_check
+                
+                # Mock successful profile insertions
+                def mock_insert_execute():
+                    # Get the profile data from the insert call
+                    insert_call_args = self.mock_client.table.return_value.insert.call_args
+                    if insert_call_args and len(insert_call_args[0]) > 0:
+                        profile_data = insert_call_args[0][0]
+                        response = Mock()
+                        response.data = [profile_data]  # Return the inserted data
+                        return response
+                    else:
+                        response = Mock()
+                        response.data = []
+                        return response
+                
+                self.mock_client.table.return_value.insert.return_value.execute.side_effect = mock_insert_execute
                 
                 # Call the method under test
                 result = service.perform_full_sync(dry_run=False)
@@ -504,58 +535,65 @@ class TestUserSynchronizationProperties:
         the same result without creating duplicates or errors
         **Validates: Requirements 3.5**
         """
-        # Set up mock responses
-        auth_response = Mock()
-        auth_response.data = auth_users
-        auth_response.count = len(auth_users)
-        
-        profiles_response = Mock()
-        profiles_response.data = existing_profiles
-        profiles_response.count = len(existing_profiles)
-        
-        # Calculate expected missing users
-        existing_user_ids = {profile["user_id"] for profile in existing_profiles}
-        missing_users = [user for user in auth_users if user["id"] not in existing_user_ids]
-        
-        # For first run: mock successful creation
-        first_run_responses = []
-        for user in missing_users:
-            response = Mock()
-            response.data = [{
-                "user_id": user["id"],
-                "role": UserRole.team_member,
-                "is_active": True
-            }]
-            first_run_responses.append(response)
-        
-        # For second run: mock that profiles already exist
-        existing_check_responses = []
-        for user in missing_users:
-            response = Mock()
-            response.data = [{  # Profile exists
-                "user_id": user["id"]
-            }]
-            existing_check_responses.append(response)
+        # Reset mock for each hypothesis example
+        self.mock_client.reset_mock()
         
         # Create service with mocked client
-        with patch('user_synchronization_service.service_supabase', self.mock_client):
-            with patch('user_synchronization_service.supabase', self.mock_client):
+        with patch('services.user_synchronization_service.service_supabase', self.mock_client):
+            with patch('services.user_synchronization_service.supabase', self.mock_client):
                 service = UserSynchronizationService()
                 service.client = self.mock_client
                 
-                # First run setup
-                self.mock_client.table.return_value.select.return_value.execute.side_effect = [
-                    auth_response,  # get_sync_statistics - auth users
-                    profiles_response,  # get_sync_statistics - profiles  
-                    auth_response,  # identify_missing_profiles - auth users
-                    profiles_response,  # identify_missing_profiles - profiles
-                    auth_response,  # perform_full_sync - auth users
-                    profiles_response   # perform_full_sync - profiles
-                ]
+                # Calculate expected missing users
+                existing_user_ids = {profile["user_id"] for profile in existing_profiles}
+                missing_users = [user for user in auth_users if user["id"] not in existing_user_ids]
                 
-                # Mock no existing profiles for first run
-                self.mock_client.table.return_value.select.return_value.eq.return_value.execute.return_value.data = []
-                self.mock_client.table.return_value.insert.return_value.execute.side_effect = first_run_responses
+                # Set up mock responses
+                auth_response = Mock()
+                auth_response.data = auth_users
+                auth_response.count = len(auth_users)
+                
+                profiles_response = Mock()
+                profiles_response.data = existing_profiles
+                profiles_response.count = len(existing_profiles)
+                
+                # First run setup - mock that profiles don't exist yet
+                def mock_first_run_profile_check(*args, **kwargs):
+                    response = Mock()
+                    response.data = []  # No existing profiles
+                    return response
+                
+                def mock_first_run_insert_execute():
+                    # Get the profile data from the insert call
+                    insert_call_args = self.mock_client.table.return_value.insert.call_args
+                    if insert_call_args and len(insert_call_args[0]) > 0:
+                        profile_data = insert_call_args[0][0]
+                        response = Mock()
+                        response.data = [profile_data]  # Return the inserted data
+                        return response
+                    else:
+                        response = Mock()
+                        response.data = []
+                        return response
+                
+                # Set up first run mocks
+                def mock_first_run_select_execute():
+                    # Return appropriate response based on table being queried
+                    table_call = self.mock_client.table.call_args
+                    if table_call and len(table_call[0]) > 0:
+                        table_name = table_call[0][0]
+                        if "auth.users" in table_name:
+                            return auth_response
+                        elif "user_profiles" in table_name:
+                            return profiles_response
+                    
+                    # Default fallback
+                    return auth_response
+                
+                self.mock_client.table.return_value.select.return_value.execute.side_effect = mock_first_run_select_execute
+                
+                self.mock_client.table.return_value.select.return_value.eq.return_value.execute.side_effect = mock_first_run_profile_check
+                self.mock_client.table.return_value.insert.return_value.execute.side_effect = mock_first_run_insert_execute
                 
                 # First synchronization run
                 first_result = service.perform_full_sync(dry_run=False)
@@ -564,31 +602,36 @@ class TestUserSynchronizationProperties:
                 self.mock_client.reset_mock()
                 
                 # Second run setup - profiles now exist
-                self.mock_client.table.return_value.select.return_value.execute.side_effect = [
-                    auth_response,  # get_sync_statistics - auth users
-                    profiles_response,  # get_sync_statistics - profiles
-                    auth_response,  # identify_missing_profiles - auth users
-                    profiles_response,  # identify_missing_profiles - profiles  
-                    auth_response,  # perform_full_sync - auth users
-                    profiles_response   # perform_full_sync - profiles
-                ]
-                
-                # Mock that profiles now exist (simulate first run created them)
                 updated_profiles = existing_profiles + [
                     {"user_id": user["id"]} for user in missing_users
                 ]
                 updated_profiles_response = Mock()
                 updated_profiles_response.data = updated_profiles
+                updated_profiles_response.count = len(updated_profiles)
                 
-                # Override the profiles response for second run
-                self.mock_client.table.return_value.select.return_value.execute.side_effect = [
-                    auth_response,  # get_sync_statistics - auth users
-                    updated_profiles_response,  # get_sync_statistics - updated profiles
-                    auth_response,  # identify_missing_profiles - auth users  
-                    updated_profiles_response,  # identify_missing_profiles - updated profiles
-                    auth_response,  # perform_full_sync - auth users
-                    updated_profiles_response   # perform_full_sync - updated profiles
-                ]
+                def mock_second_run_profile_check(*args, **kwargs):
+                    # For second run, profiles exist for previously missing users
+                    response = Mock()
+                    response.data = [{"user_id": "dummy"}]  # Profile exists
+                    return response
+                
+                # Set up second run mocks
+                def mock_second_run_select_execute():
+                    # Return appropriate response based on table being queried
+                    table_call = self.mock_client.table.call_args
+                    if table_call and len(table_call[0]) > 0:
+                        table_name = table_call[0][0]
+                        if "auth.users" in table_name:
+                            return auth_response
+                        elif "user_profiles" in table_name:
+                            return updated_profiles_response
+                    
+                    # Default fallback
+                    return auth_response
+                
+                self.mock_client.table.return_value.select.return_value.execute.side_effect = mock_second_run_select_execute
+                
+                self.mock_client.table.return_value.select.return_value.eq.return_value.execute.side_effect = mock_second_run_profile_check
                 
                 # Second synchronization run
                 second_result = service.perform_full_sync(dry_run=False)
@@ -639,7 +682,7 @@ class TestUserSynchronizationProperties:
         create_response = Mock()
         create_response.data = [{
             "user_id": user_id,
-            "role": UserRole.team_member,
+            "role": UserRole.team_member.value,
             "is_active": True
         }]
         
@@ -648,8 +691,8 @@ class TestUserSynchronizationProperties:
         existing_profile_response.data = [{"user_id": user_id}]
         
         # Create service with mocked client
-        with patch('user_synchronization_service.service_supabase', self.mock_client):
-            with patch('user_synchronization_service.supabase', self.mock_client):
+        with patch('services.user_synchronization_service.service_supabase', self.mock_client):
+            with patch('services.user_synchronization_service.supabase', self.mock_client):
                 service = UserSynchronizationService()
                 service.client = self.mock_client
                 
@@ -713,8 +756,8 @@ class TestUserSynchronizationProperties:
         error_response.side_effect = Exception("Database error")
         
         # Create service with mocked client
-        with patch('user_synchronization_service.service_supabase', self.mock_client):
-            with patch('user_synchronization_service.supabase', self.mock_client):
+        with patch('services.user_synchronization_service.service_supabase', self.mock_client):
+            with patch('services.user_synchronization_service.supabase', self.mock_client):
                 service = UserSynchronizationService()
                 service.client = self.mock_client
                 

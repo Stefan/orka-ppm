@@ -1,192 +1,342 @@
-import { ENV_CONFIG } from './supabase-minimal'
+/**
+ * API utilities and configuration
+ */
 
-// Mock data for fallback when API is unavailable
-const MOCK_DATA = {
-  '/projects': [
-    {
-      "id": "1",
-      "name": "Office Complex Phase 1",
-      "status": "active",
-      "health": "green",
-      "budget": 150000,
-      "created_at": "2024-01-15T10:00:00Z"
-    },
-    {
-      "id": "2", 
-      "name": "Residential Tower A",
-      "status": "active",
-      "health": "yellow",
-      "budget": 200000,
-      "created_at": "2024-01-20T10:00:00Z"
-    },
-    {
-      "id": "3",
-      "name": "Shopping Center Renovation", 
-      "status": "active",
-      "health": "red",
-      "budget": 80000,
-      "created_at": "2024-02-01T10:00:00Z"
-    }
-  ],
-  '/optimized/dashboard/quick-stats': {
-    "quick_stats": {
-      "total_projects": 12,
-      "active_projects": 8,
-      "health_distribution": {
-        "green": 6,
-        "yellow": 4,
-        "red": 2
-      },
-      "critical_alerts": 2,
-      "at_risk_projects": 4
-    },
-    "kpis": {
-      "project_success_rate": 85,
-      "budget_performance": 92,
-      "timeline_performance": 78,
-      "average_health_score": 2.1,
-      "resource_efficiency": 88,
-      "active_projects_ratio": 67
-    }
-  },
-  '/optimized/dashboard/projects-summary': [
-    {
-      "id": "1",
-      "name": "Office Complex Phase 1",
-      "status": "active",
-      "health": "green",
-      "budget": 150000,
-      "actual": 145000,
-      "variance": -5000,
-      "variance_percentage": -3.3,
-      "created_at": "2024-01-15T10:00:00Z"
-    },
-    {
-      "id": "2", 
-      "name": "Residential Tower A",
-      "status": "active",
-      "health": "yellow",
-      "budget": 200000,
-      "actual": 210000,
-      "variance": 10000,
-      "variance_percentage": 5.0,
-      "created_at": "2024-01-20T10:00:00Z"
-    }
-  ]
-}
-
-// Get mock data for an endpoint
-function getMockData(endpoint: string): any {
-  // Handle parameterized endpoints
-  if (endpoint.includes('/projects/') && endpoint.includes('/scenarios')) {
-    return {
-      "scenarios": [
-        {
-          "id": "scenario-1",
-          "project_id": endpoint.split('/')[2],
-          "name": "Accelerated Timeline",
-          "description": "Complete project 2 weeks earlier by adding resources",
-          "timeline_impact": {
-            "duration_change": -14,
-            "critical_path_affected": true
-          },
-          "cost_impact": {
-            "cost_change": 15000,
-            "cost_change_percentage": 10.0
-          },
-          "resource_impact": {
-            "utilization_changes": {
-              "developers": 25.0,
-              "designers": 15.0
-            }
-          },
-          "created_at": "2024-01-08T10:00:00Z"
-        }
-      ]
-    }
-  }
-  
-  return MOCK_DATA[endpoint as keyof typeof MOCK_DATA] || null
-}
-
-// API configuration with fallbacks - Use local development server
+// API Configuration
 export const API_CONFIG = {
-  baseURL: process.env.NODE_ENV === 'production' 
-    ? 'https://orka-ppm.onrender.com' 
-    : 'http://localhost:8001', // Local development server
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-} as const
+  baseUrl: process.env.NEXT_PUBLIC_API_URL || '/api',
+  timeout: 30000,
+  retryAttempts: 3,
+  retryDelay: 1000
+}
 
-// API URL builder with validation and fallback
-export function getApiUrl(endpoint: string): string {
-  const baseUrl = API_CONFIG.baseURL
-  
-  if (!baseUrl) {
-    console.warn('API_URL not configured, using localhost fallback')
-    return `http://localhost:8002${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`
-  }
-  
-  // Validate URL format
-  try {
-    new URL(baseUrl)
-  } catch (error) {
-    console.error('Invalid API_URL format:', baseUrl)
-    throw new Error(`Invalid API URL: ${baseUrl}`)
-  }
-  
-  // Ensure endpoint starts with /
-  const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
-  
-  // Remove trailing slash from baseUrl and combine
-  const cleanBaseUrl = baseUrl.replace(/\/$/, '')
-  
-  const fullUrl = `${cleanBaseUrl}${normalizedEndpoint}`
-  
-  // Validate final URL
-  try {
-    new URL(fullUrl)
-    return fullUrl
-  } catch (error) {
-    console.error('Invalid final URL:', fullUrl)
-    throw new Error(`Invalid final URL: ${fullUrl}`)
+// API Error types
+export class APIError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+    public code?: string,
+    public details?: any
+  ) {
+    super(message)
+    this.name = 'APIError'
   }
 }
 
-// Fetch wrapper with error handling and mock fallback
-export async function apiRequest<T = unknown>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
-  const url = getApiUrl(endpoint)
-  
-  try {
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        ...API_CONFIG.headers,
-        ...options.headers,
-      },
-    })
-    
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`)
-    }
-    
-    const data = await response.json()
-    return data as T
-  } catch (error: unknown) {
-    console.error('API request error:', error)
-    
-    // If API fails, try mock data fallback
-    const mockData = getMockData(endpoint)
-    if (mockData) {
-      console.warn(`🔄 Using mock data for ${endpoint}`)
-      return mockData as T
-    }
-    
-    throw error instanceof Error ? error : new Error('Unknown API error')
+// Request configuration
+export interface RequestConfig extends RequestInit {
+  timeout?: number
+  retries?: number
+  baseUrl?: string
+}
+
+// Response wrapper
+export interface APIResponse<T = any> {
+  data: T
+  success: boolean
+  message?: string
+  errors?: string[]
+  meta?: {
+    page?: number
+    limit?: number
+    total?: number
+    totalPages?: number
   }
+}
+
+/**
+ * Get the full API URL for an endpoint
+ */
+export function getApiUrl(endpoint: string, baseUrl?: string): string {
+  const base = baseUrl || API_CONFIG.baseUrl
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
+  return `${base}${cleanEndpoint}`
+}
+
+/**
+ * Make an API request with automatic retry and error handling
+ */
+export async function apiRequest<T = any>(
+  endpoint: string,
+  config: RequestConfig = {}
+): Promise<APIResponse<T>> {
+  const {
+    timeout = API_CONFIG.timeout,
+    retries = API_CONFIG.retryAttempts,
+    baseUrl,
+    ...requestConfig
+  } = config
+
+  const url = getApiUrl(endpoint, baseUrl)
+  
+  // Default headers
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...requestConfig.headers
+  }
+
+  // Add auth token if available
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('auth_token')
+    if (token) {
+      headers.Authorization = `Bearer ${token}`
+    }
+  }
+
+  const makeRequest = async (): Promise<APIResponse<T>> => {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeout)
+
+    try {
+      const response = await fetch(url, {
+        ...requestConfig,
+        headers,
+        signal: controller.signal
+      })
+
+      clearTimeout(timeoutId)
+
+      // Handle non-JSON responses
+      const contentType = response.headers.get('content-type')
+      let responseData: any
+
+      if (contentType && contentType.includes('application/json')) {
+        responseData = await response.json()
+      } else {
+        responseData = await response.text()
+      }
+
+      if (!response.ok) {
+        throw new APIError(
+          responseData.message || `HTTP ${response.status}`,
+          response.status,
+          responseData.code,
+          responseData
+        )
+      }
+
+      // Normalize response format
+      if (typeof responseData === 'object' && responseData !== null) {
+        return {
+          data: responseData.data || responseData,
+          success: responseData.success !== false,
+          message: responseData.message,
+          errors: responseData.errors,
+          meta: responseData.meta
+        }
+      }
+
+      return {
+        data: responseData as T,
+        success: true
+      }
+    } catch (error) {
+      clearTimeout(timeoutId)
+
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        throw new APIError('Request timeout', 408, 'TIMEOUT')
+      }
+
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new APIError('Network error', 0, 'NETWORK_ERROR')
+      }
+
+      throw error
+    }
+  }
+
+  // Retry logic
+  let lastError: any
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await makeRequest()
+    } catch (error) {
+      lastError = error
+
+      // Don't retry on client errors (4xx) except 408 (timeout)
+      if (error instanceof APIError && error.status >= 400 && error.status < 500 && error.status !== 408) {
+        throw error
+      }
+
+      // Don't retry on the last attempt
+      if (attempt === retries) {
+        throw error
+      }
+
+      // Exponential backoff
+      const delay = API_CONFIG.retryDelay * Math.pow(2, attempt)
+      await new Promise(resolve => setTimeout(resolve, delay))
+    }
+  }
+
+  throw lastError
+}
+
+/**
+ * GET request helper
+ */
+export async function get<T = any>(
+  endpoint: string,
+  config?: RequestConfig
+): Promise<APIResponse<T>> {
+  return apiRequest<T>(endpoint, { ...config, method: 'GET' })
+}
+
+/**
+ * POST request helper
+ */
+export async function post<T = any>(
+  endpoint: string,
+  data?: any,
+  config?: RequestConfig
+): Promise<APIResponse<T>> {
+  return apiRequest<T>(endpoint, {
+    ...config,
+    method: 'POST',
+    body: data ? JSON.stringify(data) : undefined
+  })
+}
+
+/**
+ * PUT request helper
+ */
+export async function put<T = any>(
+  endpoint: string,
+  data?: any,
+  config?: RequestConfig
+): Promise<APIResponse<T>> {
+  return apiRequest<T>(endpoint, {
+    ...config,
+    method: 'PUT',
+    body: data ? JSON.stringify(data) : undefined
+  })
+}
+
+/**
+ * PATCH request helper
+ */
+export async function patch<T = any>(
+  endpoint: string,
+  data?: any,
+  config?: RequestConfig
+): Promise<APIResponse<T>> {
+  return apiRequest<T>(endpoint, {
+    ...config,
+    method: 'PATCH',
+    body: data ? JSON.stringify(data) : undefined
+  })
+}
+
+/**
+ * DELETE request helper
+ */
+export async function del<T = any>(
+  endpoint: string,
+  config?: RequestConfig
+): Promise<APIResponse<T>> {
+  return apiRequest<T>(endpoint, { ...config, method: 'DELETE' })
+}
+
+/**
+ * Upload file helper
+ */
+export async function uploadFile<T = any>(
+  endpoint: string,
+  file: File,
+  additionalData?: Record<string, any>,
+  config?: RequestConfig
+): Promise<APIResponse<T>> {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  if (additionalData) {
+    Object.entries(additionalData).forEach(([key, value]) => {
+      formData.append(key, typeof value === 'string' ? value : JSON.stringify(value))
+    })
+  }
+
+  const { headers, ...restConfig } = config || {}
+  
+  return apiRequest<T>(endpoint, {
+    ...restConfig,
+    method: 'POST',
+    body: formData,
+    headers: {
+      // Don't set Content-Type for FormData, let the browser set it
+      ...headers
+    }
+  })
+}
+
+/**
+ * Download file helper
+ */
+export async function downloadFile(
+  endpoint: string,
+  filename?: string,
+  config?: RequestConfig
+): Promise<void> {
+  const response = await fetch(getApiUrl(endpoint), {
+    ...config,
+    headers: {
+      ...config?.headers
+    }
+  })
+
+  if (!response.ok) {
+    throw new APIError(`HTTP ${response.status}`, response.status)
+  }
+
+  const blob = await response.blob()
+  const url = window.URL.createObjectURL(blob)
+  
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename || 'download'
+  document.body.appendChild(a)
+  a.click()
+  
+  window.URL.revokeObjectURL(url)
+  document.body.removeChild(a)
+}
+
+/**
+ * Check if error is retryable
+ */
+export function isRetryableError(error: any): boolean {
+  if (error instanceof APIError) {
+    return error.status >= 500 || error.status === 408 || error.status === 0
+  }
+  return false
+}
+
+/**
+ * Format API error for display
+ */
+export function formatAPIError(error: any): string {
+  if (error instanceof APIError) {
+    return error.message
+  }
+  
+  if (error instanceof Error) {
+    return error.message
+  }
+  
+  return 'An unexpected error occurred'
+}
+
+// Export default object with all functions
+export default {
+  apiRequest,
+  get,
+  post,
+  put,
+  patch,
+  del,
+  uploadFile,
+  downloadFile,
+  getApiUrl,
+  isRetryableError,
+  formatAPIError,
+  APIError
 }

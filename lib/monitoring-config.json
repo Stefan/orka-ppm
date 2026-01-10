@@ -1,0 +1,24 @@
+{
+  "enabled": true,
+  "endpoints": [
+    "/api/health",
+    "/api/performance",
+    "/api/ai/status"
+  ],
+  "alerts": {
+    "responseTime": 2000,
+    "errorRate": 0.05,
+    "memoryUsage": 0.85
+  },
+  "metrics": {
+    "responseTime": true,
+    "errorRate": true,
+    "memoryUsage": true,
+    "coreWebVitals": true,
+    "aiPerformance": true
+  },
+  "reporting": {
+    "interval": 60000,
+    "retention": 86400000
+  }
+}

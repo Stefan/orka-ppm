@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useLocalStorage } from './useLocalStorage'
-import { helpChatAPI } from '../lib/help-chat-api'
+import { helpChatAPI } from '../lib/help-chat/api'
 
 export interface SupportedLanguage {
   code: string

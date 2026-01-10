@@ -120,7 +120,8 @@ describe('Change Management System Integration', () => {
         <ApprovalWorkflow 
           changeId="test-id"
           userRole="approver"
-          onApprovalDecision={mockOnApprovalDecision}
+          currentUserId="test-user-123"
+          onDecisionMade={mockOnApprovalDecision}
         />
       )
       
@@ -352,7 +353,12 @@ describe('Change Management System Integration', () => {
         approvalRate: 76.7
       }
       
-      render(<ChangeAnalyticsDashboard analyticsData={mockAnalyticsData} />)
+      render(<ChangeAnalyticsDashboard 
+        dateRange={{
+          from: new Date('2024-01-01'),
+          to: new Date('2024-01-31')
+        }}
+      />)
       
       await waitFor(() => {
         expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument()
@@ -367,9 +373,64 @@ describe('Change Management System Integration', () => {
     it('should display impact analysis correctly', async () => {
       const mockImpactData = {
         changeId: 'test-id',
-        scheduleImpact: { days: 14, criticalPath: true },
-        costImpact: { total: 25000, direct: 20000, indirect: 5000 },
-        riskImpact: { newRisks: 2, modifiedRisks: 1 }
+        critical_path_affected: true,
+        schedule_impact_days: 14,
+        affected_activities: [
+          {
+            id: 'act-1',
+            name: 'Foundation Work',
+            original_duration: 5,
+            new_duration: 8,
+            delay_days: 3,
+            resource_impact: 'Additional crew needed'
+          }
+        ],
+        total_cost_impact: 25000,
+        direct_costs: 20000,
+        indirect_costs: 5000,
+        cost_savings: 0,
+        cost_breakdown: {
+          materials: 12000,
+          labor: 8000,
+          equipment: 3000,
+          overhead: 1500,
+          contingency: 500
+        },
+        additional_resources_needed: [],
+        resource_reallocation: [],
+        new_risks: [
+          {
+            id: 'risk-1',
+            description: 'Schedule risk',
+            probability: 0.3,
+            impact_score: 5000,
+            mitigation_cost: 1000,
+            category: 'Schedule'
+          }
+        ],
+        modified_risks: [],
+        scenarios: {
+          best_case: {
+            cost_impact: 20000,
+            schedule_impact: 10,
+            probability: 0.3,
+            description: 'Best case scenario'
+          },
+          worst_case: {
+            cost_impact: 30000,
+            schedule_impact: 20,
+            probability: 0.2,
+            description: 'Worst case scenario'
+          },
+          most_likely: {
+            cost_impact: 25000,
+            schedule_impact: 14,
+            probability: 0.5,
+            description: 'Most likely scenario'
+          }
+        },
+        analyzed_by: 'Test Analyst',
+        analyzed_at: '2024-01-15T10:30:00Z'
       }
       
       render(<ImpactAnalysisDashboard changeId="test-id" impactData={mockImpactData} />)

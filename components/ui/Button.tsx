@@ -20,11 +20,12 @@ export const Button: React.FC<ButtonProps> = ({
     sm: 'px-3 py-2 text-sm touch-target',
     md: 'px-4 py-3 text-base touch-target-comfortable',
     lg: 'px-6 py-4 text-lg touch-target-large',
+    xl: 'px-8 py-5 text-xl touch-target-large',
   }
 
-  const handleClick = () => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (!disabled && !loading && onClick) {
-      onClick()
+      onClick(event)
     }
   }
 

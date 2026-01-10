@@ -1,0 +1,91 @@
+{
+  "report_type": "Data Privacy Compliance Verification",
+  "timestamp": "2026-01-09T23:40:33.497108",
+  "summary": {
+    "total_tests": 7,
+    "passed_tests": 5,
+    "failed_tests": 2,
+    "compliance_rate": 71.42857142857143
+  },
+  "regulation_compliance": {
+    "GDPR": {
+      "total": 4,
+      "passed": 3,
+      "compliance_rate": 75.0
+    },
+    "Privacy_by_Design": {
+      "total": 3,
+      "passed": 2,
+      "compliance_rate": 66.66666666666666
+    }
+  },
+  "test_results": [
+    {
+      "test_name": "GDPR Data Minimization",
+      "passed": false,
+      "regulation": "GDPR",
+      "requirement": "Article 5(1)(c) - Data minimization",
+      "details": {
+        "error": "{'message': \"Could not find the table 'public.help_sessions' in the schema cache\", 'code': 'PGRST205', 'hint': \"Perhaps you meant the table 'public.milestones'\", 'details': None}"
+      }
+    },
+    {
+      "test_name": "GDPR Consent Management",
+      "passed": true,
+      "regulation": "GDPR",
+      "requirement": "Article 6 - Lawfulness of processing",
+      "details": {
+        "note": "Consent managed through user preferences"
+      }
+    },
+    {
+      "test_name": "GDPR Right to Erasure",
+      "passed": true,
+      "regulation": "GDPR",
+      "requirement": "Article 17 - Right to erasure",
+      "details": {
+        "deletion_mechanism": "Available through analytics cleanup endpoint"
+      }
+    },
+    {
+      "test_name": "GDPR Data Portability",
+      "passed": true,
+      "regulation": "GDPR",
+      "requirement": "Article 20 - Right to data portability",
+      "details": {
+        "export_mechanism": "Chat history export available in HelpChatProvider"
+      }
+    },
+    {
+      "test_name": "Anonymous Analytics",
+      "passed": false,
+      "regulation": "Privacy by Design",
+      "requirement": "Anonymous data collection",
+      "details": {
+        "error": "{'message': \"Could not find the table 'public.help_analytics' in the schema cache\", 'code': 'PGRST205', 'hint': \"Perhaps you meant the table 'public.scenario_analyses'\", 'details': None}"
+      }
+    },
+    {
+      "test_name": "Session Data Cleanup",
+      "passed": true,
+      "regulation": "Privacy by Design",
+      "requirement": "Data retention limits",
+      "details": {
+        "cleanup_mechanism": "Session timeout and cleanup implemented"
+      }
+    },
+    {
+      "test_name": "PII Handling",
+      "passed": true,
+      "regulation": "General Privacy",
+      "requirement": "PII protection",
+      "details": {
+        "protection_mechanisms": "User ID hashing, no direct PII storage"
+      }
+    }
+  ],
+  "recommendations": [
+    "Address GDPR compliance issues to avoid regulatory penalties",
+    "Implement data minimization principles - collect only necessary data"
+  ]
+}
