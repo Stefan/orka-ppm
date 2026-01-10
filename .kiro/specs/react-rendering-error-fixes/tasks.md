@@ -99,14 +99,29 @@ This implementation plan systematically addresses React rendering errors in the 
   - **Files Modified**: `components/help-chat/LanguageSelector.tsx`, `hooks/useLanguage.ts`
   - _Requirements: 1.1, 1.2_
 
-- [ ] 2.4 Scan for Similar React Rendering Issues
+- [x] 2.4 Fix MobileOptimizedChart Dimension Error
+  - ✅ **COMPLETED**: Fixed "The width(-1) and height(-1) of chart should be greater than 0" error in MobileOptimizedChart component
+  - **Root Cause**: ResponsiveContainer was trying to calculate dimensions before parent container was properly sized, and window object access during SSR caused issues
+  - **Solution**: Added comprehensive defensive programming and proper dimension handling
+  - **Changes Made**:
+    - Added minimum width (300px) and height (200px) constraints to prevent invalid dimensions
+    - Added `isMounted` state to prevent SSR issues with window object access
+    - Enhanced ResponsiveContainer with `minWidth`, `minHeight`, and `debounceMs` props
+    - Added loading state during SSR and before component mount
+    - Added proper window object checks with `typeof window !== 'undefined'`
+    - Ensured chart container always has valid dimensions with CSS fallbacks
+  - **Testing**: Development server runs successfully, no chart dimension errors in console
+  - **Files Modified**: `components/charts/MobileOptimizedChart.tsx`
+  - _Requirements: 1.1, 1.2_
+
+- [ ] 2.5 Scan for Similar React Rendering Issues
   - Scan codebase for similar component rendering patterns that could cause errors
   - Identify components that might render objects directly instead of invoking them
   - Add linting rules to prevent invalid React children patterns
   - Create automated tests for common React rendering mistakes
   - _Requirements: 1.1, 1.5_
 
-- [ ] 2.5 Write property test for React children validation
+- [ ] 2.6 Write property test for React children validation
   - **Property 11: React Children Validation**
   - **Validates: Requirements 1.1, 1.2, 1.3**
   - Analyze all React components and pages for unsafe property access

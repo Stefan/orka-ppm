@@ -95,6 +95,12 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
   })
 
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait')
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Handle client-side mounting
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // Detect orientation changes
   useEffect(() => {
@@ -340,12 +346,14 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
 
   // Render chart based on type with mobile optimizations
   const renderChart = () => {
-    const isMobile = window.innerWidth < 768
+    if (!isMounted) return null // Prevent SSR issues
+    
+    const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false
     const chartHeight = viewState.isFullscreen 
-      ? window.innerHeight - 120 
+      ? (typeof window !== 'undefined' ? Math.max(window.innerHeight - 120, 200) : height)
       : orientation === 'landscape' && isMobile 
-        ? Math.min(height, window.innerHeight * 0.6)
-        : height
+        ? Math.min(height, typeof window !== 'undefined' ? Math.max(window.innerHeight * 0.6, 200) : height)
+        : Math.max(height, 200) // Ensure minimum height of 200px
 
     const commonProps = {
       data,
@@ -459,6 +467,30 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
     translate(${viewState.panX}px, ${viewState.panY}px)
   `
 
+  // Show loading state during SSR or before mount
+  if (!isMounted) {
+    return (
+      <div className={containerClasses}>
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-gray-50">
+          {title && (
+            <h3 className="text-sm sm:text-lg font-semibold text-gray-900 truncate">
+              {title}
+            </h3>
+          )}
+        </div>
+        <div 
+          className="relative overflow-hidden flex items-center justify-center"
+          style={{ 
+            height: Math.max(height, 200),
+            minHeight: '200px'
+          }}
+        >
+          <div className="text-gray-500 text-sm">Loading chart...</div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={containerClasses}>
       {/* Header */}
@@ -535,7 +567,12 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
         ref={chartContainerRef}
         className="relative overflow-hidden"
         style={{ 
-          height: viewState.isFullscreen ? 'calc(100vh - 80px)' : height,
+          height: viewState.isFullscreen 
+            ? 'calc(100vh - 80px)' 
+            : Math.max(height, 200), // Ensure minimum height
+          minHeight: '200px', // CSS fallback for minimum height
+          width: '100%',
+          minWidth: '300px', // Ensure minimum width
           touchAction: 'none' // Prevent default touch behaviors
         }}
         onTouchStart={handleTouchStart}
@@ -547,10 +584,18 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
           className="w-full h-full transition-transform duration-200 ease-out"
           style={{ 
             transform: chartTransform,
-            transformOrigin: 'center center'
+            transformOrigin: 'center center',
+            minHeight: '200px', // Ensure chart wrapper has minimum height
+            minWidth: '300px' // Ensure chart wrapper has minimum width
           }}
         >
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer 
+            width="100%" 
+            height="100%"
+            minWidth={300}
+            minHeight={200}
+            debounceMs={50} // Add debounce to prevent rapid resize calculations
+          >
             {renderChart()}
           </ResponsiveContainer>
         </div>
@@ -573,7 +618,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
       </div>
 
       {/* Mobile Legend (when hidden from chart) */}
-      {showLegend && window.innerWidth < 768 && type === 'pie' && (
+      {showLegend && typeof window !== 'undefined' && window.innerWidth < 768 && type === 'pie' && (
         <div className="p-3 border-t border-gray-200 bg-gray-50">
           <div className="grid grid-cols-2 gap-2 text-xs">
             {data.map((entry, index) => (
