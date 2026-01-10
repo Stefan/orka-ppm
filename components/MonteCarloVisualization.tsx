@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { BarChart3, TrendingUp, Download, RefreshCw, Settings, AlertTriangle } from 'lucide-react'
 import { getApiUrl } from '../lib/api/client'
+import { ImageWithStabilizedLayout } from './ui/LayoutStabilizer'
 
 interface MonteCarloChart {
   title: string
@@ -301,10 +302,13 @@ export default function MonteCarloVisualization({
               
               <div className="p-6">
                 <div className="flex justify-center">
-                  <img
+                  <ImageWithStabilizedLayout
                     src={chart.base64_image}
                     alt={chart.title}
-                    className="max-w-full h-auto rounded-lg shadow-sm"
+                    className="max-w-full rounded-lg shadow-sm"
+                    aspectRatio="16/9"
+                    fallbackHeight={300}
+                    fallbackWidth={500}
                   />
                 </div>
                 

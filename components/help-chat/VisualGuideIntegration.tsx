@@ -14,6 +14,7 @@ import {
 import { cn } from '../../lib/design-system'
 import { VisualGuideSystem, type VisualGuide } from './VisualGuideSystem'
 import { VisualGuideManager } from './VisualGuideManager'
+import { ImageWithStabilizedLayout } from '../ui/LayoutStabilizer'
 import type { ChatMessage, QuickAction } from '../../types/help-chat'
 
 // Types
@@ -232,12 +233,15 @@ function RecommendationCard({ recommendation, onSelect }: RecommendationCardProp
          onClick={onSelect}>
       <div className="flex items-start space-x-3">
         {/* Thumbnail */}
-        <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center">
+        <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center overflow-hidden">
           {guide.steps[0]?.screenshot ? (
-            <img
+            <ImageWithStabilizedLayout
               src={guide.steps[0].screenshot}
               alt={guide.title}
-              className="w-full h-full object-cover rounded-md"
+              className="rounded-md"
+              aspectRatio="1/1"
+              fallbackHeight={48}
+              fallbackWidth={48}
             />
           ) : (
             <Camera className="h-5 w-5 text-gray-400" />
