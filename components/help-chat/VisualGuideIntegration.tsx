@@ -1,11 +1,9 @@
 'use client'
 
-import React, { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { 
   BookOpen, 
   Camera, 
-  Play, 
-  Eye,
   ArrowRight,
   X,
   Maximize2,
@@ -193,7 +191,7 @@ export function VisualGuideIntegration({
                   <VisualGuideManager
                     onGuideSelect={handleGuideSelect}
                     onGuideComplete={handleGuideComplete}
-                    currentContext={currentContext}
+                    currentContext={currentContext || { route: '', pageTitle: '', userRole: '' }}
                   />
                 </div>
               </div>
@@ -329,7 +327,7 @@ async function generateRecommendations(context: {
 
     // Route matching
     const routeSegment = context.route.split('/')[1]
-    if (guide.tags.includes(routeSegment)) {
+    if (routeSegment && guide.tags.includes(routeSegment)) {
       relevanceScore += 0.3
     }
 

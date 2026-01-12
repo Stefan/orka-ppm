@@ -4,8 +4,8 @@
  * Requirements: 11.2, 11.5
  */
 
-import { crossDeviceSyncService, SessionState } from './cross-device-sync'
-import { getApiUrl, apiRequest } from '../api'
+import { SessionState } from './cross-device-sync'
+import { apiRequest } from '../api'
 
 // Node.js types
 declare global {
@@ -330,10 +330,11 @@ export class SessionContinuityService {
    */
   async restoreFromDevice(deviceId: string): Promise<ContinuitySnapshot | null> {
     try {
-      const snapshot = await apiRequest<ContinuitySnapshot>(
+      const response = await apiRequest<ContinuitySnapshot>(
         `/sync/continuity/latest/${this.userId}?deviceId=${deviceId}`
       )
       
+      const snapshot = response.data
       await this.applySnapshot(snapshot)
       return snapshot
     } catch (error) {
@@ -347,9 +348,10 @@ export class SessionContinuityService {
    */
   async getLatestSnapshot(): Promise<ContinuitySnapshot | null> {
     try {
-      return await apiRequest<ContinuitySnapshot>(
+      const response = await apiRequest<ContinuitySnapshot>(
         `/sync/continuity/latest/${this.userId}`
       )
+      return response.data
     } catch (error) {
       console.error('Failed to get latest snapshot:', error)
       return null
@@ -509,12 +511,12 @@ export class SessionContinuityService {
   private async loadWorkspaceState(): Promise<void> {
     try {
       // Try to load from server first
-      const remoteState = await apiRequest<WorkspaceState>(
+      const response = await apiRequest<WorkspaceState>(
         `/sync/workspace/${this.userId}`
       )
       this.workspaceState = {
-        ...remoteState,
-        lastModified: new Date(remoteState.lastModified)
+        ...response.data,
+        lastModified: new Date(response.data.lastModified)
       }
     } catch (error) {
       // Fall back to localStorage
@@ -537,11 +539,11 @@ export class SessionContinuityService {
    */
   async getAvailableSnapshots(): Promise<ContinuitySnapshot[]> {
     try {
-      const snapshots = await apiRequest<ContinuitySnapshot[]>(
+      const response = await apiRequest<ContinuitySnapshot[]>(
         `/sync/continuity/snapshots/${this.userId}`
       )
       
-      return snapshots.map(snapshot => ({
+      return response.data.map(snapshot => ({
         ...snapshot,
         timestamp: new Date(snapshot.timestamp)
       }))

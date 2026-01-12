@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { getNetworkInfo, shouldLoadHighQuality } from '@/lib/performance'
+import { getNetworkInfo, shouldLoadHighQuality } from '../../lib/performance'
 import { Skeleton } from './SkeletonLoader'
 
 interface NetworkAwareLoaderProps {
@@ -183,6 +183,8 @@ export const ProgressiveContentLoader: React.FC<{
       if (loadedStages >= stages.length) return
 
       const currentStage = stages[loadedStages]
+      if (!currentStage) return
+      
       const networkRequirement = currentStage.networkRequirement || 'any'
       
       // Check if network meets requirements

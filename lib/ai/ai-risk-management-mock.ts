@@ -296,7 +296,7 @@ const mockMitigationStrategies: MitigationStrategy[] = [
 ]
 
 export class MockAIRiskManagementService {
-  async analyzeRisk(request: RiskAnalysisRequest): Promise<{
+  async analyzeRisk(_request: RiskAnalysisRequest): Promise<{
     analysis_id: string
     risk_score: number
     risk_level: string
@@ -343,7 +343,7 @@ export class MockAIRiskManagementService {
     }
   }
 
-  async recognizePatterns(request: any): Promise<{
+  async recognizePatterns(_request: any): Promise<{
     recognition_id: string
     identified_patterns: RiskPattern[]
     pattern_confidence: number
@@ -375,7 +375,7 @@ export class MockAIRiskManagementService {
     }
   }
 
-  async predictEscalation(request: any): Promise<{
+  async predictEscalation(_request: any): Promise<{
     prediction_id: string
     escalation_alerts: RiskEscalationAlert[]
     escalation_probability: number
@@ -419,7 +419,7 @@ export class MockAIRiskManagementService {
     }
   }
 
-  async suggestMitigation(request: any): Promise<{
+  async suggestMitigation(_request: any): Promise<{
     suggestion_id: string
     recommended_strategies: MitigationStrategy[]
     strategy_ranking: Array<{
@@ -449,8 +449,8 @@ export class MockAIRiskManagementService {
       strategy_ranking: mockMitigationStrategies.map((strategy, index) => ({
         strategy_id: strategy.strategy_id,
         rank: index + 1,
-        score: strategy.effectiveness_score,
-        rationale: `Best fit for current risk profile with ${Math.round(strategy.effectiveness_score * 100)}% effectiveness`
+        score: strategy.historical_success_rate,
+        rationale: `Best fit for current risk profile with ${Math.round(strategy.historical_success_rate * 100)}% effectiveness`
       })),
       implementation_plan: {
         immediate_actions: [
@@ -470,7 +470,7 @@ export class MockAIRiskManagementService {
         ]
       },
       cost_benefit_analysis: {
-        total_estimated_cost: mockMitigationStrategies.reduce((sum, s) => sum + s.estimated_cost, 0),
+        total_estimated_cost: mockMitigationStrategies.reduce((sum, s) => sum + (s.estimated_cost.min + s.estimated_cost.max) / 2, 0),
         potential_savings: Math.floor(Math.random() * 100000) + 50000,
         roi_estimate: Math.random() * 3 + 2, // 2x to 5x ROI
         payback_period_days: Math.floor(Math.random() * 90) + 30
@@ -494,7 +494,7 @@ export class MockAIRiskManagementService {
     return mockMitigationStrategies
   }
 
-  async generateEscalationAlerts(request: {
+  async generateEscalationAlerts(_request: {
     risk_ids?: string[]
     project_ids?: string[]
     time_horizon_days?: number
@@ -577,7 +577,7 @@ export class MockAIRiskManagementService {
     }
   }
 
-  async identifyRiskPatterns(request: RiskAnalysisRequest = {}): Promise<{
+  async identifyRiskPatterns(_request: RiskAnalysisRequest = {}): Promise<{
     patterns: RiskPattern[]
     pattern_summary: {
       total_patterns_found: number
@@ -848,9 +848,13 @@ export class MockAIRiskManagementService {
     const strategies = mockMitigationStrategies
     const recommendedStrategy = strategies[0]
 
+    if (!recommendedStrategy) {
+      throw new Error('No mitigation strategies available')
+    }
+
     return {
       strategies,
-      strategy_ranking: strategies.map((strategy, index) => ({
+      strategy_ranking: strategies.map((strategy) => ({
         strategy_id: strategy.strategy_id,
         overall_score: strategy.historical_success_rate * 0.9,
         effectiveness_score: strategy.average_risk_reduction,

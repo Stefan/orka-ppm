@@ -99,7 +99,10 @@ export function useSessionContinuity(): UseSessionContinuityReturn {
       setAvailableSnapshots(snapshots)
       
       if (snapshots.length > 0) {
-        setLatestSnapshot(snapshots[0]) // Assuming sorted by timestamp desc
+        const snapshot = snapshots[0]
+        if (snapshot) {
+          setLatestSnapshot(snapshot) // Assuming sorted by timestamp desc
+        }
       }
     } catch (error) {
       console.error('Failed to refresh snapshots:', error)
@@ -189,8 +192,7 @@ export function useSessionContinuity(): UseSessionContinuityReturn {
 
   // Listen for session restoration events
   useEffect(() => {
-    const handleSessionRestored = (event: CustomEvent) => {
-      const snapshot = event.detail as ContinuitySnapshot
+    const handleSessionRestored = () => {
       setLastRestoreTime(new Date())
       loadActiveTasks()
       loadWorkspaceState()

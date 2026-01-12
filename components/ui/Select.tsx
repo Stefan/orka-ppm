@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState } from 'react'
 import { ChevronDown, Check } from 'lucide-react'
 import { cn, componentVariants } from '@/lib/design-system'
 import { useClickOutside } from '@/hooks'

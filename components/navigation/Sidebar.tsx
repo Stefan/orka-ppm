@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { LogOut, Activity, MessageSquare, X, Users, BarChart3 } from 'lucide-react'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
 
-interface SidebarProps {
+export interface SidebarProps {
   isOpen?: boolean
   onToggle?: () => void
   isMobile?: boolean
@@ -52,16 +52,16 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
         {/* Mobile Sidebar */}
         <nav 
           id="navigation"
-          className="fixed left-0 top-0 h-full w-64 bg-gray-800 text-white flex flex-col z-50 lg:hidden transform transition-transform duration-300 ease-in-out"
+          className="fixed left-0 top-0 h-full w-64 bg-gray-800 text-white flex flex-col z-50 lg:hidden transform transition-transform duration-300 ease-in-out overflow-y-auto sidebar-optimized animation-optimized modal-optimized"
           role="navigation"
           aria-label="Main navigation"
         >
           {/* Header with close button */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-700">
-            <h2 className="text-xl font-bold text-white">PPM Dashboard</h2>
+          <div className="flex items-center justify-between p-4 border-b border-gray-700 layout-stable">
+            <h2 className="text-xl font-bold text-white text-optimized">PPM Dashboard</h2>
             <button
               onClick={onToggle}
-              className="p-2 rounded-md hover:bg-gray-700 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="p-2 rounded-md hover:bg-gray-700 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center hover-optimized focus-optimized"
               aria-label="Close navigation menu"
             >
               <X className="h-5 w-5" />
@@ -72,7 +72,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             <li role="listitem">
               <Link 
                 href="/dashboards" 
-                className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
+                className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center hover-optimized focus-optimized"
                 onClick={handleLinkClick}
                 aria-label="Go to Portfolio Dashboards"
               >
@@ -204,16 +204,16 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
   return (
     <nav 
       id="navigation"
-      className={`hidden lg:flex w-64 h-screen p-4 bg-gray-800 text-white flex-col ${!isOpen ? 'hidden' : ''}`}
+      className={`hidden lg:flex w-64 h-screen p-4 bg-gray-800 text-white flex-col overflow-y-auto sidebar-optimized layout-stable ${!isOpen ? 'hidden' : ''}`}
       role="navigation"
       aria-label="Main navigation"
     >
-      <div className="mb-8">
-        <h2 className="text-xl font-bold text-white">PPM Dashboard</h2>
+      <div className="mb-8 layout-stable">
+        <h2 className="text-xl font-bold text-white text-optimized">PPM Dashboard</h2>
       </div>
       
       <ul className="space-y-2 flex-1" role="list">
-        <li role="listitem"><Link href="/dashboards" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center" aria-label="Go to Portfolio Dashboards">Portfolio Dashboards</Link></li>
+        <li role="listitem"><Link href="/dashboards" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center hover-optimized focus-optimized" aria-label="Go to Portfolio Dashboards">Portfolio Dashboards</Link></li>
         <li role="listitem"><Link href="/scenarios" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center" aria-label="Go to What-If Scenarios">What-If Scenarios</Link></li>
         <li role="listitem"><Link href="/resources" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center" aria-label="Go to Resource Management">Resource Management</Link></li>
         <li role="listitem"><Link href="/reports" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center" aria-label="Go to AI Reports & Analytics">AI Reports & Analytics</Link></li>

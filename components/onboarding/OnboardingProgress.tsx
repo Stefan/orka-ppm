@@ -4,9 +4,9 @@ import React from 'react'
 import { CheckCircle, Circle, Clock, Trophy, Star } from 'lucide-react'
 import { cn } from '../../lib/utils/design-system'
 import { OnboardingTour } from './OnboardingTour'
-import { useOnboardingTour } from '../hooks/useOnboardingTour'
+import { useOnboardingTour } from '../../hooks/useOnboardingTour'
 
-interface OnboardingProgressProps {
+export interface OnboardingProgressProps {
   userRole?: string
   showRecommendations?: boolean
   className?: string
@@ -178,8 +178,7 @@ export const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
     resumeTour,
     getProgress,
     getAllProgress,
-    getRecommendedTours,
-    isTourCompleted
+    getRecommendedTours
   } = useOnboardingTour()
 
   const recommendedTours = getRecommendedTours(userRole)

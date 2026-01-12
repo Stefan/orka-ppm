@@ -12,8 +12,11 @@ export function useIntersectionObserver(
   useEffect(() => {
     if (!ref.current) return
 
-    const observer = new IntersectionObserver(([entry]) => {
-      setIsIntersecting(entry.isIntersecting)
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0]
+      if (entry) {
+        setIsIntersecting(entry.isIntersecting)
+      }
     }, options)
 
     observer.observe(ref.current)
@@ -38,8 +41,9 @@ export function useLazyLoad(threshold = 0.1) {
     if (!ref.current || hasLoaded) return
 
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
+      (entries) => {
+        const entry = entries[0]
+        if (entry && entry.isIntersecting) {
           setIsVisible(true)
           setHasLoaded(true)
           observer.disconnect()

@@ -165,16 +165,16 @@ export const useToast = () => {
 
   return {
     success: (title: string, message?: string, options?: Partial<Toast>) =>
-      addToast({ type: 'success', title, message, ...options }),
+      addToast({ type: 'success', title, message: message || '', ...options }),
     
     error: (title: string, message?: string, options?: Partial<Toast>) =>
-      addToast({ type: 'error', title, message, ...options }),
+      addToast({ type: 'error', title, message: message || '', ...options }),
     
     warning: (title: string, message?: string, options?: Partial<Toast>) =>
-      addToast({ type: 'warning', title, message, ...options }),
+      addToast({ type: 'warning', title, message: message || '', ...options }),
     
     info: (title: string, message?: string, options?: Partial<Toast>) =>
-      addToast({ type: 'info', title, message, ...options }),
+      addToast({ type: 'info', title, message: message || '', ...options }),
     
     custom: (toast: Omit<Toast, 'id'>) => addToast(toast),
     

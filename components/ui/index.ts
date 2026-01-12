@@ -9,6 +9,7 @@ export { Input, Textarea } from './Input'
 export { Card, CardHeader, CardContent, CardFooter } from './Card'
 export { Modal, ModalFooter } from './Modal'
 export { Select } from './Select'
+export { Alert, AlertDescription } from './Alert'
 
 // Atomic Design System Components
 // Atoms - Basic building blocks

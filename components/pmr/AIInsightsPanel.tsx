@@ -4,10 +4,8 @@ import React, { useState, useCallback, useMemo } from 'react'
 import { 
   Brain, 
   TrendingUp, 
-  TrendingDown, 
   AlertTriangle, 
   CheckCircle, 
-  Clock, 
   Target, 
   DollarSign, 
   Users, 
@@ -16,14 +14,11 @@ import {
   ChevronRight,
   ThumbsUp,
   ThumbsDown,
-  Eye,
-  EyeOff,
   Filter,
   RefreshCw,
   Lightbulb,
   Zap,
   BarChart3,
-  PieChart,
   Activity
 } from 'lucide-react'
 
@@ -46,7 +41,6 @@ export interface AIInsight {
 }
 
 export interface AIInsightsPanelProps {
-  reportId: string
   insights: AIInsight[]
   onInsightValidate: (insightId: string, isValid: boolean, notes?: string) => void
   onInsightApply: (insightId: string) => void
@@ -65,7 +59,6 @@ interface InsightFilters {
 }
 
 const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
-  reportId,
   insights,
   onInsightValidate,
   onInsightApply,
@@ -113,7 +106,7 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
       if (!grouped[insight.category]) {
         grouped[insight.category] = []
       }
-      grouped[insight.category].push(insight)
+      grouped[insight.category]!.push(insight)
     })
     return grouped
   }, [filteredInsights])
@@ -135,7 +128,7 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
     onInsightValidate(insight.id, isValid, notes)
   }, [onInsightValidate])
 
-  const getInsightIcon = (type: string, category: string) => {
+  const getInsightIcon = (type: string) => {
     switch (type) {
       case 'prediction':
         return <TrendingUp className="h-4 w-4" />
@@ -201,7 +194,7 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({
           <div className="flex items-start justify-between">
             <div className="flex items-start space-x-3 flex-1">
               <div className="flex-shrink-0 mt-1">
-                {getInsightIcon(insight.type, insight.category)}
+                {getInsightIcon(insight.type)}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center space-x-2 mb-1">

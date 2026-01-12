@@ -77,7 +77,6 @@ const RealTimeChart: React.FC<RealTimeChartProps> = ({
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
   const websocketRef = useRef<WebSocket | null>(null)
-  const lastRenderTime = useRef<number>(0)
   const frameCount = useRef<number>(0)
   const fpsInterval = useRef<NodeJS.Timeout | null>(null)
 
@@ -235,7 +234,7 @@ const RealTimeChart: React.FC<RealTimeChartProps> = ({
   }, [stopUpdates])
 
   // Custom tooltip with performance info
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload
       return (
@@ -437,10 +436,12 @@ const RealTimeChart: React.FC<RealTimeChartProps> = ({
       <div className="px-4 py-2 border-t border-gray-200 bg-gray-50 text-xs text-gray-500">
         <div className="flex justify-between items-center">
           <span>
-            {data.length > 0 
-              ? `Latest: ${data[data.length - 1]?.value.toFixed(2)} at ${new Date(data[data.length - 1]?.timestamp).toLocaleTimeString()}`
-              : 'No data'
-            }
+            {(() => {
+              const lastItem = data[data.length - 1]
+              return data.length > 0 && lastItem?.timestamp
+                ? `Latest: ${lastItem.value.toFixed(2)} at ${new Date(lastItem.timestamp).toLocaleTimeString()}`
+                : 'No data'
+            })()}
           </span>
           <span>
             {isPlaying ? 'Live' : 'Paused'} • {data.length}/{settings.maxDataPoints} points

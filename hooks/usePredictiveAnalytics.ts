@@ -8,10 +8,9 @@ import {
   predictiveAnalyticsEngine,
   type CapacityPrediction,
   type PerformancePattern,
-  type LearningOutcome,
   type PredictiveAnalyticsConfig,
   generateCapacityRecommendations
-} from '../lib/sync/predictive-analytics'
+} from '../lib/ai/predictive-analytics'
 
 interface UsePredictiveAnalyticsOptions {
   autoRefresh?: boolean
@@ -43,8 +42,7 @@ interface PredictiveAnalyticsState {
 export function usePredictiveAnalytics(options: UsePredictiveAnalyticsOptions = {}) {
   const {
     autoRefresh = false,
-    refreshInterval = 5 * 60 * 1000, // 5 minutes
-    config
+    refreshInterval = 5 * 60 * 1000 // 5 minutes
   } = options
 
   const [state, setState] = useState<PredictiveAnalyticsState>({

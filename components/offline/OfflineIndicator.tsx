@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { getNetworkInfo } from '@/lib/performance'
+import { getNetworkInfo } from '../../lib/performance'
 
-interface OfflineIndicatorProps {
+export interface OfflineIndicatorProps {
   className?: string
   showNetworkInfo?: boolean
 }

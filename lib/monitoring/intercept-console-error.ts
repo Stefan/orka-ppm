@@ -217,9 +217,9 @@ class ErrorInterceptor {
 
     const enhancedErrorInfo = this.createEnhancedErrorInfo({
       message: error.message,
-      stack: this.config.enableStackTrace ? error.stack : undefined,
-      componentStack: this.config.enableComponentStack ? errorInfo.componentStack : undefined,
-      errorBoundary,
+      ...(this.config.enableStackTrace && error.stack ? { stack: error.stack } : {}),
+      ...(this.config.enableComponentStack && errorInfo.componentStack ? { componentStack: errorInfo.componentStack } : {}),
+      ...(errorBoundary ? { errorBoundary } : {}),
       errorType: 'boundary',
       severity: 'high',
       context: {
@@ -247,16 +247,16 @@ class ErrorInterceptor {
   }): EnhancedErrorInfo {
     return {
       message: params.message,
-      stack: params.stack,
-      componentStack: params.componentStack,
-      errorBoundary: params.errorBoundary,
+      ...(params.stack ? { stack: params.stack } : {}),
+      ...(params.componentStack ? { componentStack: params.componentStack } : {}),
+      ...(params.errorBoundary ? { errorBoundary: params.errorBoundary } : {}),
       timestamp: new Date().toISOString(),
       userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'Server',
       url: typeof window !== 'undefined' ? window.location.href : 'Server',
       environment: process.env.NODE_ENV || 'unknown',
       errorType: params.errorType,
       severity: params.severity,
-      context: params.context
+      ...(params.context ? { context: params.context } : {})
     }
   }
 

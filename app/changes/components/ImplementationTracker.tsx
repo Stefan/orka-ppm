@@ -149,7 +149,6 @@ export default function ImplementationTracker({
         planned_start_date: '2024-01-15',
         planned_end_date: '2024-02-15',
         actual_start_date: '2024-01-16',
-        actual_end_date: undefined,
         assigned_to: 'user-1',
         assigned_to_name: 'John Smith',
         status: 'in_progress',
@@ -208,7 +207,6 @@ export default function ImplementationTracker({
           planned_start_date: '2024-01-21',
           planned_end_date: '2024-01-25',
           actual_start_date: '2024-01-20',
-          actual_end_date: undefined,
           status: 'in_progress',
           progress_percentage: 75,
           estimated_effort_hours: 40,
@@ -229,12 +227,9 @@ export default function ImplementationTracker({
           assigned_to_name: 'David Brown',
           planned_start_date: '2024-01-26',
           planned_end_date: '2024-01-30',
-          actual_start_date: undefined,
-          actual_end_date: undefined,
           status: 'planned',
           progress_percentage: 0,
           estimated_effort_hours: 48,
-          actual_effort_hours: undefined,
           dependencies: ['task-2'],
           deliverables: ['Foundation poured', 'Quality inspection passed'],
           created_at: '2024-01-10T10:00:00Z',
@@ -256,7 +251,6 @@ export default function ImplementationTracker({
           title: 'Foundation Phase Complete',
           type: 'explicit',
           target_date: '2024-01-30',
-          actual_date: undefined,
           status: 'in_progress',
           milestone_type: 'phase'
         }
@@ -935,7 +929,7 @@ interface ResourceAllocationProps {
 }
 
 export function ResourceAllocationView({ 
-  implementationPlanId, 
+  implementationPlanId: _implementationPlanId, 
   resources, 
   onResourceUpdate 
 }: ResourceAllocationProps) {
@@ -1282,7 +1276,7 @@ interface ProgressReportingProps {
 }
 
 export function ProgressReporting({ 
-  implementationPlanId, 
+  implementationPlanId: _implementationPlanId, 
   reports, 
   onGenerateReport 
 }: ProgressReportingProps) {

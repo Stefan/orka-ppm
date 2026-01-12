@@ -1,22 +1,21 @@
 'use client'
 
-import React, { useRef, useEffect } from 'react'
+import { useRef, useEffect } from 'react'
 import { 
   Search, 
   Clock, 
-  TrendingUp, 
+  TrendingUp,
   Zap, 
   ArrowRight,
-  Hash,
   FileText,
   HelpCircle,
   Navigation
 } from 'lucide-react'
-import { useIntelligentSearch } from '../hooks/useIntelligentSearch'
-import { highlightMatch } from '../utils/fuzzySearch'
-import type { SearchResult, SearchSuggestion } from '../types/search'
+import { useIntelligentSearch } from '../../hooks/useIntelligentSearch'
+import { highlightMatch } from '../../utils/fuzzySearch'
+import type { SearchResult, SearchSuggestion } from '../../types/search'
 
-interface SearchBarWithAIProps {
+export interface SearchBarWithAIProps {
   placeholder?: string
   className?: string
   onClose?: () => void

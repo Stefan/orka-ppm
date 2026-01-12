@@ -1,7 +1,5 @@
 'use client'
 
-import React from 'react'
-
 /**
  * ColorBlindnessFilters component provides SVG filters for color blindness simulation
  */

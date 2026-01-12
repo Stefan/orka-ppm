@@ -4,8 +4,8 @@
  * Requirements: 11.3
  */
 
-import { crossDeviceSyncService, OfflineChange } from './cross-device-sync'
-import { getApiUrl, apiRequest } from './api'
+import { getCrossDeviceSyncService, OfflineChange } from '../sync/cross-device-sync'
+import { apiRequest } from '../api'
 
 // Node.js types
 declare global {
@@ -104,7 +104,7 @@ export class OfflineSyncService {
     this.mergeStrategies.set('last-writer-wins', {
       name: 'Last Writer Wins',
       description: 'Use the most recently modified version',
-      apply: (local: any, remote: any, conflict: MergeConflict) => {
+      apply: (local: any, remote: any, _conflict: MergeConflict) => {
         const localTime = new Date(local.lastModified || local.updated_at || 0)
         const remoteTime = new Date(remote.lastModified || remote.updated_at || 0)
         return localTime > remoteTime ? local : remote
@@ -115,7 +115,7 @@ export class OfflineSyncService {
     this.mergeStrategies.set('merge-fields', {
       name: 'Merge Fields',
       description: 'Merge non-conflicting fields, prefer local for conflicts',
-      apply: (local: any, remote: any, conflict: MergeConflict) => {
+      apply: (local: any, remote: any, _conflict: MergeConflict) => {
         const merged = { ...remote, ...local }
         merged.version = Math.max(local.version || 0, remote.version || 0) + 1
         merged.lastModified = new Date()
@@ -127,7 +127,7 @@ export class OfflineSyncService {
     this.mergeStrategies.set('array-merge', {
       name: 'Array Merge',
       description: 'Merge arrays by combining unique values',
-      apply: (local: any, remote: any, conflict: MergeConflict) => {
+      apply: (local: any, remote: any, _conflict: MergeConflict) => {
         const merged = { ...local }
         
         Object.keys(remote).forEach(key => {
@@ -148,7 +148,7 @@ export class OfflineSyncService {
     this.mergeStrategies.set('user-preference', {
       name: 'User Preference',
       description: 'Require manual user resolution',
-      apply: (local: any, remote: any, conflict: MergeConflict) => {
+      apply: (_local: any, _remote: any, _conflict: MergeConflict) => {
         // This strategy requires user intervention
         throw new Error('Manual resolution required')
       }
@@ -185,7 +185,7 @@ export class OfflineSyncService {
     this.saveSyncQueue()
 
     // Also queue in the cross-device sync service
-    crossDeviceSyncService.queueOfflineChange(change)
+    getCrossDeviceSyncService().queueOfflineChange(change)
   }
 
   /**
@@ -534,7 +534,7 @@ export class OfflineSyncService {
   getPendingConflicts(): MergeConflict[] {
     const conflicts: MergeConflict[] = []
     
-    for (const queue of this.syncQueue) {
+    for (const _queue of this.syncQueue) {
       // This would be populated during sync attempts
       // For now, return empty array as conflicts are handled in real-time
     }
@@ -608,7 +608,7 @@ export class OfflineSyncService {
       pendingChanges,
       failedChanges,
       totalQueues: this.syncQueue.length,
-      lastSyncAttempt
+      ...(lastSyncAttempt ? { lastSyncAttempt } : {})
     }
   }
 

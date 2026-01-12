@@ -1,5 +1,3 @@
-import { ENV_CONFIG } from './supabase-minimal'
-
 // Browser API type declarations
 declare global {
   interface RequestInit {

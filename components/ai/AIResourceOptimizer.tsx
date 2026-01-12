@@ -1,32 +1,27 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { 
   Zap, 
   TrendingUp, 
   AlertTriangle, 
   CheckCircle, 
-  Clock, 
   Users, 
   Target,
   BarChart3,
   RefreshCw,
   ChevronDown,
   ChevronUp,
-  Info,
-  ExternalLink,
-  Settings
+  Info
 } from 'lucide-react'
 import { 
   AIResourceOptimizer, 
   OptimizationAnalysis, 
   OptimizationSuggestion,
-  ConflictDetails,
-  AlternativeStrategy,
   createAIResourceOptimizer
 } from '../../lib/ai/resource-optimizer'
 
-interface AIResourceOptimizerProps {
+export interface AIResourceOptimizerProps {
   authToken?: string
   onOptimizationApplied?: (suggestionId: string) => void
   className?: string
@@ -511,7 +506,7 @@ export default function AIResourceOptimizerComponent({
                             <div>
                               <h5 className="text-sm font-medium text-gray-900 mb-3">Alternative Strategies</h5>
                               <div className="space-y-3">
-                                {suggestion.alternative_strategies.map((strategy, index) => (
+                                {suggestion.alternative_strategies.map((strategy) => (
                                   <div key={strategy.strategy_id} className="p-3 bg-gray-50 rounded-lg">
                                     <div className="flex items-center justify-between mb-2">
                                       <h6 className="text-sm font-medium text-gray-900">{strategy.name}</h6>

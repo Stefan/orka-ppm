@@ -94,7 +94,6 @@ export default function PerformanceMonitoringInterface({
   const [loading, setLoading] = useState(true)
   const [activeView, setActiveView] = useState<'approval' | 'success' | 'team' | 'bottlenecks'>('approval')
   const [refreshing, setRefreshing] = useState(false)
-  const [selectedBottleneck, setSelectedBottleneck] = useState<BottleneckAnalysis | null>(null)
 
   // Mock data for demonstration - replace with actual API call
   useEffect(() => {

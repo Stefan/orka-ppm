@@ -1,13 +1,11 @@
 'use client'
 
-import { useContext, useMemo, useCallback } from 'react'
+import { useMemo, useCallback } from 'react'
 import { useHelpChat as useHelpChatContext } from '../app/providers/HelpChatProvider'
 import { useVisualGuideIntegration } from '../components/help-chat/VisualGuideIntegration'
 import type { 
   UseHelpChatReturn, 
   ChatMessage, 
-  ProactiveTip,
-  PageContext,
   HelpChatUserPreferences 
 } from '../types/help-chat'
 
@@ -48,12 +46,14 @@ export function useHelpChat(): UseHelpChatReturn {
   // Additional utility functions
   const getLastUserMessage = useCallback((): ChatMessage | null => {
     const userMessages = context.state.messages.filter(msg => msg.type === 'user')
-    return userMessages.length > 0 ? userMessages[userMessages.length - 1] : null
+    const lastMessage = userMessages[userMessages.length - 1]
+    return lastMessage || null
   }, [context.state.messages])
 
   const getLastAssistantMessage = useCallback((): ChatMessage | null => {
     const assistantMessages = context.state.messages.filter(msg => msg.type === 'assistant')
-    return assistantMessages.length > 0 ? assistantMessages[assistantMessages.length - 1] : null
+    const lastMessage = assistantMessages[assistantMessages.length - 1]
+    return lastMessage || null
   }, [context.state.messages])
 
   const getMessagesByType = useCallback((type: ChatMessage['type']): ChatMessage[] => {
@@ -76,7 +76,7 @@ export function useHelpChat(): UseHelpChatReturn {
       const current = context.state.messages[i]
       const previous = context.state.messages[i - 1]
       
-      if (current.type === 'assistant' && previous.type === 'user') {
+      if (current && previous && current.type === 'assistant' && previous.type === 'user') {
         totalTime += current.timestamp.getTime() - previous.timestamp.getTime()
         count++
       }
@@ -90,6 +90,8 @@ export function useHelpChat(): UseHelpChatReturn {
     
     const firstMessage = context.state.messages[0]
     const lastMessage = context.state.messages[context.state.messages.length - 1]
+    
+    if (!firstMessage || !lastMessage) return 0
     
     return lastMessage.timestamp.getTime() - firstMessage.timestamp.getTime()
   }, [context.state.messages])

@@ -102,11 +102,17 @@ class ErrorReportingService {
       timestamp: new Date(),
       errors: [errorLog],
       diagnosticData: diagnosticCollector.getDiagnosticData(),
-      userFeedback: userFeedback?.feedback,
-      reproductionSteps: userFeedback?.reproductionSteps,
       userAgent: navigator.userAgent,
       url: window.location.href,
       sessionId: errorLog.sessionId
+    }
+
+    if (userFeedback?.feedback) {
+      report.userFeedback = userFeedback.feedback
+    }
+
+    if (userFeedback?.reproductionSteps) {
+      report.reproductionSteps = userFeedback.reproductionSteps
     }
 
     this.addReport(report)
@@ -128,11 +134,17 @@ class ErrorReportingService {
       timestamp: new Date(),
       errors: errorLogs,
       diagnosticData: diagnosticCollector.getDiagnosticData(),
-      userFeedback: userFeedback?.feedback,
-      reproductionSteps: userFeedback?.reproductionSteps,
       userAgent: navigator.userAgent,
       url: window.location.href,
-      sessionId: errorLogs[0].sessionId
+      sessionId: errorLogs[0]?.sessionId || 'unknown'
+    }
+
+    if (userFeedback?.feedback) {
+      report.userFeedback = userFeedback.feedback
+    }
+
+    if (userFeedback?.reproductionSteps) {
+      report.reproductionSteps = userFeedback.reproductionSteps
     }
 
     this.addReport(report)
@@ -146,7 +158,7 @@ class ErrorReportingService {
       component,
       errorType: 'component',
       severity: 'critical',
-      context
+      ...(context && { context })
     })
 
     // Immediately create and send report for critical errors

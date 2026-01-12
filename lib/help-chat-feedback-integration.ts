@@ -5,10 +5,7 @@
 
 import type {
   HelpFeedbackRequest,
-  FeedbackResponse,
-  ChatMessage,
-  HelpChatAnalytics,
-  HelpChatEvent
+  FeedbackResponse
 } from '../types/help-chat'
 import { helpChatAPI } from './help-chat-api'
 import { logger } from './monitoring/logger'
@@ -33,7 +30,6 @@ export interface FeedbackAnalytics {
 
 export class HelpChatFeedbackIntegration {
   private feedbackCache: Map<string, FeedbackAnalytics> = new Map()
-  private authToken: string | null = null
   private metrics: FeedbackMetrics = {
     totalFeedback: 0,
     averageRating: 0,
@@ -41,10 +37,6 @@ export class HelpChatFeedbackIntegration {
     notHelpfulCount: 0,
     suggestionCount: 0,
     responseTimeMs: 0
-  }
-
-  setAuthToken(token: string) {
-    this.authToken = token
   }
 
   async submitFeedback(
@@ -87,7 +79,7 @@ export class HelpChatFeedbackIntegration {
   async submitIntegratedFeedback(
     messageId: string,
     feedback: HelpFeedbackRequest,
-    messageContent: string,
+    _messageContent: string,
     context: any,
     options?: {
       createBugReport?: boolean
@@ -101,13 +93,18 @@ export class HelpChatFeedbackIntegration {
     featureRequestId?: string
     errors: string[]
   }> {
-    const result = {
+    const result: {
+      helpFeedbackSubmitted: boolean
+      bugReportSubmitted: boolean
+      featureRequestSubmitted: boolean
+      bugReportId?: string
+      featureRequestId?: string
+      errors: string[]
+    } = {
       helpFeedbackSubmitted: false,
       bugReportSubmitted: false,
       featureRequestSubmitted: false,
-      bugReportId: undefined as string | undefined,
-      featureRequestId: undefined as string | undefined,
-      errors: [] as string[]
+      errors: []
     }
 
     try {

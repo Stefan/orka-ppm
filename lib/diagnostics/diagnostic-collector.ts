@@ -315,12 +315,18 @@ class DiagnosticCollector {
       stackTrace: params.error.stack || '',
       userAgent: navigator.userAgent,
       url: window.location.href,
-      userId: params.userId,
       sessionId: this.sessionId,
       errorType: params.errorType,
       severity: params.severity,
-      context: params.context,
       breadcrumbs: [...this.breadcrumbs]
+    }
+
+    if (params.userId) {
+      errorLog.userId = params.userId
+    }
+
+    if (params.context) {
+      errorLog.context = params.context
     }
 
     this.errorLogs.push(errorLog)
@@ -430,9 +436,15 @@ class DiagnosticCollector {
       timestamp: new Date(),
       name: params.name,
       value: params.value,
-      unit: params.unit,
-      component: params.component,
-      context: params.context
+      unit: params.unit
+    }
+
+    if (params.component) {
+      metric.component = params.component
+    }
+
+    if (params.context) {
+      metric.context = params.context
     }
 
     this.performanceMetrics.push(metric)
@@ -457,9 +469,15 @@ class DiagnosticCollector {
       timestamp: new Date(),
       action: params.action,
       component: params.component,
-      data: params.data,
-      userId: params.userId,
       sessionId: this.sessionId
+    }
+
+    if (params.data) {
+      userAction.data = params.data
+    }
+
+    if (params.userId) {
+      userAction.userId = params.userId
     }
 
     this.userActions.push(userAction)
@@ -468,7 +486,7 @@ class DiagnosticCollector {
     this.addBreadcrumb({
       category: 'user-action',
       message: `User ${params.action} in ${params.component}`,
-      data: params.data
+      ...(params.data && { data: params.data })
     })
 
     return userAction.id
@@ -482,8 +500,11 @@ class DiagnosticCollector {
     const breadcrumb: BreadcrumbEntry = {
       timestamp: new Date(),
       category: params.category,
-      message: params.message,
-      data: params.data
+      message: params.message
+    }
+
+    if (params.data) {
+      breadcrumb.data = params.data
     }
 
     this.breadcrumbs.push(breadcrumb)
@@ -553,15 +574,17 @@ class DiagnosticCollector {
   }
 
   private getSessionInfo(): SessionInfo {
-    return {
+    const sessionInfo: SessionInfo = {
       sessionId: this.sessionId,
       startTime: this.sessionStartTime,
-      userId: undefined, // Will be set by authentication system
       isAuthenticated: false, // Will be updated by authentication system
       pageViews: this.pageViews,
       totalTime: Date.now() - this.sessionStartTime.getTime(),
       lastActivity: this.lastActivity
     }
+
+    // Don't set userId if it's undefined - let it remain optional
+    return sessionInfo
   }
 
   // Public API for retrieving diagnostic data

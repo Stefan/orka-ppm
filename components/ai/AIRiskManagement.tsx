@@ -12,8 +12,6 @@ import {
   type RiskPattern,
   type RiskEscalationAlert,
   type MitigationStrategy,
-  calculateRiskTrend,
-  assessMitigationUrgency,
   generateRiskInsights
 } from '../../lib/ai/risk-management'
 import { 
@@ -27,18 +25,12 @@ import {
   CheckCircle,
   XCircle,
   Info,
-  ArrowUp,
-  ArrowDown,
-  Minus,
   Eye,
   Bell,
-  Settings,
-  RefreshCw,
-  Download,
-  Filter
+  RefreshCw
 } from 'lucide-react'
 
-interface AIRiskManagementProps {
+export interface AIRiskManagementProps {
   risks: Array<{
     id: string
     title: string
@@ -55,7 +47,7 @@ interface AIRiskManagementProps {
 
 export default function AIRiskManagement({ 
   risks, 
-  onRiskUpdate, 
+  onRiskUpdate: _onRiskUpdate, 
   onAlertGenerated 
 }: AIRiskManagementProps) {
   const [patterns, setPatterns] = useState<RiskPattern[]>([])

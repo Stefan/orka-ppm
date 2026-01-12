@@ -57,7 +57,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   // Handle pull gesture
-  const handlePullToRefresh = useCallback((distance: number, pullThreshold: number) => {
+  const handlePullToRefresh = useCallback((distance: number) => {
     if (disabled || isRefreshing) return
 
     setPullDistance(Math.min(distance, threshold * 1.5))

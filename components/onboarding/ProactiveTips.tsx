@@ -30,7 +30,7 @@ const TIP_ARIA_LABELS = {
   maximizeContainer: 'Show all tips'
 } as const
 
-interface ProactiveTipsProps {
+export interface ProactiveTipsProps {
   className?: string
   position?: 'top-right' | 'bottom-right' | 'top-left' | 'bottom-left'
   maxVisible?: number

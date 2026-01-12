@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Line, ComposedChart } from 'recharts'
 import { 
-  TrendingUp, TrendingDown, Filter, Download, RefreshCw, 
+  TrendingUp, TrendingDown, Download, RefreshCw, 
   AlertTriangle, DollarSign, Target, PieChart, FileText
 } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'

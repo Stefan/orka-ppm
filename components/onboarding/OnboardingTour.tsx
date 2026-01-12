@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { X, ChevronLeft, ChevronRight, Play, Pause, SkipForward } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react'
 import { cn } from '../../lib/utils/design-system'
 
 // Types for onboarding tour system
@@ -29,7 +29,7 @@ export interface OnboardingTour {
   completionReward?: string
 }
 
-interface OnboardingTourProps {
+export interface OnboardingTourProps {
   tour: OnboardingTour
   isActive: boolean
   onComplete: () => void
@@ -109,6 +109,11 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
   const autoAdvanceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const currentStep = tour.steps[currentStepIndex]
+
+  // Early return if no current step
+  if (!currentStep) {
+    return null
+  }
 
   // Find and highlight target element
   useEffect(() => {

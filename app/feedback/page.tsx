@@ -340,7 +340,7 @@ export default function Feedback() {
               onClick={() => setShowFeatureForm(true)}
               variant="primary"
               size="md"
-              leftIcon={Lightbulb}
+              leftIcon={<Lightbulb />}
             >
               Suggest Feature
             </TouchButton>
@@ -350,7 +350,7 @@ export default function Feedback() {
               variant="primary"
               size="md"
               className="bg-red-600 hover:bg-red-700"
-              leftIcon={Bug}
+              leftIcon={<Bug />}
             >
               Report Bug
             </TouchButton>

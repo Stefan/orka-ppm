@@ -29,7 +29,9 @@ export function createHelpChatError(
 ): HelpChatError {
   const error = new Error(message) as HelpChatError
   error.code = code
-  error.context = context
+  if (context) {
+    error.context = context
+  }
   error.retryable = code === 'NETWORK_ERROR' || code === 'RATE_LIMIT_ERROR'
   return error
 }
@@ -59,9 +61,23 @@ export class HelpChatAPIService {
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`
     
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      ...options.headers
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    }
+
+    // Add custom headers if provided
+    if (options.headers) {
+      if (options.headers instanceof Headers) {
+        options.headers.forEach((value, key) => {
+          headers[key] = value
+        })
+      } else if (Array.isArray(options.headers)) {
+        options.headers.forEach(([key, value]) => {
+          headers[key] = value
+        })
+      } else {
+        Object.assign(headers, options.headers)
+      }
     }
 
     if (this.authToken) {

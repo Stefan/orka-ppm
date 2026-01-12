@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { 
   Camera, 
   Play, 
@@ -14,7 +14,6 @@ import {
   ArrowLeft,
   MousePointer,
   Eye,
-  Download,
   Edit3,
   Check,
   AlertTriangle
@@ -293,7 +292,6 @@ export function VisualGuideSystem({
               {showAnnotations && (
                 <AnnotationOverlay 
                   annotations={currentStep.annotations}
-                  containerRef={screenshotRef as React.RefObject<HTMLElement>}
                 />
               )}
             </div>
@@ -423,19 +421,14 @@ export function VisualGuideSystem({
  * Annotation Overlay Component
  * Renders visual annotations on top of screenshots
  */
-interface AnnotationOverlayProps {
-  annotations: ScreenshotAnnotation[]
-  containerRef: React.RefObject<HTMLElement>
-}
 
-function AnnotationOverlay({ annotations, containerRef }: AnnotationOverlayProps) {
+function AnnotationOverlay({ annotations }: { annotations: ScreenshotAnnotation[] }) {
   return (
     <div className="absolute inset-0 pointer-events-none">
       {annotations.map((annotation) => (
         <AnnotationElement
           key={annotation.id}
           annotation={annotation}
-          containerRef={containerRef}
         />
       ))}
     </div>
@@ -445,12 +438,8 @@ function AnnotationOverlay({ annotations, containerRef }: AnnotationOverlayProps
 /**
  * Individual Annotation Element
  */
-interface AnnotationElementProps {
-  annotation: ScreenshotAnnotation
-  containerRef: React.RefObject<HTMLElement>
-}
 
-function AnnotationElement({ annotation, containerRef }: AnnotationElementProps) {
+function AnnotationElement({ annotation }: { annotation: ScreenshotAnnotation }) {
   const { type, position, size, content, direction, color = '#3B82F6', style = 'solid' } = annotation
 
   const baseClasses = "absolute transition-all duration-300"

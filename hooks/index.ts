@@ -25,6 +25,14 @@ export {
   useDashboardPerformance
 } from './usePerformanceMonitoring'
 
+// Scroll performance hooks
+export {
+  useScrollPerformance,
+  useGlobalScrollPerformance,
+  useScrollLazyLoading,
+  useScrollPosition
+} from './useScrollPerformance'
+
 // Help chat hooks
 export { 
   useHelpChat,

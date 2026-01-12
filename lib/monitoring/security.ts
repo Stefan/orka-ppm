@@ -204,8 +204,12 @@ class SecurityManager {
 
     try {
       // Validate base64 encoding of header and payload
-      JSON.parse(atob(parts[0]))
-      JSON.parse(atob(parts[1]))
+      if (parts[0] && parts[1]) {
+        JSON.parse(atob(parts[0]))
+        JSON.parse(atob(parts[1]))
+      } else {
+        errors.push('Missing JWT parts')
+      }
     } catch (e) {
       errors.push('Invalid JWT encoding')
     }

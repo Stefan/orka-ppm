@@ -232,12 +232,6 @@ export default function Risks() {
       
       // Extract projects array from response
       const projects = Array.isArray(projectsData) ? projectsData : (projectsData.projects || [])
-      
-      // Create project lookup
-      const projectLookup = projects.reduce((acc: any, project: any) => {
-        acc[project.id] = project.name
-        return acc
-      }, {})
     
     // Enhanced sample risk data with more realistic scenarios
     const sampleRisks: Risk[] = [
@@ -821,7 +815,7 @@ export default function Risks() {
               category: risk.category,
               risk_score: risk.risk_score,
               project_id: risk.project_id,
-              project_name: risk.project_name,
+              project_name: risk.project_name || 'Unknown Project',
               status: risk.status,
               created_at: risk.created_at
             }))}
@@ -871,7 +865,7 @@ export default function Risks() {
                     fill="#8884d8"
                     dataKey="count"
                   >
-                    {statusData.map((entry, index) => (
+                    {statusData.map((_entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -1190,16 +1184,21 @@ export default function Risks() {
                 const formData = new FormData(e.currentTarget)
                 
                 try {
+                  const descriptionValue = formData.get('description') as string
+                  const mitigationValue = formData.get('mitigation') as string
+                  const ownerIdValue = formData.get('owner') as string
+                  const dueDateValue = formData.get('due_date') as string
+                  
                   await createRisk({
                     project_id: formData.get('project_id') as string,
                     title: formData.get('title') as string,
-                    description: formData.get('description') as string || undefined,
+                    ...(descriptionValue && { description: descriptionValue }),
                     category: formData.get('category') as 'technical' | 'financial' | 'resource' | 'schedule' | 'external',
                     probability: parseFloat(formData.get('probability') as string) / 100,
                     impact: parseFloat(formData.get('impact') as string) / 100,
-                    mitigation: formData.get('mitigation') as string || undefined,
-                    owner_id: formData.get('owner') as string || undefined,
-                    due_date: formData.get('due_date') as string || undefined
+                    ...(mitigationValue && { mitigation: mitigationValue }),
+                    ...(ownerIdValue && { owner_id: ownerIdValue }),
+                    ...(dueDateValue && { due_date: dueDateValue })
                   })
                 } catch (error) {
                   alert(error instanceof Error ? error.message : 'Failed to create risk')

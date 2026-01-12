@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect } from 'react'
 import { useLocalStorage } from '../../hooks/useLocalStorage'
 
 interface AccessibilitySettings {

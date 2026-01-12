@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback } from 'react'
 
 interface DocumentSection {
   id: string
@@ -36,6 +36,7 @@ interface UseIntelligentDocSearchReturn {
   results: SearchResult[]
   isSearching: boolean
   searchQuery: string
+  searchHistory: string[]
   
   // Search functions
   search: (query: string, filters?: SearchFilters) => Promise<SearchResult[]>
@@ -186,6 +187,10 @@ export function useIntelligentDocSearch(): UseIntelligentDocSearchReturn {
       if (contentMatches > 0) {
         matchedTerms.push(term)
       }
+      
+      // Term frequency boost
+      const termFrequency = docTerms.filter(docTerm => docTerm === term).length
+      score += termFrequency * 0.5
     })
 
     // Boost score based on document popularity
@@ -415,6 +420,7 @@ export function useIntelligentDocSearch(): UseIntelligentDocSearchReturn {
     results,
     isSearching,
     searchQuery,
+    searchHistory,
     
     // Search functions
     search,

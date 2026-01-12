@@ -10,7 +10,7 @@ import {
   type MitigationStrategy,
   type RiskAnalysisRequest,
   type RiskLearningOutcome
-} from './ai-risk-management'
+} from './risk-management'
 
 // Mock data generators
 export class MockAIRiskManagementService {
@@ -654,12 +654,13 @@ export class MockAIRiskManagementService {
   async acknowledgeAlert(alertId: string, response: any) {
     const alertIndex = this.alerts.findIndex(a => a.alert_id === alertId)
     if (alertIndex !== -1) {
+      const existingAlert = this.alerts[alertIndex]
       this.alerts[alertIndex] = {
-        ...this.alerts[alertIndex],
+        ...existingAlert,
         acknowledged: true,
         acknowledged_by: response.acknowledged_by,
         acknowledged_at: response.acknowledged_at
-      }
+      } as RiskEscalationAlert
 
       return {
         success: true,

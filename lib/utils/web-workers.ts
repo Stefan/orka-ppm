@@ -2,8 +2,8 @@
  * Web Worker utilities for CPU-intensive tasks
  */
 
-import React, { useState, useCallback } from 'react'
-import { performanceMonitor } from './performance'
+import { useState, useCallback } from 'react'
+import { performanceMonitor } from '../monitoring/performance'
 
 interface WorkerTask<T = any, R = any> {
   id: string
@@ -118,20 +118,25 @@ class WebWorkerManager {
     const pool = this.pools.get(workerType)!
     
     // Find available worker
-    const availableWorkerIndex = pool.workers.findIndex((worker, index) => 
+    const availableWorkerIndex = pool.workers.findIndex((_, index) => 
       !Array.from(pool.workerAssignments.values()).includes(index)
     )
     
     if (availableWorkerIndex !== -1) {
       const availableWorker = pool.workers[availableWorkerIndex]
-      // Execute immediately
-      pool.activeTasks.set(task.id, task)
-      pool.workerAssignments.set(task.id, availableWorkerIndex)
-      availableWorker.postMessage({
-        taskId: task.id,
-        type: task.type,
-        data: task.data
-      })
+      if (availableWorker) {
+        // Execute immediately
+        pool.activeTasks.set(task.id, task)
+        pool.workerAssignments.set(task.id, availableWorkerIndex)
+        availableWorker.postMessage({
+          taskId: task.id,
+          type: task.type,
+          data: task.data
+        })
+      } else {
+        // Queue for later if worker is not available
+        pool.taskQueue.push(task)
+      }
     } else {
       // Queue for later
       pool.taskQueue.push(task)
@@ -203,7 +208,7 @@ class WebWorkerManager {
       }
     } else {
       // Terminate all pools
-      this.pools.forEach((pool, type) => {
+      this.pools.forEach((pool) => {
         pool.workers.forEach(worker => worker.terminate())
       })
       this.pools.clear()

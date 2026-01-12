@@ -526,7 +526,7 @@ export class PredictiveAnalyticsEngine {
   /**
    * Transform capacity prediction response to standardized format
    */
-  private transformCapacityPredictionResponse(data: any, processingTime: number): any {
+  private transformCapacityPredictionResponse(data: any, _processingTime: number): any {
     // Transform predictions to ensure consistent format
     const predictions: CapacityPrediction[] = (data.predictions || []).map((pred: any) => ({
       prediction_id: pred.id || `pred_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,

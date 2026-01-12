@@ -6,7 +6,6 @@ import { performanceMonitor } from '../../lib/monitoring/performance-utils'
 interface PerformanceOptimizerProps {
   children: React.ReactNode
   enableLazyLoading?: boolean
-  enableCodeSplitting?: boolean
   enableNetworkAdaptation?: boolean
 }
 
@@ -41,7 +40,6 @@ interface PerformanceState {
 export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
   children,
   enableLazyLoading = true,
-  enableCodeSplitting = true,
   enableNetworkAdaptation = true
 }) => {
   const [performanceState, setPerformanceState] = useState<PerformanceState>({

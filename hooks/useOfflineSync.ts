@@ -7,10 +7,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { 
   offlineSyncService, 
-  OfflineQueue, 
   MergeConflict, 
   SyncResult 
-} from '../lib/offline/offline-sync'
+} from '../lib/offline/sync'
 import { OfflineChange } from '../lib/sync/cross-device-sync'
 
 export interface UseOfflineSyncReturn {
@@ -47,11 +46,15 @@ export function useOfflineSync(): UseOfflineSyncReturn {
   const [isOnline, setIsOnline] = useState(navigator.onLine)
   const [isSyncing, setIsSyncing] = useState(false)
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null)
-  const [syncStats, setSyncStats] = useState({
+  const [syncStats, setSyncStats] = useState<{
+    pendingChanges: number
+    failedChanges: number
+    totalQueues: number
+    lastSyncAttempt?: Date
+  }>({
     pendingChanges: 0,
     failedChanges: 0,
-    totalQueues: 0,
-    lastSyncAttempt: undefined as Date | undefined
+    totalQueues: 0
   })
   const [pendingConflicts, setPendingConflicts] = useState<MergeConflict[]>([])
   
@@ -79,7 +82,7 @@ export function useOfflineSync(): UseOfflineSyncReturn {
       pendingChanges: stats.pendingChanges,
       failedChanges: stats.failedChanges,
       totalQueues: stats.totalQueues,
-      lastSyncAttempt: stats.lastSyncAttempt || undefined
+      ...(stats.lastSyncAttempt && { lastSyncAttempt: stats.lastSyncAttempt })
     })
   }, [])
 

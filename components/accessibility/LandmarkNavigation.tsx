@@ -59,7 +59,7 @@ export default function LandmarkNavigation({ children }: LandmarkNavigationProps
 
       // Banner/header areas
       const headerElements = document.querySelectorAll('header')
-      headerElements.forEach((header, index) => {
+      headerElements.forEach((header) => {
         if (!header.getAttribute('role')) {
           header.setAttribute('role', 'banner')
         }
@@ -70,7 +70,7 @@ export default function LandmarkNavigation({ children }: LandmarkNavigationProps
 
       // Footer areas
       const footerElements = document.querySelectorAll('footer')
-      footerElements.forEach((footer, index) => {
+      footerElements.forEach((footer) => {
         if (!footer.getAttribute('role')) {
           footer.setAttribute('role', 'contentinfo')
         }
@@ -194,7 +194,7 @@ export function SkipLink({
   return (
     <a
       href={href}
-      className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded z-50 font-medium"
+      className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded focus:z-50 focus:font-medium focus:no-underline"
       onClick={(e) => {
         e.preventDefault()
         const targetId = href.replace('#', '')

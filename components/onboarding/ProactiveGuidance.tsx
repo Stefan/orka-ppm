@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { AlertCircle, Lightbulb, HelpCircle, X } from 'lucide-react'
+import { Lightbulb, X } from 'lucide-react'
 import { cn } from '../../lib/utils/design-system'
 
 interface GuidanceRule {
@@ -25,7 +25,7 @@ interface UserContext {
   strugglingIndicators: string[]
 }
 
-interface ProactiveGuidanceProps {
+export interface ProactiveGuidanceProps {
   isEnabled?: boolean
   onGuidanceShown?: (ruleId: string) => void
   className?: string
@@ -62,7 +62,7 @@ export const ProactiveGuidance: React.FC<ProactiveGuidanceProps> = ({
   className
 }) => {
   const [activeGuidance, setActiveGuidance] = useState<GuidanceRule | null>(null)
-  const [userContext, setUserContext] = useState<UserContext>({
+  const [userContext] = useState<UserContext>({
     currentPage: '',
     timeOnPage: 0,
     clickCount: 0,

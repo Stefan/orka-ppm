@@ -4,8 +4,6 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { 
   MessageCircle, 
   X, 
-  Minimize2, 
-  Maximize2, 
   Lightbulb, 
   AlertCircle,
   HelpCircle,
@@ -14,7 +12,7 @@ import {
   ChevronDown
 } from 'lucide-react'
 import { cn } from '../../lib/utils/design-system'
-import { useHelpChat } from '../hooks/useHelpChat'
+import { useHelpChat } from '../../app/providers/HelpChatProvider'
 
 interface AIInsight {
   id: string
@@ -39,7 +37,7 @@ interface UserStruggleIndicators {
   lastActivity: Date
 }
 
-interface FloatingAIAssistantProps {
+export interface FloatingAIAssistantProps {
   isEnabled?: boolean
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
   proactiveThreshold?: number // Time in ms before showing proactive help
@@ -64,9 +62,8 @@ export const FloatingAIAssistant: React.FC<FloatingAIAssistantProps> = ({
   })
   const [currentContext, setCurrentContext] = useState<string>('')
   
-  const { sendMessage, state } = useHelpChat()
+  const { sendMessage } = useHelpChat()
   const pageStartTime = useRef(Date.now())
-  const activityTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const proactiveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Detect current page context

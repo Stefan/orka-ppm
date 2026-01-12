@@ -36,15 +36,20 @@ export function useNavigationAnalytics() {
       if (existingPatternIndex >= 0) {
         // Update existing pattern
         updatedPatterns = [...existingPatterns]
-        updatedPatterns[existingPatternIndex] = {
-          ...updatedPatterns[existingPatternIndex],
-          visitCount: updatedPatterns[existingPatternIndex].visitCount + 1,
-          lastVisited: now,
-          timeSpent: updatedPatterns[existingPatternIndex].timeSpent + timeSpent,
-          contextualUsage: {
-            timeOfDay: currentHour,
-            dayOfWeek: currentDay,
-            sessionDuration: timeSpent
+        const existingPattern = updatedPatterns[existingPatternIndex]
+        if (existingPattern) {
+          updatedPatterns[existingPatternIndex] = {
+            ...existingPattern,
+            userId: user.id,
+            itemId,
+            visitCount: existingPattern.visitCount + 1,
+            lastVisited: now,
+            timeSpent: existingPattern.timeSpent + timeSpent,
+            contextualUsage: {
+              timeOfDay: currentHour,
+              dayOfWeek: currentDay,
+              sessionDuration: timeSpent
+            }
           }
         }
       } else {
@@ -83,7 +88,6 @@ export function useNavigationAnalytics() {
     const suggestions: AINavigationSuggestion[] = []
     const now = new Date()
     const currentHour = now.getHours()
-    const currentDay = now.getDay()
 
     // Sort patterns by usage frequency
     const sortedPatterns = [...patterns].sort((a, b) => b.visitCount - a.visitCount)

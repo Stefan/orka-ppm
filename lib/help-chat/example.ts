@@ -3,13 +3,12 @@
  * Demonstrates how to use the comprehensive API integration service
  */
 
-import { helpChatAPI } from './help-chat-api'
+import { helpChatAPI } from './api'
 import type {
   HelpQueryRequest,
   HelpQueryResponse,
-  HelpFeedbackRequest,
-  PageContext
-} from '../types/help-chat'
+  HelpFeedbackRequest
+} from '../../types/help-chat'
 
 /**
  * Example: Basic help query submission
@@ -26,7 +25,6 @@ export async function submitBasicHelpQuery() {
         route: '/projects',
         pageTitle: 'Projects',
         userRole: 'user',
-        currentProject: undefined,
         currentPortfolio: 'portfolio-123'
       },
       language: 'en',

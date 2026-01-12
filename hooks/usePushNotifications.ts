@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { pushNotificationService, NotificationPayload, PushSubscriptionData } from '@/lib/push-notifications';
+import { pushNotificationService, NotificationPayload, PushSubscriptionData } from '@/lib/services/push-notifications';
 import { offlineStorage } from '@/lib/offline-storage';
 
 interface NotificationPreferences {

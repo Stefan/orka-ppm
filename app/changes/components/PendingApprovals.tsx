@@ -303,14 +303,6 @@ export default function PendingApprovals() {
     })
   }
 
-  const getDaysUntilDue = (dueDate: string) => {
-    const due = new Date(dueDate)
-    const now = new Date()
-    const diffTime = due.getTime() - now.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    return diffDays
-  }
-
   const sortApprovals = (approvals: PendingApproval[]) => {
     return [...approvals].sort((a, b) => {
       let aValue: any, bValue: any

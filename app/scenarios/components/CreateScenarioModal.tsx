@@ -38,7 +38,7 @@ export default function CreateScenarioModal({
   isOpen,
   onClose,
   project,
-  session,
+  session: _session,
   onScenarioCreated
 }: CreateScenarioModalProps) {
   const [formData, setFormData] = useState<ScenarioFormData>({

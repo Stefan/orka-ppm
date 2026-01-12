@@ -6,7 +6,6 @@ import AppLayout from '../../components/shared/AppLayout'
 import { getApiUrl } from '../../lib/api'
 import CreateScenarioModal from './components/CreateScenarioModal'
 import { Plus, BarChart3, TrendingUp, TrendingDown, DollarSign, Clock, Users, AlertTriangle, RefreshCw, Trash2, Edit3, GitBranch, Zap, Target } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { ResponsiveContainer } from '../../components/ui/molecules/ResponsiveContainer'
 import { AdaptiveGrid } from '../../components/ui/molecules/AdaptiveGrid'
 import { TouchButton } from '../../components/ui/atoms/TouchButton'
@@ -71,7 +70,6 @@ interface ScenarioComparison {
 
 export default function ScenariosPage() {
   const { session } = useAuth()
-  const router = useRouter()
   const [projects, setProjects] = useState<Project[]>([])
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [scenarios, setScenarios] = useState<ScenarioAnalysis[]>([])
@@ -248,7 +246,7 @@ export default function ScenariosPage() {
                 variant="secondary"
                 size="md"
                 className="bg-purple-600 text-white hover:bg-purple-700"
-                leftIcon={BarChart3}
+                leftIcon={<BarChart3 className="h-4 w-4" />}
               >
                 Compare ({selectedScenarios.length})
               </TouchButton>
@@ -259,7 +257,7 @@ export default function ScenariosPage() {
               disabled={!selectedProject}
               variant="primary"
               size="md"
-              leftIcon={Plus}
+              leftIcon={<Plus className="h-4 w-4" />}
             >
               New Scenario
             </TouchButton>

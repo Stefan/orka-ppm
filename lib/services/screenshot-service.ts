@@ -191,21 +191,23 @@ export class ScreenshotService {
         // Capture screenshot for this step
         const screenshot = await this.captureScreenshot({
           ...screenshotOptions,
-          element: step.targetElement
+          ...(step?.targetElement ? { element: step.targetElement } : {})
         })
 
         // Generate step ID
         const stepId = `step-${i + 1}-${Date.now()}`
 
         // Process annotations
-        const annotations = step.annotations || []
+        const annotations = step?.annotations || []
 
-        processedSteps.push({
-          ...step,
-          id: stepId,
-          screenshot: screenshot.dataUrl,
-          annotations
-        })
+        if (step) {
+          processedSteps.push({
+            ...step,
+            id: stepId,
+            screenshot: screenshot.dataUrl,
+            annotations
+          })
+        }
 
         // Small delay between screenshots to allow for UI changes
         await this.delay(500)
@@ -213,11 +215,13 @@ export class ScreenshotService {
         console.warn(`Failed to capture screenshot for step ${i + 1}:`, error)
         
         // Add step without screenshot
-        processedSteps.push({
-          ...step,
-          id: `step-${i + 1}-${Date.now()}`,
-          annotations: step.annotations || []
-        })
+        if (step) {
+          processedSteps.push({
+            ...step,
+            id: `step-${i + 1}-${Date.now()}`,
+            annotations: step.annotations || []
+          })
+        }
       }
     }
 

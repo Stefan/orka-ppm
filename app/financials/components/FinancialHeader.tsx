@@ -17,7 +17,7 @@ export default function FinancialHeader({
   metrics,
   analyticsData,
   selectedCurrency,
-  showFilters,
+  showFilters: _showFilters,
   onCurrencyChange,
   onExport,
   onRefresh,

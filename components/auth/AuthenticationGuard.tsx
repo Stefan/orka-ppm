@@ -3,10 +3,10 @@
 import React, { useState, useEffect, ReactNode } from 'react'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
 import { Loader, AlertTriangle, RefreshCw, LogIn, Shield } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { DiagnosticCollector } from '@/lib/diagnostics/diagnostic-collector'
-import { ErrorReporter } from '@/lib/diagnostics/error-reporting'
+import { Button } from '../ui/Button'
+import { Card, CardContent, CardHeader } from '../ui/Card'
+import { diagnosticCollector } from '@/lib/diagnostics/diagnostic-collector'
+import { errorReportingService } from '@/lib/diagnostics/error-reporting'
 
 interface AuthenticationGuardProps {
   children: ReactNode
@@ -17,14 +17,14 @@ interface AuthenticationGuardProps {
   redirectToLogin?: boolean
 }
 
-interface AuthFallbackProps {
+export interface AuthFallbackProps {
   authState: AuthState
   onRetry: () => void
   onLogin: () => void
   retryCount: number
 }
 
-interface AuthState {
+export interface AuthState {
   isAuthenticated: boolean
   isLoading: boolean
   error: Error | null
@@ -49,9 +49,6 @@ export const AuthenticationGuard: React.FC<AuthenticationGuardProps> = ({
     hasTimedOut: false
   })
   const [isRetrying, setIsRetrying] = useState(false)
-  
-  const diagnosticCollector = DiagnosticCollector.getInstance()
-  const errorReporter = ErrorReporter.getInstance()
 
   // Authentication timeout (10 seconds)
   useEffect(() => {
@@ -68,6 +65,8 @@ export const AuthenticationGuard: React.FC<AuthenticationGuardProps> = ({
 
       return () => clearTimeout(timeout)
     }
+    // Return undefined when not loading (satisfies TypeScript)
+    return undefined
   }, [loading, authState.retryCount, diagnosticCollector])
 
   // Update auth state based on provider state
@@ -81,7 +80,7 @@ export const AuthenticationGuard: React.FC<AuthenticationGuardProps> = ({
 
     // Update diagnostic collector with auth state
     diagnosticCollector.updateSessionInfo({
-      userId: user?.id,
+      userId: user?.id || '',
       isAuthenticated: !!session && !!user
     })
 
@@ -93,14 +92,13 @@ export const AuthenticationGuard: React.FC<AuthenticationGuardProps> = ({
         retryCount: authState.retryCount
       })
 
-      errorReporter.reportError(error, {
-        component: 'AuthenticationGuard',
+      errorReportingService.reportCriticalError(error, 'AuthenticationGuard', {
         context: 'authentication_failure',
         userId: user?.id,
         sessionExists: !!session
       })
     }
-  }, [session, user, loading, error, authState.retryCount, diagnosticCollector, errorReporter])
+  }, [session, user, loading, error, authState.retryCount, diagnosticCollector, errorReportingService])
 
   const handleRetry = async () => {
     if (authState.retryCount >= retryAttempts) {
@@ -119,7 +117,7 @@ export const AuthenticationGuard: React.FC<AuthenticationGuardProps> = ({
     diagnosticCollector.logUserAction({
       action: 'auth_retry',
       component: 'AuthenticationGuard',
-      context: {
+      data: {
         retryCount: authState.retryCount + 1,
         maxRetries: retryAttempts
       }
@@ -152,7 +150,7 @@ export const AuthenticationGuard: React.FC<AuthenticationGuardProps> = ({
     diagnosticCollector.logUserAction({
       action: 'auth_login_redirect',
       component: 'AuthenticationGuard',
-      context: {
+      data: {
         retryCount: authState.retryCount,
         enableGuestMode
       }
@@ -250,7 +248,7 @@ export const AuthenticationGuard: React.FC<AuthenticationGuardProps> = ({
               )}
               
               <Button
-                variant="outline"
+                variant="secondary"
                 onClick={handleLogin}
                 className="flex items-center gap-2"
               >
@@ -265,7 +263,7 @@ export const AuthenticationGuard: React.FC<AuthenticationGuardProps> = ({
                   Or continue with limited functionality
                 </p>
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   onClick={() => {
                     diagnosticCollector.logUserAction({
                       action: 'auth_guest_mode',

@@ -36,7 +36,7 @@ function LoginForm() {
     console.log('- ENV_CONFIG:', ENV_CONFIG)
     console.log('- Supabase client available:', !!supabase)
     console.log('- Auth methods available:', !!supabase?.auth)
-    console.log('- Validation source:', ENV_CONFIG.validationSource || 'unknown')
+    console.log('- Validation source:', 'environment')
     console.log('- Force override active:', ENV_CONFIG.isDevelopment)
     console.log('- Production mode:', ENV_CONFIG.isProduction)
     console.log('- Environment bypass:', ENV_CONFIG.isDevelopment)

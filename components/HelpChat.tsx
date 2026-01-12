@@ -17,7 +17,7 @@ import type { HelpFeedbackRequest } from '../types/help-chat'
 import { cn } from '../lib/utils/design-system'
 import { MessageRenderer } from './help-chat/MessageRenderer'
 import { LanguageSelector } from './help-chat/LanguageSelector'
-import type { ChatMessage, QuickAction } from '../types/help-chat'
+import type { QuickAction } from '../types/help-chat'
 
 // Accessibility constants
 const ARIA_LABELS = {
@@ -85,7 +85,7 @@ export function HelpChat({ className }: HelpChatProps) {
       scrollToBottom()
       // Announce new messages to screen readers
       const lastMessage = state.messages[state.messages.length - 1]
-      if (lastMessage.type === 'assistant') {
+      if (lastMessage && lastMessage.type === 'assistant') {
         announceToScreenReader('New response from AI Assistant received')
       }
     }

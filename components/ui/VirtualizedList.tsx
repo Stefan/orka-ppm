@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import React, { useState, useRef, useCallback, useMemo } from 'react'
 import { performanceMonitor } from '@/lib/performance'
 
 interface VirtualizedListProps<T> {
@@ -45,7 +45,9 @@ export const VirtualizedList = <T,>({
   const scrollElementRef = useRef<HTMLDivElement>(null)
 
   const getItemHeightValue = useCallback((index: number) => {
-    return typeof itemHeight === 'function' ? itemHeight(index, items[index]) : itemHeight
+    const item = items[index]
+    if (!item) return typeof itemHeight === 'function' ? 0 : itemHeight
+    return typeof itemHeight === 'function' ? itemHeight(index, item) : itemHeight
   }, [itemHeight, items])
 
   // Calculate total height and item positions
@@ -90,10 +92,7 @@ export const VirtualizedList = <T,>({
     onScroll?.(newScrollTop)
     
     // Record scroll performance
-    performanceMonitor.recordMetric('virtualized_list_scroll', performance.now(), 'custom', {
-      itemCount: items.length,
-      visibleItems: visibleRange.end - visibleRange.start + 1
-    })
+    performanceMonitor.mark(`virtualized_list_scroll_${Date.now()}`)
   }, [onScroll, items.length, visibleRange])
 
   // Render visible items
@@ -104,6 +103,8 @@ export const VirtualizedList = <T,>({
       if (i >= items.length) break
       
       const item = items[i]
+      if (!item) continue
+      
       const top = itemPositions[i] || 0
       const height = getItemHeightValue(i)
       
@@ -157,7 +158,7 @@ export const VirtualizedTable = <T,>({
   const renderRow = useCallback((item: T, index: number, style: React.CSSProperties) => {
     return (
       <div className="flex border-b border-gray-200" style={style}>
-        {columns.map((column, colIndex) => (
+        {columns.map((column) => (
           <div
             key={column.key}
             className="px-4 py-2 flex-shrink-0 overflow-hidden"
@@ -191,8 +192,8 @@ export const VirtualizedTable = <T,>({
         itemHeight={rowHeight}
         containerHeight={containerHeight - 48} // Subtract header height
         renderItem={renderRow}
-        getItemKey={getRowKey}
-        onScroll={onScroll}
+        {...(getRowKey && { getItemKey: getRowKey })}
+        {...(onScroll && { onScroll })}
       />
     </div>
   )
@@ -245,6 +246,8 @@ export const VirtualizedGrid = <T,>({
         if (index >= items.length) break
         
         const item = items[index]
+        if (!item) continue
+        
         const x = col * (itemWidth + gap)
         const y = row * (itemHeight + gap)
         
@@ -273,6 +276,7 @@ export const VirtualizedGrid = <T,>({
       className={`relative overflow-auto ${className}`}
       style={{ width: containerWidth, height: containerHeight }}
       onScroll={handleScroll}
+      data-scroll-left={scrollLeft} // Track horizontal scroll position
     >
       <div style={{ width: '100%', height: totalHeight, position: 'relative' }}>
         {visibleItems}

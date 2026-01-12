@@ -4,7 +4,6 @@
  * Requirements: 11.1, 11.2, 11.3, 11.4, 11.5
  */
 
-import { supabase } from '../api/supabase-minimal'
 
 // Helper function for API requests to Next.js API routes
 async function apiRequest<T = any>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -708,6 +707,8 @@ export class CrossDeviceSyncService {
     if (conflictIndex === -1) return
     
     const conflict = conflicts[conflictIndex]
+    if (!conflict) return
+    
     let resolvedData: any
     
     switch (resolution) {

@@ -17,9 +17,9 @@ import {
   Clock,
   Target
 } from 'lucide-react'
-import { usePredictiveAnalytics } from '../hooks/usePredictiveAnalytics'
+import { usePredictiveAnalytics } from '../../hooks/usePredictiveAnalytics'
 
-interface PredictiveInsightsWidgetProps {
+export interface PredictiveInsightsWidgetProps {
   className?: string
   showFullDashboardLink?: boolean
   maxInsights?: number

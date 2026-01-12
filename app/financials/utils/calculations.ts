@@ -18,9 +18,9 @@ export function calculateAnalyticsData(
   const projectsUnderBudget = budgetVariances.filter(v => v.variance_amount < 0).length
   const projectsOnBudget = projects.length - projectsOverBudget - projectsUnderBudget
 
-  budgetStatusData[0].value = projectsUnderBudget
-  budgetStatusData[1].value = projectsOverBudget
-  budgetStatusData[2].value = projectsOnBudget
+  budgetStatusData[0]!.value = projectsUnderBudget
+  budgetStatusData[1]!.value = projectsOverBudget
+  budgetStatusData[2]!.value = projectsOnBudget
 
   // Calculate category spending
   const categorySpending = budgetVariances.reduce((acc, variance) => {
@@ -28,9 +28,9 @@ export function calculateAnalyticsData(
       if (!acc[cat.category]) {
         acc[cat.category] = { planned: 0, actual: 0, variance: 0 }
       }
-      acc[cat.category].planned += cat.planned
-      acc[cat.category].actual += cat.actual
-      acc[cat.category].variance += cat.variance
+      acc[cat.category]!.planned += cat.planned
+      acc[cat.category]!.actual += cat.actual
+      acc[cat.category]!.variance += cat.variance
     })
     return acc
   }, {} as Record<string, { planned: number, actual: number, variance: number }>)

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { 
   ThumbsUp, 
   ThumbsDown, 
@@ -49,7 +49,6 @@ export function FeedbackInterface({
     rating: 3,
     feedbackType: 'helpful',
     feedbackText: '',
-    reportType: undefined,
     reportTitle: '',
     reportDescription: ''
   })

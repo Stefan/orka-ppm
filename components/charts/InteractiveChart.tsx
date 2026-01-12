@@ -23,17 +23,14 @@ import {
   Search, 
   MoreVertical, 
   Eye, 
-  EyeOff,
   TrendingUp,
-  BarChart3,
-  PieChart as PieChartIcon,
   Play,
   Pause,
   Wifi,
   WifiOff,
   Zap
 } from 'lucide-react'
-import { getWebSocketService, WebSocketMessage, ChartDataPoint } from '../../lib/websocket-service'
+import { getWebSocketService, WebSocketMessage, ChartDataPoint } from '../../lib/services/websocket-service'
 
 interface ChartData {
   [key: string]: any
@@ -75,13 +72,6 @@ interface FilterState {
   valueRange: [number, number]
 }
 
-interface TooltipData {
-  x: number
-  y: number
-  data: any
-  visible: boolean
-}
-
 const InteractiveChart: React.FC<InteractiveChartProps> = ({
   type,
   data: initialData,
@@ -93,7 +83,6 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
   enableDrillDown = false,
   drillDownLevels = [],
   enableFiltering = false,
-  enableExport = true,
   enableBrushing = false,
   showLegend = true,
   className = '',
@@ -112,7 +101,6 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
   const [showContextMenu, setShowContextMenu] = useState(false)
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 })
   const [selectedDataPoint, setSelectedDataPoint] = useState<any>(null)
-  const [customTooltip, setCustomTooltip] = useState<TooltipData>({ x: 0, y: 0, data: null, visible: false })
   
   // Real-time states
   const [isRealTimeActive, setIsRealTimeActive] = useState(false)
@@ -132,9 +120,8 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
   })
 
   const chartRef = useRef<HTMLDivElement>(null)
-  const wsService = useRef(getWebSocketService({ url: websocketUrl }))
+  const wsService = useRef(getWebSocketService({ url: websocketUrl || '' }))
   const frameCount = useRef<number>(0)
-  const lastRenderTime = useRef<number>(0)
   const performanceInterval = useRef<NodeJS.Timeout | null>(null)
 
   // Filter data based on current filters
@@ -326,7 +313,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
 
   // Convert data to CSV
   const convertToCSV = (data: ChartData[]) => {
-    if (data.length === 0) return ''
+    if (data.length === 0 || !data[0]) return ''
     
     const headers = Object.keys(data[0])
     const csvRows = [
@@ -353,7 +340,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
   }
 
   // Custom tooltip with drill-down info and advanced features
-  const CustomTooltip = ({ active, payload, label, coordinate }: any) => {
+  const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload
       
@@ -670,7 +657,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
               dataKey={dataKey}
               onClick={handleChartClick}
               style={{ cursor: enableDrillDown ? 'pointer' : 'default' }}
-              label={({ name, value, percent }) => 
+              label={({ name, percent }) => 
                 `${name}: ${((percent || 0) * 100).toFixed(1)}%`
               }
               {...animationProps}
@@ -703,14 +690,14 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
             <Line 
               type="monotone" 
               dataKey={dataKey} 
-              stroke={colors[0]}
+              stroke={colors[0] || '#3B82F6'}
               strokeWidth={2}
               dot={enableRealTime && isRealTimeActive ? false : { r: 4, cursor: enableDrillDown ? 'pointer' : 'default' }}
               activeDot={{ r: 6 }}
               onClick={handleChartClick}
               {...animationProps}
             />
-            {enableBrushing && <Brush dataKey={nameKey} height={30} stroke={colors[0]} />}
+            {enableBrushing && <Brush dataKey={nameKey} height={30} stroke={colors[0] || '#3B82F6'} />}
           </LineChart>
         )
 

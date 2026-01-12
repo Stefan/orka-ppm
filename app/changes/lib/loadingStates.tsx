@@ -163,8 +163,8 @@ export const useLoadingState = (initialState: LoadingState = 'idle') => {
   const setLoading = (message?: string, progress?: number) => {
     setLoadingConfig({
       state: 'loading',
-      message,
-      progress,
+      ...(message && { message }),
+      ...(progress !== undefined && { progress }),
       showProgress: progress !== undefined
     })
   }
@@ -203,11 +203,11 @@ export const withLoadingState = <P extends object>(
     const { loading, error, ...componentProps } = props
 
     if (loading) {
-      return <LoadingState state="loading" message={loadingMessage} />
+      return <LoadingState state="loading" {...(loadingMessage && { message: loadingMessage })} />
     }
 
     if (error) {
-      return <LoadingState state="error" error={error} />
+      return <LoadingState state="error" {...(error && { error })} />
     }
 
     return <Component {...(componentProps as P)} ref={ref} />

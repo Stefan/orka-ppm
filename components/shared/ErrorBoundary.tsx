@@ -47,7 +47,6 @@ class ErrorBoundaryComponent extends Component<Props, State> {
       console.error('Error name:', error.name)
       console.error('Error stack:', error.stack)
       console.error('Component stack:', errorInfo.componentStack)
-      console.error('Error digest:', errorInfo.digest)
       console.error('Full error object:', error)
       console.error('Full errorInfo object:', errorInfo)
       console.groupEnd()
@@ -66,14 +65,13 @@ class ErrorBoundaryComponent extends Component<Props, State> {
         name: error.name,
         stack: error.stack,
         componentStack: errorInfo.componentStack,
-        digest: errorInfo.digest,
         errorId: this.state.errorId
       })
     }
   }
 
   private handleRetry = () => {
-    this.setState({ hasError: false, error: undefined, errorInfo: undefined, errorId: undefined })
+    this.setState({ hasError: false })
   }
 
   private handleGoHome = () => {
@@ -323,7 +321,7 @@ export const withErrorBoundary = <P extends object>(
   onError?: (error: Error, errorInfo: ErrorInfo) => void
 ) => {
   const WrappedComponent = (props: P) => (
-    <ErrorBoundary fallback={fallback} onError={onError}>
+    <ErrorBoundary fallback={fallback} {...(onError && { onError })}>
       <Component {...props} />
     </ErrorBoundary>
   )

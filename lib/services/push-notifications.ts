@@ -295,7 +295,7 @@ class PushNotificationService {
         p256dh: key ? this.arrayBufferToBase64(key) : '',
         auth: token ? this.arrayBufferToBase64(token) : ''
       },
-      userId,
+      ...(userId ? { userId } : {}),
       deviceInfo: {
         userAgent: navigator.userAgent,
         platform: navigator.platform,
@@ -329,7 +329,10 @@ class PushNotificationService {
     const bytes = new Uint8Array(buffer);
     let binary = '';
     for (let i = 0; i < bytes.byteLength; i++) {
-      binary += String.fromCharCode(bytes[i]);
+      const byte = bytes[i];
+      if (byte !== undefined) {
+        binary += String.fromCharCode(byte);
+      }
     }
     return window.btoa(binary);
   }

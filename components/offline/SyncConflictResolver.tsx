@@ -5,11 +5,11 @@
  */
 
 import React, { useState, useCallback } from 'react'
-import { AlertTriangle, Smartphone, Monitor, Tablet, Check, X, GitMerge } from 'lucide-react'
-import { useCrossDeviceSync } from '../hooks/useCrossDeviceSync'
+import { AlertTriangle, Smartphone, Monitor, Tablet, X, GitMerge } from 'lucide-react'
+import { useCrossDeviceSync } from '../../hooks/useCrossDeviceSync'
 import { SyncConflict } from '../../lib/sync/cross-device-sync'
 
-interface SyncConflictResolverProps {
+export interface SyncConflictResolverProps {
   isOpen: boolean
   onClose: () => void
 }
@@ -50,7 +50,7 @@ export const SyncConflictResolver: React.FC<SyncConflictResolverProps> = ({
     }
   }
 
-  const formatConflictField = (field: string, value: any) => {
+  const formatConflictField = (value: any) => {
     if (typeof value === 'object') {
       return JSON.stringify(value, null, 2)
     }
@@ -182,7 +182,7 @@ export const SyncConflictResolver: React.FC<SyncConflictResolverProps> = ({
                           <div key={field} className="text-sm">
                             <span className="font-medium text-gray-700">{field}:</span>
                             <div className="mt-1 p-2 bg-gray-50 rounded text-xs font-mono">
-                              {formatConflictField(field, getNestedValue(selectedConflict.localData, field))}
+                              {formatConflictField(getNestedValue(selectedConflict.localData, field))}
                             </div>
                           </div>
                         ))}
@@ -203,7 +203,7 @@ export const SyncConflictResolver: React.FC<SyncConflictResolverProps> = ({
                           <div key={field} className="text-sm">
                             <span className="font-medium text-gray-700">{field}:</span>
                             <div className="mt-1 p-2 bg-gray-50 rounded text-xs font-mono">
-                              {formatConflictField(field, getNestedValue(selectedConflict.remoteData, field))}
+                              {formatConflictField(getNestedValue(selectedConflict.remoteData, field))}
                             </div>
                           </div>
                         ))}

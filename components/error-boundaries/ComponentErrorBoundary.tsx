@@ -2,10 +2,10 @@
 
 import React, { Component, ErrorInfo, ReactNode } from 'react'
 import { AlertCircle, RefreshCw, Eye, EyeOff } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { DiagnosticCollector } from '@/lib/diagnostics/diagnostic-collector'
-import { ErrorReporter } from '@/lib/diagnostics/error-reporting'
+import { Button } from '../ui/Button'
+import { Card, CardContent, CardHeader } from '../ui/Card'
+import { diagnosticCollector } from '@/lib/diagnostics/diagnostic-collector'
+import { errorReportingService } from '@/lib/diagnostics/error-reporting'
 
 interface ComponentErrorBoundaryProps {
   children: ReactNode
@@ -17,7 +17,7 @@ interface ComponentErrorBoundaryProps {
   className?: string
 }
 
-interface ComponentErrorFallbackProps {
+export interface ComponentErrorFallbackProps {
   error: Error
   componentName: string
   resetError: () => void
@@ -37,8 +37,8 @@ export class ComponentErrorBoundary extends Component<
   ComponentErrorBoundaryProps,
   ComponentErrorBoundaryState
 > {
-  private diagnosticCollector: DiagnosticCollector
-  private errorReporter: ErrorReporter
+  private diagnosticCollector = diagnosticCollector
+  private errorReporter = errorReportingService
 
   constructor(props: ComponentErrorBoundaryProps) {
     super(props)
@@ -51,9 +51,6 @@ export class ComponentErrorBoundary extends Component<
       isRetrying: false,
       showDetails: false
     }
-
-    this.diagnosticCollector = DiagnosticCollector.getInstance()
-    this.errorReporter = ErrorReporter.getInstance()
   }
 
   static getDerivedStateFromError(error: Error): Partial<ComponentErrorBoundaryState> {
@@ -74,6 +71,8 @@ export class ComponentErrorBoundary extends Component<
     this.diagnosticCollector.logError({
       error,
       component: componentName,
+      errorType: 'component',
+      severity: 'medium',
       context: {
         componentStack: errorInfo.componentStack,
         errorBoundary: 'component',
@@ -86,8 +85,7 @@ export class ComponentErrorBoundary extends Component<
     })
 
     // Report error for monitoring
-    this.errorReporter.reportError(error, {
-      component: componentName,
+    this.errorReporter.reportCriticalError(error, componentName, {
       componentStack: errorInfo.componentStack,
       errorId: this.state.errorId,
       retryCount: this.state.retryCount,
@@ -112,7 +110,7 @@ export class ComponentErrorBoundary extends Component<
     this.diagnosticCollector.logUserAction({
       action: 'component_error_retry',
       component: componentName,
-      context: {
+      data: {
         errorId: this.state.errorId,
         retryCount: this.state.retryCount + 1,
         error: this.state.error?.message
@@ -138,7 +136,7 @@ export class ComponentErrorBoundary extends Component<
     this.diagnosticCollector.logUserAction({
       action: 'component_error_toggle_details',
       component: this.props.componentName,
-      context: {
+      data: {
         errorId: this.state.errorId,
         showDetails: !this.state.showDetails
       }
@@ -201,7 +199,7 @@ export class ComponentErrorBoundary extends Component<
               {showErrorDetails && (
                 <Button
                   size="sm"
-                  variant="outline"
+                  variant="secondary"
                   onClick={this.toggleDetails}
                   className="flex items-center gap-2"
                 >

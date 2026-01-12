@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { MessageSquare, HelpCircle, Lightbulb, X, PanelRightOpen, PanelRightClose } from 'lucide-react'
+import { MessageSquare, Lightbulb, X, PanelRightOpen, PanelRightClose } from 'lucide-react'
 import { useHelpChat } from '../hooks/useHelpChat'
 import { useMediaQuery } from '../hooks/useMediaQuery'
 import { cn } from '../lib/utils/design-system'

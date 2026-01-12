@@ -13,11 +13,9 @@ import {
   WifiOff, 
   Clock, 
   Play, 
-  MoreVertical,
   RefreshCw
 } from 'lucide-react'
-import { useCrossDeviceSync, useSessionContinuity } from '../hooks/useCrossDeviceSync'
-import { DeviceInfo } from '../../lib/sync/cross-device-sync'
+import { useCrossDeviceSync, useSessionContinuity } from '../../hooks/useCrossDeviceSync'
 
 interface DeviceManagerProps {
   isOpen: boolean
@@ -30,7 +28,6 @@ export const DeviceManager: React.FC<DeviceManagerProps> = ({
 }) => {
   const { availableDevices, refreshDevices, isOnline, isSyncing } = useCrossDeviceSync()
   const { recentDevices, continueFromDevice, sessionState } = useSessionContinuity()
-  const [selectedDevice, setSelectedDevice] = useState<DeviceInfo | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
@@ -244,12 +241,6 @@ export const DeviceManager: React.FC<DeviceManagerProps> = ({
                           <span className="text-sm">Continue</span>
                         </button>
                       )}
-                      <button
-                        onClick={() => setSelectedDevice(device)}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                      >
-                        <MoreVertical className="h-4 w-4 text-gray-500" />
-                      </button>
                     </div>
                   </div>
                 ))}

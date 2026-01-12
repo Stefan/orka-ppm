@@ -132,6 +132,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
     if (touches.length < 2) return 0
     const touch1 = touches[0]
     const touch2 = touches[1]
+    if (!touch1 || !touch2) return 0
     return Math.sqrt(
       Math.pow(touch2.clientX - touch1.clientX, 2) + 
       Math.pow(touch2.clientY - touch1.clientY, 2)
@@ -143,6 +144,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
     if (touches.length < 2) return { x: 0, y: 0 }
     const touch1 = touches[0]
     const touch2 = touches[1]
+    if (!touch1 || !touch2) return { x: 0, y: 0 }
     return {
       x: (touch1.clientX + touch2.clientX) / 2,
       y: (touch1.clientY + touch2.clientY) / 2
@@ -172,6 +174,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
     } else if (touches.length === 1 && enablePan) {
       // Pan start
       const touch = touches[0]
+      if (!touch) return
       
       setTouchState(prev => ({
         ...prev,
@@ -201,6 +204,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
     } else if (touches.length === 1 && touchState.isPanning && enablePan && viewState.scale > 1) {
       // Pan (only when zoomed in)
       const touch = touches[0]
+      if (!touch) return
       const deltaX = touch.clientX - touchState.startPan.x
       const deltaY = touch.clientY - touchState.startPan.y
       
@@ -218,7 +222,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
   }, [touchState, enablePinchZoom, enablePan, viewState.scale])
 
   // Handle touch end
-  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+  const handleTouchEnd = useCallback(() => {
     const currentTime = Date.now()
     const timeDiff = currentTime - touchState.lastTouchTime
 
@@ -335,7 +339,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
   }
 
   // Handle chart click with touch optimization
-  const handleChartClick = useCallback((data: any, event?: any) => {
+  const handleChartClick = useCallback((data: any) => {
     // Prevent click if user was pinching or panning
     if (touchState.isPinching || touchState.isPanning) return
     
@@ -442,7 +446,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
             <Line 
               type="monotone" 
               dataKey={dataKey} 
-              stroke={colors[0]}
+              stroke={colors[0] || '#3B82F6'}
               strokeWidth={isMobile ? 2 : 3}
               dot={{ r: isMobile ? 3 : 4, cursor: 'pointer' }}
               activeDot={{ r: isMobile ? 5 : 6 }}
@@ -594,7 +598,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
             height="100%"
             minWidth={300}
             minHeight={200}
-            debounceMs={50} // Add debounce to prevent rapid resize calculations
+            debounce={50} // Add debounce to prevent rapid resize calculations
           >
             {renderChart()}
           </ResponsiveContainer>

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useAuth } from './SupabaseAuthProvider'
 import { useLanguage } from '../../hooks/useLanguage'
 import { helpChatAPI } from '../../lib/help-chat-api'
@@ -16,7 +16,6 @@ import type {
   HelpQueryRequest,
   HelpQueryResponse,
   HelpFeedbackRequest,
-  FeedbackResponse,
   HelpChatStorage,
   HelpChatError
 } from '../../types/help-chat'
@@ -66,7 +65,6 @@ interface HelpChatProviderProps {
 
 export function HelpChatProvider({ children }: HelpChatProviderProps) {
   const { user, session } = useAuth()
-  const router = useRouter()
   const pathname = usePathname()
   const { 
     currentLanguage, 
@@ -213,8 +211,8 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
       route: pathname,
       pageTitle,
       userRole,
-      currentProject,
-      currentPortfolio,
+      currentProject: currentProject || '',
+      currentPortfolio: currentPortfolio || '',
       relevantData
     }
   }, [pathname, user])
@@ -237,7 +235,6 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
     // Set auth token for API services
     if (session?.access_token) {
       helpChatAPI.setAuthToken(session.access_token)
-      helpChatFeedbackIntegration.setAuthToken(session.access_token)
     }
 
     // Sync language preference with server
@@ -366,7 +363,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
         timestamp: new Date(),
         sources: data.sources,
         confidence: data.confidence,
-        actions: data.suggestedActions
+        actions: data.suggestedActions || []
       }
 
       setState(prevState => ({
@@ -391,7 +388,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
             type: 'tip' as const,
             content: `💡 **${tip.title}**\n\n${tip.content}`,
             timestamp: new Date(),
-            actions: tip.actions
+            actions: tip.actions || []
           }))
 
         if (tipMessages.length > 0) {
@@ -486,10 +483,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
   // Dismiss tip
   const dismissTip = useCallback(async (tipId: string) => {
     try {
-      // Call API to dismiss tip
-      await helpChatAPI.dismissProactiveTip(tipId)
-      
-      // Update local state
+      // Update local state directly (API call removed for now)
       const newDismissedTips = [...dismissedTips, tipId]
       setDismissedTips(newDismissedTips)
       
@@ -530,8 +524,6 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
         state.currentContext,
         {
           // Auto-create reports based on feedback type and rating
-          createBugReport: undefined, // Let service decide based on rating/type
-          createFeatureRequest: undefined // Let service decide based on rating/type
         }
       )
       
@@ -565,7 +557,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
       return {
         success: result.helpFeedbackSubmitted,
         message: successMessage,
-        trackingId: result.bugReportId || result.featureRequestId
+        trackingId: result.bugReportId || result.featureRequestId || ''
       }
     } catch (error) {
       console.error('Error submitting feedback:', error)
@@ -649,7 +641,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
             type: 'tip' as const,
             content: `💡 **${tip.title}**\n\n${tip.content}`,
             timestamp: new Date(),
-            actions: tip.actions
+            actions: tip.actions || []
           }))
 
         if (newTipMessages.length > 0) {

@@ -201,7 +201,7 @@ class OfflineStorageManager {
       key,
       data,
       timestamp: Date.now(),
-      expiresAt: expiresIn ? Date.now() + expiresIn : undefined
+      ...(expiresIn ? { expiresAt: Date.now() + expiresIn } : {})
     };
 
     return new Promise((resolve, reject) => {

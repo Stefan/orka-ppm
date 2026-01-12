@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
@@ -9,7 +9,6 @@ import {
   Check, 
   ExternalLink, 
   ThumbsUp, 
-  ThumbsDown, 
   Star,
   AlertCircle,
   Info,
@@ -118,7 +117,6 @@ export function MessageRenderer({
   const markdownComponents = {
     // Style code blocks with better contrast
     code: ({ node, inline, className, children, ...props }: any) => {
-      const match = /language-(\w+)/.exec(className || '')
       return !inline ? (
         <pre 
           className="bg-gray-100 rounded-md p-3 overflow-x-auto text-sm border border-gray-200"

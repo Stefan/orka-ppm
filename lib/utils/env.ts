@@ -2,7 +2,7 @@
  * Environment variables utility with type safety and validation
  */
 
-import { logger } from './logger'
+import { logger } from '../monitoring/logger'
 
 interface EnvConfig {
   NODE_ENV: 'development' | 'production' | 'test'
@@ -28,10 +28,10 @@ class EnvironmentManager {
       NODE_ENV: (process.env.NODE_ENV as EnvConfig['NODE_ENV']) || 'development',
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-      DATABASE_URL: process.env.DATABASE_URL,
-      NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-      NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+      ...(process.env.SUPABASE_SERVICE_ROLE_KEY && { SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY }),
+      ...(process.env.DATABASE_URL && { DATABASE_URL: process.env.DATABASE_URL }),
+      ...(process.env.NEXTAUTH_SECRET && { NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET }),
+      ...(process.env.NEXTAUTH_URL && { NEXTAUTH_URL: process.env.NEXTAUTH_URL }),
     }
   }
 

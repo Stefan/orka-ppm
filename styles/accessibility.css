@@ -149,23 +149,50 @@ html {
   white-space: normal !important;
 }
 
-/* Skip links styling */
+/* Skip links styling - COMPLETELY HIDDEN BY DEFAULT */
 .skip-link {
-  position: absolute;
-  top: -40px;
-  left: 6px;
-  background: var(--accent-primary, #3b82f6);
-  color: var(--bg-primary, #ffffff);
-  padding: 8px;
-  text-decoration: none;
-  border-radius: 4px;
-  z-index: 1000;
-  font-weight: 600;
-  transition: top 0.3s;
+  position: absolute !important;
+  left: -10000px !important;
+  top: -10000px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+  display: none !important;
 }
 
-.skip-link:focus {
-  top: 6px;
+.skip-link:focus,
+.skip-link:focus-visible {
+  position: absolute !important;
+  left: 6px !important;
+  top: 6px !important;
+  width: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  z-index: 1000 !important;
+  display: block !important;
+  background: var(--accent-primary, #3b82f6) !important;
+  color: var(--bg-primary, #ffffff) !important;
+  padding: 8px 12px !important;
+  text-decoration: none !important;
+  border-radius: 4px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+/* Zusätzliche Sicherheit: Skip-Links nur bei Keyboard-Navigation anzeigen */
+.skip-link:not(:focus):not(:focus-visible) {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 /* Touch target minimum sizes */

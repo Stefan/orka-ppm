@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { BarChart3, TrendingUp, Download, RefreshCw, Settings, AlertTriangle } from 'lucide-react'
+import { BarChart3, Download, RefreshCw, Settings, AlertTriangle } from 'lucide-react'
 import { getApiUrl } from '../lib/api/client'
 import { ImageWithStabilizedLayout } from './ui/LayoutStabilizer'
 
@@ -86,6 +86,9 @@ export default function MonteCarloVisualization({
     try {
       // Convert base64 to blob and download
       const base64Data = chart.base64_image.split(',')[1]
+      if (!base64Data) {
+        throw new Error('Invalid base64 image data')
+      }
       const byteCharacters = atob(base64Data)
       const byteNumbers = new Array(byteCharacters.length)
       

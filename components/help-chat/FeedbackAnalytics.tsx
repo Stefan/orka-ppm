@@ -1,12 +1,11 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { 
   BarChart3, 
   TrendingUp, 
   MessageSquare, 
   ThumbsUp, 
-  ThumbsDown,
   Star,
   Users,
   Clock,
@@ -294,7 +293,7 @@ export function FeedbackAnalytics({
             <h3 className="text-lg font-semibold text-gray-900">Common Topics</h3>
           </div>
           <div className="space-y-3">
-            {data.common_topics.map((topic, index) => {
+            {data.common_topics.map((topic) => {
               const maxCount = Math.max(...data.common_topics.map(t => t.count))
               const percentage = (topic.count / maxCount) * 100
               

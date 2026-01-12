@@ -158,7 +158,6 @@ export default function ImplementationMonitoringDashboard({
         corrective_action: 'Adjusted schedule to account for weather delays, added protective measures',
         impact_assessment: 'Project completion delayed by 3 days, minimal cost impact',
         detected_date: '2024-01-22',
-        resolved_date: undefined,
         status: 'in_progress',
         implementation_plan_id: 'impl-1'
       },
@@ -253,11 +252,11 @@ export default function ImplementationMonitoringDashboard({
   }
 
   const getSeverityConfig = (severity: string) => {
-    return ALERT_SEVERITIES.find(s => s.value === severity) || ALERT_SEVERITIES[0]
+    return ALERT_SEVERITIES.find(s => s.value === severity) ?? ALERT_SEVERITIES[0]!
   }
 
   const getDeviationTypeConfig = (type: string) => {
-    return DEVIATION_TYPES.find(t => t.value === type) || DEVIATION_TYPES[0]
+    return DEVIATION_TYPES.find(t => t.value === type) ?? DEVIATION_TYPES[0]!
   }
 
   const formatDateTime = (dateString: string) => {
@@ -277,7 +276,6 @@ export default function ImplementationMonitoringDashboard({
   })
 
   const criticalAlerts = alerts.filter(alert => alert.severity === 'critical' && !alert.resolved)
-  const highAlerts = alerts.filter(alert => alert.severity === 'high' && !alert.resolved)
   const unresolvedDeviations = deviations.filter(dev => dev.status !== 'resolved' && dev.status !== 'closed')
 
   if (loading) {

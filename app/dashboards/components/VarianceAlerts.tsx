@@ -35,8 +35,8 @@ export default function VarianceAlerts({ session, onAlertCount }: VarianceAlerts
 
   useEffect(() => {
     // Notify parent component of alert count
-    const activeAlerts = alerts.filter(alert => !alert.resolved)
-    onAlertCount?.(activeAlerts.length)
+    const activeAlerts = alerts?.filter(alert => !alert?.resolved) || []
+    onAlertCount?.(activeAlerts?.length || 0)
   }, [alerts, onAlertCount])
 
   const fetchVarianceAlerts = async () => {
@@ -105,17 +105,17 @@ export default function VarianceAlerts({ session, onAlertCount }: VarianceAlerts
         }
       })
       
-      if (response.ok) {
-        setAlerts(prev => prev.map(alert => 
-          alert.id === alertId ? { ...alert, resolved: true } : alert
-        ))
+      if (response?.ok) {
+        setAlerts(prev => prev?.map(alert => 
+          alert?.id === alertId ? { ...alert, resolved: true } : alert
+        ) || [])
       }
     } catch (error) {
       console.error('Error resolving alert:', error)
       // For demo purposes, still mark as resolved
-      setAlerts(prev => prev.map(alert => 
-        alert.id === alertId ? { ...alert, resolved: true } : alert
-      ))
+      setAlerts(prev => prev?.map(alert => 
+        alert?.id === alertId ? { ...alert, resolved: true } : alert
+      ) || [])
     }
   }
 
@@ -158,10 +158,10 @@ export default function VarianceAlerts({ session, onAlertCount }: VarianceAlerts
     )
   }
 
-  const activeAlerts = alerts.filter(alert => !alert.resolved)
-  const displayAlerts = showAll ? alerts : activeAlerts.slice(0, 3)
+  const activeAlerts = alerts?.filter(alert => !alert?.resolved) || []
+  const displayAlerts = showAll ? alerts : activeAlerts?.slice(0, 3) || []
 
-  if (activeAlerts.length === 0) {
+  if ((activeAlerts?.length || 0) === 0) {
     return (
       <div className="bg-green-50 border border-green-200 rounded-lg p-4">
         <div className="flex items-center">
@@ -178,22 +178,22 @@ export default function VarianceAlerts({ session, onAlertCount }: VarianceAlerts
     <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900">
-          Variance Alerts ({activeAlerts.length})
+          Variance Alerts ({activeAlerts?.length || 0})
         </h3>
-        {alerts.length > 3 && (
+        {(alerts?.length || 0) > 3 && (
           <button
             onClick={() => setShowAll(!showAll)}
             className="text-sm text-blue-600 hover:text-blue-800"
           >
-            {showAll ? 'Show Less' : `Show All (${alerts.length})`}
+            {showAll ? 'Show Less' : `Show All (${alerts?.length || 0})`}
           </button>
         )}
       </div>
       
       <div className="space-y-3">
-        {displayAlerts.map((alert) => (
+        {displayAlerts?.map((alert) => (
           <div
-            key={alert.id}
+            key={alert?.id}
             className={`p-3 rounded-lg border ${getSeverityColor(alert.severity)} ${
               alert.resolved ? 'opacity-50' : ''
             }`}

@@ -12,7 +12,6 @@ import {
   TrendingDown, 
   AlertTriangle, 
   Users, 
-  Clock, 
   Target,
   Brain,
   BarChart3,
@@ -26,12 +25,10 @@ import {
   predictiveAnalyticsEngine,
   type CapacityPrediction,
   type PerformancePattern,
-  type LearningOutcome,
-  generateCapacityRecommendations,
   assessCapacityRisk
 } from '../../lib/ai/predictive-analytics'
 
-interface PredictiveAnalyticsDashboardProps {
+export interface PredictiveAnalyticsDashboardProps {
   userId?: string
   className?: string
 }
@@ -75,7 +72,7 @@ interface DashboardData {
 }
 
 export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboardProps> = ({
-  userId,
+  userId: _userId,
   className = ''
 }) => {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)

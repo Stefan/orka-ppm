@@ -83,6 +83,9 @@ export const TouchButton: React.FC<TouchButtonProps> = ({
 
   // Press animation classes
   const pressClasses = isPressed && hapticFeedback ? 'transform scale-95' : ''
+  
+  // Focus classes
+  const focusClasses = isFocused ? 'ring-2 ring-offset-2' : ''
 
   // Full width classes
   const widthClasses = fullWidth ? 'w-full' : ''
@@ -172,7 +175,7 @@ export const TouchButton: React.FC<TouchButtonProps> = ({
     
     // If it's a React component object (like Lucide React icons with $$typeof and render)
     if (typeof icon === 'object' && icon !== null && '$$typeof' in icon && 'render' in icon) {
-      const IconComponent = icon as React.ComponentType<any>
+      const IconComponent = icon as unknown as React.ComponentType<any>
       return <IconComponent className="h-4 w-4" />
     }
     
@@ -198,6 +201,7 @@ export const TouchButton: React.FC<TouchButtonProps> = ({
         sizeClasses[size],
         touchTargetClasses[touchTarget],
         pressClasses,
+        focusClasses,
         widthClasses,
         className
       )}

@@ -10,17 +10,15 @@ import {
   GitMerge, 
   Monitor, 
   Cloud, 
-  Check, 
   X, 
-  Clock,
   FileText,
   Settings,
   Database
 } from 'lucide-react'
-import { useOfflineSync } from '../hooks/useOfflineSync'
-import { MergeConflict } from '../../lib/offline/offline-sync'
+import { useOfflineSync } from '../../hooks/useOfflineSync'
+import { MergeConflict } from '../../lib/offline/sync'
 
-interface OfflineConflictResolverProps {
+export interface OfflineConflictResolverProps {
   isOpen: boolean
   onClose: () => void
 }

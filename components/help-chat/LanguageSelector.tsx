@@ -5,9 +5,9 @@
 
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronDownIcon, GlobeAltIcon, CheckIcon } from '@heroicons/react/24/outline'
-import { useLanguage, type SupportedLanguage } from '../../hooks/useLanguage'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useHelpChat } from '../../app/providers/HelpChatProvider'
 
 interface LanguageSelectorProps {

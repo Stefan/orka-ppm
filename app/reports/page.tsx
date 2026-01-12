@@ -114,7 +114,7 @@ export default function Reports() {
       timestamp: new Date(),
       errorType,
       message,
-      statusCode,
+      statusCode: statusCode || 0,
       retryable
     }
   }

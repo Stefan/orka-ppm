@@ -2,11 +2,11 @@
 
 import React, { Component, ErrorInfo, ReactNode } from 'react'
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { DiagnosticCollector } from '@/lib/diagnostics/diagnostic-collector'
-import { ErrorReporter } from '@/lib/diagnostics/error-reporting'
+import { Button } from '@/components/ui/Button'
+import { Card, CardContent, CardHeader } from '@/components/ui/Card'
+import { Alert, AlertDescription } from '@/components/ui/Alert'
+import { diagnosticCollector } from '@/lib/diagnostics/diagnostic-collector'
+import { errorReportingService } from '@/lib/diagnostics/error-reporting'
 
 export interface ErrorFallbackProps {
   error: Error
@@ -36,8 +36,8 @@ export class DashboardErrorBoundary extends Component<
   DashboardErrorBoundaryProps,
   DashboardErrorBoundaryState
 > {
-  private diagnosticCollector: DiagnosticCollector
-  private errorReporter: ErrorReporter
+  private diagnosticCollector = diagnosticCollector
+  private errorReporter = errorReportingService
 
   constructor(props: DashboardErrorBoundaryProps) {
     super(props)
@@ -48,11 +48,8 @@ export class DashboardErrorBoundary extends Component<
       errorId: '',
       retryCount: 0,
       isRetrying: false,
-      componentStack: undefined
+      componentStack: ''
     }
-
-    this.diagnosticCollector = DiagnosticCollector.getInstance()
-    this.errorReporter = ErrorReporter.getInstance()
   }
 
   static getDerivedStateFromError(error: Error): Partial<DashboardErrorBoundaryState> {
@@ -71,7 +68,7 @@ export class DashboardErrorBoundary extends Component<
     
     // Update state with component stack
     this.setState({
-      componentStack: errorInfo.componentStack
+      componentStack: errorInfo.componentStack || ''
     })
 
     // Log error with diagnostic collector
@@ -79,6 +76,8 @@ export class DashboardErrorBoundary extends Component<
       this.diagnosticCollector.logError({
         error,
         component: 'DashboardErrorBoundary',
+        errorType: 'component',
+        severity: 'critical',
         context: {
           componentStack: errorInfo.componentStack,
           errorBoundary: 'dashboard',
@@ -91,8 +90,7 @@ export class DashboardErrorBoundary extends Component<
     }
 
     // Report error for monitoring
-    this.errorReporter.reportError(error, {
-      component: 'DashboardErrorBoundary',
+    this.errorReporter.reportCriticalError(error, 'DashboardErrorBoundary', {
       componentStack: errorInfo.componentStack,
       errorId: this.state.errorId,
       retryCount: this.state.retryCount
@@ -121,7 +119,7 @@ export class DashboardErrorBoundary extends Component<
     this.diagnosticCollector.logUserAction({
       action: 'error_boundary_retry',
       component: 'DashboardErrorBoundary',
-      context: {
+      data: {
         errorId: this.state.errorId,
         retryCount: this.state.retryCount + 1,
         error: this.state.error?.message
@@ -137,7 +135,7 @@ export class DashboardErrorBoundary extends Component<
       error: null,
       errorId: '',
       isRetrying: false,
-      componentStack: undefined
+      componentStack: ''
     })
   }
 
@@ -145,7 +143,7 @@ export class DashboardErrorBoundary extends Component<
     this.diagnosticCollector.logUserAction({
       action: 'error_boundary_go_home',
       component: 'DashboardErrorBoundary',
-      context: {
+      data: {
         errorId: this.state.errorId,
         error: this.state.error?.message
       }
@@ -166,7 +164,7 @@ export class DashboardErrorBoundary extends Component<
             error={error}
             resetError={this.handleRetry}
             errorId={errorId}
-            componentStack={componentStack}
+            componentStack={componentStack || ''}
           />
         )
       }
@@ -210,7 +208,7 @@ export class DashboardErrorBoundary extends Component<
                 )}
                 
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   onClick={this.handleGoHome}
                   className="flex items-center gap-2"
                 >

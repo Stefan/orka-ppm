@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 /**
  * LiveRegion component for announcing dynamic content changes to screen readers
@@ -253,7 +253,7 @@ export function AccessibleTable({
 
   return (
     <table className={`w-full ${className}`} role="table">
-      <TableCaption summary={summary}>
+      <TableCaption {...(summary && { summary })}>
         {caption}
       </TableCaption>
       

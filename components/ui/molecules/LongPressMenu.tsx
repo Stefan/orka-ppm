@@ -75,19 +75,19 @@ export const LongPressMenu: React.FC<LongPressMenuProps> = ({
     const menuWidth = 200 // Estimated menu width
     const menuHeight = actions.length * 48 + 16 // Estimated menu height
 
-    let x = point.x
-    let y = point.y
+    let x = point.x - containerRect.left
+    let y = point.y - containerRect.top
 
     // Auto positioning logic
     if (menuPosition === 'auto') {
       // Adjust horizontal position
-      if (x + menuWidth > window.innerWidth - 20) {
-        x = point.x - menuWidth
+      if (x + menuWidth > containerRect.width - 20) {
+        x = point.x - containerRect.left - menuWidth
       }
       
       // Adjust vertical position
-      if (y + menuHeight > window.innerHeight - 20) {
-        y = point.y - menuHeight
+      if (y + menuHeight > containerRect.height - 20) {
+        y = point.y - containerRect.top - menuHeight
       }
     } else {
       // Manual positioning
@@ -289,7 +289,7 @@ export const LongPressMenu: React.FC<LongPressMenuProps> = ({
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {actions.map((action, index) => (
+            {actions.map((action) => (
               <button
                 key={action.id}
                 className={cn(

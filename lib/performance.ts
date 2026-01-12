@@ -6,8 +6,6 @@ import { performanceMonitor } from './monitoring/performance-utils'
 
 // Core Web Vitals reporting
 export async function getCoreWebVitalsReport() {
-  const metrics = performanceMonitor.getMetrics()
-  
   const lcp = performanceMonitor.getAverageMetric('LCP') || 0
   const fid = performanceMonitor.getAverageMetric('FID') || 0
   const cls = performanceMonitor.getAverageMetric('CLS') || 0

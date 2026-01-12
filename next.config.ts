@@ -23,7 +23,7 @@ const nextConfig: NextConfig = {
   },
   
   // Bundle analyzer and optimization
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+  webpack: (config, { dev, isServer }) => {
     // Bundle optimization
     if (!dev && !isServer) {
       // Split chunks for better caching

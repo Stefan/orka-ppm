@@ -70,9 +70,23 @@ export async function apiRequest<T = any>(
   const url = getApiUrl(endpoint, baseUrl)
   
   // Default headers
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    ...requestConfig.headers
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json'
+  }
+
+  // Add custom headers if provided
+  if (requestConfig.headers) {
+    if (requestConfig.headers instanceof Headers) {
+      requestConfig.headers.forEach((value, key) => {
+        headers[key] = value
+      })
+    } else if (Array.isArray(requestConfig.headers)) {
+      requestConfig.headers.forEach(([key, value]) => {
+        headers[key] = value
+      })
+    } else {
+      Object.assign(headers, requestConfig.headers)
+    }
   }
 
   // Add auth token if available
@@ -193,7 +207,7 @@ export async function post<T = any>(
   return apiRequest<T>(endpoint, {
     ...config,
     method: 'POST',
-    body: data ? JSON.stringify(data) : undefined
+    body: data ? JSON.stringify(data) : null
   })
 }
 
@@ -208,7 +222,7 @@ export async function put<T = any>(
   return apiRequest<T>(endpoint, {
     ...config,
     method: 'PUT',
-    body: data ? JSON.stringify(data) : undefined
+    body: data ? JSON.stringify(data) : null
   })
 }
 
@@ -223,7 +237,7 @@ export async function patch<T = any>(
   return apiRequest<T>(endpoint, {
     ...config,
     method: 'PATCH',
-    body: data ? JSON.stringify(data) : undefined
+    body: data ? JSON.stringify(data) : null
   })
 }
 

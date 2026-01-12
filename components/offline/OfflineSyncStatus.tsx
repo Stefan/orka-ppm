@@ -16,10 +16,10 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react'
-import { useCrossDeviceSync } from '../hooks/useCrossDeviceSync'
+import { useCrossDeviceSync } from '../../hooks/useCrossDeviceSync'
 import { OfflineChange } from '../../lib/sync/cross-device-sync'
 
-interface OfflineSyncStatusProps {
+export interface OfflineSyncStatusProps {
   className?: string
 }
 

@@ -181,8 +181,8 @@ export function usePageLoadPerformance(pageName: string) {
       const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
       if (!navigation) return
 
-      const loadTime = navigation.loadEventEnd - navigation.navigationStart
-      const domContentLoaded = navigation.domContentLoadedEventEnd - navigation.navigationStart
+      const loadTime = navigation.loadEventEnd - navigation.startTime
+      const domContentLoaded = navigation.domContentLoadedEventEnd - navigation.startTime
 
       // Get paint metrics
       let firstContentfulPaint = 0
@@ -196,9 +196,9 @@ export function usePageLoadPerformance(pageName: string) {
       const clsMetric = performanceMonitor.getMetricsByName('CLS')
       const fidMetric = performanceMonitor.getMetricsByName('FID')
 
-      const largestContentfulPaint = lcpMetric.length > 0 ? lcpMetric[lcpMetric.length - 1].value : 0
-      const cumulativeLayoutShift = clsMetric.length > 0 ? clsMetric[clsMetric.length - 1].value : 0
-      const firstInputDelay = fidMetric.length > 0 ? fidMetric[fidMetric.length - 1].value : 0
+      const largestContentfulPaint = lcpMetric?.[lcpMetric.length - 1]?.value ?? 0
+      const cumulativeLayoutShift = clsMetric?.[clsMetric.length - 1]?.value ?? 0
+      const firstInputDelay = fidMetric?.[fidMetric.length - 1]?.value ?? 0
 
       const metrics = {
         loadTime,

@@ -17,7 +17,7 @@ import {
   Settings,
   BarChart3
 } from 'lucide-react'
-import { useSessionContinuity } from '../hooks/useSessionContinuity'
+import { useSessionContinuity } from '../../hooks/useSessionContinuity'
 import { ContinuitySnapshot, TaskContext } from '../../lib/sync/session-continuity'
 
 interface SessionRestorationProps {

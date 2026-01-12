@@ -12,5 +12,3 @@ export { default as ApiDebugger } from './ApiDebugger'
 // Type exports
 export type { AppLayoutProps } from './AppLayout'
 export type { LoadingSpinnerProps } from './LoadingSpinner'
-export type { ToastProps } from './Toast'
-export type { ApiDebuggerProps } from './ApiDebugger'

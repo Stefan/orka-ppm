@@ -5,6 +5,9 @@
 
 export * from './logger'
 export * from './performance'
-export * from './performance-utils'
+export { 
+  markPerformance, 
+  measurePerformance
+} from './performance-utils'
 export * from './production-monitoring'
 export * from './security'

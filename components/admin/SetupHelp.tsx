@@ -34,7 +34,7 @@ interface SetupHelpProps {
   session: any
 }
 
-export default function SetupHelp({ session }: SetupHelpProps) {
+export default function SetupHelp({ session: _session }: SetupHelpProps) {
   const [helpData, setHelpData] = useState<SetupHelpData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

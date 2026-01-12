@@ -208,7 +208,7 @@ export default function ChangeRequestManager() {
     <LoadingState
       state={isLoading ? 'loading' : isError ? 'error' : 'success'}
       message="Loading change requests..."
-      error={error}
+      {...(error && { error })}
       fallback={<SkeletonTable rows={5} columns={6} />}
     >
     <div className="space-y-6">

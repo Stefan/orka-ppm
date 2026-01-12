@@ -19,10 +19,8 @@ import type {
   HelpFeedbackRequest,
   FeedbackResponse,
   ProactiveTipsResponse,
-  PageContext,
-  ChatMessage,
   HelpChatError
-} from '../types/help-chat'
+} from '../../types/help-chat'
 
 // Configuration
 const HELP_CHAT_CONFIG = {
@@ -172,7 +170,9 @@ function createHelpChatError(
 ): HelpChatError {
   const error = new Error(message) as HelpChatError
   error.code = code
-  error.context = context
+  if (context) {
+    error.context = context
+  }
   error.retryable = retryable
   return error
 }
@@ -213,7 +213,7 @@ class StreamingResponseHandler {
     } else {
       // Fallback for Node.js environment
       this.decoder = {
-        decode: (input: Uint8Array, options?: { stream?: boolean }) => {
+        decode: (input: Uint8Array, _options?: { stream?: boolean }) => {
           return Buffer.from(input).toString('utf-8')
         }
       } as TextDecoder
@@ -380,8 +380,6 @@ export class HelpChatAPIService {
     this.checkRateLimit()
 
     // Check cache first
-    const cacheKey = { endpoint: 'query', request }
-
     const cachedResponse = this.cache.get('query', request)
     if (cachedResponse) {
       logger.debug('Returning cached help query response', { requestId: request.query.slice(0, 50) })
@@ -856,9 +854,10 @@ export class HelpChatAPIService {
    */
   async getSupportedLanguages(): Promise<any[]> {
     try {
-      return await apiRequest(HELP_CHAT_CONFIG.endpoints.languages, {
+      const response = await apiRequest(HELP_CHAT_CONFIG.endpoints.languages, {
         method: 'GET'
       })
+      return response.data || []
     } catch (error) {
       this.handleError('Failed to get supported languages', error)
       throw error
@@ -870,9 +869,10 @@ export class HelpChatAPIService {
    */
   async getUserLanguagePreference(): Promise<{ language: string }> {
     try {
-      return await apiRequest(HELP_CHAT_CONFIG.endpoints.languagePreference, {
+      const response = await apiRequest(HELP_CHAT_CONFIG.endpoints.languagePreference, {
         method: 'GET'
       })
+      return response.data || { language: 'en' }
     } catch (error) {
       this.handleError('Failed to get language preference', error)
       throw error
@@ -884,10 +884,11 @@ export class HelpChatAPIService {
    */
   async setUserLanguagePreference(language: string): Promise<FeedbackResponse> {
     try {
-      return await apiRequest(HELP_CHAT_CONFIG.endpoints.languagePreference, {
+      const response = await apiRequest(HELP_CHAT_CONFIG.endpoints.languagePreference, {
         method: 'POST',
         body: JSON.stringify({ language })
       })
+      return response.data || { success: true, message: 'Language preference updated' }
     } catch (error) {
       this.handleError('Failed to set language preference', error)
       throw error
@@ -943,9 +944,10 @@ export class HelpChatAPIService {
         ? `${HELP_CHAT_CONFIG.endpoints.clearCache}?language=${encodeURIComponent(language)}`
         : HELP_CHAT_CONFIG.endpoints.clearCache
 
-      return await apiRequest(url, {
+      const response = await apiRequest(url, {
         method: 'DELETE'
       })
+      return response.data || { success: true, message: 'Cache cleared successfully' }
     } catch (error) {
       this.handleError('Failed to clear translation cache', error)
       throw error

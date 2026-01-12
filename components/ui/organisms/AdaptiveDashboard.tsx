@@ -3,26 +3,18 @@
  * Widget-based dashboard system with intelligent arrangement and optimization
  */
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { cn, responsive } from '@/lib/design-system'
-import { AdaptiveGrid, ResponsiveContainer } from '../molecules'
+import React, { useState, useEffect, useMemo } from 'react'
+import { cn } from '@/lib/design-system'
 import { Card } from '../Card'
 import { Button } from '../Button'
 import { 
-  Settings, 
   Zap, 
-  BarChart3, 
-  TrendingUp, 
-  Users, 
-  DollarSign,
+  BarChart3,
   AlertTriangle,
-  CheckCircle,
-  Clock,
+  GripVertical,
   RefreshCw,
-  Maximize2,
-  Minimize2,
   X,
-  GripVertical
+  Settings
 } from 'lucide-react'
 
 // Types for dashboard widgets
@@ -55,7 +47,7 @@ export interface AdaptiveDashboardProps {
 
 // AI optimization service (mock implementation)
 const aiOptimizationService = {
-  async getUserDashboardInteractions(userId: string) {
+  async getUserDashboardInteractions(_userId: string) {
     // Mock user behavior data
     return {
       mostViewedWidgets: ['metrics-1', 'chart-2', 'ai-insight-1'],
@@ -69,7 +61,7 @@ const aiOptimizationService = {
     }
   },
 
-  async getAIDashboardRecommendations(params: {
+  async getAIDashboardRecommendations(_params: {
     userId: string
     userRole: string
     behavior: any
@@ -308,14 +300,6 @@ export const AdaptiveDashboard: React.FC<AdaptiveDashboardProps> = ({
 
   const handleWidgetRemove = (widgetId: string) => {
     const updatedWidgets = widgets.filter(w => w.id !== widgetId)
-    setWidgets(updatedWidgets)
-    onWidgetUpdate?.(updatedWidgets)
-  }
-
-  const handleWidgetResize = (widgetId: string, newSize: 'small' | 'medium' | 'large') => {
-    const updatedWidgets = widgets.map(w => 
-      w.id === widgetId ? { ...w, size: newSize } : w
-    )
     setWidgets(updatedWidgets)
     onWidgetUpdate?.(updatedWidgets)
   }

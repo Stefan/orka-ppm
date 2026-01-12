@@ -630,7 +630,7 @@ export class AIRiskManagementSystem {
   /**
    * Transform pattern analysis response to standardized format
    */
-  private transformPatternAnalysisResponse(data: any, processingTime: number): any {
+  private transformPatternAnalysisResponse(data: any, _processingTime: number): any {
     const patterns: RiskPattern[] = (data.patterns || []).map((pattern: any) => ({
       pattern_id: pattern.id || `pattern_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       pattern_name: pattern.name || 'Unnamed Pattern',

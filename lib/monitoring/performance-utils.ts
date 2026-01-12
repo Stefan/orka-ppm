@@ -23,12 +23,17 @@ class PerformanceMonitor {
   private observers: PerformanceObserver[] = []
 
   constructor() {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && typeof PerformanceObserver !== 'undefined') {
       this.initializeObservers()
     }
   }
 
   private initializeObservers() {
+    // Only initialize if we have the required APIs
+    if (typeof PerformanceObserver === 'undefined') {
+      return
+    }
+
     // Core Web Vitals Observer
     this.observeCoreWebVitals()
     

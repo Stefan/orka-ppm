@@ -58,12 +58,12 @@ interface ImpactEstimationToolsProps {
 }
 
 export default function ImpactEstimationTools({
-  changeId,
-  changeType,
+  changeId: _changeId,
+  changeType: _changeType,
   projectValue,
   currentEstimate,
   onEstimateUpdate,
-  onSaveTemplate
+  onSaveTemplate: _onSaveTemplate
 }: ImpactEstimationToolsProps) {
   const [activeTab, setActiveTab] = useState<'calculator' | 'scenarios' | 'templates'>('calculator')
   const [estimate, setEstimate] = useState<ImpactEstimate>(

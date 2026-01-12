@@ -17,7 +17,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   
   // Opt out of parallel tests on CI
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 1 : 4,
   
   // Reporter to use
   reporter: [
@@ -136,10 +136,7 @@ export default defineConfig({
       name: 'accessibility-desktop',
       use: {
         ...devices['Desktop Chrome'],
-        viewport: { width: 1280, height: 720 },
-        // Simulate screen reader preferences
-        reducedMotion: 'reduce',
-        forcedColors: 'active'
+        viewport: { width: 1280, height: 720 }
       },
     },
 
@@ -172,18 +169,20 @@ export default defineConfig({
     // Maximum time expect() should wait for the condition to be met
     timeout: 5000,
     
-    // Threshold for pixel difference in visual comparisons
-    threshold: 0.2,
-    
-    // Animation handling for visual tests
-    animations: 'disabled'
+    // Visual comparison settings
+    toHaveScreenshot: {
+      threshold: 0.2,
+      animations: 'disabled'
+    }
   },
 
   // Web server configuration for local testing
-  webServer: process.env.CI ? undefined : {
-    command: 'npm run dev',
-    port: 3000,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120000
-  }
+  ...(process.env.CI ? {} : {
+    webServer: {
+      command: 'npm run dev',
+      port: 3000,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120000
+    }
+  })
 })

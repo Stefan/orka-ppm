@@ -73,8 +73,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" type="image/svg+xml" sizes="32x32" href="/favicon-32x32.svg" />
         <link rel="icon" type="image/svg+xml" sizes="16x16" href="/favicon-16x16.svg" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2563eb" />
+        
+
       </head>
-      <body className="font-sans antialiased" suppressHydrationWarning={true}>
+      <body className="font-sans antialiased bg-white min-h-screen" suppressHydrationWarning={true}>
         <PerformanceOptimizer>
           <ErrorBoundary>
             <SupabaseAuthProvider>

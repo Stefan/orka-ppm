@@ -37,7 +37,7 @@ export const Modal: React.FC<ModalProps> = ({
   })
 
   // Handle escape key
-  useKeyboard('Escape', onClose, { preventDefault: true })
+  useKeyboard('Escape', closeOnEscape ? onClose : () => {}, { preventDefault: true })
 
   // Prevent body scroll when modal is open
   useEffect(() => {

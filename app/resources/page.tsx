@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { Users, Plus, Search, Filter, TrendingUp, AlertCircle, BarChart3, PieChart as PieChartIcon, Target, Zap, ChevronUp, RefreshCw, Download, MapPin } from 'lucide-react'
+import { Users, Plus, Search, Filter, TrendingUp, AlertCircle, BarChart3, PieChart as PieChartIcon, Target, Zap, RefreshCw, Download, MapPin } from 'lucide-react'
 import AppLayout from '../../components/shared/AppLayout'
 import AIResourceOptimizer from '../../components/ai/AIResourceOptimizer'
 import { getApiUrl } from '../../lib/api/client'
@@ -38,23 +38,6 @@ interface ResourceFilters {
   utilization_range: [number, number]
 }
 
-interface OptimizationSuggestion {
-  type: string
-  resource_id: string
-  resource_name: string
-  match_score?: number
-  current_utilization?: number
-  available_hours?: number
-  matching_skills?: string[]
-  recommendation: string
-  priority: string
-  confidence_score?: number
-  reasoning?: string
-  analysis_time_ms?: number
-  conflict_detected?: boolean
-  alternative_strategies?: string[]
-}
-
 export default function Resources() {
   const { session } = useAuth()
   const [resources, setResources] = useState<Resource[]>([])
@@ -64,7 +47,6 @@ export default function Resources() {
   const [showFilters, setShowFilters] = useState(false)
   const [showOptimization, setShowOptimization] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
-  const [optimizationSuggestions, setOptimizationSuggestions] = useState<OptimizationSuggestion[]>([])
   const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null)
   const [autoRefresh, setAutoRefresh] = useState(false)
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
@@ -249,98 +231,6 @@ export default function Resources() {
     }
   }
 
-  async function fetchOptimizationSuggestions() {
-    if (!session?.access_token) return
-    
-    setLoading(true)
-    const startTime = Date.now()
-    
-    try {
-      const response = await fetch(getApiUrl('/ai/resource-optimizer'), {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session?.access_token || ''}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({})
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        const analysisTime = Date.now() - startTime
-        
-        // Add analysis time to suggestions for requirement 2.1 (within 30 seconds)
-        const enhancedSuggestions = (data.suggestions || []).map((suggestion: OptimizationSuggestion) => ({
-          ...suggestion,
-          analysis_time_ms: analysisTime,
-          confidence_score: suggestion.match_score || Math.random() * 0.3 + 0.7, // Mock confidence if not provided
-          reasoning: suggestion.recommendation,
-          conflict_detected: suggestion.type === 'conflict_resolution',
-          alternative_strategies: suggestion.type === 'conflict_resolution' ? [
-            'Redistribute workload across team members',
-            'Adjust project timeline to accommodate resource constraints',
-            'Consider hiring additional resources with required skills'
-          ] : []
-        }))
-        
-        setOptimizationSuggestions(enhancedSuggestions)
-        
-        // Show status message if AI is in mock mode
-        if (data.status === 'ai_unavailable') {
-          console.log('AI Resource Optimizer is in mock mode - configure OPENAI_API_KEY for full functionality')
-        }
-        
-        // Requirement 2.1: Analysis within 30 seconds
-        if (analysisTime > 30000) {
-          console.warn(`Resource optimization took ${analysisTime}ms - exceeds 30 second requirement`)
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch optimization suggestions:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleApplyOptimization = async (suggestion: OptimizationSuggestion) => {
-    if (!session?.access_token) return
-    
-    try {
-      // Requirement 2.5: Update resource allocations and notify stakeholders
-      const response = await fetch(getApiUrl(`/resources/${suggestion.resource_id}/apply-optimization`), {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session?.access_token || ''}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          optimization_type: suggestion.type,
-          recommendation: suggestion.recommendation,
-          confidence_score: suggestion.confidence_score,
-          notify_stakeholders: true
-        })
-      })
-      
-      if (response.ok) {
-        // Refresh resources data to reflect changes
-        await fetchResources()
-        
-        // Remove applied suggestion from the list
-        setOptimizationSuggestions(prev => 
-          prev.filter(s => s.resource_id !== suggestion.resource_id || s.type !== suggestion.type)
-        )
-        
-        // Show success message
-        alert(`Optimization applied successfully for ${suggestion.resource_name}. Stakeholders have been notified.`)
-      } else {
-        throw new Error(`Failed to apply optimization: ${response.status}`)
-      }
-    } catch (error) {
-      console.error('Error applying optimization:', error)
-      alert(`Failed to apply optimization: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    }
-  }
-
   const handleFilterChange = (filterType: keyof ResourceFilters, value: any) => {
     setFilters(prev => ({ ...prev, [filterType]: value }))
   }
@@ -450,7 +340,6 @@ export default function Resources() {
               <button
                 onClick={() => {
                   fetchResources()
-                  if (showOptimization) fetchOptimizationSuggestions()
                 }}
                 className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 text-sm font-medium"
               >
@@ -473,7 +362,6 @@ export default function Resources() {
               <button
                 onClick={() => {
                   setShowOptimization(!showOptimization)
-                  if (!showOptimization) fetchOptimizationSuggestions()
                 }}
                 className={`flex items-center justify-center min-h-[44px] px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
                   showOptimization 
@@ -564,14 +452,10 @@ export default function Resources() {
         {/* AI Optimization Panel */}
         {showOptimization && (
           <AIResourceOptimizer
-            authToken={session?.access_token}
-            onOptimizationApplied={(suggestionId) => {
+            authToken={session?.access_token || ''}
+            onOptimizationApplied={(_suggestionId) => {
               // Refresh resources data when optimization is applied
               fetchResources()
-              // Remove the suggestion from local state if needed
-              setOptimizationSuggestions(prev => 
-                prev.filter(s => s.resource_id !== suggestionId)
-              )
             }}
             className="mb-6"
           />
@@ -1118,15 +1002,19 @@ export default function Resources() {
                 const skills = skillsInput ? skillsInput.split(',').map(s => s.trim()).filter(Boolean) : []
                 
                 try {
+                  const roleValue = formData.get('role') as string
+                  const hourlyRateValue = formData.get('hourly_rate') as string
+                  const locationValue = formData.get('location') as string
+                  
                   await createResource({
                     name: formData.get('name') as string,
                     email: formData.get('email') as string,
-                    role: formData.get('role') as string || undefined,
+                    ...(roleValue && { role: roleValue }),
                     capacity: parseInt(formData.get('capacity') as string) || 40,
                     availability: parseInt(formData.get('availability') as string) || 100,
-                    hourly_rate: parseFloat(formData.get('hourly_rate') as string) || undefined,
+                    ...(hourlyRateValue && { hourly_rate: parseFloat(hourlyRateValue) }),
                     skills,
-                    location: formData.get('location') as string || undefined
+                    ...(locationValue && { location: locationValue })
                   })
                 } catch (error) {
                   alert(error instanceof Error ? error.message : 'Failed to create resource')

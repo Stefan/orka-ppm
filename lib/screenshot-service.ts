@@ -74,7 +74,7 @@ export class ScreenshotService {
 
   private async captureWithDisplayMedia(): Promise<ScreenshotResult> {
     const stream = await navigator.mediaDevices.getDisplayMedia({
-      video: { mediaSource: 'screen' }
+      video: true
     })
 
     const video = document.createElement('video')
@@ -231,7 +231,11 @@ export class VisualGuideBuilder {
       id: `step_${this.steps.length + 1}`,
       title,
       description,
-      ...options
+      ...(options.action ? { action: options.action } : {}),
+      ...(options.element ? { element: options.element } : {}),
+      ...(options.coordinates ? { coordinates: options.coordinates } : {}),
+      ...(options.text ? { text: options.text } : {}),
+      ...(options.duration ? { duration: options.duration } : {})
     }
 
     if (options.captureScreenshot) {
@@ -308,32 +312,37 @@ export class VisualGuideBuilder {
       let stepTitle = ''
       let stepDescription = ''
 
-      switch (action.type) {
-        case 'click':
-          stepTitle = `Click ${action.element || 'element'}`
-          stepDescription = `Click on the ${action.element || 'specified element'}`
-          break
-        case 'type':
-          stepTitle = `Type "${action.text}"`
-          stepDescription = `Enter the text "${action.text}" in the input field`
-          break
-        case 'scroll':
-          stepTitle = 'Scroll page'
-          stepDescription = 'Scroll to view more content'
-          break
-        case 'wait':
-          stepTitle = 'Wait'
-          stepDescription = 'Wait for the page to load'
-          break
+      if (action) {
+        switch (action.type) {
+          case 'click':
+            stepTitle = `Click ${action.element || 'element'}`
+            stepDescription = `Click on the ${action.element || 'specified element'}`
+            break
+          case 'type':
+            stepTitle = `Type "${action.text}"`
+            stepDescription = `Enter the text "${action.text}" in the input field`
+            break
+          case 'scroll':
+            stepTitle = 'Scroll page'
+            stepDescription = 'Scroll to view more content'
+            break
+          case 'wait':
+            stepTitle = 'Wait'
+            stepDescription = 'Wait for the page to load'
+            break
+        }
+      } else {
+        stepTitle = 'Unknown action'
+        stepDescription = 'Perform an action'
       }
 
       await this.addStep(stepTitle, stepDescription, {
         captureScreenshot: true,
-        element: action.element,
-        action: action.type,
-        coordinates: action.coordinates,
-        text: action.text,
-        duration: nextAction ? nextAction.timestamp - action.timestamp : undefined
+        ...(action?.element ? { element: action.element } : {}),
+        ...(action?.type ? { action: action.type } : {}),
+        ...(action?.coordinates ? { coordinates: action.coordinates } : {}),
+        ...(action?.text ? { text: action.text } : {}),
+        ...(nextAction && action ? { duration: nextAction.timestamp - action.timestamp } : {})
       })
     }
 

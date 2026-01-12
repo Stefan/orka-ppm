@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { useLocalStorage } from './useLocalStorage'
 import { useAuth } from '../app/providers/SupabaseAuthProvider'
 import { useDebounce } from './useDebounce'
 import { fuzzySearch, generateSearchSuggestions } from '../utils/fuzzySearch'
 import type { SearchResult, SearchSuggestion, SearchAnalytics } from '../types/search'
-import type { NavigationItem } from '../types/navigation'
 
 // Search data configuration
 const SEARCH_DATA: SearchResult[] = [
@@ -295,7 +294,10 @@ export function useIntelligentSearch() {
         event.preventDefault()
         if (selectedIndex >= 0) {
           if (selectedIndex < searchSuggestions.length) {
-            handleSelectSuggestion(searchSuggestions[selectedIndex])
+            const suggestion = searchSuggestions[selectedIndex]
+            if (suggestion) {
+              handleSelectSuggestion(suggestion)
+            }
           } else {
             const resultIndex = selectedIndex - searchSuggestions.length
             if (searchResults[resultIndex]) {

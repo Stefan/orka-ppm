@@ -14,8 +14,6 @@ import {
   AlertTriangle, 
   Play, 
   Settings, 
-  Download,
-  RefreshCw,
   Clock,
   Target,
   DollarSign,
@@ -113,7 +111,7 @@ export default function MonteCarloPage() {
       
       setSimulationHistory(sampleHistory)
       if (sampleHistory.length > 0) {
-        setActiveSimulation(sampleHistory[0])
+        setActiveSimulation(sampleHistory[0] || null)
       }
     } catch (err) {
       console.error('Failed to load simulation history:', err)
@@ -259,7 +257,7 @@ export default function MonteCarloPage() {
               onClick={() => setShowConfig(!showConfig)}
               variant="secondary"
               size="md"
-              leftIcon={Settings}
+              leftIcon={<Settings className="h-4 w-4" />}
             >
               Configure
             </TouchButton>
@@ -269,7 +267,7 @@ export default function MonteCarloPage() {
               disabled={loading || config.risks.length === 0}
               variant="primary"
               size="md"
-              leftIcon={Play}
+              leftIcon={<Play className="h-4 w-4" />}
               loading={loading}
             >
               {loading ? 'Running...' : 'Run Simulation'}
@@ -381,7 +379,7 @@ export default function MonteCarloPage() {
                       value={config.random_seed || ''}
                       onChange={(e) => setConfig(prev => ({
                         ...prev,
-                        random_seed: e.target.value ? parseInt(e.target.value) : undefined
+                        random_seed: e.target.value ? parseInt(e.target.value) : 0
                       }))}
                       placeholder="Leave empty for random"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"

@@ -21,7 +21,7 @@ export interface TooltipContent {
   persistent?: boolean
 }
 
-interface ContextualTooltipProps {
+export interface ContextualTooltipProps {
   content: TooltipContent
   target: string // CSS selector for the target element
   trigger: 'hover' | 'click' | 'focus' | 'manual'
@@ -140,8 +140,11 @@ export const ContextualTooltip: React.FC<ContextualTooltipProps> = ({
         finalPosition = 'top'
       } else if (spaceRight >= tooltipRect.width + 16) {
         finalPosition = 'right'
-      } else {
+      } else if (spaceLeft >= tooltipRect.width + 16) {
         finalPosition = 'left'
+      } else {
+        // Default to bottom if no space is adequate
+        finalPosition = 'bottom'
       }
     } else {
       finalPosition = position

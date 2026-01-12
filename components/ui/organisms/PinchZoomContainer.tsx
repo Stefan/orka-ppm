@@ -95,17 +95,17 @@ export const PinchZoomContainer: React.FC<PinchZoomContainerProps> = ({
   }, [initialScale, animationDuration, onZoomChange, onPanChange])
 
   // Handle pinch zoom
-  const handlePinchStart = useCallback((newScale: number, center: TouchPoint) => {
+  const handlePinchStart = useCallback((_newScale: number, _center: TouchPoint) => {
     setIsAnimating(false)
   }, [])
 
-  const handlePinchMove = useCallback((newScale: number, center: TouchPoint, delta: number) => {
+  const handlePinchMove = useCallback((newScale: number, _center: TouchPoint, _delta: number) => {
     const constrainedScale = constrainScale(newScale)
     setScale(constrainedScale)
     onZoomChange?.(constrainedScale)
   }, [constrainScale, onZoomChange])
 
-  const handlePinchEnd = useCallback((finalScale: number, center: TouchPoint) => {
+  const handlePinchEnd = useCallback((finalScale: number, _center: TouchPoint) => {
     const constrainedScale = constrainScale(finalScale)
     setScale(constrainedScale)
     onZoomChange?.(constrainedScale)
@@ -156,7 +156,7 @@ export const PinchZoomContainer: React.FC<PinchZoomContainerProps> = ({
   ])
 
   // Handle pan (when zoomed in)
-  const handleSwipe = useCallback((direction: 'up' | 'down' | 'left' | 'right', velocity: number, distance: number) => {
+  const handleSwipe = useCallback((direction: 'up' | 'down' | 'left' | 'right', _velocity: number, distance: number) => {
     if (scale <= 1) return // Only pan when zoomed in
 
     const panDistance = Math.min(distance, 100) // Limit pan distance

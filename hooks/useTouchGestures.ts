@@ -167,17 +167,19 @@ export const useTouchGestures = (
     }))
 
     // Initialize multi-touch values
-    if (points.length === 2) {
+    if (points.length === 2 && points[0] && points[1]) {
       initialDistance.current = getDistance(points[0], points[1])
       initialScale.current = 1
       initialRotation.current = getAngle(points[0], points[1])
     }
 
     // Long press detection
-    if (points.length === 1) {
+    if (points.length === 1 && points[0]) {
       longPressTimer.current = setTimeout(() => {
-        callbacks.onLongPress?.(points[0])
-        triggerHapticFeedback(20)
+        if (points[0]) {
+          callbacks.onLongPress?.(points[0])
+          triggerHapticFeedback(20)
+        }
       }, opts.longPressDuration)
     }
   }, [
@@ -213,7 +215,7 @@ export const useTouchGestures = (
       }
 
       // Handle pinch gesture
-      if (points.length === 2 && prev.startPoints.length === 2) {
+      if (points.length === 2 && prev.startPoints.length === 2 && points[0] && points[1]) {
         const currentDistance = getDistance(points[0], points[1])
         const scale = currentDistance / initialDistance.current
         const rotation = getAngle(points[0], points[1]) - initialRotation.current
@@ -237,7 +239,7 @@ export const useTouchGestures = (
       }
 
       // Handle pull-to-refresh (single touch, vertical movement from top)
-      if (points.length === 1 && prev.startPoints.length === 1) {
+      if (points.length === 1 && prev.startPoints.length === 1 && points[0] && prev.startPoints[0]) {
         const deltaY = points[0].y - prev.startPoints[0].y
         const deltaX = Math.abs(points[0].x - prev.startPoints[0].x)
         
@@ -293,26 +295,28 @@ export const useTouchGestures = (
       if (prev.startPoints.length === 1 && endPoints.length === 1 && duration < 200) {
         const point = endPoints[0]
         const startPoint = prev.startPoints[0]
-        const distance = getDistance(startPoint, point)
+        if (point && startPoint) {
+          const distance = getDistance(startPoint, point)
 
-        if (distance < 10) { // Minimal movement for tap
-          const timeSinceLastTap = now - lastTapTime.current
-          const lastPoint = lastTapPoint.current
+          if (distance < 10) { // Minimal movement for tap
+            const timeSinceLastTap = now - lastTapTime.current
+            const lastPoint = lastTapPoint.current
 
-          if (
-            timeSinceLastTap < opts.doubleTapInterval &&
-            lastPoint &&
-            getDistance(point, lastPoint) < opts.doubleTapDistance
-          ) {
-            // Double tap
-            callbacks.onDoubleTap?.(point)
-            triggerHapticFeedback(15)
-            lastTapTime.current = 0 // Reset to prevent triple tap
-          } else {
-            // Single tap
-            callbacks.onTap?.(point)
-            lastTapTime.current = now
-            lastTapPoint.current = point
+            if (
+              timeSinceLastTap < opts.doubleTapInterval &&
+              lastPoint &&
+              getDistance(point, lastPoint) < opts.doubleTapDistance
+            ) {
+              // Double tap
+              callbacks.onDoubleTap?.(point)
+              triggerHapticFeedback(15)
+              lastTapTime.current = 0 // Reset to prevent triple tap
+            } else {
+              // Single tap
+              callbacks.onTap?.(point)
+              lastTapTime.current = now
+              lastTapPoint.current = point
+            }
           }
         }
       }
@@ -321,28 +325,30 @@ export const useTouchGestures = (
       if (prev.startPoints.length === 1 && endPoints.length === 1) {
         const startPoint = prev.startPoints[0]
         const endPoint = endPoints[0]
-        const distance = getDistance(startPoint, endPoint)
-        const velocity = getVelocity(startPoint, endPoint)
-        const velocityMagnitude = Math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y)
+        if (startPoint && endPoint) {
+          const distance = getDistance(startPoint, endPoint)
+          const velocity = getVelocity(startPoint, endPoint)
+          const velocityMagnitude = Math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y)
 
-        if (distance > opts.swipeThreshold && velocityMagnitude > opts.swipeVelocityThreshold) {
-          const deltaX = endPoint.x - startPoint.x
-          const deltaY = endPoint.y - startPoint.y
+          if (distance > opts.swipeThreshold && velocityMagnitude > opts.swipeVelocityThreshold) {
+            const deltaX = endPoint.x - startPoint.x
+            const deltaY = endPoint.y - startPoint.y
           
-          let direction: 'up' | 'down' | 'left' | 'right'
-          if (Math.abs(deltaX) > Math.abs(deltaY)) {
-            direction = deltaX > 0 ? 'right' : 'left'
-          } else {
-            direction = deltaY > 0 ? 'down' : 'up'
-          }
+            let direction: 'up' | 'down' | 'left' | 'right'
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+              direction = deltaX > 0 ? 'right' : 'left'
+            } else {
+              direction = deltaY > 0 ? 'down' : 'up'
+            }
 
-          callbacks.onSwipe?.(direction, velocityMagnitude, distance)
-          triggerHapticFeedback(12)
+            callbacks.onSwipe?.(direction, velocityMagnitude, distance)
+            triggerHapticFeedback(12)
+          }
         }
       }
 
       // Handle pull-to-refresh trigger
-      if (prev.startPoints.length === 1 && endPoints.length === 1) {
+      if (prev.startPoints.length === 1 && endPoints.length === 1 && endPoints[0] && prev.startPoints[0]) {
         const deltaY = endPoints[0].y - prev.startPoints[0].y
         if (deltaY > opts.pullToRefreshThreshold && prev.startPoints[0].y < 100) {
           callbacks.onPullToRefreshTrigger?.()

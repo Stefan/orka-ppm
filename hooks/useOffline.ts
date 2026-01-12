@@ -141,7 +141,7 @@ export function useOffline(options: UseOfflineOptions = {}) {
           const response = await fetch(item.url, {
             method: item.method,
             headers: item.headers,
-            body: item.body || undefined
+            ...(item.body && { body: item.body })
           });
 
           if (response.ok) {
@@ -199,7 +199,10 @@ export function useOffline(options: UseOfflineOptions = {}) {
       }
 
       // Queue for background sync
-      await queueRequest(url, { ...fetchOptions, metadata });
+      await queueRequest(url, { 
+        ...fetchOptions, 
+        ...(metadata && { metadata })
+      });
       throw new Error('Request queued for background sync - currently offline');
     }
 

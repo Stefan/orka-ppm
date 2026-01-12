@@ -2,7 +2,7 @@
  * Global error handling utilities for ORKA-PPM
  */
 
-import { logger } from './logger'
+import { logger } from '../monitoring/logger'
 
 export interface AppError extends Error {
   code?: string

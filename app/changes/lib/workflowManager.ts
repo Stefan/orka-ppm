@@ -125,7 +125,7 @@ export class WorkflowManager {
       from: 'impact_analysis',
       to: 'technical_review',
       action: 'analyze_impact',
-      conditions: (cr, context) => {
+      conditions: (_cr, context) => {
         return context?.impactAnalysis !== undefined
       },
       validations: (cr, context) => {
@@ -145,7 +145,7 @@ export class WorkflowManager {
       from: 'technical_review',
       to: 'approval_routing',
       action: 'technical_approve',
-      conditions: (cr, context) => {
+      conditions: (_cr, context) => {
         return context?.user?.permissions?.includes('technical_review')
       }
     })
@@ -154,7 +154,7 @@ export class WorkflowManager {
       from: 'technical_review',
       to: 'draft',
       action: 'technical_reject',
-      conditions: (cr, context) => {
+      conditions: (_cr, context) => {
         return context?.user?.permissions?.includes('technical_review')
       }
     })
@@ -229,7 +229,7 @@ export class WorkflowManager {
       from: 'approved',
       to: 'implementation_planning',
       action: 'start_implementation',
-      conditions: (cr, context) => {
+      conditions: (_cr, context) => {
         return context?.user?.permissions?.includes('implementation_manage')
       },
       validations: (cr) => {
@@ -280,7 +280,7 @@ export class WorkflowManager {
       from: 'verification',
       to: 'closure',
       action: 'verify',
-      conditions: (cr, context) => {
+      conditions: (_cr, context) => {
         return context?.user?.permissions?.includes('change_verify')
       }
     })
@@ -325,7 +325,7 @@ export class WorkflowManager {
       from: 'cancelled',
       to: 'draft',
       action: 'reopen',
-      conditions: (cr, context) => {
+      conditions: (_cr, context) => {
         return context?.user?.permissions?.includes('change_admin')
       }
     })
@@ -335,7 +335,7 @@ export class WorkflowManager {
       from: 'approval_pending',
       to: 'approval_pending',
       action: 'escalate',
-      conditions: (cr, context) => {
+      conditions: (cr, _context) => {
         const overdueApprovals = cr.pending_approvals.filter(approval => {
           const dueDate = new Date(approval.due_date)
           return dueDate < new Date() && approval.status === 'pending'
@@ -453,13 +453,14 @@ export class WorkflowManager {
     
     return availableRules.map(rule => {
       const validation = this.validateTransition(currentStatus, rule.to, rule.action, context)
+      const firstError = validation.errors.length > 0 ? validation.errors[0] : undefined
       
       return {
         action: rule.action,
         to: rule.to,
         description: this.getActionDescription(rule.action),
         enabled: validation.isValid,
-        reason: validation.errors.length > 0 ? validation.errors[0] : undefined
+        ...(firstError && { reason: firstError })
       }
     })
   }
@@ -538,9 +539,13 @@ export class WorkflowManager {
     
     // Check for conflicting decisions within a short time window (5 minutes)
     for (let i = 1; i < sortedDecisions.length; i++) {
-      const timeDiff = sortedDecisions[i].timestamp.getTime() - sortedDecisions[i-1].timestamp.getTime()
-      if (timeDiff < 5 * 60 * 1000) { // 5 minutes
-        conflicts.push(`Concurrent decisions by ${sortedDecisions[i-1].approverId} and ${sortedDecisions[i].approverId}`)
+      const current = sortedDecisions[i]
+      const previous = sortedDecisions[i-1]
+      if (current && previous) {
+        const timeDiff = current.timestamp.getTime() - previous.timestamp.getTime()
+        if (timeDiff < 5 * 60 * 1000) { // 5 minutes
+          conflicts.push(`Concurrent decisions by ${previous.approverId} and ${current.approverId}`)
+        }
       }
     }
 
@@ -609,7 +614,7 @@ export class WorkflowManager {
 
   public handleEmergencyEscalation(
     changeRequest: ChangeRequest,
-    context: WorkflowContext
+    _context: WorkflowContext
   ): { escalationPath: string[]; requiredApprovals: string[]; timeframe: string } {
     const escalationPath: string[] = []
     const requiredApprovals: string[] = []
@@ -649,7 +654,7 @@ export const workflowManager = new WorkflowManager()
 export const canUserPerformAction = (
   action: WorkflowAction,
   userPermissions: string[],
-  changeRequest: ChangeRequest
+  _changeRequest: ChangeRequest
 ): boolean => {
   const permissionMap: Record<WorkflowAction, string[]> = {
     submit: ['change_create'],

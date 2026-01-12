@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { BudgetVariance, Project, FinancialAlert, AnalyticsData } from '../types'
+import { BudgetVariance, Project, FinancialAlert } from '../types'
 import { calculateAnalyticsData } from '../utils/calculations'
 
 interface UseAnalyticsProps {

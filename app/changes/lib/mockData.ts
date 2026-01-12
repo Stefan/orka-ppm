@@ -269,12 +269,8 @@ export const generateMockChangeRequest = (overrides: Partial<ChangeRequest> = {}
   
   estimated_cost_impact: 25000,
   estimated_schedule_impact_days: 14,
-  actual_cost_impact: undefined,
-  actual_schedule_impact_days: undefined,
   
   implementation_progress: 0,
-  implementation_start_date: undefined,
-  implementation_end_date: undefined,
   
   pending_approvals: [
     {
@@ -304,15 +300,13 @@ export const generateMockChangeRequest = (overrides: Partial<ChangeRequest> = {}
       approver_role: 'Technical Reviewer',
       decision: 'approved',
       decision_date: '2024-01-16T14:20:00Z',
-      comments: 'Technical review completed. Design changes are sound and necessary for structural integrity.',
-      conditions: undefined
+      comments: 'Technical review completed. Design changes are sound and necessary for structural integrity.'
     }
   ],
   
   version: 1,
   created_at: '2024-01-15T10:30:00Z',
   updated_at: '2024-01-16T14:20:00Z',
-  closed_at: undefined,
   
   attachments: [
     {
@@ -614,9 +608,9 @@ export const generateMockChangeRequests = (count: number = 10): ChangeRequest[] 
       id: `cr-${String(index + 1).padStart(3, '0')}`,
       change_number: `CR-2024-${String(index + 1).padStart(4, '0')}`,
       title: `Change Request ${index + 1}`,
-      status: statuses[index % statuses.length],
-      change_type: types[index % types.length],
-      priority: priorities[index % priorities.length],
+      status: statuses[index % statuses.length]!,
+      change_type: types[index % types.length]!,
+      priority: priorities[index % priorities.length]!,
       estimated_cost_impact: Math.floor(Math.random() * 50000) + 5000,
       estimated_schedule_impact_days: Math.floor(Math.random() * 30) + 1
     })

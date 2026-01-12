@@ -19,7 +19,6 @@ import BudgetVarianceTable from './components/tables/BudgetVarianceTable'
 
 // Import hooks
 import { useFinancialData } from './hooks/useFinancialData'
-import { useCSVImport } from './hooks/useCSVImport'
 import { useAnalytics } from './hooks/useAnalytics'
 
 // Import types
@@ -50,10 +49,6 @@ export default function Financials() {
   } = useFinancialData({
     accessToken: session?.access_token,
     selectedCurrency
-  })
-
-  const csvImportProps = useCSVImport({
-    accessToken: session?.access_token
   })
 
   const analyticsData = useAnalytics({

@@ -120,7 +120,7 @@ class PerformanceMonitor {
       value,
       timestamp: Date.now(),
       type: 'web-vital',
-      metadata,
+      ...(metadata ? { metadata } : {}),
       rating
     }
 
@@ -238,8 +238,8 @@ class PerformanceMonitor {
       value,
       timestamp: Date.now(),
       type,
-      metadata,
-      rating
+      ...(metadata ? { metadata } : {}),
+      ...(rating ? { rating } : {})
     }
 
     this.metrics.push(metric)

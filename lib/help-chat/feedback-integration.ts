@@ -4,8 +4,8 @@
  * Handles bug reports and feature requests from help chat interactions
  */
 
-import { getApiUrl } from './api'
-import type { HelpFeedbackRequest, FeedbackResponse } from '../types/help-chat'
+import { getApiUrl } from '../api'
+import type { HelpFeedbackRequest, FeedbackResponse } from '../../types/help-chat'
 
 // Configuration
 const FEEDBACK_INTEGRATION_CONFIG = {
@@ -344,7 +344,7 @@ export class HelpChatFeedbackIntegration {
   /**
    * Get feedback integration statistics
    */
-  async getFeedbackIntegrationStats(days: number = 30): Promise<{
+  async getFeedbackIntegrationStats(_days: number = 30): Promise<{
     totalHelpFeedback: number
     bugReportsCreated: number
     featureRequestsCreated: number
@@ -370,7 +370,7 @@ export class HelpChatFeedbackIntegration {
   /**
    * Get recent feedback integrations
    */
-  async getRecentIntegrations(limit: number = 10): Promise<Array<{
+  async getRecentIntegrations(_limit: number = 10): Promise<Array<{
     id: string
     messageId: string
     rating: number

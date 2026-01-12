@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { BarChart, Bar, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart } from 'recharts'
 import { DollarSign, Calendar, Users, AlertTriangle, Target, Activity, BarChart3, Settings, Download, RefreshCw, Info } from 'lucide-react'
 import { ImpactAnalysisData, mockDataService } from '../lib/mockData'
-import { useAsyncData, LoadingState, SkeletonChart } from '../lib/loadingStates'
+import { useAsyncData, SkeletonChart } from '../lib/loadingStates'
 
 interface ImpactAnalysisDashboardProps {
   changeId: string
@@ -17,7 +17,7 @@ export default function ImpactAnalysisDashboard({
   changeId,
   impactData: initialData,
   editable = false,
-  onDataUpdate
+  onDataUpdate: _onDataUpdate
 }: ImpactAnalysisDashboardProps) {
   const [activeView, setActiveView] = useState<'overview' | 'cost' | 'schedule' | 'resources' | 'risks' | 'scenarios'>('overview')
   const [refreshing, setRefreshing] = useState(false)
@@ -256,7 +256,7 @@ export default function ImpactAnalysisDashboard({
                         fill="#8884d8"
                         dataKey="value"
                       >
-                        {costBreakdownData.map((entry, index) => (
+                        {costBreakdownData.map((_entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>

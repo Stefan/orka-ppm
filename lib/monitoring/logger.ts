@@ -41,9 +41,9 @@ class Logger {
     const entry: LogEntry = {
       level,
       message,
-      data,
+      ...(data !== undefined ? { data } : {}),
       timestamp: new Date(),
-      context
+      ...(context ? { context } : {})
     }
 
     // Add to internal log storage

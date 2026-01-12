@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useId } from 'react'
+import { useId } from 'react'
 import { FormFieldDescription, ErrorMessage, ScreenReaderOnly } from './ScreenReaderSupport'
 
 interface AccessibleInputProps {

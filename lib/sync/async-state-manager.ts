@@ -3,7 +3,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
-import { performanceMonitor } from './performance'
+import { performanceMonitor } from '../monitoring/performance'
 
 interface AsyncState<T> {
   data: T | null

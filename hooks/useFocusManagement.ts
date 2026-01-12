@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useRef, useCallback } from 'react'
 
 /**
  * Hook for managing focus within a component or container
@@ -36,7 +36,7 @@ export function useFocusManagement() {
    */
   const focusFirst = useCallback(() => {
     const focusableElements = getFocusableElements()
-    if (focusableElements.length > 0) {
+    if (focusableElements.length > 0 && focusableElements[0]) {
       focusableElements[0].focus()
     }
   }, [getFocusableElements])
@@ -46,8 +46,9 @@ export function useFocusManagement() {
    */
   const focusLast = useCallback(() => {
     const focusableElements = getFocusableElements()
-    if (focusableElements.length > 0) {
-      focusableElements[focusableElements.length - 1].focus()
+    const lastElement = focusableElements[focusableElements.length - 1]
+    if (focusableElements.length > 0 && lastElement) {
+      lastElement.focus()
     }
   }, [getFocusableElements])
 
@@ -61,9 +62,15 @@ export function useFocusManagement() {
     if (currentIndex === -1) {
       focusFirst()
     } else if (currentIndex < focusableElements.length - 1) {
-      focusableElements[currentIndex + 1].focus()
+      const nextElement = focusableElements[currentIndex + 1]
+      if (nextElement) {
+        nextElement.focus()
+      }
     } else {
-      focusableElements[0].focus() // Wrap to first
+      const firstElement = focusableElements[0]
+      if (firstElement) {
+        firstElement.focus() // Wrap to first
+      }
     }
   }, [getFocusableElements, focusFirst])
 
@@ -77,9 +84,15 @@ export function useFocusManagement() {
     if (currentIndex === -1) {
       focusLast()
     } else if (currentIndex > 0) {
-      focusableElements[currentIndex - 1].focus()
+      const prevElement = focusableElements[currentIndex - 1]
+      if (prevElement) {
+        prevElement.focus()
+      }
     } else {
-      focusableElements[focusableElements.length - 1].focus() // Wrap to last
+      const lastElement = focusableElements[focusableElements.length - 1]
+      if (lastElement) {
+        lastElement.focus() // Wrap to last
+      }
     }
   }, [getFocusableElements, focusLast])
 
@@ -97,13 +110,13 @@ export function useFocusManagement() {
 
     if (event.shiftKey) {
       // Shift + Tab
-      if (document.activeElement === firstElement) {
+      if (document.activeElement === firstElement && lastElement) {
         event.preventDefault()
         lastElement.focus()
       }
     } else {
       // Tab
-      if (document.activeElement === lastElement) {
+      if (document.activeElement === lastElement && firstElement) {
         event.preventDefault()
         firstElement.focus()
       }

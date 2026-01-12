@@ -353,7 +353,7 @@ export const validateTouchTarget = (element: HTMLElement): boolean => {
   return rect.width >= 44 && rect.height >= 44
 }
 
-export const validateColorContrast = (foreground: string, background: string): number => {
+export const validateColorContrast = (_foreground: string, _background: string): number => {
   // Simplified contrast ratio calculation
   // In a real implementation, you'd use a proper color contrast library
   return 4.5 // Placeholder for WCAG AA compliance

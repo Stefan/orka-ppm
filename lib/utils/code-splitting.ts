@@ -3,7 +3,7 @@
  */
 
 import React from 'react'
-import { measureChunkLoad, getNetworkInfo } from './performance'
+import { measureChunkLoad, getNetworkInfo } from '../monitoring/performance'
 
 interface LazyComponentOptions {
   fallback?: React.ComponentType

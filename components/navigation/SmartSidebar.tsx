@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { 
@@ -20,12 +20,11 @@ import {
   Clock,
   Star
 } from 'lucide-react'
-import { useAuth } from '../app/providers/SupabaseAuthProvider'
-import { useNavigationAnalytics } from '../hooks/useNavigationAnalytics'
-import { useMediaQuery } from '../hooks/useMediaQuery'
-import type { NavigationItem, AINavigationSuggestion } from '../types/navigation'
+import { useAuth } from '../../app/providers/SupabaseAuthProvider'
+import { useNavigationAnalytics } from '../../hooks/useNavigationAnalytics'
+import type { NavigationItem, AINavigationSuggestion } from '../../types/navigation'
 
-interface SmartSidebarProps {
+export interface SmartSidebarProps {
   isOpen?: boolean
   onToggle?: () => void
   isMobile?: boolean
@@ -130,7 +129,7 @@ export default function SmartSidebar({
 }: SmartSidebarProps) {
   const router = useRouter()
   const pathname = usePathname()
-  const { user, clearSession } = useAuth()
+  const { clearSession } = useAuth()
   const { 
     trackNavigation, 
     getUsageFrequency, 
@@ -139,7 +138,6 @@ export default function SmartSidebar({
   
   const [aiSuggestions, setAiSuggestions] = useState<AINavigationSuggestion[]>([])
   const [navigationStartTime, setNavigationStartTime] = useState<number>(Date.now())
-  const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1023px)')
 
   // Update AI suggestions based on current context
   useEffect(() => {

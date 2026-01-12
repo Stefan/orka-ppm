@@ -33,36 +33,37 @@ export default function DashboardCharts({ projects, portfolioMetrics }: Dashboar
     { name: 'Critical', value: portfolioMetrics.health_distribution.red || 0, color: '#EF4444' }
   ] : []
 
-  const statusChartData = Array.isArray(projects) && projects.length > 0 ? (() => {
-    const statusCounts = projects.reduce((acc, project) => {
-      acc[project.status] = (acc[project.status] || 0) + 1
+  const statusChartData = Array.isArray(projects) && (projects?.length || 0) > 0 ? (() => {
+    const statusCounts = projects?.reduce((acc, project) => {
+      const status = project?.status || 'unknown'
+      acc[status] = (acc[status] || 0) + 1
       return acc
-    }, {} as Record<string, number>)
+    }, {} as Record<string, number>) || {}
     
-    return Object.entries(statusCounts).map(([status, count]) => ({
-      name: status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' '),
+    return Object.entries(statusCounts)?.map(([status, count]) => ({
+      name: status?.charAt(0)?.toUpperCase() + status?.slice(1)?.replace('-', ' ') || 'Unknown',
       value: count,
       color: status === 'completed' ? '#10B981' : 
              status === 'active' ? '#3B82F6' :
              status === 'on-hold' ? '#F59E0B' :
              status === 'cancelled' ? '#EF4444' : '#6B7280'
-    }))
+    })) || []
   })() : []
 
   const budgetChartData = projects
-    .filter(p => p.budget && p.actual_cost !== undefined)
-    .slice(0, 10) // Limit to 10 projects for performance
-    .map(p => ({
-      name: p.name.length > 15 ? p.name.substring(0, 15) + '...' : p.name,
-      budget: p.budget || 0,
-      actual: p.actual_cost || 0,
-      variance: (p.actual_cost || 0) - (p.budget || 0)
-    }))
+    ?.filter(p => p?.budget && p?.actual_cost !== undefined)
+    ?.slice(0, 10) // Limit to 10 projects for performance
+    ?.map(p => ({
+      name: (p?.name?.length || 0) > 15 ? (p?.name?.substring(0, 15) || '') + '...' : (p?.name || 'Unknown'),
+      budget: p?.budget || 0,
+      actual: p?.actual_cost || 0,
+      variance: (p?.actual_cost || 0) - (p?.budget || 0)
+    })) || []
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Project Health Distribution */}
-      {healthChartData.length > 0 && (
+      {(healthChartData?.length || 0) > 0 && (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Project Health Distribution</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -77,7 +78,7 @@ export default function DashboardCharts({ projects, portfolioMetrics }: Dashboar
                 fill="#8884d8"
                 dataKey="value"
               >
-                {healthChartData.map((entry, index) => (
+                {healthChartData?.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
@@ -88,7 +89,7 @@ export default function DashboardCharts({ projects, portfolioMetrics }: Dashboar
       )}
 
       {/* Project Status Distribution */}
-      {statusChartData.length > 0 && (
+      {(statusChartData?.length || 0) > 0 && (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Project Status Distribution</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -103,7 +104,7 @@ export default function DashboardCharts({ projects, portfolioMetrics }: Dashboar
       )}
 
       {/* Budget vs Actual Spending */}
-      {budgetChartData.length > 0 && (
+      {(budgetChartData?.length || 0) > 0 && (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 lg:col-span-2">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Budget vs Actual Spending (Top 10)</h3>
           <ResponsiveContainer width="100%" height={400}>

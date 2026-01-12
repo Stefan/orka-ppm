@@ -131,7 +131,7 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
     const files = e.dataTransfer.files
     if (files.length > 0) {
       const file = files[0]
-      if (file.name.toLowerCase().endsWith('.csv')) {
+      if (file && file.name.toLowerCase().endsWith('.csv')) {
         handleFileUpload(file, importType)
       } else {
         alert('Bitte wählen Sie eine CSV-Datei aus.')

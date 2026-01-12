@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Bar, ComposedChart } from 'recharts'
 import { Calendar, Filter } from 'lucide-react'
-import { getApiUrl } from '../../../lib/api'
 
 interface VarianceTrend {
   date: string
@@ -51,7 +50,7 @@ export default function VarianceTrends({ session, selectedCurrency = 'USD' }: Va
         const variancePercentage = (Math.random() - 0.5) * 20
         
         mockTrendData.push({
-          date: date.toISOString().split('T')[0],
+          date: date.toISOString().split('T')[0]!,
           total_variance: baseVariance,
           variance_percentage: variancePercentage,
           projects_over_budget: Math.floor(Math.random() * 5),
@@ -80,7 +79,7 @@ export default function VarianceTrends({ session, selectedCurrency = 'USD' }: Va
     )
   }
 
-  if (error || trendData.length === 0) {
+  if (error || (trendData?.length || 0) === 0) {
     return (
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Variance Trends</h3>
@@ -156,27 +155,27 @@ export default function VarianceTrends({ session, selectedCurrency = 'USD' }: Va
       <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
         <div className="text-center">
           <div className="font-semibold text-gray-900">
-            {trendData[trendData.length - 1]?.total_variance >= 0 ? '+' : ''}
-            {trendData[trendData.length - 1]?.total_variance.toLocaleString()} {selectedCurrency}
+            {(trendData?.[trendData.length - 1]?.total_variance ?? 0) >= 0 ? '+' : ''}
+            {(trendData?.[trendData.length - 1]?.total_variance ?? 0).toLocaleString()} {selectedCurrency}
           </div>
           <div className="text-gray-600">Latest Variance</div>
         </div>
         <div className="text-center">
           <div className="font-semibold text-gray-900">
-            {trendData[trendData.length - 1]?.variance_percentage >= 0 ? '+' : ''}
-            {trendData[trendData.length - 1]?.variance_percentage.toFixed(1)}%
+            {(trendData?.[trendData.length - 1]?.variance_percentage ?? 0) >= 0 ? '+' : ''}
+            {(trendData?.[trendData.length - 1]?.variance_percentage ?? 0).toFixed(1)}%
           </div>
           <div className="text-gray-600">Latest %</div>
         </div>
         <div className="text-center">
           <div className="font-semibold text-red-600">
-            {trendData[trendData.length - 1]?.projects_over_budget}
+            {trendData?.[trendData.length - 1]?.projects_over_budget ?? 0}
           </div>
           <div className="text-gray-600">Over Budget</div>
         </div>
         <div className="text-center">
           <div className="font-semibold text-green-600">
-            {trendData[trendData.length - 1]?.projects_under_budget}
+            {trendData?.[trendData.length - 1]?.projects_under_budget ?? 0}
           </div>
           <div className="text-gray-600">Under Budget</div>
         </div>

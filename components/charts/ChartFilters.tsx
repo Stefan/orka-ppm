@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
-import { Search, Filter, X, Calendar, TrendingUp, BarChart3 } from 'lucide-react'
+import { Search, Filter, X, TrendingUp } from 'lucide-react'
 
 export interface FilterConfig {
   searchTerm: string
@@ -308,10 +308,13 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
               </button>
               <button
                 onClick={() => {
-                  const values = [dataRange.minValue, dataRange.maxValue]
-                  const q1 = values[0] + (values[1] - values[0]) * 0.25
-                  const q3 = values[0] + (values[1] - values[0]) * 0.75
-                  updateFilter('valueRange', [q1, q3])
+                  if (dataRange.minValue !== undefined && dataRange.maxValue !== undefined) {
+                    const minVal = dataRange.minValue
+                    const maxVal = dataRange.maxValue
+                    const q1 = minVal + (maxVal - minVal) * 0.25
+                    const q3 = minVal + (maxVal - minVal) * 0.75
+                    updateFilter('valueRange', [q1, q3])
+                  }
                 }}
                 className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200"
               >

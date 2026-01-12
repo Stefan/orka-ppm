@@ -1,5 +1,5 @@
-import React, { useRef, useState, useCallback, useEffect } from 'react'
-import { cn, componentVariants, a11y } from '@/lib/design-system'
+import React, { useRef, useState, useCallback } from 'react'
+import { cn, componentVariants } from '@/lib/design-system'
 import type { CardProps } from '@/types'
 
 /**
@@ -100,6 +100,8 @@ export const SwipeableCard: React.FC<SwipeableCardProps> = ({
     if (swipeDisabled || isAnimating) return
 
     const touch = e.touches[0]
+    if (!touch) return
+    
     setStartX(touch.clientX)
     setStartY(touch.clientY)
     setIsDragging(true)
@@ -111,6 +113,8 @@ export const SwipeableCard: React.FC<SwipeableCardProps> = ({
     if (!isDragging || swipeDisabled || isAnimating) return
 
     const touch = e.touches[0]
+    if (!touch) return
+    
     const deltaX = touch.clientX - startX
     const deltaY = touch.clientY - startY
 
@@ -316,7 +320,7 @@ export const SwipeableCard: React.FC<SwipeableCardProps> = ({
     
     return {
       backgroundColor: action.backgroundColor,
-      opacity: opacity * 0.9,
+      opacity: (opacity * 0.9) * (isActive ? 1.2 : 1),
       transform: side === 'left' 
         ? `translateX(${swipeOffset < -20 ? 0 : '-100%'})` 
         : `translateX(${swipeOffset > 20 ? 0 : '100%'})`,

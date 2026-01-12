@@ -67,10 +67,6 @@ interface UseLanguageReturn {
   formatNumber: (number: number, language?: string) => string
 }
 
-const API_BASE = process.env.NODE_ENV === 'production' 
-  ? '/api' 
-  : 'http://localhost:8000'
-
 export function useLanguage(): UseLanguageReturn {
   const [currentLanguage, setCurrentLanguage] = useLocalStorage<string>('help-chat-language', 'en')
   const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([])

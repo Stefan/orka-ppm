@@ -5,15 +5,15 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 
-interface CSVImportRequest {
-  file: File
-  importType: 'projects' | 'risks' | 'resources' | 'users'
-  options?: {
-    skipFirstRow?: boolean
-    delimiter?: string
-    encoding?: string
-  }
-}
+// interface CSVImportRequest {
+//   file: File
+//   importType: 'projects' | 'risks' | 'resources' | 'users'
+//   options?: {
+//     skipFirstRow?: boolean
+//     delimiter?: string
+//     encoding?: string
+//   }
+// }
 
 interface CSVImportResponse {
   importId: string

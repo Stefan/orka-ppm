@@ -53,21 +53,21 @@ export default function VarianceKPIs({ session, selectedCurrency = 'USD' }: Vari
       
       const data = await response.json()
       console.log('Variance API response:', data)
-      const variances = data.variances || []
+      const variances = data?.variances || []
       
-      if (variances.length === 0) {
+      if ((variances?.length || 0) === 0) {
         setVarianceData(null)
         return
       }
       
       // Calculate KPIs from variance data
-      const totalCommitments = variances.reduce((sum: number, v: any) => sum + v.total_commitment, 0)
-      const totalActuals = variances.reduce((sum: number, v: any) => sum + v.total_actual, 0)
+      const totalCommitments = variances?.reduce((sum: number, v: any) => sum + (v?.total_commitment || 0), 0) || 0
+      const totalActuals = variances?.reduce((sum: number, v: any) => sum + (v?.total_actual || 0), 0) || 0
       const totalVariance = totalActuals - totalCommitments
       const variancePercentage = totalCommitments > 0 ? (totalVariance / totalCommitments * 100) : 0
       
-      const projectsOverBudget = variances.filter((v: any) => v.status === 'over').length
-      const projectsUnderBudget = variances.filter((v: any) => v.status === 'under').length
+      const projectsOverBudget = variances?.filter((v: any) => v?.status === 'over')?.length || 0
+      const projectsUnderBudget = variances?.filter((v: any) => v?.status === 'under')?.length || 0
       
       setVarianceData({
         total_variance: totalVariance,

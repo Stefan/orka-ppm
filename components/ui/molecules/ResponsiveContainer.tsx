@@ -1,5 +1,5 @@
 import React from 'react'
-import { cn, responsive } from '@/lib/design-system'
+import { cn } from '@/lib/design-system'
 import type { LayoutProps } from '@/types'
 
 /**

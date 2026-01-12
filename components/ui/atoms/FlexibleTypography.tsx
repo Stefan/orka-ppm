@@ -1,5 +1,5 @@
 import React from 'react'
-import { cn, responsive, a11y } from '@/lib/design-system'
+import { cn, a11y } from '@/lib/design-system'
 import type { ComponentProps } from '@/types'
 
 export interface TypographyProps extends ComponentProps {

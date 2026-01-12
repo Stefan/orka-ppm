@@ -124,10 +124,10 @@ export default function KeyboardNavigation({
     allShortcuts.map(shortcut => ({
       key: shortcut.key,
       callback: shortcut.action,
-      ctrl: shortcut.ctrl,
-      alt: shortcut.alt,
-      shift: shortcut.shift,
-      meta: shortcut.meta,
+      ...(shortcut.ctrl !== undefined && { ctrl: shortcut.ctrl }),
+      ...(shortcut.alt !== undefined && { alt: shortcut.alt }),
+      ...(shortcut.shift !== undefined && { shift: shortcut.shift }),
+      ...(shortcut.meta !== undefined && { meta: shortcut.meta }),
       preventDefault: true
     }))
   )

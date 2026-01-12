@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { getNetworkInfo, shouldLoadHighQuality } from '@/lib/performance'
+import { shouldLoadHighQuality } from '../../lib/performance'
 
 interface ProgressiveImageProps {
   src: string
@@ -41,7 +41,6 @@ export const ProgressiveImage: React.FC<ProgressiveImageProps> = ({
   useEffect(() => {
     if (!isInView) return
 
-    const network = getNetworkInfo()
     const shouldUseHighQuality = shouldLoadHighQuality()
     
     // Use low quality image on slow connections or save-data mode
@@ -172,7 +171,6 @@ export const useProgressiveImage = (src: string, lowQualitySrc?: string) => {
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
-    const network = getNetworkInfo()
     const shouldUseHighQuality = shouldLoadHighQuality()
     
     // Start with low quality if available
