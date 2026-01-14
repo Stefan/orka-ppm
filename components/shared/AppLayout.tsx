@@ -57,15 +57,20 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <HelpChatProvider>
       <div className="flex h-screen bg-white">
-        {/* Sidebar */}
+        {/* Sidebar - Fixed position on desktop */}
         <Sidebar 
           isOpen={isMobile ? sidebarOpen : true} 
           onToggle={toggleSidebar}
           isMobile={isMobile}
         />
         
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col min-w-0">
+        {/* Main Content - With left margin for fixed sidebar on desktop */}
+        <div 
+          className="flex-1 flex flex-col min-w-0"
+          style={{
+            marginLeft: isMobile ? 0 : '256px' // 256px = w-64
+          }}
+        >
           {/* Mobile Header with Menu Button */}
           {isMobile && (
             <header className="lg:hidden bg-white border-b border-gray-200 p-4 flex items-center">

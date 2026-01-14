@@ -183,19 +183,27 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
     )
   }
 
-  // Desktop sidebar - Simple standard CSS that works everywhere
+  // Desktop sidebar - Consistent cross-browser layout
   return (
     <nav
       ref={sidebarRef}
       id="navigation"
-      className="hidden lg:flex lg:flex-col w-64 h-screen p-4 bg-gray-800 text-white overflow-y-auto flex-shrink-0"
+      className="hidden lg:flex lg:flex-col w-64 h-screen bg-gray-800 text-white flex-shrink-0"
+      style={{
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        overflowY: 'auto',
+        overflowX: 'hidden'
+      }}
     >
-      <div className="mb-8">
+      <div className="p-4 mb-4">
         <h1 className="text-2xl font-bold text-white">ORKA PPM</h1>
         <p className="text-gray-400 text-sm mt-1">Portfolio Management</p>
       </div>
       
-      <ul className="space-y-2 flex-1">
+      <ul className="px-4 space-y-2" style={{ flex: '1 1 auto', minHeight: 0 }}>
         <li>
           <Link 
             href="/dashboards" 
@@ -290,7 +298,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
         </li>
       </ul>
       
-      <div className="mt-auto pt-4 border-t border-gray-700">
+      <div className="p-4 mt-4 border-t border-gray-700" style={{ flexShrink: 0 }}>
         <button 
           onClick={handleLogout} 
           className="flex items-center w-full py-2 px-4 rounded hover:bg-gray-700 text-gray-300 hover:text-white transition-colors"
