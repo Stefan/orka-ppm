@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation'
 import { Menu } from 'lucide-react'
 import Sidebar from '../navigation/Sidebar'
 import HelpChat from '../HelpChat'
-import HelpChatToggle from '../HelpChatToggle'
 import { useIsMobile } from '../../hooks/useMediaQuery'
 
 export interface AppLayoutProps {
@@ -93,9 +92,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </main>
         </div>
 
-        {/* Help Chat Integration */}
+        {/* Help Chat Integration - Toggle is now in Sidebar */}
         <HelpChat />
-        <HelpChatToggle />
       </div>
     </HelpChatProvider>
   )

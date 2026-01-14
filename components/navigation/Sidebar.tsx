@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { LogOut, Activity, MessageSquare, X, Users, BarChart3 } from 'lucide-react'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
+import { CompactHelpChatToggle } from '../HelpChatToggle'
 
 export interface SidebarProps {
   isOpen?: boolean
@@ -61,6 +62,11 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             >
               <X className="h-5 w-5" />
             </button>
+          </div>
+          
+          {/* AI Help Button for mobile */}
+          <div className="p-4 border-b border-gray-700">
+            <CompactHelpChatToggle className="w-full justify-start text-white hover:bg-gray-700 py-3 px-4 rounded min-h-[44px]" />
           </div>
           
           <ul className="space-y-2 flex-1 p-4">
@@ -212,13 +218,18 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
         }
       `}</style>
       
-      <div style={{ padding: '1rem', marginBottom: '1rem', flexShrink: 0 }}>
+      <div style={{ padding: '1rem', marginBottom: '0.5rem', flexShrink: 0 }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#ffffff', margin: 0, display: 'block' }}>
           ORKA PPM
         </h1>
         <p style={{ fontSize: '0.875rem', color: '#9ca3af', marginTop: '0.25rem', display: 'block' }}>
           Portfolio Management
         </p>
+      </div>
+      
+      {/* AI Help Button integrated in sidebar */}
+      <div style={{ padding: '0 1rem', marginBottom: '1rem', flexShrink: 0 }}>
+        <CompactHelpChatToggle className="w-full justify-start text-white hover:bg-gray-700 py-2 px-4 rounded" />
       </div>
       
       <ul style={{ padding: '0 1rem', margin: 0, listStyle: 'none', flex: '1 1 auto', minHeight: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
