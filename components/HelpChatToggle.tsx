@@ -78,10 +78,7 @@ export function HelpChatToggle({ className }: HelpChatToggleProps) {
             {hasUnreadTips ? (
               <Lightbulb className="h-5 w-5" />
             ) : (
-              <div className="relative">
-                <MessageCircleQuestion className="h-5 w-5" />
-                <PanelRight className="h-2.5 w-2.5 absolute -bottom-0.5 -right-0.5 opacity-70" />
-              </div>
+              <MessageCircleQuestion className="h-5 w-5" />
             )}
             
             {hasUnreadTips && (
@@ -154,10 +151,7 @@ export function HelpChatToggle({ className }: HelpChatToggleProps) {
           ) : hasUnreadTips ? (
             <Lightbulb className="h-5 w-5" />
           ) : (
-            <div className="relative">
-              <MessageCircleQuestion className="h-5 w-5" />
-              <PanelRight className="h-2.5 w-2.5 absolute -bottom-0.5 -right-0.5 opacity-70" />
-            </div>
+            <MessageCircleQuestion className="h-5 w-5" />
           )}
           
           {hasUnreadTips && !state.isOpen && (
