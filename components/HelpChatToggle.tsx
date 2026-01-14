@@ -49,7 +49,7 @@ export function HelpChatToggle({ className }: HelpChatToggleProps) {
     setShowTooltip(false)
   }
 
-  // Mobile version - Top right corner, no overlap
+  // Mobile version - Bottom left corner, no overlap
   if (isMobile) {
     return (
       <>
@@ -57,7 +57,7 @@ export function HelpChatToggle({ className }: HelpChatToggleProps) {
           ref={buttonRef}
           onClick={handleClick}
           className={cn(
-            'fixed top-4 right-4 z-[9999]',
+            'fixed bottom-4 left-4 z-[9999]',
             'w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white',
             'rounded-lg shadow-lg hover:shadow-xl',
             'flex items-center justify-center',
@@ -69,8 +69,8 @@ export function HelpChatToggle({ className }: HelpChatToggleProps) {
           )}
           style={{
             position: 'fixed',
-            top: '1rem',
-            right: '1rem',
+            bottom: '1rem',
+            left: '1rem',
             zIndex: 9999
           }}
         >
@@ -99,11 +99,11 @@ export function HelpChatToggle({ className }: HelpChatToggleProps) {
         {showTooltip && (
           <div
             ref={tooltipRef}
-            className="fixed top-4 right-20 z-[9999]"
+            className="fixed bottom-4 left-20 z-[9999]"
             style={{
               position: 'fixed',
-              top: '1rem',
-              right: '5rem',
+              bottom: '1rem',
+              left: '5rem',
               zIndex: 9999
             }}
           >
@@ -116,7 +116,7 @@ export function HelpChatToggle({ className }: HelpChatToggleProps) {
     )
   }
 
-  // Desktop version - Top right corner, no overlap
+  // Desktop version - Bottom left corner, no overlap with sidebar or other elements
   return (
     <>
       <button
@@ -125,7 +125,7 @@ export function HelpChatToggle({ className }: HelpChatToggleProps) {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         className={cn(
-          'fixed top-4 right-4 z-[9999]',
+          'fixed bottom-4 left-4 z-[9999]',
           'w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white',
           'rounded-lg shadow-lg hover:shadow-xl',
           'flex items-center justify-center',
@@ -137,8 +137,8 @@ export function HelpChatToggle({ className }: HelpChatToggleProps) {
         )}
         style={{
           position: 'fixed',
-          top: '1rem',
-          right: '1rem',
+          bottom: '1rem',
+          left: '1rem',
           zIndex: 9999
         }}
       >
@@ -173,11 +173,11 @@ export function HelpChatToggle({ className }: HelpChatToggleProps) {
       {showTooltip && (
         <div
           ref={tooltipRef}
-          className="fixed top-4 right-20 z-[9999]"
+          className="fixed bottom-4 left-20 z-[9999]"
           style={{
             position: 'fixed',
-            top: '1rem',
-            right: '5rem',
+            bottom: '1rem',
+            left: '5rem',
             zIndex: 9999
           }}
         >
