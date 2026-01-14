@@ -199,15 +199,12 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
     )
   }
 
-  // Desktop sidebar - SIMPLIFIED: No browser detection, just standard CSS
+  // Desktop sidebar - Standard CSS that works in all browsers
   return (
     <nav
       ref={sidebarRef}
       id="navigation"
-      className="w-64 h-screen p-4 bg-gray-800 text-white flex-col overflow-y-auto hidden lg:flex"
-      style={{
-        display: isMobile ? 'none' : undefined
-      }}
+      className="hidden lg:flex lg:flex-col w-64 h-screen p-4 bg-gray-800 text-white overflow-y-auto"
     >
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">ORKA PPM</h1>
@@ -215,17 +212,98 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
       </div>
       
       <ul className="space-y-2 flex-1">
-        <li><Link href="/dashboards" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center">Portfolio Dashboards</Link></li>
-        <li><Link href="/scenarios" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center">What-If Scenarios</Link></li>
-        <li><Link href="/resources" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center">Resource Management</Link></li>
-        <li><Link href="/reports" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center">AI Reports & Analytics</Link></li>
-        <li><Link href="/financials" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center">Financial Tracking</Link></li>
-        <li><Link href="/risks" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center">Risk/Issue Registers</Link></li>
-        <li><Link href="/monte-carlo" className="flex items-center py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"><BarChart3 className="mr-2 h-4 w-4" />Monte Carlo Analysis</Link></li>
-        <li><Link href="/changes" className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center">Change Management</Link></li>
-        <li><Link href="/feedback" className="flex items-center py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"><MessageSquare className="mr-2 h-4 w-4" />Feedback & Ideas</Link></li>
-        <li><Link href="/admin/performance" className="flex items-center py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"><Activity className="mr-2 h-4 w-4" />Performance Monitor</Link></li>
-        <li><Link href="/admin/users" className="flex items-center py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"><Users className="mr-2 h-4 w-4" />User Management</Link></li>
+        <li>
+          <Link 
+            href="/dashboards" 
+            className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
+          >
+            Portfolio Dashboards
+          </Link>
+        </li>
+        <li>
+          <Link 
+            href="/scenarios" 
+            className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
+          >
+            What-If Scenarios
+          </Link>
+        </li>
+        <li>
+          <Link 
+            href="/resources" 
+            className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
+          >
+            Resource Management
+          </Link>
+        </li>
+        <li>
+          <Link 
+            href="/reports" 
+            className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
+          >
+            AI Reports & Analytics
+          </Link>
+        </li>
+        <li>
+          <Link 
+            href="/financials" 
+            className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
+          >
+            Financial Tracking
+          </Link>
+        </li>
+        <li>
+          <Link 
+            href="/risks" 
+            className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
+          >
+            Risk/Issue Registers
+          </Link>
+        </li>
+        <li>
+          <Link 
+            href="/monte-carlo" 
+            className="flex items-center py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
+          >
+            <BarChart3 className="mr-2 h-4 w-4" />
+            Monte Carlo Analysis
+          </Link>
+        </li>
+        <li>
+          <Link 
+            href="/changes" 
+            className="block py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
+          >
+            Change Management
+          </Link>
+        </li>
+        <li>
+          <Link 
+            href="/feedback" 
+            className="flex items-center py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
+          >
+            <MessageSquare className="mr-2 h-4 w-4" />
+            Feedback & Ideas
+          </Link>
+        </li>
+        <li>
+          <Link 
+            href="/admin/performance" 
+            className="flex items-center py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
+          >
+            <Activity className="mr-2 h-4 w-4" />
+            Performance Monitor
+          </Link>
+        </li>
+        <li>
+          <Link 
+            href="/admin/users" 
+            className="flex items-center py-2 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
+          >
+            <Users className="mr-2 h-4 w-4" />
+            User Management
+          </Link>
+        </li>
       </ul>
       
       <div className="mt-auto pt-4 border-t border-gray-700">
