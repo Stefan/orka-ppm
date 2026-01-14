@@ -77,8 +77,10 @@ export function HelpChatToggle({ className }: HelpChatToggleProps) {
           <div className="relative">
             {hasUnreadTips ? (
               <Lightbulb className="h-5 w-5" />
+            ) : state.isOpen ? (
+              <PanelRightClose className="h-5 w-5" />
             ) : (
-              <MessageCircleQuestion className="h-5 w-5" />
+              <PanelRightOpen className="h-5 w-5" />
             )}
             
             {hasUnreadTips && (
@@ -142,16 +144,13 @@ export function HelpChatToggle({ className }: HelpChatToggleProps) {
           zIndex: 9999
         }}
       >
-        <div className={cn(
-          'transition-transform duration-200',
-          state.isOpen && 'rotate-180'
-        )}>
+        <div>
           {state.isOpen ? (
             <PanelRightClose className="h-5 w-5" />
           ) : hasUnreadTips ? (
             <Lightbulb className="h-5 w-5" />
           ) : (
-            <MessageCircleQuestion className="h-5 w-5" />
+            <PanelRightOpen className="h-5 w-5" />
           )}
           
           {hasUnreadTips && !state.isOpen && (
