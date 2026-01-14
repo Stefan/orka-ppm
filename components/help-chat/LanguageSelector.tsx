@@ -65,7 +65,7 @@ export function LanguageSelector({
       
       if (success) {
         // Update help chat preferences
-        await updatePreferences({ language: languageCode as 'en' | 'de' | 'fr' })
+        await updatePreferences({ language: languageCode as any })
       }
     } catch (err) {
       console.error('Failed to change language:', err)

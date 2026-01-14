@@ -3,6 +3,9 @@
  * Type definitions for the AI-powered help chat system
  */
 
+// Supported languages type
+export type SupportedLanguage = 'en' | 'de' | 'fr' | 'es' | 'it' | 'pt' | 'nl' | 'pl' | 'ru' | 'zh' | 'ja'
+
 // Core Help Chat Types
 export interface HelpChatState {
   isOpen: boolean
@@ -12,7 +15,7 @@ export interface HelpChatState {
   userPreferences: HelpChatUserPreferences
   sessionId: string
   proactiveTipsEnabled: boolean
-  language: 'en' | 'de' | 'fr'
+  language: SupportedLanguage
   isTyping: boolean
   error: string | null
 }
@@ -27,7 +30,7 @@ export interface PageContext {
 }
 
 export interface HelpChatUserPreferences {
-  language: 'en' | 'de' | 'fr'
+  language: SupportedLanguage
   proactiveTips: boolean
   chatPosition: 'right' | 'left'
   soundEnabled: boolean
@@ -96,7 +99,7 @@ export interface HelpQueryRequest {
   query: string
   sessionId?: string
   context: PageContext
-  language: 'en' | 'de' | 'fr'
+  language: SupportedLanguage
   includeProactiveTips?: boolean
 }
 
@@ -263,8 +266,8 @@ export interface HelpChatConfig {
   retryAttempts: number
   enableAnalytics: boolean
   enableProactiveTips: boolean
-  supportedLanguages: ('en' | 'de' | 'fr')[]
-  defaultLanguage: 'en' | 'de' | 'fr'
+  supportedLanguages: SupportedLanguage[]
+  defaultLanguage: SupportedLanguage
   rateLimits: {
     messagesPerMinute: number
     messagesPerHour: number

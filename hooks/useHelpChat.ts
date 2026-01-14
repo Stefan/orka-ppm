@@ -6,7 +6,8 @@ import { useVisualGuideIntegration } from '../components/help-chat/VisualGuideIn
 import type { 
   UseHelpChatReturn, 
   ChatMessage, 
-  HelpChatUserPreferences 
+  HelpChatUserPreferences,
+  SupportedLanguage
 } from '../types/help-chat'
 
 /**
@@ -327,7 +328,7 @@ export function useHelpChatPreferences() {
     })
   }, [updatePreferences, state.userPreferences.proactiveTips])
 
-  const setLanguage = useCallback((language: 'en' | 'de' | 'fr') => {
+  const setLanguage = useCallback((language: SupportedLanguage) => {
     updatePreferences({ language })
   }, [updatePreferences])
 
