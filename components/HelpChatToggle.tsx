@@ -71,7 +71,8 @@ export function HelpChatToggle({ className }: HelpChatToggleProps) {
             position: 'fixed',
             top: '1rem',
             right: '1rem',
-            zIndex: 9999
+            zIndex: 9999,
+            willChange: isAnimating ? 'transform' : 'auto'
           }}
         >
           <div className="relative">

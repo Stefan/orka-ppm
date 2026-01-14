@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import { 
   X, 
   Send, 
@@ -16,8 +17,13 @@ import { useMediaQuery } from '../hooks/useMediaQuery'
 import type { HelpFeedbackRequest } from '../types/help-chat'
 import { cn } from '../lib/utils/design-system'
 import { MessageRenderer } from './help-chat/MessageRenderer'
-import { LanguageSelector } from './help-chat/LanguageSelector'
 import type { QuickAction } from '../types/help-chat'
+
+// Dynamic import for LanguageSelector to reduce initial bundle
+const LanguageSelector = dynamic(
+  () => import('./help-chat/LanguageSelector').then(mod => ({ default: mod.LanguageSelector })),
+  { ssr: false }
+)
 
 interface HelpChatProps {
   className?: string
@@ -141,6 +147,9 @@ export function HelpChat({ className }: HelpChatProps) {
             state.isOpen ? 'translate-x-0' : 'translate-x-full',
             className
           )}
+          style={{
+            willChange: state.isOpen ? 'transform' : 'auto'
+          }}
         >
           <div className="flex flex-col h-full bg-white">
             <header className="flex items-center justify-between p-4 border-b-2 border-gray-200 bg-white">
@@ -269,6 +278,9 @@ export function HelpChat({ className }: HelpChatProps) {
           isMinimized && 'translate-x-full',
           className
         )}
+        style={{
+          willChange: state.isOpen ? 'transform' : 'auto'
+        }}
       >
         <div className="flex flex-col h-full">
           <header className="flex items-center justify-between p-4 border-b-2 border-gray-200 bg-white">

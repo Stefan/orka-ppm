@@ -1,14 +1,16 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, lazy, Suspense } from 'react'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
 import { HelpChatProvider } from '../../app/providers/HelpChatProvider'
 import { useRouter } from 'next/navigation'
 import { Menu } from 'lucide-react'
 import Sidebar from '../navigation/Sidebar'
-import HelpChat from '../HelpChat'
 import HelpChatToggle from '../HelpChatToggle'
 import { useIsMobile } from '../../hooks/useMediaQuery'
+
+// Lazy load HelpChat for better performance
+const HelpChat = lazy(() => import('../HelpChat'))
 
 export interface AppLayoutProps {
   children: React.ReactNode
@@ -96,8 +98,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
         {/* Help Chat Toggle - Floating at bottom-left to avoid collisions */}
         <HelpChatToggle />
 
-        {/* Help Chat Integration */}
-        <HelpChat />
+        {/* Help Chat Integration - Lazy loaded */}
+        <Suspense fallback={null}>
+          <HelpChat />
+        </Suspense>
       </div>
     </HelpChatProvider>
   )
