@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { FileText, Loader, Send, Bot, User, AlertTriangle, RefreshCw } from 'lucide-react'
+import { FileText, Loader, Send, Bot, User, AlertTriangle, RefreshCw, Sparkles, CheckCircle, XCircle } from 'lucide-react'
 import AppLayout from '../../components/shared/AppLayout'
 import { getApiUrl } from '../../lib/api/client'
 
@@ -13,6 +13,17 @@ interface ChatMessage {
   timestamp: Date
   sources?: Array<{type: string, count?: number, data?: string}>
   confidence?: number
+  action?: string
+  actionData?: Record<string, any>
+  suggestedChanges?: Array<{
+    id: string
+    section: string
+    changeType: string
+    content: string
+    reason: string
+    confidence: number
+    applied: boolean
+  }>
 }
 
 interface RAGResponse {
@@ -66,6 +77,22 @@ export default function Reports() {
   const [showError, setShowError] = useState(false)
   const [currentError, setCurrentError] = useState<ChatError | null>(null)
   const [isMobile, setIsMobile] = useState(false)
+  const [isPMRMode, setIsPMRMode] = useState(false)
+  const [pmrContext, setPMRContext] = useState<{
+    reportId?: string
+    projectId?: string
+    currentSection?: string
+  }>({})
+  const [pendingChanges, setPendingChanges] = useState<Array<{
+    id: string
+    section: string
+    changeType: string
+    content: string
+    reason: string
+    confidence: number
+    applied: boolean
+  }>>([])
+  const [showPMRActions, setShowPMRActions] = useState(false)
 
   // Handle window size detection on client side only
   useEffect(() => {
@@ -215,10 +242,18 @@ export default function Reports() {
           count: 1,
           data: `${s.type}:${s.id} (${(s.similarity * 100).toFixed(1)}% match)`
         })),
-        confidence: data.confidence_score
+        confidence: data.confidence_score,
+        action: data.action,
+        actionData: data.actionData,
+        suggestedChanges: data.suggestedChanges
       }
 
       setMessages(prev => [...prev, assistantMessage])
+      
+      // Handle PMR-specific suggested changes
+      if (data.suggestedChanges && data.suggestedChanges.length > 0) {
+        setPendingChanges(prev => [...prev, ...data.suggestedChanges])
+      }
       
       // Show AI status if in mock mode
       if (data.status === 'ai_unavailable') {
@@ -298,6 +333,93 @@ export default function Reports() {
     }
   }
 
+  const applySuggestedChange = useCallback((changeId: string) => {
+    setPendingChanges(prev => 
+      prev.map(change => 
+        change.id === changeId 
+          ? { ...change, applied: true }
+          : change
+      )
+    )
+  }, [])
+
+  const rejectSuggestedChange = useCallback((changeId: string) => {
+    setPendingChanges(prev => 
+      prev.filter(change => change.id !== changeId)
+    )
+  }, [])
+
+  const sendPMRAction = useCallback(async (
+    action: string,
+    message: string
+  ) => {
+    if (!session?.access_token) return
+
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: message,
+      timestamp: new Date(),
+      action
+    }
+
+    setMessages(prev => [...prev, userMessage])
+    setCurrentQuery('')
+    setIsLoading(true)
+
+    try {
+      const response = await fetch(getApiUrl('/reports/pmr/chat'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          message,
+          action,
+          context: pmrContext,
+          conversation_id: conversationId
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+
+      const assistantMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'assistant',
+        content: data.response,
+        timestamp: new Date(),
+        action: data.action,
+        actionData: data.actionData,
+        suggestedChanges: data.suggestedChanges,
+        confidence: data.confidence_score,
+        sources: data.sources?.map((s: any) => ({
+          type: s.type,
+          count: 1,
+          data: `${s.type}:${s.id} (${(s.similarity * 100).toFixed(1)}% match)`
+        }))
+      }
+
+      setMessages(prev => [...prev, assistantMessage])
+
+      if (data.suggestedChanges && data.suggestedChanges.length > 0) {
+        setPendingChanges(prev => [...prev, ...data.suggestedChanges])
+      }
+
+      resetErrorState()
+    } catch (error) {
+      const chatError = createChatError(error)
+      setCurrentError(chatError)
+      setShowError(true)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [session, pmrContext, conversationId, resetErrorState, createChatError])
+
   const formatTimestamp = (date: Date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
@@ -322,6 +444,17 @@ export default function Reports() {
               </div>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
+              <button
+                onClick={() => setIsPMRMode(!isPMRMode)}
+                className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-lg text-sm ${
+                  isPMRMode 
+                    ? 'bg-purple-600 text-white hover:bg-purple-700' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                <Sparkles className="w-4 h-4 flex-shrink-0" />
+                <span className="hidden sm:inline">PMR Mode</span>
+              </button>
               <button
                 onClick={() => setShowReportOptions(!showReportOptions)}
                 className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
@@ -364,6 +497,109 @@ export default function Reports() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* PMR Actions Panel */}
+      {isPMRMode && (
+        <div className="bg-purple-50 border-b border-purple-200 px-4 sm:px-6 py-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-2">
+              <Sparkles className="w-5 h-5 text-purple-600" />
+              <span className="text-sm font-medium text-purple-900">PMR AI Actions</span>
+            </div>
+            <button
+              onClick={() => setShowPMRActions(!showPMRActions)}
+              className="text-sm text-purple-600 hover:text-purple-800"
+            >
+              {showPMRActions ? 'Hide' : 'Show'} Actions
+            </button>
+          </div>
+          
+          {showPMRActions && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <button
+                onClick={() => sendPMRAction('update_section', 'Update executive summary with latest data')}
+                disabled={isLoading}
+                className="px-3 py-2 bg-white border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
+              >
+                Update Section
+              </button>
+              <button
+                onClick={() => sendPMRAction('generate_insight', 'Generate budget insights')}
+                disabled={isLoading}
+                className="px-3 py-2 bg-white border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
+              >
+                Generate Insights
+              </button>
+              <button
+                onClick={() => sendPMRAction('analyze_data', 'Analyze schedule performance')}
+                disabled={isLoading}
+                className="px-3 py-2 bg-white border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
+              >
+                Analyze Data
+              </button>
+              <button
+                onClick={() => sendPMRAction('suggest_content', 'Suggest improvements for risk section')}
+                disabled={isLoading}
+                className="px-3 py-2 bg-white border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
+              >
+                Suggest Content
+              </button>
+              <button
+                onClick={() => sendPMRAction('modify_content', 'Make executive summary more concise')}
+                disabled={isLoading}
+                className="px-3 py-2 bg-white border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
+              >
+                Modify Content
+              </button>
+              <button
+                onClick={() => sendPMRAction('add_visualization', 'Add budget variance chart')}
+                disabled={isLoading}
+                className="px-3 py-2 bg-white border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
+              >
+                Add Visualization
+              </button>
+            </div>
+          )}
+
+          {/* Pending Changes */}
+          {pendingChanges.length > 0 && (
+            <div className="mt-4 space-y-2">
+              <span className="text-sm font-medium text-purple-900">Pending Changes ({pendingChanges.filter(c => !c.applied).length})</span>
+              {pendingChanges.filter(c => !c.applied).map((change) => (
+                <div key={change.id} className="bg-white border border-purple-200 rounded-lg p-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="text-xs font-medium text-purple-700">{change.section}</span>
+                        <span className="text-xs text-gray-500">({change.changeType})</span>
+                        <span className="text-xs text-gray-500">{Math.round(change.confidence * 100)}% confidence</span>
+                      </div>
+                      <p className="text-sm text-gray-700 mb-1">{change.content}</p>
+                      <p className="text-xs text-gray-500">{change.reason}</p>
+                    </div>
+                    <div className="flex space-x-2 ml-3">
+                      <button
+                        onClick={() => applySuggestedChange(change.id)}
+                        className="p-1 text-green-600 hover:text-green-800"
+                        title="Apply change"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => rejectSuggestedChange(change.id)}
+                        className="p-1 text-red-600 hover:text-red-800"
+                        title="Reject change"
+                      >
+                        <XCircle className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -446,6 +682,36 @@ export default function Reports() {
                     }`}
                   >
                     <div className="whitespace-pre-wrap break-words text-sm sm:text-base text-gray-900">{message.content}</div>
+                    
+                    {/* PMR Action Indicator */}
+                    {message.action && (
+                      <div className="mt-2 flex items-center space-x-2">
+                        <Sparkles className="w-3 h-3 text-purple-600" />
+                        <span className="text-xs text-purple-600 font-medium">
+                          Action: {message.action.replace(/_/g, ' ')}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Suggested Changes */}
+                    {message.suggestedChanges && message.suggestedChanges.length > 0 && (
+                      <div className="mt-3 space-y-2">
+                        <span className="text-xs font-medium text-gray-700">Suggested Changes:</span>
+                        {message.suggestedChanges.map((change) => (
+                          <div key={change.id} className="bg-purple-50 border border-purple-200 rounded p-2">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center space-x-2 mb-1">
+                                  <span className="text-xs font-medium text-purple-700">{change.section}</span>
+                                  <span className="text-xs text-gray-500">({change.changeType})</span>
+                                </div>
+                                <p className="text-xs text-gray-700">{change.content}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     
                     {/* Sources and Confidence for Assistant Messages */}
                     {message.type === 'assistant' && (message.sources || message.confidence !== undefined) && (
@@ -535,13 +801,19 @@ export default function Reports() {
         <div className="mt-4">
           <p className="text-xs text-gray-500 mb-2">Versuchen Sie zu fragen:</p>
           <div className="flex flex-wrap gap-2">
-            {[
+            {isPMRMode ? [
+              "Update executive summary with latest project status",
+              "Generate budget variance insights",
+              "Analyze schedule performance trends",
+              "Suggest improvements for risk section",
+              "Add resource utilization chart"
+            ] : [
               "Wie ist der aktuelle Status aller Projekte?",
               "Welche Ressourcen sind überbelastet?",
               "Zeige mir die Budgetnutzung aller Projekte",
               "Erstelle einen Risikobewertungsbericht",
               "Welche Fähigkeiten sind am meisten gefragt?"
-            ].map((example, index) => (
+            ]}.map((example, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentQuery(example)}

@@ -201,7 +201,7 @@ export interface AISuggestion {
 
 // Event types for real-time collaboration
 export interface CollaborationEvent {
-  type: 'section_update' | 'cursor_position' | 'comment_add' | 'user_joined' | 'user_left'
+  type: 'section_update' | 'cursor_position' | 'comment_add' | 'comment_resolve' | 'user_joined' | 'user_left' | 'conflict_detected' | 'conflict_resolved' | 'sync' | 'heartbeat'
   user_id: string
   timestamp: string
   data: any

@@ -50,3 +50,11 @@ export {
   useFeatureCheck,
   useProgressiveClasses
 } from './useProgressiveEnhancement'
+
+// PMR collaboration hooks
+export { useRealtimePMR } from './useRealtimePMR'
+export type { 
+  ActiveUser,
+  RealtimePMRState,
+  RealtimePMRActions
+} from './useRealtimePMR'
