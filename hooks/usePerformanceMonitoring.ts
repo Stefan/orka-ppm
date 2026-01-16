@@ -1,503 +1,401 @@
 /**
- * Performance monitoring hooks for dashboard components
- * Implements Requirements 6.1, 6.2, 6.3, 6.4, 6.5
+ * Performance Monitoring Hook for Enhanced PMR
+ * Client-side performance tracking and reporting
  */
 
-import { useEffect, useRef, useCallback, useState } from 'react'
-import { diagnosticCollector, logPerformanceMetric } from '../lib/diagnostics/diagnostic-collector'
-import { performanceMonitor } from '../lib/monitoring/performance-utils'
+import { useEffect, useCallback, useRef, useState } from 'react'
 
-export interface PerformanceMetrics {
-  renderTime: number
-  mountTime: number
-  updateCount: number
-  lastUpdateTime: number
-  memoryUsage?: {
-    usedJSHeapSize: number
-    totalJSHeapSize: number
-    usagePercentage: number
+// ============================================================================
+// Types
+// ============================================================================
+
+export interface PerformanceMetric {
+  name: string
+  value: number
+  timestamp: number
+  tags?: Record<string, string>
+}
+
+export interface PerformanceReport {
+  metrics: PerformanceMetric[]
+  webVitals: {
+    lcp?: number // Largest Contentful Paint
+    fid?: number // First Input Delay
+    cls?: number // Cumulative Layout Shift
+    fcp?: number // First Contentful Paint
+    ttfb?: number // Time to First Byte
   }
-}
-
-export interface ComponentPerformanceData {
-  componentName: string
-  metrics: PerformanceMetrics
-  isSlowComponent: boolean
-  recommendations: string[]
-}
-
-/**
- * Hook for monitoring component render performance
- */
-export function useComponentPerformance(componentName: string) {
-  const mountTimeRef = useRef<number>(Date.now())
-  const renderStartRef = useRef<number>(0)
-  const updateCountRef = useRef<number>(0)
-  const lastUpdateTimeRef = useRef<number>(0)
-  const [metrics, setMetrics] = useState<PerformanceMetrics>({
-    renderTime: 0,
-    mountTime: 0,
-    updateCount: 0,
-    lastUpdateTime: 0
-  })
-
-  // Mark render start
-  const markRenderStart = useCallback(() => {
-    renderStartRef.current = performance.now()
-  }, [])
-
-  // Mark render end and calculate metrics
-  const markRenderEnd = useCallback(() => {
-    if (renderStartRef.current > 0) {
-      const renderTime = performance.now() - renderStartRef.current
-      const mountTime = Date.now() - mountTimeRef.current
-      updateCountRef.current += 1
-      lastUpdateTimeRef.current = Date.now()
-
-      const newMetrics: PerformanceMetrics = {
-        renderTime,
-        mountTime,
-        updateCount: updateCountRef.current,
-        lastUpdateTime: lastUpdateTimeRef.current
-      }
-
-      // Add memory usage if available
-      const memoryInfo = performanceMonitor.getMemoryUsage()
-      if (memoryInfo) {
-        newMetrics.memoryUsage = memoryInfo
-      }
-
-      setMetrics(newMetrics)
-
-      // Log performance metric
-      logPerformanceMetric({
-        name: 'component_render_time',
-        value: renderTime,
-        unit: 'ms',
-        component: componentName,
-        context: {
-          updateCount: updateCountRef.current,
-          mountTime,
-          memoryUsage: memoryInfo
-        }
-      })
-
-      // Warn about slow renders
-      if (renderTime > 16) { // More than one frame at 60fps
-        console.warn(`Slow render detected in ${componentName}: ${renderTime.toFixed(2)}ms`)
-        
-        logPerformanceMetric({
-          name: 'slow_component_render',
-          value: renderTime,
-          unit: 'ms',
-          component: componentName,
-          context: {
-            threshold: 16,
-            severity: renderTime > 100 ? 'high' : 'medium'
-          }
-        })
-      }
-
-      renderStartRef.current = 0
-    }
-  }, [componentName])
-
-  // Auto-track renders
-  useEffect(() => {
-    markRenderStart()
-    markRenderEnd()
-  })
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      const totalMountTime = Date.now() - mountTimeRef.current
-      logPerformanceMetric({
-        name: 'component_lifetime',
-        value: totalMountTime,
-        unit: 'ms',
-        component: componentName,
-        context: {
-          totalUpdates: updateCountRef.current,
-          averageRenderTime: metrics.renderTime
-        }
-      })
-    }
-  }, [componentName, metrics.renderTime])
-
-  const getPerformanceData = useCallback((): ComponentPerformanceData => {
-    const isSlowComponent = metrics.renderTime > 16 || (metrics.memoryUsage?.usagePercentage || 0) > 80
-    const recommendations: string[] = []
-
-    if (metrics.renderTime > 16) {
-      recommendations.push('Consider optimizing render logic or using React.memo')
-    }
-    if (metrics.updateCount > 100) {
-      recommendations.push('High update frequency detected - consider debouncing or throttling')
-    }
-    if ((metrics.memoryUsage?.usagePercentage || 0) > 80) {
-      recommendations.push('High memory usage - check for memory leaks')
-    }
-
-    return {
-      componentName,
-      metrics,
-      isSlowComponent,
-      recommendations
-    }
-  }, [componentName, metrics])
-
-  return {
-    metrics,
-    markRenderStart,
-    markRenderEnd,
-    getPerformanceData
+  resourceTiming: {
+    totalResources: number
+    totalSize: number
+    totalDuration: number
   }
+  customMetrics: Record<string, number>
 }
 
-/**
- * Hook for monitoring page load performance
- */
-export function usePageLoadPerformance(pageName: string) {
-  const [loadMetrics, setLoadMetrics] = useState<{
-    loadTime: number
-    domContentLoaded: number
-    firstContentfulPaint: number
-    largestContentfulPaint: number
-    cumulativeLayoutShift: number
-    firstInputDelay: number
-  } | null>(null)
+// ============================================================================
+// Performance Monitoring Hook
+// ============================================================================
 
-  useEffect(() => {
-    const measurePageLoad = () => {
-      if (typeof performance === 'undefined') return
+export function usePerformanceMonitoring(options: {
+  enabled?: boolean
+  reportInterval?: number // milliseconds
+  onReport?: (report: PerformanceReport) => void
+} = {}) {
+  const {
+    enabled = true,
+    reportInterval = 30000, // 30 seconds
+    onReport
+  } = options
 
-      // Wait for page to be fully loaded
-      if (document.readyState !== 'complete') {
-        window.addEventListener('load', measurePageLoad, { once: true })
-        return
-      }
+  const metricsRef = useRef<PerformanceMetric[]>([])
+  const customMetricsRef = useRef<Record<string, number>>({})
+  const reportTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const [isMonitoring, setIsMonitoring] = useState(false)
 
-      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
-      if (!navigation) return
+  // ========================================================================
+  // Core Metric Recording
+  // ========================================================================
 
-      const loadTime = navigation.loadEventEnd - navigation.startTime
-      const domContentLoaded = navigation.domContentLoadedEventEnd - navigation.startTime
+  const recordMetric = useCallback((
+    name: string,
+    value: number,
+    tags?: Record<string, string>
+  ) => {
+    if (!enabled) return
 
-      // Get paint metrics
-      let firstContentfulPaint = 0
-      const fcpEntry = performance.getEntriesByName('first-contentful-paint')[0]
-      if (fcpEntry) {
-        firstContentfulPaint = fcpEntry.startTime
-      }
-
-      // Get Core Web Vitals from performance monitor
-      const lcpMetric = performanceMonitor.getMetricsByName('LCP')
-      const clsMetric = performanceMonitor.getMetricsByName('CLS')
-      const fidMetric = performanceMonitor.getMetricsByName('FID')
-
-      const largestContentfulPaint = lcpMetric?.[lcpMetric.length - 1]?.value ?? 0
-      const cumulativeLayoutShift = clsMetric?.[clsMetric.length - 1]?.value ?? 0
-      const firstInputDelay = fidMetric?.[fidMetric.length - 1]?.value ?? 0
-
-      const metrics = {
-        loadTime,
-        domContentLoaded,
-        firstContentfulPaint,
-        largestContentfulPaint,
-        cumulativeLayoutShift,
-        firstInputDelay
-      }
-
-      setLoadMetrics(metrics)
-
-      // Log all metrics
-      Object.entries(metrics).forEach(([name, value]) => {
-        logPerformanceMetric({
-          name: `page_${name}`,
-          value,
-          unit: name.includes('shift') ? 'score' : 'ms',
-          component: pageName,
-          context: {
-            pageName,
-            url: window.location.href,
-            referrer: document.referrer
-          }
-        })
-      })
-
-      // Log overall page performance
-      logPerformanceMetric({
-        name: 'page_load_complete',
-        value: loadTime,
-        unit: 'ms',
-        component: pageName,
-        context: {
-          ...metrics,
-          pageName,
-          url: window.location.href
-        }
-      })
+    const metric: PerformanceMetric = {
+      name,
+      value,
+      timestamp: Date.now(),
+      tags
     }
 
-    measurePageLoad()
-  }, [pageName])
+    metricsRef.current.push(metric)
 
-  return loadMetrics
-}
+    // Keep only last 100 metrics to prevent memory issues
+    if (metricsRef.current.length > 100) {
+      metricsRef.current = metricsRef.current.slice(-100)
+    }
+  }, [enabled])
 
-/**
- * Hook for monitoring API call performance
- */
-export function useApiPerformanceMonitoring() {
-  const trackApiCall = useCallback(async <T>(
-    apiCall: () => Promise<T>,
-    endpoint: string,
-    method: string = 'GET'
-  ): Promise<T> => {
-    const startTime = performance.now()
-    const startTimestamp = Date.now()
+  const recordCustomMetric = useCallback((name: string, value: number) => {
+    if (!enabled) return
+    customMetricsRef.current[name] = value
+  }, [enabled])
+
+  // ========================================================================
+  // Web Vitals Monitoring
+  // ========================================================================
+
+  const captureWebVitals = useCallback(() => {
+    if (!enabled || typeof window === 'undefined') return {}
+
+    const vitals: PerformanceReport['webVitals'] = {}
 
     try {
-      const result = await apiCall()
-      const endTime = performance.now()
-      const responseTime = endTime - startTime
+      // Get navigation timing
+      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
+      if (navigation) {
+        vitals.ttfb = navigation.responseStart - navigation.requestStart
+        vitals.fcp = navigation.domContentLoadedEventEnd - navigation.fetchStart
+      }
 
-      // Log successful API call
-      logPerformanceMetric({
-        name: 'api_response_time',
-        value: responseTime,
-        unit: 'ms',
-        component: 'api-client',
-        context: {
-          endpoint,
-          method,
-          success: true,
-          timestamp: startTimestamp
-        }
-      })
+      // Get paint timing
+      const paintEntries = performance.getEntriesByType('paint')
+      const lcp = paintEntries.find(entry => entry.name === 'largest-contentful-paint')
+      if (lcp) {
+        vitals.lcp = lcp.startTime
+      }
 
-      // Log to diagnostic collector
-      diagnosticCollector.logUserAction({
-        action: 'api_call_success',
-        component: 'api-client',
-        data: {
-          endpoint,
-          method,
-          responseTime,
-          timestamp: startTimestamp
-        }
-      })
+      // Get layout shift (CLS)
+      const layoutShifts = performance.getEntriesByType('layout-shift') as any[]
+      if (layoutShifts.length > 0) {
+        vitals.cls = layoutShifts.reduce((sum, entry) => sum + entry.value, 0)
+      }
 
+      // Get first input delay (FID)
+      const firstInput = performance.getEntriesByType('first-input') as any[]
+      if (firstInput.length > 0) {
+        vitals.fid = firstInput[0].processingStart - firstInput[0].startTime
+      }
+    } catch (error) {
+      console.error('Error capturing web vitals:', error)
+    }
+
+    return vitals
+  }, [enabled])
+
+  // ========================================================================
+  // Resource Timing
+  // ========================================================================
+
+  const captureResourceTiming = useCallback(() => {
+    if (!enabled || typeof window === 'undefined') {
+      return {
+        totalResources: 0,
+        totalSize: 0,
+        totalDuration: 0
+      }
+    }
+
+    try {
+      const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[]
+      
+      const totalSize = resources.reduce((sum, resource) => {
+        return sum + (resource.transferSize || 0)
+      }, 0)
+
+      const totalDuration = resources.reduce((sum, resource) => {
+        return sum + resource.duration
+      }, 0)
+
+      return {
+        totalResources: resources.length,
+        totalSize,
+        totalDuration
+      }
+    } catch (error) {
+      console.error('Error capturing resource timing:', error)
+      return {
+        totalResources: 0,
+        totalSize: 0,
+        totalDuration: 0
+      }
+    }
+  }, [enabled])
+
+  // ========================================================================
+  // Report Generation
+  // ========================================================================
+
+  const generateReport = useCallback((): PerformanceReport => {
+    return {
+      metrics: [...metricsRef.current],
+      webVitals: captureWebVitals(),
+      resourceTiming: captureResourceTiming(),
+      customMetrics: { ...customMetricsRef.current }
+    }
+  }, [captureWebVitals, captureResourceTiming])
+
+  const sendReport = useCallback(() => {
+    if (!enabled || !onReport) return
+
+    const report = generateReport()
+    onReport(report)
+
+    // Clear metrics after reporting
+    metricsRef.current = []
+  }, [enabled, onReport, generateReport])
+
+  // ========================================================================
+  // PMR-Specific Metrics
+  // ========================================================================
+
+  const recordReportLoadTime = useCallback((reportId: string, duration: number) => {
+    recordMetric('pmr.report.load_time', duration, { report_id: reportId })
+    recordCustomMetric('last_report_load_time', duration)
+  }, [recordMetric, recordCustomMetric])
+
+  const recordSectionRenderTime = useCallback((sectionId: string, duration: number) => {
+    recordMetric('pmr.section.render_time', duration, { section_id: sectionId })
+  }, [recordMetric])
+
+  const recordInsightGenerationTime = useCallback((duration: number) => {
+    recordMetric('pmr.insights.generation_time', duration)
+    recordCustomMetric('last_insight_generation_time', duration)
+  }, [recordMetric, recordCustomMetric])
+
+  const recordExportTime = useCallback((format: string, duration: number) => {
+    recordMetric('pmr.export.time', duration, { format })
+  }, [recordMetric])
+
+  const recordWebSocketLatency = useCallback((latency: number) => {
+    recordMetric('pmr.websocket.latency', latency)
+    recordCustomMetric('websocket_latency', latency)
+  }, [recordMetric, recordCustomMetric])
+
+  const recordCacheHit = useCallback((cacheKey: string) => {
+    recordMetric('pmr.cache.hit', 1, { key: cacheKey })
+  }, [recordMetric])
+
+  const recordCacheMiss = useCallback((cacheKey: string) => {
+    recordMetric('pmr.cache.miss', 1, { key: cacheKey })
+  }, [recordMetric])
+
+  const recordAPICall = useCallback((endpoint: string, duration: number, status: number) => {
+    recordMetric('pmr.api.call', duration, { endpoint, status: String(status) })
+  }, [recordMetric])
+
+  // ========================================================================
+  // Performance Timing Utilities
+  // ========================================================================
+
+  const measureAsync = useCallback(async <T,>(
+    name: string,
+    fn: () => Promise<T>,
+    tags?: Record<string, string>
+  ): Promise<T> => {
+    const start = performance.now()
+    try {
+      const result = await fn()
+      const duration = performance.now() - start
+      recordMetric(name, duration, tags)
       return result
     } catch (error) {
-      const endTime = performance.now()
-      const responseTime = endTime - startTime
+      const duration = performance.now() - start
+      recordMetric(name, duration, { ...tags, error: 'true' })
+      throw error
+    }
+  }, [recordMetric])
 
-      // Log failed API call
-      logPerformanceMetric({
-        name: 'api_response_time',
-        value: responseTime,
-        unit: 'ms',
-        component: 'api-client',
-        context: {
-          endpoint,
-          method,
-          success: false,
-          error: error instanceof Error ? error.message : String(error),
-          timestamp: startTimestamp
+  const measureSync = useCallback(<T,>(
+    name: string,
+    fn: () => T,
+    tags?: Record<string, string>
+  ): T => {
+    const start = performance.now()
+    try {
+      const result = fn()
+      const duration = performance.now() - start
+      recordMetric(name, duration, tags)
+      return result
+    } catch (error) {
+      const duration = performance.now() - start
+      recordMetric(name, duration, { ...tags, error: 'true' })
+      throw error
+    }
+  }, [recordMetric])
+
+  // ========================================================================
+  // Lifecycle
+  // ========================================================================
+
+  useEffect(() => {
+    if (!enabled) return
+
+    setIsMonitoring(true)
+
+    // Set up periodic reporting
+    if (onReport && reportInterval > 0) {
+      reportTimerRef.current = setInterval(sendReport, reportInterval)
+    }
+
+    // Capture initial web vitals
+    if (typeof window !== 'undefined') {
+      // Wait for page load
+      if (document.readyState === 'complete') {
+        captureWebVitals()
+      } else {
+        window.addEventListener('load', captureWebVitals)
+      }
+    }
+
+    return () => {
+      setIsMonitoring(false)
+      
+      if (reportTimerRef.current) {
+        clearInterval(reportTimerRef.current)
+      }
+
+      // Send final report
+      if (onReport) {
+        sendReport()
+      }
+
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('load', captureWebVitals)
+      }
+    }
+  }, [enabled, onReport, reportInterval, sendReport, captureWebVitals])
+
+  // ========================================================================
+  // Return API
+  // ========================================================================
+
+  return {
+    // State
+    isMonitoring,
+
+    // Core functions
+    recordMetric,
+    recordCustomMetric,
+    generateReport,
+    sendReport,
+
+    // PMR-specific functions
+    recordReportLoadTime,
+    recordSectionRenderTime,
+    recordInsightGenerationTime,
+    recordExportTime,
+    recordWebSocketLatency,
+    recordCacheHit,
+    recordCacheMiss,
+    recordAPICall,
+
+    // Timing utilities
+    measureAsync,
+    measureSync,
+
+    // Web vitals
+    captureWebVitals,
+    captureResourceTiming
+  }
+}
+
+// ============================================================================
+// Performance Observer Hook
+// ============================================================================
+
+export function usePerformanceObserver(
+  entryTypes: string[],
+  callback: (entries: PerformanceEntry[]) => void
+) {
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('PerformanceObserver' in window)) {
+      return
+    }
+
+    try {
+      const observer = new PerformanceObserver((list) => {
+        callback(list.getEntries())
+      })
+
+      entryTypes.forEach(type => {
+        try {
+          observer.observe({ entryTypes: [type] })
+        } catch (error) {
+          console.warn(`Failed to observe ${type}:`, error)
         }
       })
 
-      // Log error to diagnostic collector
-      if (error instanceof Error) {
-        diagnosticCollector.logApiError({
-          endpoint,
-          method,
-          statusCode: 0, // Unknown status for network errors
-          error,
-          responseTime,
-          context: {
-            timestamp: startTimestamp
-          }
-        })
-      }
-
-      throw error
+      return () => observer.disconnect()
+    } catch (error) {
+      console.error('Failed to create PerformanceObserver:', error)
     }
-  }, [])
-
-  return { trackApiCall }
+  }, [entryTypes, callback])
 }
 
-/**
- * Hook for monitoring memory usage
- */
-export function useMemoryMonitoring(componentName: string, interval: number = 30000) {
-  const [memoryMetrics, setMemoryMetrics] = useState<{
-    usedJSHeapSize: number
-    totalJSHeapSize: number
-    jsHeapSizeLimit: number
-    usagePercentage: number
-  } | null>(null)
+// ============================================================================
+// Component Render Time Hook
+// ============================================================================
+
+export function useRenderTime(componentName: string) {
+  const renderStartRef = useRef<number>(0)
+  const { recordMetric } = usePerformanceMonitoring()
 
   useEffect(() => {
-    const checkMemory = () => {
-      const memoryInfo = performanceMonitor.getMemoryUsage()
-      if (memoryInfo) {
-        setMemoryMetrics(memoryInfo)
+    renderStartRef.current = performance.now()
+  })
 
-        logPerformanceMetric({
-          name: 'memory_usage',
-          value: memoryInfo.usagePercentage,
-          unit: 'percent',
-          component: componentName,
-          context: memoryInfo
-        })
-
-        // Warn about high memory usage
-        if (memoryInfo.usagePercentage > 80) {
-          console.warn(`High memory usage in ${componentName}: ${memoryInfo.usagePercentage}%`)
-          
-          diagnosticCollector.logError({
-            error: new Error(`High memory usage: ${memoryInfo.usagePercentage}%`),
-            component: componentName,
-            errorType: 'component',
-            severity: memoryInfo.usagePercentage > 90 ? 'high' : 'medium',
-            context: memoryInfo
-          })
-        }
-      }
-    }
-
-    checkMemory()
-    const intervalId = setInterval(checkMemory, interval)
-
-    return () => clearInterval(intervalId)
-  }, [componentName, interval])
-
-  return memoryMetrics
+  useEffect(() => {
+    const renderTime = performance.now() - renderStartRef.current
+    recordMetric(`component.${componentName}.render_time`, renderTime)
+  })
 }
 
-/**
- * Hook for monitoring user interaction performance
- */
-export function useInteractionPerformance(componentName: string) {
-  const trackInteraction = useCallback((
-    interactionType: string,
-    callback: () => void | Promise<void>
-  ) => {
-    return async () => {
-      const startTime = performance.now()
+// ============================================================================
+// Export Default
+// ============================================================================
 
-      try {
-        await callback()
-        const endTime = performance.now()
-        const duration = endTime - startTime
-
-        logPerformanceMetric({
-          name: 'user_interaction_time',
-          value: duration,
-          unit: 'ms',
-          component: componentName,
-          context: {
-            interactionType,
-            timestamp: Date.now()
-          }
-        })
-
-        diagnosticCollector.logUserAction({
-          action: interactionType,
-          component: componentName,
-          data: {
-            duration,
-            timestamp: Date.now()
-          }
-        })
-
-        // Warn about slow interactions
-        if (duration > 100) {
-          console.warn(`Slow interaction in ${componentName}: ${interactionType} took ${duration.toFixed(2)}ms`)
-        }
-      } catch (error) {
-        const endTime = performance.now()
-        const duration = endTime - startTime
-
-        diagnosticCollector.logError({
-          error: error instanceof Error ? error : new Error(String(error)),
-          component: componentName,
-          errorType: 'component',
-          severity: 'medium',
-          context: {
-            interactionType,
-            duration,
-            timestamp: Date.now()
-          }
-        })
-
-        throw error
-      }
-    }
-  }, [componentName])
-
-  return { trackInteraction }
-}
-
-/**
- * Hook for comprehensive dashboard performance monitoring
- */
-export function useDashboardPerformance(dashboardName: string) {
-  const componentPerf = useComponentPerformance(dashboardName)
-  const pageLoadMetrics = usePageLoadPerformance(dashboardName)
-  const memoryMetrics = useMemoryMonitoring(dashboardName)
-  const { trackApiCall } = useApiPerformanceMonitoring()
-  const { trackInteraction } = useInteractionPerformance(dashboardName)
-
-  const getOverallPerformanceScore = useCallback(() => {
-    let score = 100
-    const issues: string[] = []
-
-    // Component performance
-    if (componentPerf.metrics.renderTime > 16) {
-      score -= 20
-      issues.push('Slow component renders')
-    }
-
-    // Page load performance
-    if (pageLoadMetrics) {
-      if (pageLoadMetrics.loadTime > 3000) {
-        score -= 15
-        issues.push('Slow page load')
-      }
-      if (pageLoadMetrics.largestContentfulPaint > 2500) {
-        score -= 15
-        issues.push('Poor LCP')
-      }
-      if (pageLoadMetrics.cumulativeLayoutShift > 0.1) {
-        score -= 10
-        issues.push('Layout shifts')
-      }
-    }
-
-    // Memory usage
-    if (memoryMetrics && memoryMetrics.usagePercentage > 80) {
-      score -= 20
-      issues.push('High memory usage')
-    }
-
-    return {
-      score: Math.max(0, score),
-      issues,
-      grade: score >= 90 ? 'A' : score >= 80 ? 'B' : score >= 70 ? 'C' : score >= 60 ? 'D' : 'F'
-    }
-  }, [componentPerf.metrics, pageLoadMetrics, memoryMetrics])
-
-  return {
-    componentPerformance: componentPerf,
-    pageLoadMetrics,
-    memoryMetrics,
-    trackApiCall,
-    trackInteraction,
-    getOverallPerformanceScore
-  }
-}
+export default usePerformanceMonitoring

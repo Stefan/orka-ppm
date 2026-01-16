@@ -1,43 +1,85 @@
 'use client'
 
-import { useEffect, useState, useMemo, Suspense } from 'react'
+import { useEffect, useState, useMemo, Suspense, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import AppLayout from '../../components/shared/AppLayout'
 import { getApiUrl, apiRequest } from '../../lib/api/client'
-import VarianceKPIs from './components/VarianceKPIs'
-import VarianceTrends from './components/VarianceTrends'
-import VarianceAlerts from './components/VarianceAlerts'
-import { AdaptiveDashboard, DashboardWidget } from '../../components/ui/organisms/AdaptiveDashboard'
+import { 
+  loadDashboardData, 
+  clearDashboardCache,
+  type QuickStats,
+  type KPIs,
+  type Project
+} from '../../lib/api/dashboard-loader'
+import ProjectCard from './components/ProjectCard'
 import { useCrossDeviceSync } from '../../hooks/useCrossDeviceSync'
+import { useAutoPrefetch } from '../../hooks/useRoutePrefetch'
 import { TrendingUp, AlertTriangle, CheckCircle, Clock, DollarSign, RefreshCw, Eye, Users, BarChart3, GitBranch, Zap } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ComponentErrorBoundary } from '../../components/error-boundaries/ComponentErrorBoundary'
+import { SkeletonCard, SkeletonChart } from '../../components/ui/skeletons'
+import type { DashboardWidget } from '../../components/ui/organisms/AdaptiveDashboard'
 
-interface QuickStats {
-  total_projects: number
-  active_projects: number
-  health_distribution: { green: number; yellow: number; red: number }
-  critical_alerts: number
-  at_risk_projects: number
-}
+// Dynamic imports for heavy components (code splitting)
+const VarianceKPIs = dynamic(() => import('./components/VarianceKPIs'), {
+  loading: () => (
+    <div className="grid grid-cols-4 gap-4">
+      {[...Array(4)].map((_, i) => (
+        <SkeletonCard key={i} variant="stat" />
+      ))}
+    </div>
+  ),
+  ssr: false
+})
 
-interface KPIs {
-  project_success_rate: number
-  budget_performance: number
-  timeline_performance: number
-  average_health_score: number
-  resource_efficiency: number
-  active_projects_ratio: number
-}
+const VarianceTrends = dynamic(() => import('./components/VarianceTrends'), {
+  loading: () => <SkeletonChart variant="line" height="h-80" />,
+  ssr: false
+})
 
-interface Project {
-  id: string
-  name: string
-  status: string
-  health: 'green' | 'yellow' | 'red'
-  budget?: number | null
-  created_at: string
-}
+const VarianceAlerts = dynamic(() => import('./components/VarianceAlerts'), {
+  loading: () => <SkeletonCard variant="stat" />,
+  ssr: false
+})
+
+const VirtualizedProjectList = dynamic(() => import('../../components/ui/VirtualizedProjectList'), {
+  loading: () => (
+    <div className="divide-y divide-gray-200">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="px-6 py-4">
+          <div className="animate-pulse flex items-center justify-between">
+            <div className="flex items-center space-x-3 flex-1">
+              <div className="w-3 h-3 bg-gray-200 rounded-full"></div>
+              <div className="flex-1">
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </div>
+            <div className="h-4 bg-gray-200 rounded w-1/6"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  ),
+  ssr: false
+})
+
+const AdaptiveDashboard = dynamic(() => import('../../components/ui/organisms/AdaptiveDashboard').then(mod => ({ default: mod.default })), {
+  loading: () => (
+    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <div className="animate-pulse space-y-4">
+        <div className="h-5 bg-gray-200 rounded w-1/3"></div>
+        <div className="grid grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-32 bg-gray-200 rounded"></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  ),
+  ssr: false
+})
 
 export default function UltraFastDashboard() {
   const { session } = useAuth()
@@ -52,6 +94,9 @@ export default function UltraFastDashboard() {
   const [dashboardWidgets, setDashboardWidgets] = useState<DashboardWidget[]>([])
   const [dashboardLayout, setDashboardLayout] = useState<'grid' | 'masonry' | 'list'>('grid')
   const [showAdaptiveDashboard, setShowAdaptiveDashboard] = useState(false)
+
+  // Prefetch /resources route for instant navigation
+  useAutoPrefetch(['/resources', '/scenarios', '/financials'], 1500)
 
   // Cross-device synchronization
   const {
@@ -92,16 +137,63 @@ export default function UltraFastDashboard() {
     </div>
   )
 
-  // Ultra-fast loading - with fallback to existing endpoints
+  // Optimized data loading with parallel requests, caching, and progressive loading
+  const loadOptimizedData = useCallback(async () => {
+    if (!session?.access_token) return
+    
+    setLoading(true)
+    setError(null)
+    
+    try {
+      // Use progressive loading: show critical data first, then secondary data
+      await loadDashboardData(
+        session.access_token,
+        // Callback for critical data (QuickStats + KPIs)
+        (criticalData) => {
+          setQuickStats(criticalData.quickStats)
+          setKPIs(criticalData.kpis)
+          setLoading(false) // Stop loading spinner once critical data is ready
+          setLastUpdated(new Date())
+        },
+        // Callback for secondary data (Projects)
+        (projects) => {
+          setRecentProjects(projects)
+        }
+      )
+    } catch (err) {
+      console.error('Dashboard load error:', err)
+      setError(err instanceof Error ? err.message : 'Failed to load dashboard')
+      
+      // Show fallback data instead of error
+      setQuickStats({
+        total_projects: 0,
+        active_projects: 0,
+        health_distribution: { green: 0, yellow: 0, red: 0 },
+        critical_alerts: 0,
+        at_risk_projects: 0
+      })
+      setKPIs({
+        project_success_rate: 0,
+        budget_performance: 0,
+        timeline_performance: 0,
+        average_health_score: 0,
+        resource_efficiency: 0,
+        active_projects_ratio: 0
+      })
+      setLoading(false)
+    }
+  }, [session?.access_token])
+
+  // Optimized loading with progressive data loading
   useEffect(() => {
-    if (session) {
-      loadEssentialData()
+    if (session?.access_token) {
+      loadOptimizedData()
       // Initialize cross-device sync
       if (session.user?.id) {
         initializeSync(session.user.id)
       }
     }
-  }, [session, initializeSync])
+  }, [session, initializeSync, loadOptimizedData])
 
   // Sync dashboard preferences when they change
   useEffect(() => {
@@ -225,150 +317,21 @@ export default function UltraFastDashboard() {
     setDashboardWidgets(widgets)
   }
 
-  const loadEssentialData = async () => {
-    if (!session?.access_token) return
-    
-    setLoading(true)
-    setError(null)
-    
-    try {
-      // Try optimized endpoint first, fallback to existing endpoints
-      try {
-        const response = await apiRequest('/optimized/dashboard/quick-stats') as any
-        setQuickStats(response.quick_stats)
-        setKPIs(response.kpis)
-      } catch (optimizedError) {
-        console.log('Using fallback endpoints...')
-        // Fallback to existing endpoints with minimal data
-        await loadFallbackData()
-      }
-      
-      setLastUpdated(new Date())
-      
-      // Load recent projects in background (non-blocking)
-      loadRecentProjects()
-      
-    } catch (err) {
-      console.error('Dashboard load error:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load dashboard')
-      
-      // Show fallback data instead of error
-      setQuickStats({
-        total_projects: 0,
-        active_projects: 0,
-        health_distribution: { green: 0, yellow: 0, red: 0 },
-        critical_alerts: 0,
-        at_risk_projects: 0
-      })
-      setKPIs({
-        project_success_rate: 0,
-        budget_performance: 0,
-        timeline_performance: 0,
-        average_health_score: 0,
-        resource_efficiency: 0,
-        active_projects_ratio: 0
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Fallback data loading using existing endpoints
-  const loadFallbackData = async () => {
-    if (!session?.access_token) return { quickStats: null, kpis: null }
-    
-    const [projectsResponse, portfolioResponse] = await Promise.all([
-      fetch(getApiUrl('/projects'), {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        }
-      }),
-      fetch(getApiUrl('/portfolios/metrics'), {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        }
-      }).catch(() => null) // Graceful fallback if metrics endpoint doesn't exist
-    ])
-
-    let projects = []
-    let portfolioMetrics = null
-
-    if (projectsResponse?.ok) {
-      const projectsData = await projectsResponse.json()
-      projects = Array.isArray(projectsData) ? projectsData : (projectsData?.projects || [])
-    }
-
-    if (portfolioResponse?.ok) {
-      portfolioMetrics = await portfolioResponse.json()
-    }
-
-    // Calculate stats from projects data
-    const projectsArray = Array.isArray(projects) ? projects : []
-    const totalProjects = projectsArray?.length || 0
-    const activeProjects = projectsArray?.filter((p: any) => p?.status === 'active')?.length || 0
-    const healthDistribution = projectsArray?.reduce((acc: any, project: any) => {
-      const health = project?.health || 'green'
-      acc[health] = (acc[health] || 0) + 1
-      return acc
-    }, { green: 0, yellow: 0, red: 0 }) || { green: 0, yellow: 0, red: 0 }
-
-    const quickStats = {
-      total_projects: totalProjects,
-      active_projects: activeProjects,
-      health_distribution: healthDistribution,
-      critical_alerts: healthDistribution?.red || 0,
-      at_risk_projects: healthDistribution?.yellow || 0
-    }
-
-    const kpis = portfolioMetrics || {
-      project_success_rate: 85,
-      budget_performance: 92,
-      timeline_performance: 78,
-      average_health_score: 2.1,
-      resource_efficiency: 88,
-      active_projects_ratio: Math.round((activeProjects / Math.max(totalProjects, 1)) * 100)
-    }
-
-    setQuickStats(quickStats)
-    setKPIs(kpis)
-
-    return { quickStats, kpis }
-  }
-
-  // Background loading of projects (non-blocking)
-  const loadRecentProjects = async () => {
-    try {
-      try {
-        const response = await apiRequest('/optimized/dashboard/projects-summary?limit=5') as any
-        const projects = response?.projects || response?.slice?.(0, 5) || []
-        setRecentProjects(projects)
-      } catch (optimizedError) {
-        // Fallback to regular projects endpoint
-        const response = await apiRequest('/projects?limit=5') as any
-        const projects = response?.projects || response?.slice?.(0, 5) || []
-        setRecentProjects(projects)
-      }
-    } catch (err) {
-      console.error('Projects load error:', err)
-      // Fail silently - don't block main dashboard
-    }
-  }
-
-  // Quick refresh (optimized)
-  const quickRefresh = async () => {
+  // Quick refresh (optimized with cache clearing)
+  const quickRefresh = useCallback(async () => {
     if (!session?.access_token) return
     
     try {
-      await loadEssentialData()
+      // Clear cache to force fresh data
+      clearDashboardCache()
+      await loadOptimizedData()
     } catch (err) {
       console.error('Refresh failed:', err)
     }
-  }
+  }, [session?.access_token, loadOptimizedData])
 
   // Handle dashboard widget updates and sync across devices
-  const handleWidgetUpdate = async (widgets: DashboardWidget[]) => {
+  const handleWidgetUpdate = useCallback(async (widgets: DashboardWidget[]) => {
     setDashboardWidgets(widgets)
     
     // Sync dashboard preferences across devices
@@ -381,10 +344,10 @@ export default function UltraFastDashboard() {
         }
       })
     }
-  }
+  }, [preferences, updatePreferences])
 
   // Handle layout changes and sync across devices
-  const handleLayoutChange = async (layout: 'grid' | 'masonry' | 'list') => {
+  const handleLayoutChange = useCallback(async (layout: 'grid' | 'masonry' | 'list') => {
     setDashboardLayout(layout)
     
     // Sync layout preference across devices
@@ -397,12 +360,12 @@ export default function UltraFastDashboard() {
         }
       })
     }
-  }
+  }, [preferences, updatePreferences])
 
   // Toggle between adaptive and traditional dashboard
-  const toggleDashboardMode = () => {
+  const toggleDashboardMode = useCallback(() => {
     setShowAdaptiveDashboard(!showAdaptiveDashboard)
-  }
+  }, [showAdaptiveDashboard])
 
   // Memoized calculations for performance
   const healthPercentages = useMemo(() => {
@@ -419,15 +382,67 @@ export default function UltraFastDashboard() {
   // Ultra-fast loading state
   if (loading) return (
     <AppLayout>
-      <div className="p-8">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-          <div className="grid grid-cols-4 gap-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-24 bg-gray-200 rounded"></div>
+      <div className="p-8 space-y-6">
+        {/* Header Skeleton */}
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+        </div>
+        
+        {/* KPI Cards Skeleton */}
+        <div className="grid grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <SkeletonCard key={i} variant="stat" />
+          ))}
+        </div>
+        
+        {/* Variance KPIs Skeleton */}
+        <div className="grid grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <SkeletonCard key={i} variant="stat" />
+          ))}
+        </div>
+        
+        {/* Health Overview Skeleton */}
+        <div className="grid grid-cols-2 gap-6">
+          <SkeletonChart variant="pie" />
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="animate-pulse space-y-4">
+              <div className="h-5 bg-gray-200 rounded w-1/3"></div>
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="flex justify-between">
+                  <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        {/* Variance Trends Skeleton */}
+        <SkeletonChart variant="line" height="h-80" />
+        
+        {/* Recent Projects Skeleton */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <div className="animate-pulse h-5 bg-gray-200 rounded w-1/4"></div>
+          </div>
+          <div className="divide-y divide-gray-200">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="px-6 py-4">
+                <div className="animate-pulse flex items-center justify-between">
+                  <div className="flex items-center space-x-3 flex-1">
+                    <div className="w-3 h-3 bg-gray-200 rounded-full"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                  <div className="h-4 bg-gray-200 rounded w-1/6"></div>
+                </div>
+              </div>
             ))}
           </div>
-          <div className="h-64 bg-gray-200 rounded"></div>
         </div>
       </div>
     </AppLayout>
@@ -724,36 +739,11 @@ export default function UltraFastDashboard() {
                   <div className="px-6 py-4 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900">Recent Projects</h3>
                   </div>
-                  <div className="divide-y divide-gray-200">
-                    {recentProjects?.map((project) => (
-                      <div key={project?.id} className="px-6 py-4 hover:bg-gray-50">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3 min-w-0 flex-1">
-                            <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
-                              project?.health === 'green' ? 'bg-green-500' :
-                              project?.health === 'yellow' ? 'bg-yellow-500' : 'bg-red-500'
-                            }`}
-                            >
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <h4 className="text-sm font-medium text-gray-900 truncate">{project?.name || 'Unknown Project'}</h4>
-                              <p className="text-sm text-gray-500 capitalize">{project?.status?.replace('-', ' ') || 'Unknown Status'}</p>
-                            </div>
-                          </div>
-                          <div className="text-right flex-shrink-0">
-                            {project?.budget && (
-                              <p className="text-sm font-medium text-gray-900">
-                                ${project.budget.toLocaleString()}
-                              </p>
-                            )}
-                            <p className="text-xs text-gray-500">
-                              {project?.created_at ? new Date(project.created_at).toLocaleDateString() : 'Unknown Date'}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <VirtualizedProjectList 
+                    projects={recentProjects} 
+                    height={600}
+                    itemHeight={120}
+                  />
                 </div>
               </ComponentErrorBoundary>
             )}

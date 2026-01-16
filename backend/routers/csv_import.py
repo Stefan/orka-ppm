@@ -426,46 +426,86 @@ async def get_financial_variances(
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
         # Get all projects with budget information
-        projects_response = supabase.table("projects").select("id, name, budget, actual_cost").execute()
-        projects = projects_response.data or []
+        try:
+            projects_response = supabase.table("projects").select("id, name, budget, actual_cost").execute()
+            projects = projects_response.data or []
+        except Exception as db_error:
+            print(f"Database query error: {db_error}")
+            # Return empty result instead of failing
+            return {
+                "variances": [],
+                "summary": {
+                    "total_variances": 0,
+                    "over_budget": 0,
+                    "under_budget": 0,
+                    "on_budget": 0
+                },
+                "filters": {
+                    "organization_id": organization_id,
+                    "project_id": project_id,
+                    "status": status,
+                    "limit": limit
+                }
+            }
         
         variances = []
         
         for project in projects:
-            if not project.get('budget'):
+            try:
+                # Skip projects without budget
+                if not project.get('budget'):
+                    continue
+                
+                # Safely extract project data with null checks
+                project_id_str = str(project.get('id', ''))
+                project_name = str(project.get('name', 'Unknown Project'))
+                
+                # Safely convert to float with fallback
+                try:
+                    budget = float(project.get('budget', 0))
+                except (ValueError, TypeError):
+                    budget = 0.0
+                
+                try:
+                    actual_cost = float(project.get('actual_cost', 0))
+                except (ValueError, TypeError):
+                    actual_cost = 0.0
+                
+                # Skip if budget is 0 or negative
+                if budget <= 0:
+                    continue
+                
+                # Calculate variance
+                variance = actual_cost - budget
+                variance_percentage = (variance / budget * 100) if budget > 0 else 0
+                
+                # Determine status based on variance
+                if actual_cost < budget * 0.95:
+                    status_val = 'under'
+                elif actual_cost <= budget * 1.05:
+                    status_val = 'on'
+                else:
+                    status_val = 'over'
+                
+                variance_record = {
+                    'id': project_id_str,
+                    'project_id': project_id_str,
+                    'project_name': project_name,
+                    'wbs_element': project_name,
+                    'total_commitment': budget,
+                    'total_actual': actual_cost,
+                    'variance': variance,
+                    'variance_percentage': variance_percentage,
+                    'status': status_val,
+                    'organization_id': organization_id
+                }
+                
+                variances.append(variance_record)
+                
+            except Exception as project_error:
+                # Log error but continue processing other projects
+                print(f"Error processing project {project.get('id', 'unknown')}: {project_error}")
                 continue
-            
-            project_id_str = project['id']
-            project_name = project['name']
-            budget = float(project.get('budget', 0))
-            actual_cost = float(project.get('actual_cost', 0))
-            
-            # Calculate variance
-            variance = actual_cost - budget
-            variance_percentage = (variance / budget * 100) if budget > 0 else 0
-            
-            # Determine status based on variance
-            if actual_cost < budget * 0.95:
-                status_val = 'under'
-            elif actual_cost <= budget * 1.05:
-                status_val = 'on'
-            else:
-                status_val = 'over'
-            
-            variance_record = {
-                'id': project_id_str,
-                'project_id': project_id_str,
-                'project_name': project_name,
-                'wbs_element': project_name,
-                'total_commitment': budget,
-                'total_actual': actual_cost,
-                'variance': variance,
-                'variance_percentage': variance_percentage,
-                'status': status_val,
-                'organization_id': organization_id
-            }
-            
-            variances.append(variance_record)
         
         # Apply filters
         if project_id:
@@ -499,6 +539,11 @@ async def get_financial_variances(
             }
         }
         
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
     except Exception as e:
         print(f"Get variances error: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Failed to get variances: {str(e)}")

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import React, { useState, useRef, useCallback, useEffect, useDeferredValue } from 'react'
 import { 
   ResponsiveContainer, 
   BarChart, 
@@ -31,6 +31,7 @@ import {
   Zap
 } from 'lucide-react'
 import { getWebSocketService, WebSocketMessage, ChartDataPoint } from '../../lib/services/websocket-service'
+import { useDebounce } from '../../hooks/useDebounce'
 
 interface ChartData {
   [key: string]: any
@@ -124,18 +125,24 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
   const frameCount = useRef<number>(0)
   const performanceInterval = useRef<NodeJS.Timeout | null>(null)
 
+  // Debounce search term to reduce update frequency (300ms delay)
+  const debouncedSearchTerm = useDebounce(filters.searchTerm, 300)
+  
+  // Defer value range filter for non-critical chart updates
+  const deferredValueRange = useDeferredValue(filters.valueRange)
+
   // Filter data based on current filters
   const filteredData = React.useMemo(() => {
     let filtered = [...data]
 
-    // Search filter
-    if (filters.searchTerm) {
+    // Search filter (using debounced value)
+    if (debouncedSearchTerm) {
       filtered = filtered.filter(item => 
-        item[nameKey]?.toString().toLowerCase().includes(filters.searchTerm.toLowerCase())
+        item[nameKey]?.toString().toLowerCase().includes(debouncedSearchTerm.toLowerCase())
       )
     }
 
-    // Value range filter
+    // Value range filter (using deferred value for non-critical updates)
     if (type !== 'pie') {
       const values = filtered.map(item => item[dataKey]).filter(v => typeof v === 'number')
       const minValue = Math.min(...values)
@@ -145,12 +152,12 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
         const value = item[dataKey]
         if (typeof value !== 'number') return true
         const normalizedValue = ((value - minValue) / (maxValue - minValue)) * 100
-        return normalizedValue >= filters.valueRange[0] && normalizedValue <= filters.valueRange[1]
+        return normalizedValue >= deferredValueRange[0] && normalizedValue <= deferredValueRange[1]
       })
     }
 
     return filtered
-  }, [data, filters, dataKey, nameKey, type])
+  }, [data, debouncedSearchTerm, deferredValueRange, dataKey, nameKey, type])
 
   // Real-time data management
   const addRealTimeDataPoint = useCallback((newDataPoint: ChartDataPoint) => {

@@ -4,9 +4,13 @@ import React, { useState } from 'react'
 import { useAuth } from './providers/SupabaseAuthProvider'
 import Sidebar from '../components/navigation/Sidebar'
 import { supabase, ENV_CONFIG } from '../lib/api/supabase-minimal'
+import { useAutoPrefetch } from '../hooks/useRoutePrefetch'
 
 export default function Home() {
   const { session, loading } = useAuth()
+
+  // Prefetch /dashboards route for instant navigation
+  useAutoPrefetch(['/dashboards'], 1000)
 
   // Show loading state while checking authentication
   if (loading) {

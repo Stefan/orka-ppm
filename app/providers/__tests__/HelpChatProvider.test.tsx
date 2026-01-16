@@ -14,13 +14,12 @@ jest.mock('../SupabaseAuthProvider', () => ({
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
-    back: jest.fn(),
-    forward: jest.fn(),
-    refresh: jest.fn(),
+    pathname: '/test',
+    query: {},
+    asPath: '/test',
   }),
-  usePathname: () => '/dashboards'
+  usePathname: () => '/test',
+  useSearchParams: () => new URLSearchParams(),
 }))
 
 jest.mock('../../../hooks/useLanguage', () => ({

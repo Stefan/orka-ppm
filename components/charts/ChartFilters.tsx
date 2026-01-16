@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useDeferredValue } from 'react'
 import { Search, Filter, X, TrendingUp } from 'lucide-react'
+import { useDebounce } from '../../hooks/useDebounce'
 
 export interface FilterConfig {
   searchTerm: string
@@ -38,6 +39,14 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
   className = ''
 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
+  
+  // Debounce search term to reduce update frequency (300ms delay)
+  const debouncedSearchTerm = useDebounce(filters.searchTerm, 300)
+  
+  // Defer non-critical filter updates (categories, date range, value range)
+  const deferredCategories = useDeferredValue(filters.categories)
+  const deferredDateRange = useDeferredValue(filters.dateRange)
+  const deferredValueRange = useDeferredValue(filters.valueRange)
 
   const updateFilter = useCallback((key: keyof FilterConfig, value: any) => {
     onFiltersChange({

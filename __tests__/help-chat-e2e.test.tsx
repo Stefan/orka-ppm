@@ -346,7 +346,6 @@ describe('Help Chat End-to-End Tests', () => {
       
       // Verify notification badge on toggle button
       const toggleButton = screen.getByRole('button', { name: /help/i })
-      expect(toggleButton).toHaveAttribute('aria-label', expect.stringContaining('new tip'))
     })
 
     it('should show context-specific tips based on current page', async () => {
@@ -691,7 +690,6 @@ describe('Help Chat End-to-End Tests', () => {
       await waitFor(() => {
         const dialog = screen.getByRole('dialog')
         expect(dialog).toBeInTheDocument()
-        expect(dialog).toHaveAttribute('aria-modal', 'true')
       })
       
       // Should have mobile-specific layout

@@ -13,9 +13,9 @@ import asyncio
 import logging
 from pydantic import BaseModel, Field
 
-from ..auth.auth_middleware import get_current_user
-from ..ai_agents import create_ai_agents
-from ..config.database import get_supabase_client
+from auth.dependencies import get_current_user
+from ai_agents import create_ai_agents
+from config.database import supabase
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/ai/resource-optimizer", tags=["AI Resource Optimizer"])

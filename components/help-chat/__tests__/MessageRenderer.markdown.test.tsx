@@ -313,7 +313,7 @@ For more information, visit the [documentation](https://example.com/docs).`,
       render(<MessageRenderer message={message} {...defaultProps} />)
 
       // User messages should not process markdown - the content should be in a single paragraph
-      const messageContent = screen.getByRole('region', { name: 'Message content' })
+      const messageContent = screen.getByTestId('markdown-content')
       expect(messageContent).toBeInTheDocument()
       
       // Check that the raw markdown text is present (not processed)

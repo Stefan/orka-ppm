@@ -10,18 +10,18 @@ import { useTouchGestures, type TouchPoint, type GestureCallbacks } from '../../
 
 // Test data generators
 const touchPointArbitrary = fc.record({
-  x: fc.float({ min: Math.fround(0), max: Math.fround(1920) }), // Screen coordinates
-  y: fc.float({ min: Math.fround(0), max: Math.fround(1080) }),
+  x: fc.float({ min: 0, max: 1920, noNaN: true, noDefaultInfinity: true }), // Screen coordinates
+  y: fc.float({ min: 0, max: 1080, noNaN: true, noDefaultInfinity: true }),
   timestamp: fc.integer({ min: Date.now() - 10000, max: Date.now() })
 }) as fc.Arbitrary<TouchPoint>
 
 const gestureOptionsArbitrary = fc.record({
   swipeThreshold: fc.integer({ min: 20, max: 200 }),
-  swipeVelocityThreshold: fc.float({ min: Math.fround(0.1), max: Math.fround(2.0) }),
+  swipeVelocityThreshold: fc.float({ min: Math.fround(0.1), max: Math.fround(2.0), noNaN: true, noDefaultInfinity: true }),
   longPressDuration: fc.integer({ min: 200, max: 2000 }),
   doubleTapInterval: fc.integer({ min: 100, max: 1000 }),
   doubleTapDistance: fc.integer({ min: 10, max: 100 }),
-  pinchSensitivity: fc.float({ min: Math.fround(0.5), max: Math.fround(3.0) }),
+  pinchSensitivity: fc.float({ min: Math.fround(0.5), max: Math.fround(3.0), noNaN: true, noDefaultInfinity: true }),
   pullToRefreshThreshold: fc.integer({ min: 40, max: 200 }),
   hapticFeedback: fc.boolean(),
   preventDefault: fc.boolean()

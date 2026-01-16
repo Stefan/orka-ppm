@@ -43,6 +43,9 @@ from monte_carlo.api_validation import (
 
 from utils.converters import convert_uuids
 
+# Import caching service
+from services.simulation_cache_service import get_cache_service, SimulationCacheService
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -59,6 +62,9 @@ chart_generator = ChartGenerator()
 # Initialize error handling and degradation management
 error_handler = APIErrorHandler()
 degradation_manager = GracefulDegradationManager()
+
+# Cache service will be initialized on first use
+_cache_service: Optional[SimulationCacheService] = None
 
 # Pydantic models for API requests/responses
 from pydantic import BaseModel, Field
@@ -156,14 +162,19 @@ def handle_monte_carlo_exceptions(func):
 async def run_simulation(
     request: SimulationRequest,
     background_tasks: BackgroundTasks,
-    current_user = Depends(require_permission(Permission.risk_read))
+    current_user = Depends(require_permission(Permission.simulation_run)),
+    use_cache: bool = Query(True, description="Use cached results if available")
 ):
     """
     Execute a Monte Carlo simulation with the provided risks and parameters.
     
     This endpoint runs a comprehensive Monte Carlo simulation and returns
     the simulation ID for tracking progress and retrieving results.
+    Supports caching for improved performance.
     """
+    # Get cache service
+    cache_service = await get_cache_service()
+    
     # Validate and sanitize request
     try:
         validation_result = validate_and_sanitize_simulation_request(request.dict())
@@ -259,6 +270,33 @@ async def run_simulation(
         except Exception as e:
             raise BusinessLogicError(f"Simulation execution failed: {str(e)}")
         
+        # Cache results if enabled
+        if use_cache and cache_service.cache_enabled:
+            try:
+                # Extract project_id if available (from baseline_costs or schedule_data)
+                project_id = None
+                if validated_data.get("baseline_costs"):
+                    # Try to extract project_id from baseline_costs keys
+                    for key in validated_data["baseline_costs"].keys():
+                        if key.startswith("project_"):
+                            try:
+                                project_id = UUID(key.replace("project_", ""))
+                                break
+                            except:
+                                pass
+                
+                if project_id:
+                    await cache_service.cache_simulation_result(
+                        simulation_id=results.simulation_id,
+                        results=results,
+                        project_id=project_id,
+                        risks_data=[r.dict() for r in request.risks],
+                        ttl=3600  # 1 hour cache
+                    )
+                    logger.info(f"Cached simulation results for {results.simulation_id}")
+            except Exception as e:
+                logger.warning(f"Failed to cache simulation results: {e}")
+        
         # Store results in database with error handling
         storage_status = "success"
         try:
@@ -331,7 +369,7 @@ async def run_simulation(
 @handle_monte_carlo_exceptions
 async def get_simulation_progress(
     simulation_id: str,
-    current_user = Depends(require_permission(Permission.risk_read))
+    current_user = Depends(require_permission(Permission.simulation_read))
 ):
     """Get the progress status of a running simulation."""
     # Validate simulation ID format
@@ -378,18 +416,35 @@ async def get_simulation_progress(
 async def get_simulation_results(
     simulation_id: str,
     include_raw_data: bool = Query(False, description="Include raw simulation data"),
-    current_user = Depends(require_permission(Permission.risk_read))
+    current_user = Depends(require_permission(Permission.simulation_read))
 ):
-    """Retrieve complete simulation results."""
-    # Validate simulation ID
-    if not simulation_id or len(simulation_id) < 10:
-        raise ValidationError("Invalid simulation ID format", "simulation_id")
-    
+    """Retrieve complete simulation results with caching support."""
     try:
-        results = monte_carlo_engine.get_cached_results(simulation_id)
+        # Validate simulation ID
+        if not simulation_id or len(simulation_id) < 10:
+            raise ValidationError("Invalid simulation ID format", "simulation_id")
         
+        # Try cache first
+        cache_service = await get_cache_service()
+        results = None
+        
+        if cache_service.cache_enabled:
+            try:
+                results = await cache_service.get_cached_result(simulation_id)
+                if results:
+                    logger.info(f"Retrieved simulation {simulation_id} from cache")
+            except Exception as e:
+                logger.warning(f"Cache retrieval failed: {e}")
+        
+        # Fall back to engine cache if not in Redis
         if results is None:
-            # Try to retrieve from database as fallback
+            try:
+                results = monte_carlo_engine.get_cached_results(simulation_id)
+            except Exception as e:
+                logger.warning(f"Engine cache retrieval failed: {e}")
+        
+        # Try to retrieve from database as fallback if still not found
+        if results is None:
             if supabase:
                 try:
                     response = supabase.table("monte_carlo_simulations").select("*").eq("id", simulation_id).execute()
@@ -499,7 +554,7 @@ async def get_simulation_results(
 @router.post("/scenarios", response_model=Dict[str, Any])
 async def create_scenario(
     request: ScenarioCreateRequest,
-    current_user = Depends(require_permission(Permission.risk_update))
+    current_user = Depends(require_permission(Permission.scenario_create))
 ):
     """Create a new risk scenario for analysis."""
     try:
@@ -573,7 +628,7 @@ async def create_scenario(
 async def list_scenarios(
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
-    current_user = Depends(require_permission(Permission.risk_read))
+    current_user = Depends(require_permission(Permission.scenario_read))
 ):
     """List all available scenarios."""
     try:
@@ -606,7 +661,7 @@ async def list_scenarios(
 @router.get("/scenarios/{scenario_id}")
 async def get_scenario(
     scenario_id: str,
-    current_user = Depends(require_permission(Permission.risk_read))
+    current_user = Depends(require_permission(Permission.scenario_read))
 ):
     """Get detailed information about a specific scenario."""
     try:
@@ -650,7 +705,7 @@ async def get_scenario(
 @router.post("/scenarios/compare")
 async def compare_scenarios(
     request: ScenarioComparisonRequest,
-    current_user = Depends(require_permission(Permission.risk_read))
+    current_user = Depends(require_permission(Permission.scenario_compare))
 ):
     """Compare multiple scenarios and their simulation results."""
     try:
@@ -1043,3 +1098,148 @@ async def get_interactive_chart_data(
         raise
     except Exception as e:
         raise ExternalSystemError(f"Interactive chart data generation failed: {str(e)}", "visualization", recoverable=True)
+
+
+# Cache Management Endpoints
+
+@router.delete("/cache/projects/{project_id}")
+@handle_monte_carlo_exceptions
+async def invalidate_project_cache(
+    project_id: UUID,
+    current_user = Depends(require_permission(Permission.simulation_run))
+):
+    """
+    Invalidate all cached simulations for a project.
+    
+    This endpoint should be called when project risk data changes
+    to ensure fresh simulations are run.
+    """
+    try:
+        cache_service = await get_cache_service()
+        
+        if not cache_service.cache_enabled:
+            return {
+                "message": "Cache not enabled",
+                "invalidated_count": 0
+            }
+        
+        invalidated_count = await cache_service.invalidate_project_cache(project_id)
+        
+        return {
+            "project_id": str(project_id),
+            "invalidated_count": invalidated_count,
+            "timestamp": datetime.now().isoformat(),
+            "message": f"Successfully invalidated {invalidated_count} cache entries"
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to invalidate project cache: {e}")
+        raise HTTPException(status_code=500, detail=f"Cache invalidation failed: {str(e)}")
+
+
+@router.get("/cache/statistics")
+@handle_monte_carlo_exceptions
+async def get_cache_statistics(
+    current_user = Depends(require_permission(Permission.simulation_read))
+):
+    """Get cache statistics and metrics."""
+    try:
+        cache_service = await get_cache_service()
+        stats = await cache_service.get_cache_statistics()
+        
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "statistics": stats
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get cache statistics: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve cache statistics: {str(e)}")
+
+
+@router.post("/simulations/background")
+@handle_monte_carlo_exceptions
+async def queue_background_simulation(
+    request: SimulationRequest,
+    project_id: UUID = Query(..., description="Project ID for the simulation"),
+    priority: int = Query(0, ge=0, le=10, description="Priority level (0-10, higher = more urgent)"),
+    current_user = Depends(require_permission(Permission.simulation_run))
+):
+    """
+    Queue a simulation for background processing.
+    
+    Useful for large simulations that may take longer than 30 seconds.
+    """
+    try:
+        cache_service = await get_cache_service()
+        
+        if not cache_service.cache_enabled:
+            raise HTTPException(
+                status_code=503,
+                detail="Background processing not available - cache service not enabled"
+            )
+        
+        # Validate request
+        validation_result = validate_and_sanitize_simulation_request(request.dict())
+        
+        # Queue the simulation
+        job_id = await cache_service.queue_background_simulation(
+            project_id=project_id,
+            simulation_config=validation_result["validated_data"],
+            priority=priority
+        )
+        
+        return {
+            "job_id": job_id,
+            "project_id": str(project_id),
+            "status": "queued",
+            "priority": priority,
+            "queued_at": datetime.now().isoformat(),
+            "message": "Simulation queued for background processing"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to queue background simulation: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to queue simulation: {str(e)}")
+
+
+@router.get("/simulations/background/next")
+@handle_monte_carlo_exceptions
+async def get_next_background_simulation(
+    current_user = Depends(require_permission(Permission.simulation_run))
+):
+    """
+    Get next simulation from the background processing queue.
+    
+    This endpoint is used by background workers to process queued simulations.
+    """
+    try:
+        cache_service = await get_cache_service()
+        
+        if not cache_service.cache_enabled:
+            raise HTTPException(
+                status_code=503,
+                detail="Background processing not available - cache service not enabled"
+            )
+        
+        job_data = await cache_service.get_next_queued_simulation()
+        
+        if job_data is None:
+            return {
+                "message": "No simulations in queue",
+                "queue_empty": True
+            }
+        
+        return {
+            "job_data": job_data,
+            "queue_empty": False,
+            "dequeued_at": datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get next background simulation: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve queued simulation: {str(e)}")

@@ -1,6 +1,6 @@
 'use client'
 
-
+import { memo } from 'react'
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell
@@ -25,7 +25,7 @@ interface DashboardChartsProps {
   session: any
 }
 
-export default function DashboardCharts({ projects, portfolioMetrics }: DashboardChartsProps) {
+function DashboardCharts({ projects, portfolioMetrics }: DashboardChartsProps) {
   // Chart data preparation
   const healthChartData = portfolioMetrics?.health_distribution ? [
     { name: 'Healthy', value: portfolioMetrics.health_distribution.green || 0, color: '#10B981' },
@@ -128,3 +128,40 @@ export default function DashboardCharts({ projects, portfolioMetrics }: Dashboar
     </div>
   )
 }
+
+// Custom comparison function to prevent unnecessary re-renders
+// Only re-render if projects array or portfolio metrics change
+const arePropsEqual = (prevProps: DashboardChartsProps, nextProps: DashboardChartsProps) => {
+  // Check if projects array length changed
+  if (prevProps.projects.length !== nextProps.projects.length) {
+    return false
+  }
+  
+  // Check if portfolio metrics changed
+  if (
+    prevProps.portfolioMetrics?.health_distribution?.green !== nextProps.portfolioMetrics?.health_distribution?.green ||
+    prevProps.portfolioMetrics?.health_distribution?.yellow !== nextProps.portfolioMetrics?.health_distribution?.yellow ||
+    prevProps.portfolioMetrics?.health_distribution?.red !== nextProps.portfolioMetrics?.health_distribution?.red
+  ) {
+    return false
+  }
+  
+  // Check if any project data changed (shallow comparison of first few projects)
+  for (let i = 0; i < Math.min(5, prevProps.projects.length); i++) {
+    const prevProject = prevProps.projects[i]
+    const nextProject = nextProps.projects[i]
+    if (
+      prevProject?.id !== nextProject?.id ||
+      prevProject?.status !== nextProject?.status ||
+      prevProject?.health !== nextProject?.health ||
+      prevProject?.budget !== nextProject?.budget ||
+      prevProject?.actual_cost !== nextProject?.actual_cost
+    ) {
+      return false
+    }
+  }
+  
+  return true
+}
+
+export default memo(DashboardCharts, arePropsEqual)

@@ -1,0 +1,86 @@
+📦 Bundle Analysis Report
+
+================================================================================
+
+📄 Pages and their chunks:
+--------------------------------------------------------------------------------
+
+/_app:
+
+
+📊 Largest Static Chunks:
+--------------------------------------------------------------------------------
+
+Top 20 Largest Chunks:
+ 1. 6069.0645cfbd28cdb9ed.js                                        1079.48 KB
+ 2. 8308-57085ce8ae4ce37d.js                                         477.17 KB
+ 3. 4bd1b696-1400c1b9494d4acb.js                                     193.88 KB
+ 4. 8589-f37283129dcfc763.js                                         186.32 KB
+ 5. 3794-2f3fc65f64ac3409.js                                         183.82 KB
+ 6. main-fcbf21fa0737b13b.js                                         145.55 KB
+ 7. framework-a676db37b243fc59.js                                    136.56 KB
+ 8. polyfills-42372ed130431b0a.js                                    109.96 KB
+ 9. app/risks/page-f48628c289a62e3b.js                                86.96 KB
+10. app/dashboards/page-9eff8aa4259b6719.js                           85.94 KB
+11. app/resources/page-11c9b8db2fc77ffb.js                            74.00 KB
+12. app/financials/page-8707d824f867ed88.js                           58.36 KB
+13. 9545-b653900d774104de.js                                          47.88 KB
+14. app/reports/pmr/page-ef3f247d9b9d884b.js                          46.66 KB
+15. 7524-65edf8eebb72a69b.js                                          31.44 KB
+16. 3719-333a5cea88be7ce8.js                                          30.43 KB
+17. app/feedback/page-68bc449e274e8369.js                             29.07 KB
+18. app/monte-carlo/page-65f36aea84dacdd1.js                          28.35 KB
+19. app/scenarios/page-701d123f625e8402.js                            25.97 KB
+20. 1459.052fb599e5801c38.js                                          25.05 KB
+
+Total JavaScript Size: 3.25 MB
+
+
+📦 Dependencies Analysis:
+--------------------------------------------------------------------------------
+
+Production Dependencies: 27
+Development Dependencies: 27
+
+📋 All Production Dependencies:
+  - @heroicons/react: ^2.2.0
+  - @supabase/supabase-js: ^2.89.0
+  - @tiptap/extension-character-count: 2.27.2
+  - @tiptap/extension-collaboration: 2.27.2
+  - @tiptap/extension-collaboration-cursor: 2.27.2
+  - @tiptap/extension-highlight: 2.27.2
+  - @tiptap/extension-placeholder: 2.27.2
+  - @tiptap/extension-task-item: 2.27.2
+  - @tiptap/extension-task-list: 2.27.2
+  - @tiptap/react: 2.27.2
+  - @tiptap/starter-kit: 2.27.2
+  - @types/react-window: 1.8.8
+  - clsx: 2.1.1
+  - critters: 0.0.23
+  - html2canvas: ^1.4.1
+  - intersection-observer: 0.12.2
+  - lucide-react: ^0.562.0
+  - next: ^16.1.1
+  - next-pwa: ^5.6.0
+  - react: ^18.3.1
+  - react-dom: ^18.3.1
+  - react-markdown: ^10.1.0
+  - react-window: 2.2.5
+  - recharts: ^3.6.0
+  - rehype-highlight: ^7.0.2
+  - remark-gfm: ^4.0.1
+  - tailwind-merge: 3.4.0
+
+================================================================================
+
+✅ Analysis complete!
+
+💡 Recommendations:
+  1. Review the largest chunks and consider code splitting
+  2. Check for duplicate dependencies across chunks
+  3. Consider lazy loading heavy components
+  4. Use dynamic imports for route-specific code
+  5. Review and remove unused dependencies
+
+📊 For visual analysis, open: .next/analyze/client.html
+

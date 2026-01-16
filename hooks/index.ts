@@ -58,3 +58,14 @@ export type {
   RealtimePMRState,
   RealtimePMRActions
 } from './useRealtimePMR'
+
+// Cache management hooks
+export { useCacheManager } from './useCacheManager'
+
+// Web Worker hooks for performance optimization
+export { useMonteCarloWorker } from './useMonteCarloWorker'
+export { useDataProcessor } from './useDataProcessor'
+
+// Route prefetching hooks for instant navigation
+export { useRoutePrefetch, useAutoPrefetch } from './useRoutePrefetch'
+export { usePredictivePrefetch, useSimplePredictivePrefetch } from './usePredictivePrefetch'

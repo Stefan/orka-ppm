@@ -26,7 +26,12 @@ async def create_scenario(
     scenario_data: ScenarioCreate,
     current_user = Depends(require_permission(Permission.project_read))
 ):
-    """Create a new what-if scenario analysis"""
+    """
+    Create a new what-if scenario analysis.
+    
+    This endpoint creates a scenario with parameter changes and calculates
+    the impact on timeline, cost, and resources.
+    """
     try:
         if not scenario_analyzer:
             raise HTTPException(status_code=503, detail="Scenario analysis service unavailable")
@@ -40,16 +45,51 @@ async def create_scenario(
         
         return result
         
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         print(f"Create scenario error: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to create scenario: {str(e)}")
+
+@router.put("/{scenario_id}", response_model=ScenarioAnalysis)
+async def update_scenario(
+    scenario_id: UUID,
+    scenario_config: ScenarioConfig,
+    current_user = Depends(require_permission(Permission.project_update))
+):
+    """
+    Update a scenario configuration and recalculate impacts in real-time.
+    
+    This endpoint allows real-time parameter adjustment with immediate
+    impact visualization.
+    """
+    try:
+        if not scenario_analyzer:
+            raise HTTPException(status_code=503, detail="Scenario analysis service unavailable")
+        
+        # Use real-time update method
+        result = await scenario_analyzer.update_scenario_realtime(
+            scenario_id=scenario_id,
+            parameter_changes=scenario_config.parameter_changes.dict(exclude_none=True),
+            user_id=UUID(current_user["user_id"])
+        )
+        
+        return result
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Update scenario error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to update scenario: {str(e)}")
 
 @router.get("/{scenario_id}", response_model=ScenarioAnalysis)
 async def get_scenario(
     scenario_id: UUID,
     current_user = Depends(require_permission(Permission.project_read))
 ):
-    """Get a specific scenario analysis"""
+    """Get a specific scenario analysis with all impact calculations"""
     try:
         if not supabase:
             raise HTTPException(status_code=503, detail="Database service unavailable")
@@ -67,128 +107,72 @@ async def get_scenario(
         print(f"Get scenario error: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get scenario: {str(e)}")
 
-@router.get("/projects/{project_id}/scenarios")
-async def list_project_scenarios(
-    project_id: UUID,
-    limit: int = Query(50, ge=1, le=100),
+@router.get("/{scenario_id}/compare", response_model=ScenarioComparison)
+async def compare_scenario_with_baseline(
+    scenario_id: UUID,
+    baseline_scenario_id: Optional[UUID] = Query(None, description="Baseline scenario to compare against"),
     current_user = Depends(require_permission(Permission.project_read))
 ):
-    """List all scenarios for a project"""
-    try:
-        if not supabase:
-            # Return mock data for development when database is unavailable
-            mock_scenarios = [
-                {
-                    "id": "550e8400-e29b-41d4-a716-446655440001",
-                    "project_id": str(project_id),
-                    "name": "Budget Increase Scenario",
-                    "description": "What if we increase the budget by 20%?",
-                    "base_scenario_id": None,
-                    "parameter_changes": {
-                        "budget": 120000,
-                        "resource_allocations": {"developers": 5, "designers": 2}
-                    },
-                    "timeline_impact": {
-                        "original_duration": 90,
-                        "new_duration": 75,
-                        "duration_change": -15,
-                        "critical_path_affected": True,
-                        "affected_milestones": ["Phase 1 Complete", "Beta Release"]
-                    },
-                    "cost_impact": {
-                        "original_cost": 100000,
-                        "new_cost": 120000,
-                        "cost_change": 20000,
-                        "cost_change_percentage": 20.0,
-                        "affected_categories": ["Personnel", "Equipment"]
-                    },
-                    "resource_impact": {
-                        "utilization_changes": {"developers": 0.2, "designers": 0.1},
-                        "over_allocated_resources": [],
-                        "under_allocated_resources": ["qa_engineers"],
-                        "new_resource_requirements": ["senior_developer"]
-                    },
-                    "created_by": current_user.get("user_id", "mock-user"),
-                    "created_at": "2024-01-01T10:00:00Z",
-                    "updated_at": "2024-01-01T10:00:00Z",
-                    "is_active": True,
-                    "is_baseline": False
-                },
-                {
-                    "id": "550e8400-e29b-41d4-a716-446655440002",
-                    "project_id": str(project_id),
-                    "name": "Accelerated Timeline",
-                    "description": "What if we need to deliver 30 days earlier?",
-                    "base_scenario_id": None,
-                    "parameter_changes": {
-                        "end_date": "2024-06-01",
-                        "resource_allocations": {"developers": 8, "designers": 3}
-                    },
-                    "timeline_impact": {
-                        "original_duration": 90,
-                        "new_duration": 60,
-                        "duration_change": -30,
-                        "critical_path_affected": True,
-                        "affected_milestones": ["All milestones"]
-                    },
-                    "cost_impact": {
-                        "original_cost": 100000,
-                        "new_cost": 135000,
-                        "cost_change": 35000,
-                        "cost_change_percentage": 35.0,
-                        "affected_categories": ["Personnel", "Overtime"]
-                    },
-                    "resource_impact": {
-                        "utilization_changes": {"developers": 0.6, "designers": 0.5},
-                        "over_allocated_resources": ["developers", "designers"],
-                        "under_allocated_resources": [],
-                        "new_resource_requirements": ["additional_developers", "project_coordinator"]
-                    },
-                    "created_by": current_user.get("user_id", "mock-user"),
-                    "created_at": "2024-01-02T14:30:00Z",
-                    "updated_at": "2024-01-02T14:30:00Z",
-                    "is_active": True,
-                    "is_baseline": False
-                }
-            ]
-            
-            return {
-                "project_id": str(project_id),
-                "scenarios": mock_scenarios,
-                "total_count": len(mock_scenarios)
-            }
-        
-        response = supabase.table("scenario_analyses").select("*").eq(
-            "project_id", str(project_id)
-        ).eq("is_active", True).order("created_at", desc=True).limit(limit).execute()
-        
-        scenarios = [ScenarioAnalysis(**scenario_data) for scenario_data in response.data or []]
-        
-        return {
-            "project_id": str(project_id),
-            "scenarios": scenarios,
-            "total_count": len(scenarios)
-        }
-        
-    except Exception as e:
-        print(f"List project scenarios error: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to list scenarios: {str(e)}")
-
-@router.post("/compare", response_model=ScenarioComparison)
-async def compare_scenarios(
-    scenario_ids: List[UUID],
-    current_user = Depends(require_permission(Permission.project_read))
-):
-    """Compare multiple scenarios"""
+    """
+    Compare a scenario with baseline or another scenario.
+    
+    Provides side-by-side comparison with delta calculations.
+    """
     try:
         if not scenario_analyzer:
             raise HTTPException(status_code=503, detail="Scenario analysis service unavailable")
         
+        # Determine scenarios to compare
+        scenario_ids = [scenario_id]
+        if baseline_scenario_id:
+            scenario_ids.append(baseline_scenario_id)
+        else:
+            # Get project's baseline scenario
+            scenario_result = supabase.table("scenario_analyses").select("project_id").eq("id", str(scenario_id)).execute()
+            if scenario_result.data:
+                project_id = scenario_result.data[0]['project_id']
+                baseline_result = supabase.table("scenario_analyses").select("id").eq(
+                    "project_id", project_id
+                ).eq("is_baseline", True).execute()
+                if baseline_result.data:
+                    scenario_ids.append(UUID(baseline_result.data[0]['id']))
+        
+        if len(scenario_ids) < 2:
+            raise HTTPException(
+                status_code=400, 
+                detail="No baseline scenario found for comparison. Please specify baseline_scenario_id."
+            )
+        
+        comparison = await scenario_analyzer.compare_scenarios(scenario_ids)
+        
+        return comparison
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Compare scenario error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to compare scenarios: {str(e)}")
+
+@router.post("/compare", response_model=ScenarioComparison)
+async def compare_multiple_scenarios(
+    scenario_ids: List[UUID],
+    current_user = Depends(require_permission(Permission.project_read))
+):
+    """
+    Compare multiple scenarios with comprehensive analysis.
+    
+    Supports comparing up to 10 scenarios simultaneously with
+    recommendations based on the comparison.
+    """
+    try:
         if len(scenario_ids) < 2:
             raise HTTPException(status_code=400, detail="At least 2 scenarios required for comparison")
         
         if len(scenario_ids) > 10:
             raise HTTPException(status_code=400, detail="Maximum 10 scenarios can be compared at once")
+        
+        if not scenario_analyzer:
+            raise HTTPException(status_code=503, detail="Scenario analysis service unavailable")
         
         comparison = await scenario_analyzer.compare_scenarios(scenario_ids)
         
@@ -200,63 +184,77 @@ async def compare_scenarios(
         print(f"Compare scenarios error: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to compare scenarios: {str(e)}")
 
-@router.put("/{scenario_id}", response_model=ScenarioAnalysis)
-async def update_scenario(
-    scenario_id: UUID,
-    scenario_config: ScenarioConfig,
-    current_user = Depends(require_permission(Permission.project_update))
+@router.get("/projects/{project_id}/scenarios")
+async def list_project_scenarios(
+    project_id: UUID,
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    include_inactive: bool = Query(False, description="Include inactive scenarios"),
+    current_user = Depends(require_permission(Permission.project_read))
 ):
-    """Update a scenario configuration and recalculate impacts"""
+    """
+    List all scenarios for a project with pagination.
+    
+    Returns scenarios ordered by creation date (newest first).
+    """
     try:
         if not supabase:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
-        # Get existing scenario
-        response = supabase.table("scenario_analyses").select("*").eq("id", str(scenario_id)).execute()
+        query = supabase.table("scenario_analyses").select("*").eq("project_id", str(project_id))
         
-        if not response.data:
-            raise HTTPException(status_code=404, detail="Scenario not found")
+        if not include_inactive:
+            query = query.eq("is_active", True)
         
-        existing_scenario = response.data[0]
+        response = query.order("created_at", desc=True).range(offset, offset + limit - 1).execute()
         
-        # Update scenario with new configuration
-        update_data = {
-            "name": scenario_config.name,
-            "description": scenario_config.description,
-            "parameter_changes": scenario_config.parameter_changes.dict(),
-            "updated_at": datetime.now().isoformat()
+        scenarios = [ScenarioAnalysis(**scenario_data) for scenario_data in response.data or []]
+        
+        # Get total count
+        count_response = supabase.table("scenario_analyses").select("id", count="exact").eq(
+            "project_id", str(project_id)
+        )
+        if not include_inactive:
+            count_response = count_response.eq("is_active", True)
+        count_result = count_response.execute()
+        total_count = count_result.count if hasattr(count_result, 'count') else len(scenarios)
+        
+        return {
+            "project_id": str(project_id),
+            "scenarios": scenarios,
+            "total_count": total_count,
+            "limit": limit,
+            "offset": offset
         }
         
-        update_response = supabase.table("scenario_analyses").update(update_data).eq(
-            "id", str(scenario_id)
-        ).execute()
-        
-        if not update_response.data:
-            raise HTTPException(status_code=400, detail="Failed to update scenario")
-        
-        return ScenarioAnalysis(**update_response.data[0])
-        
-    except HTTPException:
-        raise
     except Exception as e:
-        print(f"Update scenario error: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to update scenario: {str(e)}")
+        print(f"List project scenarios error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to list scenarios: {str(e)}")
 
 @router.delete("/{scenario_id}", status_code=204)
 async def delete_scenario(
     scenario_id: UUID,
+    hard_delete: bool = Query(False, description="Permanently delete instead of soft delete"),
     current_user = Depends(require_permission(Permission.project_update))
 ):
-    """Delete a scenario (soft delete by marking as inactive)"""
+    """
+    Delete a scenario (soft delete by default, marking as inactive).
+    
+    Use hard_delete=true to permanently remove the scenario.
+    """
     try:
         if not supabase:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
-        # Soft delete by marking as inactive
-        response = supabase.table("scenario_analyses").update({
-            "is_active": False,
-            "updated_at": datetime.now().isoformat()
-        }).eq("id", str(scenario_id)).execute()
+        if hard_delete:
+            # Hard delete - permanently remove
+            response = supabase.table("scenario_analyses").delete().eq("id", str(scenario_id)).execute()
+        else:
+            # Soft delete - mark as inactive
+            response = supabase.table("scenario_analyses").update({
+                "is_active": False,
+                "updated_at": datetime.now().isoformat()
+            }).eq("id", str(scenario_id)).execute()
         
         if not response.data:
             raise HTTPException(status_code=404, detail="Scenario not found")
@@ -268,3 +266,95 @@ async def delete_scenario(
     except Exception as e:
         print(f"Delete scenario error: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to delete scenario: {str(e)}")
+
+@router.post("/{scenario_id}/clone", response_model=ScenarioAnalysis, status_code=201)
+async def clone_scenario(
+    scenario_id: UUID,
+    new_name: Optional[str] = Query(None, description="Name for the cloned scenario"),
+    current_user = Depends(require_permission(Permission.project_update))
+):
+    """
+    Clone an existing scenario with a new name.
+    
+    Useful for creating variations of existing scenarios.
+    """
+    try:
+        if not supabase or not scenario_analyzer:
+            raise HTTPException(status_code=503, detail="Service unavailable")
+        
+        # Get original scenario
+        original_response = supabase.table("scenario_analyses").select("*").eq("id", str(scenario_id)).execute()
+        
+        if not original_response.data:
+            raise HTTPException(status_code=404, detail="Scenario not found")
+        
+        original = original_response.data[0]
+        
+        # Create new scenario config
+        scenario_config = ScenarioConfig(
+            name=new_name or f"{original['name']} (Copy)",
+            description=f"Cloned from: {original['name']}",
+            parameter_changes=original['parameter_changes'],
+            analysis_scope=original.get('impact_results', {}).keys() or ['timeline', 'cost', 'resources']
+        )
+        
+        # Create new scenario
+        result = await scenario_analyzer.create_scenario(
+            base_project_id=UUID(original['project_id']),
+            scenario_config=scenario_config,
+            user_id=UUID(current_user["user_id"]),
+            base_scenario_id=scenario_id
+        )
+        
+        return result
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Clone scenario error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to clone scenario: {str(e)}")
+
+@router.post("/{scenario_id}/set-baseline", response_model=ScenarioAnalysis)
+async def set_as_baseline(
+    scenario_id: UUID,
+    current_user = Depends(require_permission(Permission.project_update))
+):
+    """
+    Set a scenario as the baseline for its project.
+    
+    Only one scenario per project can be the baseline.
+    """
+    try:
+        if not supabase:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
+        
+        # Get scenario to verify it exists and get project_id
+        scenario_response = supabase.table("scenario_analyses").select("project_id").eq("id", str(scenario_id)).execute()
+        
+        if not scenario_response.data:
+            raise HTTPException(status_code=404, detail="Scenario not found")
+        
+        project_id = scenario_response.data[0]['project_id']
+        
+        # Unset any existing baseline for this project
+        supabase.table("scenario_analyses").update({
+            "is_baseline": False,
+            "updated_at": datetime.now().isoformat()
+        }).eq("project_id", project_id).eq("is_baseline", True).execute()
+        
+        # Set this scenario as baseline
+        response = supabase.table("scenario_analyses").update({
+            "is_baseline": True,
+            "updated_at": datetime.now().isoformat()
+        }).eq("id", str(scenario_id)).execute()
+        
+        if not response.data:
+            raise HTTPException(status_code=400, detail="Failed to set baseline")
+        
+        return ScenarioAnalysis(**response.data[0])
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Set baseline error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to set baseline: {str(e)}")

@@ -24,6 +24,7 @@ describe('HelpChatAPIService', () => {
     apiService = new HelpChatAPIService()
     mockFetch.mockClear()
     apiService.clearCache()
+    apiService.resetRateLimits()
   })
 
   afterEach(() => {
@@ -485,12 +486,86 @@ describe('HelpChatAPIService', () => {
       const result = await apiService.getProactiveTips('/dashboard')
 
       expect(result).toEqual(mockTips)
+      
+      // Validate the URL format matches backend expectations
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/ai/help/tips?context=%2Fdashboard'),
+        expect.stringContaining('/ai/help/tips?page_route=%2Fdashboard'),
         expect.objectContaining({
           method: 'GET'
         })
       )
+      
+      // Verify the URL structure
+      const callUrl = mockFetch.mock.calls[0][0] as string
+      const url = new URL(callUrl, 'http://test.com')
+      expect(url.searchParams.has('page_route')).toBe(true)
+      expect(url.searchParams.get('page_route')).toBe('/dashboard')
+    })
+
+    it('should handle complex query parameters', async () => {
+      const mockTips: ProactiveTipsResponse = {
+        tips: [],
+        context: {
+          route: '/projects',
+          pageTitle: 'Projects',
+          userRole: 'user'
+        }
+      }
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockTips,
+        headers: new Headers()
+      } as Response)
+
+      // Test with query string (like HelpChatProvider uses)
+      const queryString = 'page_route=/projects&page_title=Projects&user_role=user'
+      const result = await apiService.getProactiveTips(queryString)
+
+      expect(result).toEqual(mockTips)
+      
+      // Verify all parameters are present
+      const callUrl = mockFetch.mock.calls[0][0] as string
+      const url = new URL(callUrl, 'http://test.com')
+      expect(url.searchParams.get('page_route')).toBe('/projects')
+      expect(url.searchParams.get('page_title')).toBe('Projects')
+      expect(url.searchParams.get('user_role')).toBe('user')
+    })
+
+    it('should handle object parameters', async () => {
+      const mockTips: ProactiveTipsResponse = {
+        tips: [],
+        context: {
+          route: '/dashboard',
+          pageTitle: 'Dashboard',
+          userRole: 'admin'
+        }
+      }
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockTips,
+        headers: new Headers()
+      } as Response)
+
+      // Test with object (alternative usage)
+      const params = {
+        page_route: '/dashboard',
+        page_title: 'Dashboard',
+        user_role: 'admin',
+        current_project: 'project-123'
+      }
+      const result = await apiService.getProactiveTips(params)
+
+      expect(result).toEqual(mockTips)
+      
+      // Verify all parameters are present
+      const callUrl = mockFetch.mock.calls[0][0] as string
+      const url = new URL(callUrl, 'http://test.com')
+      expect(url.searchParams.get('page_route')).toBe('/dashboard')
+      expect(url.searchParams.get('page_title')).toBe('Dashboard')
+      expect(url.searchParams.get('user_role')).toBe('admin')
+      expect(url.searchParams.get('current_project')).toBe('project-123')
     })
   })
 
@@ -620,6 +695,7 @@ describe('API Calls with Various Contexts', () => {
     apiService = new HelpChatAPIService()
     mockFetch.mockClear()
     apiService.clearLocalCache()
+    apiService.resetRateLimits()
   })
 
   describe('Context Variations', () => {
@@ -899,6 +975,7 @@ describe('Enhanced Error Handling and Retry Logic', () => {
     apiService = new HelpChatAPIService()
     mockFetch.mockClear()
     apiService.clearLocalCache()
+    apiService.resetRateLimits()
   })
 
   describe('Network Error Scenarios', () => {

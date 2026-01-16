@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { 
   BarChart3, TrendingUp, PieChart, Target, Upload, FileText, 
-  CheckCircle 
+  CheckCircle, FolderTree 
 } from 'lucide-react'
 import { ViewMode } from '../types'
 
@@ -63,6 +63,7 @@ export default function TabNavigation({ viewMode, onViewModeChange }: TabNavigat
     { key: 'detailed', label: 'Detailliert', icon: TrendingUp, description: 'Detaillierte Kategorieanalyse' },
     { key: 'trends', label: 'Trends', icon: PieChart, description: 'Zeitliche Entwicklung und Prognosen' },
     { key: 'analysis', label: 'Analyse', icon: Target, description: 'Erweiterte Kostenanalyse' },
+    { key: 'po-breakdown', label: 'PO Breakdown', icon: FolderTree, description: 'SAP Purchase Order Hierarchie' },
     { key: 'csv-import', label: 'CSV Import', icon: Upload, description: 'Daten importieren', highlight: true },
     { key: 'commitments-actuals', label: 'Commitments vs Actuals', icon: FileText, description: 'Geplant vs. Ist-Vergleich' }
   ], [])
@@ -73,6 +74,7 @@ export default function TabNavigation({ viewMode, onViewModeChange }: TabNavigat
       case 'detailed': return 'Detailliert'
       case 'trends': return 'Trends'
       case 'analysis': return 'Analyse'
+      case 'po-breakdown': return 'PO Breakdown'
       case 'csv-import': return 'CSV Import'
       case 'commitments-actuals': return 'Commitments vs Actuals'
       default: return 'Übersicht'

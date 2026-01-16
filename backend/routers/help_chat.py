@@ -1038,11 +1038,10 @@ async def track_visual_guide_completion(
 
 # Analytics endpoints
 @router.get("/analytics/metrics", response_model=Dict[str, Any])
-@require_permission(Permission.ADMIN_READ)
 async def get_help_analytics_metrics(
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
-    current_user = Depends(get_current_user)
+    current_user = Depends(require_permission(Permission.admin_read))
 ):
     """Get help chat usage metrics for specified date range (Admin only)"""
     try:
@@ -1086,10 +1085,9 @@ async def get_help_analytics_metrics(
         )
 
 @router.get("/analytics/weekly-report", response_model=Dict[str, Any])
-@require_permission(Permission.ADMIN_READ)
 async def get_weekly_analytics_report(
     week_start: Optional[str] = None,
-    current_user = Depends(get_current_user)
+    current_user = Depends(require_permission(Permission.admin_read))
 ):
     """Get comprehensive weekly analytics report (Admin only)"""
     try:
@@ -1130,10 +1128,9 @@ async def get_weekly_analytics_report(
         )
 
 @router.post("/analytics/cleanup", response_model=Dict[str, Any])
-@require_permission(Permission.ADMIN_WRITE)
 async def cleanup_analytics_data(
     days_to_keep: int = 90,
-    current_user = Depends(get_current_user)
+    current_user = Depends(require_permission(Permission.admin_update))
 ):
     """Clean up old analytics data for privacy compliance (Admin only)"""
     try:
@@ -1288,9 +1285,8 @@ async def _log_help_analytics(user_id: str, event_type: str, event_data: Dict[st
 
 # Performance monitoring endpoints
 @router.get("/performance/metrics", response_model=Dict[str, Any])
-@require_permission(Permission.ADMIN_READ)
 async def get_help_chat_performance_metrics(
-    current_user = Depends(get_current_user)
+    current_user = Depends(require_permission(Permission.admin_read))
 ):
     """Get help chat performance metrics (Admin only)"""
     try:
@@ -1310,10 +1306,9 @@ async def get_help_chat_performance_metrics(
         )
 
 @router.post("/performance/cache/clear", response_model=Dict[str, Any])
-@require_permission(Permission.ADMIN_WRITE)
 async def clear_help_chat_cache(
     pattern: Optional[str] = "*",
-    current_user = Depends(get_current_user)
+    current_user = Depends(require_permission(Permission.admin_update))
 ):
     """Clear help chat cache (Admin only)"""
     try:

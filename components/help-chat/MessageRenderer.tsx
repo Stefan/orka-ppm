@@ -249,8 +249,8 @@ export function MessageRenderer({
                 id={`${messageId}-sources`}
                 className="space-y-2"
               >
-                {(expandedSources ? message.sources : message.sources.slice(0, 2)).map((source) => (
-                  <div key={source.id}>
+                {(expandedSources ? message.sources : message.sources.slice(0, 2)).map((source, index) => (
+                  <div key={source.id || `source-${index}`}>
                     <SourceCard source={source} />
                   </div>
                 ))}

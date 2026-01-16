@@ -67,6 +67,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             <li>
               <Link 
                 href="/dashboards" 
+                prefetch={true}
                 className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
                 onClick={handleLinkClick}
               >
@@ -76,6 +77,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             <li>
               <Link 
                 href="/scenarios" 
+                prefetch={true}
                 className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
                 onClick={handleLinkClick}
               >
@@ -85,6 +87,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             <li>
               <Link 
                 href="/resources" 
+                prefetch={true}
                 className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
                 onClick={handleLinkClick}
               >
@@ -94,6 +97,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             <li>
               <Link 
                 href="/reports" 
+                prefetch={true}
                 className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
                 onClick={handleLinkClick}
               >
@@ -103,6 +107,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             <li>
               <Link 
                 href="/financials" 
+                prefetch={true}
                 className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
                 onClick={handleLinkClick}
               >
@@ -112,6 +117,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             <li>
               <Link 
                 href="/risks" 
+                prefetch={true}
                 className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
                 onClick={handleLinkClick}
               >
@@ -121,6 +127,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             <li>
               <Link 
                 href="/monte-carlo" 
+                prefetch={true}
                 className="flex items-center py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
                 onClick={handleLinkClick}
               >
@@ -131,6 +138,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             <li>
               <Link 
                 href="/changes" 
+                prefetch={true}
                 className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
                 onClick={handleLinkClick}
               >
@@ -140,6 +148,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             <li>
               <Link 
                 href="/feedback" 
+                prefetch={true}
                 className="flex items-center py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
                 onClick={handleLinkClick}
               >
@@ -150,6 +159,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             <li>
               <Link 
                 href="/admin/performance" 
+                prefetch={true}
                 className="flex items-center py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
                 onClick={handleLinkClick}
               >
@@ -160,6 +170,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             <li>
               <Link 
                 href="/admin/users" 
+                prefetch={true}
                 className="flex items-center py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
                 onClick={handleLinkClick}
               >
@@ -225,6 +236,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
         <li style={{ display: 'block', width: '100%' }}>
           <Link 
             href="/dashboards" 
+            prefetch={true}
             style={{ 
               display: 'block', 
               padding: '0.5rem 1rem', 
@@ -240,6 +252,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
         <li style={{ display: 'block', width: '100%' }}>
           <Link 
             href="/scenarios" 
+            prefetch={true}
             style={{ 
               display: 'block', 
               padding: '0.5rem 1rem', 
@@ -255,6 +268,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
         <li style={{ display: 'block', width: '100%' }}>
           <Link 
             href="/resources" 
+            prefetch={true}
             style={{ 
               display: 'block', 
               padding: '0.5rem 1rem', 
@@ -270,6 +284,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
         <li style={{ display: 'block', width: '100%' }}>
           <Link 
             href="/reports" 
+            prefetch={true}
             style={{ 
               display: 'block', 
               padding: '0.5rem 1rem', 
@@ -285,6 +300,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
         <li style={{ display: 'block', width: '100%' }}>
           <Link 
             href="/financials" 
+            prefetch={true}
             style={{ 
               display: 'block', 
               padding: '0.5rem 1rem', 
@@ -300,6 +316,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
         <li style={{ display: 'block', width: '100%' }}>
           <Link 
             href="/risks" 
+            prefetch={true}
             style={{ 
               display: 'block', 
               padding: '0.5rem 1rem', 
@@ -315,6 +332,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
         <li style={{ display: 'block', width: '100%' }}>
           <Link 
             href="/monte-carlo" 
+            prefetch={true}
             style={{ 
               display: 'flex', 
               alignItems: 'center',
@@ -332,6 +350,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
         <li style={{ display: 'block', width: '100%' }}>
           <Link 
             href="/changes" 
+            prefetch={true}
             style={{ 
               display: 'block', 
               padding: '0.5rem 1rem', 
@@ -347,6 +366,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
         <li style={{ display: 'block', width: '100%' }}>
           <Link 
             href="/feedback" 
+            prefetch={true}
             style={{ 
               display: 'flex', 
               alignItems: 'center',
@@ -364,6 +384,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
         <li style={{ display: 'block', width: '100%' }}>
           <Link 
             href="/admin/performance" 
+            prefetch={true}
             style={{ 
               display: 'flex', 
               alignItems: 'center',
@@ -381,6 +402,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
         <li style={{ display: 'block', width: '100%' }}>
           <Link 
             href="/admin/users" 
+            prefetch={true}
             style={{ 
               display: 'flex', 
               alignItems: 'center',

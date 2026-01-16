@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useReducer } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
   Plus, 
@@ -26,6 +26,32 @@ interface ChangeRequestFilters {
   priority: string
   project_id: string
   assigned_to_me: boolean
+}
+
+// Reducer for batching filter state updates
+type FilterAction =
+  | { type: 'SET_FILTER'; key: keyof ChangeRequestFilters; value: string | boolean }
+  | { type: 'RESET_FILTERS' }
+  | { type: 'SET_MULTIPLE_FILTERS'; filters: Partial<ChangeRequestFilters> }
+
+function filterReducer(state: ChangeRequestFilters, action: FilterAction): ChangeRequestFilters {
+  switch (action.type) {
+    case 'SET_FILTER':
+      return { ...state, [action.key]: action.value }
+    case 'RESET_FILTERS':
+      return {
+        search: '',
+        status: '',
+        change_type: '',
+        priority: '',
+        project_id: '',
+        assigned_to_me: false
+      }
+    case 'SET_MULTIPLE_FILTERS':
+      return { ...state, ...action.filters }
+    default:
+      return state
+  }
 }
 
 const CHANGE_STATUSES = [
@@ -68,7 +94,9 @@ export default function ChangeRequestManager() {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [showFilters, setShowFilters] = useState(false)
   const [showCreateForm, setShowCreateForm] = useState(false)
-  const [filters, setFilters] = useState<ChangeRequestFilters>({
+  
+  // Use reducer for batching filter state updates
+  const [filters, dispatchFilters] = useReducer(filterReducer, {
     search: '',
     status: '',
     change_type: '',
@@ -90,7 +118,7 @@ export default function ChangeRequestManager() {
   )
 
   const handleFilterChange = (key: keyof ChangeRequestFilters, value: string | boolean) => {
-    setFilters(prev => ({ ...prev, [key]: value }))
+    dispatchFilters({ type: 'SET_FILTER', key, value })
   }
 
   const handleSelectItem = (id: string) => {

@@ -32,6 +32,35 @@ export { default as MonteCarloAnalysisComponent } from './MonteCarloAnalysisComp
 export { default as PMRExportManager } from './PMRExportManager'
 export type { PMRExportManagerProps, ExportConfig, ExportFormat, ExportTemplate } from './PMRExportManager'
 
+export { default as PMRChart } from './PMRChart'
+export type { PMRChartProps, PMRChartType, PMRChartDataPoint, AIInsightOverlay } from './PMRChart'
+
+// Help and Documentation Components
+export { default as ContextualHelp } from './ContextualHelp'
+export type { HelpContent, ContextualHelpProps } from './ContextualHelp'
+
+export { default as OnboardingTour, useOnboardingTour, enhancedPMRTourSteps } from './OnboardingTour'
+export type { TourStep, OnboardingTourProps } from './OnboardingTour'
+
+export { default as AIAssistanceTooltip, useAITooltip, PMR_AI_TOOLTIPS } from './AIAssistanceTooltip'
+export type { AITooltipContent, AIAssistanceTooltipProps } from './AIAssistanceTooltip'
+
+export { default as PMRHelpIntegration } from './PMRHelpIntegration'
+export type { PMRHelpIntegrationProps } from './PMRHelpIntegration'
+
+// Export chart utilities
+export {
+  generateBudgetVarianceData,
+  generateSchedulePerformanceData,
+  generateRiskHeatmapData,
+  generateResourceUtilizationData,
+  generateCostPerformanceData,
+  exportChartData,
+  calculateTrend,
+  getChartColorScheme,
+  formatForPMRReport
+} from './pmr-chart-utils'
+
 // Export all types
 export * from './types'
 

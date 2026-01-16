@@ -34,13 +34,33 @@ self.onmessage = function(event) {
         result = validateData(data.items, data.schema)
         break
       
+      case 'batch-transform':
+        result = batchTransform(data.items, data.operations)
+        break
+      
+      case 'deduplicate':
+        result = deduplicateData(data.items, data.keyFields)
+        break
+      
+      case 'merge':
+        result = mergeDatasets(data.datasets, data.mergeKey)
+        break
+      
+      case 'pivot':
+        result = pivotData(data.items, data.rowField, data.columnField, data.valueField)
+        break
+      
+      case 'normalize':
+        result = normalizeData(data.items, data.fields, data.method)
+        break
+      
       default:
         throw new Error(`Unknown task type: ${type}`)
     }
 
-    self.postMessage({ taskId, result })
+    self.postMessage({ taskId, result, success: true })
   } catch (error) {
-    self.postMessage({ taskId, error: error.message })
+    self.postMessage({ taskId, error: error.message, success: false })
   }
 }
 
@@ -186,4 +206,168 @@ function validateData(items, schema) {
     errors,
     validItems: items.length - errors.length
   }
+}
+
+
+// ============================================================================
+// Additional Data Processing Functions
+// ============================================================================
+
+/**
+ * Batch transform - apply multiple operations in sequence
+ */
+function batchTransform(items, operations) {
+  let result = items
+  
+  operations.forEach(op => {
+    switch (op.type) {
+      case 'filter':
+        result = filterData(result, op.predicate)
+        break
+      case 'sort':
+        result = sortData(result, op.compareFn, op.direction)
+        break
+      case 'transform':
+        result = transformData(result, op.transformFn)
+        break
+      case 'aggregate':
+        result = aggregateData(result, op.groupBy, op.aggregations)
+        break
+    }
+  })
+  
+  return result
+}
+
+/**
+ * Deduplicate data based on key fields
+ */
+function deduplicateData(items, keyFields) {
+  const seen = new Set()
+  const result = []
+  
+  items.forEach(item => {
+    const key = keyFields.map(field => item[field]).join('|')
+    if (!seen.has(key)) {
+      seen.add(key)
+      result.push(item)
+    }
+  })
+  
+  return result
+}
+
+/**
+ * Merge multiple datasets on a common key
+ */
+function mergeDatasets(datasets, mergeKey) {
+  if (datasets.length === 0) return []
+  if (datasets.length === 1) return datasets[0]
+  
+  const merged = new Map()
+  
+  datasets.forEach((dataset, datasetIndex) => {
+    dataset.forEach(item => {
+      const key = item[mergeKey]
+      if (!merged.has(key)) {
+        merged.set(key, { [mergeKey]: key })
+      }
+      
+      const mergedItem = merged.get(key)
+      Object.keys(item).forEach(field => {
+        if (field !== mergeKey) {
+          const fieldName = datasets.length > 2 
+            ? `${field}_${datasetIndex}` 
+            : field
+          mergedItem[fieldName] = item[field]
+        }
+      })
+    })
+  })
+  
+  return Array.from(merged.values())
+}
+
+/**
+ * Pivot data from long to wide format
+ */
+function pivotData(items, rowField, columnField, valueField) {
+  const pivoted = {}
+  
+  items.forEach(item => {
+    const row = item[rowField]
+    const column = item[columnField]
+    const value = item[valueField]
+    
+    if (!pivoted[row]) {
+      pivoted[row] = { [rowField]: row }
+    }
+    
+    pivoted[row][column] = value
+  })
+  
+  return Object.values(pivoted)
+}
+
+/**
+ * Normalize data fields using various methods
+ */
+function normalizeData(items, fields, method = 'minmax') {
+  const result = items.map(item => ({ ...item }))
+  
+  fields.forEach(field => {
+    const values = items.map(item => item[field]).filter(v => typeof v === 'number')
+    
+    if (values.length === 0) return
+    
+    let normalized
+    
+    switch (method) {
+      case 'minmax':
+        const min = Math.min(...values)
+        const max = Math.max(...values)
+        const range = max - min
+        
+        if (range === 0) {
+          normalized = values.map(() => 0)
+        } else {
+          normalized = values.map(v => (v - min) / range)
+        }
+        break
+      
+      case 'zscore':
+        const mean = values.reduce((sum, v) => sum + v, 0) / values.length
+        const variance = values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length
+        const stdDev = Math.sqrt(variance)
+        
+        if (stdDev === 0) {
+          normalized = values.map(() => 0)
+        } else {
+          normalized = values.map(v => (v - mean) / stdDev)
+        }
+        break
+      
+      case 'decimal':
+        const maxAbs = Math.max(...values.map(v => Math.abs(v)))
+        
+        if (maxAbs === 0) {
+          normalized = values.map(() => 0)
+        } else {
+          normalized = values.map(v => v / maxAbs)
+        }
+        break
+      
+      default:
+        normalized = values
+    }
+    
+    let normalizedIndex = 0
+    result.forEach(item => {
+      if (typeof item[field] === 'number') {
+        item[`${field}_normalized`] = normalized[normalizedIndex++]
+      }
+    })
+  })
+  
+  return result
 }

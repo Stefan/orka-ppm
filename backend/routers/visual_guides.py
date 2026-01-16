@@ -8,10 +8,10 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 
-from ..config.database import get_db
-from ..auth.dependencies import get_current_user
-from ..services.visual_guide_service import visual_guide_service, VisualGuide
-from ..models.users import User
+from config.database import get_db
+from auth.dependencies import get_current_user
+from services.visual_guide_service import visual_guide_service, VisualGuide
+from models.users import User
 
 router = APIRouter(prefix="/visual-guides", tags=["visual-guides"])
 

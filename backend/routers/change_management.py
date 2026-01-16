@@ -20,67 +20,43 @@ from models.change_management import (
     ChangeStatus, ChangeType, PriorityLevel, ApprovalDecision
 )
 from config.database import supabase
+from services.change_request_manager import ChangeRequestManager
+from services.approval_workflow_engine import ApprovalWorkflowEngine
+from services.change_notification_system import ChangeNotificationSystem
+from services.impact_analysis_calculator import ImpactAnalysisCalculator
+from services.implementation_tracker import ImplementationTracker
+from services.change_analytics_service import ChangeAnalyticsService
 
 router = APIRouter(prefix="/changes", tags=["Change Management"])
 
-# Note: Services will be initialized when they are properly implemented
-# For now, we'll create mock implementations to test the API structure
+# Initialize services
+change_request_manager = ChangeRequestManager()
+approval_workflow_engine = ApprovalWorkflowEngine()
+change_notification_system = ChangeNotificationSystem()
+impact_analysis_calculator = ImpactAnalysisCalculator()
+implementation_tracker = ImplementationTracker()
+change_analytics_service = ChangeAnalyticsService()
 
 # ============================================================================
-# CHANGE REQUEST CRUD ENDPOINTS (Subtask 11.1)
+# CHANGE REQUEST CRUD ENDPOINTS (Subtask 6.2)
 # ============================================================================
 
 @router.post("", response_model=ChangeRequestResponse)
 async def create_change_request(
     change_data: ChangeRequestCreate,
-    current_user = Depends(require_permission(Permission.project_update))
+    current_user = Depends(require_permission(Permission.change_create))
 ):
     """
     Create a new change request
     
-    Requirements: 1.1, 1.2, 1.4
+    Requirements: 4.1, 4.2, 4.3
     """
     try:
-        # Mock implementation for testing API structure
-        change_id = str(UUID("12345678-1234-5678-9012-123456789012"))
-        change_number = f"CR-2024-{random.randint(1000, 9999)}"
-        
-        # Create mock response
-        change_request = ChangeRequestResponse(
-            id=change_id,
-            change_number=change_number,
-            title=change_data.title,
-            description=change_data.description,
-            justification=change_data.justification,
-            change_type=change_data.change_type.value,
-            priority=change_data.priority.value,
-            status=ChangeStatus.DRAFT.value,
-            requested_by=current_user['user_id'],
-            requested_date=datetime.now(),
-            required_by_date=change_data.required_by_date,
-            project_id=str(change_data.project_id),
-            project_name="Test Project",
-            affected_milestones=[],
-            affected_pos=[],
-            estimated_cost_impact=change_data.estimated_cost_impact,
-            estimated_schedule_impact_days=change_data.estimated_schedule_impact_days,
-            estimated_effort_hours=change_data.estimated_effort_hours,
-            actual_cost_impact=None,
-            actual_schedule_impact_days=None,
-            actual_effort_hours=None,
-            implementation_progress=None,
-            implementation_start_date=None,
-            implementation_end_date=None,
-            implementation_notes=None,
-            pending_approvals=[],
-            approval_history=[],
-            version=1,
-            parent_change_id=None,
-            template_id=str(change_data.template_id) if change_data.template_id else None,
-            created_at=datetime.now(),
-            updated_at=datetime.now(),
-            closed_at=None,
-            closed_by=None
+        # Create change request using the service
+        change_request = await change_request_manager.create_change_request(
+            request_data=change_data,
+            creator_id=UUID(current_user['user_id']),
+            template_id=change_data.template_id if hasattr(change_data, 'template_id') else None
         )
         
         return change_request
@@ -103,7 +79,7 @@ async def list_change_requests(
     search_term: Optional[str] = Query(None, description="Search in title and description"),
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
-    current_user = Depends(require_permission(Permission.project_read))
+    current_user = Depends(require_permission(Permission.change_read))
 ):
     """
     List change requests with filtering and pagination
@@ -450,6 +426,103 @@ async def escalate_approval(
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to escalate approval: {str(e)}")
+
+
+@router.post("/{change_id}/link-po")
+async def link_change_to_po(
+    change_id: UUID,
+    po_breakdown_ids: List[UUID],
+    impact_type: str = "cost_increase",
+    impact_amount: Optional[float] = None,
+    current_user = Depends(require_permission(Permission.project_update))
+):
+    """
+    Link a change request to one or more PO breakdowns
+    
+    Requirements: 4.4, 4.5
+    """
+    try:
+        # Check if change request exists
+        change_request = await change_request_manager.get_change_request(change_id)
+        if not change_request:
+            raise HTTPException(status_code=404, detail="Change request not found")
+        
+        # Link to each PO breakdown
+        linked_count = 0
+        for po_id in po_breakdown_ids:
+            success = await change_request_manager.link_to_purchase_order(
+                change_id=change_id,
+                po_id=po_id,
+                linked_by=UUID(current_user['user_id'])
+            )
+            if success:
+                linked_count += 1
+        
+        return {
+            "message": f"Successfully linked change request to {linked_count} PO breakdown(s)",
+            "change_request_id": str(change_id),
+            "linked_po_count": linked_count
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to link change to PO: {str(e)}")
+
+
+@router.post("/{change_id}/approve")
+async def approve_change_request(
+    change_id: UUID,
+    decision: ApprovalDecisionRequest,
+    current_user = Depends(require_permission(Permission.project_update))
+):
+    """
+    Approve or reject a change request (simplified endpoint)
+    
+    Requirements: 4.4, 4.5
+    """
+    try:
+        # Check if change request exists
+        change_request = await change_request_manager.get_change_request(change_id)
+        if not change_request:
+            raise HTTPException(status_code=404, detail="Change request not found")
+        
+        # Update change request status based on decision
+        if decision.decision == ApprovalDecision.APPROVED:
+            new_status = ChangeStatus.APPROVED
+        elif decision.decision == ApprovalDecision.REJECTED:
+            new_status = ChangeStatus.REJECTED
+        else:
+            new_status = ChangeStatus.UNDER_REVIEW
+        
+        updates = ChangeRequestUpdate(status=new_status)
+        updated_change = await change_request_manager.update_change_request(
+            change_id=change_id,
+            updates=updates,
+            updated_by=UUID(current_user['user_id'])
+        )
+        
+        # Send notification
+        await change_notification_system.notify_stakeholders(
+            change_id=change_id,
+            event_type=f"change_{decision.decision.value}",
+            stakeholder_roles=["requestor", "project_manager"]
+        )
+        
+        return {
+            "message": f"Change request {decision.decision.value} successfully",
+            "change_request_id": str(change_id),
+            "new_status": new_status.value
+        }
+        
+    except HTTPException:
+        raise
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to process approval: {str(e)}")
+
+
 # ============================================================================
 # IMPACT ANALYSIS ENDPOINTS (Subtask 11.3)
 # ============================================================================

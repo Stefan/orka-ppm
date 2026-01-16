@@ -483,12 +483,25 @@ export class VisualGuideBuilder {
     tags: [],
     version: '1.0.0'
   }
+  private screenshotService: ScreenshotService
 
-  constructor(title: string, description: string) {
+  constructor(screenshotService: ScreenshotService) {
+    this.screenshotService = screenshotService
+  }
+
+  startGuide(
+    title: string,
+    description: string,
+    category?: VisualGuide['category']
+  ): this {
     this.guide.title = title
     this.guide.description = description
+    if (category) {
+      this.guide.category = category
+    }
     this.guide.id = `guide-${Date.now()}`
     this.guide.lastUpdated = new Date()
+    return this
   }
 
   setCategory(category: VisualGuide['category']): this {
@@ -512,18 +525,42 @@ export class VisualGuideBuilder {
     return this
   }
 
+  addTags(...tags: string[]): this {
+    if (!this.guide.tags) this.guide.tags = []
+    this.guide.tags.push(...tags)
+    return this
+  }
+
   addPrerequisite(prerequisite: string): this {
     if (!this.guide.prerequisites) this.guide.prerequisites = []
     this.guide.prerequisites.push(prerequisite)
     return this
   }
 
-  addStep(step: Omit<VisualGuideStep, 'id'>): this {
+  addStep(
+    title: string,
+    description: string,
+    options?: {
+      action?: string
+      element?: string
+      targetElement?: string
+      annotations?: ScreenshotAnnotation[]
+      actionData?: any
+    }
+  ): this {
     if (!this.guide.steps) this.guide.steps = []
     
+    const stepNumber = this.guide.steps.length + 1
+    const stepId = `step_${stepNumber}`
+
     this.guide.steps.push({
-      ...step,
-      id: `step-${this.guide.steps.length + 1}-${Date.now()}`
+      id: stepId,
+      title,
+      description,
+      targetElement: options?.targetElement || options?.element,
+      action: options?.action,
+      actionData: options?.actionData,
+      annotations: options?.annotations || []
     })
     return this
   }
@@ -534,9 +571,7 @@ export class VisualGuideBuilder {
     targetElement: string,
     annotations: ScreenshotAnnotation[] = []
   ): this {
-    return this.addStep({
-      title,
-      description,
+    return this.addStep(title, description, {
       targetElement,
       action: 'click',
       annotations: [
@@ -558,9 +593,7 @@ export class VisualGuideBuilder {
     text: string,
     annotations: ScreenshotAnnotation[] = []
   ): this {
-    return this.addStep({
-      title,
-      description,
+    return this.addStep(title, description, {
       targetElement,
       action: 'type',
       actionData: { text },
@@ -570,7 +603,7 @@ export class VisualGuideBuilder {
 
   build(): VisualGuide {
     if (!this.guide.title || !this.guide.description) {
-      throw new Error('Title and description are required')
+      throw new Error('Guide title and description are required')
     }
 
     if (!this.guide.steps || this.guide.steps.length === 0) {

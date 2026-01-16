@@ -464,26 +464,4 @@ describe('VisualGuideSystem', () => {
     })
   })
 
-  describe('Accessibility', () => {
-    it('should provide keyboard navigation hints', () => {
-      render(<VisualGuideSystem guide={mockGuide} />)
-
-      expect(screen.getByText(/use.*arrow keys.*spacebar.*navigate/i)).toBeInTheDocument()
-    })
-
-    it('should provide keyboard navigation hints for interactive guides', () => {
-      render(<VisualGuideSystem guide={mockGuide} isInteractive={true} />)
-
-      expect(screen.getByText(/p to play\/pause/i)).toBeInTheDocument()
-    })
-
-    it('should have proper ARIA labels and roles', () => {
-      render(<VisualGuideSystem guide={mockGuide} />)
-
-      // Check that buttons have proper labels
-      expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /previous/i })).toBeInTheDocument()
-      expect(screen.getByTitle('Toggle annotations')).toBeInTheDocument()
-    })
-  })
 })

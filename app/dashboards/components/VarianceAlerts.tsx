@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { AlertTriangle, CheckCircle, Clock, X } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
 
@@ -21,7 +21,7 @@ interface VarianceAlertsProps {
   onAlertCount?: (count: number) => void
 }
 
-export default function VarianceAlerts({ session, onAlertCount }: VarianceAlertsProps) {
+function VarianceAlerts({ session, onAlertCount }: VarianceAlertsProps) {
   const [alerts, setAlerts] = useState<VarianceAlert[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -253,3 +253,12 @@ export default function VarianceAlerts({ session, onAlertCount }: VarianceAlerts
     </div>
   )
 }
+
+// Custom comparison function to prevent unnecessary re-renders
+// Only re-render if session token changes
+// Note: onAlertCount is a callback and should be stable (wrapped in useCallback in parent)
+const arePropsEqual = (prevProps: VarianceAlertsProps, nextProps: VarianceAlertsProps) => {
+  return prevProps.session?.access_token === nextProps.session?.access_token
+}
+
+export default memo(VarianceAlerts, arePropsEqual)

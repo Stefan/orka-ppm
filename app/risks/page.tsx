@@ -1,12 +1,25 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useDeferredValue, useReducer, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, ScatterChart, Scatter, Area, AreaChart } from 'recharts'
 import AppLayout from '../../components/shared/AppLayout'
-import AIRiskManagement from '../../components/ai/AIRiskManagement'
 import { AlertTriangle, Shield, TrendingUp, Activity, Clock, User, Calendar, Target, Filter, Download, RefreshCw, BarChart3, Plus, Search, SortAsc, SortDesc, Zap } from 'lucide-react'
 import { getApiUrl } from '../../lib/api/client'
+import { SkeletonCard, SkeletonChart, SkeletonTable } from '../../components/ui/skeletons'
+import { useDebounce } from '../../hooks/useDebounce'
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ScatterChart, Scatter, AreaChart, Area } from 'recharts'
+
+// Dynamic imports for heavy components (code splitting)
+const AIRiskManagement = dynamic(() => import('../../components/ai/AIRiskManagement'), {
+  loading: () => <SkeletonCard variant="stat" />,
+  ssr: false
+})
+
+const RiskCharts = dynamic(() => import('./components/RiskCharts'), {
+  loading: () => <SkeletonChart variant="bar" height="h-80" />,
+  ssr: false
+})
 
 interface Risk {
   id: string
@@ -52,6 +65,43 @@ interface RiskAlert {
   created_at: string
 }
 
+// Reducer for batching filter and sort state updates
+interface FilterSortState {
+  filterCategory: string
+  filterStatus: string
+  sortBy: 'risk_score' | 'created_at' | 'due_date'
+  sortOrder: 'asc' | 'desc'
+}
+
+type FilterSortAction =
+  | { type: 'SET_FILTER_CATEGORY'; value: string }
+  | { type: 'SET_FILTER_STATUS'; value: string }
+  | { type: 'SET_SORT_BY'; value: 'risk_score' | 'created_at' | 'due_date' }
+  | { type: 'TOGGLE_SORT_ORDER' }
+  | { type: 'RESET_FILTERS' }
+
+function filterSortReducer(state: FilterSortState, action: FilterSortAction): FilterSortState {
+  switch (action.type) {
+    case 'SET_FILTER_CATEGORY':
+      return { ...state, filterCategory: action.value }
+    case 'SET_FILTER_STATUS':
+      return { ...state, filterStatus: action.value }
+    case 'SET_SORT_BY':
+      return { ...state, sortBy: action.value }
+    case 'TOGGLE_SORT_ORDER':
+      return { ...state, sortOrder: state.sortOrder === 'asc' ? 'desc' : 'asc' }
+    case 'RESET_FILTERS':
+      return {
+        filterCategory: 'all',
+        filterStatus: 'all',
+        sortBy: 'risk_score',
+        sortOrder: 'desc'
+      }
+    default:
+      return state
+  }
+}
+
 export default function Risks() {
   const { session } = useAuth()
   const [risks, setRisks] = useState<Risk[]>([])
@@ -60,15 +110,29 @@ export default function Risks() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'overview' | 'matrix' | 'trends' | 'detailed'>('overview')
-  const [filterCategory, setFilterCategory] = useState<string>('all')
-  const [filterStatus, setFilterStatus] = useState<string>('all')
+  
+  // Use reducer for batching filter and sort state updates
+  const [filterSortState, dispatchFilterSort] = useReducer(filterSortReducer, {
+    filterCategory: 'all',
+    filterStatus: 'all',
+    sortBy: 'risk_score',
+    sortOrder: 'desc'
+  })
+  
+  const { filterCategory, filterStatus, sortBy, sortOrder } = filterSortState
+  
   const [searchTerm, setSearchTerm] = useState('')
-  const [sortBy, setSortBy] = useState<'risk_score' | 'created_at' | 'due_date'>('risk_score')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [showFilters, setShowFilters] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
   const [showMonteCarloModal, setShowMonteCarloModal] = useState(false)
   const [showAIAnalysis, setShowAIAnalysis] = useState(true)
+
+  // Debounce search term to reduce update frequency (300ms delay)
+  const debouncedSearchTerm = useDebounce(searchTerm, 300)
+
+  // Defer filter changes for non-critical updates (charts, analytics)
+  const deferredFilterCategory = useDeferredValue(filterCategory)
+  const deferredFilterStatus = useDeferredValue(filterStatus)
 
   // Enhanced analytics data
   const analyticsData = useMemo(() => {
@@ -76,6 +140,7 @@ export default function Risks() {
 
     const riskTrendData = metrics.trend_data || []
     
+    // Use deferred filter values for analytics to prioritize critical UI updates
     const categoryRiskData = Object.entries(metrics.by_category).map(([category, count]) => ({
       category: category.charAt(0).toUpperCase() + category.slice(1),
       count,
@@ -117,17 +182,17 @@ export default function Risks() {
       criticalRisks: metrics.high_risk_count,
       avgRiskScore: metrics.average_risk_score
     }
-  }, [metrics, risks])
+  }, [metrics, risks, deferredFilterCategory, deferredFilterStatus])
 
   // Filtered and sorted risks
   const filteredRisks = useMemo(() => {
     const filtered = risks.filter(risk => {
       const matchesCategory = filterCategory === 'all' || risk.category === filterCategory
       const matchesStatus = filterStatus === 'all' || risk.status === filterStatus
-      const matchesSearch = searchTerm === '' || 
-        risk.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        risk.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        risk.project_name?.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesSearch = debouncedSearchTerm === '' || 
+        risk.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        risk.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        risk.project_name?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
       
       return matchesCategory && matchesStatus && matchesSearch
     })
@@ -155,7 +220,7 @@ export default function Risks() {
     })
 
     return filtered
-  }, [risks, filterCategory, filterStatus, searchTerm, sortBy, sortOrder])
+  }, [risks, filterCategory, filterStatus, debouncedSearchTerm, sortBy, sortOrder])
 
   useEffect(() => {
     if (session) {
@@ -494,8 +559,49 @@ export default function Risks() {
 
   if (loading) return (
     <AppLayout>
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="p-8 space-y-6">
+        {/* Header Skeleton */}
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+        </div>
+        
+        {/* Summary Cards Skeleton */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[...Array(4)].map((_, i) => (
+            <SkeletonCard key={i} variant="stat" />
+          ))}
+        </div>
+        
+        {/* Charts Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <SkeletonChart variant="bar" height="h-80" />
+          <SkeletonChart variant="pie" height="h-80" />
+        </div>
+        
+        {/* Top Risks Skeleton */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="animate-pulse">
+            <div className="h-5 bg-gray-200 rounded w-1/4 mb-4"></div>
+            <div className="space-y-3">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center space-x-4 flex-1">
+                    <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                  <div className="h-6 w-16 bg-gray-200 rounded-full"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        {/* Risk Table Skeleton */}
+        <SkeletonTable rows={8} columns={9} showHeader={true} />
       </div>
     </AppLayout>
   )
@@ -677,7 +783,7 @@ export default function Risks() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                 <select
                   value={filterCategory}
-                  onChange={(e) => setFilterCategory(e.target.value)}
+                  onChange={(e) => dispatchFilterSort({ type: 'SET_FILTER_CATEGORY', value: e.target.value })}
                   className="w-full min-h-[44px] p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                 >
                   <option value="all">All Categories</option>
@@ -693,7 +799,7 @@ export default function Risks() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                 <select
                   value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
+                  onChange={(e) => dispatchFilterSort({ type: 'SET_FILTER_STATUS', value: e.target.value })}
                   className="w-full min-h-[44px] p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                 >
                   <option value="all">All Statuses</option>
@@ -709,7 +815,7 @@ export default function Risks() {
                 <div className="flex space-x-2">
                   <select
                     value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as any)}
+                    onChange={(e) => dispatchFilterSort({ type: 'SET_SORT_BY', value: e.target.value as any })}
                     className="flex-1 min-h-[44px] p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   >
                     <option value="risk_score">Risk Score</option>
@@ -717,7 +823,7 @@ export default function Risks() {
                     <option value="due_date">Due Date</option>
                   </select>
                   <button
-                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                    onClick={() => dispatchFilterSort({ type: 'TOGGLE_SORT_ORDER' })}
                     className="min-h-[44px] px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 active:bg-gray-100"
                   >
                     {sortOrder === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
@@ -728,11 +834,8 @@ export default function Risks() {
               <div className="flex items-end">
                 <button 
                   onClick={() => {
-                    setFilterCategory('all')
-                    setFilterStatus('all')
+                    dispatchFilterSort({ type: 'RESET_FILTERS' })
                     setSearchTerm('')
-                    setSortBy('risk_score')
-                    setSortOrder('desc')
                   }}
                   className="w-full min-h-[44px] px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 active:bg-gray-300 font-medium"
                 >

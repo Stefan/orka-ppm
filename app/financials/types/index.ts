@@ -141,7 +141,7 @@ export interface CSVUploadResult {
   import_id: string
 }
 
-export type ViewMode = 'overview' | 'detailed' | 'trends' | 'analysis' | 'csv-import' | 'commitments-actuals'
+export type ViewMode = 'overview' | 'detailed' | 'trends' | 'analysis' | 'csv-import' | 'commitments-actuals' | 'po-breakdown'
 
 export interface AnalyticsData {
   budgetStatusData: Array<{
@@ -173,4 +173,67 @@ export interface AnalyticsData {
   totalOverruns: number
   avgEfficiency: number
   netVariance: number
+}
+
+
+// PO Breakdown Types
+export interface POBreakdown {
+  id: string
+  project_id: string
+  name: string
+  code?: string
+  sap_po_number?: string
+  sap_line_item?: string
+  hierarchy_level: number
+  parent_breakdown_id?: string
+  cost_center?: string
+  gl_account?: string
+  planned_amount: number
+  committed_amount: number
+  actual_amount: number
+  remaining_amount: number
+  currency: string
+  breakdown_type: 'sap_standard' | 'custom_hierarchy' | 'cost_center' | 'work_package'
+  category?: string
+  subcategory?: string
+  custom_fields?: Record<string, any>
+  tags?: string[]
+  notes?: string
+  import_batch_id?: string
+  import_source?: string
+  version: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+  children?: POBreakdown[]
+  rollup_data?: {
+    planned_amount: number
+    committed_amount: number
+    actual_amount: number
+    child_planned_total: number
+    child_committed_total: number
+    child_actual_total: number
+    children_count: number
+  }
+}
+
+export interface POBreakdownSummary {
+  total_planned: number
+  total_committed: number
+  total_actual: number
+  total_remaining: number
+  breakdown_count: number
+  hierarchy_levels: number
+  currency: string
+}
+
+export interface POImportResult {
+  success: boolean
+  import_batch_id?: string
+  total_rows: number
+  successful_imports: number
+  failed_imports: number
+  errors: string[]
+  warnings: string[]
+  created_breakdowns: string[]
 }

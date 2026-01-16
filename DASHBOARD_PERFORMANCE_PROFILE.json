@@ -1,0 +1,148 @@
+{
+  "timestamp": "2026-01-15T12:19:00.079Z",
+  "issues": [
+    {
+      "severity": "medium",
+      "category": "state-management",
+      "message": "High number of useState calls (11)",
+      "impact": "May cause unnecessary re-renders",
+      "recommendation": "Consider using useReducer or consolidating related state"
+    },
+    {
+      "severity": "high",
+      "category": "component-optimization",
+      "component": "VarianceKPIs",
+      "message": "VarianceKPIs is not memoized",
+      "impact": "Component re-renders unnecessarily, increasing TBT",
+      "recommendation": "Wrap VarianceKPIs with React.memo"
+    },
+    {
+      "severity": "high",
+      "category": "component-optimization",
+      "component": "VarianceTrends",
+      "message": "VarianceTrends is not memoized",
+      "impact": "Component re-renders unnecessarily, increasing TBT",
+      "recommendation": "Wrap VarianceTrends with React.memo"
+    },
+    {
+      "severity": "high",
+      "category": "component-optimization",
+      "component": "VarianceAlerts",
+      "message": "VarianceAlerts is not memoized",
+      "impact": "Component re-renders unnecessarily, increasing TBT",
+      "recommendation": "Wrap VarianceAlerts with React.memo"
+    },
+    {
+      "severity": "high",
+      "category": "component-optimization",
+      "component": "AdaptiveDashboard",
+      "message": "AdaptiveDashboard is not memoized",
+      "impact": "Component re-renders unnecessarily, increasing TBT",
+      "recommendation": "Wrap AdaptiveDashboard with React.memo"
+    },
+    {
+      "severity": "high",
+      "category": "component-optimization",
+      "component": "VirtualizedProjectList",
+      "message": "VirtualizedProjectList is not memoized",
+      "impact": "Component re-renders unnecessarily, increasing TBT",
+      "recommendation": "Wrap VirtualizedProjectList with React.memo"
+    },
+    {
+      "severity": "medium",
+      "category": "dependencies",
+      "dependency": "recharts",
+      "message": "Heavy dependency: recharts (~400KB)",
+      "impact": "Increases bundle size and initial load time",
+      "recommendation": "lightweight-charts or chart.js"
+    },
+    {
+      "severity": "medium",
+      "category": "dependencies",
+      "dependency": "@tiptap/react",
+      "message": "Heavy dependency: @tiptap/react (~200KB)",
+      "impact": "Increases bundle size and initial load time",
+      "recommendation": "Consider lazy loading"
+    },
+    {
+      "severity": "medium",
+      "category": "dependencies",
+      "dependency": "react-markdown",
+      "message": "Heavy dependency: react-markdown (~100KB)",
+      "impact": "Increases bundle size and initial load time",
+      "recommendation": "Consider lazy loading"
+    },
+    {
+      "severity": "medium",
+      "category": "dependencies",
+      "dependency": "html2canvas",
+      "message": "Heavy dependency: html2canvas (~150KB)",
+      "impact": "Increases bundle size and initial load time",
+      "recommendation": "Consider lazy loading"
+    },
+    {
+      "severity": "high",
+      "category": "code-splitting",
+      "message": "No dynamic imports detected",
+      "impact": "All code loads upfront, increasing initial bundle size",
+      "recommendation": "Use next/dynamic to lazy load heavy components like charts and modals"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": 1,
+      "title": "Implement React.memo for Heavy Components",
+      "description": "Wrap VarianceKPIs, VarianceTrends, VarianceAlerts with React.memo to prevent unnecessary re-renders",
+      "estimatedImpact": "Reduce TBT by 30-50ms",
+      "effort": "Low (1-2 hours)"
+    },
+    {
+      "priority": 2,
+      "title": "Add Dynamic Imports for Charts",
+      "description": "Use next/dynamic to lazy load Recharts and other heavy visualization components",
+      "estimatedImpact": "Reduce initial bundle by 200-400KB, improve LCP by 500-800ms",
+      "effort": "Medium (2-4 hours)"
+    },
+    {
+      "priority": 3,
+      "title": "Optimize State Management",
+      "description": "Consolidate related state using useReducer and add useCallback for event handlers",
+      "estimatedImpact": "Reduce re-renders by 20-30%",
+      "effort": "Medium (3-5 hours)"
+    },
+    {
+      "priority": 4,
+      "title": "Implement Virtual Scrolling",
+      "description": "Already using VirtualizedProjectList, ensure it's properly configured",
+      "estimatedImpact": "Improve scroll performance for large lists",
+      "effort": "Low (1 hour)"
+    },
+    {
+      "priority": 5,
+      "title": "Add Resource Hints",
+      "description": "Add preconnect and dns-prefetch for API endpoints",
+      "estimatedImpact": "Reduce API latency by 50-100ms",
+      "effort": "Low (30 minutes)"
+    }
+  ],
+  "metrics": {
+    "componentAnalysis": {
+      "imports": 16,
+      "hooks": 27,
+      "state": 11,
+      "effects": 4,
+      "memoized": 2,
+      "callbacks": 0
+    },
+    "dependencies": {
+      "total": 50,
+      "heavy": 4
+    },
+    "dataFetching": {
+      "parallelRequests": true,
+      "caching": true,
+      "deduplication": true,
+      "progressiveLoading": true
+    }
+  }
+}

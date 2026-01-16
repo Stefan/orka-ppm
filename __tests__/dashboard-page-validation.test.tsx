@@ -22,7 +22,9 @@ jest.mock('next/navigation', () => ({
     pathname: '/dashboards',
     query: {},
     asPath: '/dashboards',
-  })
+  }),
+  usePathname: () => '/dashboards',
+  useSearchParams: () => new URLSearchParams(),
 }))
 
 // Mock auth provider with different states

@@ -125,7 +125,10 @@ async def generate_project_report(
     report_request: ReportGenerationRequest,
     current_user = Depends(require_permission(Permission.project_read))
 ):
-    """Generate a Google Slides report for a project"""
+    """Generate a Google Slides report for a project
+    
+    Requirements: 6.1, 6.3, 6.4
+    """
     try:
         if not google_suite_service:
             raise HTTPException(status_code=503, detail="Google Suite service not available")
@@ -154,6 +157,21 @@ async def generate_project_report(
     except Exception as e:
         print(f"Error generating report: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to generate report: {str(e)}")
+
+
+@router.post("/export-google", response_model=GeneratedReport, status_code=status.HTTP_201_CREATED)
+@limiter.limit("5/minute")
+async def export_to_google_suite(
+    request: Request,
+    report_request: ReportGenerationRequest,
+    current_user = Depends(require_permission(Permission.project_read))
+):
+    """Export project data to Google Slides (alias for generate endpoint)
+    
+    Requirements: 6.1, 6.3, 6.4
+    """
+    # This is an alias endpoint for better API naming consistency
+    return await generate_project_report(request, report_request, current_user)
 
 
 @router.get("/projects/{project_id}/reports")
@@ -267,7 +285,8 @@ async def google_suite_health_check(
                 "template_management": True,
                 "report_generation": True,
                 "google_drive_integration": False,  # Mock - would check actual Google API
-                "chart_generation": True
+                "chart_generation": True,
+                "oauth_authentication": True
             }
         }
         
@@ -276,3 +295,109 @@ async def google_suite_health_check(
     except Exception as e:
         print(f"Error checking Google Suite health: {e}")
         raise HTTPException(status_code=500, detail=f"Health check failed: {str(e)}")
+
+
+# OAuth 2.0 Authentication Endpoints
+@router.get("/oauth/authorize")
+@limiter.limit("10/minute")
+async def initiate_google_oauth(
+    request: Request,
+    redirect_uri: str = Query(..., description="OAuth callback redirect URI"),
+    current_user = Depends(get_current_user)
+):
+    """Initiate OAuth 2.0 flow for Google Suite access
+    
+    Requirements: 9.2 (OAuth 2.0 authentication)
+    """
+    try:
+        if not google_suite_service:
+            raise HTTPException(status_code=503, detail="Google Suite service not available")
+        
+        user_id = UUID(current_user.get("user_id"))
+        
+        # Initiate OAuth flow
+        oauth_result = await google_suite_service.initiate_oauth_flow(user_id, redirect_uri)
+        
+        return {
+            "authorization_url": oauth_result['authorization_url'],
+            "state": oauth_result['state'],
+            "message": "Redirect user to authorization_url to grant permissions"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error initiating OAuth flow: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to initiate OAuth: {str(e)}")
+
+
+@router.post("/oauth/callback")
+@limiter.limit("10/minute")
+async def handle_google_oauth_callback(
+    request: Request,
+    code: str = Query(..., description="Authorization code from Google"),
+    state: str = Query(..., description="State parameter for CSRF protection"),
+    current_user = Depends(get_current_user)
+):
+    """Handle OAuth 2.0 callback from Google
+    
+    Requirements: 9.2 (OAuth 2.0 authentication)
+    """
+    try:
+        if not google_suite_service:
+            raise HTTPException(status_code=503, detail="Google Suite service not available")
+        
+        user_id = UUID(current_user.get("user_id"))
+        
+        # Handle OAuth callback
+        success = await google_suite_service.handle_oauth_callback(user_id, code, state)
+        
+        if not success:
+            raise HTTPException(status_code=400, detail="Failed to complete OAuth flow")
+        
+        return {
+            "success": True,
+            "message": "Google Suite access granted successfully",
+            "user_id": str(user_id)
+        }
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error handling OAuth callback: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to handle OAuth callback: {str(e)}")
+
+
+@router.get("/oauth/status")
+@limiter.limit("30/minute")
+async def check_google_oauth_status(
+    request: Request,
+    current_user = Depends(get_current_user)
+):
+    """Check if user has granted Google Suite access
+    
+    Requirements: 9.2 (OAuth 2.0 authentication)
+    """
+    try:
+        if not google_suite_service:
+            raise HTTPException(status_code=503, detail="Google Suite service not available")
+        
+        user_id = UUID(current_user.get("user_id"))
+        
+        # Check if user has valid credentials
+        credentials = google_suite_service._get_google_credentials(user_id)
+        
+        return {
+            "authenticated": credentials is not None,
+            "user_id": str(user_id),
+            "expires_at": credentials.get('expires_at').isoformat() if credentials else None,
+            "scopes": ['drive.file', 'presentations'] if credentials else []
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error checking OAuth status: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to check OAuth status: {str(e)}")

@@ -17,7 +17,7 @@ import json
 import asyncio
 
 # Import feedback service classes
-from feedback_service import (
+from services.feedback_service import (
     FeedbackCaptureService, FeedbackType, TrainingDataQuality,
     FeedbackAnalysis, TrainingDataPoint
 )

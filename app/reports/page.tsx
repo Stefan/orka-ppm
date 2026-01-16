@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import { FileText, Loader, Send, Bot, User, AlertTriangle, RefreshCw, Sparkles, CheckCircle, XCircle } from 'lucide-react'
 import AppLayout from '../../components/shared/AppLayout'
@@ -801,7 +801,7 @@ export default function Reports() {
         <div className="mt-4">
           <p className="text-xs text-gray-500 mb-2">Versuchen Sie zu fragen:</p>
           <div className="flex flex-wrap gap-2">
-            {isPMRMode ? [
+            {(isPMRMode ? [
               "Update executive summary with latest project status",
               "Generate budget variance insights",
               "Analyze schedule performance trends",
@@ -813,7 +813,7 @@ export default function Reports() {
               "Zeige mir die Budgetnutzung aller Projekte",
               "Erstelle einen Risikobewertungsbericht",
               "Welche Fähigkeiten sind am meisten gefragt?"
-            ]}.map((example, index) => (
+            ]).map((example, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentQuery(example)}

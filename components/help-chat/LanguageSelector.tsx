@@ -6,7 +6,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ChevronDownIcon, GlobeAltIcon, CheckIcon } from '@heroicons/react/24/outline'
+import { ChevronDown, Globe, Check } from 'lucide-react'
 import { useLanguage } from '../../hooks/useLanguage'
 import { useHelpChat } from '../../app/providers/HelpChatProvider'
 
@@ -88,9 +88,9 @@ export function LanguageSelector({
           className="flex items-center space-x-1 px-2 py-1 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors disabled:opacity-50"
           title={`Current language: ${displayName}`}
         >
-          <GlobeAltIcon className="h-4 w-4" />
+          <Globe className="h-4 w-4" />
           <span className="text-xs font-medium">{currentLanguage.toUpperCase()}</span>
-          <ChevronDownIcon className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </button>
 
         {isOpen && Array.isArray(supportedLanguages) && supportedLanguages.length > 0 && (
@@ -113,7 +113,7 @@ export function LanguageSelector({
                       <div className="text-xs text-gray-500">{language.name}</div>
                     </div>
                     {language.code === currentLanguage && (
-                      <CheckIcon className="h-4 w-4 text-blue-600" />
+                      <Check className="h-4 w-4 text-blue-600" />
                     )}
                   </div>
                 </button>
@@ -139,13 +139,13 @@ export function LanguageSelector({
         className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <div className="flex items-center space-x-2">
-          <GlobeAltIcon className="h-4 w-4 text-gray-400" />
+          <Globe className="h-4 w-4 text-gray-400" />
           <span>{displayName}</span>
           {isChanging && (
             <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600"></div>
           )}
         </div>
-        <ChevronDownIcon className={`h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && Array.isArray(supportedLanguages) && supportedLanguages.length > 0 && (
@@ -168,7 +168,7 @@ export function LanguageSelector({
                     <div className="text-xs text-gray-500">{language.name}</div>
                   </div>
                   {language.code === currentLanguage && (
-                    <CheckIcon className="h-4 w-4 text-blue-600" />
+                    <Check className="h-4 w-4 text-blue-600" />
                   )}
                 </div>
               </button>

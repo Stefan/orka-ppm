@@ -215,7 +215,7 @@ export class VisualGuideBuilder {
     return this
   }
 
-  async addStep(
+  addStep(
     title: string,
     description: string,
     options: {
@@ -226,7 +226,7 @@ export class VisualGuideBuilder {
       text?: string
       duration?: number
     } = {}
-  ): Promise<this> {
+  ): this {
     const step: VisualGuideStep = {
       id: `step_${this.steps.length + 1}`,
       title,
@@ -238,16 +238,10 @@ export class VisualGuideBuilder {
       ...(options.duration ? { duration: options.duration } : {})
     }
 
+    // Note: Screenshot capture is handled separately via captureStepScreenshot()
+    // to keep the fluent interface synchronous
     if (options.captureScreenshot) {
-      try {
-        if (options.element) {
-          step.screenshot = await this.screenshotService.captureElement(options.element)
-        } else {
-          step.screenshot = await this.screenshotService.captureScreen()
-        }
-      } catch (error) {
-        console.warn('Failed to capture screenshot for step:', error)
-      }
+      console.warn('Screenshot capture should be done via captureStepScreenshot() after building the guide')
     }
 
     this.steps.push(step)

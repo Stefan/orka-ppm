@@ -37,6 +37,10 @@ from routers.schedules import router as schedules_router
 from routers.help_chat import router as help_chat_router
 from routers.ai_resource_optimizer import router as ai_resource_optimizer_router
 from routers.enhanced_pmr import router as enhanced_pmr_router
+from routers.shareable_urls import router as shareable_urls_router
+from routers.po_breakdown import router as po_breakdown_router
+from routers.feature_flags import router as feature_flags_router
+from routers.audit import router as audit_router
 
 # Import AI agents and services
 try:
@@ -83,6 +87,8 @@ except ImportError as e:
     print(f"⚠️ Performance optimization not available: {e}")
     cache_manager = None
     performance_monitor = None
+    bulk_operation_manager = None
+    version_manager = None
 
 # Import pre-startup testing system
 try:
@@ -187,6 +193,10 @@ app.include_router(schedules_router)
 app.include_router(help_chat_router)
 app.include_router(ai_resource_optimizer_router)
 app.include_router(enhanced_pmr_router)
+app.include_router(shareable_urls_router)
+app.include_router(po_breakdown_router)
+app.include_router(feature_flags_router)
+app.include_router(audit_router)
 
 # Basic endpoints
 @app.get("/")

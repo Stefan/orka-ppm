@@ -38,14 +38,21 @@ from services.collaboration_service import CollaborationManager
 
 # Import performance optimization
 try:
-    from performance_optimization import limiter
-except ImportError:
+    from performance_optimization import limiter, CacheManager, PerformanceMonitor
+    from services.pmr_performance_optimizer import PMRPerformanceOptimizer
+    from services.websocket_optimizer import WebSocketOptimizer
+    from services.pmr_performance_monitor import PMRPerformanceMonitor
+    
+    performance_available = True
+except ImportError as e:
+    logger.warning(f"Performance optimization not fully available: {e}")
     # Fallback if performance optimization not available
     def limiter_fallback(rate: str):
         def decorator(func):
             return func
         return decorator
     limiter = type('MockLimiter', (), {'limit': limiter_fallback})()
+    performance_available = False
 
 # Initialize logger
 logger = logging.getLogger(__name__)
@@ -59,6 +66,28 @@ enhanced_pmr_service = EnhancedPMRService(supabase, openai_api_key) if supabase 
 
 # Initialize collaboration manager
 collaboration_manager = CollaborationManager(supabase) if supabase else None
+
+# Initialize performance components
+pmr_performance_optimizer: Optional[PMRPerformanceOptimizer] = None
+websocket_optimizer: Optional[WebSocketOptimizer] = None
+pmr_performance_monitor: Optional[PMRPerformanceMonitor] = None
+
+if performance_available:
+    try:
+        redis_url = os.getenv("REDIS_URL")
+        cache_manager = CacheManager(redis_url)
+        performance_monitor = PerformanceMonitor()
+        
+        pmr_performance_optimizer = PMRPerformanceOptimizer(cache_manager, performance_monitor)
+        websocket_optimizer = WebSocketOptimizer(
+            max_connections=1000,
+            max_connections_per_session=10
+        )
+        pmr_performance_monitor = PMRPerformanceMonitor()
+        
+        logger.info("PMR performance components initialized")
+    except Exception as e:
+        logger.error(f"Failed to initialize performance components: {e}")
 
 
 # ============================================================================
@@ -1091,3 +1120,347 @@ async def websocket_collaborate(
             await websocket.close(code=1011, reason=f"Internal error: {str(e)}")
         except:
             pass
+
+
+# ============================================================================
+# PERFORMANCE OPTIMIZATION ENDPOINTS
+# ============================================================================
+
+@router.get("/{report_id}/sections/{section_id}/lazy")
+@limiter.limit("60/minute")
+async def get_section_lazy(
+    request: Request,
+    report_id: UUID,
+    section_id: str,
+    current_user = Depends(require_permission(Permission.project_read))
+):
+    """
+    Lazy load a specific section with caching
+    
+    Optimized endpoint for loading individual sections on-demand.
+    Uses Redis caching for frequently accessed sections.
+    
+    Requirements: Lazy loading, performance optimization
+    """
+    try:
+        start_time = datetime.utcnow()
+        
+        # Try cache first
+        if pmr_performance_optimizer:
+            cached_section = await pmr_performance_optimizer.get_cached_section(report_id, section_id)
+            if cached_section:
+                duration = (datetime.utcnow() - start_time).total_seconds()
+                
+                if pmr_performance_monitor:
+                    pmr_performance_monitor.record_section_load(
+                        report_id, section_id, duration, from_cache=True
+                    )
+                
+                return {
+                    **cached_section,
+                    "cached": True,
+                    "load_time_ms": int(duration * 1000)
+                }
+        
+        # Load from database
+        report_response = supabase.table("enhanced_pmr_reports").select(
+            "sections"
+        ).eq("id", str(report_id)).execute()
+        
+        if not report_response.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Report not found"
+            )
+        
+        sections = report_response.data[0].get("sections", [])
+        section = next((s for s in sections if s.get("section_id") == section_id), None)
+        
+        if not section:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Section not found"
+            )
+        
+        # Cache the section
+        if pmr_performance_optimizer:
+            await pmr_performance_optimizer.cache_section(report_id, section_id, section)
+        
+        duration = (datetime.utcnow() - start_time).total_seconds()
+        
+        if pmr_performance_monitor:
+            pmr_performance_monitor.record_section_load(
+                report_id, section_id, duration, from_cache=False
+            )
+        
+        return {
+            **section,
+            "cached": False,
+            "load_time_ms": int(duration * 1000)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error loading section lazily: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to load section: {str(e)}"
+        )
+
+
+@router.get("/{report_id}/insights/lazy")
+@limiter.limit("60/minute")
+async def get_insights_lazy(
+    request: Request,
+    report_id: UUID,
+    category: Optional[str] = Query(None, description="Filter by category"),
+    current_user = Depends(require_permission(Permission.project_read))
+):
+    """
+    Lazy load AI insights with caching
+    
+    Optimized endpoint for loading AI insights on-demand.
+    Supports filtering by category and uses Redis caching.
+    
+    Requirements: Lazy loading, AI insights, performance optimization
+    """
+    try:
+        start_time = datetime.utcnow()
+        
+        # Try cache first
+        if pmr_performance_optimizer:
+            cached_insights = await pmr_performance_optimizer.get_cached_ai_insights(
+                report_id, category
+            )
+            if cached_insights:
+                duration = (datetime.utcnow() - start_time).total_seconds()
+                
+                if pmr_performance_monitor:
+                    pmr_performance_monitor.record_insights_load(
+                        report_id, len(cached_insights), duration, from_cache=True
+                    )
+                
+                return {
+                    "insights": cached_insights,
+                    "count": len(cached_insights),
+                    "cached": True,
+                    "load_time_ms": int(duration * 1000)
+                }
+        
+        # Load from database
+        query = supabase.table("ai_insights").select("*").eq("report_id", str(report_id))
+        
+        if category:
+            query = query.eq("category", category)
+        
+        insights_response = query.execute()
+        insights = insights_response.data or []
+        
+        # Cache the insights
+        if pmr_performance_optimizer:
+            await pmr_performance_optimizer.cache_ai_insights(report_id, insights)
+        
+        duration = (datetime.utcnow() - start_time).total_seconds()
+        
+        if pmr_performance_monitor:
+            pmr_performance_monitor.record_insights_load(
+                report_id, len(insights), duration, from_cache=False
+            )
+        
+        return {
+            "insights": insights,
+            "count": len(insights),
+            "cached": False,
+            "load_time_ms": int(duration * 1000)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error loading insights lazily: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to load insights: {str(e)}"
+        )
+
+
+@router.post("/{report_id}/cache/invalidate")
+@limiter.limit("10/minute")
+async def invalidate_report_cache(
+    request: Request,
+    report_id: UUID,
+    current_user = Depends(require_permission(Permission.project_update))
+):
+    """
+    Invalidate all cache entries for a report
+    
+    Use this after making significant changes to force fresh data loading.
+    
+    Requirements: Cache management, data consistency
+    """
+    try:
+        if not pmr_performance_optimizer:
+            return {
+                "message": "Cache optimization not available",
+                "invalidated_count": 0
+            }
+        
+        count = await pmr_performance_optimizer.invalidate_report_cache(report_id)
+        
+        logger.info(f"Invalidated {count} cache entries for report {report_id}")
+        
+        return {
+            "report_id": str(report_id),
+            "invalidated_count": count,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error invalidating cache: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to invalidate cache: {str(e)}"
+        )
+
+
+@router.get("/performance/stats")
+@limiter.limit("30/minute")
+async def get_performance_stats(
+    request: Request,
+    current_user = Depends(require_permission(Permission.admin_read))
+):
+    """
+    Get PMR performance statistics
+    
+    Returns comprehensive performance metrics including:
+    - Response times
+    - Cache hit rates
+    - WebSocket connection stats
+    - Report generation times
+    - Active alerts
+    
+    Requirements: Performance monitoring, admin access
+    """
+    try:
+        stats = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "pmr_optimizer": None,
+            "websocket_optimizer": None,
+            "performance_monitor": None
+        }
+        
+        # Get PMR optimizer stats
+        if pmr_performance_optimizer:
+            stats["pmr_optimizer"] = await pmr_performance_optimizer.get_pmr_performance_stats()
+        
+        # Get WebSocket optimizer stats
+        if websocket_optimizer:
+            stats["websocket_optimizer"] = websocket_optimizer.get_connection_stats()
+        
+        # Get performance monitor stats
+        if pmr_performance_monitor:
+            stats["performance_monitor"] = pmr_performance_monitor.get_performance_report()
+        
+        return stats
+        
+    except Exception as e:
+        logger.error(f"Error getting performance stats: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get performance stats: {str(e)}"
+        )
+
+
+@router.get("/performance/health")
+@limiter.limit("60/minute")
+async def get_performance_health(
+    request: Request,
+    current_user = Depends(get_current_user)
+):
+    """
+    Get PMR performance health status
+    
+    Quick health check endpoint for monitoring systems.
+    
+    Requirements: Health monitoring, alerting
+    """
+    try:
+        health = {
+            "status": "healthy",
+            "timestamp": datetime.utcnow().isoformat(),
+            "components": {
+                "pmr_optimizer": pmr_performance_optimizer is not None,
+                "websocket_optimizer": websocket_optimizer is not None,
+                "performance_monitor": pmr_performance_monitor is not None
+            }
+        }
+        
+        # Get health status from monitor
+        if pmr_performance_monitor:
+            monitor_health = pmr_performance_monitor.get_health_status()
+            health["status"] = monitor_health["status"]
+            health["active_alerts"] = monitor_health["active_alerts_count"]
+        
+        return health
+        
+    except Exception as e:
+        logger.error(f"Error getting performance health: {e}", exc_info=True)
+        return {
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.utcnow().isoformat()
+        }
+
+
+@router.get("/performance/alerts")
+@limiter.limit("30/minute")
+async def get_performance_alerts(
+    request: Request,
+    active_only: bool = Query(True, description="Return only active alerts"),
+    limit: int = Query(50, ge=1, le=100, description="Number of alerts to return"),
+    current_user = Depends(require_permission(Permission.admin_read))
+):
+    """
+    Get performance alerts
+    
+    Returns active and historical performance alerts.
+    
+    Requirements: Performance monitoring, alerting, admin access
+    """
+    try:
+        if not pmr_performance_monitor:
+            return {
+                "alerts": [],
+                "message": "Performance monitoring not available"
+            }
+        
+        if active_only:
+            alerts = pmr_performance_monitor.get_active_alerts()
+        else:
+            alerts = pmr_performance_monitor.get_alert_history(limit)
+        
+        return {
+            "alerts": [
+                {
+                    "id": alert.id,
+                    "metric_type": alert.metric_type.value,
+                    "severity": alert.severity.value,
+                    "message": alert.message,
+                    "current_value": alert.current_value,
+                    "threshold_value": alert.threshold_value,
+                    "timestamp": alert.timestamp.isoformat(),
+                    "metadata": alert.metadata
+                }
+                for alert in alerts
+            ],
+            "count": len(alerts),
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting performance alerts: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get performance alerts: {str(e)}"
+        )

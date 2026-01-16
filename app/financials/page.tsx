@@ -15,6 +15,7 @@ import AnalysisView from './components/views/AnalysisView'
 import DetailedView from './components/views/DetailedView'
 import TrendsView from './components/views/TrendsView'
 import CSVImportView from './components/views/CSVImportView'
+import POBreakdownView from './components/views/POBreakdownView'
 import BudgetVarianceTable from './components/tables/BudgetVarianceTable'
 
 // Import hooks
@@ -246,6 +247,13 @@ export default function Financials() {
         {viewMode === 'csv-import' && (
           <CSVImportView
             accessToken={session?.access_token}
+          />
+        )}
+
+        {viewMode === 'po-breakdown' && (
+          <POBreakdownView
+            accessToken={session?.access_token}
+            projectId={projects[0]?.id}
           />
         )}
 

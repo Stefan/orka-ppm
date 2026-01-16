@@ -91,22 +91,118 @@ jest.mock('next/navigation', () => ({
       back: jest.fn(),
       forward: jest.fn(),
       refresh: jest.fn(),
+      pathname: '/',
+      query: {},
+      asPath: '/',
     }
   },
   useSearchParams() {
     return new URLSearchParams()
   },
   usePathname() {
-    return ''
+    return '/'
   },
 }))
 
-// Mock Supabase
+// Mock Supabase Auth
 jest.mock('./app/providers/SupabaseAuthProvider', () => ({
   useAuth: () => ({
-    user: null,
+    user: {
+      id: 'test-user-123',
+      email: 'test@example.com',
+      name: 'Test User',
+      role: 'project_manager',
+    },
+    session: {
+      user: {
+        id: 'test-user-123',
+        email: 'test@example.com',
+      },
+      access_token: 'mock-access-token',
+    },
     loading: false,
+    error: null,
     clearSession: jest.fn(),
+  }),
+  SupabaseAuthProvider: ({ children }) => children,
+}))
+
+// Mock HelpChat Provider
+jest.mock('./app/providers/HelpChatProvider', () => ({
+  useHelpChat: () => ({
+    state: {
+      isOpen: false,
+      messages: [],
+      isLoading: false,
+      currentContext: {
+        route: '/',
+        pageTitle: 'Dashboard',
+        userRole: 'user',
+      },
+      userPreferences: {
+        language: 'en',
+        proactiveTips: true,
+        chatPosition: 'right',
+        soundEnabled: false,
+        tipFrequency: 'medium',
+        theme: 'auto',
+      },
+      sessionId: 'test-session-123',
+      proactiveTipsEnabled: true,
+      language: 'en',
+      isTyping: false,
+      error: null,
+    },
+    toggleChat: jest.fn(),
+    sendMessage: jest.fn(),
+    clearMessages: jest.fn(),
+    updateContext: jest.fn(),
+    updatePreferences: jest.fn(),
+    dismissTip: jest.fn(),
+    submitFeedback: jest.fn(),
+    isContextRelevant: jest.fn(() => true),
+    getProactiveTips: jest.fn(() => Promise.resolve([])),
+    exportChatHistory: jest.fn(() => '[]'),
+    translateMessage: jest.fn((content) => Promise.resolve(content)),
+    detectMessageLanguage: jest.fn(() => Promise.resolve(null)),
+    formatMessageDate: jest.fn((date) => date.toLocaleDateString()),
+    formatMessageNumber: jest.fn((num) => num.toLocaleString()),
+    getLanguageName: jest.fn((code) => code),
+    currentLanguage: 'en',
+  }),
+  HelpChatProvider: ({ children }) => children,
+}))
+
+// Mock Language Hook
+jest.mock('./hooks/useLanguage', () => ({
+  useLanguage: () => ({
+    currentLanguage: 'en',
+    supportedLanguages: [
+      { code: 'en', name: 'English', native_name: 'English', formal_tone: false },
+      { code: 'de', name: 'German', native_name: 'Deutsch', formal_tone: true },
+      { code: 'fr', name: 'French', native_name: 'Français', formal_tone: true },
+    ],
+    isLoading: false,
+    error: null,
+    setLanguage: jest.fn(() => Promise.resolve(true)),
+    getUserLanguagePreference: jest.fn(() => Promise.resolve('en')),
+    getSupportedLanguages: jest.fn(() => Promise.resolve([])),
+    detectLanguage: jest.fn(() => Promise.resolve(null)),
+    translateContent: jest.fn((content) => Promise.resolve({
+      original_content: content,
+      translated_content: content,
+      source_language: 'en',
+      target_language: 'en',
+      quality_score: 1.0,
+      translation_time_ms: 0,
+      cached: false,
+      confidence: 1.0,
+    })),
+    clearTranslationCache: jest.fn(() => Promise.resolve(true)),
+    getLanguageName: jest.fn((code) => code),
+    isRTL: jest.fn(() => false),
+    formatDate: jest.fn((date) => date.toLocaleDateString()),
+    formatNumber: jest.fn((num) => num.toLocaleString()),
   }),
 }))
 
@@ -127,3 +223,193 @@ Object.defineProperty(window, 'navigator', {
   },
   writable: true,
 })
+
+// Mock Enhanced AI Chat Hook
+jest.mock('./hooks/useEnhancedAIChat', () => ({
+  useEnhancedAIChat: jest.fn(() => ({
+    messages: [],
+    isLoading: false,
+    error: null,
+    context: {
+      reportId: 'test-report-123',
+      projectId: 'test-project-123',
+      userId: 'test-user-123',
+    },
+    sendMessage: jest.fn(() => Promise.resolve()),
+    clearMessages: jest.fn(),
+    updateContext: jest.fn(),
+    quickActions: {
+      generateInsights: jest.fn(() => Promise.resolve()),
+      suggestActions: jest.fn(() => Promise.resolve()),
+      analyzeRisks: jest.fn(() => Promise.resolve()),
+    },
+  })),
+}))
+
+// Mock Mobile PMR Hook
+jest.mock('./hooks/useMobilePMR', () => ({
+  useMobilePMR: jest.fn(() => ({
+    state: {
+      isMobile: true,
+      viewMode: 'compact',
+      activePanel: 'editor',
+      offlineMode: false,
+      syncStatus: 'synced',
+    },
+    actions: {
+      setViewMode: jest.fn(),
+      togglePanel: jest.fn(),
+      saveOffline: jest.fn(() => Promise.resolve()),
+      syncOfflineChanges: jest.fn(() => Promise.resolve()),
+      exportReport: jest.fn(() => Promise.resolve()),
+    },
+  })),
+}))
+
+// Mock Media Query Hooks
+jest.mock('./hooks/useMediaQuery', () => ({
+  useMediaQuery: jest.fn(() => false),
+  useIsMobile: jest.fn(() => false),
+  useIsTablet: jest.fn(() => false),
+  useIsDesktop: jest.fn(() => true),
+}))
+
+// Mock Offline Hook
+jest.mock('./hooks/useOffline', () => ({
+  useOffline: jest.fn(() => ({
+    isOnline: true,
+    queueRequest: jest.fn(),
+    cacheData: jest.fn(),
+    getCachedData: jest.fn(),
+    performBackgroundSync: jest.fn(),
+  })),
+}))
+
+// Mock Touch Gestures Hook
+jest.mock('./hooks/useTouchGestures', () => ({
+  useTouchGestures: jest.fn(() => ({
+    elementRef: { current: null },
+    gestureState: {
+      isActive: false,
+      scale: 1,
+      rotation: 0,
+      startPoints: [],
+      currentPoints: [],
+      velocity: { x: 0, y: 0 },
+    },
+    isGestureActive: false,
+  })),
+}))
+
+// Mock PMR Context Hook
+jest.mock('./hooks/usePMRContext', () => ({
+  usePMRContext: jest.fn(() => ({
+    state: {
+      currentReport: null,
+      isLoading: false,
+      isSaving: false,
+      pendingChanges: new Map(),
+      error: null,
+      exportJobs: [],
+    },
+    actions: {
+      loadReport: jest.fn(() => Promise.resolve()),
+      saveReport: jest.fn(() => Promise.resolve()),
+      updateSection: jest.fn(() => Promise.resolve()),
+      generateReport: jest.fn(() => Promise.resolve()),
+      exportReport: jest.fn(() => Promise.resolve()),
+    },
+    hasUnsavedChanges: false,
+  })),
+}))
+
+// Mock Realtime PMR Hook
+jest.mock('./hooks/useRealtimePMR', () => ({
+  useRealtimePMR: jest.fn(() => [
+    {
+      isConnected: true,
+      activeUsers: [],
+      pendingChanges: [],
+      conflicts: [],
+    },
+    {
+      updateCursor: jest.fn(),
+      sendUpdate: jest.fn(),
+      resolveConflict: jest.fn(),
+    },
+  ]),
+}))
+
+// Setup global fetch mock
+if (typeof global.fetch === 'undefined') {
+  // Import mock data for API responses
+  const mockResponses = {
+    '/api/dashboards/quick-stats': {
+      quick_stats: {
+        total_projects: 10,
+        active_projects: 7,
+        completed_projects: 2,
+        at_risk_projects: 1,
+        health_distribution: { green: 6, yellow: 3, red: 1 },
+        budget_summary: {
+          total_budget: 5000000,
+          total_actual: 2500000,
+          variance: -2500000,
+          variance_percentage: -50,
+        },
+        schedule_summary: { on_track: 6, at_risk: 3, delayed: 1 },
+      },
+      kpis: {
+        project_success_rate: 85,
+        budget_performance: 92,
+        timeline_performance: 78,
+        average_health_score: 2.1,
+        resource_efficiency: 88,
+        active_projects_ratio: 70,
+      },
+    },
+    '/api/pmr/reports': {
+      reports: [],
+      total: 0,
+    },
+    '/api/projects': {
+      projects: [],
+      total: 0,
+    },
+  }
+
+  global.fetch = jest.fn((url, options) => {
+    const urlString = typeof url === 'string' ? url : url.toString()
+    const path = urlString.replace(/^https?:\/\/[^/]+/, '')
+    
+    // Find matching mock response
+    let response = mockResponses[path] || { success: true, data: null }
+    
+    // Handle different HTTP methods
+    const method = options?.method || 'GET'
+    
+    if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
+      try {
+        const body = options?.body ? JSON.parse(options.body) : {}
+        response = { success: true, data: body }
+      } catch {
+        response = { success: true, data: response }
+      }
+    }
+    
+    if (method === 'DELETE') {
+      response = { success: true, message: 'Deleted successfully' }
+    }
+    
+    return Promise.resolve({
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: () => Promise.resolve(response),
+      text: () => Promise.resolve(JSON.stringify(response)),
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+    })
+  })
+}

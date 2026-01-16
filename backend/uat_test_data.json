@@ -1,0 +1,606 @@
+{
+  "projects": [
+    {
+      "id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "name": "Construction Project Alpha - Office Building",
+      "description": "New 5-story office building construction in downtown area",
+      "status": "active",
+      "budget": 5000000.0,
+      "spent_to_date": 3250000.0,
+      "start_date": "2025-07-19",
+      "end_date": "2026-07-14",
+      "completion_percentage": 65,
+      "project_manager": "John Smith",
+      "risks": [
+        {
+          "title": "Weather delays",
+          "probability": 0.4,
+          "impact": 0.6
+        },
+        {
+          "title": "Material shortages",
+          "probability": 0.3,
+          "impact": 0.7
+        },
+        {
+          "title": "Labor availability",
+          "probability": 0.2,
+          "impact": 0.5
+        }
+      ]
+    },
+    {
+      "id": "4dd9049d-ea27-479b-8856-faef75e0458e",
+      "name": "Infrastructure Upgrade - Highway Extension",
+      "description": "Highway extension project with 10km new roadway",
+      "status": "active",
+      "budget": 15000000.0,
+      "spent_to_date": 8500000.0,
+      "start_date": "2025-04-20",
+      "end_date": "2027-04-10",
+      "completion_percentage": 45,
+      "project_manager": "Sarah Johnson",
+      "risks": [
+        {
+          "title": "Environmental permits",
+          "probability": 0.5,
+          "impact": 0.8
+        },
+        {
+          "title": "Traffic management",
+          "probability": 0.4,
+          "impact": 0.6
+        },
+        {
+          "title": "Utility relocations",
+          "probability": 0.6,
+          "impact": 0.7
+        }
+      ]
+    },
+    {
+      "id": "ade503aa-c98e-49f7-879f-ae51c5bf1519",
+      "name": "Manufacturing Facility - Phase 2 Expansion",
+      "description": "Expansion of existing manufacturing facility with new production line",
+      "status": "planning",
+      "budget": 8000000.0,
+      "spent_to_date": 500000.0,
+      "start_date": "2026-01-15",
+      "end_date": "2027-01-15",
+      "completion_percentage": 5,
+      "project_manager": "Michael Chen",
+      "risks": [
+        {
+          "title": "Equipment delivery delays",
+          "probability": 0.3,
+          "impact": 0.8
+        },
+        {
+          "title": "Integration complexity",
+          "probability": 0.5,
+          "impact": 0.6
+        },
+        {
+          "title": "Regulatory compliance",
+          "probability": 0.2,
+          "impact": 0.9
+        }
+      ]
+    }
+  ],
+  "shareable_urls": [
+    {
+      "id": "c768b1ea-9f06-4931-a8e6-f248204b5424",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "project_name": "Construction Project Alpha - Office Building",
+      "token": "share_d571047309f14ac8",
+      "permissions": {
+        "can_view_basic_info": true,
+        "can_view_financial": true,
+        "can_view_risks": true,
+        "can_view_resources": false,
+        "can_view_timeline": true
+      },
+      "expires_at": "2026-02-14T22:59:32.108508",
+      "created_by": "admin@example.com",
+      "access_count": 9,
+      "purpose": "External stakeholder review"
+    },
+    {
+      "id": "68473eaf-b284-4920-a1d9-97cdb705bba9",
+      "project_id": "4dd9049d-ea27-479b-8856-faef75e0458e",
+      "project_name": "Infrastructure Upgrade - Highway Extension",
+      "token": "share_ec041e56bd594d16",
+      "permissions": {
+        "can_view_basic_info": true,
+        "can_view_financial": true,
+        "can_view_risks": true,
+        "can_view_resources": false,
+        "can_view_timeline": true
+      },
+      "expires_at": "2026-02-14T22:59:32.108551",
+      "created_by": "admin@example.com",
+      "access_count": 14,
+      "purpose": "External stakeholder review"
+    }
+  ],
+  "simulations": [
+    {
+      "id": "94880692-3970-4065-b4bc-c98c26f2b701",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "project_name": "Construction Project Alpha - Office Building",
+      "config": {
+        "iterations": 10000,
+        "confidence_levels": [
+          0.1,
+          0.5,
+          0.9
+        ]
+      },
+      "cost_percentiles": {
+        "P10": 4750000.0,
+        "P50": 5250000.0,
+        "P90": 6000000.0
+      },
+      "schedule_percentiles": {
+        "P10": 350,
+        "P50": 365,
+        "P90": 395
+      },
+      "statistics": {
+        "mean_cost": 5300000.0,
+        "std_dev_cost": 400000.0,
+        "mean_schedule": 368,
+        "std_dev_schedule": 15
+      },
+      "created_at": "2026-01-15T22:59:32.108583",
+      "interpretation": "50% probability of completing within budget, 90% probability of 20% cost overrun"
+    },
+    {
+      "id": "e99fe52e-f445-4b89-958e-1f216ab98d53",
+      "project_id": "4dd9049d-ea27-479b-8856-faef75e0458e",
+      "project_name": "Infrastructure Upgrade - Highway Extension",
+      "config": {
+        "iterations": 10000,
+        "confidence_levels": [
+          0.1,
+          0.5,
+          0.9
+        ]
+      },
+      "cost_percentiles": {
+        "P10": 14250000.0,
+        "P50": 15750000.0,
+        "P90": 18000000.0
+      },
+      "schedule_percentiles": {
+        "P10": 350,
+        "P50": 365,
+        "P90": 395
+      },
+      "statistics": {
+        "mean_cost": 15900000.0,
+        "std_dev_cost": 1200000.0,
+        "mean_schedule": 368,
+        "std_dev_schedule": 15
+      },
+      "created_at": "2026-01-15T22:59:32.108592",
+      "interpretation": "50% probability of completing within budget, 90% probability of 20% cost overrun"
+    },
+    {
+      "id": "77626c72-5c44-4747-9846-4f80eba53b10",
+      "project_id": "ade503aa-c98e-49f7-879f-ae51c5bf1519",
+      "project_name": "Manufacturing Facility - Phase 2 Expansion",
+      "config": {
+        "iterations": 10000,
+        "confidence_levels": [
+          0.1,
+          0.5,
+          0.9
+        ]
+      },
+      "cost_percentiles": {
+        "P10": 7600000.0,
+        "P50": 8400000.0,
+        "P90": 9600000.0
+      },
+      "schedule_percentiles": {
+        "P10": 350,
+        "P50": 365,
+        "P90": 395
+      },
+      "statistics": {
+        "mean_cost": 8480000.0,
+        "std_dev_cost": 640000.0,
+        "mean_schedule": 368,
+        "std_dev_schedule": 15
+      },
+      "created_at": "2026-01-15T22:59:32.108616",
+      "interpretation": "50% probability of completing within budget, 90% probability of 20% cost overrun"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "70342724-6745-4c0d-9f06-e4094feb51f5",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "project_name": "Construction Project Alpha - Office Building",
+      "name": "Accelerated Schedule - Add Resources",
+      "description": "What if we add 5 additional workers to accelerate the schedule by 30 days?",
+      "parameter_changes": {
+        "additional_resources": 5,
+        "resource_cost_increase": 150000,
+        "target_schedule_reduction": 30
+      },
+      "timeline_impact": {
+        "days_change": -30,
+        "new_completion_date": "2026-06-14",
+        "critical_path_affected": true
+      },
+      "cost_impact": {
+        "cost_change": 150000,
+        "new_total_cost": 5150000.0,
+        "roi_analysis": {
+          "early_completion_value": 200000,
+          "net_benefit": 50000
+        }
+      },
+      "resource_impact": {
+        "utilization_change": 20,
+        "new_peak_utilization": 95
+      }
+    },
+    {
+      "id": "4403fd6f-df69-4e8b-b1b0-33e1efd39b91",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "project_name": "Construction Project Alpha - Office Building",
+      "name": "Reduced Scope - Phase Approach",
+      "description": "What if we reduce scope by 20% and deliver in phases?",
+      "parameter_changes": {
+        "scope_reduction_percentage": 20,
+        "cost_savings": 1000000,
+        "phase_approach": true
+      },
+      "timeline_impact": {
+        "days_change": 0,
+        "new_completion_date": "2026-07-14",
+        "critical_path_affected": false
+      },
+      "cost_impact": {
+        "cost_change": -1000000,
+        "new_total_cost": 4000000.0,
+        "savings_percentage": 20
+      },
+      "resource_impact": {
+        "utilization_change": -15,
+        "new_peak_utilization": 70
+      }
+    }
+  ],
+  "change_requests": [
+    {
+      "id": "0a89c8e9-393b-49db-8049-976fb5ed41d8",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "project_name": "Construction Project Alpha - Office Building",
+      "title": "Emergency Safety System Upgrade",
+      "description": "Install enhanced emergency safety systems to meet new regulatory requirements",
+      "change_type": "safety",
+      "priority": "high",
+      "status": "approved",
+      "estimated_cost_impact": 250000,
+      "estimated_schedule_impact_days": 21,
+      "actual_cost_impact": 235000,
+      "actual_schedule_impact_days": 19,
+      "justification": "Required for regulatory compliance by Q2 2024",
+      "requested_by": "Safety Officer",
+      "requested_date": "2025-12-01T22:59:32.108658",
+      "approved_date": "2025-12-16T22:59:32.108677",
+      "implementation_status": "completed"
+    },
+    {
+      "id": "8486fb8f-5c4f-4196-b370-18d558acf00d",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "project_name": "Construction Project Alpha - Office Building",
+      "title": "Structural Design Modification",
+      "description": "Modify structural design to accommodate additional floor load requirements",
+      "change_type": "design",
+      "priority": "medium",
+      "status": "implementing",
+      "estimated_cost_impact": 180000,
+      "estimated_schedule_impact_days": 14,
+      "justification": "Client requirement change for heavier equipment",
+      "requested_by": "Project Manager",
+      "requested_date": "2025-12-26T22:59:32.108693",
+      "approved_date": "2026-01-05T22:59:32.108697",
+      "implementation_status": "in_progress"
+    }
+  ],
+  "po_breakdowns": [
+    {
+      "id": "b21dea6c-3410-4dd1-af4f-9dc74b166072",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "name": "Construction Materials",
+      "sap_po_number": "PO-2024-6730",
+      "hierarchy_level": 0,
+      "parent_breakdown_id": null,
+      "cost_center": "CC-335",
+      "planned_amount": 2000000,
+      "actual_amount": 1980000,
+      "currency": "USD",
+      "breakdown_type": "category",
+      "variance": -20000,
+      "variance_percentage": -1.0
+    },
+    {
+      "id": "71616c01-78f6-4cfb-a087-c7991c38f00f",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "name": "Structural Steel",
+      "sap_po_number": "PO-2024-1356",
+      "hierarchy_level": 1,
+      "parent_breakdown_id": "b21dea6c-3410-4dd1-af4f-9dc74b166072",
+      "cost_center": "CC-531",
+      "planned_amount": 800000,
+      "actual_amount": 785000,
+      "currency": "USD",
+      "breakdown_type": "line_item",
+      "variance": -15000,
+      "variance_percentage": -1.875
+    },
+    {
+      "id": "7184cf61-9541-462a-b7b2-f596ac5aaa0e",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "name": "Concrete",
+      "sap_po_number": "PO-2024-3141",
+      "hierarchy_level": 1,
+      "parent_breakdown_id": "b21dea6c-3410-4dd1-af4f-9dc74b166072",
+      "cost_center": "CC-772",
+      "planned_amount": 600000,
+      "actual_amount": 620000,
+      "currency": "USD",
+      "breakdown_type": "line_item",
+      "variance": 20000,
+      "variance_percentage": 3.3333333333333335
+    },
+    {
+      "id": "6cf70615-b8ab-45db-bcc7-0c7dd47f0c61",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "name": "Rebar",
+      "sap_po_number": "PO-2024-1538",
+      "hierarchy_level": 1,
+      "parent_breakdown_id": "b21dea6c-3410-4dd1-af4f-9dc74b166072",
+      "cost_center": "CC-516",
+      "planned_amount": 400000,
+      "actual_amount": 395000,
+      "currency": "USD",
+      "breakdown_type": "line_item",
+      "variance": -5000,
+      "variance_percentage": -1.25
+    },
+    {
+      "id": "33d739c7-4e15-42da-a417-eb83d3e637e7",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "name": "Other Materials",
+      "sap_po_number": "PO-2024-6039",
+      "hierarchy_level": 1,
+      "parent_breakdown_id": "b21dea6c-3410-4dd1-af4f-9dc74b166072",
+      "cost_center": "CC-197",
+      "planned_amount": 200000,
+      "actual_amount": 180000,
+      "currency": "USD",
+      "breakdown_type": "line_item",
+      "variance": -20000,
+      "variance_percentage": -10.0
+    },
+    {
+      "id": "25c1fb95-7508-4c5d-a07c-99e032fcc1fe",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "name": "Labor Costs",
+      "sap_po_number": "PO-2024-1335",
+      "hierarchy_level": 0,
+      "parent_breakdown_id": null,
+      "cost_center": "CC-510",
+      "planned_amount": 1500000,
+      "actual_amount": 1485000,
+      "currency": "USD",
+      "breakdown_type": "category",
+      "variance": -15000,
+      "variance_percentage": -1.0
+    },
+    {
+      "id": "4f9bd339-0cf9-4bc8-ac3f-9f4d7cb90beb",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "name": "Site Supervision",
+      "sap_po_number": "PO-2024-1357",
+      "hierarchy_level": 1,
+      "parent_breakdown_id": "25c1fb95-7508-4c5d-a07c-99e032fcc1fe",
+      "cost_center": "CC-735",
+      "planned_amount": 400000,
+      "actual_amount": 410000,
+      "currency": "USD",
+      "breakdown_type": "line_item",
+      "variance": 10000,
+      "variance_percentage": 2.5
+    },
+    {
+      "id": "cb93eaca-5bdc-4202-bd57-60158dbadbb6",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "name": "Construction Crew",
+      "sap_po_number": "PO-2024-2588",
+      "hierarchy_level": 1,
+      "parent_breakdown_id": "25c1fb95-7508-4c5d-a07c-99e032fcc1fe",
+      "cost_center": "CC-481",
+      "planned_amount": 800000,
+      "actual_amount": 790000,
+      "currency": "USD",
+      "breakdown_type": "line_item",
+      "variance": -10000,
+      "variance_percentage": -1.25
+    },
+    {
+      "id": "3a6bfabd-419f-427f-8134-c0613ff23948",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "name": "Specialized Trades",
+      "sap_po_number": "PO-2024-3964",
+      "hierarchy_level": 1,
+      "parent_breakdown_id": "25c1fb95-7508-4c5d-a07c-99e032fcc1fe",
+      "cost_center": "CC-675",
+      "planned_amount": 300000,
+      "actual_amount": 285000,
+      "currency": "USD",
+      "breakdown_type": "line_item",
+      "variance": -15000,
+      "variance_percentage": -5.0
+    },
+    {
+      "id": "38cccadb-f568-45d3-9156-8f172195f08f",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "name": "Equipment & Machinery",
+      "sap_po_number": "PO-2024-3072",
+      "hierarchy_level": 0,
+      "parent_breakdown_id": null,
+      "cost_center": "CC-833",
+      "planned_amount": 800000,
+      "actual_amount": 785000,
+      "currency": "USD",
+      "breakdown_type": "category",
+      "variance": -15000,
+      "variance_percentage": -1.875
+    },
+    {
+      "id": "32a0e627-a517-499b-887b-20f112c65e22",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "name": "Heavy Equipment Rental",
+      "sap_po_number": "PO-2024-8814",
+      "hierarchy_level": 1,
+      "parent_breakdown_id": "38cccadb-f568-45d3-9156-8f172195f08f",
+      "cost_center": "CC-241",
+      "planned_amount": 500000,
+      "actual_amount": 485000,
+      "currency": "USD",
+      "breakdown_type": "line_item",
+      "variance": -15000,
+      "variance_percentage": -3.0
+    },
+    {
+      "id": "7167d792-af51-4577-a9b7-c6314c76a625",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "name": "Tools & Small Equipment",
+      "sap_po_number": "PO-2024-8299",
+      "hierarchy_level": 1,
+      "parent_breakdown_id": "38cccadb-f568-45d3-9156-8f172195f08f",
+      "cost_center": "CC-575",
+      "planned_amount": 200000,
+      "actual_amount": 195000,
+      "currency": "USD",
+      "breakdown_type": "line_item",
+      "variance": -5000,
+      "variance_percentage": -2.5
+    },
+    {
+      "id": "135bb4c0-8eff-4775-86e2-5f92a2a50cca",
+      "project_id": "9c963cbe-23fb-4da9-afab-61c15c379d1a",
+      "name": "Safety Equipment",
+      "sap_po_number": "PO-2024-2410",
+      "hierarchy_level": 1,
+      "parent_breakdown_id": "38cccadb-f568-45d3-9156-8f172195f08f",
+      "cost_center": "CC-981",
+      "planned_amount": 100000,
+      "actual_amount": 105000,
+      "currency": "USD",
+      "breakdown_type": "line_item",
+      "variance": 5000,
+      "variance_percentage": 5.0
+    }
+  ],
+  "report_templates": [
+    {
+      "id": "e1155b50-f3ba-4ccd-8f05-e728974b8263",
+      "name": "Executive Project Status Report",
+      "description": "Monthly executive briefing with KPIs and highlights",
+      "template_type": "executive_summary",
+      "data_mappings": {
+        "project_name": "{{project.name}}",
+        "completion_percentage": "{{project.completion_percentage}}",
+        "budget_variance": "{{financial.budget_variance}}",
+        "schedule_variance": "{{schedule.variance_days}}",
+        "risk_summary": "{{risks.summary}}"
+      },
+      "chart_configurations": [
+        {
+          "chart_type": "bar",
+          "data_source": "budget_by_category",
+          "title": "Budget Allocation"
+        },
+        {
+          "chart_type": "line",
+          "data_source": "schedule_progress",
+          "title": "Schedule Progress"
+        },
+        {
+          "chart_type": "pie",
+          "data_source": "risk_distribution",
+          "title": "Risk Distribution"
+        }
+      ],
+      "version": "1.0",
+      "is_active": true
+    },
+    {
+      "id": "f86d6995-30b3-486c-8661-def74e987bc1",
+      "name": "Detailed Project Status Report",
+      "description": "Comprehensive project status with detailed metrics",
+      "template_type": "detailed_status",
+      "data_mappings": {
+        "project_details": "{{project.*}}",
+        "financial_details": "{{financial.*}}",
+        "schedule_details": "{{schedule.*}}",
+        "resource_details": "{{resources.*}}",
+        "risk_details": "{{risks.*}}"
+      },
+      "chart_configurations": [
+        {
+          "chart_type": "gantt",
+          "data_source": "schedule_timeline",
+          "title": "Project Timeline"
+        },
+        {
+          "chart_type": "waterfall",
+          "data_source": "cost_breakdown",
+          "title": "Cost Breakdown"
+        },
+        {
+          "chart_type": "heatmap",
+          "data_source": "resource_utilization",
+          "title": "Resource Utilization"
+        }
+      ],
+      "version": "1.0",
+      "is_active": true
+    },
+    {
+      "id": "1a6472dd-a0cf-4acc-8ba0-df7ca45b9b77",
+      "name": "Risk Assessment Report",
+      "description": "Focused risk analysis and mitigation strategies",
+      "template_type": "risk_assessment",
+      "data_mappings": {
+        "risk_summary": "{{risks.summary}}",
+        "high_priority_risks": "{{risks.high_priority}}",
+        "mitigation_plans": "{{risks.mitigation_plans}}",
+        "monte_carlo_results": "{{simulations.latest}}"
+      },
+      "chart_configurations": [
+        {
+          "chart_type": "scatter",
+          "data_source": "risk_matrix",
+          "title": "Risk Probability vs Impact"
+        },
+        {
+          "chart_type": "histogram",
+          "data_source": "monte_carlo_distribution",
+          "title": "Cost Distribution"
+        }
+      ],
+      "version": "1.0",
+      "is_active": true
+    }
+  ]
+}

@@ -7,7 +7,10 @@ import AIInsightsPanel from '../../../components/pmr/AIInsightsPanel'
 import CollaborationPanel from '../../../components/pmr/CollaborationPanel'
 import CursorTracker from '../../../components/pmr/CursorTracker'
 import ConflictResolutionModal from '../../../components/pmr/ConflictResolutionModal'
+import PMRHelpIntegration from '../../../components/pmr/PMRHelpIntegration'
+import ContextualHelp from '../../../components/pmr/ContextualHelp'
 import { useRealtimePMR } from '../../../hooks/useRealtimePMR'
+import { getPMRHelpContent } from '../../../lib/pmr-help-content'
 import { 
   FileText, 
   Loader, 
@@ -21,7 +24,8 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  RefreshCw
+  RefreshCw,
+  HelpCircle
 } from 'lucide-react'
 import type { 
   PMRReport, 
@@ -300,6 +304,16 @@ export default function EnhancedPMRPage() {
   return (
     <AppLayout>
       <div ref={containerRef} className="h-full flex flex-col bg-gray-50">
+        {/* Help Integration */}
+        <PMRHelpIntegration
+          enableOnboarding={true}
+          enableContextualHelp={true}
+          enableAITooltips={true}
+          onHelpInteraction={(type, action) => {
+            console.log('Help interaction:', type, action)
+          }}
+        />
+
         {/* Cursor Tracker */}
         <CursorTracker
           cursors={realtimeState.cursors}
@@ -365,9 +379,15 @@ export default function EnhancedPMRPage() {
               
               {/* Active Users */}
               {realtimeState.activeUsers.length > 0 && (
-                <div className="flex items-center space-x-1 px-2 py-1 rounded-lg bg-gray-100">
+                <div className="flex items-center space-x-1 px-2 py-1 rounded-lg bg-gray-100" data-tour="collaboration">
                   <Users className="h-4 w-4 text-gray-600" />
                   <span className="text-xs text-gray-600">{realtimeState.activeUsers.length}</span>
+                  <ContextualHelp
+                    content={getPMRHelpContent('collaboration')!}
+                    position="bottom"
+                    trigger="hover"
+                    iconClassName="h-3 w-3"
+                  />
                 </div>
               )}
               
@@ -378,6 +398,12 @@ export default function EnhancedPMRPage() {
                   <span className="text-xs text-red-600">
                     {realtimeState.conflicts.filter(c => !c.resolved).length}
                   </span>
+                  <ContextualHelp
+                    content={getPMRHelpContent('conflicts')!}
+                    position="bottom"
+                    trigger="hover"
+                    iconClassName="h-3 w-3"
+                  />
                 </div>
               )}
               
@@ -397,9 +423,16 @@ export default function EnhancedPMRPage() {
               <button
                 onClick={() => setShowExportModal(true)}
                 className="flex items-center space-x-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm"
+                data-tour="export"
               >
                 <Download className="h-4 w-4" />
                 <span className="hidden sm:inline">Export</span>
+                <ContextualHelp
+                  content={getPMRHelpContent('export')!}
+                  position="bottom"
+                  trigger="hover"
+                  iconClassName="h-3 w-3"
+                />
               </button>
             </div>
           </div>
@@ -434,6 +467,7 @@ export default function EnhancedPMRPage() {
                   className={`flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded-lg text-sm ${
                     activePanel === 'collaboration' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
                   }`}
+                  data-tour="preview"
                 >
                   <MessageSquare className="h-4 w-4" />
                   <span>Collab</span>
@@ -443,8 +477,17 @@ export default function EnhancedPMRPage() {
           )}
 
           {/* Editor Panel */}
-          <div className={`flex-1 overflow-y-auto p-4 sm:p-6 ${isMobile && activePanel !== 'editor' ? 'hidden' : ''}`}>
+          <div className={`flex-1 overflow-y-auto p-4 sm:p-6 ${isMobile && activePanel !== 'editor' ? 'hidden' : ''}`} data-tour="editor">
             <div className="max-w-4xl mx-auto">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">Report Sections</h2>
+                <ContextualHelp
+                  content={getPMRHelpContent('editor')!}
+                  position="left"
+                  trigger="click"
+                />
+              </div>
+              
               {currentReport?.sections.map((section) => (
                 <div key={section.section_id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
                   <div className="flex items-center justify-between mb-4">
@@ -477,7 +520,16 @@ export default function EnhancedPMRPage() {
           </div>
 
           {/* AI Insights Panel */}
-          <div className={`${isMobile ? (activePanel === 'insights' ? 'w-full' : 'hidden') : 'w-96'}`}>
+          <div className={`${isMobile ? (activePanel === 'insights' ? 'w-full' : 'hidden') : 'w-96'}`} data-tour="ai-insights">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-sm font-semibold text-gray-900">AI Insights</h3>
+              <ContextualHelp
+                content={getPMRHelpContent('aiInsights')!}
+                position="left"
+                trigger="hover"
+                iconClassName="h-4 w-4"
+              />
+            </div>
             <AIInsightsPanel
               insights={insights}
               onInsightValidate={handleInsightValidate}

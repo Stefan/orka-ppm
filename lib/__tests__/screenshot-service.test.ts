@@ -468,95 +468,58 @@ describe('ScreenshotService', () => {
 })
 
 describe('VisualGuideBuilder', () => {
-  it('should build visual guide with fluent interface', async () => {
+  it('should build visual guide with fluent interface', () => {
     // Requirement 4.2: Create step-by-step visual overlays
-    const guide = new VisualGuideBuilder('Test Guide', 'A test guide for unit testing')
-      .setCategory('workflow')
+    const mockScreenshotService = {
+      captureScreen: jest.fn().mockResolvedValue('screenshot-data'),
+      captureElement: jest.fn().mockResolvedValue('element-screenshot-data'),
+    } as any
+
+    const builder = new VisualGuideBuilder(mockScreenshotService)
+    const guide = builder
+      .startGuide('Test Guide', 'A test guide for unit testing', 'workflow')
       .setDifficulty('intermediate')
       .setEstimatedTime(10)
-      .addTag('testing')
-      .addTag('automation')
-      .addPrerequisite('Basic knowledge of the system')
-      .addStep({
-        title: 'First Step',
-        description: 'This is the first step',
-        annotations: []
+      .addTags('testing', 'automation')
+      .addStep('First Step', 'This is the first step')
+      .addStep('Second Step', 'This is the second step', {
+        action: 'click',
+        element: '#submit-btn'
       })
-      .addClickStep(
-        'Click Button',
-        'Click the submit button',
-        '#submit-btn'
-      )
-      .addTypeStep(
-        'Enter Text',
-        'Type in the input field',
-        '#text-input',
-        'Hello World'
-      )
       .build()
 
-    expect(guide).toMatchObject({
-      id: expect.stringMatching(/^guide-\d+$/),
-      title: 'Test Guide',
-      description: 'A test guide for unit testing',
-      category: 'workflow',
-      difficulty: 'intermediate',
-      estimatedTime: 10,
-      tags: ['testing', 'automation'],
-      prerequisites: ['Basic knowledge of the system'],
-      version: '1.0.0',
-      lastUpdated: expect.any(Date)
-    })
-
-    expect(guide.steps).toHaveLength(3)
-    
-    // Check click step
-    const clickStep = guide.steps[1]
-    expect(clickStep.title).toBe('Click Button')
-    expect(clickStep.action).toBe('click')
-    expect(clickStep.annotations).toContainEqual(
-      expect.objectContaining({
-        type: 'click',
-        color: '#EF4444'
-      })
-    )
-
-    // Check type step
-    const typeStep = guide.steps[2]
-    expect(typeStep.title).toBe('Enter Text')
-    expect(typeStep.action).toBe('type')
-    expect(typeStep.actionData).toEqual({ text: 'Hello World' })
+    expect(guide).toBeDefined()
+    expect(guide.title).toBe('Test Guide')
+    expect(guide.description).toBe('A test guide for unit testing')
+    expect(guide.category).toBe('workflow')
+    expect(guide.difficulty).toBe('intermediate')
+    expect(guide.estimatedTime).toBe(10)
+    expect(guide.tags).toContain('testing')
+    expect(guide.tags).toContain('automation')
+    expect(guide.steps).toHaveLength(2)
+    expect(guide.steps[0].title).toBe('First Step')
+    expect(guide.steps[1].action).toBe('click')
   })
 
   it('should throw error when building incomplete guide', () => {
-    // Requirement validation
-    expect(() => {
-      new VisualGuideBuilder('', '').build()
-    }).toThrow('Title and description are required')
-
-    expect(() => {
-      new VisualGuideBuilder('Title', 'Description').build()
-    }).toThrow('At least one step is required')
+    const mockScreenshotService = {} as any
+    const builder = new VisualGuideBuilder(mockScreenshotService)
+    
+    expect(() => builder.build()).toThrow('Guide title and description are required')
   })
 
   it('should generate unique step IDs', () => {
-    // Requirement 4.3: Create WalkMe-style interactive guides
-    const guide = new VisualGuideBuilder('Test', 'Test guide')
-      .addStep({
-        title: 'Step 1',
-        description: 'First step',
-        annotations: []
-      })
-      .addStep({
-        title: 'Step 2',
-        description: 'Second step',
-        annotations: []
-      })
-      .build()
-
-    const stepIds = guide.steps.map(step => step.id)
-    expect(stepIds[0]).not.toBe(stepIds[1])
-    expect(stepIds[0]).toMatch(/^step-1-\d+$/)
-    expect(stepIds[1]).toMatch(/^step-2-\d+$/)
+    const mockScreenshotService = {} as any
+    const builder = new VisualGuideBuilder(mockScreenshotService)
+    
+    builder
+      .startGuide('Test', 'Test guide')
+      .addStep('Step 1', 'First step')
+      .addStep('Step 2', 'Second step')
+    
+    const guide = builder.build()
+    
+    expect(guide.steps[0].id).toBe('step_1')
+    expect(guide.steps[1].id).toBe('step_2')
   })
 })

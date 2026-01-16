@@ -8,6 +8,7 @@ export { ErrorBoundary, withErrorBoundary } from './ErrorBoundary'
 export { default as LoadingSpinner } from './LoadingSpinner'
 export { default as Toast } from './Toast'
 export { default as ApiDebugger } from './ApiDebugger'
+export { default as ShareableURLWidget } from './ShareableURLWidget'
 
 // Type exports
 export type { AppLayoutProps } from './AppLayout'

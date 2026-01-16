@@ -17,6 +17,9 @@ class Settings:
     SUPABASE_ANON_KEY: str = os.getenv("SUPABASE_ANON_KEY", "")
     SUPABASE_SERVICE_ROLE_KEY: str = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
     
+    # Security Configuration
+    SECRET_KEY: str = os.getenv("SECRET_KEY", os.getenv("SUPABASE_SERVICE_ROLE_KEY", "default-secret-key-change-in-production"))
+    
     # OpenAI Configuration
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     

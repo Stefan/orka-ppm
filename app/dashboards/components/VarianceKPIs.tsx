@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { TrendingUp, TrendingDown, AlertTriangle, Target } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
 
@@ -19,7 +19,7 @@ interface VarianceKPIsProps {
   selectedCurrency?: string
 }
 
-export default function VarianceKPIs({ session, selectedCurrency = 'USD' }: VarianceKPIsProps) {
+function VarianceKPIs({ session, selectedCurrency = 'USD' }: VarianceKPIsProps) {
   const [varianceData, setVarianceData] = useState<VarianceKPIs | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -240,3 +240,14 @@ export default function VarianceKPIs({ session, selectedCurrency = 'USD' }: Vari
     </div>
   )
 }
+
+// Custom comparison function to prevent unnecessary re-renders
+// Only re-render if session token or currency changes
+const arePropsEqual = (prevProps: VarianceKPIsProps, nextProps: VarianceKPIsProps) => {
+  return (
+    prevProps.session?.access_token === nextProps.session?.access_token &&
+    prevProps.selectedCurrency === nextProps.selectedCurrency
+  )
+}
+
+export default memo(VarianceKPIs, arePropsEqual)

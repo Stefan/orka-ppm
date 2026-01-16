@@ -70,6 +70,63 @@ class Permission(str, Enum):
     admin_delete = "admin_delete"
     system_admin = "system_admin"
     data_import = "data_import"
+    
+    # PMR permissions
+    pmr_create = "pmr_create"
+    pmr_read = "pmr_read"
+    pmr_update = "pmr_update"
+    pmr_delete = "pmr_delete"
+    pmr_approve = "pmr_approve"
+    pmr_export = "pmr_export"
+    pmr_collaborate = "pmr_collaborate"
+    pmr_ai_insights = "pmr_ai_insights"
+    pmr_template_manage = "pmr_template_manage"
+    pmr_audit_read = "pmr_audit_read"
+    
+    # Shareable URL permissions
+    shareable_url_create = "shareable_url_create"
+    shareable_url_read = "shareable_url_read"
+    shareable_url_revoke = "shareable_url_revoke"
+    shareable_url_manage = "shareable_url_manage"
+    
+    # Monte Carlo simulation permissions
+    simulation_run = "simulation_run"
+    simulation_read = "simulation_read"
+    simulation_delete = "simulation_delete"
+    simulation_manage = "simulation_manage"
+    
+    # What-If scenario permissions
+    scenario_create = "scenario_create"
+    scenario_read = "scenario_read"
+    scenario_update = "scenario_update"
+    scenario_delete = "scenario_delete"
+    scenario_compare = "scenario_compare"
+    
+    # Change management permissions
+    change_create = "change_create"
+    change_read = "change_read"
+    change_update = "change_update"
+    change_delete = "change_delete"
+    change_approve = "change_approve"
+    change_implement = "change_implement"
+    change_audit_read = "change_audit_read"
+    
+    # PO breakdown permissions
+    po_breakdown_import = "po_breakdown_import"
+    po_breakdown_create = "po_breakdown_create"
+    po_breakdown_read = "po_breakdown_read"
+    po_breakdown_update = "po_breakdown_update"
+    po_breakdown_delete = "po_breakdown_delete"
+    
+    # Report generation permissions
+    report_generate = "report_generate"
+    report_read = "report_read"
+    report_template_create = "report_template_create"
+    report_template_manage = "report_template_manage"
+    
+    # Audit trail permissions (Requirements 6.7, 6.8)
+    AUDIT_READ = "audit:read"
+    AUDIT_EXPORT = "audit:export"
 
 # Default role permissions configuration
 DEFAULT_ROLE_PERMISSIONS = {
@@ -82,7 +139,21 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.risk_create, Permission.risk_read, Permission.risk_update, Permission.risk_delete,
         Permission.issue_create, Permission.issue_read, Permission.issue_update, Permission.issue_delete,
         Permission.ai_rag_query, Permission.ai_resource_optimize, Permission.ai_risk_forecast, Permission.ai_metrics_read,
-        Permission.user_manage, Permission.role_manage, Permission.system_admin, Permission.data_import
+        Permission.user_manage, Permission.role_manage, Permission.system_admin, Permission.data_import,
+        Permission.pmr_create, Permission.pmr_read, Permission.pmr_update, Permission.pmr_delete,
+        Permission.pmr_approve, Permission.pmr_export, Permission.pmr_collaborate, Permission.pmr_ai_insights,
+        Permission.pmr_template_manage, Permission.pmr_audit_read,
+        # Roche Construction/Engineering PPM features
+        Permission.shareable_url_create, Permission.shareable_url_read, Permission.shareable_url_revoke, Permission.shareable_url_manage,
+        Permission.simulation_run, Permission.simulation_read, Permission.simulation_delete, Permission.simulation_manage,
+        Permission.scenario_create, Permission.scenario_read, Permission.scenario_update, Permission.scenario_delete, Permission.scenario_compare,
+        Permission.change_create, Permission.change_read, Permission.change_update, Permission.change_delete,
+        Permission.change_approve, Permission.change_implement, Permission.change_audit_read,
+        Permission.po_breakdown_import, Permission.po_breakdown_create, Permission.po_breakdown_read,
+        Permission.po_breakdown_update, Permission.po_breakdown_delete,
+        Permission.report_generate, Permission.report_read, Permission.report_template_create, Permission.report_template_manage,
+        # Audit trail permissions
+        Permission.AUDIT_READ, Permission.AUDIT_EXPORT
     ],
     UserRole.portfolio_manager: [
         # Portfolio and project management
@@ -92,7 +163,18 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.financial_read, Permission.financial_create, Permission.financial_update, Permission.budget_alert_manage,
         Permission.risk_read, Permission.risk_update,
         Permission.issue_read, Permission.issue_update,
-        Permission.ai_rag_query, Permission.ai_resource_optimize, Permission.ai_risk_forecast, Permission.ai_metrics_read
+        Permission.ai_rag_query, Permission.ai_resource_optimize, Permission.ai_risk_forecast, Permission.ai_metrics_read,
+        Permission.pmr_create, Permission.pmr_read, Permission.pmr_update, Permission.pmr_approve,
+        Permission.pmr_export, Permission.pmr_collaborate, Permission.pmr_ai_insights, Permission.pmr_audit_read,
+        # Roche Construction/Engineering PPM features
+        Permission.shareable_url_create, Permission.shareable_url_read, Permission.shareable_url_revoke,
+        Permission.simulation_run, Permission.simulation_read, Permission.simulation_delete,
+        Permission.scenario_create, Permission.scenario_read, Permission.scenario_update, Permission.scenario_delete, Permission.scenario_compare,
+        Permission.change_create, Permission.change_read, Permission.change_update, Permission.change_approve,
+        Permission.po_breakdown_read, Permission.po_breakdown_update,
+        Permission.report_generate, Permission.report_read, Permission.report_template_create,
+        # Audit trail permissions
+        Permission.AUDIT_READ, Permission.AUDIT_EXPORT
     ],
     UserRole.project_manager: [
         # Project-specific management
@@ -101,7 +183,18 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.financial_read, Permission.financial_create, Permission.financial_update,
         Permission.risk_create, Permission.risk_read, Permission.risk_update,
         Permission.issue_create, Permission.issue_read, Permission.issue_update,
-        Permission.ai_rag_query, Permission.ai_resource_optimize, Permission.ai_risk_forecast
+        Permission.ai_rag_query, Permission.ai_resource_optimize, Permission.ai_risk_forecast,
+        Permission.pmr_create, Permission.pmr_read, Permission.pmr_update,
+        Permission.pmr_export, Permission.pmr_collaborate, Permission.pmr_ai_insights,
+        # Roche Construction/Engineering PPM features
+        Permission.shareable_url_create, Permission.shareable_url_read,
+        Permission.simulation_run, Permission.simulation_read,
+        Permission.scenario_create, Permission.scenario_read, Permission.scenario_update, Permission.scenario_compare,
+        Permission.change_create, Permission.change_read, Permission.change_update,
+        Permission.po_breakdown_read, Permission.po_breakdown_update,
+        Permission.report_generate, Permission.report_read,
+        # Audit trail permissions
+        Permission.AUDIT_READ
     ],
     UserRole.resource_manager: [
         # Resource management focus
@@ -110,7 +203,13 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.financial_read,
         Permission.risk_read,
         Permission.issue_read,
-        Permission.ai_rag_query, Permission.ai_resource_optimize
+        Permission.ai_rag_query, Permission.ai_resource_optimize,
+        # Roche Construction/Engineering PPM features
+        Permission.simulation_read,
+        Permission.scenario_read,
+        Permission.change_read,
+        Permission.po_breakdown_read,
+        Permission.report_read
     ],
     UserRole.team_member: [
         # Basic project participation
@@ -119,7 +218,13 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.financial_read,
         Permission.risk_read, Permission.risk_create,
         Permission.issue_read, Permission.issue_create, Permission.issue_update,
-        Permission.ai_rag_query
+        Permission.ai_rag_query,
+        # Roche Construction/Engineering PPM features
+        Permission.simulation_read,
+        Permission.scenario_read,
+        Permission.change_create, Permission.change_read,
+        Permission.po_breakdown_read,
+        Permission.report_read
     ],
     UserRole.viewer: [
         # Read-only access
@@ -129,7 +234,16 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.financial_read,
         Permission.risk_read,
         Permission.issue_read,
-        Permission.ai_rag_query
+        Permission.ai_rag_query,
+        Permission.pmr_read,
+        # Roche Construction/Engineering PPM features
+        Permission.simulation_read,
+        Permission.scenario_read,
+        Permission.change_read,
+        Permission.po_breakdown_read,
+        Permission.report_read,
+        # Audit trail permissions (read-only for viewers)
+        Permission.AUDIT_READ
     ]
 }
 

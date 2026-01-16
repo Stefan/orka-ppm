@@ -189,3 +189,164 @@ class ChangeRequest(BaseModel):
     updated_at: datetime
     closed_at: Optional[datetime] = None
     closed_by: Optional[str] = None
+
+
+class ChangeRequestFilters(BaseModel):
+    """Filters for listing change requests"""
+    project_id: Optional[UUID] = None
+    status: Optional[ChangeStatus] = None
+    change_type: Optional[ChangeType] = None
+    priority: Optional[PriorityLevel] = None
+    requested_by: Optional[UUID] = None
+    assigned_to_me: bool = False
+    date_from: Optional[date] = None
+    date_to: Optional[date] = None
+    search_term: Optional[str] = None
+    page: int = 1
+    page_size: int = 20
+
+
+class ApprovalResponse(BaseModel):
+    """Response model for approval information"""
+    id: str
+    change_request_id: str
+    step_number: int
+    approver_id: str
+    approver_name: Optional[str] = None
+    approver_role: str
+    decision: Optional[ApprovalDecision] = None
+    comments: Optional[str] = None
+    is_required: bool
+    is_parallel: bool
+    due_date: Optional[datetime] = None
+    decided_at: Optional[datetime] = None
+    created_at: datetime
+
+
+class PendingApproval(BaseModel):
+    """Pending approval for a user"""
+    approval_id: str
+    change_request_id: str
+    change_number: str
+    change_title: str
+    change_type: str
+    priority: str
+    requested_by: str
+    requested_date: datetime
+    step_number: int
+    due_date: Optional[datetime] = None
+    is_overdue: bool
+    project_name: str
+    estimated_cost_impact: Optional[Decimal] = None
+
+
+class ImpactAnalysisRequest(BaseModel):
+    """Request for impact analysis"""
+    include_scenarios: bool = True
+    detailed_breakdown: bool = True
+    analysis_scope: List[str] = Field(default_factory=lambda: ['cost', 'schedule', 'resources'])
+
+
+class ImpactAnalysisResponse(BaseModel):
+    """Response model for impact analysis"""
+    change_request_id: str
+    total_cost_impact: Decimal
+    schedule_impact_days: int
+    resource_impact: Dict[str, Any]
+    risk_impact: Dict[str, Any]
+    affected_milestones: List[Dict[str, Any]]
+    affected_pos: List[Dict[str, Any]]
+    scenarios: Optional[Dict[str, Any]] = None
+    analyzed_at: datetime
+    analyzed_by: str
+
+
+class ImplementationPlan(BaseModel):
+    """Implementation plan for a change request"""
+    implementation_plan: Dict[str, Any]
+    estimated_duration_days: int
+    assigned_team: List[str]
+    milestones: List[Dict[str, Any]]
+    dependencies: List[str] = Field(default_factory=list)
+    risks: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+class ImplementationProgress(BaseModel):
+    """Progress update for implementation"""
+    progress_percentage: int = Field(..., ge=0, le=100)
+    completed_tasks: List[str]
+    in_progress_tasks: List[str]
+    blocked_tasks: List[str] = Field(default_factory=list)
+    issues: List[Dict[str, Any]] = Field(default_factory=list)
+    lessons_learned: Optional[str] = None
+    next_steps: Optional[str] = None
+
+
+class ImplementationResponse(BaseModel):
+    """Response model for implementation status"""
+    change_request_id: str
+    status: str
+    progress_percentage: int
+    implementation_plan: Dict[str, Any]
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    completed_tasks: List[str]
+    in_progress_tasks: List[str]
+    blocked_tasks: List[str]
+    issues: List[Dict[str, Any]]
+    lessons_learned: Optional[str] = None
+
+
+class ChangeAnalytics(BaseModel):
+    """Analytics data for change management"""
+    total_changes: int
+    changes_by_status: Dict[str, int]
+    changes_by_type: Dict[str, int]
+    changes_by_priority: Dict[str, int]
+    average_approval_time_days: float
+    average_implementation_time_days: float
+    total_cost_impact: Decimal
+    total_schedule_impact_days: int
+    approval_rate: float
+    rejection_rate: float
+    trends: Optional[Dict[str, Any]] = None
+
+
+class AuditLogEntry(BaseModel):
+    """Audit log entry for change request"""
+    id: str
+    change_request_id: str
+    event_type: str
+    event_description: str
+    performed_by: str
+    performed_at: datetime
+    old_values: Optional[Dict[str, Any]] = None
+    new_values: Optional[Dict[str, Any]] = None
+    related_entity_type: Optional[str] = None
+    related_entity_id: Optional[str] = None
+
+
+class ChangeTemplateCreate(BaseModel):
+    """Request model for creating a change template"""
+    name: str
+    description: Optional[str] = None
+    change_type: ChangeType
+    template_fields: Dict[str, Any]
+    default_values: Dict[str, Any] = Field(default_factory=dict)
+    required_fields: List[str] = Field(default_factory=list)
+    is_active: bool = True
+
+
+class ChangeTemplateResponse(BaseModel):
+    """Response model for change template"""
+    id: str
+    name: str
+    description: Optional[str] = None
+    change_type: str
+    template_fields: Dict[str, Any]
+    default_values: Dict[str, Any]
+    required_fields: List[str]
+    is_active: bool
+    created_by: str
+    created_at: datetime
+    updated_at: datetime

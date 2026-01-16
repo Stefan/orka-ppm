@@ -5,6 +5,8 @@ import { Inter } from 'next/font/google'
 import { SupabaseAuthProvider } from './providers/SupabaseAuthProvider'
 import { ErrorBoundary } from '../components/shared/ErrorBoundary'
 import PerformanceOptimizer from '../components/performance/PerformanceOptimizer'
+import { ResourcePreloader } from '../components/performance/ResourcePreloader'
+import PredictivePrefetcher from '../components/performance/PredictivePrefetcher'
 import FirefoxSidebarFix from '../components/navigation/FirefoxSidebarFix'
 
 const inter = Inter({ 
@@ -66,11 +68,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Performance optimizations */}
         <link rel="preconnect" href="https://orka-ppm.onrender.com" />
         <link rel="dns-prefetch" href="https://orka-ppm.onrender.com" />
-        <link rel="preload" href="/icon.svg" as="image" type="image/svg+xml" />
         
-        {/* Icons */}
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        {/* Preload critical fonts - Inter is loaded via next/font/google with automatic optimization */}
+        {/* Next.js automatically inlines and optimizes Google Fonts, no manual preload needed */}
+        
+        {/* Preload critical icons for faster LCP */}
+        <link rel="preload" href="/icon.svg" as="image" type="image/svg+xml" />
+        <link rel="preload" href="/apple-touch-icon.png" as="image" type="image/png" />
+        
+        {/* Preload critical CSS - Next.js handles this automatically via CSS-in-JS */}
+        {/* Preload critical JavaScript - Next.js handles this automatically via code splitting */}
+        
+        {/* Icons with proper dimensions */}
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
         <link rel="icon" type="image/svg+xml" sizes="32x32" href="/favicon-32x32.svg" />
         <link rel="icon" type="image/svg+xml" sizes="16x16" href="/favicon-16x16.svg" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2563eb" />
@@ -88,6 +98,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         } as React.CSSProperties}
       >
         <FirefoxSidebarFix />
+        <ResourcePreloader />
+        <PredictivePrefetcher enabled={true} />
         <PerformanceOptimizer>
           <ErrorBoundary>
             <SupabaseAuthProvider>

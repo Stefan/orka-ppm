@@ -17,7 +17,21 @@ from cryptography.fernet import Fernet
 import hashlib
 import base64
 
-from roche_construction_models import *
+from roche_construction_models import (
+    ShareablePermissions,
+    ShareableURLResponse,
+    ShareableURLValidation,
+    SimulationConfig,
+    SimulationStatistics,
+    SimulationResult,
+    ProjectChanges,
+    TimelineImpact,
+    CostImpact,
+    ResourceImpact,
+    ScenarioConfig,
+    ScenarioAnalysis,
+    ScenarioComparison
+)
 
 
 class TokenManager:
@@ -79,13 +93,13 @@ class ShareableURLService:
         expiration: datetime,
         user_id: UUID,
         description: Optional[str] = None
-    ) -> ShareableURL:
+    ) -> ShareableURLResponse:
         """Generate a new shareable URL for a project"""
         
         # Create token payload
         token_payload = {
             'project_id': str(project_id),
-            'permissions': permissions.dict(),
+            'permissions': permissions.model_dump(),
             'exp': int(expiration.timestamp()),
             'created_by': str(user_id)
         }
@@ -97,7 +111,7 @@ class ShareableURLService:
         url_data = {
             'project_id': str(project_id),
             'token': token,
-            'permissions': permissions.dict(),
+            'permissions': permissions.model_dump(),
             'created_by': str(user_id),
             'expires_at': expiration.isoformat(),
             'access_count': 0,
@@ -109,7 +123,7 @@ class ShareableURLService:
         if not result.data:
             raise Exception("Failed to create shareable URL")
         
-        return ShareableURL(**result.data[0])
+        return ShareableURLResponse(**result.data[0])
     
     async def validate_shareable_url(self, token: str) -> ShareableURLValidation:
         """Validate a shareable URL token and return validation result"""
@@ -175,13 +189,13 @@ class ShareableURLService:
         except Exception:
             return False
     
-    async def list_project_shareable_urls(self, project_id: UUID) -> List[ShareableURL]:
+    async def list_project_shareable_urls(self, project_id: UUID) -> List[ShareableURLResponse]:
         """List all shareable URLs for a project"""
         result = self.supabase.table('shareable_urls').select('*').eq(
             'project_id', str(project_id)
         ).order('created_at', desc=True).execute()
         
-        return [ShareableURL(**url_data) for url_data in result.data]
+        return [ShareableURLResponse(**url_data) for url_data in result.data]
 
 
 class MonteCarloEngine:
@@ -356,11 +370,205 @@ class MonteCarloEngine:
             return False
 
 
+class ProjectModelingEngine:
+    """Engine for modeling project parameter changes and calculating impacts"""
+    
+    def __init__(self):
+        pass
+    
+    def calculate_timeline_impact(
+        self, 
+        base_project: Dict[str, Any], 
+        changes: ProjectChanges,
+        milestones: List[Dict[str, Any]] = None
+    ) -> TimelineImpact:
+        """Calculate timeline impact of parameter changes with critical path analysis"""
+        
+        # Get original timeline
+        original_start = datetime.fromisoformat(base_project.get('start_date', datetime.now().isoformat()))
+        original_end = datetime.fromisoformat(base_project.get('end_date', (datetime.now() + timedelta(days=90)).isoformat()))
+        original_duration = (original_end - original_start).days
+        
+        # Calculate new timeline based on changes
+        new_start = changes.start_date or original_start.date()
+        new_end = changes.end_date or original_end.date()
+        
+        # Apply resource allocation impact on duration
+        if changes.resource_allocations:
+            # More resources can reduce duration, fewer can increase it
+            resource_factor = self._calculate_resource_impact_factor(changes.resource_allocations)
+            duration_adjustment = int(original_duration * (1 - resource_factor))
+            new_end = new_start + timedelta(days=max(1, original_duration + duration_adjustment))
+        
+        new_duration = (new_end - new_start).days
+        
+        # Identify affected milestones
+        affected_milestones = []
+        if milestones:
+            for milestone in milestones:
+                milestone_date = datetime.fromisoformat(milestone.get('planned_date', datetime.now().isoformat())).date()
+                if milestone_date > new_end or milestone_date < new_start:
+                    affected_milestones.append(milestone.get('name', 'Unknown Milestone'))
+        
+        # Determine if critical path is affected (significant duration change)
+        critical_path_affected = abs(new_duration - original_duration) > 7  # More than a week
+        
+        return TimelineImpact(
+            original_duration=original_duration,
+            new_duration=new_duration,
+            duration_change=new_duration - original_duration,
+            critical_path_affected=critical_path_affected,
+            affected_milestones=affected_milestones
+        )
+    
+    def calculate_cost_impact(
+        self, 
+        base_project: Dict[str, Any], 
+        changes: ProjectChanges
+    ) -> CostImpact:
+        """Calculate cost impact of parameter changes"""
+        
+        original_cost = Decimal(str(base_project.get('budget', 0)))
+        
+        # Start with explicit budget change if provided
+        if changes.budget:
+            new_cost = changes.budget
+        else:
+            new_cost = original_cost
+        
+        # Apply resource allocation cost impact
+        if changes.resource_allocations:
+            resource_cost_delta = self._calculate_resource_cost_delta(
+                changes.resource_allocations, 
+                original_cost
+            )
+            new_cost += resource_cost_delta
+        
+        # Apply risk adjustment cost impact
+        if changes.risk_adjustments:
+            risk_cost_delta = self._calculate_risk_cost_delta(changes.risk_adjustments)
+            new_cost += risk_cost_delta
+        
+        cost_change = new_cost - original_cost
+        cost_change_percentage = float((cost_change / original_cost * 100)) if original_cost > 0 else 0
+        
+        # Identify affected cost categories
+        affected_categories = []
+        if changes.budget:
+            affected_categories.append('budget')
+        if changes.resource_allocations:
+            affected_categories.append('resources')
+        if changes.risk_adjustments:
+            affected_categories.append('risk_mitigation')
+        
+        return CostImpact(
+            original_cost=original_cost,
+            new_cost=new_cost,
+            cost_change=cost_change,
+            cost_change_percentage=cost_change_percentage,
+            affected_categories=affected_categories
+        )
+    
+    def calculate_resource_impact(
+        self, 
+        base_project: Dict[str, Any], 
+        changes: ProjectChanges,
+        current_allocations: List[Dict[str, Any]] = None
+    ) -> ResourceImpact:
+        """Calculate resource impact of parameter changes"""
+        
+        if not changes.resource_allocations:
+            return ResourceImpact(
+                utilization_changes={},
+                over_allocated_resources=[],
+                under_allocated_resources=[],
+                new_resource_requirements=[]
+            )
+        
+        utilization_changes = {}
+        over_allocated = []
+        under_allocated = []
+        new_requirements = []
+        
+        # Analyze each resource allocation change
+        for resource_type, allocation_value in changes.resource_allocations.items():
+            # Calculate utilization change (assuming 100% is full capacity)
+            utilization_changes[resource_type] = allocation_value
+            
+            # Identify over/under allocation
+            if allocation_value > 1.0:  # Over 100% capacity
+                over_allocated.append(resource_type)
+            elif allocation_value < 0.5:  # Under 50% capacity
+                under_allocated.append(resource_type)
+            
+            # Identify new resource requirements (new resource types)
+            if current_allocations:
+                existing_types = [r.get('resource_type') for r in current_allocations]
+                if resource_type not in existing_types:
+                    new_requirements.append(resource_type)
+        
+        return ResourceImpact(
+            utilization_changes=utilization_changes,
+            over_allocated_resources=over_allocated,
+            under_allocated_resources=under_allocated,
+            new_resource_requirements=new_requirements
+        )
+    
+    def _calculate_resource_impact_factor(self, resource_allocations: Dict[str, float]) -> float:
+        """Calculate overall resource impact factor on timeline"""
+        # Average resource change (positive means more resources, negative means fewer)
+        if not resource_allocations:
+            return 0.0
+        
+        # Calculate average utilization change
+        avg_change = sum(resource_allocations.values()) / len(resource_allocations)
+        
+        # Convert to timeline impact factor (capped at ±30%)
+        # More resources = faster completion (negative duration change)
+        # Fewer resources = slower completion (positive duration change)
+        return max(-0.3, min(0.3, (avg_change - 1.0) * 0.2))
+    
+    def _calculate_resource_cost_delta(
+        self, 
+        resource_allocations: Dict[str, float], 
+        base_cost: Decimal
+    ) -> Decimal:
+        """Calculate cost delta from resource allocation changes"""
+        # Assume resource costs are proportional to allocation
+        # Average cost per resource type is base_cost / number of resource types
+        
+        total_delta = Decimal('0')
+        for resource_type, allocation in resource_allocations.items():
+            # Assume each resource type costs 20% of base budget
+            resource_base_cost = base_cost * Decimal('0.2')
+            # Cost delta is proportional to allocation change from 100%
+            delta = resource_base_cost * Decimal(str(allocation - 1.0))
+            total_delta += delta
+        
+        return total_delta
+    
+    def _calculate_risk_cost_delta(self, risk_adjustments: Dict[str, Dict[str, float]]) -> Decimal:
+        """Calculate cost delta from risk adjustments"""
+        total_delta = Decimal('0')
+        
+        for risk_id, adjustments in risk_adjustments.items():
+            # Extract cost impact from risk adjustments
+            cost_impact = adjustments.get('cost_impact', 0.0)
+            probability = adjustments.get('probability', 0.5)
+            
+            # Expected value of risk cost
+            expected_cost = Decimal(str(cost_impact * probability))
+            total_delta += expected_cost
+        
+        return total_delta
+
+
 class ScenarioAnalyzer:
-    """What-If scenario analysis service"""
+    """What-If scenario analysis service with real-time updates"""
     
     def __init__(self, supabase: Client):
         self.supabase = supabase
+        self.modeling_engine = ProjectModelingEngine()
     
     async def create_scenario(
         self,
@@ -369,15 +577,39 @@ class ScenarioAnalyzer:
         user_id: UUID,
         base_scenario_id: Optional[UUID] = None
     ) -> ScenarioAnalysis:
-        """Create a new what-if scenario"""
+        """Create a new what-if scenario with comprehensive impact analysis"""
         
         # Get base project data
         base_project = await self._get_project_data(base_project_id)
         
-        # Calculate impacts
-        timeline_impact = await self._calculate_timeline_impact(base_project, scenario_config.parameter_changes)
-        cost_impact = await self._calculate_cost_impact(base_project, scenario_config.parameter_changes)
-        resource_impact = await self._calculate_resource_impact(base_project, scenario_config.parameter_changes)
+        # Get additional context data
+        milestones = await self._get_project_milestones(base_project_id)
+        current_allocations = await self._get_resource_allocations(base_project_id)
+        
+        # Calculate impacts using modeling engine
+        timeline_impact = None
+        cost_impact = None
+        resource_impact = None
+        
+        if 'timeline' in scenario_config.analysis_scope:
+            timeline_impact = self.modeling_engine.calculate_timeline_impact(
+                base_project, 
+                scenario_config.parameter_changes,
+                milestones
+            )
+        
+        if 'cost' in scenario_config.analysis_scope:
+            cost_impact = self.modeling_engine.calculate_cost_impact(
+                base_project, 
+                scenario_config.parameter_changes
+            )
+        
+        if 'resources' in scenario_config.analysis_scope:
+            resource_impact = self.modeling_engine.calculate_resource_impact(
+                base_project, 
+                scenario_config.parameter_changes,
+                current_allocations
+            )
         
         # Store scenario
         scenario_data = {
@@ -385,15 +617,15 @@ class ScenarioAnalyzer:
             'name': scenario_config.name,
             'description': scenario_config.description,
             'base_scenario_id': str(base_scenario_id) if base_scenario_id else None,
-            'parameter_changes': scenario_config.parameter_changes.dict(),
+            'parameter_changes': scenario_config.parameter_changes.dict(exclude_none=True),
             'impact_results': {
                 'timeline': timeline_impact.dict() if timeline_impact else {},
                 'cost': cost_impact.dict() if cost_impact else {},
                 'resource': resource_impact.dict() if resource_impact else {}
             },
-            'timeline_impact': timeline_impact.dict() if timeline_impact else {},
-            'cost_impact': cost_impact.dict() if cost_impact else {},
-            'resource_impact': resource_impact.dict() if resource_impact else {},
+            'timeline_impact': timeline_impact.dict() if timeline_impact else None,
+            'cost_impact': cost_impact.dict() if cost_impact else None,
+            'resource_impact': resource_impact.dict() if resource_impact else None,
             'created_by': str(user_id),
             'is_active': True,
             'is_baseline': False
@@ -406,6 +638,67 @@ class ScenarioAnalyzer:
         
         return ScenarioAnalysis(**result.data[0])
     
+    async def update_scenario_realtime(
+        self,
+        scenario_id: UUID,
+        parameter_changes: Dict[str, Any],
+        user_id: UUID
+    ) -> ScenarioAnalysis:
+        """Update scenario parameters and recalculate impacts in real-time"""
+        
+        # Get existing scenario
+        existing_scenario = await self._get_scenario(scenario_id)
+        
+        # Get base project data
+        base_project = await self._get_project_data(UUID(existing_scenario['project_id']))
+        
+        # Merge parameter changes
+        current_changes = existing_scenario.get('parameter_changes', {})
+        updated_changes = {**current_changes, **parameter_changes}
+        
+        # Convert to ProjectChanges model
+        project_changes = ProjectChanges(**updated_changes)
+        
+        # Get additional context data
+        milestones = await self._get_project_milestones(UUID(existing_scenario['project_id']))
+        current_allocations = await self._get_resource_allocations(UUID(existing_scenario['project_id']))
+        
+        # Recalculate impacts
+        timeline_impact = self.modeling_engine.calculate_timeline_impact(
+            base_project, 
+            project_changes,
+            milestones
+        )
+        
+        cost_impact = self.modeling_engine.calculate_cost_impact(
+            base_project, 
+            project_changes
+        )
+        
+        resource_impact = self.modeling_engine.calculate_resource_impact(
+            base_project, 
+            project_changes,
+            current_allocations
+        )
+        
+        # Update scenario in database
+        update_data = {
+            'parameter_changes': updated_changes,
+            'timeline_impact': timeline_impact.dict() if timeline_impact else None,
+            'cost_impact': cost_impact.dict() if cost_impact else None,
+            'resource_impact': resource_impact.dict() if resource_impact else None,
+            'updated_at': datetime.now().isoformat()
+        }
+        
+        result = self.supabase.table('scenario_analyses').update(update_data).eq(
+            'id', str(scenario_id)
+        ).execute()
+        
+        if not result.data:
+            raise Exception("Failed to update scenario")
+        
+        return ScenarioAnalysis(**result.data[0])
+    
     async def _get_project_data(self, project_id: UUID) -> Dict[str, Any]:
         """Get project data for analysis"""
         result = self.supabase.table('projects').select('*').eq('id', str(project_id)).execute()
@@ -413,98 +706,133 @@ class ScenarioAnalyzer:
             raise ValueError(f"Project {project_id} not found")
         return result.data[0]
     
-    async def _calculate_timeline_impact(
-        self, 
-        base_project: Dict[str, Any], 
-        changes: ProjectChanges
-    ) -> Optional[TimelineImpact]:
-        """Calculate timeline impact of parameter changes"""
-        
-        if not changes.start_date and not changes.end_date:
-            return None
-        
-        # Get original timeline
-        original_start = datetime.fromisoformat(base_project.get('start_date', datetime.now().isoformat()))
-        original_end = datetime.fromisoformat(base_project.get('end_date', datetime.now().isoformat()))
-        original_duration = (original_end - original_start).days
-        
-        # Calculate new timeline
-        new_start = changes.start_date or original_start.date()
-        new_end = changes.end_date or original_end.date()
-        new_duration = (new_end - new_start).days
-        
-        return TimelineImpact(
-            original_duration=original_duration,
-            new_duration=new_duration,
-            duration_change=new_duration - original_duration,
-            critical_path_affected=abs(new_duration - original_duration) > 7,  # More than a week
-            affected_milestones=[]  # Would need milestone data to populate
-        )
+    async def _get_scenario(self, scenario_id: UUID) -> Dict[str, Any]:
+        """Get scenario by ID"""
+        result = self.supabase.table('scenario_analyses').select('*').eq('id', str(scenario_id)).execute()
+        if not result.data:
+            raise ValueError(f"Scenario {scenario_id} not found")
+        return result.data[0]
     
-    async def _calculate_cost_impact(
-        self, 
-        base_project: Dict[str, Any], 
-        changes: ProjectChanges
-    ) -> Optional[CostImpact]:
-        """Calculate cost impact of parameter changes"""
-        
-        if not changes.budget:
-            return None
-        
-        original_cost = Decimal(str(base_project.get('budget', 0)))
-        new_cost = changes.budget
-        cost_change = new_cost - original_cost
-        cost_change_percentage = float((cost_change / original_cost * 100)) if original_cost > 0 else 0
-        
-        return CostImpact(
-            original_cost=original_cost,
-            new_cost=new_cost,
-            cost_change=cost_change,
-            cost_change_percentage=cost_change_percentage,
-            affected_categories=['budget']  # Would need more detailed cost breakdown
-        )
+    async def _get_project_milestones(self, project_id: UUID) -> List[Dict[str, Any]]:
+        """Get project milestones"""
+        try:
+            result = self.supabase.table('milestones').select('*').eq('project_id', str(project_id)).execute()
+            return result.data or []
+        except Exception:
+            return []
     
-    async def _calculate_resource_impact(
-        self, 
-        base_project: Dict[str, Any], 
-        changes: ProjectChanges
-    ) -> Optional[ResourceImpact]:
-        """Calculate resource impact of parameter changes"""
-        
-        if not changes.resource_allocations:
-            return None
-        
-        return ResourceImpact(
-            utilization_changes=changes.resource_allocations,
-            over_allocated_resources=[],
-            under_allocated_resources=[],
-            new_resource_requirements=[]
-        )
+    async def _get_resource_allocations(self, project_id: UUID) -> List[Dict[str, Any]]:
+        """Get current resource allocations"""
+        try:
+            result = self.supabase.table('resource_assignments').select('*').eq('project_id', str(project_id)).execute()
+            return result.data or []
+        except Exception:
+            return []
     
     async def compare_scenarios(self, scenario_ids: List[UUID]) -> ScenarioComparison:
-        """Compare multiple scenarios"""
+        """Compare multiple scenarios with detailed analysis"""
+        
+        if len(scenario_ids) < 2:
+            raise ValueError("At least 2 scenarios required for comparison")
         
         scenarios = []
         for scenario_id in scenario_ids:
             result = self.supabase.table('scenario_analyses').select('*').eq('id', str(scenario_id)).execute()
             if result.data:
                 scenarios.append(ScenarioAnalysis(**result.data[0]))
+            else:
+                raise ValueError(f"Scenario {scenario_id} not found")
         
-        # Build comparison matrix
+        # Build comprehensive comparison matrix
         comparison_matrix = {}
         for scenario in scenarios:
-            comparison_matrix[str(scenario.id)] = {
+            scenario_key = str(scenario.id)
+            comparison_matrix[scenario_key] = {
                 'name': scenario.name,
+                'description': scenario.description,
                 'cost_impact': scenario.cost_impact.dict() if scenario.cost_impact else {},
                 'timeline_impact': scenario.timeline_impact.dict() if scenario.timeline_impact else {},
-                'resource_impact': scenario.resource_impact.dict() if scenario.resource_impact else {}
+                'resource_impact': scenario.resource_impact.dict() if scenario.resource_impact else {},
+                'parameter_changes': scenario.parameter_changes.dict() if hasattr(scenario.parameter_changes, 'dict') else scenario.parameter_changes
             }
+        
+        # Generate recommendations based on comparison
+        recommendations = self._generate_scenario_recommendations(scenarios)
         
         return ScenarioComparison(
             scenarios=scenarios,
             comparison_matrix=comparison_matrix,
-            recommendations=[]  # Would implement recommendation logic
+            recommendations=recommendations
         )
+    
+    def _generate_scenario_recommendations(self, scenarios: List[ScenarioAnalysis]) -> List[str]:
+        """Generate recommendations based on scenario comparison"""
+        recommendations = []
+        
+        # Find scenario with best cost impact
+        cost_scenarios = [(s, s.cost_impact.cost_change if s.cost_impact else Decimal('0')) for s in scenarios]
+        best_cost_scenario = min(cost_scenarios, key=lambda x: x[1])
+        if best_cost_scenario[1] < 0:
+            recommendations.append(
+                f"Scenario '{best_cost_scenario[0].name}' offers the best cost savings "
+                f"with a reduction of {abs(best_cost_scenario[1])}"
+            )
+        
+        # Find scenario with best timeline impact
+        timeline_scenarios = [(s, s.timeline_impact.duration_change if s.timeline_impact else 0) for s in scenarios]
+        best_timeline_scenario = min(timeline_scenarios, key=lambda x: x[1])
+        if best_timeline_scenario[1] < 0:
+            recommendations.append(
+                f"Scenario '{best_timeline_scenario[0].name}' offers the fastest completion "
+                f"with {abs(best_timeline_scenario[1])} days saved"
+            )
+        
+        # Check for resource over-allocation warnings
+        for scenario in scenarios:
+            if scenario.resource_impact and scenario.resource_impact.over_allocated_resources:
+                recommendations.append(
+                    f"Warning: Scenario '{scenario.name}' has over-allocated resources: "
+                    f"{', '.join(scenario.resource_impact.over_allocated_resources)}"
+                )
+        
+        # Check for critical path impacts
+        for scenario in scenarios:
+            if scenario.timeline_impact and scenario.timeline_impact.critical_path_affected:
+                recommendations.append(
+                    f"Note: Scenario '{scenario.name}' affects the critical path - "
+                    f"review milestone impacts carefully"
+                )
+        
+        if not recommendations:
+            recommendations.append("All scenarios have similar impacts - consider other factors for decision making")
+        
+        return recommendations
+    
+    async def _calculate_timeline_impact(
+        self, 
+        base_project: Dict[str, Any], 
+        changes: ProjectChanges
+    ) -> Optional[TimelineImpact]:
+        """Calculate timeline impact of parameter changes (legacy method for compatibility)"""
+        milestones = await self._get_project_milestones(UUID(base_project['id']))
+        return self.modeling_engine.calculate_timeline_impact(base_project, changes, milestones)
+    
+    async def _calculate_cost_impact(
+        self, 
+        base_project: Dict[str, Any], 
+        changes: ProjectChanges
+    ) -> Optional[CostImpact]:
+        """Calculate cost impact of parameter changes (legacy method for compatibility)"""
+        return self.modeling_engine.calculate_cost_impact(base_project, changes)
+    
+    async def _calculate_resource_impact(
+        self, 
+        base_project: Dict[str, Any], 
+        changes: ProjectChanges
+    ) -> Optional[ResourceImpact]:
+        """Calculate resource impact of parameter changes (legacy method for compatibility)"""
+        current_allocations = await self._get_resource_allocations(UUID(base_project['id']))
+        return self.modeling_engine.calculate_resource_impact(base_project, changes, current_allocations)
 
 
 class ChangeManagementService:
@@ -809,8 +1137,12 @@ class HierarchyManager:
         import csv
         from io import StringIO
         
-        # Parse CSV
-        csv_reader = csv.DictReader(StringIO(csv_data))
+        # Sanitize CSV data to handle newline characters in fields
+        # Replace carriage returns and newlines within fields with spaces
+        sanitized_data = csv_data.replace('\r\n', '\n').replace('\r', ' ')
+        
+        # Parse CSV with proper newline handling
+        csv_reader = csv.DictReader(StringIO(sanitized_data, newline=''))
         rows = list(csv_reader)
         
         # Convert to standardized format using column mappings
@@ -819,7 +1151,11 @@ class HierarchyManager:
             parsed_row = {}
             for csv_column, model_field in column_mappings.items():
                 if csv_column in row:
-                    parsed_row[model_field] = row[csv_column]
+                    # Clean field values by removing any remaining control characters
+                    value = row[csv_column]
+                    if isinstance(value, str):
+                        value = value.replace('\r', ' ').replace('\n', ' ').strip()
+                    parsed_row[model_field] = value
             
             # Add hierarchy level detection
             parsed_row['hierarchy_level'] = self._detect_hierarchy_level(parsed_row)
@@ -1421,11 +1757,191 @@ class TemplateEngine:
 
 
 class GoogleSuiteReportGenerator:
-    """Service for generating Google Slides reports from project data"""
+    """Service for generating Google Slides reports from project data
     
-    def __init__(self, supabase: Client):
+    Implements Google Drive and Slides API integration with OAuth 2.0 authentication.
+    Provides template-based report generation with chart and visualization support.
+    
+    Requirements: 6.1, 6.2, 9.2
+    """
+    
+    def __init__(self, supabase: Client, google_credentials_path: Optional[str] = None):
         self.supabase = supabase
         self.template_engine = TemplateEngine()
+        self.google_credentials_path = google_credentials_path
+        self._google_service = None  # Lazy initialization for Google API clients
+    
+    def __init__(self, supabase: Client, google_credentials_path: Optional[str] = None):
+        self.supabase = supabase
+        self.template_engine = TemplateEngine()
+        self.google_credentials_path = google_credentials_path
+        self._google_service = None  # Lazy initialization for Google API clients
+    
+    def _get_google_credentials(self, user_id: UUID) -> Optional[Dict[str, Any]]:
+        """
+        Get Google OAuth 2.0 credentials for a user.
+        
+        In a production implementation, this would:
+        1. Retrieve stored OAuth tokens from database
+        2. Refresh expired tokens using refresh_token
+        3. Handle token expiration and re-authentication
+        
+        Requirements: 9.2 (OAuth 2.0 authentication)
+        """
+        try:
+            # Query user's Google credentials from database
+            result = self.supabase.table('user_google_credentials').select('*').eq(
+                'user_id', str(user_id)
+            ).execute()
+            
+            if result.data:
+                credentials = result.data[0]
+                
+                # Check if token is expired
+                expires_at = datetime.fromisoformat(credentials.get('expires_at', datetime.now().isoformat()))
+                if datetime.now() >= expires_at:
+                    # Token expired - would need to refresh
+                    # In production: call Google OAuth refresh endpoint
+                    return None
+                
+                return {
+                    'access_token': credentials.get('access_token'),
+                    'refresh_token': credentials.get('refresh_token'),
+                    'token_type': credentials.get('token_type', 'Bearer'),
+                    'expires_at': expires_at
+                }
+            
+            return None
+            
+        except Exception as e:
+            print(f"Error retrieving Google credentials: {e}")
+            return None
+    
+    def _initialize_google_services(self, credentials: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Initialize Google Drive and Slides API clients with OAuth credentials.
+        
+        In a production implementation, this would:
+        1. Create authenticated Google API client instances
+        2. Use google-auth and google-api-python-client libraries
+        3. Handle API rate limiting and errors
+        
+        Requirements: 6.1, 6.2, 9.2
+        """
+        # Mock implementation - in production would use:
+        # from google.oauth2.credentials import Credentials
+        # from googleapiclient.discovery import build
+        #
+        # creds = Credentials(
+        #     token=credentials['access_token'],
+        #     refresh_token=credentials['refresh_token'],
+        #     token_uri='https://oauth2.googleapis.com/token',
+        #     client_id=CLIENT_ID,
+        #     client_secret=CLIENT_SECRET
+        # )
+        #
+        # drive_service = build('drive', 'v3', credentials=creds)
+        # slides_service = build('slides', 'v1', credentials=creds)
+        
+        return {
+            'drive': None,  # Would be actual Drive API client
+            'slides': None,  # Would be actual Slides API client
+            'credentials': credentials
+        }
+    
+    async def initiate_oauth_flow(self, user_id: UUID, redirect_uri: str) -> Dict[str, str]:
+        """
+        Initiate OAuth 2.0 authorization flow for Google Suite access.
+        
+        Returns authorization URL for user to grant permissions.
+        
+        Requirements: 9.2 (OAuth 2.0 authentication)
+        """
+        # In production, would use Google OAuth 2.0 library:
+        # from google_auth_oauthlib.flow import Flow
+        #
+        # flow = Flow.from_client_secrets_file(
+        #     self.google_credentials_path,
+        #     scopes=[
+        #         'https://www.googleapis.com/auth/drive.file',
+        #         'https://www.googleapis.com/auth/presentations'
+        #     ],
+        #     redirect_uri=redirect_uri
+        # )
+        #
+        # authorization_url, state = flow.authorization_url(
+        #     access_type='offline',
+        #     include_granted_scopes='true'
+        # )
+        
+        # Mock implementation
+        state = secrets.token_urlsafe(32)
+        
+        # Store state for verification
+        await self._store_oauth_state(user_id, state)
+        
+        return {
+            'authorization_url': f'https://accounts.google.com/o/oauth2/v2/auth?state={state}',
+            'state': state
+        }
+    
+    async def _store_oauth_state(self, user_id: UUID, state: str) -> None:
+        """Store OAuth state for CSRF protection"""
+        try:
+            self.supabase.table('oauth_states').insert({
+                'user_id': str(user_id),
+                'state': state,
+                'provider': 'google',
+                'created_at': datetime.now().isoformat(),
+                'expires_at': (datetime.now() + timedelta(minutes=10)).isoformat()
+            }).execute()
+        except Exception as e:
+            print(f"Warning: Could not store OAuth state: {e}")
+    
+    async def handle_oauth_callback(
+        self,
+        user_id: UUID,
+        authorization_code: str,
+        state: str
+    ) -> bool:
+        """
+        Handle OAuth 2.0 callback and exchange authorization code for tokens.
+        
+        Requirements: 9.2 (OAuth 2.0 authentication)
+        """
+        # Verify state for CSRF protection
+        state_result = self.supabase.table('oauth_states').select('*').eq(
+            'user_id', str(user_id)
+        ).eq('state', state).execute()
+        
+        if not state_result.data:
+            raise ValueError("Invalid OAuth state - possible CSRF attack")
+        
+        # In production, would exchange code for tokens:
+        # flow = Flow.from_client_secrets_file(...)
+        # flow.fetch_token(code=authorization_code)
+        # credentials = flow.credentials
+        
+        # Mock token storage
+        try:
+            self.supabase.table('user_google_credentials').insert({
+                'user_id': str(user_id),
+                'access_token': f'mock_access_token_{secrets.token_hex(16)}',
+                'refresh_token': f'mock_refresh_token_{secrets.token_hex(16)}',
+                'token_type': 'Bearer',
+                'expires_at': (datetime.now() + timedelta(hours=1)).isoformat(),
+                'scopes': ['drive.file', 'presentations'],
+                'created_at': datetime.now().isoformat()
+            }).execute()
+            
+            # Clean up OAuth state
+            self.supabase.table('oauth_states').delete().eq('state', state).execute()
+            
+            return True
+            
+        except Exception as e:
+            print(f"Error storing Google credentials: {e}")
+            return False
     
     async def generate_report(
         self,
@@ -1457,7 +1973,7 @@ class GoogleSuiteReportGenerator:
         
         # Create Google Slides presentation (mock implementation)
         google_result = await self._create_google_slides_presentation(
-            populated_template, charts, report_config
+            populated_template, charts, report_config, user_id
         )
         
         # Store report record
@@ -1528,21 +2044,78 @@ class GoogleSuiteReportGenerator:
         self,
         populated_template: Dict[str, Any],
         charts: List[Dict[str, Any]],
-        config: Dict[str, Any]
+        config: Dict[str, Any],
+        user_id: UUID
     ) -> Dict[str, Any]:
-        """Create Google Slides presentation (mock implementation)"""
+        """
+        Create Google Slides presentation using Google APIs with OAuth 2.0.
         
-        # In a real implementation, this would:
-        # 1. Authenticate with Google APIs
-        # 2. Copy the template presentation
-        # 3. Replace placeholders with actual data
-        # 4. Insert charts and visualizations
-        # 5. Save to Google Drive
-        # 6. Set appropriate sharing permissions
+        In a production implementation, this would:
+        1. Authenticate with Google APIs using OAuth 2.0 credentials
+        2. Copy the template presentation from Google Drive
+        3. Replace placeholders with actual data
+        4. Insert charts and visualizations
+        5. Save to Google Drive with appropriate permissions
+        6. Return shareable link
         
-        # Mock implementation
+        Requirements: 6.1, 6.2, 6.3, 9.2
+        """
+        
         import time
         start_time = time.time()
+        
+        # Get user's Google credentials
+        credentials = self._get_google_credentials(user_id)
+        
+        if credentials:
+            # Initialize Google API services
+            google_services = self._initialize_google_services(credentials)
+            
+            # In production, would perform actual Google API operations:
+            # 1. Copy template presentation
+            # template_id = populated_template.get('google_slides_template_id')
+            # copy_request = {
+            #     'name': config.get('custom_title', 'Project Report')
+            # }
+            # copied_file = google_services['drive'].files().copy(
+            #     fileId=template_id,
+            #     body=copy_request
+            # ).execute()
+            #
+            # 2. Update slides with data
+            # requests = []
+            # for placeholder, value in populated_template['populated_data'].items():
+            #     requests.append({
+            #         'replaceAllText': {
+            #             'containsText': {'text': f'{{{{{placeholder}}}}}'},
+            #             'replaceText': str(value)
+            #         }
+            #     })
+            #
+            # 3. Insert charts
+            # for chart in charts:
+            #     requests.append({
+            #         'createChart': {
+            #             'chartType': chart['type'].upper(),
+            #             'data': chart['data'],
+            #             'labels': chart['labels']
+            #         }
+            #     })
+            #
+            # google_services['slides'].presentations().batchUpdate(
+            #     presentationId=copied_file['id'],
+            #     body={'requests': requests}
+            # ).execute()
+            #
+            # 4. Set sharing permissions
+            # google_services['drive'].permissions().create(
+            #     fileId=copied_file['id'],
+            #     body={'type': 'anyone', 'role': 'reader'}
+            # ).execute()
+            
+            print(f"Using OAuth credentials for user {user_id}")
+        else:
+            print(f"No Google credentials found for user {user_id} - using mock implementation")
         
         # Simulate processing time
         await asyncio.sleep(0.1)
@@ -1559,7 +2132,8 @@ class GoogleSuiteReportGenerator:
             'file_id': file_id,
             'drive_url': drive_url,
             'generation_time_ms': generation_time,
-            'status': 'success'
+            'status': 'success',
+            'oauth_authenticated': credentials is not None
         }
     
     async def create_template(

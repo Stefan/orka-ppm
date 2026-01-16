@@ -4,7 +4,7 @@ Financial tracking and budget management Pydantic models
 
 from pydantic import BaseModel
 from datetime import date, datetime
-from typing import List, Optional
+from typing import List, Optional, Dict
 from uuid import UUID
 
 from .base import BaseResponse

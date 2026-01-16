@@ -12,8 +12,6 @@ from pathlib import Path
 import base64
 import hashlib
 
-from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_, desc, asc
 from fastapi import HTTPException, UploadFile
 import asyncio
 import aiofiles
@@ -108,7 +106,7 @@ class VisualGuideService:
         tags: List[str] = None,
         prerequisites: List[str] = None,
         created_by: str = None,
-        db: Session = None
+        db = None
     ) -> VisualGuide:
         """Create a new visual guide"""
         
@@ -172,7 +170,7 @@ class VisualGuideService:
         
         return guide
 
-    async def get_visual_guide(self, guide_id: str, db: Session = None) -> Optional[VisualGuide]:
+    async def get_visual_guide(self, guide_id: str, db = None) -> Optional[VisualGuide]:
         """Get a visual guide by ID"""
         
         guide_file = self.guide_path / f"{guide_id}.json"
@@ -204,7 +202,7 @@ class VisualGuideService:
         include_outdated: bool = False,
         limit: int = 50,
         offset: int = 0,
-        db: Session = None
+        db = None
     ) -> List[VisualGuide]:
         """List visual guides with filtering"""
         
@@ -237,7 +235,7 @@ class VisualGuideService:
         self,
         guide_id: str,
         updates: Dict[str, Any],
-        db: Session = None
+        db = None
     ) -> Optional[VisualGuide]:
         """Update a visual guide"""
         
@@ -261,7 +259,7 @@ class VisualGuideService:
         
         return guide
 
-    async def delete_visual_guide(self, guide_id: str, db: Session = None) -> bool:
+    async def delete_visual_guide(self, guide_id: str, db = None) -> bool:
         """Delete a visual guide"""
         
         guide_file = self.guide_path / f"{guide_id}.json"
@@ -375,7 +373,7 @@ class VisualGuideService:
         self,
         context: Dict[str, str],
         limit: int = 5,
-        db: Session = None
+        db = None
     ) -> List[Dict[str, Any]]:
         """Get guide recommendations based on context"""
         
@@ -429,7 +427,7 @@ class VisualGuideService:
         user_id: str,
         completed_steps: List[str],
         completion_time: float,
-        db: Session = None
+        db = None
     ) -> bool:
         """Track guide completion for analytics"""
         

@@ -8,7 +8,12 @@ const mockPush = jest.fn()
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
+    pathname: '/changes',
+    query: {},
+    asPath: '/changes',
   }),
+  usePathname: () => '/changes',
+  useSearchParams: () => new URLSearchParams(),
 }))
 
 // Mock timers

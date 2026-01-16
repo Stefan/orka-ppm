@@ -5,6 +5,7 @@ import { useAuth } from '../providers/SupabaseAuthProvider'
 import AppLayout from '../../components/shared/AppLayout'
 import { getApiUrl } from '../../lib/api'
 import CreateScenarioModal from './components/CreateScenarioModal'
+import VirtualizedProjectSelector from '../../components/ui/VirtualizedProjectSelector'
 import { Plus, BarChart3, TrendingUp, TrendingDown, DollarSign, Clock, Users, AlertTriangle, RefreshCw, Trash2, Edit3, GitBranch, Zap, Target } from 'lucide-react'
 import { ResponsiveContainer } from '../../components/ui/molecules/ResponsiveContainer'
 import { AdaptiveGrid } from '../../components/ui/molecules/AdaptiveGrid'
@@ -137,9 +138,14 @@ export default function ScenariosPage() {
   }
 
   const compareScenarios = async () => {
-    if (selectedScenarios.length < 2) return
+    if (selectedScenarios.length < 2) {
+      setError('Please select at least 2 scenarios to compare')
+      return
+    }
     
     try {
+      setError(null) // Clear any previous errors
+      
       const response = await fetch(getApiUrl('/simulations/what-if/compare'), {
         method: 'POST',
         headers: {
@@ -148,7 +154,18 @@ export default function ScenariosPage() {
         body: JSON.stringify(selectedScenarios)
       })
       
-      if (!response.ok) throw new Error('Failed to compare scenarios')
+      if (!response.ok) {
+        // Try to get error details from response
+        let errorMessage = 'Failed to compare scenarios'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.detail || errorData.message || errorMessage
+        } catch {
+          // If response is not JSON, use status text
+          errorMessage = `${errorMessage} (${response.status}: ${response.statusText})`
+        }
+        throw new Error(errorMessage)
+      }
       
       const comparisonData = await response.json()
       setComparison(comparisonData)
@@ -240,7 +257,7 @@ export default function ScenariosPage() {
           </div>
           
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-            {selectedScenarios.length >= 2 && (
+            {selectedScenarios.length >= 2 ? (
               <TouchButton
                 onClick={compareScenarios}
                 variant="secondary"
@@ -250,7 +267,12 @@ export default function ScenariosPage() {
               >
                 Compare ({selectedScenarios.length})
               </TouchButton>
-            )}
+            ) : selectedScenarios.length === 1 ? (
+              <div className="text-sm text-gray-500 flex items-center">
+                <AlertTriangle className="h-4 w-4 mr-2" />
+                Select one more scenario to compare
+              </div>
+            ) : null}
             
             <TouchButton
               onClick={() => setShowCreateModal(true)}
@@ -290,39 +312,14 @@ export default function ScenariosPage() {
                   <p className="text-gray-500">No projects available</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {projects.map((project) => (
-                    <div
-                      key={project.id}
-                      onClick={() => setSelectedProject(project)}
-                      className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${
-                        selectedProject?.id === project.id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className={`w-3 h-3 rounded-full ${
-                            project.health === 'green' ? 'bg-green-500' :
-                            project.health === 'yellow' ? 'bg-yellow-500' : 'bg-red-500'
-                          }`} />
-                          <div>
-                            <h4 className="font-medium text-gray-900">{project.name}</h4>
-                            <p className="text-sm text-gray-500 capitalize">
-                              {project.status.replace('-', ' ')}
-                            </p>
-                          </div>
-                        </div>
-                        {project.budget && (
-                          <span className="text-sm font-medium text-gray-600">
-                            {formatCurrency(project.budget)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <VirtualizedProjectSelector
+                  projects={projects}
+                  selectedProject={selectedProject}
+                  onSelectProject={setSelectedProject}
+                  formatCurrency={formatCurrency}
+                  height={400}
+                  itemHeight={80}
+                />
               )}
             </div>
           </div>

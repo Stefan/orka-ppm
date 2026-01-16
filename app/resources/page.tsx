@@ -1,12 +1,16 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useDeferredValue, useReducer } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import { Users, Plus, Search, Filter, TrendingUp, AlertCircle, BarChart3, PieChart as PieChartIcon, Target, Zap, RefreshCw, Download, MapPin } from 'lucide-react'
 import AppLayout from '../../components/shared/AppLayout'
 import AIResourceOptimizer from '../../components/ai/AIResourceOptimizer'
+import ResourceCard from './components/ResourceCard'
+import VirtualizedResourceTable from '../../components/ui/VirtualizedResourceTable'
 import { getApiUrl } from '../../lib/api/client'
 import MobileOptimizedChart from '../../components/charts/MobileOptimizedChart'
+import { SkeletonCard, SkeletonChart } from '../../components/ui/skeletons'
+import { useDebounce } from '../../hooks/useDebounce'
 
 interface Resource {
   id: string
@@ -36,6 +40,32 @@ interface ResourceFilters {
   skills: string[]
   location: string
   utilization_range: [number, number]
+}
+
+// Reducer for batching filter state updates
+type FilterAction =
+  | { type: 'SET_FILTER'; key: keyof ResourceFilters; value: any }
+  | { type: 'RESET_FILTERS' }
+  | { type: 'SET_MULTIPLE_FILTERS'; filters: Partial<ResourceFilters> }
+
+function filterReducer(state: ResourceFilters, action: FilterAction): ResourceFilters {
+  switch (action.type) {
+    case 'SET_FILTER':
+      return { ...state, [action.key]: action.value }
+    case 'RESET_FILTERS':
+      return {
+        search: '',
+        role: 'all',
+        availability_status: 'all',
+        skills: [],
+        location: 'all',
+        utilization_range: [0, 100]
+      }
+    case 'SET_MULTIPLE_FILTERS':
+      return { ...state, ...action.filters }
+    default:
+      return state
+  }
 }
 
 export default function Resources() {
@@ -72,7 +102,8 @@ export default function Resources() {
     return undefined
   }, [autoRefresh, session])
 
-  const [filters, setFilters] = useState<ResourceFilters>({
+  // Use reducer for batching filter state updates
+  const [filters, dispatchFilters] = useReducer(filterReducer, {
     search: '',
     role: 'all',
     availability_status: 'all',
@@ -81,12 +112,18 @@ export default function Resources() {
     utilization_range: [0, 100]
   })
 
+  // Debounce search filter to reduce update frequency (300ms delay)
+  const debouncedSearchFilter = useDebounce(filters.search, 300)
+
+  // Defer filter changes for non-critical updates (charts, analytics)
+  const deferredFilters = useDeferredValue(filters)
+
   // Filtered resources based on current filters
   const filteredResources = useMemo(() => {
     return resources.filter(resource => {
-      // Search filter
-      if (filters.search && !resource.name.toLowerCase().includes(filters.search.toLowerCase()) &&
-          !resource.email.toLowerCase().includes(filters.search.toLowerCase())) {
+      // Search filter (using debounced value)
+      if (debouncedSearchFilter && !resource.name.toLowerCase().includes(debouncedSearchFilter.toLowerCase()) &&
+          !resource.email.toLowerCase().includes(debouncedSearchFilter.toLowerCase())) {
         return false
       }
       
@@ -115,9 +152,9 @@ export default function Resources() {
       
       return true
     })
-  }, [resources, filters])
+  }, [resources, debouncedSearchFilter, filters.role, filters.availability_status, filters.location, filters.utilization_range, filters.skills])
 
-  // Analytics data
+  // Analytics data (uses deferred filters for non-critical chart updates)
   const analyticsData = useMemo(() => {
     const utilizationDistribution = [
       { name: 'Under-utilized (0-50%)', value: resources.filter(r => r.utilization_percentage <= 50).length, color: '#10B981' },
@@ -159,7 +196,7 @@ export default function Resources() {
       availableResources: resources.filter(r => r.can_take_more_work).length,
       overallocatedResources: resources.filter(r => r.utilization_percentage > 100).length
     }
-  }, [resources])
+  }, [resources, deferredFilters])
 
   useEffect(() => {
     if (session) {
@@ -232,18 +269,11 @@ export default function Resources() {
   }
 
   const handleFilterChange = (filterType: keyof ResourceFilters, value: any) => {
-    setFilters(prev => ({ ...prev, [filterType]: value }))
+    dispatchFilters({ type: 'SET_FILTER', key: filterType, value })
   }
 
   const clearFilters = () => {
-    setFilters({
-      search: '',
-      role: 'all',
-      availability_status: 'all',
-      skills: [],
-      location: 'all',
-      utilization_range: [0, 100]
-    })
+    dispatchFilters({ type: 'RESET_FILTERS' })
   }
 
   const exportResourceData = () => {
@@ -266,8 +296,33 @@ export default function Resources() {
 
   if (loading) return (
     <AppLayout>
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
+        {/* Header Skeleton */}
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+        </div>
+        
+        {/* Analytics Cards Skeleton */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[...Array(4)].map((_, i) => (
+            <SkeletonCard key={i} variant="stat" />
+          ))}
+        </div>
+        
+        {/* Charts Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <SkeletonChart variant="pie" height="h-64" />
+          <SkeletonChart variant="bar" height="h-64" />
+          <SkeletonChart variant="pie" height="h-64" />
+        </div>
+        
+        {/* Resource Cards Skeleton */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {[...Array(6)].map((_, i) => (
+            <SkeletonCard key={i} variant="resource" />
+          ))}
+        </div>
       </div>
     </AppLayout>
   )
@@ -634,180 +689,17 @@ export default function Resources() {
         {viewMode === 'cards' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredResources.map((resource) => (
-              <div key={resource.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow touch-manipulation">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{resource.name}</h3>
-                    <p className="text-sm text-gray-700 truncate">{resource.role || 'No role specified'}</p>
-                    <p className="text-sm text-gray-500 truncate">{resource.email}</p>
-                    {resource.location && (
-                      <div className="flex items-center mt-1 text-sm text-gray-500">
-                        <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
-                        <span className="truncate">{resource.location}</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ml-2 ${
-                    resource.availability_status === 'available' ? 'bg-green-100 text-green-800' :
-                    resource.availability_status === 'partially_allocated' ? 'bg-yellow-100 text-yellow-800' :
-                    resource.availability_status === 'mostly_allocated' ? 'bg-orange-100 text-orange-800' :
-                    'bg-red-100 text-red-800'
-                  }`}
-                  >
-                    {resource.availability_status.replace('_', ' ')}
-                  </div>
-                </div>
-                
-                <div className="mt-4">
-                  <div className="flex justify-between text-sm text-gray-700 mb-2">
-                    <span>Utilization</span>
-                    <span className="font-medium">{resource.utilization_percentage.toFixed(1)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3 touch-manipulation">
-                    <div 
-                      className={`h-3 rounded-full transition-all duration-300 ${
-                        resource.utilization_percentage <= 70 ? 'bg-green-500' :
-                        resource.utilization_percentage <= 90 ? 'bg-yellow-500' :
-                        resource.utilization_percentage <= 100 ? 'bg-orange-500' :
-                        'bg-red-500'
-                      }`}
-                      style={{ width: `${Math.min(100, resource.utilization_percentage)}%` }}
-                    >
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-700">Available Hours:</span>
-                    <span className="font-medium text-gray-900">{resource.available_hours.toFixed(1)}h/week</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-700">Current Projects:</span>
-                    <span className="font-medium text-gray-900">{resource.current_projects.length}</span>
-                  </div>
-                  {resource.hourly_rate && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-700">Hourly Rate:</span>
-                      <span className="font-medium text-gray-900">${resource.hourly_rate}/hr</span>
-                    </div>
-                  )}
-                </div>
-
-                {resource.skills.length > 0 && (
-                  <div className="mt-4">
-                    <p className="text-sm text-gray-700 mb-2">Skills:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {resource.skills.slice(0, 3).map((skill, index) => (
-                        <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded touch-manipulation">
-                          {skill}
-                        </span>
-                      ))}
-                      {resource.skills.length > 3 && (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
-                          +{resource.skills.length - 3} more
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between">
-                  <button className="text-sm text-blue-600 hover:text-blue-800 active:text-blue-900 min-h-[44px] px-3 py-2 -mx-3 -my-2 rounded touch-manipulation">
-                    View Details
-                  </button>
-                  <button className="text-sm text-gray-600 hover:text-gray-800 active:text-gray-900 min-h-[44px] px-3 py-2 -mx-3 -my-2 rounded touch-manipulation">
-                    Edit
-                  </button>
-                </div>
-              </div>
+              <ResourceCard key={resource.id} resource={resource} />
             ))}
           </div>
         )}
 
         {viewMode === 'table' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resource</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Utilization</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Available Hours</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Projects</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Skills</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredResources.map((resource) => (
-                    <tr key={resource.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{resource.name}</div>
-                          <div className="text-sm text-gray-500">{resource.email}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {resource.role || 'Unassigned'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-1 mr-2">
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div 
-                                className={`h-2 rounded-full ${
-                                  resource.utilization_percentage <= 70 ? 'bg-green-500' :
-                                  resource.utilization_percentage <= 90 ? 'bg-yellow-500' :
-                                  resource.utilization_percentage <= 100 ? 'bg-orange-500' :
-                                  'bg-red-500'
-                                }`}
-                                style={{ width: `${Math.min(100, resource.utilization_percentage)}%` }}
-                              >
-                              </div>
-                            </div>
-                          </div>
-                          <span className="text-sm text-gray-900">{resource.utilization_percentage.toFixed(1)}%</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {resource.available_hours.toFixed(1)}h
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {resource.current_projects.length}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex flex-wrap gap-1">
-                          {resource.skills.slice(0, 2).map((skill, index) => (
-                            <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
-                              {skill}
-                            </span>
-                          ))}
-                          {resource.skills.length > 2 && (
-                            <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
-                              +{resource.skills.length - 2}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          resource.availability_status === 'available' ? 'bg-green-100 text-green-800' :
-                          resource.availability_status === 'partially_allocated' ? 'bg-yellow-100 text-yellow-800' :
-                          resource.availability_status === 'mostly_allocated' ? 'bg-orange-100 text-orange-800' :
-                          'bg-red-100 text-red-800'
-                        }`}
-                        >
-                          {resource.availability_status.replace('_', ' ')}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <VirtualizedResourceTable 
+            resources={filteredResources}
+            height={600}
+            itemHeight={80}
+          />
         )}
 
         {/* Enhanced Touch-Optimized Heatmap */}

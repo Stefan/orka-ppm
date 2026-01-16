@@ -12,12 +12,14 @@ from uuid import UUID, uuid4
 from decimal import Decimal
 import logging
 import json
+import hashlib
 from enum import Enum
 
 from config.database import supabase
 from models.change_management import (
     AuditLogEntry, ChangeStatus, ChangeType, PriorityLevel
 )
+from services.audit_encryption_service import get_encryption_service
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +101,347 @@ class AuditComplianceService:
         self.db = supabase
         if not self.db:
             raise RuntimeError("Database connection not available")
+        
+        # Initialize encryption service
+        try:
+            self.encryption_service = get_encryption_service()
+        except Exception as e:
+            logger.warning(f"Encryption service not available: {e}")
+            self.encryption_service = None
+    
+    # Hash Chain Generation and Verification Methods
+    
+    def generate_event_hash(
+        self,
+        event_data: Dict[str, Any],
+        previous_hash: Optional[str] = None
+    ) -> str:
+        """
+        Generate SHA-256 hash for an audit event.
+        
+        Creates a cryptographic hash of the event data combined with the previous
+        event's hash to form a tamper-evident chain.
+        
+        Args:
+            event_data: Dictionary containing event data to hash
+            previous_hash: Hash of the previous event in the chain (None for first event)
+            
+        Returns:
+            str: SHA-256 hash in hexadecimal format
+        """
+        # Create a deterministic string representation of the event data
+        # Sort keys to ensure consistent ordering
+        hash_input = {
+            "event_type": event_data.get("event_type", ""),
+            "user_id": str(event_data.get("user_id", "")),
+            "entity_type": event_data.get("entity_type", ""),
+            "entity_id": str(event_data.get("entity_id", "")),
+            "action_details": json.dumps(event_data.get("action_details", {}), sort_keys=True),
+            "timestamp": event_data.get("timestamp", datetime.utcnow().isoformat()),
+            "previous_hash": previous_hash or "0" * 64  # Genesis block uses zeros
+        }
+        
+        # Create JSON string with sorted keys for consistent hashing
+        hash_string = json.dumps(hash_input, sort_keys=True, default=str)
+        
+        # Generate SHA-256 hash
+        return hashlib.sha256(hash_string.encode('utf-8')).hexdigest()
+    
+    async def get_latest_audit_hash(
+        self,
+        tenant_id: Optional[UUID] = None
+    ) -> Optional[str]:
+        """
+        Get the hash of the most recent audit event.
+        
+        This is used to link new events to the existing chain.
+        
+        Args:
+            tenant_id: Optional tenant ID for multi-tenant isolation
+            
+        Returns:
+            str: Hash of the latest event, or None if no events exist
+        """
+        try:
+            query = self.db.table("roche_audit_logs").select("hash").order(
+                "timestamp", desc=True
+            ).limit(1)
+            
+            if tenant_id:
+                query = query.eq("tenant_id", str(tenant_id))
+            
+            result = query.execute()
+            
+            if result.data and len(result.data) > 0:
+                return result.data[0].get("hash")
+            
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error retrieving latest audit hash: {e}")
+            return None
+    
+    async def create_audit_event_with_hash(
+        self,
+        event_type: str,
+        user_id: Optional[UUID],
+        entity_type: str,
+        entity_id: Optional[UUID],
+        action_details: Dict[str, Any],
+        severity: str = "info",
+        ip_address: Optional[str] = None,
+        user_agent: Optional[str] = None,
+        project_id: Optional[UUID] = None,
+        tenant_id: Optional[UUID] = None,
+        performance_metrics: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """
+        Create an audit event with hash chain linking.
+        
+        This method generates a cryptographic hash for the event and links it
+        to the previous event in the chain, ensuring tamper-evident logging.
+        
+        Args:
+            event_type: Type of audit event
+            user_id: ID of user performing the action
+            entity_type: Type of entity being acted upon
+            entity_id: ID of the entity
+            action_details: Detailed information about the action
+            severity: Severity level (info, warning, error, critical)
+            ip_address: IP address of the client
+            user_agent: User agent string
+            project_id: Associated project ID
+            tenant_id: Tenant ID for multi-tenant isolation
+            performance_metrics: Performance data
+            
+        Returns:
+            Dict containing the created audit event with hash
+            
+        Raises:
+            RuntimeError: If event creation fails
+        """
+        try:
+            # Get the hash of the previous event
+            previous_hash = await self.get_latest_audit_hash(tenant_id)
+            
+            # Prepare event data
+            timestamp = datetime.utcnow().isoformat()
+            event_data = {
+                "event_type": event_type,
+                "user_id": str(user_id) if user_id else None,
+                "entity_type": entity_type,
+                "entity_id": str(entity_id) if entity_id else None,
+                "action_details": action_details,
+                "severity": severity,
+                "ip_address": ip_address,
+                "user_agent": user_agent,
+                "project_id": str(project_id) if project_id else None,
+                "tenant_id": str(tenant_id) if tenant_id else None,
+                "performance_metrics": performance_metrics,
+                "timestamp": timestamp
+            }
+            
+            # Generate hash for this event
+            event_hash = self.generate_event_hash(event_data, previous_hash)
+            
+            # Add hash fields to event data
+            event_data["hash"] = event_hash
+            event_data["previous_hash"] = previous_hash
+            
+            # Encrypt sensitive fields before storage (Requirement 6.6)
+            if self.encryption_service:
+                event_data = self.encryption_service.encrypt_audit_event(event_data)
+            
+            # Convert action_details and performance_metrics to JSON strings for storage
+            event_data["action_details"] = json.dumps(action_details)
+            if performance_metrics:
+                event_data["performance_metrics"] = json.dumps(performance_metrics)
+            
+            # Insert into database
+            result = self.db.table("roche_audit_logs").insert(event_data).execute()
+            
+            if not result.data:
+                raise RuntimeError("Failed to create audit event")
+            
+            logger.info(
+                f"Audit event created with hash chain: {event_type} "
+                f"(hash: {event_hash[:8]}..., previous: {previous_hash[:8] if previous_hash else 'genesis'}...)"
+            )
+            
+            return result.data[0]
+            
+        except Exception as e:
+            logger.error(f"Error creating audit event with hash: {e}")
+            raise RuntimeError(f"Failed to create audit event: {str(e)}")
+    
+    async def verify_hash_chain(
+        self,
+        tenant_id: Optional[UUID] = None,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+        limit: int = 1000
+    ) -> Dict[str, Any]:
+        """
+        Verify the integrity of the audit log hash chain.
+        
+        This method checks that each event's previous_hash matches the hash
+        of the chronologically previous event, ensuring the chain is unbroken.
+        
+        Args:
+            tenant_id: Optional tenant ID for multi-tenant isolation
+            start_date: Optional start date for verification range
+            end_date: Optional end date for verification range
+            limit: Maximum number of events to verify
+            
+        Returns:
+            Dict containing verification results:
+                - chain_valid: bool indicating if chain is intact
+                - total_events: number of events verified
+                - break_point: index of first broken link (if any)
+                - broken_event_id: ID of event where chain breaks (if any)
+                - verification_time: time taken to verify (seconds)
+                
+        Raises:
+            RuntimeError: If verification fails due to database error
+        """
+        try:
+            verification_start = datetime.utcnow()
+            
+            # Build query for audit events
+            query = self.db.table("roche_audit_logs").select(
+                "id", "hash", "previous_hash", "timestamp"
+            ).order("timestamp", desc=False).limit(limit)
+            
+            if tenant_id:
+                query = query.eq("tenant_id", str(tenant_id))
+            if start_date:
+                query = query.gte("timestamp", start_date.isoformat())
+            if end_date:
+                query = query.lte("timestamp", end_date.isoformat())
+            
+            # Execute query
+            result = query.execute()
+            events = result.data
+            
+            if not events or len(events) == 0:
+                return {
+                    "chain_valid": True,
+                    "total_events": 0,
+                    "break_point": None,
+                    "broken_event_id": None,
+                    "verification_time": 0.0,
+                    "message": "No events to verify"
+                }
+            
+            # Verify chain integrity
+            chain_valid = True
+            break_point = None
+            broken_event_id = None
+            
+            for i in range(1, len(events)):
+                current_event = events[i]
+                previous_event = events[i-1]
+                
+                # Check if current event's previous_hash matches previous event's hash
+                if current_event.get("previous_hash") != previous_event.get("hash"):
+                    chain_valid = False
+                    break_point = i
+                    broken_event_id = current_event.get("id")
+                    
+                    # Log critical alert for chain break
+                    logger.critical(
+                        f"HASH CHAIN INTEGRITY VIOLATION: Chain broken at event {broken_event_id} "
+                        f"(position {i}). Expected previous_hash: {previous_event.get('hash')}, "
+                        f"Got: {current_event.get('previous_hash')}"
+                    )
+                    
+                    # Raise alert for chain break
+                    await self._raise_chain_break_alert(
+                        broken_event_id=broken_event_id,
+                        break_point=i,
+                        expected_hash=previous_event.get("hash"),
+                        actual_hash=current_event.get("previous_hash")
+                    )
+                    
+                    break
+            
+            verification_time = (datetime.utcnow() - verification_start).total_seconds()
+            
+            verification_result = {
+                "chain_valid": chain_valid,
+                "total_events": len(events),
+                "break_point": break_point,
+                "broken_event_id": broken_event_id,
+                "verification_time": verification_time
+            }
+            
+            if chain_valid:
+                verification_result["message"] = f"Hash chain verified successfully for {len(events)} events"
+                logger.info(f"Hash chain verification passed: {len(events)} events verified in {verification_time:.3f}s")
+            else:
+                verification_result["message"] = f"Hash chain broken at event {break_point}"
+                logger.error(f"Hash chain verification failed at event {break_point}")
+            
+            return verification_result
+            
+        except Exception as e:
+            logger.error(f"Error verifying hash chain: {e}")
+            raise RuntimeError(f"Failed to verify hash chain: {str(e)}")
+    
+    async def _raise_chain_break_alert(
+        self,
+        broken_event_id: str,
+        break_point: int,
+        expected_hash: str,
+        actual_hash: str
+    ) -> None:
+        """
+        Raise a critical alert when hash chain integrity is violated.
+        
+        This method creates an alert record and logs the violation for
+        immediate investigation.
+        
+        Args:
+            broken_event_id: ID of the event where chain breaks
+            break_point: Position in the chain where break occurs
+            expected_hash: Expected previous_hash value
+            actual_hash: Actual previous_hash value found
+        """
+        try:
+            alert_data = {
+                "id": str(uuid4()),
+                "alert_type": "hash_chain_integrity_violation",
+                "severity": "critical",
+                "broken_event_id": broken_event_id,
+                "break_point": break_point,
+                "expected_hash": expected_hash,
+                "actual_hash": actual_hash,
+                "detected_at": datetime.utcnow().isoformat(),
+                "status": "open",
+                "requires_immediate_investigation": True,
+                "alert_message": (
+                    f"CRITICAL: Audit log hash chain integrity violated at event {broken_event_id}. "
+                    f"This indicates potential tampering with audit records. "
+                    f"Immediate investigation required."
+                )
+            }
+            
+            # Store alert in database
+            self.db.table("audit_integrity_alerts").insert(alert_data).execute()
+            
+            # Log to application logger
+            logger.critical(
+                f"HASH CHAIN ALERT RAISED: {alert_data['alert_message']}"
+            )
+            
+            # In production, this would also:
+            # 1. Send immediate notifications to security team
+            # 2. Create incident tickets
+            # 3. Potentially trigger automated response procedures
+            
+        except Exception as e:
+            logger.error(f"Error raising chain break alert: {e}")
+            # Even if alert creation fails, the critical log above ensures visibility
     
     # Comprehensive Audit Logging Methods
     
@@ -203,6 +546,8 @@ class AuditComplianceService:
         """
         Retrieve complete audit trail for a change request.
         
+        Automatically decrypts sensitive fields on retrieval.
+        
         Args:
             change_request_id: ID of the change request
             include_related: Whether to include related entity events
@@ -210,7 +555,7 @@ class AuditComplianceService:
             date_to: End date filter
             
         Returns:
-            List[AuditLogEntry]: Complete audit trail
+            List[AuditLogEntry]: Complete audit trail with decrypted fields
         """
         try:
             # Build query
@@ -229,6 +574,10 @@ class AuditComplianceService:
             
             # Execute query
             result = query.execute()
+            
+            # Decrypt sensitive fields if encryption service is available
+            if self.encryption_service and result.data:
+                result.data = self.encryption_service.decrypt_batch(result.data)
             
             # Convert to response models
             audit_entries = []

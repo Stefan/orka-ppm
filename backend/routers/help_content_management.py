@@ -62,7 +62,7 @@ class RegenerateEmbeddingsResponse(BaseModel):
 async def create_help_content(
     content_data: HelpContentCreate,
     current_user = Depends(get_current_user),
-    _permission = Depends(require_permission(Permission.MANAGE_CONTENT))
+    _permission = Depends(require_permission(Permission.admin_update))
 ):
     """Create new help content with automatic embedding generation"""
     try:
@@ -144,7 +144,7 @@ async def update_help_content(
     content_id: UUID,
     content_data: HelpContentUpdate,
     current_user = Depends(get_current_user),
-    _permission = Depends(require_permission(Permission.MANAGE_CONTENT))
+    _permission = Depends(require_permission(Permission.admin_update))
 ):
     """Update existing help content with version tracking"""
     try:
@@ -170,7 +170,7 @@ async def update_help_content(
 async def delete_help_content(
     content_id: UUID,
     current_user = Depends(get_current_user),
-    _permission = Depends(require_permission(Permission.MANAGE_CONTENT))
+    _permission = Depends(require_permission(Permission.admin_update))
 ):
     """Delete help content and associated data"""
     try:
@@ -227,7 +227,7 @@ async def search_help_content(
 async def get_content_versions(
     content_id: UUID,
     current_user = Depends(get_current_user),
-    _permission = Depends(require_permission(Permission.MANAGE_CONTENT))
+    _permission = Depends(require_permission(Permission.admin_update))
 ):
     """Get version history for help content"""
     try:
@@ -250,7 +250,7 @@ async def get_content_versions(
 async def bulk_update_content(
     operation: BulkContentOperation,
     current_user = Depends(get_current_user),
-    _permission = Depends(require_permission(Permission.MANAGE_CONTENT))
+    _permission = Depends(require_permission(Permission.admin_update))
 ):
     """Perform bulk operations on help content"""
     try:
@@ -273,7 +273,7 @@ async def bulk_update_content(
 async def regenerate_embeddings(
     content_types: Optional[List[ContentType]] = Query(None),
     current_user = Depends(get_current_user),
-    _permission = Depends(require_permission(Permission.MANAGE_CONTENT))
+    _permission = Depends(require_permission(Permission.admin_update))
 ):
     """Regenerate embeddings for help content"""
     try:

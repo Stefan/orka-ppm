@@ -41,8 +41,7 @@ module.exports = {
         // Skip certain audits that aren't relevant for our testing
         skipAudits: [
           'canonical',
-          'robots-txt',
-          'tap-targets' // We test this separately with our custom tests
+          'robots-txt'
         ]
       }
     },
@@ -76,8 +75,7 @@ module.exports = {
         
         // Mobile-specific
         'viewport': 'error',
-        'font-size': 'error',
-        'touch-targets': 'warn' // Warn instead of error since we have custom tests
+        'font-size': 'error'
       }
     },
     

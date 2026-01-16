@@ -555,4 +555,16 @@ export const AdaptiveDashboard: React.FC<AdaptiveDashboardProps> = ({
   )
 }
 
-export default AdaptiveDashboard
+// Custom comparison function to prevent unnecessary re-renders
+const arePropsEqual = (prevProps: AdaptiveDashboardProps, nextProps: AdaptiveDashboardProps) => {
+  return (
+    prevProps.userId === nextProps.userId &&
+    prevProps.userRole === nextProps.userRole &&
+    prevProps.layout === nextProps.layout &&
+    prevProps.enableAI === nextProps.enableAI &&
+    prevProps.enableDragDrop === nextProps.enableDragDrop &&
+    JSON.stringify(prevProps.widgets) === JSON.stringify(nextProps.widgets)
+  )
+}
+
+export default React.memo(AdaptiveDashboard, arePropsEqual)

@@ -36,6 +36,14 @@ export {
   PinchZoomContainer,
 } from './organisms'
 
+// New Roche Construction PPM Components
+export { SimulationCard, ImpactBadge, StatisticDisplay } from './SimulationCard'
+export { FormField, FormSection, CheckboxField } from './FormField'
+export { ProgressIndicator, LinearProgress, CircularProgress } from './ProgressIndicator'
+export { Tooltip, InfoTooltip } from './Tooltip'
+export { GuidedWorkflow, HelpPanel } from './GuidedWorkflow'
+export { ErrorMessage, ValidationError, EmptyState } from './ErrorMessage'
+
 // Re-export types
 export type { 
   ButtonProps, 

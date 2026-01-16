@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Bar, ComposedChart } from 'recharts'
 import { Calendar, Filter } from 'lucide-react'
 
@@ -17,7 +17,7 @@ interface VarianceTrendsProps {
   selectedCurrency?: string
 }
 
-export default function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsProps) {
+function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsProps) {
   const [trendData, setTrendData] = useState<VarianceTrend[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -183,3 +183,14 @@ export default function VarianceTrends({ session, selectedCurrency = 'USD' }: Va
     </div>
   )
 }
+
+// Custom comparison function to prevent unnecessary re-renders
+// Only re-render if session token or currency changes
+const arePropsEqual = (prevProps: VarianceTrendsProps, nextProps: VarianceTrendsProps) => {
+  return (
+    prevProps.session?.access_token === nextProps.session?.access_token &&
+    prevProps.selectedCurrency === nextProps.selectedCurrency
+  )
+}
+
+export default memo(VarianceTrends, arePropsEqual)

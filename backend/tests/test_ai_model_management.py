@@ -21,7 +21,7 @@ from ai_model_management import (
     AIModelManager, ModelOperation, ModelOperationType, 
     UserFeedback, ABTestConfig, ABTestStatus, PerformanceStatus
 )
-from feedback_service import FeedbackCaptureService, FeedbackType
+from services.feedback_service import FeedbackCaptureService, FeedbackType
 
 # Load environment variables
 load_dotenv()
