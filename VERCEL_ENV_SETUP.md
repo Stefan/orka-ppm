@@ -1,149 +1,130 @@
-# Vercel Environment Variables Setup Guide
+# 🚀 Vercel Environment Variables Setup
 
 ## Problem
-You can't log into the production app because environment variables are not configured in Vercel.
+You're seeing this error in production:
+```
+❌ CONFIGURATION ERROR: Supabase environment variables are not configured
+```
 
-**Important:** The `.env.production` file is only used for local builds. Vercel needs environment variables to be set in its dashboard.
+## Root Cause
+**Vercel does NOT automatically read from `.env.production` file.** You must set environment variables in the Vercel dashboard.
 
-## Quick Fix (Automated)
+## ✅ Solution: Add Environment Variables to Vercel
 
-Run the verification script:
+### Method 1: Via Vercel Dashboard (Recommended)
+
+1. **Go to your Vercel project**:
+   - Visit https://vercel.com/orka/orka-ppm (or your project URL)
+   - Or go to https://vercel.com and select your project
+
+2. **Navigate to Settings**:
+   - Click on "Settings" tab
+   - Click on "Environment Variables" in the left sidebar
+
+3. **Add these environment variables**:
+
+   **Variable 1:**
+   - Name: `NEXT_PUBLIC_SUPABASE_URL`
+   - Value: `https://xceyrfvxooiplbmwavlb.supabase.co`
+   - Environment: Select **Production**, **Preview**, and **Development**
+
+   **Variable 2:**
+   - Name: `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - Value: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjZXlyZnZ4b29pcGxibXdhdmxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4Mjg3ODEsImV4cCI6MjA4MjQwNDc4MX0.jIyJlwx2g9xn8OTSaLum6H8BKqknyxB8gYxgEKdfgqo`
+   - Environment: Select **Production**, **Preview**, and **Development**
+
+   **Variable 3 (Optional - for server-side operations):**
+   - Name: `SUPABASE_SERVICE_ROLE_KEY`
+   - Value: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjZXlyZnZ4b29pcGxibXdhdmxiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjgyODc4MSwiZXhwIjoyMDgyNDA0NzgxfQ.ak3-04l8Fp1CnAg-Rp1s_mHyMnmVNCS9fwH9QWBO4lY`
+   - Environment: Select **Production** only (keep this secret!)
+
+   **Variable 4:**
+   - Name: `NEXT_PUBLIC_API_URL`
+   - Value: `https://orka-ppm.onrender.com`
+   - Environment: Select **Production**, **Preview**, and **Development**
+
+4. **Save and Redeploy**:
+   - After adding all variables, click "Save"
+   - Go to "Deployments" tab
+   - Click the three dots (...) on the latest deployment
+   - Click "Redeploy"
+   - Check "Use existing Build Cache" (optional)
+   - Click "Redeploy"
+
+### Method 2: Via Vercel CLI (Faster)
+
+If you have Vercel CLI installed, run this script:
 
 ```bash
+# Make the script executable
+chmod +x scripts/verify-vercel-env.sh
+
+# Run the script to set environment variables
 ./scripts/verify-vercel-env.sh
 ```
 
-This script will:
-1. Check if Vercel CLI is installed
-2. Verify you're logged in
-3. Read variables from `.env.production`
-4. Let you set them in Vercel
-5. Trigger a new deployment
+Or manually with Vercel CLI:
 
-## Manual Fix (Vercel Dashboard)
-
-### Step 1: Go to Vercel Dashboard
-Visit: https://vercel.com/orka/orka-ppm/settings/environment-variables
-
-### Step 2: Add Environment Variables
-
-Add these variables for **Production** environment:
-
-#### Variable 1: NEXT_PUBLIC_SUPABASE_URL
-- **Name:** `NEXT_PUBLIC_SUPABASE_URL`
-- **Value:** `https://xceyrfvxooiplbmwavlb.supabase.co`
-- **Environment:** Production ✓
-
-#### Variable 2: NEXT_PUBLIC_SUPABASE_ANON_KEY
-- **Name:** `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- **Value:** `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjZXlyZnZ4b29pcGxibXdhdmxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4Mjg3ODEsImV4cCI6MjA4MjQwNDc4MX0.jIyJlwx2g9xn8OTSaLum6H8BKqknyxB8gYxgEKdfgqo`
-- **Environment:** Production ✓
-
-#### Variable 3: SUPABASE_SERVICE_ROLE_KEY
-- **Name:** `SUPABASE_SERVICE_ROLE_KEY`
-- **Value:** `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjZXlyZnZ4b29pcGxibXdhdmxiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjgyODc4MSwiZXhwIjoyMDgyNDA0NzgxfQ.ak3-04l8Fp1CnAg-Rp1s_mHyMnmVNCS9fwH9QWBO4lY`
-- **Environment:** Production ✓
-
-#### Variable 4: NEXT_PUBLIC_API_URL
-- **Name:** `NEXT_PUBLIC_API_URL`
-- **Value:** `https://orka-ppm.onrender.com`
-- **Environment:** Production ✓
-
-### Step 3: Redeploy
-
-After adding the variables, trigger a new deployment:
-
-**Option A: Via Dashboard**
-- Go to: https://vercel.com/orka/orka-ppm
-- Click "Redeploy" on the latest deployment
-
-**Option B: Via Git Push**
 ```bash
-git commit --allow-empty -m "Trigger redeploy for env vars"
-git push origin main
-```
+# Install Vercel CLI if you haven't
+npm i -g vercel
 
-**Option C: Via Vercel CLI**
-```bash
+# Login to Vercel
+vercel login
+
+# Link your project
+vercel link
+
+# Add environment variables
+vercel env add NEXT_PUBLIC_SUPABASE_URL production
+# Paste: https://xceyrfvxooiplbmwavlb.supabase.co
+
+vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production
+# Paste: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjZXlyZnZ4b29pcGxibXdhdmxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4Mjg3ODEsImV4cCI6MjA4MjQwNDc4MX0.jIyJlwx2g9xn8OTSaLum6H8BKqknyxB8gYxgEKdfgqo
+
+vercel env add NEXT_PUBLIC_API_URL production
+# Paste: https://orka-ppm.onrender.com
+
+# Redeploy
 vercel --prod
 ```
 
-### Step 4: Verify
+## 🔍 Verification
 
-1. Wait for deployment to complete (2-3 minutes)
-2. Visit your production URL
-3. Try logging in with your credentials
-4. Check browser console for any errors
+After redeploying, visit your production site and:
 
-## Troubleshooting
+1. Open browser DevTools (F12)
+2. Go to Console tab
+3. You should see logs showing Supabase configuration
+4. The error message should be gone
 
-### Issue: Still can't log in after setting variables
+## 📝 Important Notes
 
-**Check 1: Verify variables are set**
+1. **`.env.production` is for local builds only** - Vercel ignores it
+2. **Environment variables are encrypted** in Vercel
+3. **Changes require a redeploy** to take effect
+4. **`NEXT_PUBLIC_*` variables** are exposed to the browser (safe for public keys)
+5. **Non-prefixed variables** (like `SUPABASE_SERVICE_ROLE_KEY`) are server-only
+
+## 🔐 Security
+
+- ✅ `NEXT_PUBLIC_SUPABASE_URL` - Safe to expose (public)
+- ✅ `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Safe to expose (public, rate-limited)
+- ⚠️ `SUPABASE_SERVICE_ROLE_KEY` - Keep secret! Only in Production environment
+
+## 🆘 Troubleshooting
+
+**Still seeing the error after redeploying?**
+
+1. Check that variables are set for "Production" environment
+2. Clear Vercel build cache and redeploy
+3. Check browser console for actual values being loaded
+4. Verify the deployment used the latest code
+
+**Need to verify variables are set?**
+
 ```bash
 vercel env ls
 ```
 
-**Check 2: Check browser console**
-Open DevTools (F12) and look for:
-- ✅ "Auth initialization complete" - Good!
-- ❌ "CONFIGURATION ERROR" - Variables not loaded
-- ❌ "Invalid API key" - Wrong key value
-
-**Check 3: Verify deployment used new variables**
-- Go to Vercel dashboard
-- Check deployment logs
-- Look for "Environment Variables" section
-
-### Issue: "Invalid API key" error
-
-This means the ANON_KEY is incorrect or corrupted.
-
-**Fix:**
-1. Go to Supabase dashboard: https://supabase.com/dashboard/project/xceyrfvxooiplbmwavlb/settings/api
-2. Copy the "anon public" key
-3. Update in Vercel dashboard
-4. Redeploy
-
-### Issue: "CORS error" or "Network error"
-
-This means the backend isn't configured to accept requests from your frontend.
-
-**Fix:**
-1. Check backend CORS configuration
-2. Ensure Supabase project allows your domain
-3. Check Supabase project settings
-
-## Vercel CLI Setup
-
-If you don't have Vercel CLI installed:
-
-```bash
-# Install globally
-npm install -g vercel
-
-# Login
-vercel login
-
-# Link project (run in project directory)
-vercel link
-```
-
-## Security Notes
-
-⚠️ **Never commit sensitive keys to Git**
-- The `.env.production` file should be in `.gitignore`
-- Use Vercel dashboard or CLI to set production secrets
-- Rotate keys if accidentally committed
-
-✅ **Best Practices**
-- Use different keys for development and production
-- Regularly rotate service role keys
-- Monitor Supabase logs for suspicious activity
-- Enable RLS (Row Level Security) in Supabase
-
-## Additional Resources
-
-- [Vercel Environment Variables Docs](https://vercel.com/docs/concepts/projects/environment-variables)
-- [Supabase Auth Docs](https://supabase.com/docs/guides/auth)
-- [Next.js Environment Variables](https://nextjs.org/docs/basic-features/environment-variables)
+This will show all environment variables configured in Vercel.
