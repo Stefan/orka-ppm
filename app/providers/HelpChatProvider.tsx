@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback, use
 import { usePathname } from 'next/navigation'
 import { useAuth } from './SupabaseAuthProvider'
 import { useLanguage } from '../../hooks/useLanguage'
+import { useTranslations } from '../../lib/i18n/context'
 import { helpChatAPI } from '../../lib/help-chat/api'
 import { helpChatFeedbackIntegration } from '../../lib/help-chat-feedback-integration'
 import type {
@@ -76,6 +77,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
     formatDate,
     formatNumber
   } = useLanguage()
+  const { t } = useTranslations()
   
   // State
   const [state, setState] = useState<HelpChatState>(DEFAULT_STATE)
@@ -159,7 +161,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
     const pathSegments = pathname.split('/').filter(Boolean)
     
     // Extract page information
-    let pageTitle = 'Dashboard'
+    let pageTitle = t('dashboard.title')
     let currentProject: string | undefined
     let currentPortfolio: string | undefined
     let relevantData: Record<string, any> = {}
@@ -167,7 +169,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
     // Determine page title and context based on route
     switch (pathSegments[0]) {
       case 'dashboards':
-        pageTitle = 'Dashboards'
+        pageTitle = t('nav.dashboards')
         break
       case 'projects':
         pageTitle = 'Projects'
@@ -177,31 +179,31 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
         }
         break
       case 'resources':
-        pageTitle = 'Resources'
+        pageTitle = t('resources.title')
         break
       case 'risks':
-        pageTitle = 'Risk Management'
+        pageTitle = t('risks.title')
         break
       case 'financials':
-        pageTitle = 'Financial Management'
+        pageTitle = t('financials.title')
         break
       case 'reports':
-        pageTitle = 'Reports'
+        pageTitle = t('reports.title')
         break
       case 'scenarios':
-        pageTitle = 'What-If Scenarios'
+        pageTitle = t('scenarios.title')
         break
       case 'monte-carlo':
-        pageTitle = 'Monte Carlo Simulations'
+        pageTitle = t('monteCarlo.title')
         break
       case 'changes':
-        pageTitle = 'Change Management'
+        pageTitle = t('nav.changes')
         break
       case 'admin':
         pageTitle = 'Administration'
         break
       default:
-        pageTitle = 'Dashboard'
+        pageTitle = t('dashboard.title')
     }
 
     // Add user role context
@@ -215,7 +217,18 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
       currentPortfolio: currentPortfolio || '',
       relevantData
     }
-  }, [pathname, user])
+  }, [pathname, user, t])
+
+  // Sync language preference TO server (one-way: client -> server)
+  // This should only push the current language to the server, not pull from it
+  const syncLanguageToServer = useCallback(async (language: string) => {
+    try {
+      // Only sync TO server, don't pull FROM server to avoid overriding user choice
+      await helpChatAPI.setUserLanguagePreference(language)
+    } catch (error) {
+      console.warn('Failed to sync language preference to server:', error)
+    }
+  }, [])
 
   // Initialize provider
   useEffect(() => {
@@ -237,35 +250,11 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
       helpChatAPI.setAuthToken(session.access_token)
     }
 
-    // Sync language preference with server
-    if (user) {
-      syncLanguageWithServer()
+    // Sync current language TO server (don't pull from server to avoid overriding user choice)
+    if (user && currentLanguage) {
+      syncLanguageToServer(currentLanguage)
     }
-  }, [session?.access_token, user?.id]) // Simplified dependencies
-
-  // Sync language preference with server
-  const syncLanguageWithServer = useCallback(async () => {
-    try {
-      const serverLanguage = await getUserLanguagePreference()
-      if (serverLanguage && serverLanguage !== currentLanguage) {
-        // Validate that serverLanguage is a supported language
-        const validLanguages = ['en', 'de', 'fr'] as const
-        if (validLanguages.includes(serverLanguage as any)) {
-          await setLanguage(serverLanguage)
-          setState(prevState => ({
-            ...prevState,
-            language: serverLanguage as 'en' | 'de' | 'fr',
-            userPreferences: {
-              ...prevState.userPreferences,
-              language: serverLanguage as 'en' | 'de' | 'fr'
-            }
-          }))
-        }
-      }
-    } catch (error) {
-      console.warn('Failed to sync language preference with server:', error)
-    }
-  }, [currentLanguage, getUserLanguagePreference, setLanguage])
+  }, [session?.access_token, user?.id, currentLanguage, syncLanguageToServer]) // Added dependencies
 
   // Update context when route changes
   useEffect(() => {
@@ -470,10 +459,11 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
     // Save to localStorage
     saveToStorage({ preferences: newPreferences })
 
-    // If language changed, sync with server
+    // If language changed, sync TO server
     if (preferences.language && preferences.language !== state.language) {
       try {
         await setLanguage(preferences.language)
+        await syncLanguageToServer(preferences.language)
       } catch (error) {
         console.error('Failed to update language preference on server:', error)
       }
