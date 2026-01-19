@@ -311,7 +311,7 @@ export default function ScenariosPage() {
         )}
 
         <AdaptiveGrid 
-          columns={{ mobile: 1, tablet: 1, desktop: 3 }}
+          columns={{ mobile: 1, tablet: 1, desktop: 4 }}
           gap="sm"
         >
           {/* Project Selection */}
@@ -339,7 +339,7 @@ export default function ScenariosPage() {
           </div>
 
           {/* Scenarios List */}
-          <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="lg:col-span-3 bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="px-3 py-2 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-gray-900">
