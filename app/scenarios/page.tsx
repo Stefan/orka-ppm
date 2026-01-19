@@ -382,7 +382,7 @@ export default function ScenariosPage() {
                       key={scenario.id}
                       className={`p-3 rounded-lg border-2 transition-colors ${
                         selectedScenarios.includes(scenario.id)
-                          ? 'border-purple-500 bg-purple-50'
+                          ? 'border-blue-400 bg-blue-50'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
@@ -398,7 +398,7 @@ export default function ScenariosPage() {
                                 setSelectedScenarios(selectedScenarios.filter(id => id !== scenario.id))
                               }
                             }}
-                            className="mt-0.5 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded flex-shrink-0"
+                            className="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded flex-shrink-0"
                           />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2 mb-2">
@@ -408,7 +408,7 @@ export default function ScenariosPage() {
                                   <p className="text-sm text-gray-600 mt-0.5">{scenario.description}</p>
                                 )}
                               </div>
-                              <div className="flex items-center space-x-1 flex-shrink-0">
+                              <div className="flex items-center gap-2 flex-shrink-0">
                                 <button
                                   onClick={() => {/* TODO: Edit scenario */}}
                                   className="p-1.5 text-gray-600 hover:text-gray-900 rounded transition-colors"
