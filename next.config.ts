@@ -12,10 +12,14 @@ const nextConfig: NextConfig = {
   
   // Bundle optimization
   experimental: {
-    optimizePackageImports: ['lucide-react', 'recharts', '@supabase/supabase-js'],
+    optimizePackageImports: ['lucide-react', 'recharts', '@supabase/supabase-js', 'react-markdown', '@tiptap/react'],
     optimizeCss: true,
     webVitalsAttribution: ['CLS', 'LCP', 'FCP', 'FID', 'TTFB'],
     scrollRestoration: true,
+    // Enable modern JavaScript output for smaller bundles
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
   },
   
   // Turbopack configuration (empty to silence warnings)
@@ -26,7 +30,8 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === 'production' ? {
       exclude: ['error', 'warn'], // Keep error and warn logs
     } : false,
-    styledComponents: false, // Disable if not using styled-components
+    // Enable React compiler optimizations
+    reactRemoveProperties: process.env.NODE_ENV === 'production' ? { properties: ['^data-test'] } : false,
   },
   
   // Bundle analyzer and optimization

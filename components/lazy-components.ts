@@ -176,3 +176,66 @@ export const LazySyncConflictResolver = dynamic(
 
 // Type exports for better TypeScript support
 export type LazyComponentType<P = {}> = ComponentType<P>
+
+// Additional heavy components for lazy loading
+
+// Scenarios page components
+export const LazyCreateScenarioModal = dynamic(
+  () => import('../app/scenarios/components/CreateScenarioModal'),
+  {
+    loading: () => <LoadingFallback />,
+    ssr: false
+  }
+)
+
+export const LazyVirtualizedProjectSelector = dynamic(
+  () => import('./ui/VirtualizedProjectSelector'),
+  {
+    loading: () => <LoadingFallback />,
+    ssr: false
+  }
+)
+
+// Dashboard variance components (already lazy but adding here for consistency)
+export const LazyVarianceKPIs = dynamic(
+  () => import('../app/dashboards/components/VarianceKPIs'),
+  {
+    loading: () => <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>,
+    ssr: false
+  }
+)
+
+export const LazyVarianceTrends = dynamic(
+  () => import('../app/dashboards/components/VarianceTrends'),
+  {
+    loading: () => <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>,
+    ssr: false
+  }
+)
+
+// React Markdown (heavy with plugins)
+export const LazyMarkdown = dynamic(
+  () => import('react-markdown'),
+  {
+    loading: () => <LoadingFallback />,
+    ssr: false
+  }
+)
+
+// Date Picker (heavy with date-fns)
+export const LazyDatePicker = dynamic(
+  () => import('react-datepicker'),
+  {
+    loading: () => <LoadingFallback />,
+    ssr: false
+  }
+)
+
+// Excel/CSV handling (heavy with xlsx)
+export const LazyCSVImport = dynamic(
+  () => import('./shared/CSVImport'),
+  {
+    loading: () => <LoadingFallback />,
+    ssr: false
+  }
+)

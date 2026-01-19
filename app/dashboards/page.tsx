@@ -21,12 +21,22 @@ import {
   TrendingUp, TrendingDown, AlertTriangle, DollarSign, Clock, RefreshCw, 
   BarChart3, Users, FileText, ChevronDown, X, Filter 
 } from 'lucide-react'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+// Charts werden nicht auf der Dashboard-Hauptseite verwendet, daher entfernen
+// import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 // Dynamic imports for code splitting (existing pattern maintained)
-const VarianceKPIs = dynamic(() => import('./components/VarianceKPIs'), { ssr: false })
-const VarianceTrends = dynamic(() => import('./components/VarianceTrends'), { ssr: false })
-const VarianceAlerts = dynamic(() => import('./components/VarianceAlerts'), { ssr: false })
+const VarianceKPIs = dynamic(() => import('./components/VarianceKPIs'), { 
+  ssr: false,
+  loading: () => <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+})
+const VarianceTrends = dynamic(() => import('./components/VarianceTrends'), { 
+  ssr: false,
+  loading: () => <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+})
+const VarianceAlerts = dynamic(() => import('./components/VarianceAlerts'), { 
+  ssr: false,
+  loading: () => <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+})
 
 // Ultra-Compact KPI Card Component - standardized font sizes
 function KPICard({ label, value, change, icon: Icon, color }: any) {
