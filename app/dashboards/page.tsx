@@ -283,8 +283,8 @@ export default function CompactDashboard() {
 
   return (
     <AppLayout>
-      {/* Compact container with reduced spacing + bottom margin for visibility */}
-      <div className="max-w-[1600px] mx-auto p-3 sm:p-4 md:p-6 space-y-2 md:space-y-3 pb-6 md:pb-8">
+      {/* Compact container with reduced spacing + bottom margin for quick actions */}
+      <div className="max-w-[1600px] mx-auto p-3 sm:p-4 md:p-6 space-y-2 md:space-y-3 pb-20 md:pb-24">
         
         {/* Header - Ultra-Compact with alerts inline - standardized font sizes */}
         <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -415,33 +415,33 @@ export default function CompactDashboard() {
         </div>
       </div>
 
-      {/* BOTTOM: Quick Actions - Fixed at bottom of viewport */}
-      <div className="sticky bottom-0 bg-white border-t border-gray-200 p-2 shadow-lg z-20">
+      {/* BOTTOM: Quick Actions - Fixed at bottom of viewport with higher z-index */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-300 p-3 shadow-2xl z-50">
         <div className="max-w-[1600px] mx-auto flex items-center gap-2 overflow-x-auto">
-          <span className="text-[10px] font-semibold text-gray-900 uppercase tracking-wide whitespace-nowrap mr-2">{t('actions.quickActions')}:</span>
-          <button onClick={() => {}} className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 rounded hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap">
-            <BarChart3 size={14} className="text-gray-600" />
-            <span className="text-xs">{t('actions.scenarios')}</span>
+          <span className="text-xs font-semibold text-gray-900 uppercase tracking-wide whitespace-nowrap mr-2">{t('actions.quickActions')}:</span>
+          <button onClick={() => {}} className="flex items-center gap-1.5 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
+            <BarChart3 size={16} className="text-gray-600" />
+            <span className="text-sm font-medium">{t('actions.scenarios')}</span>
           </button>
-          <button onClick={() => {}} className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 rounded hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap">
-            <Users size={14} className="text-gray-600" />
-            <span className="text-xs">{t('actions.resources')}</span>
+          <button onClick={() => {}} className="flex items-center gap-1.5 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
+            <Users size={16} className="text-gray-600" />
+            <span className="text-sm font-medium">{t('actions.resources')}</span>
           </button>
-          <button onClick={() => {}} className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 rounded hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap">
-            <DollarSign size={14} className="text-gray-600" />
-            <span className="text-xs">{t('actions.financials')}</span>
+          <button onClick={() => {}} className="flex items-center gap-1.5 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
+            <DollarSign size={16} className="text-gray-600" />
+            <span className="text-sm font-medium">{t('actions.financials')}</span>
           </button>
-          <button onClick={() => {}} className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 rounded hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap">
-            <FileText size={14} className="text-gray-600" />
-            <span className="text-xs">{t('actions.reports')}</span>
+          <button onClick={() => {}} className="flex items-center gap-1.5 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
+            <FileText size={16} className="text-gray-600" />
+            <span className="text-sm font-medium">{t('actions.reports')}</span>
           </button>
-          <button onClick={() => {}} className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 rounded hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap">
-            <Clock size={14} className="text-gray-600" />
-            <span className="text-xs">Timeline</span>
+          <button onClick={() => {}} className="flex items-center gap-1.5 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
+            <Clock size={16} className="text-gray-600" />
+            <span className="text-sm font-medium">Timeline</span>
           </button>
-          <button onClick={() => {}} className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 rounded hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap">
-            <TrendingUp size={14} className="text-gray-600" />
-            <span className="text-xs">Analytics</span>
+          <button onClick={() => {}} className="flex items-center gap-1.5 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
+            <TrendingUp size={16} className="text-gray-600" />
+            <span className="text-sm font-medium">Analytics</span>
           </button>
         </div>
       </div>
