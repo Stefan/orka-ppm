@@ -260,7 +260,7 @@ export default function ScenariosPage() {
 
   return (
     <AppLayout>
-      <ResponsiveContainer padding="sm" className="space-y-3 pb-20">
+      <ResponsiveContainer padding="sm" className="space-y-3 pb-24">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-2 sm:space-y-0">
           <div>
