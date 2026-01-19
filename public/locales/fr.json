@@ -916,6 +916,40 @@
       "actionFailed": "Échec de {action} l'utilisateur"
     }
   },
+  "auth": {
+    "signIn": "Connectez-vous à votre compte",
+    "signUp": "Créer votre compte",
+    "subtitle": "Gestion de portefeuille de projets alimentée par l'IA",
+    "email": "Adresse e-mail",
+    "emailPlaceholder": "Entrez votre adresse e-mail",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Entrez votre mot de passe",
+    "newPasswordPlaceholder": "Créez un mot de passe sécurisé (min. 6 caractères)",
+    "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères",
+    "signInButton": "Se connecter",
+    "signUpButton": "S'inscrire",
+    "loading": "Chargement...",
+    "redirecting": "Redirection vers le tableau de bord...",
+    "alreadyHaveAccount": "Vous avez déjà un compte ? Se connecter",
+    "needAccount": "Besoin d'un compte ? S'inscrire",
+    "forgotPassword": "Mot de passe oublié ?",
+    "errors": {
+      "bothRequired": "Veuillez entrer l'e-mail et le mot de passe",
+      "invalidEmail": "Veuillez entrer une adresse e-mail valide",
+      "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+      "invalidCredentials": "E-mail ou mot de passe invalide. Veuillez vérifier vos identifiants et réessayer.",
+      "emailNotConfirmed": "Veuillez vérifier votre e-mail et cliquer sur le lien de confirmation avant de vous connecter.",
+      "userAlreadyRegistered": "Cet e-mail est déjà enregistré. Veuillez vous connecter à la place.",
+      "configError": "Erreur de configuration : Clé API invalide détectée. Les variables d'environnement doivent être corrigées.",
+      "networkError": "Problème de connexion réseau détecté. Veuillez vérifier votre connexion Internet et réessayer.",
+      "unexpectedError": "Une erreur inattendue s'est produite. Veuillez réessayer."
+    },
+    "success": {
+      "accountCreated": "Compte créé avec succès ! Veuillez vérifier votre e-mail pour confirmer.",
+      "accountConfirmed": "Compte créé et confirmé ! Vous pouvez maintenant vous connecter.",
+      "loginSuccess": "Connexion réussie ! Redirection vers le tableau de bord..."
+    }
+  },
   "changes": {
     "implementationTracker": {
       "title": "Implementation Tracking",

@@ -5,9 +5,12 @@ import { useAuth } from './providers/SupabaseAuthProvider'
 import Sidebar from '../components/navigation/Sidebar'
 import { supabase, ENV_CONFIG } from '../lib/api/supabase-minimal'
 import { useAutoPrefetch } from '../hooks/useRoutePrefetch'
+import { GlobalLanguageSelector } from '../components/navigation/GlobalLanguageSelector'
+import { useTranslations } from '@/lib/i18n/context'
 
 export default function Home() {
   const { session, loading } = useAuth()
+  const { t } = useTranslations()
 
   // Prefetch /dashboards route for instant navigation
   useAutoPrefetch(['/dashboards'], 1000)
@@ -18,7 +21,7 @@ export default function Home() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-gray-600">{t('auth.loading')}</p>
         </div>
       </div>
     )
@@ -37,13 +40,14 @@ export default function Home() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Redirecting to dashboard...</p>
+        <p className="mt-4 text-gray-600">{t('auth.redirecting')}</p>
       </div>
     </div>
   )
 }
 
 function LoginForm() {
+  const { t } = useTranslations()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSignup, setIsSignup] = useState(false)
@@ -86,19 +90,19 @@ function LoginForm() {
 
     // Enhanced input validation
     if (!trimmedEmail || !trimmedPassword) {
-      setError('Please enter both email and password')
+      setError(t('auth.errors.bothRequired'))
       setLoading(false)
       return
     }
 
     if (!trimmedEmail.includes('@') || trimmedEmail.length < 5) {
-      setError('Please enter a valid email address')
+      setError(t('auth.errors.invalidEmail'))
       setLoading(false)
       return
     }
 
     if (trimmedPassword.length < 6) {
-      setError('Password must be at least 6 characters long')
+      setError(t('auth.errors.passwordTooShort'))
       setLoading(false)
       return
     }
@@ -143,17 +147,17 @@ function LoginForm() {
         
         // ENHANCED: Specific error handling for different failure modes
         if (authError.message.includes('Invalid login credentials')) {
-          setError('Invalid email or password. Please check your credentials and try again.')
+          setError(t('auth.errors.invalidCredentials'))
         } else if (authError.message.includes('Email not confirmed')) {
-          setError('Please check your email and click the confirmation link before signing in.')
+          setError(t('auth.errors.emailNotConfirmed'))
         } else if (authError.message.includes('User already registered')) {
-          setError('This email is already registered. Please sign in instead.')
+          setError(t('auth.errors.userAlreadyRegistered'))
         } else if (authError.message.includes('Invalid API key') || authError.message.includes('JWT')) {
-          setError('❌ CONFIGURATION ERROR: Invalid API key detected. Environment variables need to be fixed.')
+          setError(t('auth.errors.configError'))
           console.error('💡 SOLUTION: Check Vercel environment variables - ANON_KEY may be corrupted')
           console.error('💡 Expected key length: ~208 chars, Current:', ENV_CONFIG.supabaseAnonKey.length)
         } else if (authError.message.includes('NetworkError') || authError.message.includes('fetch') || authError.message.includes('CORS')) {
-          setError('❌ NETWORK ERROR: Cannot connect to authentication service. CORS or network issue.')
+          setError(t('auth.errors.networkError'))
           console.error('💡 SOLUTION: Check backend CORS configuration and network connectivity')
         } else {
           setError(`Authentication failed: ${authError.message}`)
@@ -167,12 +171,12 @@ function LoginForm() {
       
       if (isSignup) {
         if (data.user && !data.user.email_confirmed_at) {
-          setError('✅ Account created successfully! Please check your email to confirm.')
+          setError(t('auth.success.accountCreated'))
         } else {
-          setError('✅ Account created and confirmed! You can now sign in.')
+          setError(t('auth.success.accountConfirmed'))
         }
       } else {
-        setError('✅ Login successful! Redirecting to dashboard...')
+        setError(t('auth.success.loginSuccess'))
         // Redirect after short delay
         setTimeout(() => {
           window.location.href = '/dashboards'
@@ -201,10 +205,10 @@ function LoginForm() {
         } else if (err.message.includes('NetworkError') || err.message.includes('CORS')) {
           setError('❌ NETWORK ERROR: Cannot reach authentication service. Check CORS configuration.')
         } else {
-          setError(`Unexpected error: ${err.message}`)
+          setError(t('auth.errors.unexpectedError'))
         }
       } else {
-        setError('An unexpected error occurred. Please try again.')
+        setError(t('auth.errors.unexpectedError'))
       }
     }
     
@@ -213,13 +217,18 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      {/* Language Selector - Top Right */}
+      <div className="fixed top-4 right-4 z-50">
+        <GlobalLanguageSelector variant="topbar" />
+      </div>
+
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            {isSignup ? 'Create your account' : 'Sign in to your account'}
+            {isSignup ? t('auth.signUp') : t('auth.signIn')}
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            AI-Powered Project Portfolio Management
+            {t('auth.subtitle')}
           </p>
         </div>
         
@@ -227,7 +236,7 @@ function LoginForm() {
           <div className="space-y-5">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 required">
-                Email Address
+                {t('auth.email')}
               </label>
               <input
                 id="email"
@@ -238,13 +247,13 @@ function LoginForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-2 input-field w-full"
-                placeholder="Enter your email address"
+                placeholder={t('auth.emailPlaceholder')}
               />
             </div>
             
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 required">
-                Password
+                {t('auth.password')}
               </label>
               <input
                 id="password"
@@ -255,10 +264,10 @@ function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="mt-2 input-field w-full"
-                placeholder={isSignup ? "Create a secure password (min. 6 characters)" : "Enter your password"}
+                placeholder={isSignup ? t('auth.newPasswordPlaceholder') : t('auth.passwordPlaceholder')}
               />
               {isSignup && (
-                <p className="text-sm text-gray-500 mt-1">Password must be at least 6 characters long</p>
+                <p className="text-sm text-gray-500 mt-1">{t('auth.passwordMinLength')}</p>
               )}
             </div>
           </div>
@@ -278,7 +287,7 @@ function LoginForm() {
               {loading ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
               ) : (
-                isSignup ? 'Sign Up' : 'Sign In'
+                isSignup ? t('auth.signUpButton') : t('auth.signInButton')
               )}
             </button>
           </div>
@@ -289,7 +298,7 @@ function LoginForm() {
               onClick={() => setIsSignup(!isSignup)}
               className="text-blue-600 hover:text-blue-500 text-sm"
             >
-              {isSignup ? 'Already have an account? Sign in' : 'Need an account? Sign up'}
+              {isSignup ? t('auth.alreadyHaveAccount') : t('auth.needAccount')}
             </button>
             
             {!isSignup && (
@@ -297,7 +306,7 @@ function LoginForm() {
                 href="/forgot-password"
                 className="text-blue-600 hover:text-blue-500 text-sm"
               >
-                Forgot password?
+                {t('auth.forgotPassword')}
               </a>
             )}
           </div>

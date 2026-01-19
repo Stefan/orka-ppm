@@ -72,14 +72,14 @@ export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
     <>
       {/* Overlay */}
       <div 
-        className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+        className="fixed inset-0 bg-black bg-opacity-50 z-40 xl:hidden"
         onClick={onClose}
       />
       
       {/* Drawer */}
       <div 
         ref={navRef}
-        className="fixed left-0 top-0 h-full w-80 max-w-[85vw] bg-white z-50 lg:hidden transform transition-transform duration-300 ease-in-out overflow-y-auto"
+        className="fixed left-0 top-0 h-full w-80 max-w-[85vw] bg-white z-50 xl:hidden transform transition-transform duration-300 ease-in-out overflow-y-auto"
         style={{
           transform: isOpen ? 'translateX(0)' : 'translateX(-100%)'
         }}

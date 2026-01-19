@@ -4,7 +4,7 @@ Provides endpoints for AI-powered in-app help chat system
 """
 
 import time
-from fastapi import APIRouter, HTTPException, Depends, status, Request
+from fastapi import APIRouter, HTTPException, Depends, status, Request, Body
 from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any, List
 from uuid import UUID
@@ -164,10 +164,10 @@ def get_translation_service() -> TranslationService:
     return translation_service
 
 @router.post("/query", response_model=HelpQueryResponse)
-@limiter.limit("20/minute")  # Rate limit: 20 queries per minute per user
+# Rate limiting temporarily disabled for debugging
 async def process_help_query(
-    request: Request,  # Required for rate limiting
     help_request: HelpQueryRequest,
+    request: Request = None,
     current_user = Depends(get_current_user)
 ):
     """Process user help query and return AI-generated response with Supabase caching"""

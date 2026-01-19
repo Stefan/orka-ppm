@@ -720,16 +720,17 @@ export class HelpChatAPIService {
       throw error
     }
   }
-  async getProactiveTips(context: string): Promise<ProactiveTipsResponse> {
+  async getProactiveTips(params: URLSearchParams): Promise<ProactiveTipsResponse> {
     // Check cache first
-    const cachedResponse = this.cache.get('tips', { context })
+    const cacheKey = params.toString()
+    const cachedResponse = this.cache.get('tips', { params: cacheKey })
     if (cachedResponse) {
       return cachedResponse
     }
 
     const operation = async (): Promise<ProactiveTipsResponse> => {
       try {
-        const url = `${getApiUrl(HELP_CHAT_CONFIG.endpoints.tips)}?context=${encodeURIComponent(context)}`
+        const url = `${getApiUrl(HELP_CHAT_CONFIG.endpoints.tips)}?${params.toString()}`
         const response = await fetch(url, {
           method: 'GET',
           headers: this.getAuthHeaders()
@@ -746,7 +747,7 @@ export class HelpChatAPIService {
         const data: ProactiveTipsResponse = await response.json()
         
         // Cache successful response
-        this.cache.set('tips', { context }, data, 15 * 60 * 1000) // 15 minutes cache
+        this.cache.set('tips', { params: cacheKey }, data, 15 * 60 * 1000) // 15 minutes cache
         
         return data
       } catch (error) {

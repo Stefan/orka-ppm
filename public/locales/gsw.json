@@ -916,6 +916,40 @@
       "actionFailed": "Fähler bim {action} vom Benutzer"
     }
   },
+  "auth": {
+    "signIn": "Bi dim Konto aamälde",
+    "signUp": "Dis Konto erstelle",
+    "subtitle": "KI-gstützts Projäkt- und Portfolio-Managemänt",
+    "email": "E-Mail-Adrässe",
+    "emailPlaceholder": "Gib dini E-Mail-Adrässe yy",
+    "password": "Passwort",
+    "passwordPlaceholder": "Gib dis Passwort yy",
+    "newPasswordPlaceholder": "Erstell e sicheres Passwort (mind. 6 Zeiche)",
+    "passwordMinLength": "S Passwort muess mindestens 6 Zeiche lang syy",
+    "signInButton": "Aamälde",
+    "signUpButton": "Registriere",
+    "loading": "Ladet...",
+    "redirecting": "Witerläitig zum Dashboard...",
+    "alreadyHaveAccount": "Hesch scho e Konto? Aamälde",
+    "needAccount": "Bruchsch e Konto? Registriere",
+    "forgotPassword": "Passwort vergässe?",
+    "errors": {
+      "bothRequired": "Bitte gib E-Mail und Passwort yy",
+      "invalidEmail": "Bitte gib e gültigi E-Mail-Adrässe yy",
+      "passwordTooShort": "S Passwort muess mindestens 6 Zeiche lang syy",
+      "invalidCredentials": "Ungültigi E-Mail oder Passwort. Bitte überprüef dini Aamäldigsdaate und versuechs nomol.",
+      "emailNotConfirmed": "Bitte überprüef dini E-Mail und klick uf dr Bestätigungslink, bevor du dich aamäldsch.",
+      "userAlreadyRegistered": "Die E-Mail isch scho registriert. Bitte mäld dich stattdässe aa.",
+      "configError": "Konfigurationsfähler: Ungültige API-Schlüssel erkännt. Umgäbigsvariable müesse korrigiert wärde.",
+      "networkError": "Netzwärkverbindigsproblem erkännt. Bitte überprüef dini Internetverbindig und versuechs nomol.",
+      "unexpectedError": "E unerwartete Fähler isch ufträtte. Bitte versuechs nomol."
+    },
+    "success": {
+      "accountCreated": "Konto erfolgryych erstellt! Bitte überprüef dini E-Mail zur Bestätigung.",
+      "accountConfirmed": "Konto erstellt und bestätigt! Du chasch dich jetzt aamälde.",
+      "loginSuccess": "Aamäldig erfolgryych! Witerläitig zum Dashboard..."
+    }
+  },
   "changes": {
     "implementationTracker": {
       "title": "Implementation Tracking",

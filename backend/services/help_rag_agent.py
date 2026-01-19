@@ -334,7 +334,8 @@ class HelpRAGAgent(RAGReporterAgent):
         # Allow general help queries about the platform
         platform_queries = [
             "how to", "where is", "what is", "help", "guide", "tutorial",
-            "navigation", "menu", "button", "feature", "function"
+            "navigation", "menu", "button", "feature", "function", "app",
+            "platform", "system", "tool", "software", "can", "does"
         ]
         
         has_platform_query = any(keyword in query_lower for keyword in platform_queries)
@@ -361,7 +362,7 @@ class HelpRAGAgent(RAGReporterAgent):
                 {
                     "id": "explore_features",
                     "label": "Explore Platform Features" if language == 'en' else "Funktionen erkunden" if language == 'de' else "Explorer les fonctionnalités",
-                    "action": "navigate_to_dashboard"
+                    "action": "navigate:/dashboards"
                 }
             ]
         )

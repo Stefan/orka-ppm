@@ -916,6 +916,40 @@
       "actionFailed": "Error al {action} usuario"
     }
   },
+  "auth": {
+    "signIn": "Iniciar sesión en su cuenta",
+    "signUp": "Crear su cuenta",
+    "subtitle": "Gestión de cartera de proyectos impulsada por IA",
+    "email": "Dirección de correo electrónico",
+    "emailPlaceholder": "Ingrese su dirección de correo electrónico",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Ingrese su contraseña",
+    "newPasswordPlaceholder": "Cree una contraseña segura (mín. 6 caracteres)",
+    "passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
+    "signInButton": "Iniciar sesión",
+    "signUpButton": "Registrarse",
+    "loading": "Cargando...",
+    "redirecting": "Redirigiendo al panel de control...",
+    "alreadyHaveAccount": "¿Ya tiene una cuenta? Iniciar sesión",
+    "needAccount": "¿Necesita una cuenta? Registrarse",
+    "forgotPassword": "¿Olvidó su contraseña?",
+    "errors": {
+      "bothRequired": "Por favor ingrese correo electrónico y contraseña",
+      "invalidEmail": "Por favor ingrese una dirección de correo electrónico válida",
+      "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
+      "invalidCredentials": "Correo electrónico o contraseña inválidos. Por favor verifique sus credenciales e intente nuevamente.",
+      "emailNotConfirmed": "Por favor verifique su correo electrónico y haga clic en el enlace de confirmación antes de iniciar sesión.",
+      "userAlreadyRegistered": "Este correo electrónico ya está registrado. Por favor inicie sesión en su lugar.",
+      "configError": "Error de configuración: Clave API inválida detectada. Las variables de entorno deben corregirse.",
+      "networkError": "Problema de conexión de red detectado. Por favor verifique su conexión a Internet e intente nuevamente.",
+      "unexpectedError": "Ocurrió un error inesperado. Por favor intente nuevamente."
+    },
+    "success": {
+      "accountCreated": "¡Cuenta creada con éxito! Por favor verifique su correo electrónico para confirmar.",
+      "accountConfirmed": "¡Cuenta creada y confirmada! Ahora puede iniciar sesión.",
+      "loginSuccess": "¡Inicio de sesión exitoso! Redirigiendo al panel de control..."
+    }
+  },
   "changes": {
     "implementationTracker": {
       "title": "Implementation Tracking",

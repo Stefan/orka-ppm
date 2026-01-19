@@ -36,8 +36,20 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [moreMenuOpen, setMoreMenuOpen] = useState(false)
+  const [showNav, setShowNav] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const moreMenuRef = useRef<HTMLDivElement>(null)
+
+  // Handle responsive navigation
+  useEffect(() => {
+    const handleResize = () => {
+      setShowNav(window.innerWidth >= 768)
+    }
+    
+    handleResize() // Initial check
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const handleLogout = async () => {
     try {
@@ -76,13 +88,14 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   const userName = session?.user?.user_metadata?.full_name || userEmail.split('@')[0]
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+    <header className="bg-white border-b border-gray-200 w-full shadow-sm" style={{ position: 'sticky', top: 0, zIndex: 9999, flexShrink: 0, minHeight: '56px' }}>
       <div className="flex items-center justify-between h-14 px-4 lg:px-6 w-full">
         {/* Left Section: Logo + Menu Button */}
         <div className="flex items-center space-x-4 flex-shrink-0">
           <button
             onClick={onMenuToggle}
-            className="sm:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            style={{ display: showNav ? 'none' : 'block' }}
             aria-label="Toggle menu"
           >
             <Menu className="h-5 w-5 text-gray-700" />
@@ -99,12 +112,17 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
         </div>
 
         {/* Center Section: Navigation Links */}
-        <nav className="flex items-center space-x-1 flex-1 justify-center">
+        <nav 
+          className="items-center space-x-1 flex-1 justify-center"
+          style={{ 
+            display: showNav ? 'flex' : 'none'
+          }}
+        >
           <Link
             href="/dashboards"
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
               pathname === '/dashboards'
-                ? 'bg-blue-50 text-blue-700'
+                ? 'bg-blue-600 text-white shadow-sm'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
@@ -114,7 +132,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             href="/scenarios"
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
               pathname === '/scenarios'
-                ? 'bg-blue-50 text-blue-700'
+                ? 'bg-blue-600 text-white shadow-sm'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
@@ -124,7 +142,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             href="/resources"
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
               pathname === '/resources'
-                ? 'bg-blue-50 text-blue-700'
+                ? 'bg-blue-600 text-white shadow-sm'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
@@ -134,7 +152,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             href="/reports"
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
               pathname === '/reports'
-                ? 'bg-blue-50 text-blue-700'
+                ? 'bg-blue-600 text-white shadow-sm'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
@@ -144,7 +162,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             href="/financials"
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
               pathname === '/financials'
-                ? 'bg-blue-50 text-blue-700'
+                ? 'bg-blue-600 text-white shadow-sm'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
@@ -157,7 +175,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
               onClick={() => setMoreMenuOpen(!moreMenuOpen)}
               className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 moreMenuOpen || ['/risks', '/monte-carlo', '/changes', '/feedback', '/admin/performance', '/admin/users'].includes(pathname)
-                  ? 'bg-blue-50 text-blue-700'
+                  ? 'bg-blue-600 text-white shadow-sm'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >

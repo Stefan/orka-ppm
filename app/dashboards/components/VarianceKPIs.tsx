@@ -114,126 +114,100 @@ function VarianceKPIs({ session, selectedCurrency = 'USD' }: VarianceKPIsProps) 
   }
 
   return (
-    <div className="space-y-4">
-      {/* Variance Alert Banner */}
-      {varianceData.projects_over_budget > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex items-center">
-            <AlertTriangle className="h-5 w-5 text-red-600 mr-2" />
-            <span className="text-sm text-red-800">
-              <strong>{varianceData.projects_over_budget}</strong> project{varianceData.projects_over_budget !== 1 ? 's' : ''} over budget
+    <div className="bg-white rounded-lg border border-gray-200 p-2 h-full flex flex-col">
+      {/* Compact header */}
+      <div className="flex items-center justify-between mb-1.5">
+        <h3 className="text-[8px] font-semibold text-gray-900 uppercase tracking-wide">{t('variance.kpis')}</h3>
+        {varianceData.projects_over_budget > 0 && (
+          <div className="flex items-center gap-1 px-1.5 py-0.5 bg-red-50 border border-red-200 rounded-full">
+            <AlertTriangle className="h-2 w-2 text-red-600" />
+            <span className="text-[8px] font-medium text-red-800">
+              {varianceData.projects_over_budget} {t('financials.overBudget')}
             </span>
           </div>
-        </div>
-      )}
-
-      {/* Variance KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Variance</p>
-              <p className={`text-xl sm:text-2xl font-bold ${
-                varianceData.total_variance >= 0 ? 'text-red-600' : 'text-green-600'
-              }`}
-              >
-                {varianceData.total_variance >= 0 ? '+' : ''}
-                {varianceData.total_variance.toLocaleString()} {varianceData.currency}
-              </p>
-            </div>
-            {varianceData.total_variance >= 0 ? 
-              <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-red-600" /> : 
-              <TrendingDown className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
-            }
-          </div>
-        </div>
-        
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Variance %</p>
-              <p className={`text-xl sm:text-2xl font-bold ${
-                varianceData.variance_percentage >= 0 ? 'text-red-600' : 'text-green-600'
-              }`}
-              >
-                {varianceData.variance_percentage >= 0 ? '+' : ''}
-                {varianceData.variance_percentage.toFixed(1)}%
-              </p>
-            </div>
-            <Target className="h-6 w-6 sm:h-8 sm:w-8 text-gray-600" />
-          </div>
-        </div>
-        
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Over Budget</p>
-              <p className="text-xl sm:text-2xl font-bold text-red-600">
-                {varianceData.projects_over_budget}
-              </p>
-            </div>
-            <AlertTriangle className="h-6 w-6 sm:h-8 sm:w-8 text-red-600" />
-          </div>
-        </div>
-        
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Under Budget</p>
-              <p className="text-xl sm:text-2xl font-bold text-green-600">
-                {varianceData.projects_under_budget}
-              </p>
-            </div>
-            <TrendingDown className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
-          </div>
-        </div>
+        )}
       </div>
 
-      {/* Commitments vs Actuals Summary */}
-      <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('variance.commitmentsVsActualsSummary')}</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">
-              {varianceData.total_commitments.toLocaleString()} {varianceData.currency}
-            </div>
-            <div className="text-sm text-gray-600">{t('variance.totalCommitments')}</div>
+      {/* Ultra-Compact KPI Grid - 4 columns, 2 rows, readable text */}
+      <div className="grid grid-cols-4 gap-1 flex-1">
+        <div className="bg-gray-50 p-1 rounded">
+          <div className="flex items-center justify-between mb-0.5">
+            <p className="text-xs font-medium text-gray-600 leading-tight">{t('variance.netVariance')}</p>
+            {varianceData.total_variance >= 0 ? 
+              <TrendingUp className="h-2 w-2 text-red-600" /> : 
+              <TrendingDown className="h-2 w-2 text-green-600" />
+            }
           </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">
-              {varianceData.total_actuals.toLocaleString()} {varianceData.currency}
-            </div>
-            <div className="text-sm text-gray-600">{t('variance.totalActuals')}</div>
-          </div>
-          <div className="text-center">
-            <div className={`text-2xl font-bold ${
-              varianceData.total_variance >= 0 ? 'text-red-600' : 'text-green-600'
-            }`}
-            >
-              {varianceData.total_variance >= 0 ? '+' : ''}
-              {varianceData.total_variance.toLocaleString()} {varianceData.currency}
-            </div>
-            <div className="text-sm text-gray-600">{t('variance.netVariance')}</div>
-          </div>
+          <p className={`text-xs font-bold leading-tight ${
+            varianceData.total_variance >= 0 ? 'text-red-600' : 'text-green-600'
+          }`}>
+            {varianceData.total_variance >= 0 ? '+' : ''}
+            {(varianceData.total_variance / 1000).toFixed(0)}k
+          </p>
         </div>
         
-        {/* Progress Bar */}
-        <div className="mt-4">
-          <div className="flex justify-between text-sm text-gray-600 mb-2">
-            <span>Spending Progress</span>
-            <span>{((varianceData.total_actuals / Math.max(varianceData.total_commitments, 1)) * 100).toFixed(1)}%</span>
+        <div className="bg-gray-50 p-1 rounded">
+          <div className="flex items-center justify-between mb-0.5">
+            <p className="text-xs font-medium text-gray-600 leading-tight">{t('financials.variance')} %</p>
+            <Target className="h-2 w-2 text-gray-600" />
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className={`h-2 rounded-full ${
-                varianceData.total_actuals > varianceData.total_commitments ? 'bg-red-500' : 'bg-blue-500'
-              }`}
-              style={{ 
-                width: `${Math.min(100, (varianceData.total_actuals / Math.max(varianceData.total_commitments, 1)) * 100)}%` 
-              }}
-            >
-            </div>
+          <p className={`text-xs font-bold leading-tight ${
+            varianceData.variance_percentage >= 0 ? 'text-red-600' : 'text-green-600'
+          }`}>
+            {varianceData.variance_percentage >= 0 ? '+' : ''}
+            {varianceData.variance_percentage.toFixed(1)}%
+          </p>
+        </div>
+        
+        <div className="bg-gray-50 p-1 rounded">
+          <div className="flex items-center justify-between mb-0.5">
+            <p className="text-xs font-medium text-gray-600 leading-tight">{t('financials.overBudget')}</p>
+            <AlertTriangle className="h-2 w-2 text-red-600" />
           </div>
+          <p className="text-xs font-bold leading-tight text-red-600">
+            {varianceData.projects_over_budget}
+          </p>
+        </div>
+        
+        <div className="bg-gray-50 p-1 rounded">
+          <div className="flex items-center justify-between mb-0.5">
+            <p className="text-xs font-medium text-gray-600 leading-tight">{t('financials.underBudget')}</p>
+            <TrendingDown className="h-2 w-2 text-green-600" />
+          </div>
+          <p className="text-xs font-bold leading-tight text-green-600">
+            {varianceData.projects_under_budget}
+          </p>
+        </div>
+
+        <div className="bg-gray-50 p-1 rounded">
+          <p className="text-xs font-medium text-gray-600 mb-0.5 leading-tight">{t('variance.totalCommitments')}</p>
+          <p className="text-xs font-bold leading-tight text-blue-600">
+            {(varianceData.total_commitments / 1000).toFixed(0)}k
+          </p>
+        </div>
+
+        <div className="bg-gray-50 p-1 rounded">
+          <p className="text-xs font-medium text-gray-600 mb-0.5 leading-tight">{t('variance.totalActuals')}</p>
+          <p className="text-xs font-bold leading-tight text-purple-600">
+            {(varianceData.total_actuals / 1000).toFixed(0)}k
+          </p>
+        </div>
+
+        <div className="bg-gray-50 p-1 rounded">
+          <p className="text-xs font-medium text-gray-600 mb-0.5 leading-tight">{t('variance.netVariance')}</p>
+          <p className={`text-xs font-bold leading-tight ${
+            varianceData.total_variance >= 0 ? 'text-red-600' : 'text-green-600'
+          }`}>
+            {varianceData.total_variance >= 0 ? '+' : ''}
+            {(varianceData.total_variance / 1000).toFixed(0)}k
+          </p>
+        </div>
+
+        <div className="bg-gray-50 p-1 rounded">
+          <p className="text-xs font-medium text-gray-600 mb-0.5 leading-tight">{t('financials.utilization')}</p>
+          <p className="text-xs font-bold leading-tight text-gray-900">
+            {((varianceData.total_actuals / Math.max(varianceData.total_commitments, 1)) * 100).toFixed(0)}%
+          </p>
         </div>
       </div>
     </div>

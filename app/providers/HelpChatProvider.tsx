@@ -238,7 +238,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
       ...prevState,
       userPreferences: preferences,
       sessionId,
-      language: preferences.language,
+      language: currentLanguage || preferences.language, // Use global language first
       proactiveTipsEnabled: preferences.proactiveTips,
       currentContext: detectPageContext()
     }))
@@ -249,12 +249,17 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
     if (session?.access_token) {
       helpChatAPI.setAuthToken(session.access_token)
     }
+  }, [session?.access_token, currentLanguage]) // Watch currentLanguage changes
 
-    // Sync current language TO server (don't pull from server to avoid overriding user choice)
-    if (user && currentLanguage) {
-      syncLanguageToServer(currentLanguage)
+  // Sync HelpChat language with global language
+  useEffect(() => {
+    if (currentLanguage && currentLanguage !== state.language) {
+      setState(prevState => ({
+        ...prevState,
+        language: currentLanguage
+      }))
     }
-  }, [session?.access_token, user?.id, currentLanguage, syncLanguageToServer]) // Added dependencies
+  }, [currentLanguage, state.language])
 
   // Update context when route changes
   useEffect(() => {
@@ -447,28 +452,29 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
 
   // Update preferences
   const updatePreferences = useCallback(async (preferences: Partial<HelpChatUserPreferences>) => {
-    const newPreferences = { ...state.userPreferences, ...preferences }
-    
-    setState(prevState => ({
-      ...prevState,
-      userPreferences: newPreferences,
-      language: newPreferences.language,
-      proactiveTipsEnabled: newPreferences.proactiveTips
-    }))
+    setState(prevState => {
+      const newPreferences = { ...prevState.userPreferences, ...preferences }
+      
+      return {
+        ...prevState,
+        userPreferences: newPreferences,
+        language: newPreferences.language,
+        proactiveTipsEnabled: newPreferences.proactiveTips
+      }
+    })
 
     // Save to localStorage
-    saveToStorage({ preferences: newPreferences })
+    saveToStorage({ preferences: { ...state.userPreferences, ...preferences } })
 
-    // If language changed, sync TO server
-    if (preferences.language && preferences.language !== state.language) {
+    // If language changed, sync TO server (but don't change global app language)
+    if (preferences.language) {
       try {
-        await setLanguage(preferences.language)
         await syncLanguageToServer(preferences.language)
       } catch (error) {
         console.error('Failed to update language preference on server:', error)
       }
     }
-  }, [state.userPreferences, state.language, saveToStorage, setLanguage])
+  }, [saveToStorage, syncLanguageToServer, state.userPreferences])
 
   // Dismiss tip
   const dismissTip = useCallback(async (tipId: string) => {
@@ -598,7 +604,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
         params.append('current_portfolio', state.currentContext.currentPortfolio)
       }
 
-      const response = await helpChatAPI.getProactiveTips(params.toString())
+      const response = await helpChatAPI.getProactiveTips(params)
       return response.tips.map((tip: any) => ({
         id: tip.id || tip.tip_id || '',
         type: (tip.type || tip.tip_type) as ProactiveTip['type'],
@@ -619,7 +625,9 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
 
   // Load proactive tips when context changes
   useEffect(() => {
-    if (state.proactiveTipsEnabled && user) {
+    // TEMPORARILY DISABLED: Proactive tips endpoint has issues
+    // TODO: Fix backend /tips endpoint
+    if (false && state.proactiveTipsEnabled && user) {
       const loadTips = async () => {
         const tips = await getProactiveTips()
         

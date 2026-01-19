@@ -916,6 +916,40 @@
       "actionFailed": "Nie udało się {action} użytkownika"
     }
   },
+  "auth": {
+    "signIn": "Zaloguj się do swojego konta",
+    "signUp": "Utwórz swoje konto",
+    "subtitle": "Zarządzanie portfelem projektów wspierane przez AI",
+    "email": "Adres e-mail",
+    "emailPlaceholder": "Wprowadź swój adres e-mail",
+    "password": "Hasło",
+    "passwordPlaceholder": "Wprowadź swoje hasło",
+    "newPasswordPlaceholder": "Utwórz bezpieczne hasło (min. 6 znaków)",
+    "passwordMinLength": "Hasło musi mieć co najmniej 6 znaków",
+    "signInButton": "Zaloguj się",
+    "signUpButton": "Zarejestruj się",
+    "loading": "Ładowanie...",
+    "redirecting": "Przekierowanie do pulpitu...",
+    "alreadyHaveAccount": "Masz już konto? Zaloguj się",
+    "needAccount": "Potrzebujesz konta? Zarejestruj się",
+    "forgotPassword": "Zapomniałeś hasła?",
+    "errors": {
+      "bothRequired": "Proszę wprowadzić e-mail i hasło",
+      "invalidEmail": "Proszę wprowadzić prawidłowy adres e-mail",
+      "passwordTooShort": "Hasło musi mieć co najmniej 6 znaków",
+      "invalidCredentials": "Nieprawidłowy e-mail lub hasło. Sprawdź swoje dane logowania i spróbuj ponownie.",
+      "emailNotConfirmed": "Sprawdź swoją pocztę e-mail i kliknij link potwierdzający przed zalogowaniem.",
+      "userAlreadyRegistered": "Ten e-mail jest już zarejestrowany. Zaloguj się zamiast tego.",
+      "configError": "Błąd konfiguracji: Wykryto nieprawidłowy klucz API. Zmienne środowiskowe muszą zostać naprawione.",
+      "networkError": "Wykryto problem z połączeniem sieciowym. Sprawdź swoje połączenie internetowe i spróbuj ponownie.",
+      "unexpectedError": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie."
+    },
+    "success": {
+      "accountCreated": "Konto utworzone pomyślnie! Sprawdź swoją pocztę e-mail w celu potwierdzenia.",
+      "accountConfirmed": "Konto utworzone i potwierdzone! Możesz się teraz zalogować.",
+      "loginSuccess": "Logowanie pomyślne! Przekierowanie do pulpitu..."
+    }
+  },
   "changes": {
     "implementationTracker": {
       "title": "Implementation Tracking",

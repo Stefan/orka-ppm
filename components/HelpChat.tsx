@@ -83,7 +83,30 @@ export function HelpChat({ className }: HelpChatProps) {
   }, [handleSubmit])
 
   const handleQuickAction = useCallback((action: QuickAction) => {
-    action.action()
+    // Backend sends action as string, frontend expects function
+    // Handle string actions by parsing them
+    if (typeof action.action === 'string') {
+      const actionStr = action.action as unknown as string
+      
+      // Parse action string (format: "action_type:target" or just "action_type")
+      if (actionStr.startsWith('navigate:') || actionStr.startsWith('navigate_to_')) {
+        const target = actionStr.replace('navigate:', '').replace('navigate_to_', '/')
+        window.location.href = target.startsWith('/') ? target : `/${target}`
+      } else if (actionStr.startsWith('guide:')) {
+        const guideId = actionStr.replace('guide:', '')
+        console.log('Open guide:', guideId)
+        // TODO: Implement guide opening
+      } else if (actionStr.startsWith('tour:')) {
+        const tourId = actionStr.replace('tour:', '')
+        console.log('Start tour:', tourId)
+        // TODO: Implement tour starting
+      } else {
+        console.log('Unknown action:', actionStr)
+      }
+    } else if (typeof action.action === 'function') {
+      // If it's already a function, call it
+      action.action()
+    }
   }, [])
 
   const handleFeedback = useCallback(async (
@@ -224,7 +247,7 @@ export function HelpChat({ className }: HelpChatProps) {
               <div ref={messagesEndRef} />
             </main>
 
-            <footer className="border-t border-gray-200 p-4 bg-white sticky bottom-0 z-10">
+            <footer className="border-t border-gray-200 p-4 bg-white">
               <form onSubmit={handleSubmit} className="flex space-x-3">
                 <textarea
                   ref={inputRef}
@@ -306,7 +329,8 @@ export function HelpChat({ className }: HelpChatProps) {
 
           <main 
             ref={messagesContainerRef}
-            className="flex-1 overflow-y-auto p-4 space-y-4"
+            className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth"
+            style={{ scrollBehavior: 'smooth' }}
           >
             {state.messages.length === 0 ? (
               <div className="text-center py-8">

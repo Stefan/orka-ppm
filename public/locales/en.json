@@ -926,6 +926,40 @@
       "actionFailed": "Failed to {action} user"
     }
   },
+  "auth": {
+    "signIn": "Sign in to your account",
+    "signUp": "Create your account",
+    "subtitle": "AI-Powered Project Portfolio Management",
+    "email": "Email Address",
+    "emailPlaceholder": "Enter your email address",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "newPasswordPlaceholder": "Create a secure password (min. 6 characters)",
+    "passwordMinLength": "Password must be at least 6 characters long",
+    "signInButton": "Sign In",
+    "signUpButton": "Sign Up",
+    "loading": "Loading...",
+    "redirecting": "Redirecting to dashboard...",
+    "alreadyHaveAccount": "Already have an account? Sign in",
+    "needAccount": "Need an account? Sign up",
+    "forgotPassword": "Forgot password?",
+    "errors": {
+      "bothRequired": "Please enter both email and password",
+      "invalidEmail": "Please enter a valid email address",
+      "passwordTooShort": "Password must be at least 6 characters long",
+      "invalidCredentials": "Invalid email or password. Please check your credentials and try again.",
+      "emailNotConfirmed": "Please check your email and click the confirmation link before signing in.",
+      "userAlreadyRegistered": "This email is already registered. Please sign in instead.",
+      "configError": "Configuration error: Invalid API key detected. Environment variables need to be fixed.",
+      "networkError": "Network connection issue detected. Please check your internet connection and try again.",
+      "unexpectedError": "An unexpected error occurred. Please try again."
+    },
+    "success": {
+      "accountCreated": "Account created successfully! Please check your email to confirm.",
+      "accountConfirmed": "Account created and confirmed! You can now sign in.",
+      "loginSuccess": "Login successful! Redirecting to dashboard..."
+    }
+  },
   "changes": {
     "implementationTracker": {
       "title": "Implementation Tracking",

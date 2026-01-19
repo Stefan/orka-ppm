@@ -922,6 +922,40 @@
       "actionFailed": "Fehler beim {action} des Benutzers"
     }
   },
+  "auth": {
+    "signIn": "Bei Ihrem Konto anmelden",
+    "signUp": "Konto erstellen",
+    "subtitle": "KI-gestütztes Projekt- und Portfolio-Management",
+    "email": "E-Mail-Adresse",
+    "emailPlaceholder": "Geben Sie Ihre E-Mail-Adresse ein",
+    "password": "Passwort",
+    "passwordPlaceholder": "Geben Sie Ihr Passwort ein",
+    "newPasswordPlaceholder": "Erstellen Sie ein sicheres Passwort (mind. 6 Zeichen)",
+    "passwordMinLength": "Das Passwort muss mindestens 6 Zeichen lang sein",
+    "signInButton": "Anmelden",
+    "signUpButton": "Registrieren",
+    "loading": "Lädt...",
+    "redirecting": "Weiterleitung zum Dashboard...",
+    "alreadyHaveAccount": "Haben Sie bereits ein Konto? Anmelden",
+    "needAccount": "Benötigen Sie ein Konto? Registrieren",
+    "forgotPassword": "Passwort vergessen?",
+    "errors": {
+      "bothRequired": "Bitte geben Sie E-Mail und Passwort ein",
+      "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "passwordTooShort": "Das Passwort muss mindestens 6 Zeichen lang sein",
+      "invalidCredentials": "Ungültige E-Mail oder Passwort. Bitte überprüfen Sie Ihre Anmeldedaten und versuchen Sie es erneut.",
+      "emailNotConfirmed": "Bitte überprüfen Sie Ihre E-Mail und klicken Sie auf den Bestätigungslink, bevor Sie sich anmelden.",
+      "userAlreadyRegistered": "Diese E-Mail ist bereits registriert. Bitte melden Sie sich stattdessen an.",
+      "configError": "Konfigurationsfehler: Ungültiger API-Schlüssel erkannt. Umgebungsvariablen müssen korrigiert werden.",
+      "networkError": "Netzwerkverbindungsproblem erkannt. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+      "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+    },
+    "success": {
+      "accountCreated": "Konto erfolgreich erstellt! Bitte überprüfen Sie Ihre E-Mail zur Bestätigung.",
+      "accountConfirmed": "Konto erstellt und bestätigt! Sie können sich jetzt anmelden.",
+      "loginSuccess": "Anmeldung erfolgreich! Weiterleitung zum Dashboard..."
+    }
+  },
   "changes": {
     "implementationTracker": {
       "title": "Implementation Tracking",

@@ -61,7 +61,7 @@ export interface SourceReference {
 export interface QuickAction {
   id: string
   label: string
-  action: () => void
+  action: (() => void) | string  // Support both function and string actions
   icon?: string
   variant?: 'primary' | 'secondary' | 'ghost'
 }
