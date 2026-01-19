@@ -49,6 +49,20 @@ jobs:
     name: Performance Tests
     runs-on: ubuntu-latest
     
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: orka_ppm_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
     strategy:
       matrix:
         device: [desktop, mobile, tablet]
@@ -63,13 +77,33 @@ jobs:
           node-version: '20'
           cache: 'npm'
           
-      - name: Install dependencies
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install frontend dependencies
         run: npm ci
         
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
         
-      - name: Build application
+      - name: Start backend server
+        run: |
+          cd backend
+          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          sleep 10
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/orka_ppm_test
+          SKIP_PRE_STARTUP_TESTS: true
+          
+      - name: Build frontend
         run: npm run build
         
       - name: Run performance tests
@@ -87,6 +121,7 @@ jobs:
           esac
         env:
           CI: true
+          BACKEND_URL: http://localhost:8000
           
       - name: Upload performance test results
         uses: actions/upload-artifact@v4
@@ -102,6 +137,20 @@ jobs:
     name: Cross-Device Tests
     runs-on: ubuntu-latest
     
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: orka_ppm_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -112,19 +161,40 @@ jobs:
           node-version: '20'
           cache: 'npm'
           
-      - name: Install dependencies
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install frontend dependencies
         run: npm ci
         
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
         
-      - name: Build application
+      - name: Start backend server
+        run: |
+          cd backend
+          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          sleep 10
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/orka_ppm_test
+          SKIP_PRE_STARTUP_TESTS: true
+          
+      - name: Build frontend
         run: npm run build
         
       - name: Run cross-device tests
         run: npm run test:cross-device
         env:
           CI: true
+          BACKEND_URL: http://localhost:8000
           
       - name: Upload cross-device test results
         uses: actions/upload-artifact@v4
@@ -140,6 +210,20 @@ jobs:
     name: Visual Regression Tests
     runs-on: ubuntu-latest
     
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: orka_ppm_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -150,19 +234,40 @@ jobs:
           node-version: '20'
           cache: 'npm'
           
-      - name: Install dependencies
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install frontend dependencies
         run: npm ci
         
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
         
-      - name: Build application
+      - name: Start backend server
+        run: |
+          cd backend
+          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          sleep 10
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/orka_ppm_test
+          SKIP_PRE_STARTUP_TESTS: true
+          
+      - name: Build frontend
         run: npm run build
         
       - name: Run visual regression tests
         run: npm run test:visual
         env:
           CI: true
+          BACKEND_URL: http://localhost:8000
           
       - name: Upload visual regression results
         uses: actions/upload-artifact@v4
