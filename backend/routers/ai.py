@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from uuid import UUID
 from typing import Optional, Dict, Any, List
 from datetime import datetime
+import os
 
 from auth.dependencies import get_current_user
 from auth.rbac import require_permission, Permission
@@ -14,6 +15,31 @@ from config.database import supabase
 from utils.converters import convert_uuids
 
 router = APIRouter(prefix="/ai", tags=["ai"])
+
+# Initialize AI agents lazily
+_rag_agent = None
+
+def get_rag_agent():
+    """Get or initialize RAG agent"""
+    global _rag_agent
+    if _rag_agent is None:
+        try:
+            from ai_agents import RAGReporterAgent
+            openai_api_key = os.getenv("OPENAI_API_KEY")
+            openai_base_url = os.getenv("OPENAI_BASE_URL")  # For Grok or other providers
+            
+            if not openai_api_key:
+                return None
+            
+            _rag_agent = RAGReporterAgent(
+                supabase_client=supabase,
+                openai_api_key=openai_api_key,
+                base_url=openai_base_url
+            )
+        except Exception as e:
+            print(f"Failed to initialize RAG agent: {e}")
+            return None
+    return _rag_agent
 
 class RAGQueryRequest(BaseModel):
     query: str
@@ -28,20 +54,32 @@ async def query_rag_agent(
 ):
     """Query the RAG (Retrieval-Augmented Generation) agent"""
     try:
-        # This would integrate with the actual AI agents
-        # For now, return a mock response
-        return {
-            "query": request.query,
-            "response": "This is a mock RAG response. The actual implementation would use the AI agents to provide intelligent answers based on project data and documentation.",
-            "sources": [
-                {"type": "project", "id": "proj-123", "similarity": 0.95},
-                {"type": "documentation", "id": "doc-456", "similarity": 0.87}
-            ],
-            "confidence_score": 0.91,
-            "conversation_id": request.conversation_id or f"conv-{int(datetime.now().timestamp())}",
-            "response_time_ms": 850,
-            "project_id": str(request.project_id) if request.project_id else None
-        }
+        rag_agent = get_rag_agent()
+        
+        # If RAG agent is not available (no API key), return mock response
+        if rag_agent is None:
+            return {
+                "query": request.query,
+                "response": "⚠️ AI-Features sind derzeit nicht verfügbar. Bitte konfigurieren Sie den OPENAI_API_KEY in den Umgebungsvariablen.\n\nMock-Antwort: Dies ist eine Beispielantwort. Die echte KI würde Ihre Projektdaten analysieren und intelligente Einblicke basierend auf Ihren spezifischen Anforderungen liefern.",
+                "sources": [
+                    {"type": "project", "id": "mock-proj-123", "similarity": 0.95},
+                    {"type": "documentation", "id": "mock-doc-456", "similarity": 0.87}
+                ],
+                "confidence_score": 0.0,
+                "conversation_id": request.conversation_id or f"conv-{int(datetime.now().timestamp())}",
+                "response_time_ms": 50,
+                "status": "ai_unavailable"
+            }
+        
+        # Use real RAG agent
+        user_id = current_user.get("user_id")
+        result = await rag_agent.process_rag_query(
+            query=request.query,
+            user_id=user_id,
+            conversation_id=request.conversation_id
+        )
+        
+        return result
         
     except Exception as e:
         print(f"RAG query error: {e}")
