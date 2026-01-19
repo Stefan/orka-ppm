@@ -260,7 +260,7 @@ export default function ScenariosPage() {
 
   return (
     <AppLayout>
-      <ResponsiveContainer padding="sm" className="space-y-3 pb-32 md:pb-28">
+      <ResponsiveContainer padding="sm" className="space-y-3 pb-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-2 sm:space-y-0">
           <div>
@@ -376,7 +376,7 @@ export default function ScenariosPage() {
                   </button>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-2 max-h-[calc(100vh-300px)] overflow-y-auto pr-2">
                   {scenarios.map((scenario) => (
                     <div
                       key={scenario.id}
