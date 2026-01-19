@@ -3,6 +3,7 @@ AI agent endpoints - RAG, resource optimization, risk forecasting, help chat
 """
 
 from fastapi import APIRouter, HTTPException, Depends, status, Query
+from pydantic import BaseModel
 from uuid import UUID
 from typing import Optional, Dict, Any, List
 from datetime import datetime
@@ -14,11 +15,15 @@ from utils.converters import convert_uuids
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
+class RAGQueryRequest(BaseModel):
+    query: str
+    context: Optional[str] = None
+    project_id: Optional[UUID] = None
+    conversation_id: Optional[str] = None
+
 @router.post("/rag/query")
 async def query_rag_agent(
-    query: str,
-    context: Optional[str] = None,
-    project_id: Optional[UUID] = None,
+    request: RAGQueryRequest,
     current_user = Depends(require_permission(Permission.ai_rag_query))
 ):
     """Query the RAG (Retrieval-Augmented Generation) agent"""
@@ -26,14 +31,16 @@ async def query_rag_agent(
         # This would integrate with the actual AI agents
         # For now, return a mock response
         return {
-            "query": query,
+            "query": request.query,
             "response": "This is a mock RAG response. The actual implementation would use the AI agents to provide intelligent answers based on project data and documentation.",
             "sources": [
-                {"title": "Project Documentation", "relevance": 0.95},
-                {"title": "Best Practices Guide", "relevance": 0.87}
+                {"type": "project", "id": "proj-123", "similarity": 0.95},
+                {"type": "documentation", "id": "doc-456", "similarity": 0.87}
             ],
-            "confidence": 0.91,
-            "project_id": str(project_id) if project_id else None
+            "confidence_score": 0.91,
+            "conversation_id": request.conversation_id or f"conv-{int(datetime.now().timestamp())}",
+            "response_time_ms": 850,
+            "project_id": str(request.project_id) if request.project_id else None
         }
         
     except Exception as e:
