@@ -150,6 +150,12 @@ const nextConfig: NextConfig = {
   // Redirects for API calls
   async rewrites() {
     return [
+      // Exclude optimized dashboard routes from rewrite - let Next.js handle them
+      {
+        source: '/api/optimized/:path*',
+        destination: '/api/optimized/:path*',
+      },
+      // Rewrite all other /api calls to backend
       {
         source: '/api/:path*',
         destination: `${process.env.NEXT_PUBLIC_API_URL || 'https://orka-ppm.onrender.com'}/:path*`,

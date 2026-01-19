@@ -4,6 +4,7 @@ import { useState, useEffect, memo } from 'react'
 import { TrendingUp, TrendingDown, AlertTriangle, Target } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
 import { useTranslations } from '../../../lib/i18n/context'
+import { resilientFetch } from '@/lib/api/resilient-fetch'
 
 interface VarianceKPIs {
   total_variance: number
@@ -42,67 +43,48 @@ function VarianceKPIs({ session, selectedCurrency = 'USD' }: VarianceKPIsProps) 
     setLoading(true)
     setError(null)
     
-    try {
-      const url = getApiUrl('/csv-import/variances')
-      console.log('Fetching variance data from:', url)
-      
-      const response = await fetch(url, {
+    const result = await resilientFetch<{ variances: any[] }>(
+      getApiUrl('/csv-import/variances'),
+      {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
-        }
-      })
-      
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error('Variance API error:', response.status, errorText)
-        
-        // Don't throw error for 404 or 500 - just show empty state
-        if (response.status === 404 || response.status === 500) {
-          console.warn('Variance endpoint not available, showing empty state')
-          setVarianceData(null)
-          setLoading(false)
-          return
-        }
-        
-        throw new Error(`Failed to fetch variance data (${response.status}): ${errorText}`)
+        },
+        timeout: 5000,
+        retries: 1,
+        fallbackData: { variances: [] },
+        silentFail: true,
       }
-      
-      const data = await response.json()
-      console.log('Variance API response:', data)
-      const variances = data?.variances || []
-      
-      if ((variances?.length || 0) === 0) {
-        setVarianceData(null)
-        return
-      }
-      
-      // Calculate KPIs from variance data
-      const totalCommitments = variances?.reduce((sum: number, v: any) => sum + (v?.total_commitment || 0), 0) || 0
-      const totalActuals = variances?.reduce((sum: number, v: any) => sum + (v?.total_actual || 0), 0) || 0
-      const totalVariance = totalActuals - totalCommitments
-      const variancePercentage = totalCommitments > 0 ? (totalVariance / totalCommitments * 100) : 0
-      
-      const projectsOverBudget = variances?.filter((v: any) => v?.status === 'over')?.length || 0
-      const projectsUnderBudget = variances?.filter((v: any) => v?.status === 'under')?.length || 0
-      
-      setVarianceData({
-        total_variance: totalVariance,
-        variance_percentage: variancePercentage,
-        projects_over_budget: projectsOverBudget,
-        projects_under_budget: projectsUnderBudget,
-        total_commitments: totalCommitments,
-        total_actuals: totalActuals,
-        currency: selectedCurrency
-      })
-      
-    } catch (error: unknown) {
-      console.error('Error fetching variance KPIs:', error)
-      setError(error instanceof Error ? error.message : 'Failed to fetch variance data')
+    )
+    
+    if (!result.data || result.data.variances.length === 0) {
       setVarianceData(null)
-    } finally {
       setLoading(false)
+      return
     }
+    
+    const variances = result.data.variances
+    
+    // Calculate KPIs from variance data
+    const totalCommitments = variances?.reduce((sum: number, v: any) => sum + (v?.total_commitment || 0), 0) || 0
+    const totalActuals = variances?.reduce((sum: number, v: any) => sum + (v?.total_actual || 0), 0) || 0
+    const totalVariance = totalActuals - totalCommitments
+    const variancePercentage = totalCommitments > 0 ? (totalVariance / totalCommitments * 100) : 0
+    
+    const projectsOverBudget = variances?.filter((v: any) => v?.status === 'over')?.length || 0
+    const projectsUnderBudget = variances?.filter((v: any) => v?.status === 'under')?.length || 0
+    
+    setVarianceData({
+      total_variance: totalVariance,
+      variance_percentage: variancePercentage,
+      projects_over_budget: projectsOverBudget,
+      projects_under_budget: projectsUnderBudget,
+      total_commitments: totalCommitments,
+      total_actuals: totalActuals,
+      currency: selectedCurrency
+    })
+    
+    setLoading(false)
   }
 
   if (loading) {

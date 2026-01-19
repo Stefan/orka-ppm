@@ -417,6 +417,12 @@
     "errorLoading": "Fehler beim Laden der Risiken"
   },
   "errors": {
+    "somethingWentWrong": "Etwas ist schiefgelaufen",
+    "componentLoadError": "Beim Laden dieser Komponente ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    "technicalDetails": "Technische Details",
+    "reloadPage": "Seite neu laden",
+    "widgetNotAvailable": "{widget} nicht verfügbar",
+    "widgetLoadError": "Diese Komponente konnte nicht geladen werden. Die restlichen Daten werden normal angezeigt.",
     "boundary": {
       "title": "{context} Fehler",
       "unexpected": "Ein unerwarteter Fehler ist aufgetreten",

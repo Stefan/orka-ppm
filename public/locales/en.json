@@ -421,6 +421,12 @@
     "errorLoading": "Error loading risks"
   },
   "errors": {
+    "somethingWentWrong": "Something went wrong",
+    "componentLoadError": "An error occurred while loading this component. Please try again.",
+    "technicalDetails": "Technical Details",
+    "reloadPage": "Reload Page",
+    "widgetNotAvailable": "{widget} not available",
+    "widgetLoadError": "This component could not be loaded. The remaining data will be displayed normally.",
     "boundary": {
       "title": "{context} Error",
       "unexpected": "An unexpected error occurred",

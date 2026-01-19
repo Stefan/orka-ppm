@@ -152,11 +152,20 @@ export const API_CONFIG = {
 
 // API URL builder with validation and fallback
 export function getApiUrl(endpoint: string): string {
+  // Ensure endpoint starts with /
+  const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
+  
+  // Check if this is an optimized dashboard endpoint - use Next.js API routes
+  if (normalizedEndpoint.startsWith('/optimized/')) {
+    return `/api${normalizedEndpoint}`
+  }
+  
+  // For all other endpoints, use backend URL
   const baseUrl = API_CONFIG.baseURL
   
   if (!baseUrl) {
     console.warn('API_URL not configured, using localhost fallback')
-    return `http://localhost:8000${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`
+    return `http://localhost:8000${normalizedEndpoint}`
   }
   
   // Validate URL format
@@ -166,9 +175,6 @@ export function getApiUrl(endpoint: string): string {
     console.error('Invalid API_URL format:', baseUrl)
     throw new Error(`Invalid API URL: ${baseUrl}`)
   }
-  
-  // Ensure endpoint starts with /
-  const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
   
   // Remove trailing slash from baseUrl
   const cleanBaseUrl = baseUrl.replace(/\/$/, '')
@@ -192,6 +198,8 @@ export async function apiRequest<T = unknown>(
 ): Promise<T> {
   const url = getApiUrl(endpoint)
   
+  console.log(`🌐 API Request: ${endpoint} -> ${url}`)
+  
   try {
     const response = await fetch(url, {
       ...options,
@@ -200,6 +208,8 @@ export async function apiRequest<T = unknown>(
         ...options.headers,
       },
     })
+    
+    console.log(`✅ Response: ${endpoint} - ${response.status}`)
     
     if (!response.ok) {
       // Try mock data fallback before throwing error
@@ -215,12 +225,12 @@ export async function apiRequest<T = unknown>(
     const data = await response.json()
     return data as T
   } catch (error: unknown) {
-    console.error('API request error:', error)
+    console.error(`❌ API request error for ${endpoint}:`, error)
     
     // If API fails, try mock data fallback
     const mockData = getMockData(endpoint)
     if (mockData) {
-      console.warn(`🔄 Using mock data for ${endpoint}`)
+      console.warn(`🔄 Using mock data for ${endpoint} (fetch failed)`)
       return mockData as T
     }
     

@@ -3,6 +3,7 @@
 import { useState, useEffect, memo } from 'react'
 import { AlertTriangle, CheckCircle, Clock, X } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
+import { resilientFetch } from '@/lib/api/resilient-fetch'
 
 interface VarianceAlert {
   id: string
@@ -45,54 +46,27 @@ function VarianceAlerts({ session, onAlertCount }: VarianceAlertsProps) {
     setLoading(true)
     setError(null)
     
-    try {
-      const response = await fetch(getApiUrl('/variance/alerts'), {
+    const result = await resilientFetch<{ alerts: VarianceAlert[] }>(
+      getApiUrl('/variance/alerts'),
+      {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
-        }
-      })
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch variance alerts')
-      }
-      
-      const data = await response.json()
-      setAlerts(data.alerts || [])
-      
-    } catch (error: unknown) {
-      console.error('Error fetching variance alerts:', error)
-      setError(error instanceof Error ? error.message : 'Failed to fetch variance alerts')
-      
-      // Create mock alerts for demonstration
-      const mockAlerts: VarianceAlert[] = [
-        {
-          id: '1',
-          project_id: 'Project Alpha',
-          variance_amount: 15000,
-          variance_percentage: 12.5,
-          threshold_percentage: 10,
-          severity: 'high',
-          message: 'Project Alpha has exceeded budget threshold by 12.5%',
-          created_at: new Date().toISOString(),
-          resolved: false
         },
-        {
-          id: '2',
-          project_id: 'Project Beta',
-          variance_amount: 8000,
-          variance_percentage: 6.2,
-          threshold_percentage: 5,
-          severity: 'medium',
-          message: 'Project Beta is approaching budget limit at 6.2% variance',
-          created_at: new Date(Date.now() - 86400000).toISOString(),
-          resolved: false
-        }
-      ]
-      setAlerts(mockAlerts)
-    } finally {
-      setLoading(false)
+        timeout: 5000,
+        retries: 1,
+        fallbackData: { alerts: [] },
+        silentFail: true, // Don't spam console with errors
+      }
+    )
+    
+    if (result.data) {
+      setAlerts(result.data.alerts || [])
+    } else {
+      setAlerts([])
     }
+    
+    setLoading(false)
   }
 
   const resolveAlert = async (alertId: string) => {
