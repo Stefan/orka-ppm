@@ -207,7 +207,7 @@ export default function Reports() {
     setIsLoading(true)
 
     try {
-      const response = await fetch(getApiUrl('/ai/rag-query'), {
+      const response = await fetch(getApiUrl('/ai/rag/query'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
