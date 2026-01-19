@@ -1,14 +1,11 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import { 
-  Copy, 
-  Check, 
   ExternalLink, 
-  ThumbsUp, 
   Star,
   AlertCircle,
   Info,
@@ -43,7 +40,6 @@ export function MessageRenderer({
   setFeedbackMessageId,
   className
 }: MessageRendererProps) {
-  const [copySuccess, setCopySuccess] = useState(false)
   const [expandedSources, setExpandedSources] = useState(false)
 
   const isUser = message.type === 'user'
@@ -53,16 +49,6 @@ export function MessageRenderer({
   const messageId = `message-${message.id}`
   const contentId = `content-${message.id}`
   const actionsId = `actions-${message.id}`
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await onCopy(message.content)
-      setCopySuccess(true)
-      setTimeout(() => setCopySuccess(false), 2000)
-    } catch (error) {
-      console.error('Failed to copy message:', error)
-    }
-  }, [message.content, onCopy])
 
   const getMessageIcon = () => {
     switch (message.type) {
@@ -276,31 +262,7 @@ export function MessageRenderer({
           )}
         </div>
 
-        {!isUser && (
-          <footer className="mt-3 pt-3 border-t-2 border-gray-200 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={handleCopy}
-                className="p-1 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors"
-                title="Copy message"
-              >
-                {copySuccess ? (
-                  <Check className="h-4 w-4 text-green-500" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </button>
 
-              <button
-                onClick={() => setFeedbackMessageId(message.id)}
-                className="p-1 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors"
-                title="Provide feedback"
-              >
-                <ThumbsUp className="h-4 w-4" />
-              </button>
-            </div>
-          </footer>
-        )}
       </div>
 
       {feedbackMessageId === message.id && (
