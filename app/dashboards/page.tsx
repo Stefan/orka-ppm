@@ -283,8 +283,8 @@ export default function CompactDashboard() {
 
   return (
     <AppLayout>
-      {/* Compact container with reduced spacing + bottom margin for quick actions */}
-      <div className="max-w-[1600px] mx-auto p-3 sm:p-4 md:p-6 space-y-2 md:space-y-3 pb-20 md:pb-24">
+      {/* Compact container with reduced spacing */}
+      <div className="max-w-[1600px] mx-auto p-3 sm:p-4 md:p-6 space-y-2 md:space-y-3">
         
         {/* Header - Ultra-Compact with alerts inline - standardized font sizes */}
         <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -402,7 +402,7 @@ export default function CompactDashboard() {
         </div>
 
         {/* Recent Projects Grid - Ultra Compact - standardized font sizes */}
-        <div className="bg-white rounded-lg border border-gray-200 p-2">
+        <div className="bg-white rounded-lg border border-gray-200 p-2 mb-20">
           <h2 className="text-[10px] font-semibold text-gray-900 mb-1.5 uppercase tracking-wide">{t('projects.recentProjects')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1.5 max-h-[80px] overflow-y-auto">
             {recentProjects.slice(0, 12).map((project) => (
@@ -416,33 +416,35 @@ export default function CompactDashboard() {
       </div>
 
       {/* BOTTOM: Quick Actions - Fixed at bottom of viewport with higher z-index */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-300 p-3 shadow-2xl z-50">
-        <div className="max-w-[1600px] mx-auto flex items-center gap-2 overflow-x-auto">
-          <span className="text-xs font-semibold text-gray-900 uppercase tracking-wide whitespace-nowrap mr-2">{t('actions.quickActions')}:</span>
-          <button onClick={() => {}} className="flex items-center gap-1.5 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
-            <BarChart3 size={16} className="text-gray-600" />
-            <span className="text-sm font-medium">{t('actions.scenarios')}</span>
-          </button>
-          <button onClick={() => {}} className="flex items-center gap-1.5 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
-            <Users size={16} className="text-gray-600" />
-            <span className="text-sm font-medium">{t('actions.resources')}</span>
-          </button>
-          <button onClick={() => {}} className="flex items-center gap-1.5 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
-            <DollarSign size={16} className="text-gray-600" />
-            <span className="text-sm font-medium">{t('actions.financials')}</span>
-          </button>
-          <button onClick={() => {}} className="flex items-center gap-1.5 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
-            <FileText size={16} className="text-gray-600" />
-            <span className="text-sm font-medium">{t('actions.reports')}</span>
-          </button>
-          <button onClick={() => {}} className="flex items-center gap-1.5 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
-            <Clock size={16} className="text-gray-600" />
-            <span className="text-sm font-medium">Timeline</span>
-          </button>
-          <button onClick={() => {}} className="flex items-center gap-1.5 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
-            <TrendingUp size={16} className="text-gray-600" />
-            <span className="text-sm font-medium">Analytics</span>
-          </button>
+      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-white/95 border-t-2 border-gray-300 py-2 px-3 shadow-2xl z-50">
+        <div className="max-w-[1600px] mx-auto">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+            <span className="text-xs font-bold text-gray-700 uppercase tracking-wide whitespace-nowrap mr-1">{t('actions.quickActions')}:</span>
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all whitespace-nowrap shadow-md hover:shadow-lg">
+              <BarChart3 size={18} />
+              <span className="text-sm font-medium">{t('actions.scenarios')}</span>
+            </button>
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
+              <Users size={18} className="text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">{t('actions.resources')}</span>
+            </button>
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
+              <DollarSign size={18} className="text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">{t('actions.financials')}</span>
+            </button>
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
+              <FileText size={18} className="text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">{t('actions.reports')}</span>
+            </button>
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
+              <Clock size={18} className="text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">Timeline</span>
+            </button>
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
+              <TrendingUp size={18} className="text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">Analytics</span>
+            </button>
+          </div>
         </div>
       </div>
     </AppLayout>
