@@ -411,14 +411,14 @@ export default function ScenariosPage() {
                               <div className="flex items-center space-x-1 flex-shrink-0">
                                 <button
                                   onClick={() => {/* TODO: Edit scenario */}}
-                                  className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                  className="p-1.5 text-gray-600 hover:text-gray-900 rounded transition-colors"
                                   title="Edit scenario"
                                 >
                                   <Edit3 className="h-4 w-4" />
                                 </button>
                                 <button
                                   onClick={() => deleteScenario(scenario.id)}
-                                  className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                  className="p-1.5 text-gray-600 hover:text-red-600 rounded transition-colors"
                                   title="Delete scenario"
                                 >
                                   <Trash2 className="h-4 w-4" />
