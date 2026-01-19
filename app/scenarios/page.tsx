@@ -386,8 +386,8 @@ export default function ScenariosPage() {
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start space-x-2">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start space-x-2 flex-1 min-w-0">
                           <input
                             type="checkbox"
                             checked={selectedScenarios.includes(scenario.id)}
@@ -398,81 +398,73 @@ export default function ScenariosPage() {
                                 setSelectedScenarios(selectedScenarios.filter(id => id !== scenario.id))
                               }
                             }}
-                            className="mt-0.5 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                            className="mt-0.5 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded flex-shrink-0"
                           />
-                          <div className="flex-1">
-                            <h4 className="text-sm font-semibold text-gray-900">{scenario.name}</h4>
-                            {scenario.description && (
-                              <p className="text-xs text-gray-600 mt-0.5">{scenario.description}</p>
-                            )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-sm font-semibold text-gray-900">{scenario.name}</h4>
+                                {scenario.description && (
+                                  <p className="text-sm text-gray-600 mt-0.5">{scenario.description}</p>
+                                )}
+                              </div>
+                              <div className="flex items-center space-x-1 flex-shrink-0">
+                                <button
+                                  onClick={() => {/* TODO: Edit scenario */}}
+                                  className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                                >
+                                  <Edit3 className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() => deleteScenario(scenario.id)}
+                                  className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </div>
                             
-                            {/* Impact Summary */}
-                            <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            {/* Impact Summary - Horizontal Layout */}
+                            <div className="flex flex-wrap items-center gap-4">
                               {/* Timeline Impact */}
                               {scenario.timeline_impact && (
-                                <div className="flex items-center space-x-1.5">
-                                  <Clock className="h-3 w-3 text-gray-400" />
-                                  <div>
-                                    <div className={`text-xs font-medium ${getImpactColor(scenario.timeline_impact.duration_change)}`}>
-                                      {getImpactIcon(scenario.timeline_impact.duration_change)}
-                                      <span className="ml-0.5">
-                                        {formatDuration(scenario.timeline_impact.duration_change)}
-                                      </span>
-                                    </div>
-                                    <div className="text-[10px] text-gray-500">{t('scenarios.timeline')}</div>
-                                  </div>
+                                <div className="flex items-center gap-1.5">
+                                  <Clock className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                  <span className="text-xs text-gray-500">Timeline:</span>
+                                  <span className={`text-sm font-medium ${getImpactColor(scenario.timeline_impact.duration_change)}`}>
+                                    {formatDuration(scenario.timeline_impact.duration_change)}
+                                  </span>
                                 </div>
                               )}
                               
                               {/* Cost Impact */}
                               {scenario.cost_impact && (
-                                <div className="flex items-center space-x-1.5">
-                                  <DollarSign className="h-3 w-3 text-gray-400" />
-                                  <div>
-                                    <div className={`text-xs font-medium ${getImpactColor(scenario.cost_impact.cost_change)}`}>
-                                      {getImpactIcon(scenario.cost_impact.cost_change)}
-                                      <span className="ml-0.5">
-                                        {scenario.cost_impact.cost_change_percentage.toFixed(1)}%
-                                      </span>
-                                    </div>
-                                    <div className="text-[10px] text-gray-500">{t('scenarios.budget')}</div>
-                                  </div>
+                                <div className="flex items-center gap-1.5">
+                                  <DollarSign className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                  <span className="text-xs text-gray-500">Budget:</span>
+                                  <span className={`text-sm font-medium ${getImpactColor(scenario.cost_impact.cost_change)}`}>
+                                    {scenario.cost_impact.cost_change_percentage.toFixed(1)}%
+                                  </span>
                                 </div>
                               )}
                               
                               {/* Resource Impact */}
                               {scenario.resource_impact && (
-                                <div className="flex items-center space-x-1.5">
-                                  <Users className="h-3 w-3 text-gray-400" />
-                                  <div>
-                                    <div className="text-xs font-medium text-gray-700">
-                                      {Object.keys(scenario.resource_impact.utilization_changes).length}
-                                    </div>
-                                    <div className="text-[10px] text-gray-500">{t('scenarios.resources')}</div>
-                                  </div>
+                                <div className="flex items-center gap-1.5">
+                                  <Users className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                  <span className="text-xs text-gray-500">Resources:</span>
+                                  <span className="text-sm font-medium text-gray-700">
+                                    {Object.keys(scenario.resource_impact.utilization_changes).length}
+                                  </span>
                                 </div>
                               )}
-                            </div>
-                            
-                            <div className="mt-2 text-[10px] text-gray-500">
-                              {t('scenarios.created')} {new Date(scenario.created_at).toLocaleDateString()}
+                              
+                              {/* Created Date */}
+                              <div className="text-xs text-gray-500 ml-auto">
+                                {new Date(scenario.created_at).toLocaleDateString()}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-1">
-                          <button
-                            onClick={() => {/* TODO: Edit scenario */}}
-                            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-                          >
-                            <Edit3 className="h-3 w-3" />
-                          </button>
-                          <button
-                            onClick={() => deleteScenario(scenario.id)}
-                            className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </button>
                         </div>
                       </div>
                     </div>
