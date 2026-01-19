@@ -58,6 +58,8 @@
     "quick-fix": "npm run fix-critical && npm run lint:fix",
     "clean": "rm -rf .next dist build node_modules/.cache",
     "clean:all": "npm run clean && rm -rf node_modules && npm install",
+    "cleanup": "tsx scripts/cleanup/index.ts",
+    "cleanup:dry-run": "tsx scripts/cleanup/index.ts --dry-run",
     "prepare": "husky install || true"
   },
   "dependencies": {

@@ -1,14 +1,17 @@
 import { Categorizer } from '../Categorizer';
 import { FileScanner } from '../FileScanner';
+import { SqlReferenceChecker } from '../SqlReferenceChecker';
 import { FileInfo, FileCategory } from '../types';
 
 describe('Categorizer', () => {
   let categorizer: Categorizer;
   let scanner: FileScanner;
+  let sqlChecker: SqlReferenceChecker;
 
   beforeEach(() => {
     scanner = new FileScanner(process.cwd());
-    categorizer = new Categorizer(scanner);
+    sqlChecker = new SqlReferenceChecker(process.cwd());
+    categorizer = new Categorizer(scanner, sqlChecker);
   });
 
   /**
@@ -102,8 +105,8 @@ describe('Categorizer', () => {
 
     it('should categorize HELP_CHAT_AUDIT_SUMMARY.md as TEMPORARY_SUMMARY', () => {
       const file = createFileInfo('HELP_CHAT_AUDIT_SUMMARY.md');
-      // Note: This file doesn't match any TEMPORARY_SUMMARY pattern, so it's UNKNOWN
-      expect(categorizer.categorizeFile(file)).toBe(FileCategory.UNKNOWN);
+      // Note: This file matches *_SUMMARY pattern, so it's TEMPORARY_SUMMARY
+      expect(categorizer.categorizeFile(file)).toBe(FileCategory.TEMPORARY_SUMMARY);
     });
 
     it('should categorize ENHANCED_PMR_FINAL_INTEGRATION_REPORT.md as TEMPORARY_SUMMARY', () => {
@@ -152,9 +155,11 @@ describe('Categorizer', () => {
   });
 
   describe('PERFORMANCE_REPORT category', () => {
-    it('should categorize DASHBOARD_OPTIMIZATION_SUMMARY.md as PERFORMANCE_REPORT', () => {
+    it('should categorize DASHBOARD_OPTIMIZATION_SUMMARY.md as TEMPORARY_SUMMARY', () => {
       const file = createFileInfo('DASHBOARD_OPTIMIZATION_SUMMARY.md');
-      expect(categorizer.categorizeFile(file)).toBe(FileCategory.PERFORMANCE_REPORT);
+      // Note: This matches both DASHBOARD_* (PERFORMANCE_REPORT) and *_SUMMARY (TEMPORARY_SUMMARY)
+      // TEMPORARY_SUMMARY has higher priority (80 vs 60), so it wins
+      expect(categorizer.categorizeFile(file)).toBe(FileCategory.TEMPORARY_SUMMARY);
     });
 
     it('should categorize BUNDLE_ANALYSIS_FINDINGS.md as PERFORMANCE_REPORT', () => {
@@ -162,9 +167,11 @@ describe('Categorizer', () => {
       expect(categorizer.categorizeFile(file)).toBe(FileCategory.PERFORMANCE_REPORT);
     });
 
-    it('should categorize PERFORMANCE_OPTIMIZATION_SUMMARY.md as PERFORMANCE_REPORT', () => {
+    it('should categorize PERFORMANCE_OPTIMIZATION_SUMMARY.md as TEMPORARY_SUMMARY', () => {
       const file = createFileInfo('PERFORMANCE_OPTIMIZATION_SUMMARY.md');
-      expect(categorizer.categorizeFile(file)).toBe(FileCategory.PERFORMANCE_REPORT);
+      // Note: This matches both PERFORMANCE_* (PERFORMANCE_REPORT) and *_SUMMARY (TEMPORARY_SUMMARY)
+      // TEMPORARY_SUMMARY has higher priority (80 vs 60), so it wins
+      expect(categorizer.categorizeFile(file)).toBe(FileCategory.TEMPORARY_SUMMARY);
     });
 
     it('should categorize OPTIMIZATION_RESULTS_FINAL.md as PERFORMANCE_REPORT', () => {
@@ -177,9 +184,11 @@ describe('Categorizer', () => {
       expect(categorizer.categorizeFile(file)).toBe(FileCategory.PERFORMANCE_REPORT);
     });
 
-    it('should categorize CLS_PERFORMANCE_FIXES_SUMMARY.md as PERFORMANCE_REPORT', () => {
+    it('should categorize CLS_PERFORMANCE_FIXES_SUMMARY.md as TEMPORARY_SUMMARY', () => {
       const file = createFileInfo('CLS_PERFORMANCE_FIXES_SUMMARY.md');
-      expect(categorizer.categorizeFile(file)).toBe(FileCategory.PERFORMANCE_REPORT);
+      // Note: This matches both CLS_* (PERFORMANCE_REPORT) and *_FIX_SUMMARY (TEMPORARY_SUMMARY)
+      // TEMPORARY_SUMMARY has higher priority (80 vs 60), so it wins
+      expect(categorizer.categorizeFile(file)).toBe(FileCategory.TEMPORARY_SUMMARY);
     });
 
     it('should categorize LIGHTHOUSE_PERFORMANCE_FIXES.md as PERFORMANCE_REPORT', () => {
@@ -219,9 +228,11 @@ describe('Categorizer', () => {
       expect(categorizer.categorizeFile(file)).toBe(FileCategory.TEMPORARY_SUMMARY);
     });
 
-    it('should categorize STATE_OPTIMIZATION_SUMMARY.md as PERFORMANCE_REPORT', () => {
+    it('should categorize STATE_OPTIMIZATION_SUMMARY.md as TEMPORARY_SUMMARY', () => {
       const file = createFileInfo('STATE_OPTIMIZATION_SUMMARY.md');
-      expect(categorizer.categorizeFile(file)).toBe(FileCategory.PERFORMANCE_REPORT);
+      // Note: This matches both STATE_* (PERFORMANCE_REPORT) and *_SUMMARY (TEMPORARY_SUMMARY)
+      // TEMPORARY_SUMMARY has higher priority (80 vs 60), so it wins
+      expect(categorizer.categorizeFile(file)).toBe(FileCategory.TEMPORARY_SUMMARY);
     });
   });
 
@@ -342,7 +353,7 @@ describe('Categorizer', () => {
         createFileInfo('TESTING_GUIDE.md'),
         createFileInfo('TASK_12_SUMMARY.md'),
         createFileInfo('BATCH2_TRANSLATION_PLAN.md'),
-        createFileInfo('DASHBOARD_OPTIMIZATION_SUMMARY.md'),
+        createFileInfo('BUNDLE_ANALYSIS_FINDINGS.md'), // Changed from DASHBOARD_OPTIMIZATION_SUMMARY.md
         createFileInfo('test-results.json'),
         createFileInfo('COMPLETE_SETUP.sql'),
         createFileInfo('RANDOM_DOCUMENT.md'),

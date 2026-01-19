@@ -11,13 +11,16 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "downlevelIteration": true,
+    "noEmit": false
   },
   "include": [
     "**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "__tests__"
   ]
 }

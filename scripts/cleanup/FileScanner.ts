@@ -6,13 +6,6 @@ import { FileInfo } from './types';
  * Essential files that must never be deleted or archived
  */
 const ESSENTIAL_FILES = new Set([
-  // Documentation guides
-  'TESTING_GUIDE.md',
-  'DESIGN_SYSTEM_GUIDE.md',
-  'DEPLOYMENT.md',
-  'AUTH_SETUP_GUIDE.md',
-  'I18N_DEVELOPER_GUIDE.md',
-  
   // Configuration files
   'package.json',
   'package-lock.json',

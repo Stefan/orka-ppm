@@ -1,15 +1,18 @@
 import { FileInfo, FileCategory, CategoryRule } from './types';
 import { FileScanner } from './FileScanner';
+import { SqlReferenceChecker } from './SqlReferenceChecker';
 
 /**
  * Categorizes files based on pattern matching rules
  */
 export class Categorizer {
   private scanner: FileScanner;
+  private sqlChecker: SqlReferenceChecker;
   private rules: CategoryRule[];
 
-  constructor(scanner: FileScanner) {
+  constructor(scanner: FileScanner, sqlChecker: SqlReferenceChecker) {
     this.scanner = scanner;
+    this.sqlChecker = sqlChecker;
     this.rules = this.initializeRules();
   }
 
@@ -48,6 +51,18 @@ export class Categorizer {
           /.*_STATUS\.md$/i,
           /.*_COMPLETE\.md$/i,
           /.*_REPORT\.md$/i,
+          /.*_SUMMARY\.md$/i, // General summary pattern
+          // Temporary development/troubleshooting notes
+          /^RESTART_DEV_SERVER\.md$/i,
+          /^START_BACKEND\.md$/i,
+          /^WORKAROUND_APPLIED\.md$/i,
+          /^QUICK_FIX_.*\.md$/i,
+          /^FIX_.*_ERROR\.md$/i,
+          /^NEXT_STEPS_.*\.md$/i,
+          /^REAL_.*_MONITORING\.md$/i,
+          /^COMPLETE_.*\.md$/i,
+          /^OPTION\d+_.*\.md$/i,
+          /^CHUNK_\d+_.*\.md$/i,
         ],
         priority: 80,
       },
@@ -63,6 +78,16 @@ export class Categorizer {
           /.*_TRANSLATION_.*\.csv$/i,
         ],
         priority: 70,
+      },
+
+      // Priority 65: Outdated setup/deployment guides
+      {
+        category: FileCategory.PERFORMANCE_REPORT, // Archive with other docs
+        patterns: [
+          /^AUTH_SETUP_GUIDE\.md$/i,
+          /^DEPLOYMENT\.md$/i, // Basic deployment config (superseded by docs/DEPLOYMENT_PROCEDURES.md)
+        ],
+        priority: 65,
       },
 
       // Priority 60: Performance reports
@@ -92,6 +117,7 @@ export class Categorizer {
           /^ROUTE_.*\.md$/i,
           /^VIRTUAL_.*\.md$/i,
           /^DYNAMIC_.*\.md$/i,
+          /.*_DEPLOYMENT_CHECKLIST\.md$/i, // Feature-specific deployment checklists
         ],
         priority: 60,
       },
@@ -103,9 +129,13 @@ export class Categorizer {
           /\.log$/i,
           /^test-results\.json$/i,
           /^test-output\.log$/i,
-          /^bundle-analysis.*\.(txt|log)$/i,
-          /^chrome-scroll-test\.html$/i,
+          /^bundle-analysis.*\.(txt|log|md)$/i,
+          /^chrome-scroll.*\.(html|md)$/i,
           /^lighthouse-.*\.(json|log)$/i,
+          /\.tsbuildinfo$/i, // TypeScript build cache
+          /^test-.*\.css$/i, // Test CSS files
+          /^DASHBOARD_.*\.json$/i, // Performance profiling data
+          /^\d+$/i, // Files with only numbers (like "0")
         ],
         priority: 50,
       },
@@ -121,24 +151,41 @@ export class Categorizer {
       return FileCategory.ESSENTIAL;
     }
 
-    // Sort rules by priority (highest first)
-    const sortedRules = [...this.rules].sort((a, b) => b.priority - a.priority);
+    // Check SQL files for references in documentation
+    if (file.extension.toLowerCase() === '.sql') {
+      if (this.sqlChecker.isReferencedInDocs(file.name)) {
+        // SQL file is referenced in essential docs, treat as ESSENTIAL
+        return FileCategory.ESSENTIAL;
+      } else {
+        // SQL file is not referenced, categorize as SQL_REVIEW for archiving
+        return FileCategory.SQL_REVIEW;
+      }
+    }
 
-    // Check each rule in priority order
-    for (const rule of sortedRules) {
+    // Find all matching rules and their priorities
+    const matches: Array<{ category: FileCategory; priority: number }> = [];
+
+    for (const rule of this.rules) {
       if (rule.category === FileCategory.ESSENTIAL) {
         continue; // Already checked above
       }
 
       for (const pattern of rule.patterns) {
         if (pattern.test(file.name)) {
-          return rule.category;
+          matches.push({ category: rule.category, priority: rule.priority });
+          break; // Only need one match per rule
         }
       }
     }
 
-    // No pattern matched
-    return FileCategory.UNKNOWN;
+    // If no matches found, return UNKNOWN
+    if (matches.length === 0) {
+      return FileCategory.UNKNOWN;
+    }
+
+    // Return the category with the highest priority
+    matches.sort((a, b) => b.priority - a.priority);
+    return matches[0].category;
   }
 
   /**
