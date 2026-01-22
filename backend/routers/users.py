@@ -532,15 +532,34 @@ async def get_user_with_profile(user_id: str) -> Optional[Dict[str, Any]]:
 
 def create_user_response(auth_data: dict, profile_data: dict) -> UserResponse:
     """Create a consistent UserResponse object from auth and profile data, ensuring backward compatibility"""
+    # Convert datetime objects to ISO strings
+    last_login = auth_data.get("last_sign_in_at")
+    if last_login and hasattr(last_login, 'isoformat'):
+        last_login = last_login.isoformat()
+    elif last_login and not isinstance(last_login, str):
+        last_login = str(last_login)
+    
+    created_at = profile_data.get("created_at") or auth_data.get("created_at")
+    if created_at and hasattr(created_at, 'isoformat'):
+        created_at = created_at.isoformat()
+    elif created_at and not isinstance(created_at, str):
+        created_at = str(created_at)
+    
+    updated_at = profile_data.get("updated_at") or auth_data.get("updated_at")
+    if updated_at and hasattr(updated_at, 'isoformat'):
+        updated_at = updated_at.isoformat()
+    elif updated_at and not isinstance(updated_at, str):
+        updated_at = str(updated_at)
+    
     return UserResponse(
         id=auth_data.get("id", ""),
         email=auth_data.get("email", f"user{str(auth_data.get('id', ''))[:8]}@example.com"),
         role=profile_data.get("role", "user"),  # Default role for users without profiles
         status=_determine_user_status(profile_data),
         is_active=profile_data.get("is_active", True),  # Default to active for users without profiles
-        last_login=auth_data.get("last_sign_in_at"),
-        created_at=profile_data.get("created_at") or auth_data.get("created_at"),
-        updated_at=profile_data.get("updated_at") or auth_data.get("updated_at"),
+        last_login=last_login,
+        created_at=created_at,
+        updated_at=updated_at,
         deactivated_at=profile_data.get("deactivated_at"),
         deactivated_by=profile_data.get("deactivated_by"),
         deactivation_reason=profile_data.get("deactivation_reason"),
