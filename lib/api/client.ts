@@ -139,11 +139,9 @@ function getMockData(endpoint: string): any {
   return MOCK_DATA[normalizedEndpoint as keyof typeof MOCK_DATA] || null
 }
 
-// API configuration with fallbacks - Use backend server
+// API configuration with fallbacks - Use Next.js API proxy
 export const API_CONFIG = {
-  baseURL: process.env.NODE_ENV === 'production' 
-    ? 'https://orka-ppm.onrender.com' 
-    : 'http://localhost:8000', // Local FastAPI backend server
+  baseURL: '/api', // Use Next.js API routes as proxy
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -155,40 +153,13 @@ export function getApiUrl(endpoint: string): string {
   // Ensure endpoint starts with /
   const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
   
-  // Check if this is an optimized dashboard endpoint - use Next.js API routes
-  if (normalizedEndpoint.startsWith('/optimized/')) {
-    return `/api${normalizedEndpoint}`
-  }
+  // Remove /api prefix if present since we'll add it
+  const cleanEndpoint = normalizedEndpoint.startsWith('/api/') 
+    ? normalizedEndpoint.slice(4) 
+    : normalizedEndpoint
   
-  // For all other endpoints, use backend URL
-  const baseUrl = API_CONFIG.baseURL
-  
-  if (!baseUrl) {
-    console.warn('API_URL not configured, using localhost fallback')
-    return `http://localhost:8000${normalizedEndpoint}`
-  }
-  
-  // Validate URL format
-  try {
-    new URL(baseUrl)
-  } catch (error) {
-    console.error('Invalid API_URL format:', baseUrl)
-    throw new Error(`Invalid API URL: ${baseUrl}`)
-  }
-  
-  // Remove trailing slash from baseUrl
-  const cleanBaseUrl = baseUrl.replace(/\/$/, '')
-  
-  const fullUrl = `${cleanBaseUrl}${normalizedEndpoint}`
-  
-  // Validate final URL
-  try {
-    new URL(fullUrl)
-    return fullUrl
-  } catch (error) {
-    console.error('Invalid final URL:', fullUrl)
-    throw new Error(`Invalid final URL: ${fullUrl}`)
-  }
+  // Use Next.js API proxy for all requests
+  return `/api${cleanEndpoint}`
 }
 
 // Fetch wrapper with error handling and mock fallback
