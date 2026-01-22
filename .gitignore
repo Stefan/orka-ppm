@@ -136,3 +136,21 @@ chrome-scroll-*.html
 chrome-scroll-*.md
 test-*.css
 DASHBOARD_*.json
+
+
+# Temporary documentation and fix summaries
+ALL_API_FIXES_SUMMARY.md
+API_CONSISTENCY_REFACTOR.md
+API_DOUBLE_PREFIX_FIX.md
+CI_FAILURES_SUMMARY.md
+E2E_TEST_FIXES_SUMMARY.md
+FIX_VISUAL_REGRESSION_CI.md
+VISUAL_REGRESSION_TESTS_GUIDE.md
+
+# Shell scripts for local development
+fix-ci.sh
+generate-snapshots-docker.sh
+update-visual-snapshots.sh
+
+# Generated reports
+performance-reports/
