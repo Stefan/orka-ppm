@@ -139,7 +139,7 @@ export default function AdminUsers() {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
       
-      const response = await fetch(getApiUrl(`/api/admin/users?${params}`), {
+      const response = await fetch(getApiUrl(`/admin/users?${params}`), {
         headers: {
           'Authorization': `Bearer ${session?.access_token || ''}`,
           'Content-Type': 'application/json',
@@ -211,7 +211,7 @@ export default function AdminUsers() {
     setActionLoading(userId)
     
     try {
-      const response = await fetch(getApiUrl(`/api/admin/users/${userId}/roles`), {
+      const response = await fetch(getApiUrl(`/admin/users/${userId}/roles`), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session?.access_token || ''}`,
@@ -243,7 +243,7 @@ export default function AdminUsers() {
     setActionLoading(userId)
     
     try {
-      const response = await fetch(getApiUrl(`/api/admin/users/${userId}/roles/${role}`), {
+      const response = await fetch(getApiUrl(`/admin/users/${userId}/roles/${role}`), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session?.access_token || ''}`,
