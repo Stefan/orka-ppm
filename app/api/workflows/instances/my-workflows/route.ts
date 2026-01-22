@@ -34,6 +34,17 @@ export async function GET(request: NextRequest) {
     queryParams.append('limit', limit)
     queryParams.append('offset', offset)
 
+    // Check if backend URL is configured
+    if (!BACKEND_URL || BACKEND_URL === 'http://localhost:8000') {
+      console.warn('Backend URL not configured, returning empty workflows')
+      return NextResponse.json({
+        workflows: [],
+        count: 0,
+        limit: parseInt(limit),
+        offset: parseInt(offset)
+      })
+    }
+
     // First, get pending approvals for the user
     const pendingApprovalsUrl = `${BACKEND_URL}/workflows/approvals/pending?${queryParams.toString()}`
     
