@@ -21,6 +21,9 @@ const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
+  // Use variable font (default) - loads single file with all weights
+  // This prevents multiple font files from being preloaded
+  preload: true,
 })
 
 export const metadata: Metadata = {

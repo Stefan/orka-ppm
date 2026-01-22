@@ -246,7 +246,7 @@ export function usePerformanceMonitoring(options: {
     // Send to analytics endpoint
     if (analyticsEndpoint && typeof window !== 'undefined') {
       try {
-        await fetch(analyticsEndpoint, {
+        const response = await fetch(analyticsEndpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -258,8 +258,15 @@ export function usePerformanceMonitoring(options: {
             timestamp: Date.now()
           })
         })
+        
+        // Silently handle 404 - endpoint not implemented yet
+        if (!response.ok && response.status === 404) {
+          // Endpoint not implemented, skip logging
+          return
+        }
       } catch (error) {
-        console.error('Failed to send performance report:', error)
+        // Silently ignore network errors for analytics endpoint
+        // This is non-critical functionality
       }
     }
 

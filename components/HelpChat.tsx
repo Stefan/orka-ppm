@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { useHelpChat } from '../hooks/useHelpChat'
 import { useMediaQuery } from '../hooks/useMediaQuery'
+import { useTranslations } from '../lib/i18n/context'
 import type { HelpFeedbackRequest } from '../types/help-chat'
 import { cn } from '../lib/utils/design-system'
 import { MessageRenderer } from './help-chat/MessageRenderer'
@@ -34,6 +35,7 @@ export function HelpChat({ className }: HelpChatProps) {
     getErrorMessage
   } = useHelpChat()
 
+  const { t } = useTranslations()
   const isMobile = useMediaQuery('(max-width: 768px)')
   const [inputValue, setInputValue] = useState('')
   const [isMinimized, setIsMinimized] = useState(false)
@@ -42,10 +44,35 @@ export function HelpChat({ className }: HelpChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const footerRef = useRef<HTMLElement>(null)
+  const [footerHeight, setFooterHeight] = useState(120)
+
+  // Get translated texts based on current language
+  const getTranslatedText = useCallback((key: string, fallback: string) => {
+    try {
+      return t(key) || fallback
+    } catch {
+      return fallback
+    }
+  }, [t])
+
+  const placeholderText = getTranslatedText('helpChat.placeholder', 'Ask me something about PPM...')
+  const welcomeTitle = getTranslatedText('helpChat.welcome', 'Welcome to AI Help Assistant!')
+  const welcomeMessage = getTranslatedText('helpChat.welcomeMessage', 'Ask me anything about the PPM platform features and I\'ll help you out.')
+  const typingText = getTranslatedText('helpChat.typing', 'AI is typing...')
+  const tryAgainText = getTranslatedText('helpChat.tryAgain', 'Try again')
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [])
+
+  // Measure footer height
+  useEffect(() => {
+    if (footerRef.current) {
+      const height = footerRef.current.offsetHeight
+      setFooterHeight(height + 20) // Add 20px extra padding
+    }
+  }, [state.isOpen])
 
   useEffect(() => {
     if (state.messages.length > 0) {
@@ -190,17 +217,18 @@ export function HelpChat({ className }: HelpChatProps) {
             <main 
               ref={messagesContainerRef}
               className="flex-1 overflow-y-auto p-4 space-y-4"
+              style={{ paddingBottom: `${footerHeight}px` }}
             >
               {state.messages.length === 0 ? (
                 <div className="text-center py-8">
                   <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-2">Welcome to AI Help Assistant!</p>
+                  <p className="text-gray-500 mb-2">{welcomeTitle}</p>
                   <p className="text-sm text-gray-400">
-                    Ask me anything about the PPM platform features and I'll help you out.
+                    {welcomeMessage}
                   </p>
                 </div>
               ) : (
-                <div>
+                <div className="space-y-4">
                   {state.messages.filter(msg => msg.type !== 'tip').map((message) => (
                     <div key={message.id}>
                       <MessageRenderer
@@ -223,7 +251,7 @@ export function HelpChat({ className }: HelpChatProps) {
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
                   </div>
-                  <span className="text-sm">AI is typing...</span>
+                  <span className="text-sm">{typingText}</span>
                 </div>
               )}
               
@@ -237,24 +265,24 @@ export function HelpChat({ className }: HelpChatProps) {
                         onClick={handleRetry}
                         className="text-sm text-red-600 hover:text-red-800 font-medium"
                       >
-                        Try again
+                        {tryAgainText}
                       </button>
                     </div>
                   </div>
                 </div>
               )}
               
-              <div ref={messagesEndRef} />
+              <div ref={messagesEndRef} className="h-16" />
             </main>
 
-            <footer className="border-t border-gray-200 p-4 bg-white">
+            <footer ref={footerRef} className="border-t border-gray-200 p-4 bg-white absolute bottom-0 left-0 right-0 z-10">
               <form onSubmit={handleSubmit} className="flex space-x-3">
                 <textarea
                   ref={inputRef}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Frage mich etwas über PPM..."
+                  placeholder={placeholderText}
                   className="flex-1 resize-none rounded-lg border-2 border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500 focus:border-blue-500 focus:outline-none min-h-[48px] max-h-32 bg-white"
                   rows={1}
                   disabled={!canSendMessage}
@@ -330,18 +358,21 @@ export function HelpChat({ className }: HelpChatProps) {
           <main 
             ref={messagesContainerRef}
             className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth"
-            style={{ scrollBehavior: 'smooth' }}
+            style={{ 
+              scrollBehavior: 'smooth',
+              paddingBottom: `${footerHeight}px`
+            }}
           >
             {state.messages.length === 0 ? (
               <div className="text-center py-8">
                 <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 mb-2">Welcome to AI Help Assistant!</p>
+                <p className="text-gray-500 mb-2">{welcomeTitle}</p>
                 <p className="text-sm text-gray-400">
-                  Ask me anything about the PPM platform features and I'll help you out.
+                  {welcomeMessage}
                 </p>
               </div>
             ) : (
-              <div>
+              <div className="space-y-4">
                 {state.messages.filter(msg => msg.type !== 'tip').map((message) => (
                   <div key={message.id}>
                     <MessageRenderer
@@ -364,7 +395,7 @@ export function HelpChat({ className }: HelpChatProps) {
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
                 </div>
-                <span className="text-sm">AI is typing...</span>
+                <span className="text-sm">{typingText}</span>
               </div>
             )}
             
@@ -378,24 +409,24 @@ export function HelpChat({ className }: HelpChatProps) {
                       onClick={handleRetry}
                       className="text-sm text-red-600 hover:text-red-800 font-medium"
                     >
-                      Try again
+                      {tryAgainText}
                     </button>
                   </div>
                 </div>
               </div>
             )}
             
-            <div ref={messagesEndRef} />
+            <div ref={messagesEndRef} className="h-16" />
           </main>
 
-          <footer className="border-t-2 border-gray-200 p-4 bg-white sticky bottom-0 z-10">
+          <footer ref={footerRef} className="border-t-2 border-gray-200 p-4 bg-white absolute bottom-0 left-0 right-0 z-10">
             <form onSubmit={handleSubmit} className="flex space-x-3">
               <textarea
                 ref={inputRef}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Frage mich etwas über PPM..."
+                placeholder={placeholderText}
                 className="flex-1 resize-none rounded-lg border-2 border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 focus:border-blue-500 focus:outline-none min-h-[44px] max-h-32 bg-white"
                 rows={1}
                 disabled={!canSendMessage}

@@ -308,7 +308,14 @@ class TranslationService:
             return bool(upsert_response.data)
             
         except Exception as e:
-            logger.error(f"Failed to set user language preference: {e}")
+            error_msg = str(e)
+            logger.error(f"Failed to set user language preference for user {user_id}: {error_msg}")
+            
+            # Check for RLS policy errors
+            if "policy" in error_msg.lower() or "permission" in error_msg.lower():
+                logger.error("⚠️  RLS Policy Error: User may not have permission to update their own profile. "
+                           "Run migrations/fix_user_profiles_update_policy.sql to fix this.")
+            
             return False
     
     async def translate_help_response(self, content: str, target_language: str, 

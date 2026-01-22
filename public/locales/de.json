@@ -143,6 +143,13 @@
     "placeholder": "Frage mich etwas über PPM...",
     "title": "KI-Hilfe-Assistent"
   },
+  "helpChat": {
+    "placeholder": "Frage mich etwas über PPM...",
+    "welcome": "Willkommen beim KI-Hilfe-Assistenten!",
+    "welcomeMessage": "Fragen Sie mich alles über die PPM-Plattform-Funktionen und ich helfe Ihnen gerne weiter.",
+    "typing": "KI tippt...",
+    "tryAgain": "Erneut versuchen"
+  },
   "variance": {
     "trends": "Varianz-Trends",
     "alerts": "Varianz-Warnungen",

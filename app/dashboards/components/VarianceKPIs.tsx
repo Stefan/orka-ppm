@@ -5,7 +5,7 @@ import { TrendingUp, TrendingDown, AlertTriangle, Target } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
 import { useTranslations } from '../../../lib/i18n/context'
 import { resilientFetch } from '@/lib/api/resilient-fetch'
-import { usePermissions } from '@/hooks/usePermissions'
+import { usePermissions } from '@/app/providers/EnhancedAuthProvider'
 
 interface VarianceKPIs {
   total_variance: number
@@ -43,7 +43,12 @@ function VarianceKPIs({ session, selectedCurrency = 'USD', showDetailedMetrics, 
   useEffect(() => {
     console.log('VarianceKPIs useEffect - session:', session?.access_token ? 'present' : 'missing')
     if (session) {
-      fetchVarianceKPIs()
+      // Defer to avoid blocking main thread during initial render
+      const timeoutId = setTimeout(() => {
+        fetchVarianceKPIs()
+      }, 50)
+      
+      return () => clearTimeout(timeoutId)
     }
   }, [session, selectedCurrency])
 
@@ -102,22 +107,27 @@ function VarianceKPIs({ session, selectedCurrency = 'USD', showDetailedMetrics, 
 
   if (loading || permissionsLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-            <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+      <div className="bg-white rounded-lg border border-gray-200 p-2 h-full flex flex-col" style={{ minHeight: '120px' }}>
+        <div className="animate-pulse">
+          <div className="h-3 bg-gray-200 rounded w-1/4 mb-2"></div>
+          <div className="grid grid-cols-4 gap-1 flex-1">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-gray-100 p-1 rounded">
+                <div className="h-3 bg-gray-200 rounded w-3/4 mb-1"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     )
   }
 
   if (error || !varianceData) {
     return (
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-center">
-          <Target className="h-5 w-5 text-blue-600 mr-2" />
+      <div className="bg-white rounded-lg border border-gray-200 p-2 h-full flex flex-col" style={{ minHeight: '120px' }}>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex-1 flex items-center">
+          <Target className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0" />
           <span className="text-sm text-blue-800">
             {error ? `Variance data unavailable: ${error}` : 'No variance data available. Import CSV files to see variance analysis.'}
           </span>
@@ -127,7 +137,7 @@ function VarianceKPIs({ session, selectedCurrency = 'USD', showDetailedMetrics, 
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-2 h-full flex flex-col">
+    <div className="bg-white rounded-lg border border-gray-200 p-2 h-full flex flex-col" style={{ minHeight: '120px' }}>
       {/* Compact header */}
       <div className="flex items-center justify-between mb-1.5">
         <h3 className="text-[8px] font-semibold text-gray-900 uppercase tracking-wide">{t('variance.kpis')}</h3>

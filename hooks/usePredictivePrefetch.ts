@@ -164,12 +164,23 @@ export function usePredictivePrefetch(config: PredictiveConfig = {}) {
     // Update previous path
     previousPathRef.current = pathname
     
-    // Prefetch predicted routes after a short delay
-    const timer = setTimeout(() => {
-      prefetchPredictedRoutes()
-    }, 1000)
+    // Defer prefetching to avoid blocking main thread
+    // Use requestIdleCallback if available, otherwise setTimeout with longer delay
+    const scheduleId = 'requestIdleCallback' in window
+      ? requestIdleCallback(() => {
+          prefetchPredictedRoutes()
+        }, { timeout: 3000 })
+      : setTimeout(() => {
+          prefetchPredictedRoutes()
+        }, 2000)
     
-    return () => clearTimeout(timer)
+    return () => {
+      if ('requestIdleCallback' in window) {
+        cancelIdleCallback(scheduleId as number)
+      } else {
+        clearTimeout(scheduleId as number)
+      }
+    }
   }, [pathname, mergedConfig.enabled, recordNavigation, prefetchPredictedRoutes])
 
   /**

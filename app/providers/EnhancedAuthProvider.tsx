@@ -113,8 +113,13 @@ export function EnhancedAuthProvider({ children }: { children: React.ReactNode }
       setLoading(true)
       setError(null)
 
+      // Add timeout to prevent infinite loading
+      const timeoutPromise = new Promise<null>((_, reject) => {
+        setTimeout(() => reject(new Error('Permission fetch timeout')), 5000)
+      })
+
       // Fetch user role assignments with role details
-      const { data: roleAssignments, error: rolesError } = await supabase
+      const fetchPromise = supabase
         .from('user_roles')
         .select(`
           role_id,
@@ -126,9 +131,22 @@ export function EnhancedAuthProvider({ children }: { children: React.ReactNode }
         `)
         .eq('user_id', userId)
 
-      if (rolesError) {
-        throw new Error(`Failed to fetch user roles: ${rolesError.message}`)
+      const result = await Promise.race([
+        fetchPromise,
+        timeoutPromise
+      ]) as any
+
+      if (!result || result.error) {
+        const errorMsg = result?.error?.message || 'Failed to fetch user roles'
+        console.warn('Error fetching user roles:', errorMsg)
+        // Don't throw - just set empty permissions and continue
+        setUserRoles([])
+        setUserPermissions([])
+        permissionCache.clear()
+        return
       }
+
+      const roleAssignments = result.data
 
       if (!roleAssignments || roleAssignments.length === 0) {
         // No roles assigned, set to empty arrays
@@ -165,6 +183,7 @@ export function EnhancedAuthProvider({ children }: { children: React.ReactNode }
     } catch (err) {
       console.error('Error fetching user roles and permissions:', err)
       setError(err instanceof Error ? err : new Error('Unknown error'))
+      // Always set to empty arrays, never undefined
       setUserRoles([])
       setUserPermissions([])
     } finally {
@@ -229,9 +248,29 @@ export function EnhancedAuthProvider({ children }: { children: React.ReactNode }
     permission: Permission | Permission[],
     context?: PermissionContext
   ): boolean => {
+    // Safety check: if userPermissions is not yet loaded, return false
+    if (!userPermissions || !Array.isArray(userPermissions)) {
+      return false
+    }
+
     // Handle array of permissions (OR logic)
     if (Array.isArray(permission)) {
-      return permission.some(perm => hasPermission(perm, context))
+      // Check each permission individually without recursion to avoid issues
+      return permission.some(perm => {
+        // Check cache first
+        const cachedResult = permissionCache.get(perm, context)
+        if (cachedResult !== null) {
+          return cachedResult
+        }
+
+        // Check if user has the permission
+        const result = userPermissions.includes(perm)
+
+        // Cache the result
+        permissionCache.set(perm, result, context)
+
+        return result
+      })
     }
 
     // Check cache first
@@ -257,6 +296,11 @@ export function EnhancedAuthProvider({ children }: { children: React.ReactNode }
    * Requirements: 2.1 - Role checking
    */
   const hasRole = useCallback((role: string | string[]): boolean => {
+    // Safety check: if userRoles is not yet loaded, return false
+    if (!userRoles || !Array.isArray(userRoles)) {
+      return false
+    }
+
     if (Array.isArray(role)) {
       return role.some(r => userRoles.includes(r))
     }
@@ -315,7 +359,7 @@ export function EnhancedAuthProvider({ children }: { children: React.ReactNode }
         if (status === 'SUBSCRIBED') {
           console.log('Successfully subscribed to role changes for user:', user.id)
         } else if (status === 'CHANNEL_ERROR') {
-          console.error('Error subscribing to role changes:', err)
+          console.error('Error subscribing to role changes:', err || 'Unknown error')
           setError(new Error('Failed to subscribe to role changes'))
         } else if (status === 'TIMED_OUT') {
           console.error('Subscription to role changes timed out')

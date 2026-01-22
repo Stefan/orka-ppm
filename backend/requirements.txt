@@ -18,6 +18,9 @@ aiohttp==3.9.1
 # OpenAI for embeddings and LLM
 openai==1.12.0
 
+# Local embeddings (for Grok or when OpenAI embeddings unavailable)
+sentence-transformers==2.2.2
+
 # Retry logic for API calls
 tenacity==8.2.3
 

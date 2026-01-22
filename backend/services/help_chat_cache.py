@@ -1,5 +1,5 @@
 """
-Help Chat Caching Service mit Supabase
+Help Chat Caching Service - In-Memory Cache for Speed
 Reduziert AI-API-Calls durch intelligentes Caching
 """
 
@@ -7,28 +7,28 @@ import hashlib
 import json
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
-from config.database import supabase
 import logging
 
 logger = logging.getLogger(__name__)
 
-# Cache TTL in Sekunden (5 Minuten)
-CACHE_TTL = 300
+# In-memory cache with TTL
+_cache_store: Dict[str, Dict[str, Any]] = {}
+CACHE_TTL = 300  # 5 minutes
 
 async def get_cached_response(
     query: str,
     user_id: str,
-    context: Optional[Dict[str, Any]] = None
+    context: Optional[Dict[str, Any]] = None,
+    language: str = "en"
 ) -> Optional[Dict[str, Any]]:
     """
-    Prüft Supabase cache-Tabelle für gecachte AI-Antwort.
-    Cache-Key: SHA256 Hash von query + user_id + context
+    Check in-memory cache for cached AI response.
+    Cache-Key: SHA256 Hash of query + user_id + context + language
     """
     try:
-        # Cache-Key generieren (inkl. context für präziseres Caching)
-        cache_input = f"{query}:{user_id}"
+        # Generate cache key
+        cache_input = f"{query}:{user_id}:{language}"
         if context:
-            # Nur relevante Context-Keys für Cache-Key verwenden
             relevant_context = {
                 'route': context.get('route'),
                 'userRole': context.get('userRole')
@@ -37,36 +37,39 @@ async def get_cached_response(
         
         cache_key = hashlib.sha256(cache_input.encode()).hexdigest()
         
-        # Query cache-Tabelle
-        result = supabase.table('help_chat_cache') \
-            .select('*') \
-            .eq('cache_key', cache_key) \
-            .gte('expires_at', datetime.utcnow().isoformat()) \
-            .single() \
-            .execute()
+        # Check in-memory cache
+        if cache_key in _cache_store:
+            cache_entry = _cache_store[cache_key]
+            
+            # Check if expired
+            if datetime.utcnow() < cache_entry['expires_at']:
+                logger.info(f"Cache HIT for query: {query[:50]}... (lang: {language})")
+                return cache_entry['response']
+            else:
+                # Remove expired entry
+                del _cache_store[cache_key]
+                logger.debug(f"Cache entry expired for: {query[:50]}...")
         
-        if result.data:
-            logger.info(f"Cache HIT for query: {query[:50]}...")
-            return result.data['response']
+        logger.debug(f"Cache MISS for: {query[:50]}...")
+        return None
     except Exception as e:
-        # Cache Miss oder Fehler - kein Problem, AI-Call folgt
-        logger.debug(f"Cache MISS: {e}")
-    
-    return None
+        logger.debug(f"Cache lookup error: {e}")
+        return None
 
 async def set_cached_response(
     query: str,
     user_id: str,
     response: Dict[str, Any],
     context: Optional[Dict[str, Any]] = None,
-    ttl: int = CACHE_TTL
+    ttl: int = CACHE_TTL,
+    language: str = "en"
 ):
     """
-    Speichert AI-Antwort in Supabase cache-Tabelle mit TTL.
+    Store AI response in in-memory cache with TTL.
     """
     try:
-        # Cache-Key generieren (gleiche Logik wie get_cached_response)
-        cache_input = f"{query}:{user_id}"
+        # Generate cache key (same logic as get_cached_response)
+        cache_input = f"{query}:{user_id}:{language}"
         if context:
             relevant_context = {
                 'route': context.get('route'),
@@ -78,64 +81,69 @@ async def set_cached_response(
         
         expires_at = datetime.utcnow() + timedelta(seconds=ttl)
         
-        # Upsert in cache-Tabelle
-        supabase.table('help_chat_cache').upsert({
-            'cache_key': cache_key,
-            'query': query[:500],  # Truncate für DB
-            'user_id': user_id,
+        # Store in memory
+        _cache_store[cache_key] = {
             'response': response,
-            'expires_at': expires_at.isoformat(),
-            'created_at': datetime.utcnow().isoformat()
-        }).execute()
+            'expires_at': expires_at,
+            'created_at': datetime.utcnow()
+        }
         
-        logger.info(f"Cached response for query: {query[:50]}... (TTL: {ttl}s)")
+        logger.info(f"Cached response for query: {query[:50]}... (lang: {language}, TTL: {ttl}s)")
+        
+        # Cleanup old entries if cache is too large
+        if len(_cache_store) > 1000:
+            await _cleanup_expired_entries()
+            
     except Exception as e:
-        # Cache-Fehler nicht kritisch
         logger.error(f"Cache write error: {e}")
+
+async def _cleanup_expired_entries():
+    """Remove expired entries from cache"""
+    try:
+        now = datetime.utcnow()
+        expired_keys = [
+            key for key, entry in _cache_store.items()
+            if now >= entry['expires_at']
+        ]
+        
+        for key in expired_keys:
+            del _cache_store[key]
+        
+        if expired_keys:
+            logger.info(f"Cleaned up {len(expired_keys)} expired cache entries")
+    except Exception as e:
+        logger.error(f"Cache cleanup error: {e}")
 
 async def invalidate_cache(user_id: Optional[str] = None):
     """
-    Invalidiert Cache-Einträge.
-    Wenn user_id gegeben, nur für diesen User.
+    Invalidate cache entries.
+    If user_id given, only for that user (not implemented for in-memory).
     """
     try:
         if user_id:
-            supabase.table('help_chat_cache') \
-                .delete() \
-                .eq('user_id', user_id) \
-                .execute()
-            logger.info(f"Invalidated cache for user: {user_id}")
+            # For in-memory cache, we'd need to track user_id separately
+            # For now, just log
+            logger.info(f"Cache invalidation requested for user: {user_id} (not implemented for in-memory)")
         else:
-            # Alle abgelaufenen Einträge löschen
-            supabase.table('help_chat_cache') \
-                .delete() \
-                .lt('expires_at', datetime.utcnow().isoformat()) \
-                .execute()
-            logger.info("Cleaned up expired cache entries")
+            # Clear all expired entries
+            await _cleanup_expired_entries()
     except Exception as e:
         logger.error(f"Cache invalidation error: {e}")
 
 async def get_cache_stats() -> Dict[str, Any]:
     """
-    Gibt Cache-Statistiken zurück.
+    Return cache statistics.
     """
     try:
-        # Anzahl aktiver Cache-Einträge
-        active_count = supabase.table('help_chat_cache') \
-            .select('id', count='exact') \
-            .gte('expires_at', datetime.utcnow().isoformat()) \
-            .execute()
-        
-        # Anzahl abgelaufener Einträge
-        expired_count = supabase.table('help_chat_cache') \
-            .select('id', count='exact') \
-            .lt('expires_at', datetime.utcnow().isoformat()) \
-            .execute()
+        now = datetime.utcnow()
+        active_count = sum(1 for entry in _cache_store.values() if now < entry['expires_at'])
+        expired_count = len(_cache_store) - active_count
         
         return {
-            'active_entries': active_count.count or 0,
-            'expired_entries': expired_count.count or 0,
-            'total_entries': (active_count.count or 0) + (expired_count.count or 0)
+            'active_entries': active_count,
+            'expired_entries': expired_count,
+            'total_entries': len(_cache_store),
+            'cache_type': 'in-memory'
         }
     except Exception as e:
         logger.error(f"Cache stats error: {e}")

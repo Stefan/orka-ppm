@@ -919,7 +919,7 @@ async def get_security_alerts(
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
     limit: int = 100,
-    current_user = Depends(require_permission(Permission.admin))
+    current_user = Depends(require_permission(Permission.system_admin))
 ):
     """
     Get security alerts for admin review.
@@ -1004,7 +1004,7 @@ async def resolve_security_alert(
     alert_id: UUID,
     resolution: str,
     action_taken: Optional[str] = None,
-    current_user = Depends(require_permission(Permission.admin))
+    current_user = Depends(require_permission(Permission.system_admin))
 ):
     """
     Resolve a security alert after admin review.
@@ -1091,7 +1091,7 @@ async def get_security_events(
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
     limit: int = 100,
-    current_user = Depends(require_permission(Permission.admin))
+    current_user = Depends(require_permission(Permission.system_admin))
 ):
     """
     Get security events log.
@@ -1180,7 +1180,7 @@ async def get_security_events(
 async def manually_suspend_share_link(
     share_id: UUID,
     reason: str,
-    current_user = Depends(require_permission(Permission.admin))
+    current_user = Depends(require_permission(Permission.system_admin))
 ):
     """
     Manually suspend a share link for security reasons.
@@ -1273,7 +1273,7 @@ async def manually_suspend_share_link(
 )
 async def get_security_dashboard(
     days: int = 7,
-    current_user = Depends(require_permission(Permission.admin))
+    current_user = Depends(require_permission(Permission.system_admin))
 ):
     """
     Get security monitoring dashboard data.

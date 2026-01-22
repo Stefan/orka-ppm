@@ -457,6 +457,17 @@ export class HelpChatAPIService {
       this.recordRequest()
       return result
     } catch (error) {
+      // Silently handle network errors - these are expected when backend is unavailable
+      // Check if it's a HelpChatError with NETWORK_ERROR code
+      if (error && typeof error === 'object' && 'code' in error) {
+        const helpError = error as HelpChatError
+        if (helpError.code === 'NETWORK_ERROR') {
+          // Don't log to console - this is expected
+          throw error
+        }
+      }
+      
+      // Log other types of errors
       console.error('Help query submission failed:', error)
       throw error
     }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
@@ -80,12 +80,27 @@ export function MessageRenderer({
       }
       
       return (
-        <pre className="bg-gray-100 rounded-md p-3 overflow-x-auto text-sm border border-gray-200">
-          <code className={className} {...props}>
-            {children}
-          </code>
-        </pre>
+        <div className="my-2">
+          <pre className="bg-gray-100 rounded-md p-3 overflow-x-auto text-sm border border-gray-200">
+            <code className={className} {...props}>
+              {children}
+            </code>
+          </pre>
+        </div>
       )
+    },
+    p: ({ children, ...props }: any) => {
+      // Check if children contains pre/code blocks
+      const hasCodeBlock = React.Children.toArray(children).some(
+        (child: any) => child?.type === 'pre' || child?.props?.node?.tagName === 'pre'
+      )
+      
+      // If it contains code blocks, render without p tag
+      if (hasCodeBlock) {
+        return <div {...props}>{children}</div>
+      }
+      
+      return <p {...props}>{children}</p>
     },
     a: ({ children, href, ...props }: any) => (
       <a
@@ -199,8 +214,8 @@ export function MessageRenderer({
 
           {message.confidence && (
             <div className="flex items-center space-x-2">
-              <Star className="h-3 w-3" />
-              <span className="text-xs font-medium">Confidence:</span>
+              <Star className="h-3 w-3 text-gray-600" />
+              <span className="text-xs font-semibold text-gray-700">Confidence:</span>
               <div className={cn(
                 'px-2 py-1 rounded-full text-xs font-medium border',
                 getConfidenceColor(message.confidence)

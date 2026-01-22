@@ -143,6 +143,13 @@
     "placeholder": "Ask me something about PPM...",
     "title": "AI Help Assistant"
   },
+  "helpChat": {
+    "placeholder": "Ask me something about PPM...",
+    "welcome": "Welcome to AI Help Assistant!",
+    "welcomeMessage": "Ask me anything about the PPM platform features and I'll help you out.",
+    "typing": "AI is typing...",
+    "tryAgain": "Try again"
+  },
   "variance": {
     "trends": "Variance Trends",
     "alerts": "Variance Alerts",

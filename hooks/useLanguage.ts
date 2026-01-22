@@ -11,6 +11,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { helpChatAPI } from '@/lib/help-chat/api'
 import { useI18n } from '@/lib/i18n/context'
+import { useAuth } from '@/app/providers/SupabaseAuthProvider'
 
 export interface SupportedLanguage {
   code: string
@@ -76,6 +77,9 @@ export function useLanguage(): UseLanguageReturn {
   // Use i18n system as single source of truth
   const i18n = useI18n()
   
+  // Get auth context to check if user is authenticated
+  const { session } = useAuth()
+  
   const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -85,20 +89,28 @@ export function useLanguage(): UseLanguageReturn {
     getSupportedLanguages()
   }, [])
 
-  // Sync with server preference on language change
-  useEffect(() => {
-    if (i18n.locale) {
-      syncLanguagePreference(i18n.locale)
-    }
-  }, [i18n.locale])
+  // Sync with server preference on language change (only if authenticated)
+  // DISABLED: Server sync is optional, local preference works fine
+  // useEffect(() => {
+  //   if (i18n.locale && session?.access_token) {
+  //     syncLanguagePreference(i18n.locale)
+  //   }
+  // }, [i18n.locale, session?.access_token])
 
   const syncLanguagePreference = async (language: string) => {
-    try {
-      await helpChatAPI.setUserLanguagePreference(language)
-    } catch (err) {
-      console.warn('Failed to sync language preference to server:', err)
-      // Don't throw error - local preference still works
-    }
+    // DISABLED: Server sync causes HTTP 400 errors
+    // Local preference in localStorage is sufficient
+    return
+    
+    // Original code (disabled):
+    // try {
+    //   if (!session?.access_token) return
+    //   await helpChatAPI.setUserLanguagePreference(language)
+    // } catch (err) {
+    //   if (process.env.NODE_ENV === 'development') {
+    //     console.debug('Language preference not synced to server:', err)
+    //   }
+    // }
   }
 
   const setLanguage = useCallback(async (language: string): Promise<boolean> => {

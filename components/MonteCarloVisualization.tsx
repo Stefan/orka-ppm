@@ -66,6 +66,13 @@ export default function MonteCarloVisualization({
       )
 
       if (!response.ok) {
+        // Silently handle 404 - endpoint not implemented yet
+        if (response.status === 404) {
+          console.log('Monte Carlo visualization endpoint not yet implemented')
+          setLoading(false)
+          return
+        }
+        
         const errorData = await response.json()
         throw new Error(errorData.detail || `Failed to generate charts: ${response.status}`)
       }

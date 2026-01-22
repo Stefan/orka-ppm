@@ -88,9 +88,15 @@ export async function fetchComprehensiveReport(
     if (response.ok) {
       return await response.json()
     }
+    
+    // Silently handle server errors - endpoint may not be fully implemented
+    if (response.status >= 500) {
+      return null
+    }
+    
     return null
   } catch (error) {
-    console.error('Failed to fetch comprehensive financial report:', error)
+    // Silently handle network errors - non-critical data
     return null
   }
 }

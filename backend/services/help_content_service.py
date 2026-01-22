@@ -32,8 +32,26 @@ class HelpContentService:
             self.openai_client = OpenAI(api_key=openai_api_key, base_url=base_url)
         else:
             self.openai_client = OpenAI(api_key=openai_api_key)
+        
+        # Check if we should use local embeddings (for Grok or when OpenAI embeddings unavailable)
+        self.use_local_embeddings = os.getenv("USE_LOCAL_EMBEDDINGS", "false").lower() == "true"
+        self.local_embedding_model = None
+        
+        if self.use_local_embeddings or base_url:
+            logger.info("HelpContentService: Using local sentence-transformers for embeddings")
+            try:
+                from sentence_transformers import SentenceTransformer
+                self.local_embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+                self.embedding_dimension = 384  # all-MiniLM-L6-v2 dimension
+                self.use_local_embeddings = True
+            except ImportError:
+                logger.warning("sentence-transformers not installed, falling back to OpenAI")
+                self.use_local_embeddings = False
+                self.embedding_dimension = 1536
+        else:
+            self.embedding_dimension = 1536
+        
         # Use configurable embedding model from environment or default
-        import os
         self.embedding_model = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-ada-002")
         self.max_content_length = 8000
         self.supported_languages = ['en', 'de', 'fr']
@@ -316,13 +334,18 @@ class HelpContentService:
             if len(text_for_embedding) > self.max_content_length:
                 text_for_embedding = text_for_embedding[:self.max_content_length]
             
-            # Generate embedding
-            response = self.openai_client.embeddings.create(
-                model=self.embedding_model,
-                input=text_for_embedding
-            )
-            
-            embedding = response.data[0].embedding
+            # Generate embedding using local model or OpenAI
+            if self.use_local_embeddings and self.local_embedding_model:
+                # Use local sentence-transformers model
+                embedding = self.local_embedding_model.encode(text_for_embedding, convert_to_numpy=True)
+                embedding = embedding.tolist()
+            else:
+                # Use OpenAI embeddings
+                response = self.openai_client.embeddings.create(
+                    model=self.embedding_model,
+                    input=text_for_embedding
+                )
+                embedding = response.data[0].embedding
             
             # Store embedding
             embedding_data = {
@@ -369,12 +392,18 @@ class HelpContentService:
     async def _vector_search(self, search_params: HelpContentSearch) -> List[HelpContentSearchResult]:
         """Perform vector similarity search"""
         try:
-            # Generate query embedding
-            response = self.openai_client.embeddings.create(
-                model=self.embedding_model,
-                input=search_params.query
-            )
-            query_embedding = response.data[0].embedding
+            # Generate query embedding using local model or OpenAI
+            if self.use_local_embeddings and self.local_embedding_model:
+                # Use local sentence-transformers model
+                query_embedding = self.local_embedding_model.encode(search_params.query, convert_to_numpy=True)
+                query_embedding = query_embedding.tolist()
+            else:
+                # Use OpenAI embeddings
+                response = self.openai_client.embeddings.create(
+                    model=self.embedding_model,
+                    input=search_params.query
+                )
+                query_embedding = response.data[0].embedding
             
             # Build content type filter
             content_types = []

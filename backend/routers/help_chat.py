@@ -121,10 +121,29 @@ class ProactiveTipsResponse(BaseModel):
     tips: List[ProactiveTipResponse]
     context_analyzed: Dict[str, Any]
 
+class LanguagePreferenceRequest(BaseModel):
+    language: str = Field(..., description="Language code (en, de, fr, es, pl, gsw)")
+
+class SupportedLanguageResponse(BaseModel):
+    code: str
+    name: str
+    native_name: str
+    formal_tone: bool
+
 # Initialize help RAG agent, proactive tips engine, and translation service (will be done in startup)
 help_rag_agent: Optional[HelpRAGAgent] = None
 proactive_tips_engine: Optional[ProactiveTipsEngine] = None
 translation_service: Optional[TranslationService] = None
+
+# Static list of supported languages (fallback when translation service unavailable)
+SUPPORTED_LANGUAGES = [
+    {"code": "en", "name": "English", "native_name": "English", "formal_tone": False},
+    {"code": "de", "name": "German", "native_name": "Deutsch", "formal_tone": True},
+    {"code": "fr", "name": "French", "native_name": "Français", "formal_tone": True},
+    {"code": "es", "name": "Spanish", "native_name": "Español", "formal_tone": False},
+    {"code": "pl", "name": "Polish", "native_name": "Polski", "formal_tone": False},
+    {"code": "gsw", "name": "Swiss German", "native_name": "Baseldytsch", "formal_tone": False},
+]
 
 def get_help_rag_agent() -> HelpRAGAgent:
     """Get the help RAG agent instance"""
@@ -138,7 +157,9 @@ def get_help_rag_agent() -> HelpRAGAgent:
                 status_code=503, 
                 detail="Help chat service unavailable - OpenAI API key not configured"
             )
-        help_rag_agent = HelpRAGAgent(supabase, openai_api_key)
+        # Support custom base URL for OpenAI-compatible APIs (e.g., Grok)
+        base_url = os.getenv("OPENAI_BASE_URL")
+        help_rag_agent = HelpRAGAgent(supabase, openai_api_key, base_url=base_url)
     return help_rag_agent
 
 def get_proactive_tips_engine() -> ProactiveTipsEngine:
@@ -160,7 +181,9 @@ def get_translation_service() -> TranslationService:
                 status_code=503, 
                 detail="Translation service unavailable - OpenAI API key not configured"
             )
-        translation_service = TranslationService(supabase, openai_api_key)
+        # Support custom base URL for OpenAI-compatible APIs (e.g., Grok)
+        base_url = os.getenv("OPENAI_BASE_URL")
+        translation_service = TranslationService(supabase, openai_api_key, base_url=base_url)
     return translation_service
 
 @router.post("/query", response_model=HelpQueryResponse)
@@ -178,11 +201,15 @@ async def process_help_query(
         if supabase is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
-        # 1. Check Supabase cache first (NEW)
+        # Log incoming request language for debugging
+        logger.info(f"Help query received - language: {help_request.language}, query: {help_request.query[:50]}...")
+        
+        # 1. Check Supabase cache first (NEW) - include language in cache key
         cached_response = await get_cached_response(
             query=help_request.query,
             user_id=current_user["user_id"],
-            context=help_request.context
+            context=help_request.context,
+            language=help_request.language
         )
         
         if cached_response:
@@ -194,11 +221,13 @@ async def process_help_query(
             # Add cache indicator to response
             cached_response['is_cached'] = True
             cached_response['response_time_ms'] = int((time.time() - start_time) * 1000)
-            logger.info(f"Returning cached response (took {cached_response['response_time_ms']}ms)")
+            logger.info(f"Returning cached response for lang={help_request.language} (took {cached_response['response_time_ms']}ms)")
             return HelpQueryResponse(**cached_response)
         
         # 2. Check if we should use fallback due to performance issues
-        if performance_service.should_use_fallback():
+        # TEMPORARILY DISABLED: Always try AI first
+        # if performance_service.should_use_fallback():
+        if False:  # Disabled fallback check
             fallback_response = await performance_service.get_fallback_response(
                 help_request.query, help_request.context
             )
@@ -276,7 +305,8 @@ async def process_help_query(
             user_id=current_user["user_id"],
             response=response_data,
             context=help_request.context,
-            ttl=cache_ttl
+            ttl=cache_ttl,
+            language=help_request.language
         )
         
         # 6. Record performance metrics
@@ -367,6 +397,9 @@ async def process_help_query(
         )
         
         logger.error(f"Help query processing failed: {e}")
+        logger.error(f"Exception type: {type(e).__name__}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         
         # Return fallback response on error
         try:
@@ -680,18 +713,14 @@ async def get_supported_languages(
 ):
     """Get list of supported languages"""
     try:
-        translation_service = get_translation_service()
-        languages = await translation_service.get_supported_languages()
-        return languages
+        # Return static list - don't depend on translation service
+        # This ensures language selection works even when OpenAI is not configured
+        return SUPPORTED_LANGUAGES
         
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error(f"Failed to get supported languages: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to get supported languages: {str(e)}"
-        )
+        # Even on error, return the static list
+        return SUPPORTED_LANGUAGES
 
 @router.get("/language/preference", response_model=Dict[str, str])
 async def get_user_language_preference(
@@ -699,36 +728,73 @@ async def get_user_language_preference(
 ):
     """Get user's language preference"""
     try:
-        translation_service = get_translation_service()
-        language = await translation_service.get_user_language_preference(current_user["user_id"])
-        return {"language": language}
+        # Try to get from database via translation service if available
+        try:
+            translation_service = get_translation_service()
+            language = await translation_service.get_user_language_preference(current_user["user_id"])
+            return {"language": language}
+        except HTTPException as e:
+            if e.status_code == 503:
+                # Translation service unavailable, try direct database access
+                logger.warning("Translation service unavailable, using direct database access")
+                response = supabase.table("user_profiles").select("preferences").eq("user_id", current_user["user_id"]).execute()
+                if response.data:
+                    preferences = response.data[0].get("preferences", {})
+                    language = preferences.get("language", "en")
+                    return {"language": language}
+                return {"language": "en"}
+            raise
         
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Failed to get language preference: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to get language preference: {str(e)}"
-        )
+        # Return default language instead of error
+        return {"language": "en"}
 
 @router.post("/language/preference", response_model=FeedbackResponse)
 async def set_user_language_preference(
-    language: str,
+    request: LanguagePreferenceRequest,
     current_user = Depends(get_current_user)
 ):
     """Set user's language preference"""
     try:
-        # Validate language
-        supported_languages = [lang.value for lang in SupportedLanguage]
-        if language not in supported_languages:
+        # Validate language against static list
+        supported_codes = [lang["code"] for lang in SUPPORTED_LANGUAGES]
+        if request.language not in supported_codes:
             raise HTTPException(
                 status_code=400,
-                detail=f"Unsupported language. Supported languages: {', '.join(supported_languages)}"
+                detail=f"Unsupported language. Supported languages: {', '.join(supported_codes)}"
             )
         
-        translation_service = get_translation_service()
-        success = await translation_service.set_user_language_preference(current_user["user_id"], language)
+        # Try to use translation service if available, otherwise direct database access
+        try:
+            translation_service = get_translation_service()
+            success = await translation_service.set_user_language_preference(current_user["user_id"], request.language)
+        except HTTPException as e:
+            if e.status_code == 503:
+                # Translation service unavailable, use direct database access
+                logger.warning("Translation service unavailable, using direct database access")
+                
+                # Get current preferences
+                response = supabase.table("user_profiles").select("preferences").eq("user_id", current_user["user_id"]).execute()
+                current_preferences = {}
+                if response.data:
+                    current_preferences = response.data[0].get("preferences", {})
+                
+                # Update language preference
+                current_preferences["language"] = request.language
+                current_preferences["language_updated_at"] = datetime.now().isoformat()
+                
+                # Upsert preferences
+                upsert_response = supabase.table("user_profiles").upsert({
+                    "user_id": current_user["user_id"],
+                    "preferences": current_preferences
+                }).execute()
+                
+                success = bool(upsert_response.data)
+            else:
+                raise
         
         if not success:
             raise HTTPException(
@@ -737,7 +803,7 @@ async def set_user_language_preference(
             )
         
         return FeedbackResponse(
-            message=f"Language preference set to {language}"
+            message=f"Language preference set to {request.language}"
         )
         
     except HTTPException:

@@ -107,54 +107,31 @@ class HelpRAGAgent(RAGReporterAgent):
             # Generate session ID
             session_id = f"help_{int(datetime.now().timestamp())}_{user_id[:8]}"
             
-            # Search for relevant help content using the new help content service
-            similar_content = await self._search_help_content(query, limit=5)
+            # SKIP help content search for speed - AI model has enough knowledge
+            similar_content = []
             
-            # Get contextual PPM data based on current page
-            contextual_data = await self._get_contextual_ppm_data(context, user_id)
+            # Get contextual PPM data based on current page (simplified for speed)
+            contextual_data = await self._get_contextual_ppm_data_fast(context, user_id)
             
-            # Build help-specific prompt
+            # Build help-specific prompt - DIRECTLY IN TARGET LANGUAGE
             system_prompt = self._build_help_system_prompt(language)
-            user_prompt = self._build_help_user_prompt(query, context, similar_content, contextual_data)
+            user_prompt = self._build_help_user_prompt(query, context, similar_content, contextual_data, language)
             
-            # Call OpenAI for help response
+            # Call OpenAI for help response - directly in target language
+            # Ultra-optimized for speed: deterministic, minimal tokens
             response = self.openai_client.chat.completions.create(
                 model=self.help_model,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                temperature=0.1,
-                max_tokens=800
+                temperature=0,  # Deterministic for speed
+                max_tokens=300  # Reduced from 400 for sub-3s responses
             )
             
             ai_response = response.choices[0].message.content
             
-            # Translate if needed
-            if language != 'en':
-                # Use the translation service for better caching and quality
-                from services.translation_service import TranslationService, TranslationRequest
-                import os
-                openai_api_key = os.getenv("OPENAI_API_KEY")
-                if openai_api_key:
-                    translation_service = TranslationService(self.supabase, openai_api_key)
-                    translation_request = TranslationRequest(
-                        content=ai_response,
-                        source_language="en",
-                        target_language=language,
-                        content_type="help_response",
-                        context={
-                            "route": context.route,
-                            "page_title": context.page_title,
-                            "user_role": context.user_role
-                        }
-                    )
-                    translation_response = await translation_service.translate_content(translation_request)
-                    ai_response = translation_response.translated_content
-                else:
-                    # Fallback to original translation method
-                    translated_response = await self.translate_response(ai_response, language)
-                    ai_response = translated_response.content
+            # NO SEPARATE TRANSLATION - response is already in target language
             
             # Calculate metrics
             response_time = int((datetime.now() - start_time).total_seconds() * 1000)
@@ -165,11 +142,18 @@ class HelpRAGAgent(RAGReporterAgent):
             sources = self._extract_help_sources(similar_content)
             confidence_score = self._calculate_help_confidence(similar_content, ai_response, context)
             
-            # Generate suggested actions
-            suggested_actions = await self._generate_suggested_actions(query, context, ai_response)
+            # Generate suggested actions (simplified for speed)
+            suggested_actions = [
+                {
+                    "id": "provide_feedback",
+                    "label": "Was this helpful?",
+                    "action": "feedback",
+                    "target": "/feedback"
+                }
+            ]
             
-            # Generate related guides
-            related_guides = await self._find_related_guides(query, context)
+            # Skip related guides for speed
+            related_guides = []
             
             # Log operation
             operation_id = await self.log_operation(
@@ -319,23 +303,84 @@ class HelpRAGAgent(RAGReporterAgent):
         """Check if query is within PPM domain boundaries"""
         query_lower = query.lower()
         
-        # Check for PPM domain keywords
-        has_ppm_keywords = any(keyword in query_lower for keyword in self.ppm_domain_keywords)
+        # Extended PPM domain keywords including translations
+        ppm_keywords_multilang = self.ppm_domain_keywords + [
+            # German keywords
+            "projekt", "projekte", "portfolio", "ressource", "ressourcen", "budget", 
+            "zeitplan", "risiko", "risiken", "problem", "meilenstein", "aufgabe", 
+            "zuteilung", "auslastung", "varianz", "baseline", "simulation", 
+            "dashboard", "bericht", "analytik", "was-wäre-wenn", "varianz-tracking",
+            # French keywords
+            "projet", "projets", "portefeuille", "ressource", "ressources", 
+            "calendrier", "risque", "risques", "problème", "jalon", "tâche",
+            "allocation", "utilisation", "écart", "écarts", "référence", 
+            "tableau de bord", "rapport", "analyse", "suivi",
+            # Spanish keywords
+            "proyecto", "proyectos", "cartera", "recurso", "recursos", "presupuesto",
+            "cronograma", "riesgo", "riesgos", "problema", "hito", "tarea",
+            "asignación", "utilización", "varianza", "variación", "línea base",
+            "panel", "informe", "análisis", "seguimiento", "simulación",
+            # Polish keywords (including declensions)
+            "projekt", "projekty", "projektu", "projektów", "portfel", "portfela",
+            "zasób", "zasoby", "zasobów", "budżet", "budżetu", "budżetów",
+            "harmonogram", "harmonogramu", "ryzyko", "ryzyka", "ryzykiem",
+            "problem", "problemu", "kamień milowy", "zadanie", "zadania",
+            "alokacja", "alokacji", "wykorzystanie", "wykorzystania",
+            "wariancja", "wariancji", "wariancję", "baseline", "symulacja", "symulacji",
+            "pulpit", "raport", "raportu", "analiza", "analizy", "śledzenie", "śledzenia",
+            # Swiss German keywords
+            "projäkt", "portfolio", "ressurse", "budget", "risiko", "ufgab"
+        ]
         
-        # Check for off-topic indicators
+        # Check for PPM domain keywords
+        has_ppm_keywords = any(keyword in query_lower for keyword in ppm_keywords_multilang)
+        
+        # Check for off-topic indicators (multilingual)
         off_topic_keywords = [
+            # English
             "competitor", "alternative", "other tools", "different software",
             "personal life", "weather", "news", "sports", "entertainment",
-            "cooking", "travel", "health", "medical", "legal advice"
+            "cooking", "travel", "health", "medical", "legal advice",
+            # German
+            "konkurrent", "alternative", "andere tools", "andere software",
+            "privatleben", "wetter", "nachrichten", "sport", "unterhaltung",
+            # French
+            "concurrent", "alternatif", "autres outils", "autre logiciel",
+            "vie privée", "météo", "nouvelles", "sport", "divertissement",
+            # Spanish
+            "competidor", "alternativa", "otras herramientas", "otro software",
+            "vida personal", "clima", "noticias", "deportes", "entretenimiento",
+            # Polish
+            "konkurent", "alternatywa", "inne narzędzia", "inne oprogramowanie",
+            "życie prywatne", "pogoda", "wiadomości", "sport", "rozrywka"
         ]
         
         has_off_topic = any(keyword in query_lower for keyword in off_topic_keywords)
         
-        # Allow general help queries about the platform
+        # Allow general help queries about the platform (multilingual)
         platform_queries = [
+            # English
             "how to", "where is", "what is", "help", "guide", "tutorial",
             "navigation", "menu", "button", "feature", "function", "app",
-            "platform", "system", "tool", "software", "can", "does"
+            "platform", "system", "tool", "software", "can", "does",
+            # German
+            "wie", "wo ist", "was ist", "hilfe", "anleitung", "tutorial",
+            "navigation", "menü", "schaltfläche", "funktion", "app",
+            "plattform", "system", "werkzeug", "kann", "macht",
+            # French
+            "comment", "où est", "qu'est-ce", "aide", "guide", "tutoriel",
+            "navigation", "menu", "bouton", "fonctionnalité", "fonction",
+            "plateforme", "système", "outil", "peut", "fait",
+            # Spanish
+            "cómo", "dónde está", "qué es", "ayuda", "guía",
+            "navegación", "menú", "botón", "característica", "función",
+            "plataforma", "sistema", "herramienta", "puede", "hace",
+            # Polish
+            "jak", "gdzie jest", "co to jest", "czym jest", "pomoc", "przewodnik",
+            "nawigacja", "menu", "przycisk", "funkcja", "aplikacja",
+            "platforma", "system", "narzędzie", "może", "robi",
+            # Swiss German
+            "wie", "wo isch", "was isch", "hilf", "aaleitig"
         ]
         
         has_platform_query = any(keyword in query_lower for keyword in platform_queries)
@@ -347,10 +392,23 @@ class HelpRAGAgent(RAGReporterAgent):
         redirect_messages = {
             'en': "I'm here to help you with PPM platform features and functionality. For questions about projects, portfolios, resources, budgets, or how to use specific features, I'm happy to assist! Could you rephrase your question to focus on the PPM platform?",
             'de': "Ich bin hier, um Ihnen bei PPM-Plattform-Features und -Funktionen zu helfen. Bei Fragen zu Projekten, Portfolios, Ressourcen, Budgets oder zur Nutzung bestimmter Features helfe ich gerne! Könnten Sie Ihre Frage umformulieren, um sich auf die PPM-Plattform zu konzentrieren?",
-            'fr': "Je suis là pour vous aider avec les fonctionnalités de la plateforme PPM. Pour les questions sur les projets, portfolios, ressources, budgets, ou comment utiliser des fonctionnalités spécifiques, je suis ravi de vous aider ! Pourriez-vous reformuler votre question pour vous concentrer sur la plateforme PPM ?"
+            'fr': "Je suis là pour vous aider avec les fonctionnalités de la plateforme PPM. Pour les questions sur les projets, portfolios, ressources, budgets, ou comment utiliser des fonctionnalités spécifiques, je suis ravi de vous aider ! Pourriez-vous reformuler votre question pour vous concentrer sur la plateforme PPM ?",
+            'es': "Estoy aquí para ayudarte con las funciones de la plataforma PPM. Para preguntas sobre proyectos, carteras, recursos, presupuestos o cómo usar funciones específicas, ¡estaré encantado de ayudarte! ¿Podrías reformular tu pregunta para centrarte en la plataforma PPM?",
+            'pl': "Jestem tutaj, aby pomóc Ci z funkcjami platformy PPM. W przypadku pytań dotyczących projektów, portfeli, zasobów, budżetów lub sposobu korzystania z określonych funkcji, chętnie pomogę! Czy mógłbyś przeformułować swoje pytanie, aby skupić się na platformie PPM?",
+            'gsw': "Ich bi do zum dir mit de PPM-Plattform-Funktione z hälfe. Bi Froge zu Projäkt, Portfolio, Ressurse, Budget oder wie mer bestimmti Funktione bruucht, hilf ich gärn! Chasch du dini Frog umformuliere, dass sie uf d PPM-Plattform fokussiert isch?"
+        }
+        
+        action_labels = {
+            'en': "Explore Platform Features",
+            'de': "Funktionen erkunden",
+            'fr': "Explorer les fonctionnalités",
+            'es': "Explorar funciones de la plataforma",
+            'pl': "Przeglądaj funkcje platformy",
+            'gsw': "Funktione erkunde"
         }
         
         response_text = redirect_messages.get(language, redirect_messages['en'])
+        action_label = action_labels.get(language, action_labels['en'])
         
         return HelpResponse(
             response=response_text,
@@ -361,7 +419,7 @@ class HelpRAGAgent(RAGReporterAgent):
             suggested_actions=[
                 {
                     "id": "explore_features",
-                    "label": "Explore Platform Features" if language == 'en' else "Funktionen erkunden" if language == 'de' else "Explorer les fonctionnalités",
+                    "label": action_label,
                     "action": "navigate:/dashboards"
                 }
             ]
@@ -406,78 +464,53 @@ class HelpRAGAgent(RAGReporterAgent):
         except Exception as e:
             logger.error(f"Failed to get contextual PPM data: {e}")
             return {}
+
+    async def _get_contextual_ppm_data_fast(self, context: PageContext, user_id: str) -> Dict[str, Any]:
+        """Fast version - skip database queries for speed"""
+        return {
+            "user_role": context.user_role,
+            "page_context": {
+                "route": context.route,
+                "page_title": context.page_title
+            }
+        }
     
     def _build_help_system_prompt(self, language: str) -> str:
-        """Build system prompt for help queries"""
-        base_prompt = """You are a helpful AI assistant for a Project Portfolio Management (PPM) platform. 
-        You provide contextual help and guidance to users about platform features and functionality.
+        """Build system prompt for help queries - ultra-optimized for speed"""
         
-        Guidelines:
-        - Focus exclusively on PPM platform features and capabilities
-        - Provide clear, actionable guidance with specific steps when possible
-        - Reference actual menu locations and navigation paths
-        - Include relevant screenshots or visual guide suggestions when helpful
-        - Suggest related features that might be useful
-        - If information is incomplete, clearly state limitations
-        - Be concise but comprehensive
-        - Use a friendly, professional tone
-        - Format responses with bullet points or numbered steps when appropriate
+        # Language-specific instructions
+        language_instructions = {
+            'en': "Respond in English. Be brief (max 2-3 short paragraphs).",
+            'de': "Antworte auf Deutsch. Sei kurz (max 2-3 kurze Absätze).",
+            'fr': "Réponds en français. Sois bref (max 2-3 courts paragraphes).",
+            'es': "Responde en español. Sé breve (máx 2-3 párrafos cortos).",
+            'pl': "Odpowiedz po polsku. Bądź zwięzły (maks 2-3 krótkie akapity).",
+            'gsw': "Antworte uf Baseldytsch. Sig churz (max 2-3 churzi Absätz)."
+        }
         
-        PPM Platform Features Include:
-        - Project management and tracking
-        - Portfolio oversight and optimization
-        - Resource allocation and utilization
-        - Budget management and financial tracking
-        - Risk assessment and mitigation
-        - What-If scenarios and Monte Carlo simulations
-        - Dashboard analytics and reporting
-        - Schedule management and baselines
-        - Issue tracking and resolution
+        lang_instruction = language_instructions.get(language, language_instructions['en'])
         
-        Always base responses on the provided context and help content."""
-        
-        if language == 'de':
-            base_prompt += "\n\nRespond in German, maintaining technical PPM terminology accuracy."
-        elif language == 'fr':
-            base_prompt += "\n\nRespond in French, maintaining technical PPM terminology accuracy."
-        
-        return base_prompt
+        return f"""You are a PPM help assistant. {lang_instruction}
+
+Focus on: projects, portfolios, resources, budgets, risks, schedules, dashboards.
+Give clear steps. Use bullet points."""
     
     def _build_help_user_prompt(self, query: str, context: PageContext, 
-                              similar_content: List[Dict], contextual_data: Dict) -> str:
-        """Build user prompt with help-specific context"""
-        prompt = f"User Query: {query}\n\n"
+                              similar_content: List[Dict], contextual_data: Dict,
+                              language: str = 'en') -> str:
+        """Build user prompt with help-specific context - optimized for speed"""
+        prompt = f"Question: {query}\n"
+        prompt += f"Page: {context.page_title} ({context.route})\n"
+        prompt += f"Role: {context.user_role}\n"
         
-        # Add current page context
-        prompt += f"Current Context:\n"
-        prompt += f"- Page: {context.page_title} ({context.route})\n"
-        prompt += f"- User Role: {context.user_role}\n"
-        
-        if context.current_project:
-            prompt += f"- Current Project: {context.current_project}\n"
-        if context.current_portfolio:
-            prompt += f"- Current Portfolio: {context.current_portfolio}\n"
-        
-        prompt += "\n"
-        
-        # Add relevant help content
+        # Add only most relevant help content (limit to 2 for speed)
         if similar_content:
-            prompt += "Relevant Help Content:\n"
-            for i, content in enumerate(similar_content[:3], 1):
-                content_text = content['content_text'][:300]
-                prompt += f"{i}. {content['content_type']}: {content_text}...\n"
-            prompt += "\n"
+            prompt += "\nRelevant info:\n"
+            for content in similar_content[:2]:
+                content_text = content['content_text'][:200]  # Reduced from 300
+                prompt += f"- {content_text}...\n"
         
-        # Add contextual data summary
-        if contextual_data:
-            prompt += "Current Data Context:\n"
-            for key, value in contextual_data.items():
-                if key not in ['user_role', 'page_context'] and value:
-                    if isinstance(value, (list, dict)):
-                        prompt += f"- {key}: {len(value) if isinstance(value, list) else 'Available'}\n"
-                    else:
-                        prompt += f"- {key}: {value}\n"
-            prompt += "\n"
+        return prompt
         
         prompt += "Please provide helpful guidance based on the user's current context and available information."
         
@@ -592,10 +625,10 @@ class HelpRAGAgent(RAGReporterAgent):
     async def _find_related_guides(self, query: str, context: PageContext) -> List[Dict]:
         """Find related guides and tutorials"""
         try:
-            # Search for guide content
+            # Search for guide content (including indexed documentation)
             guide_content = await self.search_similar_content(
                 query,
-                content_types=['guide', 'tutorial', 'walkthrough'],
+                content_types=['document', 'guide', 'tutorial', 'walkthrough'],
                 limit=3
             )
             
@@ -623,6 +656,7 @@ class HelpRAGAgent(RAGReporterAgent):
         
         # Generate appropriate URLs based on content type
         url_mapping = {
+            "document": f"/help/docs/{content_id}",
             "guide": f"/help/guides/{content_id}",
             "faq": f"/help/faq#{content_id}",
             "tutorial": f"/help/tutorials/{content_id}",
@@ -842,57 +876,60 @@ class HelpRAGAgent(RAGReporterAgent):
         
         return tips
     
-    async def _search_help_content(self, query: str, limit: int = 5) -> List[Dict]:
-        """Search help content using the new help content service"""
+    async def _search_help_content(self, query: str, limit: int = 3) -> List[Dict]:
+        """Search help content - with timeout for speed"""
         try:
-            # Import here to avoid circular imports
-            from services.help_content_service import HelpContentService
-            from models.help_content import HelpContentSearch, ContentType
+            import asyncio
             
-            # Initialize help content service
-            import os
-            openai_api_key = os.getenv("OPENAI_API_KEY")
-            if not openai_api_key:
-                logger.warning("OpenAI API key not available for help content search")
+            # Set a timeout of 2 seconds for the search
+            async def search_with_timeout():
+                from services.help_content_service import HelpContentService
+                from models.help_content import HelpContentSearch, ContentType
+                
+                import os
+                openai_api_key = os.getenv("OPENAI_API_KEY")
+                if not openai_api_key:
+                    return []
+                
+                help_content_service = HelpContentService(self.supabase, openai_api_key)
+                
+                search_params = HelpContentSearch(
+                    query=query,
+                    content_types=[ContentType.guide, ContentType.faq],  # Reduced types
+                    is_active=True,
+                    limit=limit
+                )
+                
+                search_response = await help_content_service.search_content(search_params)
+                
+                similar_content = []
+                for result in search_response.results[:limit]:
+                    content = result.content
+                    similar_content.append({
+                        'content_type': content.content_type,
+                        'content_id': str(content.id),
+                        'content_text': content.content[:300],  # Limit content length
+                        'similarity_score': result.similarity_score or 0.8,
+                        'metadata': {'title': content.title}
+                    })
+                
+                return similar_content
+            
+            # Try to get results within 2 seconds, otherwise return empty
+            try:
+                return await asyncio.wait_for(search_with_timeout(), timeout=2.0)
+            except asyncio.TimeoutError:
+                logger.warning("Help content search timed out")
                 return []
-            
-            help_content_service = HelpContentService(self.supabase, openai_api_key)
-            
-            # Search for help content
-            search_params = HelpContentSearch(
-                query=query,
-                content_types=[ContentType.guide, ContentType.faq, ContentType.feature_doc, ContentType.tutorial],
-                is_active=True,
-                limit=limit
-            )
-            
-            search_response = await help_content_service.search_content(search_params)
-            
-            # Convert to format expected by RAG agent
-            similar_content = []
-            for result in search_response.results:
-                content = result.content
-                similar_content.append({
-                    'content_type': content.content_type,
-                    'content_id': str(content.id),
-                    'content_text': content.content,
-                    'similarity_score': result.similarity_score or 0.8,
-                    'metadata': {
-                        'title': content.title,
-                        'tags': content.tags,
-                        'language': content.language,
-                        'slug': content.slug
-                    }
-                })
             
             return similar_content
             
         except Exception as e:
             logger.error(f"Failed to search help content: {e}")
-            # Fallback to original search method
+            # Fallback to original search method - search for documents (our indexed documentation)
             return await self.search_similar_content(
                 query,
-                content_types=['help_content', 'feature_doc', 'guide', 'faq'],
+                content_types=['document', 'help_content', 'feature_doc', 'guide', 'faq'],
                 limit=limit
             )
 

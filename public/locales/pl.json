@@ -143,6 +143,13 @@
     "placeholder": "Zapytaj mnie o coś związanego z PPM...",
     "title": "Asystent Pomocy AI"
   },
+  "helpChat": {
+    "placeholder": "Zapytaj mnie o coś związanego z PPM...",
+    "welcome": "Witamy w Asystencie Pomocy AI!",
+    "welcomeMessage": "Zapytaj mnie o cokolwiek związanego z funkcjami platformy PPM, a ja Ci pomogę.",
+    "typing": "AI pisze...",
+    "tryAgain": "Spróbuj ponownie"
+  },
   "variance": {
     "trends": "Trendy Wariancji",
     "alerts": "Alerty Wariancji",

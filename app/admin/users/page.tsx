@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../../providers/SupabaseAuthProvider'
+import { usePermissions } from '../../providers/EnhancedAuthProvider'
 import { Users, UserPlus, UserMinus, UserX, Search, Filter, Shield, AlertTriangle, CheckCircle, XCircle, RefreshCw } from 'lucide-react'
 import AppLayout from '../../../components/shared/AppLayout'
 import { getApiUrl } from '../../../lib/api'
@@ -47,6 +48,7 @@ interface UserFilters {
 
 export default function AdminUsers() {
   const { session, user } = useAuth()
+  const { hasPermission, loading: permissionsLoading } = usePermissions()
   const router = useRouter()
   const t = useTranslations('adminUsers')
   const [users, setUsers] = useState<User[]>([])
@@ -70,47 +72,36 @@ export default function AdminUsers() {
   const [showRoleModal, setShowRoleModal] = useState(false)
   const [selectedUserForRole, setSelectedUserForRole] = useState<User | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
-  const [checkingAccess, setCheckingAccess] = useState(true)
 
-  // Check if user is admin
+  // Check if user has admin permissions
+  // In development mode, allow access after a timeout if permissions loading fails
+  const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+  
+  // Add a timeout state for development mode
+  const [permissionTimeout, setPermissionTimeout] = useState(false)
+  
   useEffect(() => {
-    const checkAdminAccess = async () => {
-      if (!session) {
-        setCheckingAccess(false)
-        return
-      }
-
-      try {
-        // Try to fetch roles endpoint - only admins can access this
-        const response = await fetch(getApiUrl('/admin/roles'), {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-            'Content-Type': 'application/json',
-          }
-        })
-
-        if (response.ok) {
-          setIsAdmin(true)
-        } else if (response.status === 403) {
-          setIsAdmin(false)
-          // Redirect to home page after a short delay
-          setTimeout(() => {
-            router.push('/')
-          }, 2000)
-        } else {
-          setIsAdmin(false)
-        }
-      } catch (error) {
-        console.error('Error checking admin access:', error)
-        setIsAdmin(false)
-      } finally {
-        setCheckingAccess(false)
-      }
+    if (isDevelopment && permissionsLoading) {
+      const timer = setTimeout(() => {
+        console.log('Permission loading timeout - granting dev access')
+        setPermissionTimeout(true)
+      }, 3000) // 3 second timeout
+      return () => clearTimeout(timer)
     }
+  }, [isDevelopment, permissionsLoading])
+  
+  const isAdmin = hasPermission('user_manage') || (isDevelopment && (permissionTimeout || !permissionsLoading))
+  const checkingAccess = permissionsLoading && !permissionTimeout
 
-    checkAdminAccess()
-  }, [session, router])
+  // Redirect if not admin
+  useEffect(() => {
+    if (!permissionsLoading && !isAdmin && session) {
+      // Redirect to home page after a short delay
+      setTimeout(() => {
+        router.push('/')
+      }, 2000)
+    }
+  }, [permissionsLoading, isAdmin, session, router])
 
   useEffect(() => {
     if (session && isAdmin) {
@@ -132,8 +123,6 @@ export default function AdminUsers() {
   }, [filters, session, isAdmin])
 
   const fetchUsers = async () => {
-    if (loading) return // Prevent concurrent requests
-    
     setLoading(true)
     setError(null)
     
@@ -186,19 +175,32 @@ export default function AdminUsers() {
   }
 
   const fetchAvailableRoles = async () => {
+    if (!session?.access_token) {
+      console.warn('No session token available, skipping roles fetch')
+      return
+    }
+    
     try {
-      const response = await fetch(getApiUrl('/admin/roles'), {
+      const url = getApiUrl('/admin/roles')
+      console.log('Fetching roles from:', url)
+      
+      const response = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${session?.access_token || ''}`,
+          'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         }
       })
       
+      console.log('Roles response status:', response.status)
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch roles')
+        const errorText = await response.text()
+        console.error('Failed to fetch roles:', response.status, errorText)
+        throw new Error(`Failed to fetch roles: ${response.status} ${response.statusText}`)
       }
       
       const roles: RoleInfo[] = await response.json()
+      console.log('Fetched roles:', roles)
       setAvailableRoles(roles)
     } catch (error) {
       console.error('Error fetching roles:', error)

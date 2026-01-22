@@ -220,14 +220,10 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
   }, [pathname, user, t])
 
   // Sync language preference TO server (one-way: client -> server)
-  // This should only push the current language to the server, not pull from it
+  // DISABLED: Server sync causes HTTP 400 errors, local preference is sufficient
   const syncLanguageToServer = useCallback(async (language: string) => {
-    try {
-      // Only sync TO server, don't pull FROM server to avoid overriding user choice
-      await helpChatAPI.setUserLanguagePreference(language)
-    } catch (error) {
-      console.warn('Failed to sync language preference to server:', error)
-    }
+    // DISABLED: Server sync not needed, local preference works fine
+    return
   }, [])
 
   // Initialize provider
@@ -253,13 +249,30 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
 
   // Sync HelpChat language with global language
   useEffect(() => {
+    console.log('🔍 [HelpChat] Language sync check:', {
+      currentLanguage,
+      stateLanguage: state.language,
+      needsUpdate: currentLanguage && currentLanguage !== state.language,
+      currentLanguageType: typeof currentLanguage,
+      stateLanguageType: typeof state.language
+    })
+    
     if (currentLanguage && currentLanguage !== state.language) {
-      setState(prevState => ({
-        ...prevState,
-        language: currentLanguage
-      }))
+      console.log('✅ [HelpChat] Updating state.language from', state.language, 'to', currentLanguage)
+      setState(prevState => {
+        console.log('🔄 [HelpChat] setState callback - prevState.language:', prevState.language, '-> newLanguage:', currentLanguage)
+        return {
+          ...prevState,
+          language: currentLanguage
+        }
+      })
     }
   }, [currentLanguage, state.language])
+
+  // Debug: Log when currentLanguage from useLanguage hook changes
+  useEffect(() => {
+    console.log('🌐 [HelpChat] currentLanguage from useLanguage changed to:', currentLanguage)
+  }, [currentLanguage])
 
   // Update context when route changes
   useEffect(() => {
@@ -337,14 +350,34 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
     }))
 
     try {
-      // Prepare request
+      // Get the most current language - prefer currentLanguage from hook, fall back to state
+      const effectiveLanguage = currentLanguage || state.language || 'en'
+      
+      console.log('🔍 [HelpChat] Language resolution:', {
+        currentLanguage,
+        stateLanguage: state.language,
+        effectiveLanguage,
+        currentLanguageType: typeof currentLanguage,
+        currentLanguageLength: currentLanguage?.length
+      })
+      
+      // Prepare request with CURRENT language (not state.language which might be stale)
       const request: HelpQueryRequest = {
         query: message.trim(),
         sessionId: state.sessionId,
         context: state.currentContext,
-        language: state.language,
+        language: effectiveLanguage,
         includeProactiveTips: state.proactiveTipsEnabled
       }
+
+      console.log('📤 [HelpChat] Sending query:', {
+        query: message.trim().substring(0, 50) + '...',
+        language: request.language,
+        currentLanguage,
+        stateLanguage: state.language,
+        requestContext: request.context,
+        fullRequest: JSON.stringify(request).substring(0, 500)
+      })
 
       // Use the new API service
       const data: HelpQueryResponse = await helpChatAPI.submitQuery(request)
@@ -394,7 +427,14 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
       }
 
     } catch (error) {
-      console.error('Error sending help message:', error)
+      // Only log non-network errors to console to reduce noise
+      // Network errors are expected when backend is unavailable
+      const isNetworkError = error && typeof error === 'object' && 'code' in error && 
+        (error as HelpChatError).code === 'NETWORK_ERROR'
+      
+      if (!isNetworkError) {
+        console.error('Error sending help message:', error)
+      }
       
       let errorContent = 'Sorry, I encountered an error processing your request. Please try again.'
       
@@ -406,7 +446,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
             errorContent = 'You\'ve reached the rate limit. Please wait a moment before sending another message.'
             break
           case 'NETWORK_ERROR':
-            errorContent = 'Network error. Please check your connection and try again.'
+            errorContent = 'Help chat is currently unavailable. Please try again later.'
             break
           case 'VALIDATION_ERROR':
             errorContent = 'Invalid request. Please check your message and try again.'
@@ -431,7 +471,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
         error: error instanceof Error ? error.message : 'Unknown error occurred'
       }))
     }
-  }, [state.sessionId, state.currentContext, state.language, state.proactiveTipsEnabled, state.isLoading, dismissedTips, saveToStorage])
+  }, [state.sessionId, state.currentContext, state.language, currentLanguage, state.proactiveTipsEnabled, state.isLoading, dismissedTips, saveToStorage])
 
   // Clear messages
   const clearMessages = useCallback(() => {

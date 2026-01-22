@@ -381,15 +381,15 @@ export default function CompactDashboard() {
         {/* Budget Variance and Variance Trends side by side - always 2 columns on desktop */}
         <div className="grid grid-cols-2 gap-2 md:gap-3">
           {/* Budget Variance - 50% width */}
-          <div className="w-full">
-            <Suspense fallback={<div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>}>
+          <div className="w-full" style={{ minHeight: '120px' }}>
+            <Suspense fallback={<div className="h-full bg-white rounded-lg border border-gray-200 animate-pulse" style={{ minHeight: '120px' }}></div>}>
               <VarianceKPIs session={session} selectedCurrency="USD" />
             </Suspense>
           </div>
           
           {/* Variance Trends - 50% width */}
-          <div className="w-full">
-            <Suspense fallback={<div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>}>
+          <div className="w-full" style={{ minHeight: '280px' }}>
+            <Suspense fallback={<div className="h-full bg-white rounded-lg border border-gray-200 animate-pulse" style={{ minHeight: '280px' }}></div>}>
               <VarianceTrends session={session} selectedCurrency="USD" />
             </Suspense>
           </div>

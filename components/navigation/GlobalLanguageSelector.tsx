@@ -32,6 +32,12 @@ export function GlobalLanguageSelector({ variant = 'sidebar' }: GlobalLanguageSe
   const selectedLanguage = LANGUAGES.find(lang => lang.code === locale) || LANGUAGES[0]
   
   const handleLanguageChange = async (languageCode: string) => {
+    console.log('🌐 [GlobalLanguageSelector] handleLanguageChange called:', {
+      newLanguage: languageCode,
+      currentLocale: locale,
+      isSame: languageCode === locale
+    })
+    
     if (languageCode === locale) {
       setIsOpen(false)
       return
@@ -42,9 +48,11 @@ export function GlobalLanguageSelector({ variant = 'sidebar' }: GlobalLanguageSe
     try {
       // Sync to cookie for Server Components
       syncLanguageToCookie(languageCode)
+      console.log('🌐 [GlobalLanguageSelector] Cookie synced for:', languageCode)
       
       // Set language through the i18n system
       await setLocale(languageCode)
+      console.log('🌐 [GlobalLanguageSelector] setLocale completed for:', languageCode)
       
       setIsOpen(false)
       

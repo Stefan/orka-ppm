@@ -126,11 +126,16 @@ class PerformanceMonitor {
     const longTaskObserver = new PerformanceObserver((list) => {
       const entries = list.getEntries()
       entries.forEach((entry) => {
-        logger.warn('Long task detected', {
-          duration: entry.duration,
-          startTime: entry.startTime,
-          name: entry.name
-        })
+        // Only log tasks significantly over the 50ms threshold (150ms+)
+        // Tasks 50-150ms are common during initial load with charts and not concerning
+        // This reduces console noise while still catching truly problematic tasks
+        if (entry.duration >= 150) {
+          logger.warn('Long task detected', {
+            duration: entry.duration,
+            startTime: entry.startTime,
+            name: entry.name
+          })
+        }
       })
     })
 

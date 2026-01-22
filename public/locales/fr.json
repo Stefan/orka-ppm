@@ -143,6 +143,13 @@
     "placeholder": "Posez-moi une question sur PPM...",
     "title": "Assistant d'aide IA"
   },
+  "helpChat": {
+    "placeholder": "Posez-moi une question sur PPM...",
+    "welcome": "Bienvenue dans l'Assistant d'aide IA !",
+    "welcomeMessage": "Posez-moi des questions sur les fonctionnalités de la plateforme PPM et je vous aiderai.",
+    "typing": "L'IA est en train d'écrire...",
+    "tryAgain": "Réessayer"
+  },
   "variance": {
     "trends": "Tendances de variance",
     "alerts": "Alertes de variance",

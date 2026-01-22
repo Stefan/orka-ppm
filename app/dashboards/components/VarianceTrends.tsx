@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, memo } from 'react'
+import { useState, useEffect, memo, useRef } from 'react'
 import { Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Bar, ComposedChart } from 'recharts'
 import { Calendar, Filter } from 'lucide-react'
 import { useTranslations } from '../../../lib/i18n/context'
@@ -24,10 +24,44 @@ function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsPro
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d')
+  const [isContainerReady, setIsContainerReady] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // Wait for container to have dimensions before rendering chart
+  useEffect(() => {
+    if (loading || !trendData.length) {
+      setIsContainerReady(false)
+      return
+    }
+    
+    const checkContainer = () => {
+      if (containerRef.current) {
+        const { offsetWidth, offsetHeight } = containerRef.current
+        if (offsetWidth > 0 && offsetHeight > 0) {
+          setIsContainerReady(true)
+        }
+      }
+    }
+    
+    // Check immediately and after short delays to ensure container is measured
+    checkContainer()
+    const timer1 = setTimeout(checkContainer, 50)
+    const timer2 = setTimeout(checkContainer, 150)
+    
+    return () => {
+      clearTimeout(timer1)
+      clearTimeout(timer2)
+    }
+  }, [loading, trendData.length])
 
   useEffect(() => {
     if (session) {
-      fetchVarianceTrends()
+      // Defer non-critical data fetching to avoid blocking main thread
+      const timeoutId = setTimeout(() => {
+        fetchVarianceTrends()
+      }, 100)
+      
+      return () => clearTimeout(timeoutId)
     }
   }, [session, timeRange])
 
@@ -38,26 +72,40 @@ function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsPro
     setError(null)
     
     try {
-      // For now, we'll simulate trend data since the backend might not have historical variance data
-      // In a real implementation, this would fetch from a trends endpoint
+      // Generate data in smaller batches to avoid blocking main thread
       const mockTrendData: VarianceTrend[] = []
       const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90
+      const batchSize = 10
       
-      for (let i = days - 1; i >= 0; i--) {
-        const date = new Date()
-        date.setDate(date.getDate() - i)
-        
-        // Simulate variance trends with some randomness
-        const baseVariance = -5000 + (Math.random() - 0.5) * 20000
-        const variancePercentage = (Math.random() - 0.5) * 20
-        
-        mockTrendData.push({
-          date: date.toISOString().split('T')[0]!,
-          total_variance: baseVariance,
-          variance_percentage: variancePercentage,
-          projects_over_budget: Math.floor(Math.random() * 5),
-          projects_under_budget: Math.floor(Math.random() * 8)
+      for (let batch = 0; batch < Math.ceil(days / batchSize); batch++) {
+        // Yield to main thread between batches
+        await new Promise(resolve => {
+          if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => resolve(undefined))
+          } else {
+            setTimeout(() => resolve(undefined), 0)
+          }
         })
+        
+        const startIdx = batch * batchSize
+        const endIdx = Math.min(startIdx + batchSize, days)
+        
+        for (let i = days - 1 - startIdx; i >= days - endIdx; i--) {
+          const date = new Date()
+          date.setDate(date.getDate() - i)
+          
+          // Simulate variance trends with some randomness
+          const baseVariance = -5000 + (Math.random() - 0.5) * 20000
+          const variancePercentage = (Math.random() - 0.5) * 20
+          
+          mockTrendData.push({
+            date: date.toISOString().split('T')[0]!,
+            total_variance: baseVariance,
+            variance_percentage: variancePercentage,
+            projects_over_budget: Math.floor(Math.random() * 5),
+            projects_under_budget: Math.floor(Math.random() * 8)
+          })
+        }
       }
       
       setTrendData(mockTrendData)
@@ -72,10 +120,10 @@ function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsPro
 
   if (loading) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white p-2 rounded-lg border border-gray-200 h-full flex flex-col" style={{ minHeight: '280px' }}>
         <div className="animate-pulse">
           <div className="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
+          <div className="flex-1 bg-gray-200 rounded" style={{ minHeight: '200px' }}></div>
         </div>
       </div>
     )
@@ -83,7 +131,7 @@ function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsPro
 
   if (error || (trendData?.length || 0) === 0) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white p-2 rounded-lg border border-gray-200 h-full flex flex-col" style={{ minHeight: '280px' }}>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('variance.trends')}</h3>
         <div className="text-center py-8">
           <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -96,7 +144,7 @@ function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsPro
   }
 
   return (
-    <div className="bg-white p-2 rounded-lg border border-gray-200 h-full flex flex-col">
+    <div className="bg-white p-2 rounded-lg border border-gray-200 h-full flex flex-col" style={{ minHeight: '280px' }}>
       <div className="flex items-center justify-between mb-1.5">
         <h3 className="text-[10px] font-semibold text-gray-900 uppercase tracking-wide">{t('variance.trends')}</h3>
         <div className="flex items-center gap-1">
@@ -113,9 +161,10 @@ function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsPro
         </div>
       </div>
       
-      <div className="flex-1 min-h-0">
-        <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={trendData}>
+      <div ref={containerRef} className="flex-1 min-h-0" style={{ minHeight: '200px' }}>
+        {isContainerReady ? (
+          <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+            <ComposedChart data={trendData}>
           <XAxis 
             dataKey="date" 
             tickFormatter={(value) => new Date(value).toLocaleDateString('en', { month: 'short', day: 'numeric' })}
@@ -154,7 +203,12 @@ function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsPro
             dot={false}
           />
         </ComposedChart>
-        </ResponsiveContainer>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-full bg-gray-50 rounded">
+            <div className="text-xs text-gray-500">Loading chart...</div>
+          </div>
+        )}
       </div>
     </div>
   )

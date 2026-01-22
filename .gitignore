@@ -9,6 +9,9 @@ backend/venv/
 .env.development
 backend/.env
 
+# Credentials and sensitive files
+ADMIN_USER_CREDENTIALS.md
+
 # Build artifacts
 .next/
 .vercel/

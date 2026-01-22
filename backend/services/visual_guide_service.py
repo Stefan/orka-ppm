@@ -482,7 +482,7 @@ class VisualGuideService:
         async with aiofiles.open(guide_file, 'w') as f:
             await f.write(json.dumps(guide_dict, indent=2, default=str))
 
-    async def _save_guide_to_db(self, guide: VisualGuide, db: Session):
+    async def _save_guide_to_db(self, guide: VisualGuide, db: Any = None):
         """Save guide metadata to database"""
         try:
             help_content = HelpContent(
@@ -501,7 +501,7 @@ class VisualGuideService:
             print(f"Error saving guide to database: {e}")
             db.rollback()
 
-    async def _update_guide_in_db(self, guide: VisualGuide, db: Session):
+    async def _update_guide_in_db(self, guide: VisualGuide, db: Any = None):
         """Update guide metadata in database"""
         try:
             help_content = db.query(HelpContent).filter(HelpContent.id == guide.id).first()
@@ -515,7 +515,7 @@ class VisualGuideService:
             print(f"Error updating guide in database: {e}")
             db.rollback()
 
-    async def _delete_guide_from_db(self, guide_id: str, db: Session):
+    async def _delete_guide_from_db(self, guide_id: str, db: Any = None):
         """Delete guide from database"""
         try:
             help_content = db.query(HelpContent).filter(HelpContent.id == guide_id).first()
@@ -526,7 +526,7 @@ class VisualGuideService:
             print(f"Error deleting guide from database: {e}")
             db.rollback()
 
-    async def _increment_usage_count(self, guide_id: str, db: Session):
+    async def _increment_usage_count(self, guide_id: str, db: Any = None):
         """Increment guide usage count"""
         # This would typically update a usage counter in the database
         pass

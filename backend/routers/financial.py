@@ -225,6 +225,8 @@ async def get_financial_tracking_budget_alerts(
 
 @router.get("/comprehensive-report")
 async def get_comprehensive_financial_report(
+    currency: str = Query("USD", description="Currency code for the report"),
+    include_trends: bool = Query(True, description="Include trend analysis"),
     project_id: Optional[UUID] = Query(None, description="Filter by specific project"),
     start_date: Optional[date] = Query(None),
     end_date: Optional[date] = Query(None),
@@ -286,18 +288,20 @@ async def get_comprehensive_financial_report(
                 "status": "over_budget" if variance > 0 else "under_budget" if variance < -project_budget * 0.1 else "on_track"
             })
         
-        # Generate trends (simplified)
-        trends = {
-            "monthly_spending": {},  # Would calculate monthly aggregates
-            "category_breakdown": {},  # Would group by category
-            "variance_trend": "stable"  # Would analyze variance over time
-        }
+        # Generate trends (simplified) - only if requested
+        trends = None
+        if include_trends:
+            trends = {
+                "monthly_spending": {},  # Would calculate monthly aggregates
+                "category_breakdown": {},  # Would group by category
+                "variance_trend": "stable"  # Would analyze variance over time
+            }
         
         # Get active alerts
         alerts_response = supabase.table("budget_alerts").select("*").eq("is_resolved", False).execute()
         active_alerts = alerts_response.data or []
         
-        return {
+        response_data = {
             "summary": {
                 "total_budget": total_budget,
                 "total_spent": total_spent,
@@ -305,18 +309,25 @@ async def get_comprehensive_financial_report(
                 "overall_utilization": (total_spent / total_budget * 100) if total_budget > 0 else 0,
                 "projects_count": len(projects),
                 "over_budget_projects": len([p for p in project_summaries if p["variance"] > 0]),
-                "active_alerts": len(active_alerts)
+                "active_alerts": len(active_alerts),
+                "currency": currency
             },
             "projects": project_summaries,
             "alerts": convert_uuids(active_alerts),
-            "trends": trends,
             "generated_at": datetime.now().isoformat(),
             "filters": {
                 "project_id": str(project_id) if project_id else None,
                 "start_date": start_date.isoformat() if start_date else None,
-                "end_date": end_date.isoformat() if end_date else None
+                "end_date": end_date.isoformat() if end_date else None,
+                "currency": currency
             }
         }
+        
+        # Only include trends if requested
+        if include_trends and trends:
+            response_data["trends"] = trends
+        
+        return response_data
         
     except Exception as e:
         print(f"Generate financial report error: {e}")

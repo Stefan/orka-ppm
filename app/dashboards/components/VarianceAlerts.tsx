@@ -4,7 +4,7 @@ import { useState, useEffect, memo } from 'react'
 import { AlertTriangle, CheckCircle, Clock, X } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
 import { resilientFetch } from '@/lib/api/resilient-fetch'
-import { usePermissions } from '@/hooks/usePermissions'
+import { usePermissions } from '@/app/providers/EnhancedAuthProvider'
 
 interface VarianceAlert {
   id: string

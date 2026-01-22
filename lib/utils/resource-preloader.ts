@@ -207,8 +207,8 @@ export function initializeResourcePreloading(): void {
   // DNS prefetch for external services
   dnsPrefetch('https://xceyrfvxooiplbmwavlb.supabase.co')
   
-  // Preload critical icons
-  preloadImage('/icon.svg', 'image/svg+xml')
+  // Note: icon.svg is only used for push notifications and manifest, not on page load
+  // Preloading it causes browser warnings since it's not used within a few seconds
   
   // Note: Fonts are handled by Next.js next/font/google automatically
   // Note: CSS and JS are handled by Next.js code splitting automatically

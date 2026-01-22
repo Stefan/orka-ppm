@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Clock, CheckCircle, XCircle, AlertCircle, ChevronRight } from 'lucide-react'
 import WorkflowStatusBadge from './WorkflowStatusBadge'
 import WorkflowApprovalModal from './WorkflowApprovalModal'
+import { useAuth } from '@/app/providers/SupabaseAuthProvider'
 
 interface WorkflowApproval {
   id: string
@@ -40,6 +41,7 @@ export default function WorkflowDashboard({
   userRole,
   compact = false 
 }: WorkflowDashboardProps) {
+  const { session } = useAuth()
   const [workflows, setWorkflows] = useState<WorkflowInstance[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -47,23 +49,30 @@ export default function WorkflowDashboard({
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('all')
 
   useEffect(() => {
-    fetchWorkflows()
-  }, [userId])
+    if (session) {
+      fetchWorkflows()
+    } else {
+      // No session, set empty workflows and stop loading
+      setWorkflows([])
+      setLoading(false)
+    }
+  }, [userId, session])
 
   const fetchWorkflows = async () => {
     try {
       setLoading(true)
       setError(null)
 
-      const token = localStorage.getItem('token')
-      if (!token) {
-        throw new Error('Not authenticated')
+      if (!session?.access_token) {
+        // Silently handle no authentication - user might not be logged in yet
+        setWorkflows([])
+        return
       }
 
       // Fetch workflows where user is involved (as initiator or approver)
       const response = await fetch('/api/workflows/instances/my-workflows', {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json'
         }
       })

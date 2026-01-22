@@ -205,14 +205,19 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
 
     async function load() {
+      console.log('🌍 [i18n] Loading translations for locale:', locale)
+      
       // Only set loading if not already cached
       const isCached = isLanguageCached(locale);
+      console.log('🌍 [i18n] Is locale cached?', isCached)
+      
       if (!isCached) {
         setIsLoading(true);
       }
       
       try {
         const newTranslations = await loadTranslations(locale);
+        console.log('🌍 [i18n] Translations loaded successfully for:', locale, 'keys:', Object.keys(newTranslations).slice(0, 5))
         
         if (!cancelled) {
           setTranslations(newTranslations);
@@ -234,6 +239,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       } finally {
         if (!cancelled) {
           setIsLoading(false);
+          console.log('🌍 [i18n] Translation loading complete for:', locale)
         }
       }
     }
@@ -259,6 +265,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
    * ```
    */
   const setLocale = useCallback(async (newLocale: string) => {
+    console.log('🌍 [i18n] setLocale called with:', newLocale, 'current locale:', locale)
+    
     // Validate locale is supported
     if (!SUPPORTED_LOCALES.includes(newLocale as SupportedLocale)) {
       console.warn(`Unsupported locale: ${newLocale}. Supported locales: ${SUPPORTED_LOCALES.join(', ')}`);
@@ -270,13 +278,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
     // If already cached, update immediately
     if (isLanguageCached(newLocale)) {
+      console.log('🌍 [i18n] Locale cached, updating immediately to:', newLocale)
       setLocaleState(newLocale);
     } else {
       // Show loading state while fetching
+      console.log('🌍 [i18n] Locale not cached, loading translations for:', newLocale)
       setIsLoading(true);
       setLocaleState(newLocale);
     }
-  }, []);
+  }, [locale]);
 
   /**
    * Translation function
@@ -308,6 +318,12 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     key: TranslationKey,
     params?: InterpolationParams
   ): string => {
+    // During loading, return the key without logging warnings
+    // This prevents console spam during initial page load
+    if (isLoading || Object.keys(translations).length === 0) {
+      return key;
+    }
+    
     // Navigate nested object using dot notation
     const keys = key.split('.');
     let value: any = translations;
@@ -408,7 +424,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
 
     return value;
-  }, [translations, locale]);
+  }, [translations, locale, isLoading]);
 
   const contextValue: I18nContextValue = {
     locale,
