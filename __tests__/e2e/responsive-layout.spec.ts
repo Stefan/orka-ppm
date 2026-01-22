@@ -269,7 +269,5 @@ test.describe('Performance Across Devices', () => {
       // Network throttling may not work in all CI environments
       console.log(`⚠️  Network throttling test skipped: ${e}`)
     }
-      console.log(`📊 ${condition.toUpperCase()} Performance: ${loadTime}ms`)
-    }
   })
 })
