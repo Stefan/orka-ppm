@@ -99,15 +99,15 @@ async def _manual_join_users_and_profiles(
 ) -> UserListResponse:
     """Manual fallback for joining auth.users and user_profiles when RPC function is not available"""
     try:
-        # Get all auth.users first
-        auth_query = supabase.table("auth.users").select("id, email, created_at, updated_at, last_sign_in_at")
+        # Use Supabase Admin API to get auth users
+        from config.database import service_supabase
         
-        # Apply email search filter
-        if search and search.strip():
-            auth_query = auth_query.ilike("email", f"%{search.strip()}%")
+        if not service_supabase:
+            raise HTTPException(status_code=503, detail="Admin API not available")
         
-        auth_result = auth_query.execute()
-        auth_users = auth_result.data or []
+        # Get auth users using admin API
+        auth_response = service_supabase.auth.admin.list_users()
+        auth_users = auth_response if isinstance(auth_response, list) else []
         
         # Get all user_profiles
         profile_query = supabase.table("user_profiles").select("*")
@@ -117,7 +117,23 @@ async def _manual_join_users_and_profiles(
         # Join the data
         joined_users = []
         for auth_user in auth_users:
-            profile = profiles.get(auth_user["id"], {})
+            # auth_user is a User object from Supabase
+            user_id = str(auth_user.id)
+            profile = profiles.get(user_id, {})
+            
+            # Convert auth_user to dict
+            auth_dict = {
+                "id": user_id,
+                "email": auth_user.email,
+                "created_at": auth_user.created_at,
+                "updated_at": auth_user.updated_at,
+                "last_sign_in_at": getattr(auth_user, 'last_sign_in_at', None)
+            }
+            
+            # Apply email search filter
+            if search and search.strip():
+                if search.strip().lower() not in (auth_user.email or "").lower():
+                    continue
             
             # Apply status filter
             if status:
@@ -132,7 +148,7 @@ async def _manual_join_users_and_profiles(
             if role and profile.get("role", "user") != role.value:
                 continue
             
-            user_response = create_user_response(auth_user, profile)
+            user_response = create_user_response(auth_dict, profile)
             joined_users.append(user_response)
         
         # Apply pagination
