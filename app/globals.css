@@ -1010,6 +1010,12 @@ textarea {
   font-weight: 400 !important;
 }
 
+/* Password fields with toggle button need extra right padding */
+input[type="password"].pr-10,
+input[type="text"].pr-10 {
+  padding-right: 2.5rem !important; /* 40px for icon button */
+}
+
 /* Focus states for better form usability */
 .input-field:focus,
 .textarea-field:focus,
