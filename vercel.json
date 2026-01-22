@@ -5,6 +5,12 @@
   "installCommand": "npm ci --prefer-offline --no-audit --no-fund --legacy-peer-deps",
   "framework": "nextjs",
   "regions": ["fra1"],
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://orka-ppm.onrender.com",
+    "NEXT_PUBLIC_BACKEND_URL": "https://orka-ppm.onrender.com",
+    "NEXT_PUBLIC_SUPABASE_URL": "https://xceyrfvxooiplbmwavlb.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjZXlyZnZ4b29pcGxibXdhdmxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4Mjg3ODEsImV4cCI6MjA4MjQwNDc4MX0.jIyJlwx2g9xn8OTSaLum6H8BKqknyxB8gYxgEKdfgqo"
+  },
   "functions": {
     "app/**/*.tsx": {
       "maxDuration": 10,
