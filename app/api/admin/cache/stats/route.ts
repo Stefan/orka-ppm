@@ -1,62 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+const BACKEND_URL = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
 
 export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization')
     
-    if (!authHeader) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-    
-    // Try to fetch from backend, but provide fallback
-    try {
-      const response = await fetch(`${BACKEND_URL}/admin/cache/stats`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': authHeader,
-        },
-        signal: AbortSignal.timeout(5000) // 5 second timeout
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        return NextResponse.json(data, {
-          status: 200,
-          headers: {
-            'X-Data-Source': 'backend-real'
-          }
-        })
-      }
-    } catch (fetchError) {
-      console.log('Backend cache stats not available, using fallback')
-    }
-    
-    // Fallback: Return in-memory cache info
-    return NextResponse.json({
-      type: 'in-memory',
-      entries: 0,
-      note: 'Using in-memory performance tracking'
-    }, {
-      status: 200,
+    const response = await fetch(`${BACKEND_URL}/api/admin/cache/stats`, {
+      method: 'GET',
       headers: {
-        'X-Data-Source': 'fallback'
+        'Content-Type': 'application/json',
+        ...(authHeader ? { 'Authorization': authHeader } : {})
       }
     })
-    
+
+    if (!response.ok) {
+      // Return empty stats if endpoint doesn't exist
+      if (response.status === 404) {
+        return NextResponse.json({ hits: 0, misses: 0, size: 0 })
+      }
+      const errorText = await response.text()
+      return NextResponse.json({ error: errorText }, { status: response.status })
+    }
+
+    const data = await response.json()
+    return NextResponse.json(data)
   } catch (error) {
-    console.error('Cache stats API error:', error)
-    return NextResponse.json(
-      { 
-        type: 'in-memory',
-        error: 'Cache stats unavailable'
-      },
-      { status: 200 }
-    )
+    console.error('Error proxying cache stats:', error)
+    return NextResponse.json({ hits: 0, misses: 0, size: 0 })
   }
 }

@@ -134,12 +134,12 @@ export default function PerformanceDashboard() {
       // Prioritize critical data (health and stats) over cache stats
       // Fetch health and stats first in parallel, then cache stats separately
       const [statsResponse, healthResponse] = await Promise.all([
-        fetch(getApiUrl('/api/admin/performance/stats'), {
+        fetch('/api/admin/performance/stats', {
           headers: { 'Authorization': `Bearer ${session?.access_token || ''}` },
           signal: abortControllerRef.current.signal,
           cache: 'no-store'
         }),
-        fetch(getApiUrl('/api/admin/performance/health'), {
+        fetch('/api/admin/performance/health', {
           headers: { 'Authorization': `Bearer ${session?.access_token || ''}` },
           signal: abortControllerRef.current.signal,
           cache: 'no-store'
@@ -173,7 +173,7 @@ export default function PerformanceDashboard() {
       }
 
       // Fetch cache stats with lower priority (non-blocking, fetched after critical data)
-      fetch(getApiUrl('/api/admin/cache/stats'), {
+      fetch('/api/admin/cache/stats', {
         headers: { 'Authorization': `Bearer ${session?.access_token || ''}` },
         signal: abortControllerRef.current.signal,
         cache: 'no-store'
@@ -225,7 +225,7 @@ export default function PerformanceDashboard() {
       setError(null)
       setSuccessMessage(null)
       
-      const response = await fetch(getApiUrl('/api/admin/cache/clear'), {
+      const response = await fetch('/api/admin/cache/clear', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session?.access_token || ''}`,
