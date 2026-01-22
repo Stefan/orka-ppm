@@ -19,8 +19,9 @@ import {
 } from '../../lib/api/dashboard-loader'
 import { 
   TrendingUp, TrendingDown, AlertTriangle, DollarSign, Clock, RefreshCw, 
-  BarChart3, Users, FileText, ChevronDown, X, Filter 
+  BarChart3, Users, FileText, ChevronDown, X, Filter, Upload 
 } from 'lucide-react'
+import ProjectImportModal from '@/components/projects/ProjectImportModal'
 // Charts werden nicht auf der Dashboard-Hauptseite verwendet, daher entfernen
 // import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
@@ -34,6 +35,10 @@ const VarianceTrends = dynamic(() => import('./components/VarianceTrends'), {
   loading: () => <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
 })
 const VarianceAlerts = dynamic(() => import('./components/VarianceAlerts'), { 
+  ssr: false,
+  loading: () => <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+})
+const WorkflowDashboard = dynamic(() => import('@/components/workflow/WorkflowDashboard'), {
   ssr: false,
   loading: () => <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
 })
@@ -205,6 +210,7 @@ export default function CompactDashboard() {
     { id: '2', title: 'Timeline Delay', description: 'Project Beta is 2 weeks behind schedule', severity: 'warning' },
     { id: '3', title: 'Resource Conflict', description: 'Team member assigned to multiple projects', severity: 'warning' },
   ])
+  const [showImportModal, setShowImportModal] = useState(false)
 
   const loadOptimizedData = useCallback(async () => {
     if (!session?.access_token) return
@@ -361,6 +367,17 @@ export default function CompactDashboard() {
           </div>
         )}
 
+        {/* Workflow Approvals - Compact View */}
+        {session?.user?.id && (
+          <Suspense fallback={<div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>}>
+            <WorkflowDashboard 
+              userId={session.user.id} 
+              userRole={session.user.role || 'viewer'}
+              compact={true}
+            />
+          </Suspense>
+        )}
+
         {/* Budget Variance and Variance Trends side by side - always 2 columns on desktop */}
         <div className="grid grid-cols-2 gap-2 md:gap-3">
           {/* Budget Variance - 50% width */}
@@ -454,9 +471,19 @@ export default function CompactDashboard() {
               <TrendingUp size={18} className="text-gray-600" />
               <span className="text-sm font-medium text-gray-700">Analytics</span>
             </button>
+            <button onClick={() => setShowImportModal(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all whitespace-nowrap shadow-md hover:shadow-lg">
+              <Upload size={18} />
+              <span className="text-sm font-medium">Import Projects</span>
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Project Import Modal */}
+      <ProjectImportModal 
+        isOpen={showImportModal} 
+        onClose={() => setShowImportModal(false)} 
+      />
     </AppLayout>
   )
 }

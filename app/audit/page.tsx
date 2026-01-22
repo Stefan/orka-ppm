@@ -6,6 +6,11 @@ import AppLayout from '../../components/shared/AppLayout'
 import { AlertTriangle, Clock, FileText, Search, BarChart3, Download, RefreshCw, FileDown } from 'lucide-react'
 import { getApiUrl } from '../../lib/api/client'
 import { useTranslations } from '../../lib/i18n/context'
+import { Timeline, AnomalyDashboard, SemanticSearch, AuditFilters } from '../../components/audit'
+import type { AuditEvent, TimelineFilters } from '../../components/audit/Timeline'
+import type { AnomalyDetection } from '../../components/audit/AnomalyDashboard'
+import type { SearchResponse } from '../../components/audit/SemanticSearch'
+import type { AuditFilters as AuditFiltersType } from '../../components/audit/AuditFilters'
 
 // Tab types
 type TabType = 'dashboard' | 'timeline' | 'anomalies' | 'search'
@@ -30,6 +35,21 @@ export default function AuditDashboard() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [autoRefresh, setAutoRefresh] = useState(false)
   const [exportLoading, setExportLoading] = useState<'pdf' | 'csv' | null>(null)
+  
+  // Timeline state
+  const [timelineEvents, setTimelineEvents] = useState<AuditEvent[]>([])
+  const [timelineFilters, setTimelineFilters] = useState<TimelineFilters>({})
+  const [timelineLoading, setTimelineLoading] = useState(false)
+  
+  // Anomalies state
+  const [anomalies, setAnomalies] = useState<AnomalyDetection[]>([])
+  const [anomaliesLoading, setAnomaliesLoading] = useState(false)
+  
+  // Search state
+  const [searchLoading, setSearchLoading] = useState(false)
+  
+  // Filters state
+  const [auditFilters, setAuditFilters] = useState<AuditFiltersType>({})
 
   // Fetch dashboard stats
   const fetchDashboardStats = useCallback(async () => {
@@ -58,6 +78,164 @@ export default function AuditDashboard() {
       setLoading(false)
     }
   }, [session?.access_token])
+  
+  // Fetch timeline events
+  const fetchTimelineEvents = useCallback(async () => {
+    if (!session?.access_token) return
+    
+    setTimelineLoading(true)
+    try {
+      const params = new URLSearchParams()
+      if (timelineFilters.dateRange?.start) {
+        params.append('start_date', timelineFilters.dateRange.start.toISOString())
+      }
+      if (timelineFilters.dateRange?.end) {
+        params.append('end_date', timelineFilters.dateRange.end.toISOString())
+      }
+      if (timelineFilters.severity && timelineFilters.severity.length > 0) {
+        params.append('severity', timelineFilters.severity.join(','))
+      }
+      if (timelineFilters.categories && timelineFilters.categories.length > 0) {
+        params.append('categories', timelineFilters.categories.join(','))
+      }
+      if (timelineFilters.showAnomaliesOnly) {
+        params.append('anomalies_only', 'true')
+      }
+      
+      const response = await fetch(getApiUrl(`/audit/logs?${params.toString()}`), {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        }
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch timeline events: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      setTimelineEvents(data.logs || [])
+      setError(null)
+    } catch (err) {
+      console.error('Error fetching timeline events:', err)
+      setError(err instanceof Error ? err.message : 'Failed to load timeline events')
+    } finally {
+      setTimelineLoading(false)
+    }
+  }, [session?.access_token, timelineFilters])
+  
+  // Fetch anomalies
+  const fetchAnomalies = useCallback(async () => {
+    if (!session?.access_token) return
+    
+    setAnomaliesLoading(true)
+    try {
+      const response = await fetch(getApiUrl('/audit/detect-anomalies'), {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          time_range_days: 30
+        })
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch anomalies: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      setAnomalies(data.anomalies || [])
+      setError(null)
+    } catch (err) {
+      console.error('Error fetching anomalies:', err)
+      setError(err instanceof Error ? err.message : 'Failed to load anomalies')
+    } finally {
+      setAnomaliesLoading(false)
+    }
+  }, [session?.access_token])
+  
+  // Handle search
+  const handleSearch = useCallback(async (query: string): Promise<SearchResponse> => {
+    if (!session?.access_token) {
+      throw new Error('Not authenticated')
+    }
+    
+    const response = await fetch(getApiUrl('/audit/search'), {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query })
+    })
+    
+    if (!response.ok) {
+      throw new Error(`Search failed: ${response.status}`)
+    }
+    
+    return await response.json()
+  }, [session?.access_token])
+  
+  // Handle anomaly feedback
+  const handleAnomalyFeedback = useCallback(async (
+    anomalyId: string,
+    isFalsePositive: boolean,
+    notes?: string
+  ) => {
+    if (!session?.access_token) return
+    
+    try {
+      const response = await fetch(getApiUrl(`/audit/anomalies/${anomalyId}/feedback`), {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          is_false_positive: isFalsePositive,
+          notes
+        })
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Failed to submit feedback: ${response.status}`)
+      }
+      
+      // Refresh anomalies
+      await fetchAnomalies()
+    } catch (err) {
+      console.error('Error submitting feedback:', err)
+      throw err
+    }
+  }, [session?.access_token, fetchAnomalies])
+  
+  // Handle tag addition
+  const handleAddTag = useCallback(async (logId: string, tag: string) => {
+    if (!session?.access_token) return
+    
+    try {
+      const response = await fetch(getApiUrl(`/audit/logs/${logId}/tag`), {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tag })
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Failed to add tag: ${response.status}`)
+      }
+      
+      // Refresh timeline events
+      await fetchTimelineEvents()
+    } catch (err) {
+      console.error('Error adding tag:', err)
+      throw err
+    }
+  }, [session?.access_token, fetchTimelineEvents])
 
   // Initial load
   useEffect(() => {
@@ -65,6 +243,24 @@ export default function AuditDashboard() {
       fetchDashboardStats()
     }
   }, [session?.access_token, fetchDashboardStats])
+  
+  // Fetch data when tab changes
+  useEffect(() => {
+    if (!session?.access_token) return
+    
+    if (activeTab === 'timeline') {
+      fetchTimelineEvents()
+    } else if (activeTab === 'anomalies') {
+      fetchAnomalies()
+    }
+  }, [activeTab, session?.access_token, fetchTimelineEvents, fetchAnomalies])
+  
+  // Fetch timeline events when filters change
+  useEffect(() => {
+    if (activeTab === 'timeline' && session?.access_token) {
+      fetchTimelineEvents()
+    }
+  }, [timelineFilters, activeTab, session?.access_token, fetchTimelineEvents])
 
   // Auto-refresh every 30 seconds when enabled
   useEffect(() => {
@@ -470,21 +666,37 @@ export default function AuditDashboard() {
             )}
             
             {activeTab === 'timeline' && (
-              <div className="text-center py-12 text-gray-500">
-                {t('audit.timelineView')}
-              </div>
+              <Timeline
+                events={timelineEvents}
+                loading={timelineLoading}
+                filters={timelineFilters}
+                onFilterChange={setTimelineFilters}
+                onEventClick={(event) => {
+                  console.log('Event clicked:', event)
+                }}
+                height={600}
+              />
             )}
             
             {activeTab === 'anomalies' && (
-              <div className="text-center py-12 text-gray-500">
-                {t('audit.anomaliesView')}
-              </div>
+              <AnomalyDashboard
+                anomalies={anomalies}
+                loading={anomaliesLoading}
+                onFeedback={handleAnomalyFeedback}
+                onAnomalyClick={(anomaly) => {
+                  console.log('Anomaly clicked:', anomaly)
+                }}
+                enableRealtime={false}
+              />
             )}
             
             {activeTab === 'search' && (
-              <div className="text-center py-12 text-gray-500">
-                {t('audit.searchView')}
-              </div>
+              <SemanticSearch
+                onSearch={handleSearch}
+                loading={searchLoading}
+                placeholder="Ask a question about audit logs..."
+                maxHeight={600}
+              />
             )}
           </div>
         </div>

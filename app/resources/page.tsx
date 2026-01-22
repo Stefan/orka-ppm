@@ -5,6 +5,7 @@ import { useAuth } from '../providers/SupabaseAuthProvider'
 import { Users, Plus, Search, Filter, TrendingUp, AlertCircle, BarChart3, PieChart as PieChartIcon, Target, Zap, RefreshCw, Download, MapPin } from 'lucide-react'
 import AppLayout from '../../components/shared/AppLayout'
 import ResourceCard from './components/ResourceCard'
+import ResourceActionButtons from '../../components/resources/ResourceActionButtons'
 import { getApiUrl } from '../../lib/api/client'
 import { SkeletonCard, SkeletonChart } from '../../components/ui/skeletons'
 import { useDebounce } from '@/hooks/useDebounce'
@@ -383,6 +384,13 @@ export default function Resources() {
             
             {/* Mobile-Optimized Action Buttons */}
             <div className="flex flex-wrap items-center gap-2">
+              {/* Resource Action Buttons with RBAC */}
+              <ResourceActionButtons
+                onAssignResource={() => {/* Handle assign */}}
+                onScheduleResource={() => {/* Handle schedule */}}
+                variant="compact"
+              />
+              
               <button
                 onClick={() => setAutoRefresh(!autoRefresh)}
                 className={`flex items-center justify-center min-h-[44px] px-3 py-2 rounded-lg transition-colors text-sm font-medium ${

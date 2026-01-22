@@ -6,6 +6,8 @@ from fastapi import APIRouter, HTTPException, Depends, status, Query
 from uuid import UUID
 from typing import Optional, List
 from datetime import datetime, date
+from decimal import Decimal
+import logging
 
 from auth.rbac import require_permission, Permission
 from auth.dependencies import get_current_user
@@ -16,22 +18,56 @@ from models.financial import (
     FinancialSummary, ComprehensiveFinancialReport
 )
 from utils.converters import convert_uuids
+from services.workflow_ppm_integration import WorkflowPPMIntegration
 
 router = APIRouter(prefix="/financial-tracking", tags=["financial"])
 budget_alerts_router = APIRouter(prefix="/budget-alerts", tags=["budget-alerts"])
+logger = logging.getLogger(__name__)
+
+# Initialize PPM integration service lazily
+_ppm_integration = None
+
+
+def get_ppm_integration() -> Optional[WorkflowPPMIntegration]:
+    """Get or initialize PPM integration service"""
+    global _ppm_integration
+    if _ppm_integration is None and supabase:
+        try:
+            _ppm_integration = WorkflowPPMIntegration(supabase)
+        except Exception as e:
+            logger.error(f"Failed to initialize PPM integration: {e}")
+            return None
+    return _ppm_integration
 
 # Financial Tracking Endpoints
 @router.post("/", response_model=FinancialTrackingResponse, status_code=status.HTTP_201_CREATED)
 async def create_financial_entry(entry: FinancialTrackingCreate, current_user = Depends(get_current_user)):
-    """Create a new financial tracking entry"""
+    """
+    Create a new financial tracking entry.
+    
+    Automatically triggers budget approval workflow if variance exceeds threshold.
+    
+    Requirements: 7.1, 7.4
+    """
     try:
         if supabase is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
-        # Verify project exists
-        project_response = supabase.table("projects").select("id").eq("id", str(entry.project_id)).execute()
+        # Get user ID
+        user_id = current_user.get("user_id")
+        if not user_id:
+            raise HTTPException(status_code=400, detail="User ID not found")
+        
+        # Verify project exists and get budget info
+        project_response = supabase.table("projects").select(
+            "id, budget, actual_cost"
+        ).eq("id", str(entry.project_id)).execute()
+        
         if not project_response.data:
             raise HTTPException(status_code=404, detail="Project not found")
+        
+        project = project_response.data[0]
+        budget = Decimal(str(project.get("budget", 0)))
         
         entry_data = entry.dict()
         entry_data['project_id'] = str(entry_data['project_id'])
@@ -41,12 +77,60 @@ async def create_financial_entry(entry: FinancialTrackingCreate, current_user = 
         if not response.data:
             raise HTTPException(status_code=400, detail="Failed to create financial entry")
         
-        return convert_uuids(response.data[0])
+        created_entry = response.data[0]
+        financial_record_id = UUID(created_entry["id"])
+        
+        # Calculate updated actual cost
+        expenses_response = supabase.table("financial_tracking").select(
+            "amount"
+        ).eq("project_id", str(entry.project_id)).eq(
+            "transaction_type", "expense"
+        ).execute()
+        
+        total_spent = sum(
+            Decimal(str(expense.get('amount', 0))) 
+            for expense in expenses_response.data or []
+        )
+        
+        # Update project actual cost
+        supabase.table("projects").update({
+            "actual_cost": str(total_spent)
+        }).eq("id", str(entry.project_id)).execute()
+        
+        # Check for budget variance and trigger workflow if needed
+        if budget > 0:
+            variance_amount = total_spent - budget
+            variance_percentage = float((variance_amount / budget) * 100)
+            
+            # Trigger workflow if variance exceeds threshold
+            ppm_integration = get_ppm_integration()
+            if ppm_integration:
+                try:
+                    workflow_instance_id = await ppm_integration.check_budget_variance_trigger(
+                        project_id=entry.project_id,
+                        financial_record_id=financial_record_id,
+                        variance_amount=variance_amount,
+                        variance_percentage=variance_percentage,
+                        budget_amount=budget,
+                        actual_amount=total_spent,
+                        user_id=UUID(user_id)
+                    )
+                    
+                    if workflow_instance_id:
+                        logger.info(
+                            f"Triggered budget approval workflow {workflow_instance_id} "
+                            f"for financial entry {financial_record_id}"
+                        )
+                except Exception as e:
+                    logger.error(f"Error triggering budget workflow: {e}")
+                    # Don't fail the financial entry creation if workflow fails
+        
+        return convert_uuids(created_entry)
         
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Create financial entry error: {e}")
+        logger.error(f"Create financial entry error: {e}")
         raise HTTPException(status_code=400, detail=f"Failed to create financial entry: {str(e)}")
 
 @router.get("/")

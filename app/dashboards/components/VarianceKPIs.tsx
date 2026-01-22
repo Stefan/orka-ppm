@@ -5,6 +5,7 @@ import { TrendingUp, TrendingDown, AlertTriangle, Target } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
 import { useTranslations } from '../../../lib/i18n/context'
 import { resilientFetch } from '@/lib/api/resilient-fetch'
+import { usePermissions } from '@/hooks/usePermissions'
 
 interface VarianceKPIs {
   total_variance: number
@@ -19,13 +20,25 @@ interface VarianceKPIs {
 interface VarianceKPIsProps {
   session: any
   selectedCurrency?: string
+  showDetailedMetrics?: boolean
+  allowEdit?: boolean
 }
 
-function VarianceKPIs({ session, selectedCurrency = 'USD' }: VarianceKPIsProps) {
+function VarianceKPIs({ session, selectedCurrency = 'USD', showDetailedMetrics, allowEdit }: VarianceKPIsProps) {
   const { t } = useTranslations()
+  const { hasPermission, loading: permissionsLoading } = usePermissions()
   const [varianceData, setVarianceData] = useState<VarianceKPIs | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Determine permissions - use props if provided, otherwise check permissions
+  const canViewFinancials = showDetailedMetrics !== undefined 
+    ? showDetailedMetrics 
+    : hasPermission('financial_read')
+  
+  const canEditFinancials = allowEdit !== undefined 
+    ? allowEdit 
+    : hasPermission('financial_update')
 
   useEffect(() => {
     console.log('VarianceKPIs useEffect - session:', session?.access_token ? 'present' : 'missing')
@@ -87,7 +100,7 @@ function VarianceKPIs({ session, selectedCurrency = 'USD' }: VarianceKPIsProps) 
     setLoading(false)
   }
 
-  if (loading) {
+  if (loading || permissionsLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
@@ -130,34 +143,43 @@ function VarianceKPIs({ session, selectedCurrency = 'USD' }: VarianceKPIsProps) 
 
       {/* Ultra-Compact KPI Grid - 4 columns, 2 rows, readable text */}
       <div className="grid grid-cols-4 gap-1 flex-1">
-        <div className="bg-gray-50 p-1 rounded">
-          <div className="flex items-center justify-between mb-0.5">
-            <p className="text-xs font-medium text-gray-600 leading-tight">{t('variance.netVariance')}</p>
-            {varianceData.total_variance >= 0 ? 
-              <TrendingUp className="h-2 w-2 text-red-600" /> : 
-              <TrendingDown className="h-2 w-2 text-green-600" />
-            }
+        {/* Show detailed metrics only if user has financial_read permission */}
+        {canViewFinancials ? (
+          <>
+            <div className="bg-gray-50 p-1 rounded">
+              <div className="flex items-center justify-between mb-0.5">
+                <p className="text-xs font-medium text-gray-600 leading-tight">{t('variance.netVariance')}</p>
+                {varianceData.total_variance >= 0 ? 
+                  <TrendingUp className="h-2 w-2 text-red-600" /> : 
+                  <TrendingDown className="h-2 w-2 text-green-600" />
+                }
+              </div>
+              <p className={`text-xs font-bold leading-tight ${
+                varianceData.total_variance >= 0 ? 'text-red-600' : 'text-green-600'
+              }`}>
+                {varianceData.total_variance >= 0 ? '+' : ''}
+                {(varianceData.total_variance / 1000).toFixed(0)}k
+              </p>
+            </div>
+            
+            <div className="bg-gray-50 p-1 rounded">
+              <div className="flex items-center justify-between mb-0.5">
+                <p className="text-xs font-medium text-gray-600 leading-tight">{t('financials.variance')} %</p>
+                <Target className="h-2 w-2 text-gray-600" />
+              </div>
+              <p className={`text-xs font-bold leading-tight ${
+                varianceData.variance_percentage >= 0 ? 'text-red-600' : 'text-green-600'
+              }`}>
+                {varianceData.variance_percentage >= 0 ? '+' : ''}
+                {varianceData.variance_percentage.toFixed(1)}%
+              </p>
+            </div>
+          </>
+        ) : (
+          <div className="col-span-2 bg-gray-50 p-1 rounded flex items-center justify-center">
+            <p className="text-xs text-gray-500">Financial details restricted</p>
           </div>
-          <p className={`text-xs font-bold leading-tight ${
-            varianceData.total_variance >= 0 ? 'text-red-600' : 'text-green-600'
-          }`}>
-            {varianceData.total_variance >= 0 ? '+' : ''}
-            {(varianceData.total_variance / 1000).toFixed(0)}k
-          </p>
-        </div>
-        
-        <div className="bg-gray-50 p-1 rounded">
-          <div className="flex items-center justify-between mb-0.5">
-            <p className="text-xs font-medium text-gray-600 leading-tight">{t('financials.variance')} %</p>
-            <Target className="h-2 w-2 text-gray-600" />
-          </div>
-          <p className={`text-xs font-bold leading-tight ${
-            varianceData.variance_percentage >= 0 ? 'text-red-600' : 'text-green-600'
-          }`}>
-            {varianceData.variance_percentage >= 0 ? '+' : ''}
-            {varianceData.variance_percentage.toFixed(1)}%
-          </p>
-        </div>
+        )}
         
         <div className="bg-gray-50 p-1 rounded">
           <div className="flex items-center justify-between mb-0.5">
@@ -179,36 +201,44 @@ function VarianceKPIs({ session, selectedCurrency = 'USD' }: VarianceKPIsProps) 
           </p>
         </div>
 
-        <div className="bg-gray-50 p-1 rounded">
-          <p className="text-xs font-medium text-gray-600 mb-0.5 leading-tight">{t('variance.totalCommitments')}</p>
-          <p className="text-xs font-bold leading-tight text-blue-600">
-            {(varianceData.total_commitments / 1000).toFixed(0)}k
-          </p>
-        </div>
+        {canViewFinancials ? (
+          <>
+            <div className="bg-gray-50 p-1 rounded">
+              <p className="text-xs font-medium text-gray-600 mb-0.5 leading-tight">{t('variance.totalCommitments')}</p>
+              <p className="text-xs font-bold leading-tight text-blue-600">
+                {(varianceData.total_commitments / 1000).toFixed(0)}k
+              </p>
+            </div>
 
-        <div className="bg-gray-50 p-1 rounded">
-          <p className="text-xs font-medium text-gray-600 mb-0.5 leading-tight">{t('variance.totalActuals')}</p>
-          <p className="text-xs font-bold leading-tight text-purple-600">
-            {(varianceData.total_actuals / 1000).toFixed(0)}k
-          </p>
-        </div>
+            <div className="bg-gray-50 p-1 rounded">
+              <p className="text-xs font-medium text-gray-600 mb-0.5 leading-tight">{t('variance.totalActuals')}</p>
+              <p className="text-xs font-bold leading-tight text-purple-600">
+                {(varianceData.total_actuals / 1000).toFixed(0)}k
+              </p>
+            </div>
 
-        <div className="bg-gray-50 p-1 rounded">
-          <p className="text-xs font-medium text-gray-600 mb-0.5 leading-tight">{t('variance.netVariance')}</p>
-          <p className={`text-xs font-bold leading-tight ${
-            varianceData.total_variance >= 0 ? 'text-red-600' : 'text-green-600'
-          }`}>
-            {varianceData.total_variance >= 0 ? '+' : ''}
-            {(varianceData.total_variance / 1000).toFixed(0)}k
-          </p>
-        </div>
+            <div className="bg-gray-50 p-1 rounded">
+              <p className="text-xs font-medium text-gray-600 mb-0.5 leading-tight">{t('variance.netVariance')}</p>
+              <p className={`text-xs font-bold leading-tight ${
+                varianceData.total_variance >= 0 ? 'text-red-600' : 'text-green-600'
+              }`}>
+                {varianceData.total_variance >= 0 ? '+' : ''}
+                {(varianceData.total_variance / 1000).toFixed(0)}k
+              </p>
+            </div>
 
-        <div className="bg-gray-50 p-1 rounded">
-          <p className="text-xs font-medium text-gray-600 mb-0.5 leading-tight">{t('financials.utilization')}</p>
-          <p className="text-xs font-bold leading-tight text-gray-900">
-            {((varianceData.total_actuals / Math.max(varianceData.total_commitments, 1)) * 100).toFixed(0)}%
-          </p>
-        </div>
+            <div className="bg-gray-50 p-1 rounded">
+              <p className="text-xs font-medium text-gray-600 mb-0.5 leading-tight">{t('financials.utilization')}</p>
+              <p className="text-xs font-bold leading-tight text-gray-900">
+                {((varianceData.total_actuals / Math.max(varianceData.total_commitments, 1)) * 100).toFixed(0)}%
+              </p>
+            </div>
+          </>
+        ) : (
+          <div className="col-span-4 bg-gray-50 p-2 rounded flex items-center justify-center">
+            <p className="text-xs text-gray-500">Detailed financial metrics require financial_read permission</p>
+          </div>
+        )}
       </div>
     </div>
   )

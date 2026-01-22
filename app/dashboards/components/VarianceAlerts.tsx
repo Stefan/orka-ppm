@@ -4,6 +4,7 @@ import { useState, useEffect, memo } from 'react'
 import { AlertTriangle, CheckCircle, Clock, X } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
 import { resilientFetch } from '@/lib/api/resilient-fetch'
+import { usePermissions } from '@/hooks/usePermissions'
 
 interface VarianceAlert {
   id: string
@@ -20,13 +21,20 @@ interface VarianceAlert {
 interface VarianceAlertsProps {
   session: any
   onAlertCount?: (count: number) => void
+  showAdminActions?: boolean
 }
 
-function VarianceAlerts({ session, onAlertCount }: VarianceAlertsProps) {
+function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAlertsProps) {
+  const { hasPermission, loading: permissionsLoading } = usePermissions()
   const [alerts, setAlerts] = useState<VarianceAlert[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showAll, setShowAll] = useState(false)
+
+  // Determine if user can manage alerts - use prop if provided, otherwise check permission
+  const canManageAlerts = showAdminActions !== undefined 
+    ? showAdminActions 
+    : hasPermission('budget_alert_manage')
 
   useEffect(() => {
     if (session) {
@@ -117,7 +125,7 @@ function VarianceAlerts({ session, onAlertCount }: VarianceAlertsProps) {
     }
   }
 
-  if (loading) {
+  if (loading || permissionsLoading) {
     return (
       <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
         <div className="animate-pulse">
@@ -198,7 +206,7 @@ function VarianceAlerts({ session, onAlertCount }: VarianceAlertsProps) {
                 </div>
               </div>
               
-              {!alert.resolved && (
+              {!alert.resolved && canManageAlerts && (
                 <button
                   onClick={() => resolveAlert(alert.id)}
                   className="ml-2 p-1 hover:bg-white hover:bg-opacity-50 rounded"
@@ -206,6 +214,12 @@ function VarianceAlerts({ session, onAlertCount }: VarianceAlertsProps) {
                 >
                   <X className="h-4 w-4" />
                 </button>
+              )}
+              
+              {!alert.resolved && !canManageAlerts && (
+                <div className="ml-2 text-xs text-gray-500 italic">
+                  Admin only
+                </div>
               )}
             </div>
             

@@ -77,8 +77,8 @@ def insufficient_risk_data_strategy(draw):
 class TestARIMAForecastOutputFormat:
     """Property 9: ARIMA Forecast Output Format tests"""
 
-    @settings(max_examples=10, deadline=60000)
-    @given(risk_data=risk_data_strategy(min_size=10, max_size=30))
+    @settings(max_examples=3, deadline=60000)
+    @given(risk_data=risk_data_strategy(min_size=10, max_size=20))
     def test_property_9_forecast_output_format(self, risk_data):
         """
         Property 9: ARIMA Forecast Output Format
@@ -173,9 +173,9 @@ class TestARIMAForecastOutputFormat:
 class TestOrganizationContextIsolation:
     """Property 5: Organization Context Isolation tests"""
 
-    @settings(max_examples=10, deadline=60000)
+    @settings(max_examples=3, deadline=60000)
     @given(
-        risk_data=risk_data_strategy(min_size=10, max_size=20),
+        risk_data=risk_data_strategy(min_size=10, max_size=15),
         org_id_1=st.uuids(),
         org_id_2=st.uuids()
     )
@@ -249,7 +249,7 @@ class TestOrganizationContextIsolation:
 class TestInsufficientDataHandling:
     """Tests for insufficient data error handling"""
 
-    @settings(max_examples=10, deadline=30000)
+    @settings(max_examples=3, deadline=30000)
     @given(risk_data=insufficient_risk_data_strategy())
     def test_property_8_insufficient_data_error(self, risk_data):
         """

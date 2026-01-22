@@ -1,0 +1,416 @@
+# Property-Based Testing Orchestration CI/CD Workflow
+#
+# This workflow runs comprehensive property-based testing orchestration with
+# automated test execution, result aggregation, analysis, and performance
+# regression detection.
+#
+# Task: 13.2 Add CI/CD integration and automation
+# Feature: property-based-testing
+
+name: PBT Orchestration
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+      - '__tests__/**'
+      - '.github/workflows/pbt-orchestration.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+      - '__tests__/**'
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      backend_only:
+        description: 'Run only backend tests'
+        required: false
+        type: boolean
+        default: false
+      frontend_only:
+        description: 'Run only frontend tests'
+        required: false
+        type: boolean
+        default: false
+      parallel:
+        description: 'Run tests in parallel'
+        required: false
+        type: boolean
+        default: true
+      performance_check:
+        description: 'Enable performance regression detection'
+        required: false
+        type: boolean
+        default: true
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+  HYPOTHESIS_PROFILE: 'ci'
+
+jobs:
+  orchestrate-tests:
+    name: Orchestrate Property-Based Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for trend analysis
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/tests/property_tests/requirements.txt
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install Python dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r tests/property_tests/requirements.txt
+          pip install pytest-json-report pytest-timeout
+      
+      - name: Install Node.js dependencies
+        run: |
+          npm ci
+      
+      - name: Create output directories
+        run: |
+          mkdir -p test-results/pbt-orchestration
+          mkdir -p test-results/pbt-analysis
+          mkdir -p .pbt-history
+      
+      - name: Restore historical test data
+        uses: actions/cache@v4
+        with:
+          path: .pbt-history
+          key: pbt-history-${{ github.ref }}-${{ github.run_number }}
+          restore-keys: |
+            pbt-history-${{ github.ref }}-
+            pbt-history-refs/heads/main-
+      
+      - name: Run property-based test orchestration
+        id: orchestration
+        run: |
+          cd backend/tests/property_tests
+          
+          # Set orchestration parameters
+          BACKEND_ONLY="${{ github.event.inputs.backend_only || 'false' }}"
+          FRONTEND_ONLY="${{ github.event.inputs.frontend_only || 'false' }}"
+          PARALLEL="${{ github.event.inputs.parallel || 'true' }}"
+          
+          # Build command
+          CMD="python pbt_orchestrator.py --output-dir ../../../test-results/pbt-orchestration"
+          
+          if [ "$BACKEND_ONLY" = "true" ]; then
+            CMD="$CMD --backend-only"
+          fi
+          
+          if [ "$FRONTEND_ONLY" = "true" ]; then
+            CMD="$CMD --frontend-only"
+          fi
+          
+          if [ "$PARALLEL" = "false" ]; then
+            CMD="$CMD --sequential"
+          fi
+          
+          # Run orchestration
+          echo "Running: $CMD"
+          $CMD
+          
+          # Capture exit code
+          EXIT_CODE=$?
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+          
+          # Continue even if tests fail (we want to analyze results)
+          exit 0
+        continue-on-error: true
+      
+      - name: Analyze test results
+        id: analysis
+        if: always()
+        run: |
+          cd backend/tests/property_tests
+          
+          # Find latest report
+          LATEST_REPORT=$(ls -t ../../../test-results/pbt-orchestration/pbt-*_report.json | head -1)
+          
+          if [ -n "$LATEST_REPORT" ]; then
+            echo "Analyzing report: $LATEST_REPORT"
+            
+            # Run analysis
+            python pbt_analysis.py "$LATEST_REPORT" \
+              --reports-dir ../../../test-results/pbt-orchestration \
+              --output ../../../test-results/pbt-analysis/latest_analysis.json
+            
+            # Extract key metrics for GitHub output
+            SUCCESS_RATE=$(jq -r '.success_rate_trend.current_value' ../../../test-results/pbt-analysis/latest_analysis.json)
+            TREND=$(jq -r '.success_rate_trend.trend_direction' ../../../test-results/pbt-analysis/latest_analysis.json)
+            FAILURES=$(jq -r '.failure_patterns | length' ../../../test-results/pbt-analysis/latest_analysis.json)
+            
+            echo "success_rate=$SUCCESS_RATE" >> $GITHUB_OUTPUT
+            echo "trend=$TREND" >> $GITHUB_OUTPUT
+            echo "failure_patterns=$FAILURES" >> $GITHUB_OUTPUT
+          else
+            echo "No report found for analysis"
+            echo "success_rate=0" >> $GITHUB_OUTPUT
+            echo "trend=unknown" >> $GITHUB_OUTPUT
+            echo "failure_patterns=0" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Performance regression detection
+        id: performance
+        if: always() && (github.event.inputs.performance_check != 'false')
+        run: |
+          cd backend/tests/property_tests
+          
+          # Find latest analysis
+          ANALYSIS_FILE="../../../test-results/pbt-analysis/latest_analysis.json"
+          
+          if [ -f "$ANALYSIS_FILE" ]; then
+            # Check for performance regressions
+            EXEC_TIME_THRESHOLD=$(jq -r '.execution_time_trend.threshold_exceeded' "$ANALYSIS_FILE")
+            SUCCESS_RATE_THRESHOLD=$(jq -r '.success_rate_trend.threshold_exceeded' "$ANALYSIS_FILE")
+            
+            echo "exec_time_regression=$EXEC_TIME_THRESHOLD" >> $GITHUB_OUTPUT
+            echo "success_rate_regression=$SUCCESS_RATE_THRESHOLD" >> $GITHUB_OUTPUT
+            
+            if [ "$EXEC_TIME_THRESHOLD" = "true" ] || [ "$SUCCESS_RATE_THRESHOLD" = "true" ]; then
+              echo "regression_detected=true" >> $GITHUB_OUTPUT
+              echo "⚠️ Performance regression detected!" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "regression_detected=false" >> $GITHUB_OUTPUT
+              echo "✅ No performance regressions detected" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "regression_detected=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Generate GitHub summary
+        if: always()
+        run: |
+          echo "## Property-Based Testing Orchestration Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Find latest report
+          LATEST_REPORT=$(ls -t test-results/pbt-orchestration/pbt-*_report.json | head -1)
+          
+          if [ -n "$LATEST_REPORT" ]; then
+            # Extract summary data
+            TOTAL_TESTS=$(jq -r '.total_tests' "$LATEST_REPORT")
+            PASSED=$(jq -r '.total_passed' "$LATEST_REPORT")
+            FAILED=$(jq -r '.total_failed' "$LATEST_REPORT")
+            SUCCESS_RATE=$(jq -r '.overall_success_rate' "$LATEST_REPORT")
+            EXEC_TIME=$(jq -r '.total_execution_time' "$LATEST_REPORT")
+            STATUS=$(jq -r '.overall_status' "$LATEST_REPORT")
+            
+            # Status emoji
+            if [ "$STATUS" = "passed" ]; then
+              STATUS_EMOJI="✅"
+            elif [ "$STATUS" = "failed" ]; then
+              STATUS_EMOJI="❌"
+            else
+              STATUS_EMOJI="⚠️"
+            fi
+            
+            echo "### $STATUS_EMOJI Overall Status: ${STATUS^^}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Total Tests | $TOTAL_TESTS |" >> $GITHUB_STEP_SUMMARY
+            echo "| Passed | $PASSED |" >> $GITHUB_STEP_SUMMARY
+            echo "| Failed | $FAILED |" >> $GITHUB_STEP_SUMMARY
+            echo "| Success Rate | ${SUCCESS_RATE}% |" >> $GITHUB_STEP_SUMMARY
+            echo "| Execution Time | ${EXEC_TIME}s |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            # Add trend information if available
+            ANALYSIS_FILE="test-results/pbt-analysis/latest_analysis.json"
+            if [ -f "$ANALYSIS_FILE" ]; then
+              echo "### 📊 Trend Analysis" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              
+              SUCCESS_TREND=$(jq -r '.success_rate_trend.trend_direction' "$ANALYSIS_FILE")
+              EXEC_TREND=$(jq -r '.execution_time_trend.trend_direction' "$ANALYSIS_FILE")
+              
+              echo "- Success Rate Trend: **${SUCCESS_TREND}**" >> $GITHUB_STEP_SUMMARY
+              echo "- Execution Time Trend: **${EXEC_TREND}**" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              
+              # Add recommendations
+              echo "### 💡 Recommendations" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              jq -r '.recommendations[]' "$ANALYSIS_FILE" | while read -r rec; do
+                echo "- $rec" >> $GITHUB_STEP_SUMMARY
+              done
+            fi
+          else
+            echo "❌ No test results found" >> $GITHUB_STEP_SUMMARY
+          fi
+      
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pbt-orchestration-results
+          path: |
+            test-results/pbt-orchestration/
+            test-results/pbt-analysis/
+          retention-days: 30
+      
+      - name: Save historical data
+        if: always()
+        run: |
+          # Copy latest results to history
+          LATEST_REPORT=$(ls -t test-results/pbt-orchestration/pbt-*_report.json | head -1)
+          if [ -n "$LATEST_REPORT" ]; then
+            cp "$LATEST_REPORT" .pbt-history/
+            
+            # Keep only last 20 reports
+            cd .pbt-history
+            ls -t pbt-*_report.json | tail -n +21 | xargs -r rm
+          fi
+      
+      - name: Comment on PR
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Read latest report
+            const reportFiles = fs.readdirSync('test-results/pbt-orchestration')
+              .filter(f => f.startsWith('pbt-') && f.endsWith('_report.json'))
+              .sort()
+              .reverse();
+            
+            if (reportFiles.length === 0) {
+              return;
+            }
+            
+            const reportPath = `test-results/pbt-orchestration/${reportFiles[0]}`;
+            const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+            
+            // Build comment
+            const statusEmoji = report.overall_status === 'passed' ? '✅' : '❌';
+            const successRate = report.overall_success_rate.toFixed(1);
+            
+            let comment = `## ${statusEmoji} Property-Based Testing Results\n\n`;
+            comment += `| Metric | Value |\n`;
+            comment += `|--------|-------|\n`;
+            comment += `| Total Tests | ${report.total_tests} |\n`;
+            comment += `| Passed | ${report.total_passed} |\n`;
+            comment += `| Failed | ${report.total_failed} |\n`;
+            comment += `| Success Rate | ${successRate}% |\n`;
+            comment += `| Execution Time | ${report.total_execution_time.toFixed(2)}s |\n`;
+            
+            // Add analysis if available
+            const analysisPath = 'test-results/pbt-analysis/latest_analysis.json';
+            if (fs.existsSync(analysisPath)) {
+              const analysis = JSON.parse(fs.readFileSync(analysisPath, 'utf8'));
+              
+              comment += `\n### 📊 Trends\n`;
+              comment += `- Success Rate: **${analysis.success_rate_trend.trend_direction}**\n`;
+              comment += `- Execution Time: **${analysis.execution_time_trend.trend_direction}**\n`;
+              
+              if (analysis.failure_patterns.length > 0) {
+                comment += `\n⚠️ **${analysis.failure_patterns.length} recurring failure pattern(s) detected**\n`;
+              }
+            }
+            
+            // Post comment
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+      
+      - name: Fail workflow on test failures
+        if: steps.orchestration.outputs.exit_code != '0'
+        run: |
+          echo "::error::Property-based tests failed"
+          exit 1
+      
+      - name: Fail workflow on performance regression
+        if: steps.performance.outputs.regression_detected == 'true'
+        run: |
+          echo "::error::Performance regression detected"
+          exit 1
+
+  # Separate job for comprehensive nightly testing
+  nightly-comprehensive:
+    name: Nightly Comprehensive Testing
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 2 * * *'
+    timeout-minutes: 60
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install -r tests/property_tests/requirements.txt
+          cd ..
+          npm ci
+      
+      - name: Run comprehensive property tests
+        run: |
+          cd backend/tests/property_tests
+          
+          # Run with thorough profile
+          HYPOTHESIS_PROFILE=ci-thorough python pbt_orchestrator.py \
+            --output-dir ../../../test-results/pbt-nightly
+      
+      - name: Upload nightly results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pbt-nightly-results
+          path: test-results/pbt-nightly/
+          retention-days: 90
+      
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Nightly PBT Failed - ${new Date().toISOString().split('T')[0]}`,
+              body: `The nightly comprehensive property-based testing run has failed.\n\nWorkflow: ${context.workflow}\nRun: ${context.runNumber}`,
+              labels: ['testing', 'automated', 'priority:high']
+            });

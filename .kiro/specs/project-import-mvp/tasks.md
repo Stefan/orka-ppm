@@ -22,31 +22,31 @@ Each task builds incrementally on previous work, with property-based tests place
     - Define constants: `REQUIRED_FIELDS`, `VALID_STATUSES`
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 8.3, 8.4, 8.5_
   
-  - [ ]* 2.2 Write property test for missing required fields validation
+  - [x] 2.2 Write property test for missing required fields validation
     - **Property 3: Missing required fields are rejected**
     - **Validates: Requirements 3.1, 8.4**
   
-  - [ ]* 2.3 Write property test for duplicate name detection
+  - [x] 2.3 Write property test for duplicate name detection
     - **Property 4: Duplicate names are rejected**
     - **Validates: Requirements 3.2**
   
-  - [ ]* 2.4 Write property test for budget validation
+  - [x] 2.4 Write property test for budget validation
     - **Property 5: Non-numeric budgets are rejected**
     - **Validates: Requirements 3.3, 8.1**
   
-  - [ ]* 2.5 Write property test for date format validation
+  - [x] 2.5 Write property test for date format validation
     - **Property 6: Invalid date formats are rejected**
     - **Validates: Requirements 3.4, 8.2**
   
-  - [ ]* 2.6 Write property test for status validation
+  - [x] 2.6 Write property test for status validation
     - **Property 9: Invalid status values are rejected**
     - **Validates: Requirements 8.3**
   
-  - [ ]* 2.7 Write property test for minimal valid records
+  - [x] 2.7 Write property test for minimal valid records
     - **Property 10: Minimal valid records are accepted**
     - **Validates: Requirements 8.5**
   
-  - [ ]* 2.8 Write unit tests for validation edge cases
+  - [x] 2.8 Write unit tests for validation edge cases
     - Test empty strings vs null values
     - Test whitespace-only fields
     - Test maximum field lengths
@@ -61,19 +61,19 @@ Each task builds incrementally on previous work, with property-based tests place
     - Create `CSVParseError` exception class
     - _Requirements: 2.1, 2.2, 10.1, 10.2, 10.3_
   
-  - [ ]* 3.2 Write property test for CSV header mapping
+  - [x] 3.2 Write property test for CSV header mapping
     - **Property 2: CSV header mapping preserves data**
     - **Validates: Requirements 2.2, 10.1, 10.2**
   
-  - [ ]* 3.3 Write property test for CSV delimiter flexibility
+  - [x] 3.3 Write property test for CSV delimiter flexibility
     - **Property 14: CSV delimiter flexibility**
     - **Validates: Requirements 10.4**
   
-  - [ ]* 3.4 Write property test for quoted field handling
+  - [x] 3.4 Write property test for quoted field handling
     - **Property 15: Quoted field handling**
     - **Validates: Requirements 10.5**
   
-  - [ ]* 3.5 Write unit tests for CSV parsing errors
+  - [x] 3.5 Write unit tests for CSV parsing errors
     - Test malformed CSV structure
     - Test missing required columns
     - Test encoding issues (UTF-8, Latin-1)
@@ -87,11 +87,11 @@ Each task builds incrementally on previous work, with property-based tests place
     - Handle audit logging failures gracefully (log warning but don't fail import)
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
   
-  - [ ]* 4.2 Write property test for audit logging completeness
+  - [x] 4.2 Write property test for audit logging completeness
     - **Property 12: Audit logging completeness**
     - **Validates: Requirements 5.1, 5.2, 5.3, 5.4**
   
-  - [ ]* 4.3 Write unit test for audit logging failure graceful degradation
+  - [x] 4.3 Write unit test for audit logging failure graceful degradation
     - Test that import succeeds even when audit logging fails
     - _Requirements: 5.5_
 
@@ -100,36 +100,36 @@ Each task builds incrementally on previous work, with property-based tests place
   - Ensure all tests pass, ask the user if questions arise
 
 - [ ] 6. Implement import service
-  - [ ] 6.1 Create `backend/services/import_service.py` with ImportService and ImportResult classes
+  - [x] 6.1 Create `backend/services/import_service.py` with ImportService and ImportResult classes
     - Implement `import_projects()` orchestration method
     - Implement `_validate_batch()` to validate all projects
     - Implement `_create_projects_transaction()` with database transaction handling
     - Integrate ValidationService, AuditService
     - _Requirements: 1.1, 1.2, 2.3, 3.5, 3.6, 9.2, 9.3_
   
-  - [ ]* 6.2 Write property test for valid imports creating all projects
+  - [x] 6.2 Write property test for valid imports creating all projects
     - **Property 1: Valid imports create all projects**
     - **Validates: Requirements 1.1, 1.2, 2.1, 2.3**
   
-  - [ ]* 6.3 Write property test for validation error completeness
+  - [x] 6.3 Write property test for validation error completeness
     - **Property 7: Validation errors are comprehensive**
     - **Validates: Requirements 3.5, 7.1**
   
-  - [ ]* 6.4 Write property test for import atomicity with invalid records
+  - [x] 6.4 Write property test for import atomicity with invalid records
     - **Property 8: Import atomicity (all-or-nothing)**
     - **Validates: Requirements 3.6, 9.1, 9.5**
   
-  - [ ]* 6.5 Write property test for transaction atomicity with valid batches
+  - [x] 6.5 Write property test for transaction atomicity with valid batches
     - **Property 11: Transaction atomicity for valid batches**
     - **Validates: Requirements 9.2**
   
-  - [ ]* 6.6 Write unit tests for database error handling
+  - [x] 6.6 Write unit tests for database error handling
     - Test transaction rollback on database errors
     - Test error message for rollback scenarios
     - _Requirements: 9.3, 9.4_
 
-- [ ] 7. Implement import API endpoints
-  - [ ] 7.1 Create `backend/routers/projects_import.py` with FastAPI router
+- [x] 7. Implement import API endpoints
+  - [x] 7.1 Create `backend/routers/projects_import.py` with FastAPI router
     - Implement `POST /api/projects/import` endpoint for JSON imports
     - Implement `POST /api/projects/import/csv` endpoint for CSV uploads
     - Add JWT authentication dependency (`get_current_user`)
@@ -138,11 +138,11 @@ Each task builds incrementally on previous work, with property-based tests place
     - Handle all error types with appropriate HTTP status codes
     - _Requirements: 1.3, 1.4, 1.5, 2.4, 2.5, 4.1, 4.2, 4.3, 4.4, 4.5_
   
-  - [ ]* 7.2 Write property test for error response format consistency
+  - [x] 7.2 Write property test for error response format consistency
     - **Property 13: Error response format consistency**
     - **Validates: Requirements 7.6**
   
-  - [ ]* 7.3 Write unit tests for authentication and authorization
+  - [x] 7.3 Write unit tests for authentication and authorization
     - Test missing JWT token returns 401
     - Test invalid JWT token returns 401
     - Test expired JWT token returns 401
@@ -150,25 +150,25 @@ Each task builds incrementally on previous work, with property-based tests place
     - Test disabled user account returns 403
     - _Requirements: 1.3, 1.4, 4.1, 4.2, 4.3, 4.4, 4.5_
   
-  - [ ]* 7.4 Write unit tests for API endpoint routing
+  - [x] 7.4 Write unit tests for API endpoint routing
     - Test POST method accepted on both endpoints
     - Test other HTTP methods rejected
     - Test correct paths: `/api/projects/import` and `/api/projects/import/csv`
     - _Requirements: 1.5, 2.4_
 
-- [ ] 8. Register import router in main application
-  - [ ] 8.1 Update `backend/main.py` to include projects_import router
+- [x] 8. Register import router in main application
+  - [x] 8.1 Update `backend/main.py` to include projects_import router
     - Import and register the new router
     - Ensure router is mounted with correct prefix
     - _Requirements: 1.5, 2.4_
 
-- [ ] 9. Checkpoint - Ensure all backend tests pass
+- [x] 9. Checkpoint - Ensure all backend tests pass
   - Run full backend test suite
   - Test API endpoints with curl or Postman
   - Ensure all tests pass, ask the user if questions arise
 
-- [ ] 10. Implement frontend import modal component
-  - [ ] 10.1 Create `components/projects/ProjectImportModal.tsx`
+- [x] 10. Implement frontend import modal component
+  - [x] 10.1 Create `components/projects/ProjectImportModal.tsx`
     - Implement modal UI with method selection (JSON/CSV tabs)
     - Implement JSON textarea input
     - Implement CSV drag-and-drop upload using react-dropzone
@@ -178,7 +178,7 @@ Each task builds incrementally on previous work, with property-based tests place
     - Add "Copy errors" button for error sharing
     - _Requirements: 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8_
   
-  - [ ]* 10.2 Write unit tests for modal component
+  - [x] 10.2 Write unit tests for modal component
     - Test modal opens and closes
     - Test method selection switches UI
     - Test file upload accepts only CSV files
@@ -187,8 +187,8 @@ Each task builds incrementally on previous work, with property-based tests place
     - Test error messages display with record details
     - _Requirements: 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8_
 
-- [ ] 11. Implement frontend API route
-  - [ ] 11.1 Create `app/api/projects/import/route.ts`
+- [x] 11. Implement frontend API route
+  - [x] 11.1 Create `app/api/projects/import/route.ts`
     - Implement POST handler for both JSON and CSV imports
     - Detect content type to determine import method
     - Extract JWT token from cookies or headers
@@ -197,7 +197,7 @@ Each task builds incrementally on previous work, with property-based tests place
     - Return appropriate status codes
     - _Requirements: 1.3, 1.4, 1.5, 2.4_
   
-  - [ ]* 11.2 Write unit tests for API route
+  - [x] 11.2 Write unit tests for API route
     - Test JSON import proxying
     - Test CSV import proxying
     - Test authentication token extraction
@@ -205,21 +205,21 @@ Each task builds incrementally on previous work, with property-based tests place
     - Test error response forwarding
     - _Requirements: 1.3, 1.4_
 
-- [ ] 12. Add import button to dashboard
-  - [ ] 12.1 Update `app/dashboards/page.tsx`
+- [x] 12. Add import button to dashboard
+  - [x] 12.1 Update `app/dashboards/page.tsx`
     - Add import button to Quick Actions section (around line 756)
     - Add state management for modal visibility
     - Wire button click to open ProjectImportModal
     - Import and render ProjectImportModal component
     - _Requirements: 6.1_
   
-  - [ ]* 12.2 Write unit test for import button
+  - [x] 12.2 Write unit test for import button
     - Test button renders in dashboard
     - Test button click opens modal
     - _Requirements: 6.1_
 
-- [ ] 13. Integration and end-to-end testing
-  - [ ]* 13.1 Write integration tests for complete import flow
+- [x] 13. Integration and end-to-end testing
+  - [x] 13.1 Write integration tests for complete import flow
     - Test JSON import from frontend to database
     - Test CSV import from frontend to database
     - Test validation error flow
@@ -227,7 +227,7 @@ Each task builds incrementally on previous work, with property-based tests place
     - Test audit logging for successful and failed imports
     - _Requirements: 1.1, 1.2, 2.1, 2.3, 3.6, 5.1, 5.2, 5.3_
 
-- [ ] 14. Final checkpoint - Ensure all tests pass
+- [x] 14. Final checkpoint - Ensure all tests pass
   - Run full test suite (backend and frontend)
   - Test complete user flow in development environment
   - Verify audit logs are created correctly

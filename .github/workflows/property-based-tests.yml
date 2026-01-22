@@ -1,0 +1,244 @@
+# Property-Based Testing CI/CD Workflow
+# 
+# This workflow runs property-based tests for the PPM backend using pytest and Hypothesis.
+# It provides deterministic test execution with configurable seeds for reproducibility.
+#
+# Task: 2.2 Add test failure debugging and CI/CD support
+# **Validates: Requirements 1.3, 1.4**
+
+name: Property-Based Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/property-based-tests.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/property-based-tests.yml'
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: 'Hypothesis seed for deterministic execution'
+        required: false
+        type: string
+      profile:
+        description: 'Test profile (ci, ci-fast, ci-thorough)'
+        required: false
+        default: 'ci'
+        type: choice
+        options:
+          - ci
+          - ci-fast
+          - ci-thorough
+      max_examples:
+        description: 'Maximum examples per test (overrides profile)'
+        required: false
+        type: string
+
+env:
+  PYTHON_VERSION: '3.11'
+  HYPOTHESIS_PROFILE: ${{ github.event.inputs.profile || 'ci' }}
+
+jobs:
+  property-tests:
+    name: Run Property-Based Tests
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: backend
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: backend/requirements*.txt
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r tests/property_tests/requirements.txt
+      
+      - name: Generate deterministic seed
+        id: seed
+        run: |
+          if [ -n "${{ github.event.inputs.seed }}" ]; then
+            echo "seed=${{ github.event.inputs.seed }}" >> $GITHUB_OUTPUT
+            echo "Using provided seed: ${{ github.event.inputs.seed }}"
+          else
+            # Generate seed from commit SHA for reproducibility
+            SEED=$(echo "${{ github.sha }}" | sha256sum | head -c 8)
+            SEED_INT=$((16#$SEED % 2147483647))
+            echo "seed=$SEED_INT" >> $GITHUB_OUTPUT
+            echo "Generated seed from commit: $SEED_INT"
+          fi
+      
+      - name: Configure test environment
+        run: |
+          echo "HYPOTHESIS_SEED=${{ steps.seed.outputs.seed }}" >> $GITHUB_ENV
+          echo "HYPOTHESIS_PROFILE=${{ env.HYPOTHESIS_PROFILE }}" >> $GITHUB_ENV
+          echo "CI=true" >> $GITHUB_ENV
+          
+          # Create directories for artifacts
+          mkdir -p .hypothesis/ci_examples
+          mkdir -p .hypothesis/ci_artifacts
+          mkdir -p test-results
+      
+      - name: Restore Hypothesis example database
+        uses: actions/cache@v4
+        with:
+          path: backend/.hypothesis
+          key: hypothesis-examples-${{ runner.os }}-${{ hashFiles('backend/tests/property_tests/**/*.py') }}
+          restore-keys: |
+            hypothesis-examples-${{ runner.os }}-
+      
+      - name: Run property-based tests
+        id: tests
+        run: |
+          # Set max examples if provided
+          if [ -n "${{ github.event.inputs.max_examples }}" ]; then
+            export HYPOTHESIS_MAX_EXAMPLES=${{ github.event.inputs.max_examples }}
+          fi
+          
+          # Run tests with JUnit XML output
+          python -m pytest tests/property_tests/ \
+            -v \
+            --tb=short \
+            --junitxml=test-results/property-tests.xml \
+            --hypothesis-seed=${{ steps.seed.outputs.seed }} \
+            --hypothesis-profile=${{ env.HYPOTHESIS_PROFILE }} \
+            -x \
+            2>&1 | tee test-output.log
+          
+          # Capture exit code
+          TEST_EXIT_CODE=${PIPESTATUS[0]}
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit $TEST_EXIT_CODE
+        continue-on-error: true
+      
+      - name: Generate test summary
+        if: always()
+        run: |
+          echo "## Property-Based Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.tests.outputs.exit_code }}" == "0" ]; then
+            echo "✅ **All tests passed**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Some tests failed**" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "| Setting | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Seed | \`${{ steps.seed.outputs.seed }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Profile | \`${{ env.HYPOTHESIS_PROFILE }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Python | \`${{ env.PYTHON_VERSION }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### Reproduction" >> $GITHUB_STEP_SUMMARY
+          echo "To reproduce these results locally:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "cd backend" >> $GITHUB_STEP_SUMMARY
+          echo "HYPOTHESIS_SEED=${{ steps.seed.outputs.seed }} HYPOTHESIS_PROFILE=${{ env.HYPOTHESIS_PROFILE }} pytest tests/property_tests/ -v" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: property-test-results
+          path: |
+            backend/test-results/
+            backend/test-output.log
+            backend/.hypothesis/ci_artifacts/
+          retention-days: 30
+      
+      - name: Upload Hypothesis database
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hypothesis-database
+          path: backend/.hypothesis/
+          retention-days: 7
+      
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Property Test Results
+          path: backend/test-results/property-tests.xml
+          reporter: java-junit
+          fail-on-error: false
+      
+      - name: Check test status
+        if: steps.tests.outputs.exit_code != '0'
+        run: |
+          echo "::error::Property-based tests failed. See test results for details."
+          echo "To reproduce: HYPOTHESIS_SEED=${{ steps.seed.outputs.seed }} pytest tests/property_tests/ -v"
+          exit 1
+
+  # Separate job for thorough testing on main branch
+  thorough-tests:
+    name: Thorough Property Tests
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    defaults:
+      run:
+        working-directory: backend
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: backend/requirements*.txt
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r tests/property_tests/requirements.txt
+      
+      - name: Generate deterministic seed
+        id: seed
+        run: |
+          SEED=$(echo "${{ github.sha }}" | sha256sum | head -c 8)
+          SEED_INT=$((16#$SEED % 2147483647))
+          echo "seed=$SEED_INT" >> $GITHUB_OUTPUT
+      
+      - name: Run thorough property tests
+        run: |
+          HYPOTHESIS_SEED=${{ steps.seed.outputs.seed }} \
+          HYPOTHESIS_PROFILE=ci-thorough \
+          python -m pytest tests/property_tests/ \
+            -v \
+            --tb=short \
+            --junitxml=test-results/thorough-property-tests.xml \
+            2>&1 | tee thorough-test-output.log
+      
+      - name: Upload thorough test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: thorough-property-test-results
+          path: |
+            backend/test-results/
+            backend/thorough-test-output.log
+          retention-days: 30

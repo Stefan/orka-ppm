@@ -1132,6 +1132,218 @@ class HierarchyManager:
     def __init__(self):
         pass
     
+    def validate_custom_code_uniqueness(
+        self,
+        code: str,
+        project_id: UUID,
+        supabase: Client,
+        exclude_breakdown_id: Optional[UUID] = None
+    ) -> Dict[str, Any]:
+        """Validate that custom code is unique within project scope"""
+        if not code:
+            return {
+                'is_valid': True,
+                'message': 'No code provided'
+            }
+        
+        # Query for existing breakdowns with same code in project
+        query = supabase.table('po_breakdowns').select('id, name, code').eq('project_id', str(project_id)).eq('code', code).eq('is_active', True)
+        
+        # Exclude current breakdown if updating
+        if exclude_breakdown_id:
+            query = query.neq('id', str(exclude_breakdown_id))
+        
+        result = query.execute()
+        
+        if result.data and len(result.data) > 0:
+            return {
+                'is_valid': False,
+                'message': f'Code "{code}" already exists in project',
+                'conflicting_breakdowns': result.data
+            }
+        
+        return {
+            'is_valid': True,
+            'message': 'Code is unique within project scope'
+        }
+    
+    def validate_hierarchy_move(
+        self,
+        item_id: UUID,
+        new_parent_id: Optional[UUID],
+        breakdowns: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """Validate that moving an item to a new parent is valid"""
+        errors = []
+        warnings = []
+        
+        # Find the item being moved
+        item = None
+        for b in breakdowns:
+            if b.get('id') == str(item_id):
+                item = b
+                break
+        
+        if not item:
+            return {
+                'is_valid': False,
+                'errors': ['Item not found'],
+                'warnings': []
+            }
+        
+        # If moving to root (no parent), always valid
+        if not new_parent_id:
+            return {
+                'is_valid': True,
+                'errors': [],
+                'warnings': [],
+                'new_hierarchy_level': 0
+            }
+        
+        # Find the new parent
+        new_parent = None
+        for b in breakdowns:
+            if b.get('id') == str(new_parent_id):
+                new_parent = b
+                break
+        
+        if not new_parent:
+            return {
+                'is_valid': False,
+                'errors': ['New parent not found'],
+                'warnings': []
+            }
+        
+        # Check for circular reference (item cannot be moved under itself or its descendants)
+        if self._is_descendant(str(new_parent_id), str(item_id), breakdowns):
+            errors.append('Cannot move item under itself or its descendants (circular reference)')
+        
+        # Check hierarchy depth limit (max 10 levels)
+        new_level = new_parent.get('hierarchy_level', 0) + 1
+        max_child_depth = self._get_max_descendant_depth(str(item_id), breakdowns)
+        total_depth = new_level + max_child_depth
+        
+        if total_depth > 10:
+            errors.append(f'Move would exceed maximum hierarchy depth of 10 levels (would be {total_depth})')
+        elif total_depth > 8:
+            warnings.append(f'Move will result in deep hierarchy ({total_depth} levels)')
+        
+        return {
+            'is_valid': len(errors) == 0,
+            'errors': errors,
+            'warnings': warnings,
+            'new_hierarchy_level': new_level
+        }
+    
+    def _is_descendant(self, potential_descendant_id: str, ancestor_id: str, breakdowns: List[Dict[str, Any]]) -> bool:
+        """Check if potential_descendant_id is a descendant of ancestor_id"""
+        if potential_descendant_id == ancestor_id:
+            return True
+        
+        # Find the potential descendant
+        current = None
+        for b in breakdowns:
+            if b.get('id') == potential_descendant_id:
+                current = b
+                break
+        
+        if not current:
+            return False
+        
+        # Walk up the parent chain
+        while current:
+            parent_id = current.get('parent_breakdown_id')
+            if not parent_id:
+                return False
+            
+            if parent_id == ancestor_id:
+                return True
+            
+            # Find parent
+            current = None
+            for b in breakdowns:
+                if b.get('id') == parent_id:
+                    current = b
+                    break
+        
+        return False
+    
+    def _get_max_descendant_depth(self, item_id: str, breakdowns: List[Dict[str, Any]]) -> int:
+        """Get the maximum depth of descendants for an item"""
+        children = [b for b in breakdowns if b.get('parent_breakdown_id') == item_id]
+        
+        if not children:
+            return 0
+        
+        max_depth = 0
+        for child in children:
+            child_id = child.get('id')
+            if child_id:
+                child_depth = self._get_max_descendant_depth(child_id, breakdowns)
+                max_depth = max(max_depth, child_depth + 1)
+        
+        return max_depth
+    
+    def update_hierarchy_levels(
+        self,
+        item_id: UUID,
+        new_parent_id: Optional[UUID],
+        breakdowns: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
+        """Calculate new hierarchy levels for item and all descendants after move"""
+        updates = []
+        
+        # Find the item
+        item = None
+        for b in breakdowns:
+            if b.get('id') == str(item_id):
+                item = b
+                break
+        
+        if not item:
+            return updates
+        
+        # Calculate new level
+        if new_parent_id:
+            new_parent = None
+            for b in breakdowns:
+                if b.get('id') == str(new_parent_id):
+                    new_parent = b
+                    break
+            
+            if new_parent:
+                new_level = new_parent.get('hierarchy_level', 0) + 1
+            else:
+                new_level = 0
+        else:
+            new_level = 0
+        
+        # Calculate level change
+        old_level = item.get('hierarchy_level', 0)
+        level_change = new_level - old_level
+        
+        # Update item and all descendants
+        def update_descendants(parent_id: str, level_delta: int):
+            for b in breakdowns:
+                if b.get('id') == parent_id:
+                    updates.append({
+                        'id': parent_id,
+                        'hierarchy_level': b.get('hierarchy_level', 0) + level_delta,
+                        'parent_breakdown_id': str(new_parent_id) if parent_id == str(item_id) and new_parent_id else b.get('parent_breakdown_id')
+                    })
+                    
+                    # Recursively update children
+                    children = [child for child in breakdowns if child.get('parent_breakdown_id') == parent_id]
+                    for child in children:
+                        child_id = child.get('id')
+                        if child_id:
+                            update_descendants(child_id, level_delta)
+                    break
+        
+        update_descendants(str(item_id), level_change)
+        
+        return updates
+    
     def parse_csv_hierarchy(self, csv_data: str, column_mappings: Dict[str, str]) -> List[Dict[str, Any]]:
         """Parse CSV data into hierarchical structure"""
         import csv
@@ -1569,6 +1781,734 @@ class POBreakdownService:
         result = query.order('hierarchy_level').order('name').range(offset, offset + limit - 1).execute()
         
         return result.data or []
+    
+    # ========================================================================
+    # Custom Field and Metadata Management
+    # Task 6.1: Add custom field and metadata support
+    # Requirements: 4.1, 4.3, 4.4
+    # ========================================================================
+    
+    async def update_custom_fields(
+        self,
+        breakdown_id: UUID,
+        custom_fields: Dict[str, Any],
+        user_id: UUID,
+        merge: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Update custom fields for a PO breakdown.
+        
+        Args:
+            breakdown_id: ID of the breakdown to update
+            custom_fields: Dictionary of custom field key-value pairs
+            user_id: ID of user making the update
+            merge: If True, merge with existing fields; if False, replace entirely
+        
+        Returns:
+            Updated breakdown data
+        
+        Validates: Requirements 4.3 (flexible JSONB storage for custom fields)
+        """
+        # Get current breakdown
+        current_result = self.supabase.table('po_breakdowns').select('custom_fields, version').eq(
+            'id', str(breakdown_id)
+        ).execute()
+        
+        if not current_result.data:
+            raise Exception(f"PO breakdown {breakdown_id} not found")
+        
+        current_data = current_result.data[0]
+        current_custom_fields = current_data.get('custom_fields', {})
+        current_version = current_data.get('version', 1)
+        
+        # Merge or replace custom fields
+        if merge:
+            updated_custom_fields = {**current_custom_fields, **custom_fields}
+        else:
+            updated_custom_fields = custom_fields
+        
+        # Update in database
+        update_data = {
+            'custom_fields': updated_custom_fields,
+            'updated_at': datetime.now().isoformat(),
+            'version': current_version + 1
+        }
+        
+        result = self.supabase.table('po_breakdowns').update(update_data).eq(
+            'id', str(breakdown_id)
+        ).execute()
+        
+        if not result.data:
+            raise Exception("Failed to update custom fields")
+        
+        return result.data[0]
+    
+    async def get_custom_field(
+        self,
+        breakdown_id: UUID,
+        field_name: str
+    ) -> Optional[Any]:
+        """
+        Get a specific custom field value from a PO breakdown.
+        
+        Args:
+            breakdown_id: ID of the breakdown
+            field_name: Name of the custom field to retrieve
+        
+        Returns:
+            Value of the custom field, or None if not found
+        
+        Validates: Requirements 4.3 (flexible JSONB storage for custom fields)
+        """
+        result = self.supabase.table('po_breakdowns').select('custom_fields').eq(
+            'id', str(breakdown_id)
+        ).execute()
+        
+        if not result.data:
+            return None
+        
+        custom_fields = result.data[0].get('custom_fields', {})
+        return custom_fields.get(field_name)
+    
+    async def delete_custom_field(
+        self,
+        breakdown_id: UUID,
+        field_name: str,
+        user_id: UUID
+    ) -> Dict[str, Any]:
+        """
+        Delete a specific custom field from a PO breakdown.
+        
+        Args:
+            breakdown_id: ID of the breakdown
+            field_name: Name of the custom field to delete
+            user_id: ID of user making the update
+        
+        Returns:
+            Updated breakdown data
+        
+        Validates: Requirements 4.3 (flexible JSONB storage for custom fields)
+        """
+        # Get current breakdown
+        current_result = self.supabase.table('po_breakdowns').select('custom_fields, version').eq(
+            'id', str(breakdown_id)
+        ).execute()
+        
+        if not current_result.data:
+            raise Exception(f"PO breakdown {breakdown_id} not found")
+        
+        current_data = current_result.data[0]
+        custom_fields = current_data.get('custom_fields', {})
+        current_version = current_data.get('version', 1)
+        
+        # Remove the field
+        if field_name in custom_fields:
+            del custom_fields[field_name]
+        
+        # Update in database
+        update_data = {
+            'custom_fields': custom_fields,
+            'updated_at': datetime.now().isoformat(),
+            'version': current_version + 1
+        }
+        
+        result = self.supabase.table('po_breakdowns').update(update_data).eq(
+            'id', str(breakdown_id)
+        ).execute()
+        
+        if not result.data:
+            raise Exception("Failed to delete custom field")
+        
+        return result.data[0]
+    
+    # ========================================================================
+    # Tag Management
+    # Task 6.1: Add support for multiple tags for cross-cutting organization
+    # Requirements: 4.4
+    # ========================================================================
+    
+    async def add_tags(
+        self,
+        breakdown_id: UUID,
+        tags: List[str],
+        user_id: UUID
+    ) -> Dict[str, Any]:
+        """
+        Add tags to a PO breakdown (supports multiple tags for cross-cutting organization).
+        
+        Args:
+            breakdown_id: ID of the breakdown
+            tags: List of tags to add
+            user_id: ID of user making the update
+        
+        Returns:
+            Updated breakdown data
+        
+        Validates: Requirements 4.4 (multiple tags for cross-cutting organization)
+        """
+        # Get current breakdown
+        current_result = self.supabase.table('po_breakdowns').select('tags, version').eq(
+            'id', str(breakdown_id)
+        ).execute()
+        
+        if not current_result.data:
+            raise Exception(f"PO breakdown {breakdown_id} not found")
+        
+        current_data = current_result.data[0]
+        current_tags = current_data.get('tags', [])
+        current_version = current_data.get('version', 1)
+        
+        # Add new tags (avoid duplicates)
+        updated_tags = list(set(current_tags + tags))
+        
+        # Update in database
+        update_data = {
+            'tags': updated_tags,
+            'updated_at': datetime.now().isoformat(),
+            'version': current_version + 1
+        }
+        
+        result = self.supabase.table('po_breakdowns').update(update_data).eq(
+            'id', str(breakdown_id)
+        ).execute()
+        
+        if not result.data:
+            raise Exception("Failed to add tags")
+        
+        return result.data[0]
+    
+    async def remove_tags(
+        self,
+        breakdown_id: UUID,
+        tags: List[str],
+        user_id: UUID
+    ) -> Dict[str, Any]:
+        """
+        Remove tags from a PO breakdown.
+        
+        Args:
+            breakdown_id: ID of the breakdown
+            tags: List of tags to remove
+            user_id: ID of user making the update
+        
+        Returns:
+            Updated breakdown data
+        
+        Validates: Requirements 4.4 (multiple tags for cross-cutting organization)
+        """
+        # Get current breakdown
+        current_result = self.supabase.table('po_breakdowns').select('tags, version').eq(
+            'id', str(breakdown_id)
+        ).execute()
+        
+        if not current_result.data:
+            raise Exception(f"PO breakdown {breakdown_id} not found")
+        
+        current_data = current_result.data[0]
+        current_tags = current_data.get('tags', [])
+        current_version = current_data.get('version', 1)
+        
+        # Remove specified tags
+        updated_tags = [tag for tag in current_tags if tag not in tags]
+        
+        # Update in database
+        update_data = {
+            'tags': updated_tags,
+            'updated_at': datetime.now().isoformat(),
+            'version': current_version + 1
+        }
+        
+        result = self.supabase.table('po_breakdowns').update(update_data).eq(
+            'id', str(breakdown_id)
+        ).execute()
+        
+        if not result.data:
+            raise Exception("Failed to remove tags")
+        
+        return result.data[0]
+    
+    async def search_by_tags(
+        self,
+        project_id: UUID,
+        tags: List[str],
+        match_all: bool = False,
+        limit: int = 50,
+        offset: int = 0
+    ) -> List[Dict[str, Any]]:
+        """
+        Search PO breakdowns by tags.
+        
+        Args:
+            project_id: ID of the project
+            tags: List of tags to search for
+            match_all: If True, match all tags; if False, match any tag
+            limit: Maximum number of results
+            offset: Offset for pagination
+        
+        Returns:
+            List of matching breakdowns
+        
+        Validates: Requirements 4.4 (multiple tags for cross-cutting organization)
+        """
+        # Get all active breakdowns for the project
+        result = self.supabase.table('po_breakdowns').select('*').eq(
+            'project_id', str(project_id)
+        ).eq('is_active', True).execute()
+        
+        if not result.data:
+            return []
+        
+        # Filter by tags in Python (PostgreSQL JSONB array operations can be complex)
+        matching_breakdowns = []
+        for breakdown in result.data:
+            breakdown_tags = set(breakdown.get('tags', []))
+            search_tags = set(tags)
+            
+            if match_all:
+                # All search tags must be present
+                if search_tags.issubset(breakdown_tags):
+                    matching_breakdowns.append(breakdown)
+            else:
+                # Any search tag must be present
+                if search_tags.intersection(breakdown_tags):
+                    matching_breakdowns.append(breakdown)
+        
+        # Apply pagination
+        return matching_breakdowns[offset:offset + limit]
+    
+    # ========================================================================
+    # Category and Subcategory Management
+    # Task 6.1: Implement category and subcategory management
+    # Requirements: 4.1
+    # ========================================================================
+    
+    async def update_category(
+        self,
+        breakdown_id: UUID,
+        category: Optional[str],
+        subcategory: Optional[str],
+        user_id: UUID
+    ) -> Dict[str, Any]:
+        """
+        Update category and subcategory for a PO breakdown.
+        
+        Args:
+            breakdown_id: ID of the breakdown
+            category: New category value (or None to clear)
+            subcategory: New subcategory value (or None to clear)
+            user_id: ID of user making the update
+        
+        Returns:
+            Updated breakdown data
+        
+        Validates: Requirements 4.1 (user-defined categories and subcategories)
+        """
+        # Get current version
+        current_result = self.supabase.table('po_breakdowns').select('version').eq(
+            'id', str(breakdown_id)
+        ).execute()
+        
+        if not current_result.data:
+            raise Exception(f"PO breakdown {breakdown_id} not found")
+        
+        current_version = current_result.data[0].get('version', 1)
+        
+        # Update in database
+        update_data = {
+            'category': category,
+            'subcategory': subcategory,
+            'updated_at': datetime.now().isoformat(),
+            'version': current_version + 1
+        }
+        
+        result = self.supabase.table('po_breakdowns').update(update_data).eq(
+            'id', str(breakdown_id)
+        ).execute()
+        
+        if not result.data:
+            raise Exception("Failed to update category")
+        
+        return result.data[0]
+    
+    async def get_project_categories(
+        self,
+        project_id: UUID
+    ) -> Dict[str, List[str]]:
+        """
+        Get all unique categories and subcategories used in a project.
+        
+        Args:
+            project_id: ID of the project
+        
+        Returns:
+            Dictionary mapping categories to lists of subcategories
+        
+        Validates: Requirements 4.1 (user-defined categories and subcategories)
+        """
+        result = self.supabase.table('po_breakdowns').select('category, subcategory').eq(
+            'project_id', str(project_id)
+        ).eq('is_active', True).execute()
+        
+        if not result.data:
+            return {}
+        
+        # Build category hierarchy
+        categories = {}
+        for breakdown in result.data:
+            category = breakdown.get('category')
+            subcategory = breakdown.get('subcategory')
+            
+            if category:
+                if category not in categories:
+                    categories[category] = []
+                
+                if subcategory and subcategory not in categories[category]:
+                    categories[category].append(subcategory)
+        
+        return categories
+    
+    async def search_by_category(
+        self,
+        project_id: UUID,
+        category: Optional[str] = None,
+        subcategory: Optional[str] = None,
+        limit: int = 50,
+        offset: int = 0
+    ) -> List[Dict[str, Any]]:
+        """
+        Search PO breakdowns by category and/or subcategory.
+        
+        Args:
+            project_id: ID of the project
+            category: Category to filter by (optional)
+            subcategory: Subcategory to filter by (optional)
+            limit: Maximum number of results
+            offset: Offset for pagination
+        
+        Returns:
+            List of matching breakdowns
+        
+        Validates: Requirements 4.1 (user-defined categories and subcategories)
+        """
+        query = self.supabase.table('po_breakdowns').select('*').eq(
+            'project_id', str(project_id)
+        ).eq('is_active', True)
+        
+        if category:
+            query = query.eq('category', category)
+        
+        if subcategory:
+            query = query.eq('subcategory', subcategory)
+        
+        result = query.order('hierarchy_level').order('name').range(
+            offset, offset + limit - 1
+        ).execute()
+        
+        return result.data or []
+    
+    # ========================================================================
+    # Custom Hierarchy Operations
+    # Task 6.2: Implement custom hierarchy operations
+    # Requirements: 4.2, 4.5
+    # ========================================================================
+    
+    async def reorder_breakdown_items(
+        self,
+        parent_id: Optional[UUID],
+        ordered_item_ids: List[UUID],
+        user_id: UUID
+    ) -> List[Dict[str, Any]]:
+        """
+        Reorder breakdown items within the same parent (drag-and-drop support).
+        
+        This method updates the display order of items at the same hierarchy level
+        by setting a 'display_order' field that can be used for sorting.
+        
+        Args:
+            parent_id: ID of the parent breakdown (None for root level)
+            ordered_item_ids: List of breakdown IDs in desired order
+            user_id: ID of user making the update
+        
+        Returns:
+            List of updated breakdown data
+        
+        Validates: Requirements 4.2 (drag-and-drop reordering support)
+        """
+        updated_items = []
+        
+        # Validate all items belong to the same parent
+        for item_id in ordered_item_ids:
+            result = self.supabase.table('po_breakdowns').select('parent_breakdown_id').eq(
+                'id', str(item_id)
+            ).execute()
+            
+            if not result.data:
+                raise ValueError(f"Breakdown {item_id} not found")
+            
+            item_parent = result.data[0].get('parent_breakdown_id')
+            expected_parent = str(parent_id) if parent_id else None
+            
+            if item_parent != expected_parent:
+                raise ValueError(
+                    f"Breakdown {item_id} does not belong to parent {parent_id}. "
+                    f"All items must have the same parent for reordering."
+                )
+        
+        # Update display_order for each item
+        for index, item_id in enumerate(ordered_item_ids):
+            update_data = {
+                'display_order': index,
+                'updated_at': datetime.now().isoformat()
+            }
+            
+            result = self.supabase.table('po_breakdowns').update(update_data).eq(
+                'id', str(item_id)
+            ).execute()
+            
+            if result.data:
+                updated_items.append(result.data[0])
+        
+        return updated_items
+    
+    async def validate_custom_code(
+        self,
+        project_id: UUID,
+        code: str,
+        exclude_breakdown_id: Optional[UUID] = None
+    ) -> Dict[str, Any]:
+        """
+        Validate custom code uniqueness within project scope.
+        
+        Args:
+            project_id: ID of the project
+            code: Code to validate
+            exclude_breakdown_id: Optional breakdown ID to exclude from check (for updates)
+        
+        Returns:
+            Dictionary with validation result:
+            {
+                'is_valid': bool,
+                'is_unique': bool,
+                'conflicts': List[Dict],
+                'suggestions': List[str]
+            }
+        
+        Validates: Requirements 4.5 (custom code validation with project-scope uniqueness)
+        """
+        # Check if code is empty
+        if not code or not code.strip():
+            return {
+                'is_valid': False,
+                'is_unique': False,
+                'conflicts': [],
+                'suggestions': [],
+                'error': 'Code cannot be empty'
+            }
+        
+        # Check code format (alphanumeric, hyphens, underscores only)
+        import re
+        if not re.match(r'^[a-zA-Z0-9_-]+$', code):
+            return {
+                'is_valid': False,
+                'is_unique': False,
+                'conflicts': [],
+                'suggestions': [],
+                'error': 'Code must contain only letters, numbers, hyphens, and underscores'
+            }
+        
+        # Check uniqueness within project
+        query = self.supabase.table('po_breakdowns').select('id, name, code').eq(
+            'project_id', str(project_id)
+        ).eq('code', code).eq('is_active', True)
+        
+        result = query.execute()
+        
+        conflicts = []
+        if result.data:
+            for item in result.data:
+                # Exclude the current breakdown if updating
+                if exclude_breakdown_id and item['id'] == str(exclude_breakdown_id):
+                    continue
+                conflicts.append({
+                    'id': item['id'],
+                    'name': item['name'],
+                    'code': item['code']
+                })
+        
+        is_unique = len(conflicts) == 0
+        
+        # Generate suggestions if not unique
+        suggestions = []
+        if not is_unique:
+            # Suggest variations with suffixes
+            for i in range(1, 6):
+                suggested_code = f"{code}_{i}"
+                # Check if suggestion is available
+                check_result = self.supabase.table('po_breakdowns').select('id').eq(
+                    'project_id', str(project_id)
+                ).eq('code', suggested_code).eq('is_active', True).execute()
+                
+                if not check_result.data:
+                    suggestions.append(suggested_code)
+                    if len(suggestions) >= 3:
+                        break
+        
+        return {
+            'is_valid': is_unique,
+            'is_unique': is_unique,
+            'conflicts': conflicts,
+            'suggestions': suggestions
+        }
+    
+    async def bulk_update_codes(
+        self,
+        code_mappings: Dict[UUID, str],
+        project_id: UUID,
+        user_id: UUID,
+        validate_first: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Bulk update codes for multiple breakdowns with validation.
+        
+        Args:
+            code_mappings: Dictionary mapping breakdown IDs to new codes
+            project_id: ID of the project
+            user_id: ID of user making the update
+            validate_first: If True, validate all codes before applying any updates
+        
+        Returns:
+            Dictionary with update results:
+            {
+                'successful': List[UUID],
+                'failed': List[Dict],
+                'validation_errors': List[Dict]
+            }
+        
+        Validates: Requirements 4.5 (custom code validation with project-scope uniqueness)
+        """
+        successful = []
+        failed = []
+        validation_errors = []
+        
+        # Validate all codes first if requested
+        if validate_first:
+            for breakdown_id, code in code_mappings.items():
+                validation = await self.validate_custom_code(
+                    project_id, code, exclude_breakdown_id=breakdown_id
+                )
+                
+                if not validation['is_valid']:
+                    validation_errors.append({
+                        'breakdown_id': str(breakdown_id),
+                        'code': code,
+                        'error': validation.get('error', 'Code is not unique'),
+                        'conflicts': validation.get('conflicts', []),
+                        'suggestions': validation.get('suggestions', [])
+                    })
+            
+            # If any validation errors, return without applying updates
+            if validation_errors:
+                return {
+                    'successful': [],
+                    'failed': [],
+                    'validation_errors': validation_errors
+                }
+        
+        # Apply updates
+        for breakdown_id, code in code_mappings.items():
+            try:
+                # Get current version
+                current_result = self.supabase.table('po_breakdowns').select('version').eq(
+                    'id', str(breakdown_id)
+                ).execute()
+                
+                if not current_result.data:
+                    failed.append({
+                        'breakdown_id': str(breakdown_id),
+                        'code': code,
+                        'error': 'Breakdown not found'
+                    })
+                    continue
+                
+                current_version = current_result.data[0].get('version', 1)
+                
+                # Update code
+                update_data = {
+                    'code': code,
+                    'updated_at': datetime.now().isoformat(),
+                    'version': current_version + 1
+                }
+                
+                result = self.supabase.table('po_breakdowns').update(update_data).eq(
+                    'id', str(breakdown_id)
+                ).execute()
+                
+                if result.data:
+                    successful.append(breakdown_id)
+                else:
+                    failed.append({
+                        'breakdown_id': str(breakdown_id),
+                        'code': code,
+                        'error': 'Update failed'
+                    })
+            
+            except Exception as e:
+                failed.append({
+                    'breakdown_id': str(breakdown_id),
+                    'code': code,
+                    'error': str(e)
+                })
+        
+        return {
+            'successful': [str(id) for id in successful],
+            'failed': failed,
+            'validation_errors': validation_errors
+        }
+    
+    async def get_hierarchy_with_custom_order(
+        self,
+        project_id: UUID,
+        parent_id: Optional[UUID] = None,
+        include_children: bool = True
+    ) -> List[Dict[str, Any]]:
+        """
+        Get hierarchy items with custom display order applied.
+        
+        Args:
+            project_id: ID of the project
+            parent_id: Optional parent ID to filter by
+            include_children: If True, recursively include children
+        
+        Returns:
+            List of breakdown items ordered by display_order
+        
+        Validates: Requirements 4.2 (drag-and-drop reordering support)
+        """
+        query = self.supabase.table('po_breakdowns').select('*').eq(
+            'project_id', str(project_id)
+        ).eq('is_active', True)
+        
+        if parent_id:
+            query = query.eq('parent_breakdown_id', str(parent_id))
+        else:
+            query = query.is_('parent_breakdown_id', 'null')
+        
+        # Order by display_order if available, then by name
+        result = query.order('display_order', nullsfirst=False).order('name').execute()
+        
+        items = result.data or []
+        
+        # Recursively include children if requested
+        if include_children:
+            for item in items:
+                children = await self.get_hierarchy_with_custom_order(
+                    project_id,
+                    parent_id=UUID(item['id']),
+                    include_children=True
+                )
+                item['children'] = children
+        
+        return items
 
 
 class TemplateEngine:

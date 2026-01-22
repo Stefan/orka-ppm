@@ -3,15 +3,20 @@ Admin dashboard and system management endpoints
 """
 
 from fastapi import APIRouter, HTTPException, Depends, status
-from typing import Dict, Any
+from typing import Dict, Any, List
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from uuid import UUID
 
-from auth.rbac import require_admin
+from auth.rbac import require_admin, UserRole, Permission, DEFAULT_ROLE_PERMISSIONS
 from auth.dependencies import get_current_user
 from config.database import supabase
+from services.rbac_audit_service import RBACAuditService
 
 router = APIRouter(prefix="/admin", tags=["admin"])
+
+# Initialize audit service
+audit_service = RBACAuditService(supabase_client=supabase)
 
 class BootstrapAdminRequest(BaseModel):
     email: str
@@ -291,3 +296,612 @@ async def get_setup_help():
     except Exception as e:
         print(f"Get setup help error: {e}")
         raise HTTPException(status_code=500, detail="Failed to get setup help")
+
+
+# ============================================================================
+# RBAC Role Management Endpoints (Task 12)
+# ============================================================================
+
+class RoleInfo(BaseModel):
+    """Information about a role and its permissions"""
+    role: str
+    permissions: List[str]
+    description: str
+
+class AssignRoleRequest(BaseModel):
+    """Request to assign a role to a user"""
+    role: str = Field(..., pattern="^(admin|portfolio_manager|project_manager|resource_manager|team_member|viewer)$")
+
+class UserRoleInfo(BaseModel):
+    """Information about a user and their roles"""
+    user_id: str
+    user_name: str
+    email: str
+    roles: List[str]
+
+@router.get("/roles", response_model=List[RoleInfo])
+async def get_roles(current_user = Depends(require_admin())):
+    """
+    Get all available roles and their associated permissions.
+    
+    Requirements: 9.1
+    Property 24: Admin Authorization
+    """
+    try:
+        # Define role descriptions
+        role_descriptions = {
+            "admin": "Full system access with user and role management capabilities",
+            "portfolio_manager": "Manage portfolios, projects, and resources with AI insights",
+            "project_manager": "Manage individual projects, resources, and risks",
+            "resource_manager": "Manage resource allocations and availability",
+            "team_member": "Basic project participation and issue reporting",
+            "viewer": "Read-only access to projects and reports"
+        }
+        
+        # Build response with all roles and their permissions
+        roles_info = []
+        for role in UserRole:
+            permissions = DEFAULT_ROLE_PERMISSIONS.get(role, [])
+            roles_info.append(RoleInfo(
+                role=role.value,
+                permissions=[perm.value for perm in permissions],
+                description=role_descriptions.get(role.value, "")
+            ))
+        
+        return roles_info
+        
+    except Exception as e:
+        print(f"Get roles error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to retrieve roles: {str(e)}"
+        )
+
+@router.post("/users/{user_id}/roles")
+async def assign_role_to_user(
+    user_id: UUID,
+    request: AssignRoleRequest,
+    current_user = Depends(require_admin())
+):
+    """
+    Assign a role to a user.
+    
+    Requirements: 9.2, 9.5, 9.6
+    Property 24: Admin Authorization
+    Property 25: Role Assignment and Removal
+    """
+    try:
+        if not supabase:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
+        
+        # Validate user exists
+        user_response = supabase.table("user_profiles").select("user_id, role, is_active").eq("user_id", str(user_id)).execute()
+        if not user_response.data:
+            raise HTTPException(status_code=404, detail=f"User {user_id} not found")
+        
+        # Validate role exists
+        try:
+            role_enum = UserRole(request.role)
+        except ValueError:
+            raise HTTPException(status_code=400, detail=f"Invalid role: {request.role}")
+        
+        # Check if role assignment already exists
+        existing_role = supabase.table("user_roles").select("*").eq("user_id", str(user_id)).eq("role", request.role).execute()
+        
+        if existing_role.data:
+            raise HTTPException(status_code=400, detail=f"User already has role: {request.role}")
+        
+        # Assign role to user
+        role_assignment = {
+            "user_id": str(user_id),
+            "role": request.role,
+            "assigned_at": datetime.now().isoformat(),
+            "assigned_by": current_user.get("user_id")
+        }
+        
+        supabase.table("user_roles").insert(role_assignment).execute()
+        
+        # Log role assignment to audit_logs
+        admin_user_id = current_user.get("user_id")
+        organization_id = current_user.get("organization_id", "00000000-0000-0000-0000-000000000000")
+        
+        audit_log = {
+            "organization_id": organization_id,
+            "user_id": admin_user_id,
+            "action": "role_assignment",
+            "entity_type": "user",
+            "entity_id": str(user_id),
+            "details": {
+                "role": request.role,
+                "affected_user_id": str(user_id),
+                "admin_user_id": admin_user_id
+            },
+            "success": True,
+            "created_at": datetime.now().isoformat()
+        }
+        
+        supabase.table("audit_logs").insert(audit_log).execute()
+        
+        return {
+            "message": f"Role '{request.role}' assigned to user {user_id}",
+            "user_id": str(user_id),
+            "role": request.role,
+            "assigned_at": datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Assign role error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to assign role: {str(e)}"
+        )
+
+@router.delete("/users/{user_id}/roles/{role}")
+async def remove_role_from_user(
+    user_id: UUID,
+    role: str,
+    current_user = Depends(require_admin())
+):
+    """
+    Remove a role from a user.
+    
+    Requirements: 9.3, 9.5, 9.6
+    Property 24: Admin Authorization
+    Property 25: Role Assignment and Removal
+    """
+    try:
+        if not supabase:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
+        
+        # Validate user exists
+        user_response = supabase.table("user_profiles").select("id, email, full_name").eq("id", str(user_id)).execute()
+        if not user_response.data:
+            raise HTTPException(status_code=404, detail=f"User {user_id} not found")
+        
+        # Validate role exists
+        try:
+            role_enum = UserRole(role)
+        except ValueError:
+            raise HTTPException(status_code=400, detail=f"Invalid role: {role}")
+        
+        # Check if role assignment exists
+        existing_role = supabase.table("user_roles").select("*").eq("user_id", str(user_id)).eq("role", role).execute()
+        
+        if not existing_role.data:
+            raise HTTPException(status_code=404, detail=f"User does not have role: {role}")
+        
+        # Remove role from user
+        supabase.table("user_roles").delete().eq("user_id", str(user_id)).eq("role", role).execute()
+        
+        # Log role removal to audit_logs
+        admin_user_id = current_user.get("user_id")
+        organization_id = current_user.get("organization_id", "00000000-0000-0000-0000-000000000000")
+        
+        audit_log = {
+            "organization_id": organization_id,
+            "user_id": admin_user_id,
+            "action": "role_removal",
+            "entity_type": "user",
+            "entity_id": str(user_id),
+            "details": {
+                "role": role,
+                "affected_user_id": str(user_id),
+                "admin_user_id": admin_user_id
+            },
+            "success": True,
+            "created_at": datetime.now().isoformat()
+        }
+        
+        supabase.table("audit_logs").insert(audit_log).execute()
+        
+        return {
+            "message": f"Role '{role}' removed from user {user_id}",
+            "user_id": str(user_id),
+            "role": role,
+            "removed_at": datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Remove role error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to remove role: {str(e)}"
+        )
+
+
+# ============================================================================
+# Custom Role Management Endpoints (Task 8.2)
+# ============================================================================
+
+class CustomRoleRequest(BaseModel):
+    """Request to create or update a custom role"""
+    name: str = Field(..., min_length=3, max_length=50, pattern="^[a-z][a-z0-9_]*$")
+    description: str = Field(..., min_length=10, max_length=500)
+    permissions: List[str]
+
+class CustomRoleResponse(BaseModel):
+    """Response for custom role operations"""
+    id: str
+    name: str
+    description: str
+    permissions: List[str]
+    is_custom: bool
+    assigned_users_count: int
+    created_at: str
+    updated_at: Optional[str] = None
+
+@router.get("/roles/all", response_model=List[CustomRoleResponse])
+async def get_all_roles(current_user = Depends(require_admin())):
+    """
+    Get all roles including system and custom roles.
+    
+    Requirements: 4.2 - Custom role listing
+    """
+    try:
+        if not supabase:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
+        
+        # Fetch all roles from database
+        roles_response = supabase.table("roles").select("*").execute()
+        
+        roles_list = []
+        for role in roles_response.data:
+            # Count assigned users for this role
+            user_count_response = supabase.table("user_roles").select(
+                "id", count="exact"
+            ).eq("role_id", role["id"]).eq("is_active", True).execute()
+            
+            user_count = user_count_response.count if user_count_response.count is not None else 0
+            
+            roles_list.append(CustomRoleResponse(
+                id=role["id"],
+                name=role["name"],
+                description=role.get("description", ""),
+                permissions=role.get("permissions", []),
+                is_custom=role.get("is_custom", False),
+                assigned_users_count=user_count,
+                created_at=role.get("created_at", datetime.now().isoformat()),
+                updated_at=role.get("updated_at")
+            ))
+        
+        return roles_list
+        
+    except Exception as e:
+        print(f"Get all roles error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to retrieve roles: {str(e)}"
+        )
+
+@router.post("/roles", response_model=CustomRoleResponse)
+async def create_custom_role(
+    request: CustomRoleRequest,
+    current_user = Depends(require_admin())
+):
+    """
+    Create a new custom role with specific permissions.
+    
+    Requirements: 4.2, 4.3 - Custom role creation with validation
+    """
+    try:
+        if not supabase:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
+        
+        # Validate permissions
+        invalid_permissions = []
+        for perm in request.permissions:
+            try:
+                Permission(perm)
+            except ValueError:
+                invalid_permissions.append(perm)
+        
+        if invalid_permissions:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid permissions: {', '.join(invalid_permissions)}"
+            )
+        
+        # Check if role name already exists
+        existing_role = supabase.table("roles").select("id").eq("name", request.name).execute()
+        if existing_role.data:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Role with name '{request.name}' already exists"
+            )
+        
+        # Validate permission combinations
+        validation_errors = validate_permission_combinations(request.permissions)
+        if validation_errors:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid permission configuration: {'; '.join(validation_errors)}"
+            )
+        
+        # Create the custom role
+        role_data = {
+            "name": request.name,
+            "description": request.description,
+            "permissions": request.permissions,
+            "is_custom": True,
+            "created_at": datetime.now().isoformat(),
+            "created_by": current_user.get("user_id")
+        }
+        
+        insert_response = supabase.table("roles").insert(role_data).execute()
+        
+        if not insert_response.data:
+            raise HTTPException(status_code=500, detail="Failed to create custom role")
+        
+        created_role = insert_response.data[0]
+        
+        # Log to audit trail using audit service
+        admin_user_id = current_user.get("user_id")
+        org_id = current_user.get("organization_id")
+        org_uuid = UUID(org_id) if org_id else None
+        
+        audit_service.log_custom_role_creation(
+            user_id=UUID(admin_user_id),
+            role_id=UUID(created_role["id"]),
+            role_name=request.name,
+            permissions=request.permissions,
+            description=request.description,
+            organization_id=org_uuid,
+            success=True
+        )
+        
+        return CustomRoleResponse(
+            id=created_role["id"],
+            name=created_role["name"],
+            description=created_role["description"],
+            permissions=created_role["permissions"],
+            is_custom=True,
+            assigned_users_count=0,
+            created_at=created_role["created_at"],
+            updated_at=None
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Create custom role error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to create custom role: {str(e)}"
+        )
+
+@router.put("/roles/{role_id}", response_model=CustomRoleResponse)
+async def update_custom_role(
+    role_id: UUID,
+    request: CustomRoleRequest,
+    current_user = Depends(require_admin())
+):
+    """
+    Update an existing custom role.
+    
+    Requirements: 4.2, 4.3 - Custom role editing with validation
+    """
+    try:
+        if not supabase:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
+        
+        # Fetch the role
+        role_response = supabase.table("roles").select("*").eq("id", str(role_id)).execute()
+        
+        if not role_response.data:
+            raise HTTPException(status_code=404, detail=f"Role {role_id} not found")
+        
+        role = role_response.data[0]
+        
+        # Prevent editing system roles
+        if not role.get("is_custom", False):
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot edit system roles"
+            )
+        
+        # Validate permissions
+        invalid_permissions = []
+        for perm in request.permissions:
+            try:
+                Permission(perm)
+            except ValueError:
+                invalid_permissions.append(perm)
+        
+        if invalid_permissions:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid permissions: {', '.join(invalid_permissions)}"
+            )
+        
+        # Validate permission combinations
+        validation_errors = validate_permission_combinations(request.permissions)
+        if validation_errors:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid permission configuration: {'; '.join(validation_errors)}"
+            )
+        
+        # Update the role
+        update_data = {
+            "description": request.description,
+            "permissions": request.permissions,
+            "updated_at": datetime.now().isoformat(),
+            "updated_by": current_user.get("user_id")
+        }
+        
+        update_response = supabase.table("roles").update(update_data).eq("id", str(role_id)).execute()
+        
+        if not update_response.data:
+            raise HTTPException(status_code=500, detail="Failed to update custom role")
+        
+        updated_role = update_response.data[0]
+        
+        # Count assigned users
+        user_count_response = supabase.table("user_roles").select(
+            "id", count="exact"
+        ).eq("role_id", str(role_id)).eq("is_active", True).execute()
+        
+        user_count = user_count_response.count if user_count_response.count is not None else 0
+        
+        # Log to audit trail using audit service
+        admin_user_id = current_user.get("user_id")
+        org_id = current_user.get("organization_id")
+        org_uuid = UUID(org_id) if org_id else None
+        
+        audit_service.log_custom_role_update(
+            user_id=UUID(admin_user_id),
+            role_id=role_id,
+            role_name=updated_role["name"],
+            old_permissions=role.get("permissions", []),
+            new_permissions=request.permissions,
+            old_description=role.get("description", ""),
+            new_description=request.description,
+            organization_id=org_uuid,
+            success=True
+        )
+        
+        return CustomRoleResponse(
+            id=updated_role["id"],
+            name=updated_role["name"],
+            description=updated_role["description"],
+            permissions=updated_role["permissions"],
+            is_custom=True,
+            assigned_users_count=user_count,
+            created_at=updated_role["created_at"],
+            updated_at=updated_role.get("updated_at")
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Update custom role error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to update custom role: {str(e)}"
+        )
+
+@router.delete("/roles/{role_id}")
+async def delete_custom_role(
+    role_id: UUID,
+    current_user = Depends(require_admin())
+):
+    """
+    Delete a custom role.
+    
+    Requirements: 4.2 - Custom role deletion
+    """
+    try:
+        if not supabase:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
+        
+        # Fetch the role
+        role_response = supabase.table("roles").select("*").eq("id", str(role_id)).execute()
+        
+        if not role_response.data:
+            raise HTTPException(status_code=404, detail=f"Role {role_id} not found")
+        
+        role = role_response.data[0]
+        
+        # Prevent deleting system roles
+        if not role.get("is_custom", False):
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot delete system roles"
+            )
+        
+        # Check if role has assigned users
+        user_assignments = supabase.table("user_roles").select(
+            "id", count="exact"
+        ).eq("role_id", str(role_id)).eq("is_active", True).execute()
+        
+        if user_assignments.count and user_assignments.count > 0:
+            # Deactivate all user assignments
+            supabase.table("user_roles").update({
+                "is_active": False
+            }).eq("role_id", str(role_id)).execute()
+        
+        # Delete the role
+        supabase.table("roles").delete().eq("id", str(role_id)).execute()
+        
+        # Log to audit trail using audit service
+        admin_user_id = current_user.get("user_id")
+        org_id = current_user.get("organization_id")
+        org_uuid = UUID(org_id) if org_id else None
+        
+        audit_service.log_custom_role_deletion(
+            user_id=UUID(admin_user_id),
+            role_id=role_id,
+            role_name=role["name"],
+            permissions=role.get("permissions", []),
+            affected_users_count=user_assignments.count if user_assignments.count else 0,
+            organization_id=org_uuid,
+            success=True
+        )
+        
+        return {
+            "message": f"Custom role '{role['name']}' deleted successfully",
+            "role_id": str(role_id),
+            "role_name": role["name"],
+            "affected_users": user_assignments.count if user_assignments.count else 0
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Delete custom role error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to delete custom role: {str(e)}"
+        )
+
+def validate_permission_combinations(permissions: List[str]) -> List[str]:
+    """
+    Validate permission combinations and return list of errors.
+    
+    Requirements: 4.3 - Permission validation
+    """
+    errors = []
+    
+    # Check for system_admin with other permissions
+    if "system_admin" in permissions and len(permissions) > 1:
+        errors.append("system_admin permission should not be combined with other permissions")
+    
+    # Check role_manage requires user_manage
+    if "role_manage" in permissions and "user_manage" not in permissions:
+        errors.append("role_manage permission requires user_manage permission")
+    
+    # Check financial write requires read
+    financial_write = [p for p in permissions if p in ["financial_create", "financial_update", "financial_delete"]]
+    if financial_write and "financial_read" not in permissions:
+        errors.append("Financial write permissions require financial_read permission")
+    
+    # Check project write requires read
+    project_write = [p for p in permissions if p in ["project_create", "project_update", "project_delete"]]
+    if project_write and "project_read" not in permissions:
+        errors.append("Project write permissions require project_read permission")
+    
+    # Check portfolio write requires read
+    portfolio_write = [p for p in permissions if p in ["portfolio_create", "portfolio_update", "portfolio_delete"]]
+    if portfolio_write and "portfolio_read" not in permissions:
+        errors.append("Portfolio write permissions require portfolio_read permission")
+    
+    # Check resource write requires read
+    resource_write = [p for p in permissions if p in ["resource_create", "resource_update", "resource_delete", "resource_allocate"]]
+    if resource_write and "resource_read" not in permissions:
+        errors.append("Resource write permissions require resource_read permission")
+    
+    # Check risk write requires read
+    risk_write = [p for p in permissions if p in ["risk_create", "risk_update", "risk_delete"]]
+    if risk_write and "risk_read" not in permissions:
+        errors.append("Risk write permissions require risk_read permission")
+    
+    # Check issue write requires read
+    issue_write = [p for p in permissions if p in ["issue_create", "issue_update", "issue_delete"]]
+    if issue_write and "issue_read" not in permissions:
+        errors.append("Issue write permissions require issue_read permission")
+    
+    return errors

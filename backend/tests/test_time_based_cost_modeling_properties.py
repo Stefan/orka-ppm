@@ -179,6 +179,11 @@ class TestTimeBasisCostModelingProperties:
         
         modeler = CostEscalationModeler()
         
+        # Remove all default factors to test only our factor
+        for factor_type in [EscalationFactorType.INFLATION, EscalationFactorType.CURRENCY, 
+                           EscalationFactorType.MATERIAL, EscalationFactorType.LABOR]:
+            modeler.remove_escalation_factor(factor_type)
+        
         # Test different compounding frequencies
         time_period_days = 365  # 1 year
         start_date = datetime(2024, 1, 1)
@@ -224,6 +229,11 @@ class TestTimeBasisCostModelingProperties:
         assume(base_cost > 0)
         
         modeler = CostEscalationModeler()
+        
+        # Remove all default factors to test only our factors
+        for factor_type in [EscalationFactorType.INFLATION, EscalationFactorType.CURRENCY, 
+                           EscalationFactorType.MATERIAL, EscalationFactorType.LABOR]:
+            modeler.remove_escalation_factor(factor_type)
         
         # Create multiple escalation factors
         factor_types = [EscalationFactorType.INFLATION, EscalationFactorType.CURRENCY, 
@@ -281,6 +291,11 @@ class TestTimeBasisCostModelingProperties:
         assume(num_scenarios >= 100)
         
         modeler = CostEscalationModeler()
+        
+        # Remove all default factors to test only our factor
+        for factor_type in [EscalationFactorType.INFLATION, EscalationFactorType.CURRENCY, 
+                           EscalationFactorType.MATERIAL, EscalationFactorType.LABOR]:
+            modeler.remove_escalation_factor(factor_type)
         
         # Create escalation factor with distribution
         factor = EscalationFactor(
@@ -345,6 +360,11 @@ class TestTimeBasisCostModelingProperties:
         assume(time_period_2 > time_period_1)
         
         modeler = CostEscalationModeler()
+        
+        # Remove all default factors to test only our factor
+        for factor_type in [EscalationFactorType.INFLATION, EscalationFactorType.CURRENCY, 
+                           EscalationFactorType.MATERIAL, EscalationFactorType.LABOR]:
+            modeler.remove_escalation_factor(factor_type)
         
         # Create escalation factor with positive rate
         factor = EscalationFactor(

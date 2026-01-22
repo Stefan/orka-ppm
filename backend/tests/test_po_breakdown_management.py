@@ -7,6 +7,7 @@ import sys
 import os
 import asyncio
 import json
+import pytest
 from datetime import datetime, timedelta
 from decimal import Decimal
 from uuid import uuid4
@@ -18,7 +19,7 @@ from roche_construction_models import (
     POBreakdownCreate, POBreakdownUpdate, POBreakdown, ImportConfig, ImportResult,
     POBreakdownSummary, POBreakdownType
 )
-from roche_construction_services import POBreakdownService, HierarchyManager
+from services.roche_construction_services import POBreakdownService, HierarchyManager
 
 # Mock Supabase client for testing
 class MockSupabaseTable:
@@ -188,6 +189,7 @@ Project Root,PO-001,100000,CC-001
     print("🎉 All Hierarchy Manager tests passed!")
     return True
 
+@pytest.mark.asyncio
 async def test_po_breakdown_service():
     """Test the POBreakdownService functionality"""
     print("\n🧪 Testing PO Breakdown Service...")

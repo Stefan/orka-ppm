@@ -213,6 +213,58 @@ class ExportRequest(BaseModel):
     include_summary: bool = Field(True, description="Include AI-generated summary")
 
 
+class AddTagRequest(BaseModel):
+    """Request for adding a tag to an audit log."""
+    tag: str = Field(..., min_length=1, max_length=50, description="Tag to add to the audit log")
+
+
+class DetectAnomaliesRequest(BaseModel):
+    """Request for anomaly detection."""
+    time_range_days: int = Field(default=30, ge=1, le=90, description="Number of days to analyze for anomalies")
+
+
+class AuditSearchRequest(BaseModel):
+    """Request for audit log search."""
+    query: str = Field(..., min_length=1, max_length=500, description="Natural language query")
+    limit: int = Field(default=50, ge=1, le=100, description="Maximum number of results")
+
+
+class AuditSearchResult(BaseModel):
+    """Search result for audit logs."""
+    log_id: UUID
+    timestamp: datetime
+    user_name: str
+    action: str
+    details: str
+    relevance_score: float
+    highlighted_text: str
+
+
+class AuditSearchResponse(BaseModel):
+    """Response for audit log search."""
+    results: List[AuditSearchResult]
+    total_results: int
+
+
+class AnomalyResult(BaseModel):
+    """Anomaly detection result for audit logs."""
+    log_id: UUID
+    timestamp: datetime
+    user_id: Optional[UUID]
+    user_name: str
+    action: str
+    confidence: float  # 0.0 = normal, 1.0 = highly anomalous
+    reason: str
+    details: Dict[str, Any]
+
+
+class DetectAnomaliesResponse(BaseModel):
+    """Response for anomaly detection."""
+    anomalies: List[AnomalyResult]
+    total_logs_analyzed: int
+    anomaly_count: int
+
+
 class DashboardStatsResponse(BaseModel):
     """Response for dashboard statistics."""
     total_events_24h: int
@@ -1607,3 +1659,639 @@ async def log_audit_access(
     except Exception as e:
         logger.error(f"Failed to log audit access: {e}")
         # Don't raise exception - logging failure shouldn't block the main operation
+
+
+# ============================================================================
+# AI-Empowered PPM Features - Audit Management Endpoints
+# ============================================================================
+
+@router.get("/logs", response_model=AuditEventsResponse)
+@limiter.limit("100/minute")
+async def get_audit_logs(
+    request: Request,
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None,
+    user_id: Optional[str] = None,
+    action_type: Optional[str] = None,
+    limit: int = 100,
+    offset: int = 0,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """
+    Get filtered audit logs with pagination.
+    
+    Supports filtering by:
+    - Date range (start_date, end_date)
+    - User ID
+    - Action type
+    
+    Implements organization isolation automatically.
+    
+    Requirements: 15.1, 15.5
+    Task: 20.1
+    """
+    try:
+        # Get organization_id from current user (using organization_id for multi-tenancy)
+        organization_id = current_user.get("organization_id") or current_user.get("tenant_id")
+        if not organization_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User must have an organization_id"
+            )
+        
+        # Build query
+        query = supabase.table("audit_logs").select("*")
+        
+        # Apply organization isolation (CRITICAL for multi-tenant security)
+        query = query.eq("organization_id", organization_id)
+        
+        # Apply filters
+        if start_date:
+            query = query.gte("created_at", start_date.isoformat())
+        
+        if end_date:
+            query = query.lte("created_at", end_date.isoformat())
+        
+        if user_id:
+            query = query.eq("user_id", user_id)
+        
+        if action_type:
+            query = query.eq("action", action_type)
+        
+        # Get total count (before pagination)
+        count_query = query
+        count_response = count_query.execute()
+        total = len(count_response.data) if count_response.data else 0
+        
+        # Apply pagination and ordering
+        query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
+        
+        # Execute query
+        response = query.execute()
+        
+        if not response.data:
+            return AuditEventsResponse(
+                events=[],
+                total=0,
+                limit=limit,
+                offset=offset
+            )
+        
+        # Convert to AuditEvent models
+        events = []
+        for event_data in response.data:
+            try:
+                # Map audit_logs fields to AuditEvent model
+                audit_event = AuditEvent(
+                    id=event_data["id"],
+                    event_type=event_data.get("action", "unknown"),
+                    user_id=event_data.get("user_id"),
+                    entity_type=event_data.get("entity_type", "unknown"),
+                    entity_id=event_data.get("entity_id"),
+                    action_details=event_data.get("details", {}),
+                    severity=event_data.get("severity", "info"),
+                    ip_address=event_data.get("ip_address"),
+                    user_agent=event_data.get("user_agent"),
+                    project_id=None,
+                    performance_metrics=None,
+                    timestamp=event_data["created_at"],
+                    anomaly_score=None,
+                    is_anomaly=False,
+                    category=None,
+                    risk_level=None,
+                    tags=event_data.get("tags", {}),
+                    ai_insights=None,
+                    tenant_id=UUID(organization_id),
+                    hash=None,
+                    previous_hash=None
+                )
+                events.append(audit_event)
+            except Exception as e:
+                logger.warning(f"Failed to parse audit log {event_data.get('id')}: {e}")
+                continue
+        
+        logger.info(f"Retrieved {len(events)} audit logs for organization {organization_id}")
+        
+        # Log audit access (audit-of-audit)
+        await log_audit_access(
+            user_id=current_user.get("id"),
+            tenant_id=organization_id,
+            action="read_logs",
+            filters={
+                "start_date": start_date.isoformat() if start_date else None,
+                "end_date": end_date.isoformat() if end_date else None,
+                "user_id": user_id,
+                "action_type": action_type,
+                "limit": limit,
+                "offset": offset
+            }
+        )
+        
+        return AuditEventsResponse(
+            events=events,
+            total=total,
+            limit=limit,
+            offset=offset
+        )
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error retrieving audit logs: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve audit logs: {str(e)}"
+        )
+
+
+@router.post("/logs/{log_id}/tag")
+@limiter.limit("100/minute")
+async def add_tag_to_audit_log(
+    request: Request,
+    log_id: UUID,
+    tag_request: AddTagRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """
+    Add a tag to an audit log entry.
+    
+    Tags help categorize and organize audit logs for easier searching and filtering.
+    The tagging action itself is logged to audit_logs for audit trail purposes.
+    
+    Requirements: 15.2, 15.6
+    Task: 20.2
+    """
+    try:
+        # Get organization_id from current user
+        organization_id = current_user.get("organization_id") or current_user.get("tenant_id")
+        if not organization_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User must have an organization_id"
+            )
+        
+        # Verify log exists and belongs to organization
+        log_query = supabase.table("audit_logs").select("*")
+        log_query = log_query.eq("id", str(log_id))
+        log_query = log_query.eq("organization_id", organization_id)
+        log_response = log_query.execute()
+        
+        if not log_response.data or len(log_response.data) == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Audit log {log_id} not found"
+            )
+        
+        log_data = log_response.data[0]
+        
+        # Get existing tags or initialize empty dict
+        existing_tags = log_data.get("tags", {})
+        if not isinstance(existing_tags, dict):
+            existing_tags = {}
+        
+        # Add new tag with timestamp and user info
+        tag_key = tag_request.tag.lower().replace(" ", "_")
+        existing_tags[tag_key] = {
+            "label": tag_request.tag,
+            "added_by": current_user.get("id"),
+            "added_at": datetime.now().isoformat()
+        }
+        
+        # Update log with new tags
+        update_data = {
+            "tags": existing_tags
+        }
+        
+        update_response = supabase.table("audit_logs").update(update_data).eq("id", str(log_id)).execute()
+        
+        if not update_response.data:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to add tag to audit log"
+            )
+        
+        # Log the tagging action to audit_logs (Requirement 15.6)
+        tagging_log = {
+            "id": str(uuid4()),
+            "organization_id": organization_id,
+            "user_id": current_user.get("id"),
+            "action": "audit_log_tagged",
+            "entity_type": "audit_log",
+            "entity_id": str(log_id),
+            "details": {
+                "tag": tag_request.tag,
+                "log_id": str(log_id)
+            },
+            "success": True,
+            "created_at": datetime.now().isoformat()
+        }
+        
+        supabase.table("audit_logs").insert(tagging_log).execute()
+        
+        logger.info(f"Tag '{tag_request.tag}' added to audit log {log_id} by user {current_user.get('id')}")
+        
+        return {
+            "success": True,
+            "message": "Tag added successfully",
+            "log_id": str(log_id),
+            "tag": tag_request.tag
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error adding tag to audit log: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to add tag: {str(e)}"
+        )
+
+
+@router.post("/export")
+@limiter.limit("10/minute")
+async def export_audit_logs(
+    request: Request,
+    export_request: ExportRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """
+    Export filtered audit logs in CSV or JSON format.
+    
+    Supports filtering by:
+    - Date range
+    - User ID
+    - Action type
+    
+    Includes all relevant fields:
+    - timestamp
+    - user_id
+    - action
+    - entity_type
+    - entity_id
+    - details
+    - success
+    - error_message
+    - tags
+    
+    Requirements: 15.3, 15.4, 15.5
+    Task: 20.3
+    """
+    try:
+        # Get organization_id from current user
+        organization_id = current_user.get("organization_id") or current_user.get("tenant_id")
+        if not organization_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User must have an organization_id"
+            )
+        
+        # Validate format parameter
+        if not hasattr(export_request.filters, 'format'):
+            # Default to CSV if not specified
+            export_format = "csv"
+        else:
+            export_format = getattr(export_request.filters, 'format', 'csv')
+        
+        # Build query with filters
+        query = supabase.table("audit_logs").select("*")
+        query = query.eq("organization_id", organization_id)
+        
+        # Apply filters from export_request.filters
+        if export_request.filters.start_date:
+            query = query.gte("created_at", export_request.filters.start_date.isoformat())
+        
+        if export_request.filters.end_date:
+            query = query.lte("created_at", export_request.filters.end_date.isoformat())
+        
+        if export_request.filters.user_id:
+            query = query.eq("user_id", export_request.filters.user_id)
+        
+        # Note: action_type is not in AuditEventFilters, but we can check for event_types
+        if hasattr(export_request.filters, 'event_types') and export_request.filters.event_types:
+            query = query.in_("action", export_request.filters.event_types)
+        
+        # Order by timestamp
+        query = query.order("created_at", desc=True)
+        
+        # Execute query
+        response = query.execute()
+        
+        if not response.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No audit logs found matching the specified filters"
+            )
+        
+        logs = response.data
+        
+        # Generate export based on format
+        if export_format.lower() == "csv":
+            # Generate CSV
+            import csv
+            import io
+            
+            output = io.StringIO()
+            
+            # Define CSV columns (Requirement 15.4)
+            fieldnames = [
+                "timestamp",
+                "user_id",
+                "action",
+                "entity_type",
+                "entity_id",
+                "details",
+                "success",
+                "error_message",
+                "tags",
+                "ip_address",
+                "user_agent"
+            ]
+            
+            writer = csv.DictWriter(output, fieldnames=fieldnames)
+            writer.writeheader()
+            
+            for log in logs:
+                row = {
+                    "timestamp": log.get("created_at", ""),
+                    "user_id": log.get("user_id", ""),
+                    "action": log.get("action", ""),
+                    "entity_type": log.get("entity_type", ""),
+                    "entity_id": log.get("entity_id", ""),
+                    "details": str(log.get("details", {})),
+                    "success": log.get("success", True),
+                    "error_message": log.get("error_message", ""),
+                    "tags": str(log.get("tags", {})),
+                    "ip_address": log.get("ip_address", ""),
+                    "user_agent": log.get("user_agent", "")
+                }
+                writer.writerow(row)
+            
+            csv_content = output.getvalue()
+            output.close()
+            
+            # Log the export access
+            await log_audit_access(
+                user_id=current_user.get("id"),
+                tenant_id=organization_id,
+                action="export_csv",
+                filters=export_request.filters.dict()
+            )
+            
+            logger.info(f"Generated CSV export with {len(logs)} logs for organization {organization_id}")
+            
+            return Response(
+                content=csv_content,
+                media_type="text/csv",
+                headers={
+                    "Content-Disposition": f"attachment; filename=audit_logs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+                }
+            )
+        
+        elif export_format.lower() == "json":
+            # Generate JSON
+            import json
+            
+            # Format logs for JSON export (Requirement 15.4)
+            export_data = []
+            for log in logs:
+                export_data.append({
+                    "timestamp": log.get("created_at", ""),
+                    "user_id": log.get("user_id", ""),
+                    "action": log.get("action", ""),
+                    "entity_type": log.get("entity_type", ""),
+                    "entity_id": log.get("entity_id", ""),
+                    "details": log.get("details", {}),
+                    "success": log.get("success", True),
+                    "error_message": log.get("error_message", ""),
+                    "tags": log.get("tags", {}),
+                    "ip_address": log.get("ip_address", ""),
+                    "user_agent": log.get("user_agent", "")
+                })
+            
+            json_content = json.dumps(export_data, indent=2, default=str)
+            
+            # Log the export access
+            await log_audit_access(
+                user_id=current_user.get("id"),
+                tenant_id=organization_id,
+                action="export_json",
+                filters=export_request.filters.dict()
+            )
+            
+            logger.info(f"Generated JSON export with {len(logs)} logs for organization {organization_id}")
+            
+            return Response(
+                content=json_content,
+                media_type="application/json",
+                headers={
+                    "Content-Disposition": f"attachment; filename=audit_logs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                }
+            )
+        
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid export format: {export_format}. Must be 'csv' or 'json'"
+            )
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error exporting audit logs: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to export audit logs: {str(e)}"
+        )
+
+
+@router.post("/detect-anomalies")
+@limiter.limit("20/minute")
+async def detect_anomalies_in_logs(
+    request: Request,
+    anomaly_request: DetectAnomaliesRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+    anomaly_service: AuditAnomalyService = Depends(get_anomaly_service)
+):
+    """
+    Detect anomalies in audit logs using Isolation Forest ML algorithm.
+    
+    Analyzes audit logs from the specified time range and identifies
+    suspicious patterns based on:
+    - Time-based patterns (hour of day, day of week)
+    - Frequency patterns (action frequency, user action diversity)
+    - User behavior patterns (time since last action)
+    
+    Returns flagged activities with confidence scores.
+    
+    Requirements: 13.1, 13.2, 13.3, 13.5
+    Task: 20.4
+    """
+    try:
+        # Get organization_id from current user
+        organization_id = current_user.get("organization_id") or current_user.get("tenant_id")
+        if not organization_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User must have an organization_id"
+            )
+        
+        # Validate time_range_days
+        if anomaly_request.time_range_days < 1 or anomaly_request.time_range_days > 90:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="time_range_days must be between 1 and 90"
+            )
+        
+        # Use AnomalyDetectorAgent to detect anomalies
+        from ai_agents import AnomalyDetectorAgent
+        
+        agent = AnomalyDetectorAgent(supabase_client=supabase)
+        
+        # Detect anomalies
+        result = await agent.detect_anomalies(
+            organization_id=organization_id,
+            time_range_days=anomaly_request.time_range_days,
+            user_id=current_user.get("id")
+        )
+        
+        # Format response
+        anomalies = []
+        for anomaly_data in result.get("anomalies", []):
+            anomaly_result = AnomalyResult(
+                log_id=UUID(anomaly_data["log_id"]),
+                timestamp=anomaly_data["timestamp"],
+                user_id=UUID(anomaly_data["user_id"]) if anomaly_data.get("user_id") else None,
+                user_name=anomaly_data.get("user_name", "Unknown"),
+                action=anomaly_data["action"],
+                confidence=anomaly_data["confidence"],
+                reason=anomaly_data.get("reason", "Anomalous pattern detected"),
+                details=anomaly_data.get("details", {})
+            )
+            anomalies.append(anomaly_result)
+        
+        logger.info(
+            f"Detected {len(anomalies)} anomalies in {anomaly_request.time_range_days} days "
+            f"for organization {organization_id}"
+        )
+        
+        # Log the detection request
+        await log_audit_access(
+            user_id=current_user.get("id"),
+            tenant_id=organization_id,
+            action="detect_anomalies",
+            filters={
+                "time_range_days": anomaly_request.time_range_days
+            }
+        )
+        
+        return DetectAnomaliesResponse(
+            anomalies=anomalies,
+            total_logs_analyzed=result.get("total_logs_analyzed", 0),
+            anomaly_count=len(anomalies)
+        )
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error detecting anomalies: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to detect anomalies: {str(e)}"
+        )
+
+
+@router.post("/search-logs", response_model=AuditSearchResponse)
+@limiter.limit("50/minute")
+async def search_audit_logs(
+    request: Request,
+    search_request: AuditSearchRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """
+    Perform semantic search over audit logs using natural language queries.
+    
+    Uses RAG (Retrieval-Augmented Generation) to:
+    - Generate query embeddings
+    - Find similar audit log entries using vector search
+    - Rank results by relevance
+    - Highlight relevant sections
+    
+    Requirements: 14.1, 14.2, 14.3, 14.4, 14.5
+    Task: 20.5
+    """
+    try:
+        # Get organization_id from current user
+        organization_id = current_user.get("organization_id") or current_user.get("tenant_id")
+        if not organization_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User must have an organization_id"
+            )
+        
+        # Use AuditSearchAgent to perform semantic search
+        from ai_agents import AuditSearchAgent
+        import os
+        
+        openai_api_key = os.getenv("OPENAI_API_KEY")
+        if not openai_api_key:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="OpenAI API key not configured. Semantic search is unavailable."
+            )
+        
+        agent = AuditSearchAgent(
+            supabase_client=supabase,
+            openai_client=None  # Agent will initialize internally
+        )
+        
+        # Perform search
+        result = await agent.search_audit_logs(
+            query=search_request.query,
+            organization_id=organization_id,
+            user_id=current_user.get("id"),
+            limit=search_request.limit
+        )
+        
+        # Format response
+        search_results = []
+        for search_result in result.get("results", []):
+            audit_search_result = AuditSearchResult(
+                log_id=UUID(search_result["log_id"]),
+                timestamp=search_result["timestamp"],
+                user_name=search_result.get("user_name", "Unknown"),
+                action=search_result["action"],
+                details=str(search_result.get("details", {})),
+                relevance_score=search_result["relevance_score"],
+                highlighted_text=search_result.get("highlighted_text", "")
+            )
+            search_results.append(audit_search_result)
+        
+        logger.info(
+            f"Semantic search returned {len(search_results)} results for query: '{search_request.query}' "
+            f"(organization {organization_id})"
+        )
+        
+        # Log the search request (Requirement 14.5)
+        await log_audit_access(
+            user_id=current_user.get("id"),
+            tenant_id=organization_id,
+            action="search_logs",
+            filters={
+                "query": search_request.query,
+                "limit": search_request.limit
+            }
+        )
+        
+        return AuditSearchResponse(
+            results=search_results,
+            total_results=len(search_results)
+        )
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error performing semantic search: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to perform semantic search: {str(e)}"
+        )

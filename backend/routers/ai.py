@@ -13,11 +13,20 @@ from auth.dependencies import get_current_user
 from auth.rbac import require_permission, Permission
 from config.database import supabase
 from utils.converters import convert_uuids
+from schemas.ai_agents import (
+    RAGReportRequest, RAGReportResponse,
+    OptimizeResourcesRequest, OptimizeResourcesResponse,
+    ForecastRisksRequest, ForecastRisksResponse,
+    ValidateDataRequest, ValidateDataResponse
+)
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
 # Initialize AI agents lazily
 _rag_agent = None
+_resource_optimizer = None
+_risk_forecaster = None
+_data_validator = None
 
 def get_rag_agent():
     """Get or initialize RAG agent"""
@@ -40,6 +49,72 @@ def get_rag_agent():
             print(f"Failed to initialize RAG agent: {e}")
             return None
     return _rag_agent
+
+def get_resource_optimizer():
+    """Get or initialize Resource Optimizer agent"""
+    global _resource_optimizer
+    if _resource_optimizer is None:
+        try:
+            from ai_agents import ResourceOptimizerAgent
+            openai_api_key = os.getenv("OPENAI_API_KEY")
+            openai_base_url = os.getenv("OPENAI_BASE_URL")
+            
+            if not openai_api_key:
+                return None
+            
+            _resource_optimizer = ResourceOptimizerAgent(
+                supabase_client=supabase,
+                openai_api_key=openai_api_key,
+                base_url=openai_base_url
+            )
+        except Exception as e:
+            print(f"Failed to initialize Resource Optimizer agent: {e}")
+            return None
+    return _resource_optimizer
+
+def get_risk_forecaster():
+    """Get or initialize Risk Forecaster agent"""
+    global _risk_forecaster
+    if _risk_forecaster is None:
+        try:
+            from ai_agents import RiskForecasterAgent
+            openai_api_key = os.getenv("OPENAI_API_KEY")
+            openai_base_url = os.getenv("OPENAI_BASE_URL")
+            
+            if not openai_api_key:
+                return None
+            
+            _risk_forecaster = RiskForecasterAgent(
+                supabase_client=supabase,
+                openai_api_key=openai_api_key,
+                base_url=openai_base_url
+            )
+        except Exception as e:
+            print(f"Failed to initialize Risk Forecaster agent: {e}")
+            return None
+    return _risk_forecaster
+
+def get_data_validator():
+    """Get or initialize Data Validator agent"""
+    global _data_validator
+    if _data_validator is None:
+        try:
+            from ai_agents import DataValidatorAgent
+            openai_api_key = os.getenv("OPENAI_API_KEY")
+            openai_base_url = os.getenv("OPENAI_BASE_URL")
+            
+            if not openai_api_key:
+                return None
+            
+            _data_validator = DataValidatorAgent(
+                supabase_client=supabase,
+                openai_api_key=openai_api_key,
+                base_url=openai_base_url
+            )
+        except Exception as e:
+            print(f"Failed to initialize Data Validator agent: {e}")
+            return None
+    return _data_validator
 
 class RAGQueryRequest(BaseModel):
     query: str
@@ -86,6 +161,263 @@ async def query_rag_agent(
         raise HTTPException(status_code=500, detail=f"Failed to process RAG query: {str(e)}")
 
 @router.post("/resource-optimizer/analyze")
+async def analyze_resource_optimization(
+    project_id: Optional[UUID] = None,
+    portfolio_id: Optional[UUID] = None,
+    current_user = Depends(require_permission(Permission.ai_resource_optimize))
+):
+    """Analyze resource allocation and provide optimization recommendations"""
+    try:
+        if supabase is None:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
+        
+        # Get project or portfolio data for analysis
+        if project_id:
+            project_response = supabase.table("projects").select("*").eq("id", str(project_id)).execute()
+            if not project_response.data:
+                raise HTTPException(status_code=404, detail="Project not found")
+            
+            context = {"type": "project", "data": project_response.data[0]}
+        elif portfolio_id:
+            portfolio_response = supabase.table("portfolios").select("*").eq("id", str(portfolio_id)).execute()
+            if not portfolio_response.data:
+                raise HTTPException(status_code=404, detail="Portfolio not found")
+            
+            context = {"type": "portfolio", "data": portfolio_response.data[0]}
+        else:
+            context = {"type": "global", "data": {}}
+        
+        # Mock resource optimization analysis
+        return {
+            "analysis_type": context["type"],
+            "recommendations": [
+                {
+                    "type": "reallocation",
+                    "priority": "high",
+                    "description": "Consider reallocating 2 developers from Project A to Project B to balance workload",
+                    "impact": "Could improve delivery timeline by 15%",
+                    "confidence": 0.85
+                },
+                {
+                    "type": "skill_gap",
+                    "priority": "medium", 
+                    "description": "Identified need for additional UX design capacity",
+                    "impact": "Hiring 1 UX designer could improve user satisfaction scores",
+                    "confidence": 0.78
+                }
+            ],
+            "utilization_metrics": {
+                "average_utilization": 82.5,
+                "over_allocated_resources": 3,
+                "under_allocated_resources": 7,
+                "optimal_allocation_score": 0.73
+            },
+            "generated_at": "2024-01-07T12:00:00Z"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Resource optimization error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to analyze resource optimization: {str(e)}")
+
+
+# New AI Agent Endpoints
+
+@router.post("/agents/optimize-resources", response_model=OptimizeResourcesResponse)
+async def optimize_resources(
+    request: OptimizeResourcesRequest,
+    current_user = Depends(get_current_user)
+):
+    """
+    Optimize resource allocations using AI-powered linear programming.
+    
+    Uses ResourceOptimizerAgent with error handling, retry logic, and confidence scores.
+    Returns recommendations with confidence scores.
+    
+    Requirements: 2.1, 2.2, 2.3, 2.4
+    """
+    try:
+        optimizer = get_resource_optimizer()
+        
+        if optimizer is None:
+            raise HTTPException(
+                status_code=503,
+                detail="Resource optimizer service unavailable. Please configure OPENAI_API_KEY."
+            )
+        
+        user_id = current_user.get("user_id")
+        organization_id = current_user.get("organization_id")
+        
+        if not organization_id:
+            raise HTTPException(
+                status_code=400,
+                detail="Organization ID not found in user context"
+            )
+        
+        # Call the optimizer agent
+        result = await optimizer.optimize_resources(
+            organization_id=organization_id,
+            user_id=user_id,
+            constraints=request.constraints
+        )
+        
+        # Check for errors
+        if "error" in result:
+            raise HTTPException(
+                status_code=400,
+                detail=result["error"]
+            )
+        
+        # Transform recommendations to match response model
+        recommendations = []
+        for rec in result.get("recommendations", []):
+            recommendations.append({
+                "resource_id": UUID(rec["resource_id"]),
+                "resource_name": rec["resource_name"],
+                "project_id": UUID(rec["project_id"]),
+                "project_name": rec["project_name"],
+                "allocated_hours": rec["allocated_hours"],
+                "cost_savings": rec["cost_savings"],
+                "confidence": result["model_confidence"]  # Use overall confidence
+            })
+        
+        return OptimizeResourcesResponse(
+            recommendations=recommendations,
+            total_cost_savings=result["total_cost_savings"],
+            model_confidence=result["model_confidence"],
+            constraints_satisfied=result["constraints_satisfied"]
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Resource optimization error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to optimize resources: {str(e)}"
+        )
+
+
+@router.post("/agents/forecast-risks", response_model=ForecastRisksResponse)
+async def forecast_risks(
+    request: ForecastRisksRequest,
+    current_user = Depends(get_current_user)
+):
+    """
+    Forecast project risks using AI-powered ARIMA time series analysis.
+    
+    Uses RiskForecasterAgent with error handling and confidence intervals.
+    Returns forecasts with confidence intervals.
+    
+    Requirements: 3.1, 3.2, 3.3, 3.4
+    """
+    try:
+        forecaster = get_risk_forecaster()
+        
+        if forecaster is None:
+            raise HTTPException(
+                status_code=503,
+                detail="Risk forecaster service unavailable. Please configure OPENAI_API_KEY."
+            )
+        
+        user_id = current_user.get("user_id")
+        organization_id = current_user.get("organization_id")
+        
+        if not organization_id:
+            raise HTTPException(
+                status_code=400,
+                detail="Organization ID not found in user context"
+            )
+        
+        # Call the forecaster agent
+        result = await forecaster.forecast_risks(
+            organization_id=organization_id,
+            user_id=user_id,
+            project_id=str(request.project_id) if request.project_id else None,
+            forecast_periods=request.forecast_periods
+        )
+        
+        return ForecastRisksResponse(
+            forecasts=result["forecasts"],
+            model_confidence=result["model_confidence"],
+            model_metrics=result["model_metrics"]
+        )
+        
+    except ValueError as e:
+        # Handle insufficient data error
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Risk forecasting error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to forecast risks: {str(e)}"
+        )
+
+
+@router.post("/agents/validate-data", response_model=ValidateDataResponse)
+async def validate_data(
+    request: ValidateDataRequest,
+    current_user = Depends(get_current_user)
+):
+    """
+    Validate data integrity and detect inconsistencies.
+    
+    Uses DataValidatorAgent with comprehensive validation rules.
+    Returns validation report with severity levels.
+    
+    Requirements: 4.1, 4.2, 4.3, 4.4
+    """
+    try:
+        validator = get_data_validator()
+        
+        if validator is None:
+            raise HTTPException(
+                status_code=503,
+                detail="Data validator service unavailable. Please configure OPENAI_API_KEY."
+            )
+        
+        user_id = current_user.get("user_id")
+        organization_id = current_user.get("organization_id")
+        
+        if not organization_id:
+            raise HTTPException(
+                status_code=400,
+                detail="Organization ID not found in user context"
+            )
+        
+        # Call the validator agent
+        result = await validator.validate_data(
+            organization_id=organization_id,
+            validation_scope=request.validation_scope,
+            user_id=user_id
+        )
+        
+        return ValidateDataResponse(
+            issues=result["issues"],
+            total_issues=result["total_issues"],
+            critical_count=result["critical_count"],
+            high_count=result["high_count"],
+            medium_count=result["medium_count"],
+            low_count=result["low_count"]
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Data validation error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to validate data: {str(e)}"
+        )
+
+
+@router.post("/risk-forecaster/predict")
 async def analyze_resource_optimization(
     project_id: Optional[UUID] = None,
     portfolio_id: Optional[UUID] = None,

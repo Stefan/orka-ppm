@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '../../providers/SupabaseAuthProvider'
 import { Users, UserPlus, UserMinus, UserX, Search, Filter, Shield, AlertTriangle, CheckCircle, XCircle, RefreshCw } from 'lucide-react'
 import AppLayout from '../../../components/shared/AppLayout'
@@ -20,6 +21,14 @@ interface User {
   deactivated_by: string | null
   deactivation_reason: string | null
   sso_provider: string | null
+  roles?: string[] // Array of assigned roles
+  full_name?: string
+}
+
+interface RoleInfo {
+  role: string
+  permissions: string[]
+  description: string
 }
 
 interface UserListResponse {
@@ -37,7 +46,8 @@ interface UserFilters {
 }
 
 export default function AdminUsers() {
-  const { session } = useAuth()
+  const { session, user } = useAuth()
+  const router = useRouter()
   const t = useTranslations('adminUsers')
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
@@ -56,24 +66,70 @@ export default function AdminUsers() {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(false)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [availableRoles, setAvailableRoles] = useState<RoleInfo[]>([])
+  const [showRoleModal, setShowRoleModal] = useState(false)
+  const [selectedUserForRole, setSelectedUserForRole] = useState<User | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
+  const [checkingAccess, setCheckingAccess] = useState(true)
+
+  // Check if user is admin
+  useEffect(() => {
+    const checkAdminAccess = async () => {
+      if (!session) {
+        setCheckingAccess(false)
+        return
+      }
+
+      try {
+        // Try to fetch roles endpoint - only admins can access this
+        const response = await fetch(getApiUrl('/admin/roles'), {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          }
+        })
+
+        if (response.ok) {
+          setIsAdmin(true)
+        } else if (response.status === 403) {
+          setIsAdmin(false)
+          // Redirect to home page after a short delay
+          setTimeout(() => {
+            router.push('/')
+          }, 2000)
+        } else {
+          setIsAdmin(false)
+        }
+      } catch (error) {
+        console.error('Error checking admin access:', error)
+        setIsAdmin(false)
+      } finally {
+        setCheckingAccess(false)
+      }
+    }
+
+    checkAdminAccess()
+  }, [session, router])
 
   useEffect(() => {
-    if (session) {
+    if (session && isAdmin) {
       fetchUsers()
+      fetchAvailableRoles()
     }
-  }, [session, pagination.page])
+  }, [session, pagination.page, isAdmin])
 
   // Debounced effect for filters to prevent excessive API calls
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (session) {
+      if (session && isAdmin) {
         setPagination(prev => ({ ...prev, page: 1 })) // Reset to page 1 when filtering
         fetchUsers()
       }
     }, 300) // 300ms debounce
 
     return () => clearTimeout(timeoutId)
-  }, [filters, session])
+  }, [filters, session, isAdmin])
 
   const fetchUsers = async () => {
     if (loading) return // Prevent concurrent requests
@@ -127,6 +183,99 @@ export default function AdminUsers() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const fetchAvailableRoles = async () => {
+    try {
+      const response = await fetch(getApiUrl('/admin/roles'), {
+        headers: {
+          'Authorization': `Bearer ${session?.access_token || ''}`,
+          'Content-Type': 'application/json',
+        }
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch roles')
+      }
+      
+      const roles: RoleInfo[] = await response.json()
+      setAvailableRoles(roles)
+    } catch (error) {
+      console.error('Error fetching roles:', error)
+    }
+  }
+
+  const handleAssignRole = async (userId: string, role: string) => {
+    setActionLoading(userId)
+    
+    try {
+      const response = await fetch(getApiUrl(`/admin/users/${userId}/roles`), {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session?.access_token || ''}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ role })
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Failed to assign role')
+      }
+      
+      setSuccessMessage(`Role "${role}" assigned successfully`)
+      setTimeout(() => setSuccessMessage(null), 3000)
+      
+      // Refresh users list
+      await fetchUsers()
+      
+    } catch (error) {
+      console.error('Error assigning role:', error)
+      setError(error instanceof Error ? error.message : 'Failed to assign role')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleRemoveRole = async (userId: string, role: string) => {
+    setActionLoading(userId)
+    
+    try {
+      const response = await fetch(getApiUrl(`/admin/users/${userId}/roles/${role}`), {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session?.access_token || ''}`,
+          'Content-Type': 'application/json',
+        }
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Failed to remove role')
+      }
+      
+      setSuccessMessage(`Role "${role}" removed successfully`)
+      setTimeout(() => setSuccessMessage(null), 3000)
+      
+      // Refresh users list
+      await fetchUsers()
+      
+    } catch (error) {
+      console.error('Error removing role:', error)
+      setError(error instanceof Error ? error.message : 'Failed to remove role')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const openRoleModal = (user: User) => {
+    setSelectedUserForRole(user)
+    setShowRoleModal(true)
+  }
+
+  const closeRoleModal = () => {
+    setSelectedUserForRole(null)
+    setShowRoleModal(false)
   }
 
   const handleUserAction = async (userId: string, action: 'deactivate' | 'activate' | 'delete', reason?: string) => {
@@ -246,6 +395,31 @@ export default function AdminUsers() {
     })
   }
 
+  if (checkingAccess) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </AppLayout>
+    )
+  }
+
+  if (isAdmin === false) {
+    return (
+      <AppLayout>
+        <div className="flex flex-col items-center justify-center h-64 space-y-4">
+          <AlertTriangle className="h-16 w-16 text-red-500" />
+          <h2 className="text-2xl font-bold text-gray-900">Access Denied</h2>
+          <p className="text-gray-600 text-center max-w-md">
+            You do not have permission to access this page. Only administrators can manage users and roles.
+          </p>
+          <p className="text-sm text-gray-500">Redirecting to home page...</p>
+        </div>
+      </AppLayout>
+    )
+  }
+
   if (loading && users.length === 0) {
     return (
       <AppLayout>
@@ -256,8 +430,131 @@ export default function AdminUsers() {
     )
   }
 
+  // Role Management Modal Component
+  const RoleManagementModal = () => {
+    if (!showRoleModal || !selectedUserForRole) return null
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Manage Roles</h2>
+              <button
+                onClick={closeRoleModal}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <XCircle className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                  <span className="text-lg font-medium text-blue-600">
+                    {selectedUserForRole.email.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div>
+                  <div className="text-lg font-medium text-gray-900">
+                    {selectedUserForRole.full_name || selectedUserForRole.email}
+                  </div>
+                  <div className="text-sm text-gray-500">{selectedUserForRole.email}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Current Roles</h3>
+              {selectedUserForRole.roles && selectedUserForRole.roles.length > 0 ? (
+                <div className="space-y-2">
+                  {selectedUserForRole.roles.map((role) => (
+                    <div key={role} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <Shield className="h-5 w-5 text-blue-600" />
+                        <div>
+                          <div className="font-medium text-gray-900">{role}</div>
+                          <div className="text-sm text-gray-500">
+                            {availableRoles.find(r => r.role === role)?.description}
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleRemoveRole(selectedUserForRole.id, role)}
+                        disabled={actionLoading === selectedUserForRole.id}
+                        className="text-red-600 hover:text-red-800 disabled:opacity-50"
+                      >
+                        <UserMinus className="h-5 w-5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-sm">No roles assigned</p>
+              )}
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Available Roles</h3>
+              <div className="space-y-2">
+                {availableRoles
+                  .filter(role => !selectedUserForRole.roles?.includes(role.role))
+                  .map((roleInfo) => (
+                    <div key={roleInfo.role} className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <Shield className="h-5 w-5 text-gray-600" />
+                            <span className="font-medium text-gray-900">{roleInfo.role}</span>
+                          </div>
+                          <p className="text-sm text-gray-600 mb-2">{roleInfo.description}</p>
+                          <div className="flex flex-wrap gap-1">
+                            {roleInfo.permissions.slice(0, 5).map((permission) => (
+                              <span
+                                key={permission}
+                                className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700"
+                              >
+                                {permission}
+                              </span>
+                            ))}
+                            {roleInfo.permissions.length > 5 && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
+                                +{roleInfo.permissions.length - 5} more
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleAssignRole(selectedUserForRole.id, roleInfo.role)}
+                          disabled={actionLoading === selectedUserForRole.id}
+                          className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+                        >
+                          <UserPlus className="h-4 w-4" />
+                          <span>Assign</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={closeRoleModal}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <AppLayout>
+      <RoleManagementModal />
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
@@ -413,6 +710,22 @@ export default function AdminUsers() {
           </div>
         )}
 
+        {/* Success Message */}
+        {successMessage && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="flex items-center">
+              <CheckCircle className="h-5 w-5 text-green-400 mr-3" />
+              <span className="text-green-700">{successMessage}</span>
+              <button
+                onClick={() => setSuccessMessage(null)}
+                className="ml-auto text-green-400 hover:text-green-600"
+              >
+                <XCircle className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Users Table */}
         <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
@@ -488,10 +801,24 @@ export default function AdminUsers() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleColor(user.role)}`}>
-                        {user.role === 'admin' && <Shield className="h-3 w-3 mr-1" />}
-                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {user.roles && user.roles.length > 0 ? (
+                          user.roles.map((role) => (
+                            <span
+                              key={role}
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleColor(role)}`}
+                            >
+                              {role === 'admin' && <Shield className="h-3 w-3 mr-1" />}
+                              {role.charAt(0).toUpperCase() + role.slice(1)}
+                            </span>
+                          ))
+                        ) : (
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleColor(user.role)}`}>
+                            {user.role === 'admin' && <Shield className="h-3 w-3 mr-1" />}
+                            {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center">
@@ -512,6 +839,14 @@ export default function AdminUsers() {
                     </td>
                     <td className="px-6 py-4 text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-2">
+                        <button
+                          onClick={() => openRoleModal(user)}
+                          className="text-blue-600 hover:text-blue-900"
+                          title="Manage Roles"
+                        >
+                          <Shield className="h-4 w-4" />
+                        </button>
+                        
                         {user.is_active ? (
                           <button
                             onClick={() => handleUserAction(user.id, 'deactivate', 'Admin deactivation')}

@@ -8,6 +8,9 @@ import React from 'react'
 // Re-export help chat types
 export * from './help-chat'
 
+// Re-export RBAC types
+export * from './rbac'
+
 // Base Types
 export interface BaseEntity {
   id: string

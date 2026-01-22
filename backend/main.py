@@ -20,6 +20,7 @@ from utils.converters import convert_uuids
 # Import routers
 from routers.portfolios import router as portfolios_router
 from routers.projects import router as projects_router
+from routers.projects_import import router as projects_import_router
 from routers.scenarios import router as scenarios_router
 from routers.simulations import router as simulations_router
 from routers.reports import router as reports_router
@@ -42,6 +43,9 @@ from routers.po_breakdown import router as po_breakdown_router
 from routers.feature_flags import router as feature_flags_router
 from routers.audit import router as audit_router
 from routers.admin_performance import router as admin_performance_router
+from routers.workflows import router as workflows_router
+from routers.rbac import router as rbac_router
+from routers.viewer_restrictions_router import router as viewer_restrictions_router
 
 # Import performance tracking middleware
 from middleware.performance_tracker import PerformanceMiddleware, performance_tracker
@@ -181,6 +185,7 @@ if pre_startup_integration is None:
 # Register routers
 app.include_router(portfolios_router)
 app.include_router(projects_router)
+app.include_router(projects_import_router)
 app.include_router(scenarios_router)
 app.include_router(simulations_router)
 app.include_router(reports_router)
@@ -203,6 +208,9 @@ app.include_router(po_breakdown_router)
 app.include_router(feature_flags_router)
 app.include_router(audit_router)
 app.include_router(admin_performance_router)
+app.include_router(workflows_router)
+app.include_router(rbac_router)
+app.include_router(viewer_restrictions_router)
 
 # Add performance tracking middleware
 app.add_middleware(PerformanceMiddleware, tracker=performance_tracker)

@@ -37,6 +37,69 @@ router = APIRouter(prefix="/reports", tags=["Google Suite Reports"])
 google_suite_service = GoogleSuiteReportGenerator(supabase) if supabase else None
 
 
+# RAG Reporter endpoint for adhoc reports
+@router.post("/adhoc", response_model=Dict[str, Any])
+@limiter.limit("10/minute")
+async def generate_adhoc_report(
+    request: Request,
+    query: str,
+    current_user = Depends(get_current_user)
+):
+    """
+    Generate adhoc report using RAG (Retrieval-Augmented Generation) agent.
+    
+    Uses enhanced RAGReporterAgent with error handling, retry logic, and confidence scores.
+    Returns confidence scores and sources.
+    
+    Requirements: 1.1, 1.2, 1.3, 1.4, 1.5
+    """
+    try:
+        # Import RAG agent
+        from ai_agents import RAGReporterAgent
+        import os
+        
+        openai_api_key = os.getenv("OPENAI_API_KEY")
+        openai_base_url = os.getenv("OPENAI_BASE_URL")
+        
+        if not openai_api_key:
+            raise HTTPException(
+                status_code=503,
+                detail="RAG service unavailable. Please configure OPENAI_API_KEY."
+            )
+        
+        # Initialize RAG agent
+        rag_agent = RAGReporterAgent(
+            supabase_client=supabase,
+            openai_api_key=openai_api_key,
+            base_url=openai_base_url
+        )
+        
+        user_id = current_user.get("user_id")
+        
+        # Process RAG query
+        result = await rag_agent.process_rag_query(
+            query=query,
+            user_id=user_id
+        )
+        
+        # Return response with confidence scores and sources
+        return {
+            "response": result["response"],
+            "confidence": result["confidence_score"],
+            "sources": result["sources"],
+            "timestamp": datetime.now()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Adhoc report generation error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate adhoc report: {str(e)}"
+        )
+
+
 @router.post("/templates", response_model=ReportTemplate, status_code=status.HTTP_201_CREATED)
 @limiter.limit("10/minute")
 async def create_report_template(

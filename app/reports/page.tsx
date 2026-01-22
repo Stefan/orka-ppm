@@ -6,6 +6,14 @@ import { FileText, Loader, Send, Bot, User, AlertTriangle, RefreshCw, Sparkles, 
 import AppLayout from '../../components/shared/AppLayout'
 import { getApiUrl } from '@/lib/api/client'
 import { useTranslations } from '@/lib/i18n/context'
+import { useToast } from '@/components/shared/Toast'
+import { formatTime } from '@/lib/utils/formatting'
+import { 
+  ResourceOptimizerChart, 
+  RiskForecastChart, 
+  ValidationIssuesDisplay,
+  ConfidenceBadge 
+} from '@/components/ai/AIResultVisualizations'
 
 interface ChatMessage {
   id: string
@@ -25,6 +33,45 @@ interface ChatMessage {
     confidence: number
     applied: boolean
   }>
+  // AI Agent Results
+  optimizerResults?: {
+    recommendations: Array<{
+      resource_id: string
+      resource_name: string
+      project_id: string
+      project_name: string
+      allocated_hours: number
+      cost_savings: number
+      confidence: number
+    }>
+    total_cost_savings: number
+    model_confidence: number
+  }
+  riskForecastResults?: {
+    forecasts: Array<{
+      period: string
+      risk_probability: number
+      risk_impact: number
+      confidence_lower: number
+      confidence_upper: number
+    }>
+    model_confidence: number
+  }
+  validationResults?: {
+    issues: Array<{
+      severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW'
+      category: string
+      entity_type: string
+      entity_id: string
+      description: string
+      recommendation?: string
+    }>
+    total_issues: number
+    critical_count: number
+    high_count: number
+    medium_count: number
+    low_count: number
+  }
 }
 
 interface RAGResponse {
@@ -55,6 +102,7 @@ interface ErrorRecoveryState {
 export default function Reports() {
   const { session } = useAuth()
   const { t } = useTranslations()
+  const toast = useToast()
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -255,6 +303,11 @@ export default function Reports() {
       // Handle PMR-specific suggested changes
       if (data.suggestedChanges && data.suggestedChanges.length > 0) {
         setPendingChanges(prev => [...prev, ...data.suggestedChanges])
+        toast.info(
+          'Suggestions Available',
+          `${data.suggestedChanges.length} content suggestions are ready for review`,
+          { duration: 5000 }
+        )
       }
       
       // Show AI status if in mock mode
@@ -267,6 +320,12 @@ export default function Reports() {
           confidence: 1.0
         }
         setMessages(prev => [...prev, statusMessage])
+        
+        toast.warning(
+          'AI Mock Mode',
+          'AI features are running in mock mode. Configure OpenAI API key for full functionality.',
+          { duration: 6000 }
+        )
       }
 
       // Reset error state on successful response
@@ -283,6 +342,22 @@ export default function Reports() {
       }
       
       const chatError = createChatError(error, statusCode)
+      
+      // Show toast notification for error
+      toast.error(
+        chatError.errorType === 'network' ? 'Connection Error' :
+        chatError.errorType === 'auth' ? 'Authentication Error' :
+        chatError.errorType === 'timeout' ? 'Request Timeout' :
+        chatError.errorType === 'server' ? 'Server Error' : 'Error',
+        chatError.message,
+        {
+          duration: 7000,
+          action: chatError.retryable && errorRecovery.retryCount < errorRecovery.maxRetries ? {
+            label: 'Retry',
+            onClick: handleRetry
+          } : undefined
+        }
+      )
       
       // Update error recovery state
       setErrorRecovery(prev => ({
@@ -415,6 +490,20 @@ export default function Reports() {
       resetErrorState()
     } catch (error) {
       const chatError = createChatError(error)
+      
+      // Show toast notification for error
+      toast.error(
+        'PMR Action Failed',
+        chatError.message,
+        {
+          duration: 7000,
+          action: chatError.retryable ? {
+            label: 'Retry',
+            onClick: () => sendPMRAction(action, message)
+          } : undefined
+        }
+      )
+      
       setCurrentError(chatError)
       setShowError(true)
     } finally {
@@ -423,7 +512,7 @@ export default function Reports() {
   }, [session, pmrContext, conversationId, resetErrorState, createChatError])
 
   const formatTimestamp = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    return formatTime(date)
   }
 
   const getConfidenceColor = (confidence: number) => {
@@ -685,6 +774,39 @@ export default function Reports() {
                   >
                     <div className="whitespace-pre-wrap break-words text-sm sm:text-base text-gray-900">{message.content}</div>
                     
+                    {/* AI Agent Visualizations */}
+                    {message.optimizerResults && (
+                      <div className="mt-4">
+                        <ResourceOptimizerChart
+                          recommendations={message.optimizerResults.recommendations}
+                          totalCostSavings={message.optimizerResults.total_cost_savings}
+                          modelConfidence={message.optimizerResults.model_confidence}
+                        />
+                      </div>
+                    )}
+
+                    {message.riskForecastResults && (
+                      <div className="mt-4">
+                        <RiskForecastChart
+                          forecasts={message.riskForecastResults.forecasts}
+                          modelConfidence={message.riskForecastResults.model_confidence}
+                        />
+                      </div>
+                    )}
+
+                    {message.validationResults && (
+                      <div className="mt-4">
+                        <ValidationIssuesDisplay
+                          issues={message.validationResults.issues}
+                          totalIssues={message.validationResults.total_issues}
+                          criticalCount={message.validationResults.critical_count}
+                          highCount={message.validationResults.high_count}
+                          mediumCount={message.validationResults.medium_count}
+                          lowCount={message.validationResults.low_count}
+                        />
+                      </div>
+                    )}
+                    
                     {/* PMR Action Indicator */}
                     {message.action && (
                       <div className="mt-2 flex items-center space-x-2">
@@ -719,11 +841,9 @@ export default function Reports() {
                     {message.type === 'assistant' && (message.sources || message.confidence !== undefined) && (
                       <div className="mt-3 pt-3 border-t border-gray-100">
                         {message.confidence !== undefined && (
-                          <div className="flex items-center space-x-2 text-xs">
+                          <div className="flex items-center space-x-2 text-xs mb-2">
                             <span className="text-gray-700">Confidence:</span>
-                            <span className={`font-medium ${getConfidenceColor(message.confidence)}`}>
-                              {Math.round(message.confidence * 100)}%
-                            </span>
+                            <ConfidenceBadge confidence={message.confidence} />
                           </div>
                         )}
                         {message.sources && message.sources.length > 0 && (

@@ -3,7 +3,7 @@ Role-Based Access Control (RBAC) system
 """
 
 from datetime import datetime
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional, Callable
 from fastapi import Depends, HTTPException
 from enum import Enum
 
@@ -127,6 +127,14 @@ class Permission(str, Enum):
     # Audit trail permissions (Requirements 6.7, 6.8)
     AUDIT_READ = "audit:read"
     AUDIT_EXPORT = "audit:export"
+    
+    # Workflow permissions (Requirements 3.5)
+    workflow_create = "workflow_create"
+    workflow_read = "workflow_read"
+    workflow_update = "workflow_update"
+    workflow_delete = "workflow_delete"
+    workflow_approve = "workflow_approve"
+    workflow_manage = "workflow_manage"
 
 # Default role permissions configuration
 DEFAULT_ROLE_PERMISSIONS = {
@@ -153,7 +161,10 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.po_breakdown_update, Permission.po_breakdown_delete,
         Permission.report_generate, Permission.report_read, Permission.report_template_create, Permission.report_template_manage,
         # Audit trail permissions
-        Permission.AUDIT_READ, Permission.AUDIT_EXPORT
+        Permission.AUDIT_READ, Permission.AUDIT_EXPORT,
+        # Workflow permissions
+        Permission.workflow_create, Permission.workflow_read, Permission.workflow_update, Permission.workflow_delete,
+        Permission.workflow_approve, Permission.workflow_manage
     ],
     UserRole.portfolio_manager: [
         # Portfolio and project management
@@ -174,7 +185,10 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.po_breakdown_read, Permission.po_breakdown_update,
         Permission.report_generate, Permission.report_read, Permission.report_template_create,
         # Audit trail permissions
-        Permission.AUDIT_READ, Permission.AUDIT_EXPORT
+        Permission.AUDIT_READ, Permission.AUDIT_EXPORT,
+        # Workflow permissions
+        Permission.workflow_create, Permission.workflow_read, Permission.workflow_update,
+        Permission.workflow_approve, Permission.workflow_manage
     ],
     UserRole.project_manager: [
         # Project-specific management
@@ -194,7 +208,9 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.po_breakdown_read, Permission.po_breakdown_update,
         Permission.report_generate, Permission.report_read,
         # Audit trail permissions
-        Permission.AUDIT_READ
+        Permission.AUDIT_READ,
+        # Workflow permissions
+        Permission.workflow_read, Permission.workflow_approve
     ],
     UserRole.resource_manager: [
         # Resource management focus
@@ -209,7 +225,9 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.scenario_read,
         Permission.change_read,
         Permission.po_breakdown_read,
-        Permission.report_read
+        Permission.report_read,
+        # Workflow permissions
+        Permission.workflow_read
     ],
     UserRole.team_member: [
         # Basic project participation
@@ -224,7 +242,9 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.scenario_read,
         Permission.change_create, Permission.change_read,
         Permission.po_breakdown_read,
-        Permission.report_read
+        Permission.report_read,
+        # Workflow permissions
+        Permission.workflow_read
     ],
     UserRole.viewer: [
         # Read-only access
@@ -243,7 +263,9 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.po_breakdown_read,
         Permission.report_read,
         # Audit trail permissions (read-only for viewers)
-        Permission.AUDIT_READ
+        Permission.AUDIT_READ,
+        # Workflow permissions
+        Permission.workflow_read
     ]
 }
 
@@ -330,6 +352,52 @@ class RoleBasedAccessControl:
             print(f"Error checking permissions: {e}")
             return False
     
+    async def has_all_permissions(self, user_id: str, required_permissions: List[Permission]) -> bool:
+        """
+        Check if user has all of the specified permissions (AND logic).
+        
+        Args:
+            user_id: The user's ID
+            required_permissions: List of permissions that are ALL required
+            
+        Returns:
+            True if the user has ALL of the specified permissions, False otherwise
+            
+        Requirements: 1.4 - Permission combination logic (AND)
+        """
+        try:
+            user_permissions = await self.get_user_permissions(user_id)
+            return all(perm in user_permissions for perm in required_permissions)
+        except Exception as e:
+            print(f"Error checking all permissions: {e}")
+            return False
+    
+    async def get_missing_permissions(
+        self, 
+        user_id: str, 
+        required_permissions: List[Permission]
+    ) -> List[Permission]:
+        """
+        Get the list of permissions the user is missing from the required set.
+        
+        Useful for error reporting to tell users exactly what they need.
+        
+        Args:
+            user_id: The user's ID
+            required_permissions: List of permissions to check
+            
+        Returns:
+            List of permissions the user is missing
+            
+        Requirements: 1.4 - Permission combination logic
+        """
+        try:
+            user_permissions = await self.get_user_permissions(user_id)
+            return [perm for perm in required_permissions if perm not in user_permissions]
+        except Exception as e:
+            print(f"Error getting missing permissions: {e}")
+            return list(required_permissions)
+    
     def _is_cache_valid(self, cache_key: str) -> bool:
         """Check if cache entry is still valid"""
         if cache_key not in self._permission_cache:
@@ -355,42 +423,315 @@ class RoleBasedAccessControl:
 rbac = RoleBasedAccessControl(supabase)
 
 # Permission dependency functions
-def require_permission(required_permission: Permission):
-    """Dependency to require a specific permission"""
-    async def permission_checker(current_user = Depends(get_current_user)):
+def require_permission(
+    required_permission: Permission,
+    context_extractor: Any = None
+):
+    """
+    Dependency to require a specific permission with optional context-aware checking.
+    
+    This function supports both simple permission checking and context-aware checking
+    for scoped permissions (project, portfolio, organization).
+    
+    Args:
+        required_permission: The permission required to access the endpoint
+        context_extractor: Optional callable that extracts PermissionContext from Request.
+                          If provided, enables context-aware permission checking.
+                          Can be an async function: async def extractor(request: Request) -> PermissionContext
+    
+    Returns:
+        FastAPI dependency function that validates the permission
+    
+    Example (simple):
+        @app.get("/projects")
+        async def list_projects(user = Depends(require_permission(Permission.project_read))):
+            ...
+    
+    Example (context-aware):
+        async def extract_project_context(request: Request) -> PermissionContext:
+            project_id = request.path_params.get("project_id")
+            return PermissionContext(project_id=UUID(project_id) if project_id else None)
+        
+        @app.get("/projects/{project_id}")
+        async def get_project(
+            project_id: str,
+            user = Depends(require_permission(Permission.project_read, extract_project_context))
+        ):
+            ...
+    
+    Requirements: 1.4, 1.5 - Context-aware permission checking with FastAPI integration
+    """
+    from fastapi import Request
+    
+    async def permission_checker(request: Request, current_user = Depends(get_current_user)):
         user_id = current_user.get("user_id")
         if not user_id:
-            raise HTTPException(status_code=401, detail="User not authenticated")
+            raise HTTPException(
+                status_code=401, 
+                detail={
+                    "error": "authentication_required",
+                    "message": "User not authenticated"
+                }
+            )
         
-        has_perm = await rbac.has_permission(user_id, required_permission)
+        # Extract context if context_extractor is provided
+        context = None
+        if context_extractor is not None:
+            try:
+                # Support both sync and async context extractors
+                import inspect
+                if inspect.iscoroutinefunction(context_extractor):
+                    context = await context_extractor(request)
+                else:
+                    context = context_extractor(request)
+            except Exception as e:
+                # Log but don't fail - fall back to non-context check
+                print(f"Warning: Context extraction failed: {e}")
+                context = None
+        
+        # Use enhanced permission checker if context is provided
+        if context is not None:
+            try:
+                from .enhanced_permission_checker import get_enhanced_permission_checker
+                from uuid import UUID
+                
+                enhanced_checker = get_enhanced_permission_checker()
+                user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
+                has_perm = await enhanced_checker.check_permission(user_uuid, required_permission, context)
+            except ImportError:
+                # Fall back to basic permission check if enhanced checker not available
+                has_perm = await rbac.has_permission(user_id, required_permission)
+        else:
+            # Use basic permission check without context
+            has_perm = await rbac.has_permission(user_id, required_permission)
+        
         if not has_perm:
             raise HTTPException(
                 status_code=403, 
-                detail=f"Insufficient permissions. Required: {required_permission.value}"
+                detail={
+                    "error": "insufficient_permissions",
+                    "message": f"Permission '{required_permission.value}' required",
+                    "required_permission": required_permission.value,
+                    "context": context.model_dump() if context and hasattr(context, 'model_dump') else None
+                }
             )
         
-        return current_user
+        # Return user with context information if available
+        result = dict(current_user)
+        if context is not None:
+            result["permission_context"] = context
+        return result
     
     return permission_checker
 
-def require_any_permission(required_permissions: List[Permission]):
-    """Dependency to require any of the specified permissions"""
-    async def permission_checker(current_user = Depends(get_current_user)):
+
+def require_any_permission(
+    required_permissions: List[Permission],
+    context_extractor: Any = None
+):
+    """
+    Dependency to require any of the specified permissions (OR logic) with optional context.
+    
+    This function checks if the user has at least one of the specified permissions.
+    Supports context-aware checking for scoped permissions.
+    
+    Args:
+        required_permissions: List of permissions where at least one is required
+        context_extractor: Optional callable that extracts PermissionContext from Request.
+                          If provided, enables context-aware permission checking.
+    
+    Returns:
+        FastAPI dependency function that validates the permissions
+    
+    Example:
+        @app.get("/resources")
+        async def list_resources(
+            user = Depends(require_any_permission([
+                Permission.resource_read,
+                Permission.admin_read
+            ]))
+        ):
+            ...
+    
+    Requirements: 1.4, 1.5 - Permission combination logic (OR) with FastAPI integration
+    """
+    from fastapi import Request
+    
+    async def permission_checker(request: Request, current_user = Depends(get_current_user)):
         user_id = current_user.get("user_id")
         if not user_id:
-            raise HTTPException(status_code=401, detail="User not authenticated")
+            raise HTTPException(
+                status_code=401, 
+                detail={
+                    "error": "authentication_required",
+                    "message": "User not authenticated"
+                }
+            )
         
-        has_any_perm = await rbac.has_any_permission(user_id, required_permissions)
+        # Extract context if context_extractor is provided
+        context = None
+        if context_extractor is not None:
+            try:
+                import inspect
+                if inspect.iscoroutinefunction(context_extractor):
+                    context = await context_extractor(request)
+                else:
+                    context = context_extractor(request)
+            except Exception as e:
+                print(f"Warning: Context extraction failed: {e}")
+                context = None
+        
+        # Use enhanced permission checker if context is provided
+        if context is not None:
+            try:
+                from .enhanced_permission_checker import get_enhanced_permission_checker
+                from uuid import UUID
+                
+                enhanced_checker = get_enhanced_permission_checker()
+                user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
+                has_any_perm = await enhanced_checker.check_any_permission(
+                    user_uuid, required_permissions, context
+                )
+            except ImportError:
+                has_any_perm = await rbac.has_any_permission(user_id, required_permissions)
+        else:
+            has_any_perm = await rbac.has_any_permission(user_id, required_permissions)
+        
         if not has_any_perm:
             perm_names = [perm.value for perm in required_permissions]
             raise HTTPException(
                 status_code=403, 
-                detail=f"Insufficient permissions. Required one of: {', '.join(perm_names)}"
+                detail={
+                    "error": "insufficient_permissions",
+                    "message": f"At least one of these permissions required: {', '.join(perm_names)}",
+                    "required_permissions": perm_names,
+                    "context": context.model_dump() if context and hasattr(context, 'model_dump') else None
+                }
             )
         
-        return current_user
+        result = dict(current_user)
+        if context is not None:
+            result["permission_context"] = context
+        return result
     
     return permission_checker
+
+
+def require_all_permissions(
+    required_permissions: List[Permission],
+    context_extractor: Any = None
+):
+    """
+    Dependency to require all of the specified permissions (AND logic) with optional context.
+    
+    This function checks if the user has ALL of the specified permissions.
+    Supports context-aware checking for scoped permissions.
+    
+    Args:
+        required_permissions: List of permissions that are ALL required
+        context_extractor: Optional callable that extracts PermissionContext from Request.
+                          If provided, enables context-aware permission checking.
+    
+    Returns:
+        FastAPI dependency function that validates the permissions
+    
+    Example:
+        @app.put("/projects/{project_id}")
+        async def update_project(
+            project_id: str,
+            user = Depends(require_all_permissions([
+                Permission.project_read,
+                Permission.project_update
+            ]))
+        ):
+            ...
+    
+    Requirements: 1.4, 1.5 - Permission combination logic (AND) with FastAPI integration
+    """
+    from fastapi import Request
+    
+    async def permission_checker(request: Request, current_user = Depends(get_current_user)):
+        user_id = current_user.get("user_id")
+        if not user_id:
+            raise HTTPException(
+                status_code=401, 
+                detail={
+                    "error": "authentication_required",
+                    "message": "User not authenticated"
+                }
+            )
+        
+        # Extract context if context_extractor is provided
+        context = None
+        if context_extractor is not None:
+            try:
+                import inspect
+                if inspect.iscoroutinefunction(context_extractor):
+                    context = await context_extractor(request)
+                else:
+                    context = context_extractor(request)
+            except Exception as e:
+                print(f"Warning: Context extraction failed: {e}")
+                context = None
+        
+        # Track which permissions are satisfied and which are missing
+        satisfied_permissions = []
+        missing_permissions = []
+        
+        # Use enhanced permission checker if context is provided
+        if context is not None:
+            try:
+                from .enhanced_permission_checker import get_enhanced_permission_checker
+                from uuid import UUID
+                
+                enhanced_checker = get_enhanced_permission_checker()
+                user_uuid = UUID(user_id) if isinstance(user_id, str) else user_id
+                
+                # Check each permission individually to track which are missing
+                has_all, satisfied_permissions, missing_permissions = \
+                    await enhanced_checker.check_all_permissions_with_details(
+                        user_uuid, required_permissions, context
+                    )
+            except ImportError:
+                # Fall back to basic check
+                user_permissions = await rbac.get_user_permissions(user_id)
+                for perm in required_permissions:
+                    if perm in user_permissions:
+                        satisfied_permissions.append(perm)
+                    else:
+                        missing_permissions.append(perm)
+                has_all = len(missing_permissions) == 0
+        else:
+            # Use basic permission check without context
+            user_permissions = await rbac.get_user_permissions(user_id)
+            for perm in required_permissions:
+                if perm in user_permissions:
+                    satisfied_permissions.append(perm)
+                else:
+                    missing_permissions.append(perm)
+            has_all = len(missing_permissions) == 0
+        
+        if not has_all:
+            required_names = [perm.value for perm in required_permissions]
+            missing_names = [perm.value for perm in missing_permissions]
+            raise HTTPException(
+                status_code=403, 
+                detail={
+                    "error": "insufficient_permissions",
+                    "message": f"Missing required permissions: {', '.join(missing_names)}",
+                    "required_permissions": required_names,
+                    "missing_permissions": missing_names,
+                    "context": context.model_dump() if context and hasattr(context, 'model_dump') else None
+                }
+            )
+        
+        result = dict(current_user)
+        if context is not None:
+            result["permission_context"] = context
+        return result
+    
+    return permission_checker
+
 
 def require_admin():
     """Dependency to require admin role"""
@@ -405,3 +746,254 @@ def require_admin():
             raise HTTPException(status_code=403, detail="Admin privileges required")
         return current_user
     return admin_checker
+
+
+# =============================================================================
+# Dynamic Permission Evaluation Functions
+# Requirements: 1.4, 1.5, 7.1 - Dynamic permission evaluation based on request context
+# =============================================================================
+
+def create_project_context_extractor():
+    """
+    Create a context extractor for project-scoped endpoints.
+    
+    This factory function creates an async context extractor that extracts
+    project context from request path parameters, query parameters, or headers.
+    
+    Returns:
+        Async function that extracts PermissionContext from Request
+    
+    Example:
+        @app.get("/projects/{project_id}")
+        async def get_project(
+            project_id: str,
+            user = Depends(require_permission(
+                Permission.project_read,
+                create_project_context_extractor()
+            ))
+        ):
+            ...
+    
+    Requirements: 7.1 - Dynamic permission evaluation based on request context
+    """
+    from fastapi import Request
+    
+    async def extractor(request: Request):
+        from .enhanced_rbac_models import PermissionContext
+        from uuid import UUID
+        
+        project_id = None
+        
+        # Try path parameters first
+        if hasattr(request, 'path_params'):
+            project_id_str = request.path_params.get("project_id")
+            if project_id_str:
+                try:
+                    project_id = UUID(project_id_str)
+                except (ValueError, TypeError):
+                    pass
+        
+        # Try query parameters
+        if project_id is None:
+            project_id_str = request.query_params.get("project_id")
+            if project_id_str:
+                try:
+                    project_id = UUID(project_id_str)
+                except (ValueError, TypeError):
+                    pass
+        
+        # Try headers
+        if project_id is None:
+            project_id_str = request.headers.get("x-project-id")
+            if project_id_str:
+                try:
+                    project_id = UUID(project_id_str)
+                except (ValueError, TypeError):
+                    pass
+        
+        return PermissionContext(project_id=project_id)
+    
+    return extractor
+
+
+def create_portfolio_context_extractor():
+    """
+    Create a context extractor for portfolio-scoped endpoints.
+    
+    This factory function creates an async context extractor that extracts
+    portfolio context from request path parameters, query parameters, or headers.
+    
+    Returns:
+        Async function that extracts PermissionContext from Request
+    
+    Example:
+        @app.get("/portfolios/{portfolio_id}")
+        async def get_portfolio(
+            portfolio_id: str,
+            user = Depends(require_permission(
+                Permission.portfolio_read,
+                create_portfolio_context_extractor()
+            ))
+        ):
+            ...
+    
+    Requirements: 7.1 - Dynamic permission evaluation based on request context
+    """
+    from fastapi import Request
+    
+    async def extractor(request: Request):
+        from .enhanced_rbac_models import PermissionContext
+        from uuid import UUID
+        
+        portfolio_id = None
+        
+        # Try path parameters first
+        if hasattr(request, 'path_params'):
+            portfolio_id_str = request.path_params.get("portfolio_id")
+            if portfolio_id_str:
+                try:
+                    portfolio_id = UUID(portfolio_id_str)
+                except (ValueError, TypeError):
+                    pass
+        
+        # Try query parameters
+        if portfolio_id is None:
+            portfolio_id_str = request.query_params.get("portfolio_id")
+            if portfolio_id_str:
+                try:
+                    portfolio_id = UUID(portfolio_id_str)
+                except (ValueError, TypeError):
+                    pass
+        
+        # Try headers
+        if portfolio_id is None:
+            portfolio_id_str = request.headers.get("x-portfolio-id")
+            if portfolio_id_str:
+                try:
+                    portfolio_id = UUID(portfolio_id_str)
+                except (ValueError, TypeError):
+                    pass
+        
+        return PermissionContext(portfolio_id=portfolio_id)
+    
+    return extractor
+
+
+def create_resource_context_extractor():
+    """
+    Create a context extractor for resource-scoped endpoints.
+    
+    This factory function creates an async context extractor that extracts
+    resource context from request path parameters, query parameters, or headers.
+    
+    Returns:
+        Async function that extracts PermissionContext from Request
+    
+    Requirements: 7.1 - Dynamic permission evaluation based on request context
+    """
+    from fastapi import Request
+    
+    async def extractor(request: Request):
+        from .enhanced_rbac_models import PermissionContext
+        from uuid import UUID
+        
+        resource_id = None
+        
+        # Try path parameters first
+        if hasattr(request, 'path_params'):
+            resource_id_str = request.path_params.get("resource_id")
+            if resource_id_str:
+                try:
+                    resource_id = UUID(resource_id_str)
+                except (ValueError, TypeError):
+                    pass
+        
+        # Try query parameters
+        if resource_id is None:
+            resource_id_str = request.query_params.get("resource_id")
+            if resource_id_str:
+                try:
+                    resource_id = UUID(resource_id_str)
+                except (ValueError, TypeError):
+                    pass
+        
+        # Try headers
+        if resource_id is None:
+            resource_id_str = request.headers.get("x-resource-id")
+            if resource_id_str:
+                try:
+                    resource_id = UUID(resource_id_str)
+                except (ValueError, TypeError):
+                    pass
+        
+        return PermissionContext(resource_id=resource_id)
+    
+    return extractor
+
+
+def create_combined_context_extractor():
+    """
+    Create a context extractor that extracts all context types.
+    
+    This factory function creates an async context extractor that extracts
+    project, portfolio, organization, and resource context from the request.
+    
+    Returns:
+        Async function that extracts PermissionContext from Request
+    
+    Requirements: 7.1 - Dynamic permission evaluation based on request context
+    """
+    from fastapi import Request
+    
+    async def extractor(request: Request):
+        from .enhanced_rbac_models import PermissionContext
+        from uuid import UUID
+        
+        def parse_uuid(value):
+            if not value:
+                return None
+            try:
+                return UUID(str(value))
+            except (ValueError, TypeError):
+                return None
+        
+        project_id = None
+        portfolio_id = None
+        organization_id = None
+        resource_id = None
+        
+        # Extract from path parameters
+        if hasattr(request, 'path_params'):
+            project_id = parse_uuid(request.path_params.get("project_id"))
+            portfolio_id = parse_uuid(request.path_params.get("portfolio_id"))
+            organization_id = parse_uuid(request.path_params.get("organization_id"))
+            resource_id = parse_uuid(request.path_params.get("resource_id"))
+        
+        # Extract from query parameters (if not already set)
+        if project_id is None:
+            project_id = parse_uuid(request.query_params.get("project_id"))
+        if portfolio_id is None:
+            portfolio_id = parse_uuid(request.query_params.get("portfolio_id"))
+        if organization_id is None:
+            organization_id = parse_uuid(request.query_params.get("organization_id"))
+        if resource_id is None:
+            resource_id = parse_uuid(request.query_params.get("resource_id"))
+        
+        # Extract from headers (if not already set)
+        if project_id is None:
+            project_id = parse_uuid(request.headers.get("x-project-id"))
+        if portfolio_id is None:
+            portfolio_id = parse_uuid(request.headers.get("x-portfolio-id"))
+        if organization_id is None:
+            organization_id = parse_uuid(request.headers.get("x-organization-id"))
+        if resource_id is None:
+            resource_id = parse_uuid(request.headers.get("x-resource-id"))
+        
+        return PermissionContext(
+            project_id=project_id,
+            portfolio_id=portfolio_id,
+            organization_id=organization_id,
+            resource_id=resource_id
+        )
+    
+    return extractor

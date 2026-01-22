@@ -188,17 +188,25 @@ class ValidationService:
         Returns:
             True if valid numeric value, False otherwise
         """
+        import math
+        
         if budget is None:
             return False
         
         # Check if already a number
         if isinstance(budget, (int, float)):
+            # Reject NaN and infinity values
+            if isinstance(budget, float) and (math.isnan(budget) or math.isinf(budget)):
+                return False
             return True
         
         # Try to convert string to float
         if isinstance(budget, str):
             try:
-                float(budget)
+                parsed = float(budget)
+                # Reject NaN and infinity values
+                if math.isnan(parsed) or math.isinf(parsed):
+                    return False
                 return True
             except ValueError:
                 return False
@@ -210,20 +218,29 @@ class ValidationService:
         date_str: str
     ) -> bool:
         """
-        Validate date is ISO 8601 format (YYYY-MM-DD).
+        Validate date is ISO 8601 extended format (YYYY-MM-DD).
         
         Args:
             date_str: Date string to validate
             
         Returns:
-            True if valid ISO 8601 format, False otherwise
+            True if valid ISO 8601 extended format (YYYY-MM-DD), False otherwise
         """
+        import re
+        
         if not date_str:
             return False
         
+        date_string = str(date_str)
+        
+        # First check the format matches YYYY-MM-DD pattern
+        # This ensures we only accept the extended format, not basic format (YYYYMMDD)
+        if not re.match(r'^\d{4}-\d{2}-\d{2}$', date_string):
+            return False
+        
         try:
-            # Try to parse as ISO 8601 date
-            datetime.fromisoformat(str(date_str))
+            # Then verify it's a valid date (e.g., not 2024-13-45)
+            datetime.fromisoformat(date_string)
             return True
         except (ValueError, TypeError):
             return False

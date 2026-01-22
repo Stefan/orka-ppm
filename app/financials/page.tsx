@@ -6,6 +6,7 @@ import { AlertTriangle } from 'lucide-react'
 import AppLayout from '../../components/shared/AppLayout'
 import { ResponsiveContainer } from '../../components/ui/molecules/ResponsiveContainer'
 import { useTranslations } from '../../lib/i18n/context'
+import FinancialActionButtons from '../../components/financial/FinancialActionButtons'
 
 // Import modular components
 import FinancialHeader from './components/FinancialHeader'
@@ -120,6 +121,14 @@ export default function Financials() {
           onRefresh={refetch}
           showFilters={showFilters}
           onToggleFilters={() => setShowFilters(!showFilters)}
+        />
+
+        {/* Financial Action Buttons with RBAC */}
+        <FinancialActionButtons
+          onImportData={() => setViewMode('csv-import')}
+          onExportReport={exportFinancialData}
+          onEditBudget={() => setViewMode('detailed')}
+          variant="default"
         />
 
         {/* Navigation Tabs */}

@@ -2,6 +2,7 @@ import React from 'react'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { SupabaseAuthProvider } from './providers/SupabaseAuthProvider'
+import { EnhancedAuthProvider } from './providers/EnhancedAuthProvider'
 import { ErrorBoundary } from '../components/shared/ErrorBoundary'
 import { ToastProvider } from '../components/shared/Toast'
 import PerformanceOptimizer from '../components/performance/PerformanceOptimizer'
@@ -111,11 +112,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <PerformanceOptimizer>
           <ErrorBoundary>
             <SupabaseAuthProvider>
-              <I18nProvider>
-                <ToastProvider>
-                  {children}
-                </ToastProvider>
-              </I18nProvider>
+              <EnhancedAuthProvider>
+                <I18nProvider>
+                  <ToastProvider>
+                    {children}
+                  </ToastProvider>
+                </I18nProvider>
+              </EnhancedAuthProvider>
             </SupabaseAuthProvider>
           </ErrorBoundary>
         </PerformanceOptimizer>

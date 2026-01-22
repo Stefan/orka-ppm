@@ -19,7 +19,7 @@ from .distribution_modeler import RiskDistributionModeler
 from .correlation_analyzer import RiskCorrelationAnalyzer
 from .results_analyzer import SimulationResultsAnalyzer
 from .scenario_generator import ScenarioGenerator
-from .visualization import VisualizationGenerator
+from .visualization import VisualizationManager
 
 # Import components that may not be fully implemented yet
 try:
@@ -106,6 +106,10 @@ class MonteCarloSystemIntegrator:
         self._config = config or ConfigurationManager().get_default_config()
         self._performance_metrics = PerformanceMetrics()
         
+        # Initialize system health tracking BEFORE component initialization
+        self._system_health = SystemHealthStatus()
+        self._last_health_check = datetime.now()
+        
         # Initialize core components
         self._initialize_components()
         
@@ -116,10 +120,6 @@ class MonteCarloSystemIntegrator:
         else:
             self._error_handler = None
             self._degradation_manager = None
-        
-        # System health tracking
-        self._system_health = SystemHealthStatus()
-        self._last_health_check = datetime.now()
         
         logger.info("Monte Carlo System Integrator initialized successfully")
     
@@ -134,7 +134,7 @@ class MonteCarloSystemIntegrator:
             self.scenario_generator = ScenarioGenerator()
             
             # Visualization and output components
-            self.visualization_generator = VisualizationGenerator()
+            self.visualization_generator = VisualizationManager()
             
             # Optional components - initialize if available
             if DistributionOutputGenerator:
@@ -152,8 +152,8 @@ class MonteCarloSystemIntegrator:
             else:
                 self.historical_calibrator = None
                 
-            if ContinuousImprovementEngine:
-                self.improvement_engine = ContinuousImprovementEngine()
+            if ContinuousImprovementEngine and self.historical_calibrator:
+                self.improvement_engine = ContinuousImprovementEngine(self.historical_calibrator)
             else:
                 self.improvement_engine = None
                 
@@ -285,7 +285,7 @@ class MonteCarloSystemIntegrator:
             
             # Step 1: Validate inputs
             logger.info("Step 1: Validating simulation parameters")
-            validation_result = self.model_validator.validate_risks(risks)
+            validation_result = self.model_validator.validate_complete_model(risks, correlations)
             if not validation_result.is_valid:
                 workflow_result.validation_errors = validation_result.errors
                 workflow_result.success = False

@@ -52,6 +52,30 @@ export const CardHeader: React.FC<{
 )
 
 /**
+ * Card Title component
+ */
+export const CardTitle: React.FC<{
+  children: React.ReactNode
+  className?: string
+}> = ({ children, className }) => (
+  <h3 className={cn('text-lg font-semibold', className)}>
+    {children}
+  </h3>
+)
+
+/**
+ * Card Description component
+ */
+export const CardDescription: React.FC<{
+  children: React.ReactNode
+  className?: string
+}> = ({ children, className }) => (
+  <p className={cn('text-sm text-muted-foreground', className)}>
+    {children}
+  </p>
+)
+
+/**
  * Card Content component
  */
 export const CardContent: React.FC<{

@@ -2246,9 +2246,56 @@ class RiskForecasterAgent(AIAgentBase):
             Tuple of (fitted_model, confidence_score)
         """
         try:
+            # Check for constant time series
+            if time_series.nunique() <= 1:
+                # Time series is constant - cannot fit ARIMA
+                # Return a simple model that predicts the constant value
+                logger.warning("Time series is constant, using simple constant model")
+                constant_value = time_series.iloc[0] if len(time_series) > 0 else 0
+                pd_module = self.pd  # Capture pandas reference for nested class
+                series_len = len(time_series)
+                
+                # Create a mock model object for constant forecasting
+                class ConstantModel:
+                    def __init__(self, value, pd_ref, ts_len):
+                        self.constant_value = value
+                        self._pd = pd_ref
+                        self.aic = 0  # Perfect fit for constant data
+                        self.resid = pd_ref.Series([0] * ts_len)
+                    
+                    def forecast(self, steps):
+                        return self._pd.Series([self.constant_value] * steps)
+                    
+                    def get_forecast(self, steps):
+                        pd_ref = self._pd
+                        value = self.constant_value
+                        
+                        class ForecastResult:
+                            def __init__(self):
+                                pass
+                            
+                            def summary_frame(self):
+                                df = pd_ref.DataFrame({
+                                    'mean': [value] * steps,
+                                    'mean_ci_lower': [value] * steps,
+                                    'mean_ci_upper': [value] * steps
+                                })
+                                return df
+                        
+                        return ForecastResult()
+                
+                model = ConstantModel(constant_value, pd_module, series_len)
+                confidence = 0.5  # Medium confidence for constant data
+                return model, confidence
+            
             # Test for stationarity
-            adf_result = self.adfuller(time_series.dropna())
-            is_stationary = adf_result[1] < 0.05  # p-value < 0.05 means stationary
+            try:
+                adf_result = self.adfuller(time_series.dropna())
+                is_stationary = adf_result[1] < 0.05  # p-value < 0.05 means stationary
+            except ValueError as e:
+                # Sample size too short for ADF test - treat as non-stationary
+                logger.warning(f"ADF test failed (sample size issue), treating as non-stationary: {e}")
+                is_stationary = False
             
             # Determine d parameter (differencing order)
             d = 0 if is_stationary else 1
@@ -2336,12 +2383,16 @@ class RiskForecasterAgent(AIAgentBase):
                 estimated_impact = 3.0  # Default medium impact
                 estimated_probability = min(1.0, max(0.0, risk_value / 5.0))
                 
+                # Calculate confidence bounds and clamp to [0, 1]
+                confidence_lower_raw = lower_bound / 5.0
+                confidence_upper_raw = upper_bound / 5.0
+                
                 forecasts.append({
                     "period": period_date.strftime("%Y-%m"),
                     "risk_probability": round(estimated_probability, 3),
                     "risk_impact": round(estimated_impact, 1),
-                    "confidence_lower": round(max(0.0, lower_bound / 5.0), 3),
-                    "confidence_upper": round(min(1.0, upper_bound / 5.0), 3)
+                    "confidence_lower": round(max(0.0, min(1.0, confidence_lower_raw)), 3),
+                    "confidence_upper": round(max(0.0, min(1.0, confidence_upper_raw)), 3)
                 })
             
             return forecasts
@@ -2690,6 +2741,778 @@ class HallucinationValidator(AIAgentBase):
         except (ValueError, AttributeError):
             return 0.0
 
+class DataValidatorAgent(AIAgentBase):
+    """Data Validation Agent for detecting inconsistencies and integrity issues"""
+    
+    def __init__(self, supabase_client: Client, openai_api_key: str, base_url: Optional[str] = None):
+        super().__init__(supabase_client, openai_api_key, base_url)
+    
+    async def validate_data(
+        self,
+        organization_id: str,
+        validation_scope: str,
+        user_id: str
+    ) -> Dict[str, Any]:
+        """
+        Validate data and return issues grouped by severity
+        
+        Args:
+            organization_id: Organization ID for filtering
+            validation_scope: "all", "financials", "timelines", or "integrity"
+            user_id: User ID for audit logging
+            
+        Returns:
+            Dict containing validation report with issues grouped by severity
+        """
+        start_time = datetime.now()
+        
+        try:
+            issues = []
+            
+            # Run validations based on scope
+            if validation_scope in ["all", "financials"]:
+                financial_issues = await self._validate_financials(organization_id)
+                issues.extend(financial_issues)
+            
+            if validation_scope in ["all", "timelines"]:
+                timeline_issues = await self._validate_timelines(organization_id)
+                issues.extend(timeline_issues)
+            
+            if validation_scope in ["all", "integrity"]:
+                integrity_issues = await self._validate_integrity(organization_id)
+                issues.extend(integrity_issues)
+            
+            # Group issues by severity
+            critical_issues = [i for i in issues if i["severity"] == "CRITICAL"]
+            high_issues = [i for i in issues if i["severity"] == "HIGH"]
+            medium_issues = [i for i in issues if i["severity"] == "MEDIUM"]
+            low_issues = [i for i in issues if i["severity"] == "LOW"]
+            
+            # Calculate response time
+            response_time = int((datetime.now() - start_time).total_seconds() * 1000)
+            
+            # Prepare result
+            result = {
+                "issues": issues,
+                "total_issues": len(issues),
+                "critical_count": len(critical_issues),
+                "high_count": len(high_issues),
+                "medium_count": len(medium_issues),
+                "low_count": len(low_issues),
+                "validation_scope": validation_scope,
+                "timestamp": datetime.now().isoformat()
+            }
+            
+            # Log operation
+            await self.log_operation(
+                operation_type="data_validation",
+                user_id=user_id,
+                inputs={"organization_id": organization_id, "validation_scope": validation_scope},
+                outputs=result,
+                response_time_ms=response_time,
+                success=True
+            )
+            
+            logger.info(f"Data validation completed: {len(issues)} issues found")
+            return result
+            
+        except Exception as e:
+            response_time = int((datetime.now() - start_time).total_seconds() * 1000)
+            
+            # Log error
+            await self.log_operation(
+                operation_type="data_validation",
+                user_id=user_id,
+                inputs={"organization_id": organization_id, "validation_scope": validation_scope},
+                outputs={},
+                response_time_ms=response_time,
+                success=False,
+                error_message=str(e)
+            )
+            
+            logger.error(f"Data validation failed: {e}")
+            raise
+    
+    async def _validate_financials(self, organization_id: str) -> List[Dict]:
+        """
+        Check for budget overruns and financial inconsistencies
+        
+        Validation rules:
+        - Budget overrun: actual_cost > budget
+        - Negative values: cost < 0 or budget < 0
+        - Missing financials: projects without budget records
+        """
+        issues = []
+        
+        try:
+            # Get all projects for the organization
+            projects_response = self.supabase.table("projects").select(
+                "id, name, budget, status"
+            ).eq("organization_id", organization_id).execute()
+            
+            projects = projects_response.data or []
+            
+            for project in projects:
+                project_id = project["id"]
+                project_name = project["name"]
+                budget = project.get("budget")
+                
+                # Check for negative budget
+                if budget is not None and budget < 0:
+                    issues.append({
+                        "severity": "CRITICAL",
+                        "category": "financial",
+                        "entity_type": "project",
+                        "entity_id": project_id,
+                        "description": f"Project '{project_name}' has negative budget: ${budget}",
+                        "recommendation": "Update budget to a positive value"
+                    })
+                
+                # Check for missing budget
+                if budget is None:
+                    issues.append({
+                        "severity": "MEDIUM",
+                        "category": "financial",
+                        "entity_type": "project",
+                        "entity_id": project_id,
+                        "description": f"Project '{project_name}' has no budget defined",
+                        "recommendation": "Define a budget for this project"
+                    })
+                    continue
+                
+                # Get actual costs for the project
+                financials_response = self.supabase.table("financials").select(
+                    "amount"
+                ).eq("project_id", project_id).execute()
+                
+                financials = financials_response.data or []
+                actual_cost = sum(f.get("amount", 0) for f in financials)
+                
+                # Check for negative costs
+                for financial in financials:
+                    amount = financial.get("amount", 0)
+                    if amount < 0:
+                        issues.append({
+                            "severity": "HIGH",
+                            "category": "financial",
+                            "entity_type": "financial",
+                            "entity_id": financial.get("id", "unknown"),
+                            "description": f"Project '{project_name}' has negative cost entry: ${amount}",
+                            "recommendation": "Correct the negative cost entry"
+                        })
+                
+                # Check for budget overruns
+                if budget > 0 and actual_cost > budget:
+                    overrun_percentage = ((actual_cost - budget) / budget) * 100
+                    
+                    # Assign severity based on overrun percentage
+                    if overrun_percentage > 20:
+                        severity = "HIGH"
+                    elif overrun_percentage > 10:
+                        severity = "MEDIUM"
+                    else:
+                        severity = "LOW"
+                    
+                    issues.append({
+                        "severity": severity,
+                        "category": "financial",
+                        "entity_type": "project",
+                        "entity_id": project_id,
+                        "description": f"Project '{project_name}' is over budget by {overrun_percentage:.1f}% (Budget: ${budget}, Actual: ${actual_cost})",
+                        "recommendation": f"Review project costs and consider budget adjustment"
+                    })
+            
+            logger.info(f"Financial validation found {len(issues)} issues")
+            return issues
+            
+        except Exception as e:
+            logger.error(f"Financial validation failed: {e}")
+            return issues
+    
+    async def _validate_timelines(self, organization_id: str) -> List[Dict]:
+        """
+        Check for schedule conflicts and deadline violations
+        
+        Validation rules:
+        - End before start: end_date < start_date
+        - Overdue projects: end_date < current_date AND status != "completed"
+        - Resource conflicts: same resource allocated to overlapping tasks
+        """
+        issues = []
+        
+        try:
+            current_date = datetime.now().date()
+            
+            # Get all projects for the organization
+            projects_response = self.supabase.table("projects").select(
+                "id, name, start_date, end_date, status"
+            ).eq("organization_id", organization_id).execute()
+            
+            projects = projects_response.data or []
+            
+            for project in projects:
+                project_id = project["id"]
+                project_name = project["name"]
+                start_date_str = project.get("start_date")
+                end_date_str = project.get("end_date")
+                status = project.get("status", "")
+                
+                # Parse dates
+                start_date = None
+                end_date = None
+                
+                if start_date_str:
+                    try:
+                        start_date = datetime.fromisoformat(start_date_str.replace('Z', '+00:00')).date()
+                    except (ValueError, AttributeError):
+                        pass
+                
+                if end_date_str:
+                    try:
+                        end_date = datetime.fromisoformat(end_date_str.replace('Z', '+00:00')).date()
+                    except (ValueError, AttributeError):
+                        pass
+                
+                # Check for end_date < start_date
+                if start_date and end_date and end_date < start_date:
+                    issues.append({
+                        "severity": "CRITICAL",
+                        "category": "timeline",
+                        "entity_type": "project",
+                        "entity_id": project_id,
+                        "description": f"Project '{project_name}' has end date ({end_date}) before start date ({start_date})",
+                        "recommendation": "Correct the project timeline dates"
+                    })
+                
+                # Check for overdue projects
+                if end_date and end_date < current_date and status.lower() != "completed":
+                    days_overdue = (current_date - end_date).days
+                    issues.append({
+                        "severity": "HIGH",
+                        "category": "timeline",
+                        "entity_type": "project",
+                        "entity_id": project_id,
+                        "description": f"Project '{project_name}' is {days_overdue} days overdue (End date: {end_date}, Status: {status})",
+                        "recommendation": "Update project status or extend deadline"
+                    })
+            
+            # Check for resource conflicts (overlapping allocations)
+            allocations_response = self.supabase.table("resource_allocations").select(
+                "id, resource_id, project_id, start_date, end_date, allocation_percentage"
+            ).eq("organization_id", organization_id).execute()
+            
+            allocations = allocations_response.data or []
+            
+            # Group allocations by resource
+            resource_allocations = {}
+            for allocation in allocations:
+                resource_id = allocation.get("resource_id")
+                if resource_id not in resource_allocations:
+                    resource_allocations[resource_id] = []
+                resource_allocations[resource_id].append(allocation)
+            
+            # Check for overlapping allocations
+            for resource_id, allocs in resource_allocations.items():
+                for i, alloc1 in enumerate(allocs):
+                    for alloc2 in allocs[i+1:]:
+                        # Parse dates
+                        try:
+                            start1 = datetime.fromisoformat(alloc1["start_date"].replace('Z', '+00:00')).date()
+                            end1 = datetime.fromisoformat(alloc1["end_date"].replace('Z', '+00:00')).date()
+                            start2 = datetime.fromisoformat(alloc2["start_date"].replace('Z', '+00:00')).date()
+                            end2 = datetime.fromisoformat(alloc2["end_date"].replace('Z', '+00:00')).date()
+                            
+                            # Check for overlap
+                            if start1 <= end2 and start2 <= end1:
+                                total_allocation = alloc1.get("allocation_percentage", 0) + alloc2.get("allocation_percentage", 0)
+                                if total_allocation > 100:
+                                    issues.append({
+                                        "severity": "HIGH",
+                                        "category": "timeline",
+                                        "entity_type": "resource_allocation",
+                                        "entity_id": resource_id,
+                                        "description": f"Resource {resource_id} is over-allocated ({total_allocation}%) during overlapping period",
+                                        "recommendation": "Adjust resource allocation percentages or timelines"
+                                    })
+                        except (ValueError, AttributeError, KeyError):
+                            continue
+            
+            logger.info(f"Timeline validation found {len(issues)} issues")
+            return issues
+            
+        except Exception as e:
+            logger.error(f"Timeline validation failed: {e}")
+            return issues
+    
+    async def _validate_integrity(self, organization_id: str) -> List[Dict]:
+        """
+        Check for data integrity issues
+        
+        Validation rules:
+        - Orphaned records: foreign keys pointing to non-existent records
+        - Missing required fields: NULL values in required fields
+        - Duplicate entries: duplicate unique identifiers
+        """
+        issues = []
+        
+        try:
+            # Check for orphaned project references in financials
+            financials_response = self.supabase.table("financials").select(
+                "id, project_id"
+            ).eq("organization_id", organization_id).execute()
+            
+            financials = financials_response.data or []
+            
+            for financial in financials:
+                project_id = financial.get("project_id")
+                if project_id:
+                    # Check if project exists
+                    project_response = self.supabase.table("projects").select(
+                        "id"
+                    ).eq("id", project_id).execute()
+                    
+                    if not project_response.data:
+                        issues.append({
+                            "severity": "CRITICAL",
+                            "category": "integrity",
+                            "entity_type": "financial",
+                            "entity_id": financial["id"],
+                            "description": f"Financial record references non-existent project {project_id}",
+                            "recommendation": "Remove orphaned financial record or restore project"
+                        })
+            
+            # Check for orphaned resource allocations
+            allocations_response = self.supabase.table("resource_allocations").select(
+                "id, resource_id, project_id"
+            ).eq("organization_id", organization_id).execute()
+            
+            allocations = allocations_response.data or []
+            
+            for allocation in allocations:
+                resource_id = allocation.get("resource_id")
+                project_id = allocation.get("project_id")
+                
+                # Check if resource exists
+                if resource_id:
+                    resource_response = self.supabase.table("resources").select(
+                        "id"
+                    ).eq("id", resource_id).execute()
+                    
+                    if not resource_response.data:
+                        issues.append({
+                            "severity": "CRITICAL",
+                            "category": "integrity",
+                            "entity_type": "resource_allocation",
+                            "entity_id": allocation["id"],
+                            "description": f"Resource allocation references non-existent resource {resource_id}",
+                            "recommendation": "Remove orphaned allocation or restore resource"
+                        })
+                
+                # Check if project exists
+                if project_id:
+                    project_response = self.supabase.table("projects").select(
+                        "id"
+                    ).eq("id", project_id).execute()
+                    
+                    if not project_response.data:
+                        issues.append({
+                            "severity": "CRITICAL",
+                            "category": "integrity",
+                            "entity_type": "resource_allocation",
+                            "entity_id": allocation["id"],
+                            "description": f"Resource allocation references non-existent project {project_id}",
+                            "recommendation": "Remove orphaned allocation or restore project"
+                        })
+            
+            # Check for missing required fields in projects
+            projects_response = self.supabase.table("projects").select(
+                "id, name, start_date, end_date"
+            ).eq("organization_id", organization_id).execute()
+            
+            projects = projects_response.data or []
+            
+            for project in projects:
+                project_id = project["id"]
+                project_name = project.get("name")
+                
+                if not project_name:
+                    issues.append({
+                        "severity": "HIGH",
+                        "category": "integrity",
+                        "entity_type": "project",
+                        "entity_id": project_id,
+                        "description": f"Project {project_id} is missing required field: name",
+                        "recommendation": "Add a name to the project"
+                    })
+                
+                if not project.get("start_date"):
+                    issues.append({
+                        "severity": "MEDIUM",
+                        "category": "integrity",
+                        "entity_type": "project",
+                        "entity_id": project_id,
+                        "description": f"Project '{project_name or project_id}' is missing required field: start_date",
+                        "recommendation": "Add a start date to the project"
+                    })
+                
+                if not project.get("end_date"):
+                    issues.append({
+                        "severity": "MEDIUM",
+                        "category": "integrity",
+                        "entity_type": "project",
+                        "entity_id": project_id,
+                        "description": f"Project '{project_name or project_id}' is missing required field: end_date",
+                        "recommendation": "Add an end date to the project"
+                    })
+            
+            # Check for duplicate project names within organization
+            project_names = {}
+            for project in projects:
+                name = project.get("name")
+                if name:
+                    if name in project_names:
+                        issues.append({
+                            "severity": "LOW",
+                            "category": "integrity",
+                            "entity_type": "project",
+                            "entity_id": project["id"],
+                            "description": f"Duplicate project name found: '{name}' (also used by project {project_names[name]})",
+                            "recommendation": "Consider using unique project names for clarity"
+                        })
+                    else:
+                        project_names[name] = project["id"]
+            
+            logger.info(f"Integrity validation found {len(issues)} issues")
+            return issues
+            
+        except Exception as e:
+            logger.error(f"Integrity validation failed: {e}")
+            return issues
+
+
+class AnomalyDetectorAgent(AIAgentBase):
+    """Anomaly Detection Agent using Isolation Forest for audit log analysis"""
+    
+    def __init__(self, supabase_client: Client, openai_api_key: str, base_url: Optional[str] = None):
+        super().__init__(supabase_client, openai_api_key, base_url)
+        self.contamination = 0.1  # Expected anomaly rate (10%)
+        self.n_estimators = 100  # Number of trees in Isolation Forest
+    
+    async def detect_anomalies(
+        self,
+        organization_id: str,
+        time_range_days: int = 30,
+        user_id: str = None
+    ) -> Dict[str, Any]:
+        """
+        Detect anomalies in audit logs using Isolation Forest
+        
+        Args:
+            organization_id: Organization to analyze
+            time_range_days: Number of days to look back (default 30)
+            user_id: User making the request (for logging)
+        
+        Returns:
+            Dict containing anomalies, total logs analyzed, and anomaly count
+        """
+        start_time = datetime.now()
+        
+        try:
+            # Retrieve audit logs filtered by organization and time range
+            cutoff_date = datetime.now() - timedelta(days=time_range_days)
+            
+            audit_logs_response = self.supabase.table("audit_logs").select(
+                "id, user_id, action, entity_type, entity_id, details, success, created_at"
+            ).eq(
+                "organization_id", organization_id
+            ).gte(
+                "created_at", cutoff_date.isoformat()
+            ).order(
+                "created_at", desc=False
+            ).execute()
+            
+            audit_logs = audit_logs_response.data or []
+            
+            if len(audit_logs) < 10:
+                # Insufficient data for anomaly detection
+                response_time = int((datetime.now() - start_time).total_seconds() * 1000)
+                
+                await self.log_operation(
+                    operation_type="anomaly_detection",
+                    user_id=user_id or "system",
+                    inputs={"organization_id": organization_id, "time_range_days": time_range_days},
+                    outputs={"message": "Insufficient data"},
+                    response_time_ms=response_time,
+                    success=True
+                )
+                
+                return {
+                    "anomalies": [],
+                    "total_logs_analyzed": len(audit_logs),
+                    "anomaly_count": 0,
+                    "message": "Insufficient data for anomaly detection (minimum 10 logs required)"
+                }
+            
+            # Extract features for anomaly detection
+            features_df = self._prepare_features(audit_logs)
+            
+            # Train Isolation Forest model
+            model = self._train_isolation_forest(features_df)
+            
+            # Score and rank anomalies
+            anomalies = self._score_anomalies(model, features_df, audit_logs)
+            
+            # Calculate metrics
+            response_time = int((datetime.now() - start_time).total_seconds() * 1000)
+            
+            # Log detection request
+            await self.log_operation(
+                operation_type="anomaly_detection",
+                user_id=user_id or "system",
+                inputs={
+                    "organization_id": organization_id,
+                    "time_range_days": time_range_days,
+                    "total_logs": len(audit_logs)
+                },
+                outputs={
+                    "anomaly_count": len(anomalies),
+                    "anomalies": [a["log_id"] for a in anomalies[:10]]  # Log first 10
+                },
+                response_time_ms=response_time,
+                success=True,
+                confidence_score=self._calculate_detection_confidence(anomalies, len(audit_logs))
+            )
+            
+            return {
+                "anomalies": anomalies,
+                "total_logs_analyzed": len(audit_logs),
+                "anomaly_count": len(anomalies),
+                "detection_confidence": self._calculate_detection_confidence(anomalies, len(audit_logs))
+            }
+            
+        except Exception as e:
+            response_time = int((datetime.now() - start_time).total_seconds() * 1000)
+            
+            # Log error
+            await self.log_operation(
+                operation_type="anomaly_detection",
+                user_id=user_id or "system",
+                inputs={"organization_id": organization_id, "time_range_days": time_range_days},
+                outputs={},
+                response_time_ms=response_time,
+                success=False,
+                error_message=str(e)
+            )
+            
+            logger.error(f"Anomaly detection failed: {e}")
+            raise
+    
+    def _prepare_features(self, audit_logs: List[Dict]) -> 'pd.DataFrame':
+        """
+        Extract features for anomaly detection
+        
+        Features:
+        - hour_of_day: Hour when action occurred (0-23)
+        - day_of_week: Day of week (0-6, Monday=0)
+        - action_frequency: Count of action type in last hour
+        - user_action_diversity: Unique actions by user in last hour
+        - time_since_last_action: Seconds since user's last action
+        - data_volume: Size of data accessed (estimated from details)
+        """
+        import pandas as pd
+        
+        # Convert to DataFrame for easier manipulation
+        df = pd.DataFrame(audit_logs)
+        df['created_at'] = pd.to_datetime(df['created_at'])
+        
+        # Extract time-based features
+        df['hour_of_day'] = df['created_at'].dt.hour
+        df['day_of_week'] = df['created_at'].dt.dayofweek
+        
+        # Calculate action frequency (actions per hour)
+        df['action_frequency'] = df.groupby(['action', pd.Grouper(key='created_at', freq='1H')])['id'].transform('count')
+        
+        # Calculate user action diversity (unique actions per user per hour)
+        df['user_action_diversity'] = df.groupby(['user_id', pd.Grouper(key='created_at', freq='1H')])['action'].transform('nunique')
+        
+        # Calculate time since last action for each user
+        df = df.sort_values(['user_id', 'created_at'])
+        df['time_since_last_action'] = df.groupby('user_id')['created_at'].diff().dt.total_seconds().fillna(0)
+        
+        # Calculate data volume (estimate from details JSON size)
+        df['data_volume'] = df['details'].apply(lambda x: len(str(x)) if x else 0)
+        
+        # Add failed attempts count (failed actions in last hour)
+        df['failed_attempts'] = df[df['success'] == False].groupby(
+            ['user_id', pd.Grouper(key='created_at', freq='1H')]
+        )['id'].transform('count').fillna(0)
+        
+        # Select feature columns
+        feature_columns = [
+            'hour_of_day',
+            'day_of_week',
+            'action_frequency',
+            'user_action_diversity',
+            'time_since_last_action',
+            'data_volume',
+            'failed_attempts'
+        ]
+        
+        features_df = df[feature_columns].fillna(0)
+        
+        logger.info(f"Prepared {len(features_df)} feature vectors with {len(feature_columns)} features")
+        
+        return features_df
+    
+    def _train_isolation_forest(self, features: 'pd.DataFrame') -> 'IsolationForest':
+        """
+        Train Isolation Forest model
+        
+        Configuration:
+        - n_estimators: 100 trees
+        - contamination: 0.1 (expect 10% anomalies)
+        - max_samples: 256
+        - random_state: 42 for reproducibility
+        """
+        from sklearn.ensemble import IsolationForest
+        
+        model = IsolationForest(
+            n_estimators=self.n_estimators,
+            contamination=self.contamination,
+            max_samples=min(256, len(features)),
+            random_state=42,
+            n_jobs=-1  # Use all available cores
+        )
+        
+        model.fit(features)
+        
+        logger.info(f"Trained Isolation Forest with {self.n_estimators} estimators")
+        
+        return model
+    
+    def _score_anomalies(
+        self,
+        model: 'IsolationForest',
+        features: 'pd.DataFrame',
+        audit_logs: List[Dict]
+    ) -> List[Dict]:
+        """
+        Score and rank anomalies
+        
+        Returns list of anomalies with confidence scores, sorted by confidence descending
+        """
+        import pandas as pd
+        
+        # Get anomaly predictions (-1 for anomaly, 1 for normal)
+        predictions = model.predict(features)
+        
+        # Get anomaly scores (lower = more anomalous)
+        scores = model.score_samples(features)
+        
+        # Convert scores to confidence values (0.0-1.0, higher = more anomalous)
+        # Normalize scores to 0-1 range
+        min_score = scores.min()
+        max_score = scores.max()
+        
+        if max_score - min_score > 0:
+            normalized_scores = (scores - min_score) / (max_score - min_score)
+            # Invert so that lower scores (more anomalous) get higher confidence
+            confidence_scores = 1.0 - normalized_scores
+        else:
+            confidence_scores = np.zeros(len(scores))
+        
+        # Build anomaly results
+        anomalies = []
+        
+        for i, (prediction, confidence) in enumerate(zip(predictions, confidence_scores)):
+            if prediction == -1:  # Anomaly detected
+                log = audit_logs[i]
+                
+                # Determine reason based on feature values
+                feature_row = features.iloc[i]
+                reasons = []
+                
+                if feature_row['hour_of_day'] < 6 or feature_row['hour_of_day'] > 22:
+                    reasons.append("Unusual time of day")
+                
+                if feature_row['action_frequency'] > features['action_frequency'].quantile(0.95):
+                    reasons.append("High action frequency")
+                
+                if feature_row['user_action_diversity'] > features['user_action_diversity'].quantile(0.95):
+                    reasons.append("High action diversity")
+                
+                if feature_row['time_since_last_action'] < 1:
+                    reasons.append("Rapid successive actions")
+                
+                if feature_row['data_volume'] > features['data_volume'].quantile(0.95):
+                    reasons.append("Large data volume accessed")
+                
+                if feature_row['failed_attempts'] > 0:
+                    reasons.append("Failed action attempts")
+                
+                if not reasons:
+                    reasons.append("Unusual pattern detected")
+                
+                # Get user name if available
+                user_name = log.get('user_id', 'Unknown')
+                
+                anomalies.append({
+                    "log_id": log["id"],
+                    "timestamp": log["created_at"],
+                    "user_id": log["user_id"],
+                    "user_name": user_name,
+                    "action": log["action"],
+                    "confidence": float(confidence),
+                    "reason": ", ".join(reasons),
+                    "details": log.get("details", {})
+                })
+        
+        # Sort by confidence descending
+        anomalies.sort(key=lambda x: x["confidence"], reverse=True)
+        
+        logger.info(f"Detected {len(anomalies)} anomalies")
+        
+        return anomalies
+    
+    def _calculate_detection_confidence(self, anomalies: List[Dict], total_logs: int) -> float:
+        """
+        Calculate overall confidence in the anomaly detection
+        
+        Based on:
+        - Number of logs analyzed
+        - Anomaly rate compared to expected contamination
+        - Average confidence of detected anomalies
+        """
+        if total_logs < 10:
+            return 0.0
+        
+        # Data volume factor (more data = higher confidence)
+        data_volume_factor = min(total_logs / 100, 1.0)
+        
+        # Anomaly rate factor (closer to expected contamination = higher confidence)
+        if total_logs > 0:
+            anomaly_rate = len(anomalies) / total_logs
+            rate_diff = abs(anomaly_rate - self.contamination)
+            rate_factor = max(0, 1.0 - (rate_diff * 5))  # Penalize large deviations
+        else:
+            rate_factor = 0.0
+        
+        # Average anomaly confidence
+        if anomalies:
+            avg_anomaly_confidence = sum(a["confidence"] for a in anomalies) / len(anomalies)
+        else:
+            avg_anomaly_confidence = 0.5
+        
+        # Combine factors
+        overall_confidence = (
+            data_volume_factor * 0.3 +
+            rate_factor * 0.3 +
+            avg_anomaly_confidence * 0.4
+        )
+        
+        return min(max(overall_confidence, 0.0), 1.0)
+
+
 # Factory function to create AI agents
 def create_ai_agents(supabase_client: Client, openai_api_key: str, base_url: Optional[str] = None) -> Dict[str, AIAgentBase]:
     """Create all AI agents with optional custom base URL for OpenAI-compatible APIs (e.g., Grok)"""
@@ -2697,5 +3520,367 @@ def create_ai_agents(supabase_client: Client, openai_api_key: str, base_url: Opt
         "rag_reporter": RAGReporterAgent(supabase_client, openai_api_key, base_url),
         "resource_optimizer": ResourceOptimizerAgent(supabase_client, openai_api_key, base_url),
         "risk_forecaster": RiskForecasterAgent(supabase_client, openai_api_key, base_url),
-        "hallucination_validator": HallucinationValidator(supabase_client, openai_api_key, base_url)
+        "hallucination_validator": HallucinationValidator(supabase_client, openai_api_key, base_url),
+        "data_validator": DataValidatorAgent(supabase_client, openai_api_key, base_url),
+        "anomaly_detector": AnomalyDetectorAgent(supabase_client, openai_api_key, base_url)
     }
+
+
+
+class AuditSearchAgent(AIAgentBase):
+    """
+    Audit Search Agent for semantic search over audit logs using RAG
+    
+    Enables natural language search over audit logs using vector embeddings
+    and semantic similarity search with pgvector.
+    
+    Requirements: 14.1, 14.2, 14.3, 14.4, 14.5
+    """
+    
+    def __init__(self, supabase_client: Client, openai_api_key: str, base_url: Optional[str] = None):
+        """
+        Initialize Audit Search Agent
+        
+        Args:
+            supabase_client: Supabase client for database operations
+            openai_api_key: OpenAI API key for embeddings
+            base_url: Optional custom base URL for OpenAI-compatible APIs
+        """
+        super().__init__(supabase_client, openai_api_key, base_url)
+        self.embedding_model = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-ada-002")
+        self.embedding_dimension = 1536  # OpenAI ada-002 dimension
+        
+        logger.info(f"AuditSearchAgent initialized with embedding model: {self.embedding_model}")
+    
+    async def search_audit_logs(
+        self,
+        query: str,
+        organization_id: str,
+        user_id: str,
+        limit: int = 50,
+        filters: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """
+        Search audit logs using natural language query with RAG
+        
+        Args:
+            query: Natural language search query
+            organization_id: Organization ID for filtering
+            user_id: User making the request (for logging)
+            limit: Maximum number of results (default 50, max 100)
+            filters: Optional filters (date_range, event_types, etc.)
+        
+        Returns:
+            Dict containing search results with relevance scores and highlights
+            
+        Requirements: 14.1, 14.2, 14.3, 14.4, 14.5
+        """
+        start_time = datetime.now()
+        
+        try:
+            # Validate inputs
+            if not query or len(query.strip()) == 0:
+                raise ValueError("Query cannot be empty")
+            
+            if limit > 100:
+                limit = 100  # Cap at 100 results
+            
+            # Generate embedding for query
+            query_embedding = await self._generate_embedding(query)
+            
+            # Perform semantic search
+            results = await self._semantic_search(
+                query_embedding,
+                organization_id,
+                limit,
+                filters
+            )
+            
+            # Rank results by relevance
+            ranked_results = self._rank_results(query, results)
+            
+            # Highlight relevant sections
+            highlighted_results = self._highlight_results(query, ranked_results)
+            
+            # Calculate metrics
+            response_time = int((datetime.now() - start_time).total_seconds() * 1000)
+            
+            # Log search query to audit_logs
+            await self._log_search_query(
+                query=query,
+                organization_id=organization_id,
+                user_id=user_id,
+                result_count=len(highlighted_results),
+                response_time_ms=response_time
+            )
+            
+            # Log operation
+            await self.log_operation(
+                operation_type="audit_search",
+                user_id=user_id,
+                inputs={
+                    "query": query,
+                    "organization_id": organization_id,
+                    "limit": limit,
+                    "filters": filters
+                },
+                outputs={
+                    "result_count": len(highlighted_results),
+                    "top_relevance_score": highlighted_results[0]["relevance_score"] if highlighted_results else 0.0
+                },
+                response_time_ms=response_time,
+                success=True
+            )
+            
+            return {
+                "results": highlighted_results,
+                "total_results": len(highlighted_results),
+                "query": query,
+                "search_time_ms": response_time
+            }
+            
+        except Exception as e:
+            response_time = int((datetime.now() - start_time).total_seconds() * 1000)
+            
+            # Log error
+            await self.log_operation(
+                operation_type="audit_search",
+                user_id=user_id,
+                inputs={"query": query, "organization_id": organization_id},
+                outputs={},
+                response_time_ms=response_time,
+                success=False,
+                error_message=str(e)
+            )
+            
+            logger.error(f"Audit search failed: {e}")
+            raise
+    
+    async def _generate_embedding(self, text: str) -> List[float]:
+        """
+        Generate embedding for text using OpenAI
+        
+        Args:
+            text: Text to generate embedding for
+            
+        Returns:
+            List of floats representing the embedding vector
+            
+        Raises:
+            Exception: If embedding generation fails
+        """
+        try:
+            response = self.openai_client.embeddings.create(
+                model=self.embedding_model,
+                input=text
+            )
+            
+            embedding = response.data[0].embedding
+            
+            # Validate embedding dimension
+            if len(embedding) != self.embedding_dimension:
+                raise ValueError(
+                    f"Expected embedding dimension {self.embedding_dimension}, got {len(embedding)}"
+                )
+            
+            logger.debug(f"Generated embedding for text of length {len(text)}")
+            return embedding
+            
+        except Exception as e:
+            logger.error(f"Embedding generation failed: {e}")
+            raise
+    
+    async def _semantic_search(
+        self,
+        query_embedding: List[float],
+        organization_id: str,
+        limit: int,
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Perform semantic search on audit logs using vector similarity
+        
+        Args:
+            query_embedding: Query embedding vector
+            organization_id: Organization ID for filtering
+            limit: Maximum number of results
+            filters: Optional filters
+            
+        Returns:
+            List of matching audit log entries
+            
+        Requirements: 14.2
+        """
+        try:
+            # Build filter parameters
+            event_types = filters.get("event_types") if filters else None
+            start_date = filters.get("start_date") if filters else None
+            end_date = filters.get("end_date") if filters else None
+            similarity_threshold = filters.get("similarity_threshold", 0.0) if filters else 0.0
+            
+            # Call the search_audit_logs_semantic RPC function
+            # This function was created in migration 028
+            result = self.supabase.rpc(
+                'search_audit_logs_semantic',
+                {
+                    'query_embedding': query_embedding,
+                    'p_tenant_id': organization_id,
+                    'event_types': event_types,
+                    'start_date': start_date.isoformat() if start_date else None,
+                    'end_date': end_date.isoformat() if end_date else None,
+                    'similarity_limit': limit,
+                    'similarity_threshold': similarity_threshold
+                }
+            ).execute()
+            
+            results = result.data or []
+            
+            logger.info(f"Semantic search returned {len(results)} results")
+            return results
+            
+        except Exception as e:
+            logger.error(f"Semantic search failed: {e}")
+            # Return empty list on error
+            return []
+    
+    def _rank_results(self, query: str, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Rank results by relevance (cosine similarity)
+        
+        Results are already ranked by the database query, but we add
+        additional relevance scoring based on query terms.
+        
+        Args:
+            query: Original search query
+            results: Search results from database
+            
+        Returns:
+            Ranked results with relevance scores
+            
+        Requirements: 14.3
+        """
+        # Results are already sorted by similarity_score from the database
+        # We just need to ensure they're in descending order
+        ranked = sorted(
+            results,
+            key=lambda x: x.get('similarity_score', 0.0),
+            reverse=True
+        )
+        
+        # Add relevance_score field (same as similarity_score for consistency)
+        for result in ranked:
+            result['relevance_score'] = result.get('similarity_score', 0.0)
+        
+        logger.debug(f"Ranked {len(ranked)} results by relevance")
+        return ranked
+    
+    def _highlight_results(self, query: str, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Highlight relevant sections in search results
+        
+        Args:
+            query: Original search query
+            results: Ranked search results
+            
+        Returns:
+            Results with highlighted_text field
+            
+        Requirements: 14.4
+        """
+        query_terms = set(query.lower().split())
+        
+        for result in results:
+            # Build text to highlight from various fields
+            text_parts = []
+            
+            # Add event type
+            if result.get('event_type'):
+                text_parts.append(f"Event: {result['event_type']}")
+            
+            # Add entity info
+            if result.get('entity_type'):
+                entity_text = f"Entity: {result['entity_type']}"
+                if result.get('entity_id'):
+                    entity_text += f" ({result['entity_id']})"
+                text_parts.append(entity_text)
+            
+            # Add action details
+            if result.get('action_details'):
+                details = result['action_details']
+                if isinstance(details, dict):
+                    # Extract key-value pairs
+                    details_text = ", ".join([f"{k}: {v}" for k, v in details.items()])
+                    text_parts.append(f"Details: {details_text}")
+                else:
+                    text_parts.append(f"Details: {str(details)}")
+            
+            # Add severity and category
+            if result.get('severity'):
+                text_parts.append(f"Severity: {result['severity']}")
+            
+            if result.get('category'):
+                text_parts.append(f"Category: {result['category']}")
+            
+            # Add risk level
+            if result.get('risk_level'):
+                text_parts.append(f"Risk: {result['risk_level']}")
+            
+            # Add tags
+            if result.get('tags'):
+                tags = result['tags']
+                if isinstance(tags, dict):
+                    tags_text = ", ".join([str(v) for v in tags.values()])
+                    text_parts.append(f"Tags: {tags_text}")
+            
+            # Combine all text
+            full_text = ". ".join(text_parts)
+            
+            # Simple highlighting: wrap matching terms in **bold**
+            highlighted_text = full_text
+            for term in query_terms:
+                if len(term) > 2:  # Only highlight terms longer than 2 chars
+                    # Case-insensitive replacement
+                    import re
+                    pattern = re.compile(re.escape(term), re.IGNORECASE)
+                    highlighted_text = pattern.sub(f"**{term}**", highlighted_text)
+            
+            result['highlighted_text'] = highlighted_text
+        
+        logger.debug(f"Highlighted {len(results)} results")
+        return results
+    
+    async def _log_search_query(
+        self,
+        query: str,
+        organization_id: str,
+        user_id: str,
+        result_count: int,
+        response_time_ms: int
+    ):
+        """
+        Log search query to audit_logs for audit trail
+        
+        Requirements: 14.5
+        """
+        try:
+            self.supabase.table("audit_logs").insert({
+                "organization_id": organization_id,
+                "user_id": user_id,
+                "action": "audit_search",
+                "entity_type": "audit_logs",
+                "entity_id": None,
+                "details": {
+                    "query": query,
+                    "result_count": result_count,
+                    "response_time_ms": response_time_ms
+                },
+                "success": True,
+                "created_at": datetime.now().isoformat()
+            }).execute()
+            
+            logger.debug(f"Logged search query for user {user_id}")
+            
+        except Exception as e:
+            logger.warning(f"Failed to log search query: {e}")
+            # Don't raise - logging failure shouldn't break search
+

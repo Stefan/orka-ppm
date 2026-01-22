@@ -16,31 +16,40 @@ from datetime import datetime
 
 from .models import RiskCategory, ImpactType, DistributionType
 
+# Import enhanced error handling
+from .error_handling import (
+    ValidationError as MCValidationError,
+    MonteCarloError,
+    ExternalSystemError as MCExternalSystemError,
+    create_user_friendly_message
+)
+
 # Configure logging
 logger = logging.getLogger(__name__)
 
-class ValidationError(Exception):
-    """Custom validation error for Monte Carlo API."""
+# Legacy exception classes for backward compatibility
+class ValidationError(MCValidationError):
+    """Custom validation error for Monte Carlo API (legacy compatibility)."""
     def __init__(self, message: str, field: str = None, code: str = None):
-        self.message = message
-        self.field = field
+        super().__init__(message, field=field)
         self.code = code
-        super().__init__(self.message)
 
-class BusinessLogicError(Exception):
+class BusinessLogicError(MonteCarloError):
     """Custom business logic error for Monte Carlo API."""
     def __init__(self, message: str, code: str = None):
-        self.message = message
+        from .error_handling import ErrorCategory, ErrorSeverity
+        super().__init__(
+            message,
+            category=ErrorCategory.BUSINESS_LOGIC,
+            severity=ErrorSeverity.MEDIUM,
+            recoverable=True
+        )
         self.code = code
-        super().__init__(self.message)
 
-class ExternalSystemError(Exception):
-    """Custom error for external system failures."""
+class ExternalSystemError(MCExternalSystemError):
+    """Custom error for external system failures (legacy compatibility)."""
     def __init__(self, message: str, system: str = None, recoverable: bool = True):
-        self.message = message
-        self.system = system
-        self.recoverable = recoverable
-        super().__init__(self.message)
+        super().__init__(message, system=system, recoverable=recoverable)
 
 """
 API Validation and Error Handling for Monte Carlo Risk Simulations.
@@ -331,49 +340,80 @@ class APIErrorHandler:
     """Centralized error handling for Monte Carlo API."""
     
     @staticmethod
-    def format_validation_error(error: ValidationError) -> Dict[str, Any]:
+    def format_validation_error(error: Union[ValidationError, MCValidationError]) -> Dict[str, Any]:
         """Format validation error for API response."""
-        return {
-            "error_type": "validation_error",
-            "message": error.message,
-            "field": error.field,
-            "code": error.code or "VALIDATION_FAILED",
-            "timestamp": datetime.now().isoformat(),
-            "recoverable": True
-        }
+        if isinstance(error, MCValidationError):
+            return {
+                "error_type": "validation_error",
+                "message": error.get_user_message(),
+                "field": error.field if hasattr(error, 'field') else None,
+                "code": error.code if hasattr(error, 'code') else "VALIDATION_FAILED",
+                "timestamp": datetime.now().isoformat(),
+                "recoverable": error.recoverable,
+                "severity": error.severity.value if hasattr(error, 'severity') else "low",
+                "context": error.context if hasattr(error, 'context') else {}
+            }
+        else:
+            # Legacy format
+            return {
+                "error_type": "validation_error",
+                "message": error.message,
+                "field": error.field,
+                "code": error.code or "VALIDATION_FAILED",
+                "timestamp": datetime.now().isoformat(),
+                "recoverable": True
+            }
     
     @staticmethod
     def format_business_logic_error(error: BusinessLogicError) -> Dict[str, Any]:
         """Format business logic error for API response."""
         return {
             "error_type": "business_logic_error",
-            "message": error.message,
+            "message": error.get_user_message() if hasattr(error, 'get_user_message') else error.message,
             "code": error.code or "BUSINESS_LOGIC_FAILED",
             "timestamp": datetime.now().isoformat(),
-            "recoverable": True
+            "recoverable": error.recoverable if hasattr(error, 'recoverable') else True,
+            "severity": error.severity.value if hasattr(error, 'severity') else "medium",
+            "context": error.context if hasattr(error, 'context') else {}
         }
     
     @staticmethod
-    def format_external_system_error(error: ExternalSystemError) -> Dict[str, Any]:
+    def format_external_system_error(error: Union[ExternalSystemError, MCExternalSystemError]) -> Dict[str, Any]:
         """Format external system error for API response."""
         return {
             "error_type": "external_system_error",
-            "message": error.message,
+            "message": error.get_user_message() if hasattr(error, 'get_user_message') else error.message,
             "system": error.system,
             "recoverable": error.recoverable,
             "timestamp": datetime.now().isoformat(),
-            "retry_recommended": error.recoverable
+            "retry_recommended": error.recoverable,
+            "severity": error.severity.value if hasattr(error, 'severity') else "medium",
+            "context": error.context if hasattr(error, 'context') else {}
         }
     
     @staticmethod
     def format_generic_error(error: Exception, error_type: str = "internal_error") -> Dict[str, Any]:
         """Format generic error for API response."""
-        return {
-            "error_type": error_type,
-            "message": str(error),
-            "timestamp": datetime.now().isoformat(),
-            "recoverable": False
-        }
+        # Use enhanced error handling if available
+        if isinstance(error, MonteCarloError):
+            return {
+                "error_type": error_type,
+                "message": error.get_user_message(),
+                "timestamp": datetime.now().isoformat(),
+                "recoverable": error.recoverable,
+                "severity": error.severity.value,
+                "category": error.category.value,
+                "context": error.context
+            }
+        else:
+            # Fallback to basic format
+            user_message = create_user_friendly_message(error)
+            return {
+                "error_type": error_type,
+                "message": user_message,
+                "timestamp": datetime.now().isoformat(),
+                "recoverable": False
+            }
 
 class GracefulDegradationManager:
     """Manages graceful degradation strategies for external system failures."""
@@ -568,15 +608,29 @@ def handle_api_exception(exception: Exception) -> tuple[int, Dict[str, Any]]:
     """Handle API exceptions and return appropriate HTTP status and response."""
     error_handler = APIErrorHandler()
     
-    if isinstance(exception, ValidationError):
+    # Handle Monte Carlo specific errors
+    if isinstance(exception, (ValidationError, MCValidationError)):
         return 400, error_handler.format_validation_error(exception)
     elif isinstance(exception, BusinessLogicError):
         return 422, error_handler.format_business_logic_error(exception)
-    elif isinstance(exception, ExternalSystemError):
+    elif isinstance(exception, (ExternalSystemError, MCExternalSystemError)):
         status_code = 503 if not exception.recoverable else 502
         return status_code, error_handler.format_external_system_error(exception)
+    elif isinstance(exception, MonteCarloError):
+        # Handle other Monte Carlo errors
+        from .error_handling import ComputationError, ResourceError, ConfigurationError
+        
+        if isinstance(exception, ComputationError):
+            return 500, error_handler.format_generic_error(exception, "computation_error")
+        elif isinstance(exception, ResourceError):
+            return 507, error_handler.format_generic_error(exception, "resource_error")
+        elif isinstance(exception, ConfigurationError):
+            return 500, error_handler.format_generic_error(exception, "configuration_error")
+        else:
+            return 500, error_handler.format_generic_error(exception, "monte_carlo_error")
     else:
         return 500, error_handler.format_generic_error(exception)
+
 
 def create_user_friendly_error_message(error: Dict[str, Any]) -> str:
     """Create user-friendly error messages from technical errors."""
@@ -596,5 +650,18 @@ def create_user_friendly_error_message(error: Dict[str, Any]) -> str:
         else:
             return f"Service unavailable: {system}. Please contact support."
     
+    elif error_type == "computation_error":
+        return f"Calculation error: {error.get('message', 'Please check your input parameters')}"
+    
+    elif error_type == "resource_error":
+        return f"System resources insufficient: {error.get('message', 'Please reduce complexity or try again later')}"
+    
+    elif error_type == "configuration_error":
+        return f"Configuration error: {error.get('message', 'Please contact system administrator')}"
+    
     else:
-        return "An unexpected error occurred. Please contact support if the problem persists."
+        # Use enhanced error message creation if available
+        message = error.get('message', 'An unexpected error occurred')
+        if len(message) > 200:
+            message = message[:197] + "..."
+        return message

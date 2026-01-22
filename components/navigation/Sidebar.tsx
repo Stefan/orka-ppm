@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation'
 import { LogOut, Activity, MessageSquare, X, Users, BarChart3 } from 'lucide-react'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
 import { GlobalLanguageSelector } from './GlobalLanguageSelector'
+import { usePermissions } from '@/hooks/usePermissions'
+import PermissionGuard from '../auth/PermissionGuard'
 
 export interface SidebarProps {
   isOpen?: boolean
@@ -16,6 +18,7 @@ export interface SidebarProps {
 export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: SidebarProps) {
   const router = useRouter()
   const { clearSession } = useAuth()
+  const { hasPermission } = usePermissions()
   const sidebarRef = useRef<HTMLElement>(null)
 
   const handleLogout = async () => {
@@ -85,67 +88,79 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
                 What-If Scenarios
               </Link>
             </li>
-            <li>
-              <Link 
-                href="/resources" 
-                prefetch={true}
-                className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
-                onClick={handleLinkClick}
-              >
-                Resource Management
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/reports" 
-                prefetch={true}
-                className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
-                onClick={handleLinkClick}
-              >
-                AI Reports & Analytics
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/financials" 
-                prefetch={true}
-                className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
-                onClick={handleLinkClick}
-              >
-                Financial Tracking
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/risks" 
-                prefetch={true}
-                className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
-                onClick={handleLinkClick}
-              >
-                Risk/Issue Registers
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/monte-carlo" 
-                prefetch={true}
-                className="flex items-center py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
-                onClick={handleLinkClick}
-              >
-                <BarChart3 className="mr-2 h-4 w-4" />
-                Monte Carlo Analysis
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/changes" 
-                prefetch={true}
-                className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
-                onClick={handleLinkClick}
-              >
-                Change Management
-              </Link>
-            </li>
+            <PermissionGuard permission="resource_read">
+              <li>
+                <Link 
+                  href="/resources" 
+                  prefetch={true}
+                  className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
+                  onClick={handleLinkClick}
+                >
+                  Resource Management
+                </Link>
+              </li>
+            </PermissionGuard>
+            <PermissionGuard permission={['report_read', 'analytics_read']}>
+              <li>
+                <Link 
+                  href="/reports" 
+                  prefetch={true}
+                  className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
+                  onClick={handleLinkClick}
+                >
+                  AI Reports & Analytics
+                </Link>
+              </li>
+            </PermissionGuard>
+            <PermissionGuard permission="financial_read">
+              <li>
+                <Link 
+                  href="/financials" 
+                  prefetch={true}
+                  className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
+                  onClick={handleLinkClick}
+                >
+                  Financial Tracking
+                </Link>
+              </li>
+            </PermissionGuard>
+            <PermissionGuard permission="risk_read">
+              <li>
+                <Link 
+                  href="/risks" 
+                  prefetch={true}
+                  className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
+                  onClick={handleLinkClick}
+                >
+                  Risk/Issue Registers
+                </Link>
+              </li>
+            </PermissionGuard>
+            <PermissionGuard permission="analytics_read">
+              <li>
+                <Link 
+                  href="/monte-carlo" 
+                  prefetch={true}
+                  className="flex items-center py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
+                  onClick={handleLinkClick}
+                >
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  Monte Carlo Analysis
+                </Link>
+              </li>
+            </PermissionGuard>
+            <PermissionGuard permission="change_read">
+              <li>
+                <Link 
+                  href="/changes" 
+                  prefetch={true}
+                  className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
+                  onClick={handleLinkClick}
+                >
+                  Change Management
+                </Link>
+              </li>
+            </PermissionGuard>
             <li>
               <Link 
                 href="/feedback" 
@@ -157,28 +172,32 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
                 Feedback & Ideas
               </Link>
             </li>
-            <li>
-              <Link 
-                href="/admin/performance" 
-                prefetch={true}
-                className="flex items-center py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
-                onClick={handleLinkClick}
-              >
-                <Activity className="mr-2 h-4 w-4" />
-                Performance Monitor
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/admin/users" 
-                prefetch={true}
-                className="flex items-center py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
-                onClick={handleLinkClick}
-              >
-                <Users className="mr-2 h-4 w-4" />
-                User Management
-              </Link>
-            </li>
+            <PermissionGuard permission="admin_read">
+              <li>
+                <Link 
+                  href="/admin/performance" 
+                  prefetch={true}
+                  className="flex items-center py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
+                  onClick={handleLinkClick}
+                >
+                  <Activity className="mr-2 h-4 w-4" />
+                  Performance Monitor
+                </Link>
+              </li>
+            </PermissionGuard>
+            <PermissionGuard permission="user_management">
+              <li>
+                <Link 
+                  href="/admin/users" 
+                  prefetch={true}
+                  className="flex items-center py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
+                  onClick={handleLinkClick}
+                >
+                  <Users className="mr-2 h-4 w-4" />
+                  User Management
+                </Link>
+              </li>
+            </PermissionGuard>
           </ul>
           
           <div className="p-4 border-t border-gray-700">
@@ -267,104 +286,116 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             What-If Scenarios
           </Link>
         </li>
-        <li style={{ display: 'block', width: '100%' }}>
-          <Link 
-            href="/resources" 
-            prefetch={true}
-            style={{ 
-              display: 'block', 
-              padding: '0.5rem 1rem', 
-              borderRadius: '0.375rem', 
-              color: '#ffffff', 
-              textDecoration: 'none',
-              transition: 'background-color 0.2s'
-            }}
-          >
-            Resource Management
-          </Link>
-        </li>
-        <li style={{ display: 'block', width: '100%' }}>
-          <Link 
-            href="/reports" 
-            prefetch={true}
-            style={{ 
-              display: 'block', 
-              padding: '0.5rem 1rem', 
-              borderRadius: '0.375rem', 
-              color: '#ffffff', 
-              textDecoration: 'none',
-              transition: 'background-color 0.2s'
-            }}
-          >
-            AI Reports & Analytics
-          </Link>
-        </li>
-        <li style={{ display: 'block', width: '100%' }}>
-          <Link 
-            href="/financials" 
-            prefetch={true}
-            style={{ 
-              display: 'block', 
-              padding: '0.5rem 1rem', 
-              borderRadius: '0.375rem', 
-              color: '#ffffff', 
-              textDecoration: 'none',
-              transition: 'background-color 0.2s'
-            }}
-          >
-            Financial Tracking
-          </Link>
-        </li>
-        <li style={{ display: 'block', width: '100%' }}>
-          <Link 
-            href="/risks" 
-            prefetch={true}
-            style={{ 
-              display: 'block', 
-              padding: '0.5rem 1rem', 
-              borderRadius: '0.375rem', 
-              color: '#ffffff', 
-              textDecoration: 'none',
-              transition: 'background-color 0.2s'
-            }}
-          >
-            Risk/Issue Registers
-          </Link>
-        </li>
-        <li style={{ display: 'block', width: '100%' }}>
-          <Link 
-            href="/monte-carlo" 
-            prefetch={true}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center',
-              padding: '0.5rem 1rem', 
-              borderRadius: '0.375rem', 
-              color: '#ffffff', 
-              textDecoration: 'none',
-              transition: 'background-color 0.2s'
-            }}
-          >
-            <BarChart3 className="mr-2 h-4 w-4" />
-            Monte Carlo Analysis
-          </Link>
-        </li>
-        <li style={{ display: 'block', width: '100%' }}>
-          <Link 
-            href="/changes" 
-            prefetch={true}
-            style={{ 
-              display: 'block', 
-              padding: '0.5rem 1rem', 
-              borderRadius: '0.375rem', 
-              color: '#ffffff', 
-              textDecoration: 'none',
-              transition: 'background-color 0.2s'
-            }}
-          >
-            Change Management
-          </Link>
-        </li>
+        {hasPermission('resource_read') && (
+          <li style={{ display: 'block', width: '100%' }}>
+            <Link 
+              href="/resources" 
+              prefetch={true}
+              style={{ 
+                display: 'block', 
+                padding: '0.5rem 1rem', 
+                borderRadius: '0.375rem', 
+                color: '#ffffff', 
+                textDecoration: 'none',
+                transition: 'background-color 0.2s'
+              }}
+            >
+              Resource Management
+            </Link>
+          </li>
+        )}
+        {(hasPermission('report_read') || hasPermission('analytics_read')) && (
+          <li style={{ display: 'block', width: '100%' }}>
+            <Link 
+              href="/reports" 
+              prefetch={true}
+              style={{ 
+                display: 'block', 
+                padding: '0.5rem 1rem', 
+                borderRadius: '0.375rem', 
+                color: '#ffffff', 
+                textDecoration: 'none',
+                transition: 'background-color 0.2s'
+              }}
+            >
+              AI Reports & Analytics
+            </Link>
+          </li>
+        )}
+        {hasPermission('financial_read') && (
+          <li style={{ display: 'block', width: '100%' }}>
+            <Link 
+              href="/financials" 
+              prefetch={true}
+              style={{ 
+                display: 'block', 
+                padding: '0.5rem 1rem', 
+                borderRadius: '0.375rem', 
+                color: '#ffffff', 
+                textDecoration: 'none',
+                transition: 'background-color 0.2s'
+              }}
+            >
+              Financial Tracking
+            </Link>
+          </li>
+        )}
+        {hasPermission('risk_read') && (
+          <li style={{ display: 'block', width: '100%' }}>
+            <Link 
+              href="/risks" 
+              prefetch={true}
+              style={{ 
+                display: 'block', 
+                padding: '0.5rem 1rem', 
+                borderRadius: '0.375rem', 
+                color: '#ffffff', 
+                textDecoration: 'none',
+                transition: 'background-color 0.2s'
+              }}
+            >
+              Risk/Issue Registers
+            </Link>
+          </li>
+        )}
+        {hasPermission('analytics_read') && (
+          <li style={{ display: 'block', width: '100%' }}>
+            <Link 
+              href="/monte-carlo" 
+              prefetch={true}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                padding: '0.5rem 1rem', 
+                borderRadius: '0.375rem', 
+                color: '#ffffff', 
+                textDecoration: 'none',
+                transition: 'background-color 0.2s'
+              }}
+            >
+              <BarChart3 className="mr-2 h-4 w-4" />
+              Monte Carlo Analysis
+            </Link>
+          </li>
+        )}
+        {hasPermission('change_read') && (
+          <li style={{ display: 'block', width: '100%' }}>
+            <Link 
+              href="/changes" 
+              prefetch={true}
+              style={{ 
+                display: 'block', 
+                padding: '0.5rem 1rem', 
+                borderRadius: '0.375rem', 
+                color: '#ffffff', 
+                textDecoration: 'none',
+                transition: 'background-color 0.2s'
+              }}
+            >
+              Change Management
+            </Link>
+          </li>
+        )}
         <li style={{ display: 'block', width: '100%' }}>
           <Link 
             href="/feedback" 
@@ -383,42 +414,46 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             Feedback & Ideas
           </Link>
         </li>
-        <li style={{ display: 'block', width: '100%' }}>
-          <Link 
-            href="/admin/performance" 
-            prefetch={true}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center',
-              padding: '0.5rem 1rem', 
-              borderRadius: '0.375rem', 
-              color: '#ffffff', 
-              textDecoration: 'none',
-              transition: 'background-color 0.2s'
-            }}
-          >
-            <Activity className="mr-2 h-4 w-4" />
-            Performance Monitor
-          </Link>
-        </li>
-        <li style={{ display: 'block', width: '100%' }}>
-          <Link 
-            href="/admin/users" 
-            prefetch={true}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center',
-              padding: '0.5rem 1rem', 
-              borderRadius: '0.375rem', 
-              color: '#ffffff', 
-              textDecoration: 'none',
-              transition: 'background-color 0.2s'
-            }}
-          >
-            <Users className="mr-2 h-4 w-4" />
-            User Management
-          </Link>
-        </li>
+        {hasPermission('admin_read') && (
+          <li style={{ display: 'block', width: '100%' }}>
+            <Link 
+              href="/admin/performance" 
+              prefetch={true}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                padding: '0.5rem 1rem', 
+                borderRadius: '0.375rem', 
+                color: '#ffffff', 
+                textDecoration: 'none',
+                transition: 'background-color 0.2s'
+              }}
+            >
+              <Activity className="mr-2 h-4 w-4" />
+              Performance Monitor
+            </Link>
+          </li>
+        )}
+        {hasPermission('user_management') && (
+          <li style={{ display: 'block', width: '100%' }}>
+            <Link 
+              href="/admin/users" 
+              prefetch={true}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                padding: '0.5rem 1rem', 
+                borderRadius: '0.375rem', 
+                color: '#ffffff', 
+                textDecoration: 'none',
+                transition: 'background-color 0.2s'
+              }}
+            >
+              <Users className="mr-2 h-4 w-4" />
+              User Management
+            </Link>
+          </li>
+        )}
       </ul>
       
       <div style={{ padding: '1rem', marginTop: '1rem', borderTop: '1px solid #374151', flexShrink: 0 }}>

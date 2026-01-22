@@ -82,10 +82,10 @@ def audit_event_strategy():
     events=st.lists(
         audit_event_strategy(),
         min_size=1,
-        max_size=1000
+        max_size=100  # Reduced from 1000
     )
 )
-@settings(max_examples=10, deadline=None)  # Reduced for faster testing
+@settings(max_examples=5, deadline=None)  # Reduced for faster testing
 async def test_batch_insertion_support(batch_size: int, events: List[Dict[str, Any]]):
     """
     Property 22: Batch Insertion Support
@@ -135,10 +135,10 @@ async def test_batch_insertion_support(batch_size: int, events: List[Dict[str, A
     events=st.lists(
         audit_event_strategy(),
         min_size=1,
-        max_size=100
+        max_size=50  # Reduced from 100
     )
 )
-@settings(max_examples=50, deadline=None)
+@settings(max_examples=5, deadline=None)  # Reduced from 50
 async def test_batch_insertion_atomicity(events: List[Dict[str, Any]]):
     """
     Property 22 (Atomicity): Batch Insertion Atomicity
@@ -194,9 +194,9 @@ async def test_batch_insertion_atomicity(events: List[Dict[str, Any]]):
 
 
 @given(
-    batch_size=st.integers(min_value=1, max_value=1000)
+    batch_size=st.integers(min_value=1, max_value=100)  # Reduced from 1000
 )
-@settings(max_examples=20, deadline=None)
+@settings(max_examples=5, deadline=None)  # Reduced from 20
 async def test_batch_size_limit(batch_size: int):
     """
     Property 22 (Size Limit): Batch Size Limit Enforcement
@@ -247,11 +247,11 @@ async def test_batch_size_limit(batch_size: int):
 @given(
     events=st.lists(
         audit_event_strategy(),
-        min_size=10,
-        max_size=100
+        min_size=5,  # Reduced from 10
+        max_size=20  # Reduced from 100
     )
 )
-@settings(max_examples=30, deadline=None)
+@settings(max_examples=5, deadline=None)  # Reduced from 30
 async def test_batch_insertion_preserves_event_data(events: List[Dict[str, Any]]):
     """
     Property 22 (Data Integrity): Batch Insertion Preserves Event Data

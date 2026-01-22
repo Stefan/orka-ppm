@@ -1,0 +1,52 @@
+#!/bin/bash
+#
+# Git Pre-Push Hook for Property-Based Testing
+#
+# This hook runs property-based tests before pushing to remote repository.
+# It helps catch issues early and ensures code quality.
+#
+# To install this hook:
+#   cp scripts/git-hooks/pre-push .git/hooks/pre-push
+#   chmod +x .git/hooks/pre-push
+#
+# To bypass this hook (not recommended):
+#   git push --no-verify
+#
+# Task: 13.2 Add CI/CD integration and automation
+# Feature: property-based-testing
+
+# Get the remote and branch being pushed to
+remote="$1"
+url="$2"
+
+# Read stdin to get the list of refs being pushed
+while read local_ref local_sha remote_ref remote_sha; do
+    if [ "$local_sha" = "0000000000000000000000000000000000000000" ]; then
+        # Branch is being deleted, skip tests
+        continue
+    fi
+    
+    if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+        # New branch, compare with main
+        range="origin/main...$local_sha"
+    else
+        # Existing branch, compare with remote
+        range="$remote_sha..$local_sha"
+    fi
+    
+    echo "Running property-based tests for changes in $range"
+    
+    # Run PBT on changes
+    if ! ./scripts/run-pbt-on-changes.sh --base "$remote_sha" --head "$local_sha"; then
+        echo ""
+        echo "❌ Property-based tests failed!"
+        echo ""
+        echo "Please fix the failing tests before pushing."
+        echo "To bypass this check (not recommended), use: git push --no-verify"
+        echo ""
+        exit 1
+    fi
+done
+
+echo "✅ Property-based tests passed!"
+exit 0

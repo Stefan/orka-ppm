@@ -1,0 +1,380 @@
+{
+  "regression_test_op": {
+    "operation_name": "regression_test_op",
+    "baseline_duration_ms": 113.0228042602539,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 135.6273651123047,
+    "max_memory_mb": 0.0,
+    "data_size": 596,
+    "timestamp": "2026-01-22T08:49:08.056487"
+  },
+  "tracked_op": {
+    "operation_name": "tracked_op",
+    "baseline_duration_ms": 30.050992965698242,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 36.06119155883789,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-21T21:30:27.376017"
+  },
+  "integrated_op": {
+    "operation_name": "integrated_op",
+    "baseline_duration_ms": 33.0350399017334,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 39.64204788208008,
+    "max_memory_mb": 0.0,
+    "data_size": 126,
+    "timestamp": "2026-01-21T21:32:11.081149"
+  },
+  "tracked_op_bc974bc5": {
+    "operation_name": "tracked_op_bc974bc5",
+    "baseline_duration_ms": 21.12293243408203,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 25.347518920898438,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:45:33.988819"
+  },
+  "tracked_op_f63a50ab": {
+    "operation_name": "tracked_op_f63a50ab",
+    "baseline_duration_ms": 30.025005340576172,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 36.030006408691406,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:45:34.083535"
+  },
+  "tracked_op_4b918d39": {
+    "operation_name": "tracked_op_4b918d39",
+    "baseline_duration_ms": 97.0449447631836,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 116.45393371582031,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:45:34.308736"
+  },
+  "tracked_op_54e1eb9d": {
+    "operation_name": "tracked_op_54e1eb9d",
+    "baseline_duration_ms": 94.98310089111328,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 113.97972106933594,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:45:35.345500"
+  },
+  "tracked_op_847ea068": {
+    "operation_name": "tracked_op_847ea068",
+    "baseline_duration_ms": 89.05696868896484,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 106.86836242675781,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:45:35.639391"
+  },
+  "tracked_op_faf87256": {
+    "operation_name": "tracked_op_faf87256",
+    "baseline_duration_ms": 30.10416030883789,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 36.12499237060547,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:45:36.292081"
+  },
+  "tracked_op_99046ad5": {
+    "operation_name": "tracked_op_99046ad5",
+    "baseline_duration_ms": 61.04016304016113,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 73.24819564819336,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:45:36.480240"
+  },
+  "tracked_op_3a9b1339": {
+    "operation_name": "tracked_op_3a9b1339",
+    "baseline_duration_ms": 60.65106391906738,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 72.78127670288086,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:45:36.967749"
+  },
+  "tracked_op_ec2442e7": {
+    "operation_name": "tracked_op_ec2442e7",
+    "baseline_duration_ms": 42.83404350280762,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 51.40085220336914,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:45:37.137892"
+  },
+  "tracked_op_7df75308": {
+    "operation_name": "tracked_op_7df75308",
+    "baseline_duration_ms": 50.107717514038086,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 60.1292610168457,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:45:37.598904"
+  },
+  "tracked_op_d89d86a1": {
+    "operation_name": "tracked_op_d89d86a1",
+    "baseline_duration_ms": 30.035972595214844,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 36.04316711425781,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:45:37.729296"
+  },
+  "tracked_op_7fe1fc3e": {
+    "operation_name": "tracked_op_7fe1fc3e",
+    "baseline_duration_ms": 30.044078826904297,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 36.052894592285156,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:45:37.887613"
+  },
+  "tracked_op_f6e39df9": {
+    "operation_name": "tracked_op_f6e39df9",
+    "baseline_duration_ms": 30.083179473876953,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 36.099815368652344,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:45:38.043545"
+  },
+  "tracked_op_9af78c9b": {
+    "operation_name": "tracked_op_9af78c9b",
+    "baseline_duration_ms": 31.038999557495117,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 37.24679946899414,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:45:38.173959"
+  },
+  "tracked_op_ad03aed5": {
+    "operation_name": "tracked_op_ad03aed5",
+    "baseline_duration_ms": 101.04179382324219,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 121.25015258789062,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:45:38.370829"
+  },
+  "tracked_op_6376b33a": {
+    "operation_name": "tracked_op_6376b33a",
+    "baseline_duration_ms": 30.02619743347168,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 36.031436920166016,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:45:38.855044"
+  },
+  "tracked_op_52637a65": {
+    "operation_name": "tracked_op_52637a65",
+    "baseline_duration_ms": 30.055999755859375,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 36.06719970703125,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:47:10.023175"
+  },
+  "tracked_op_c3100637": {
+    "operation_name": "tracked_op_c3100637",
+    "baseline_duration_ms": 30.030012130737305,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 36.036014556884766,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:47:10.118079"
+  },
+  "tracked_op_71256522": {
+    "operation_name": "tracked_op_71256522",
+    "baseline_duration_ms": 45.01509666442871,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 54.01811599731445,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:47:10.356448"
+  },
+  "tracked_op_a91fb288": {
+    "operation_name": "tracked_op_a91fb288",
+    "baseline_duration_ms": 56.05196952819824,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 67.26236343383789,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:47:10.713583"
+  },
+  "tracked_op_735c10c7": {
+    "operation_name": "tracked_op_735c10c7",
+    "baseline_duration_ms": 41.088104248046875,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 49.30572509765625,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:47:10.868071"
+  },
+  "tracked_op_922eeed8": {
+    "operation_name": "tracked_op_922eeed8",
+    "baseline_duration_ms": 88.92297744750977,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 106.70757293701172,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:47:11.351429"
+  },
+  "tracked_op_3a8bdb77": {
+    "operation_name": "tracked_op_3a8bdb77",
+    "baseline_duration_ms": 101.03201866149902,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 121.23842239379883,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:47:11.765325"
+  },
+  "tracked_op_f13c301f": {
+    "operation_name": "tracked_op_f13c301f",
+    "baseline_duration_ms": 94.02298927307129,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 112.82758712768555,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:47:12.689753"
+  },
+  "tracked_op_e14d41cd": {
+    "operation_name": "tracked_op_e14d41cd",
+    "baseline_duration_ms": 81.01773262023926,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 97.22127914428711,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:47:13.797922"
+  },
+  "tracked_op_7679e8ce": {
+    "operation_name": "tracked_op_7679e8ce",
+    "baseline_duration_ms": 81.05587959289551,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 97.26705551147461,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:47:14.337034"
+  },
+  "tracked_op_26fdb1c4": {
+    "operation_name": "tracked_op_26fdb1c4",
+    "baseline_duration_ms": 34.04688835144043,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 40.856266021728516,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:47:14.544237"
+  },
+  "tracked_op_77b8a3ef": {
+    "operation_name": "tracked_op_77b8a3ef",
+    "baseline_duration_ms": 81.03179931640625,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 97.2381591796875,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:47:14.766470"
+  },
+  "tracked_op_848384e4": {
+    "operation_name": "tracked_op_848384e4",
+    "baseline_duration_ms": 81.07924461364746,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 97.29509353637695,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:47:15.414787"
+  },
+  "tracked_op_38f8bc1f": {
+    "operation_name": "tracked_op_38f8bc1f",
+    "baseline_duration_ms": 0.26297569274902344,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 0.3155708312988281,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:49:08.174606"
+  },
+  "tracked_op_68c0e2c6": {
+    "operation_name": "tracked_op_68c0e2c6",
+    "baseline_duration_ms": 0.2617835998535156,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 0.31414031982421875,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:49:08.176403"
+  },
+  "tracked_op_b2408e3a": {
+    "operation_name": "tracked_op_b2408e3a",
+    "baseline_duration_ms": 1.2788772583007812,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 1.5346527099609375,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:49:08.179760"
+  },
+  "tracked_op_e4fcab5d": {
+    "operation_name": "tracked_op_e4fcab5d",
+    "baseline_duration_ms": 1.1949539184570312,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 1.4339447021484375,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:49:08.187555"
+  },
+  "tracked_op_658a2c05": {
+    "operation_name": "tracked_op_658a2c05",
+    "baseline_duration_ms": 0.7131099700927734,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 0.8557319641113281,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:49:08.199369"
+  },
+  "tracked_op_50ae3d8d": {
+    "operation_name": "tracked_op_50ae3d8d",
+    "baseline_duration_ms": 0.7908344268798828,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 0.9490013122558594,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:49:08.209542"
+  },
+  "tracked_op_02562b65": {
+    "operation_name": "tracked_op_02562b65",
+    "baseline_duration_ms": 0.6339550018310547,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 0.7607460021972656,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:49:08.216833"
+  },
+  "tracked_op_c8e07bcc": {
+    "operation_name": "tracked_op_c8e07bcc",
+    "baseline_duration_ms": 1.0492801666259766,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 1.2591361999511719,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:49:08.223284"
+  },
+  "tracked_op_10f534f0": {
+    "operation_name": "tracked_op_10f534f0",
+    "baseline_duration_ms": 0.4019737243652344,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 0.48236846923828125,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:49:08.227975"
+  },
+  "tracked_op_fb26894a": {
+    "operation_name": "tracked_op_fb26894a",
+    "baseline_duration_ms": 1.2192726135253906,
+    "baseline_memory_mb": 0.0,
+    "max_duration_ms": 1.4631271362304688,
+    "max_memory_mb": 0.0,
+    "data_size": 100,
+    "timestamp": "2026-01-22T08:49:08.234111"
+  }
+}
