@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     const authHeader = request.headers.get('authorization')
     
     // Forward all query parameters to backend
-    const backendUrl = `${BACKEND_URL}/ai/help/tips?${searchParams.toString()}`
+    const backendUrl = `${BACKEND_URL}/api/ai/help/tips?${searchParams.toString()}`
     
     const response = await fetch(backendUrl, {
       method: 'GET',

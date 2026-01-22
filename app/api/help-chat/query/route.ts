@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     // Backend API Call (mit Supabase Caching)
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-    const response = await fetch(`${backendUrl}/ai/help/query`, {
+    const response = await fetch(`${backendUrl}/api/ai/help/query`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

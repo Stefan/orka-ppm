@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const authHeader = request.headers.get('authorization')
     
     // Forward request to backend
-    const response = await fetch(`${BACKEND_URL}/ai/help/context?page_route=${encodeURIComponent(pageRoute)}`, {
+    const response = await fetch(`${BACKEND_URL}/api/ai/help/context?page_route=${encodeURIComponent(pageRoute)}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

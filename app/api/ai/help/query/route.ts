@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     console.log('[Help Chat Proxy] Sending to backend:', JSON.stringify(backendBody, null, 2))
     
     const authHeader = request.headers.get('authorization')
-    const backendUrl = `${BACKEND_URL}/ai/help/query`
+    const backendUrl = `${BACKEND_URL}/api/ai/help/query`
     
     let response: Response
     
