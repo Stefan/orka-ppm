@@ -20,7 +20,7 @@ from models.feature_flags import (
 )
 from services.feature_flag_service import FeatureFlagService
 
-router = APIRouter(prefix="/admin/feature-flags", tags=["feature-flags"])
+router = APIRouter(prefix="/api/admin/feature-flags", tags=["feature-flags"])
 
 # Initialize service
 feature_flag_service = None

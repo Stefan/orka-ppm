@@ -15,7 +15,7 @@ from models.users import (
 )
 from utils.converters import convert_uuids
 
-router = APIRouter(prefix="/admin/users", tags=["users"])
+router = APIRouter(prefix="/api/admin/users", tags=["users"])
 
 @router.get("/", response_model=UserListResponse)
 async def list_users(

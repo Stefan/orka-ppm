@@ -134,12 +134,12 @@ export default function PerformanceDashboard() {
       // Prioritize critical data (health and stats) over cache stats
       // Fetch health and stats first in parallel, then cache stats separately
       const [statsResponse, healthResponse] = await Promise.all([
-        fetch(getApiUrl('/admin/performance/stats'), {
+        fetch(getApiUrl('/api/admin/performance/stats'), {
           headers: { 'Authorization': `Bearer ${session?.access_token || ''}` },
           signal: abortControllerRef.current.signal,
           cache: 'no-store'
         }),
-        fetch(getApiUrl('/admin/performance/health'), {
+        fetch(getApiUrl('/api/admin/performance/health'), {
           headers: { 'Authorization': `Bearer ${session?.access_token || ''}` },
           signal: abortControllerRef.current.signal,
           cache: 'no-store'
@@ -150,8 +150,8 @@ export default function PerformanceDashboard() {
       
       // Record API call metrics
       performanceMonitoring.recordCustomMetric('api_fetch_duration', fetchDuration)
-      performanceMonitoring.recordAPICall('/admin/performance/stats', fetchDuration, statsResponse.status)
-      performanceMonitoring.recordAPICall('/admin/performance/health', fetchDuration, healthResponse.status)
+      performanceMonitoring.recordAPICall('/api/admin/performance/stats', fetchDuration, statsResponse.status)
+      performanceMonitoring.recordAPICall('/api/admin/performance/health', fetchDuration, healthResponse.status)
 
       // Process critical responses immediately
       if (statsResponse.ok) {
@@ -173,14 +173,14 @@ export default function PerformanceDashboard() {
       }
 
       // Fetch cache stats with lower priority (non-blocking, fetched after critical data)
-      fetch(getApiUrl('/admin/cache/stats'), {
+      fetch(getApiUrl('/api/admin/cache/stats'), {
         headers: { 'Authorization': `Bearer ${session?.access_token || ''}` },
         signal: abortControllerRef.current.signal,
         cache: 'no-store'
       })
         .then(async (cacheResponse) => {
           const cacheDuration = performance.now() - fetchStart
-          performanceMonitoring.recordAPICall('/admin/cache/stats', cacheDuration, cacheResponse.status)
+          performanceMonitoring.recordAPICall('/api/admin/cache/stats', cacheDuration, cacheResponse.status)
           
           if (cacheResponse.ok) {
             const cacheData = await cacheResponse.json()
@@ -225,7 +225,7 @@ export default function PerformanceDashboard() {
       setError(null)
       setSuccessMessage(null)
       
-      const response = await fetch(getApiUrl('/admin/cache/clear'), {
+      const response = await fetch(getApiUrl('/api/admin/cache/clear'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session?.access_token || ''}`,

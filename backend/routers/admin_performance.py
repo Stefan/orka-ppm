@@ -11,7 +11,7 @@ from datetime import datetime
 from auth.rbac import require_permission, Permission
 from middleware.performance_tracker import performance_tracker
 
-router = APIRouter(prefix="/admin/performance", tags=["admin", "performance"])
+router = APIRouter(prefix="/api/admin/performance", tags=["admin", "performance"])
 
 
 @router.get("/stats")
