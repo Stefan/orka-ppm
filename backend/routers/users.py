@@ -83,10 +83,14 @@ async def list_users(
             print(f"RPC function failed, falling back to manual join: {rpc_error}")
             
             # Fallback to manual join if RPC function doesn't exist
-            return await _manual_join_users_and_profiles(page, per_page, search, status, role)
+            result = await _manual_join_users_and_profiles(page, per_page, search, status, role)
+            print(f"Manual join returned {result.total_count} users")
+            return result
         
     except Exception as e:
         print(f"List users error: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Failed to list users: {str(e)}")
 
 
@@ -99,20 +103,27 @@ async def _manual_join_users_and_profiles(
 ) -> UserListResponse:
     """Manual fallback for joining auth.users and user_profiles when RPC function is not available"""
     try:
+        print(f"[DEBUG] Starting manual join - page={page}, per_page={per_page}")
+        
         # Use Supabase Admin API to get auth users
         from config.database import service_supabase
         
         if not service_supabase:
+            print("[DEBUG] Service client not available!")
             raise HTTPException(status_code=503, detail="Admin API not available")
         
+        print("[DEBUG] Fetching users from Supabase admin API...")
         # Get auth users using admin API
         auth_response = service_supabase.auth.admin.list_users()
         auth_users = auth_response if isinstance(auth_response, list) else []
+        print(f"[DEBUG] Found {len(auth_users)} auth users")
         
         # Get all user_profiles
+        print("[DEBUG] Fetching user profiles...")
         profile_query = supabase.table("user_profiles").select("*")
         profile_result = profile_query.execute()
         profiles = {p["user_id"]: p for p in (profile_result.data or [])}
+        print(f"[DEBUG] Found {len(profiles)} user profiles")
         
         # Join the data
         joined_users = []
