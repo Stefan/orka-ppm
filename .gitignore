@@ -154,3 +154,16 @@ update-visual-snapshots.sh
 
 # Generated reports
 performance-reports/
+
+# Additional temporary files
+BUILD_ERRORS_FIX.md
+DOCKER_BUILD_FIX.md
+EMERGENCY_PASSWORD_RESET_GUIDE.md
+FIX_SUPABASE_REDIRECT_URL.md
+JEST_CLI_FIX.md
+PASSWORD_RESET_QUICK_FIX.md
+RESET_PASSWORD_NOW.md
+SECURITY_INCIDENT_RESPONSE.md
+SUPABASE_REDIRECT_SETUP.md
+deploy-password-reset.sh
+remove-credentials-from-history.sh
