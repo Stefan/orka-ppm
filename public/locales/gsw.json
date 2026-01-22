@@ -719,7 +719,9 @@
       "confirmed": "Bschtätigt",
       "inProgress": "I Bearbeitig",
       "resolved": "Glöst",
-      "closed": "Gschlosse"
+      "closed": "Gschlosse",
+      "pending": "Usstehend",
+      "open": "Offe"
     },
     "priority": {
       "low": "Niedrigi Priorität",
