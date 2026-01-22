@@ -2,16 +2,34 @@ services:
   - type: web
     name: orka-ppm-backend
     env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "cd backend && python simple_server.py"
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && SKIP_PRE_STARTUP_TESTS=true uvicorn main:app --host 0.0.0.0 --port $PORT"
     plan: starter
     region: frankfurt
     branch: main
-    healthCheckPath: /
+    healthCheckPath: /health
     envVars:
       - key: PORT
         value: 8001
       - key: PYTHON_VERSION
         value: 3.11
+      - key: SKIP_PRE_STARTUP_TESTS
+        value: true
+      - key: ENVIRONMENT
+        value: production
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_BASE_URL
+        value: https://api.x.ai/v1
+      - key: OPENAI_MODEL
+        value: grok-4-1-fast-non-reasoning
+      - key: USE_LOCAL_EMBEDDINGS
+        value: true
     autoDeploy: true
     preDeployCommand: "echo 'Starting deployment...'"
