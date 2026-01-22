@@ -87,7 +87,7 @@ export default function PerformanceDashboard() {
   const performanceMonitoring = usePerformanceMonitoring({
     enabled: true,
     reportInterval: 30000, // Report every 30 seconds
-    analyticsEndpoint: getApiUrl('/api/analytics/performance'),
+    analyticsEndpoint: '/api/analytics/performance',
     onReport: (report) => {
       // Log metrics in development
       if (process.env.NODE_ENV === 'development') {
