@@ -24,7 +24,9 @@ export function calculateAnalyticsData(
 
   // Calculate category spending
   const categorySpending = budgetVariances.reduce((acc, variance) => {
-    variance.categories.forEach(cat => {
+    // Handle case where categories might be undefined or null
+    const categories = variance.categories || []
+    categories.forEach(cat => {
       if (!acc[cat.category]) {
         acc[cat.category] = { planned: 0, actual: 0, variance: 0 }
       }
