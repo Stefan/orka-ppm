@@ -72,6 +72,10 @@ export default function AdminUsers() {
   const [showRoleModal, setShowRoleModal] = useState(false)
   const [selectedUserForRole, setSelectedUserForRole] = useState<User | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [showInviteModal, setShowInviteModal] = useState(false)
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteRole, setInviteRole] = useState<string>('team_member')
+  const [inviteLoading, setInviteLoading] = useState(false)
 
   // Check if user has admin permissions
   // In development mode, allow access after a timeout if permissions loading fails
@@ -278,6 +282,91 @@ export default function AdminUsers() {
   const closeRoleModal = () => {
     setSelectedUserForRole(null)
     setShowRoleModal(false)
+  }
+
+  const openInviteModal = () => {
+    setInviteEmail('')
+    setInviteRole('team_member')
+    setShowInviteModal(true)
+  }
+
+  const closeInviteModal = () => {
+    setInviteEmail('')
+    setInviteRole('team_member')
+    setShowInviteModal(false)
+  }
+
+  const handleInviteUser = async () => {
+    if (!inviteEmail.trim()) {
+      setError(t('errors.emailRequired'))
+      return
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(inviteEmail)) {
+      setError(t('errors.invalidEmail'))
+      return
+    }
+
+    setInviteLoading(true)
+    setError(null)
+
+    try {
+      const url = getApiUrl('/admin/users/invite')
+      console.log('Calling invite endpoint:', url)
+      console.log('Request body:', { email: inviteEmail, role: inviteRole })
+      console.log('Auth token:', session?.access_token ? 'Present' : 'Missing')
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session?.access_token || ''}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: inviteEmail,
+          role: inviteRole
+        })
+      })
+
+      console.log('Response status:', response.status, response.statusText)
+      console.log('Response URL:', response.url)
+
+      if (!response.ok) {
+        // Clone response to read body multiple times if needed
+        const responseText = await response.text()
+        console.error('Raw error response:', responseText)
+        console.error('Response status:', response.status)
+        
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`
+        
+        if (responseText) {
+          try {
+            const errorData = JSON.parse(responseText)
+            errorMessage = errorData.detail || errorData.message || errorMessage
+          } catch {
+            errorMessage = responseText || errorMessage
+          }
+        }
+        
+        throw new Error(errorMessage)
+      }
+
+      const data = await response.json()
+      console.log('Success response:', data)
+      setSuccessMessage(t('inviteSuccess', { email: inviteEmail }))
+      setTimeout(() => setSuccessMessage(null), 5000)
+      
+      closeInviteModal()
+      await fetchUsers() // Refresh the user list
+      
+    } catch (error) {
+      console.error('Error inviting user:', error)
+      setError(error instanceof Error ? error.message : t('errors.inviteFailed'))
+    } finally {
+      setInviteLoading(false)
+    }
   }
 
   const handleUserAction = async (userId: string, action: 'deactivate' | 'activate' | 'delete', reason?: string) => {
@@ -554,9 +643,103 @@ export default function AdminUsers() {
     )
   }
 
+  // Invite User Modal Component
+  const InviteUserModal = () => {
+    if (!showInviteModal) return null
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">{t('inviteUser')}</h2>
+              <button
+                onClick={closeInviteModal}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <XCircle className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('email')}
+                </label>
+                <input
+                  type="email"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  placeholder={t('enterEmail')}
+                  maxLength={254}
+                  autoFocus
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-900"
+                  disabled={inviteLoading}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('role')}
+                </label>
+                <select
+                  value={inviteRole}
+                  onChange={(e) => setInviteRole(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-900"
+                  disabled={inviteLoading}
+                >
+                  <option value="team_member">{t('teamMember')}</option>
+                  <option value="project_manager">{t('projectManager')}</option>
+                  <option value="portfolio_manager">{t('portfolioManager')}</option>
+                  <option value="resource_manager">{t('resourceManager')}</option>
+                  <option value="admin">{t('admin')}</option>
+                  <option value="viewer">{t('viewer')}</option>
+                </select>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-sm text-blue-800">
+                  {t('inviteNote')}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                onClick={closeInviteModal}
+                disabled={inviteLoading}
+                className="px-4 py-2 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 disabled:opacity-50"
+              >
+                {t('cancel')}
+              </button>
+              <button
+                onClick={handleInviteUser}
+                disabled={inviteLoading || !inviteEmail.trim()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+              >
+                {inviteLoading ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    <span>{t('sending')}</span>
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="h-4 w-4" />
+                    <span>{t('sendInvite')}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <AppLayout>
       <RoleManagementModal />
+      <InviteUserModal />
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
@@ -591,7 +774,7 @@ export default function AdminUsers() {
             </button>
             
             <button
-              onClick={() => {/* TODO: Implement invite user */}}
+              onClick={openInviteModal}
               className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <UserPlus className="h-4 w-4 mr-2" />

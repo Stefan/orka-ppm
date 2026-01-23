@@ -881,6 +881,7 @@
     "inviteUser": "Invitar Usuario",
     "searchByEmail": "Buscar por correo electrónico",
     "enterEmail": "Ingresar correo...",
+    "email": "Correo Electrónico",
     "status": "Estado",
     "allStatuses": "Todos los estados",
     "active": "Activo",
@@ -892,11 +893,20 @@
     "manager": "Gerente",
     "user": "Usuario",
     "viewer": "Observador",
+    "teamMember": "Miembro del equipo",
+    "projectManager": "Gerente de proyecto",
+    "portfolioManager": "Gerente de portafolio",
+    "resourceManager": "Gerente de recursos",
     "usersSelected": "usuario(s) seleccionado(s)",
     "activate": "Activar",
     "deactivate": "Desactivar",
     "delete": "Eliminar",
     "clear": "Limpiar",
+    "cancel": "Cancelar",
+    "sendInvite": "Enviar Invitación",
+    "sending": "Enviando...",
+    "inviteNote": "Se enviará un correo de invitación al usuario con instrucciones para configurar su cuenta.",
+    "inviteSuccess": "Invitación enviada exitosamente a {email}",
     "tableHeaders": {
       "user": "Usuario",
       "role": "Rol",
@@ -925,7 +935,10 @@
     "errors": {
       "fetchFailed": "Error al cargar usuarios",
       "timeout": "Tiempo de espera agotado. Por favor, inténtelo de nuevo.",
-      "actionFailed": "Error al {action} usuario"
+      "actionFailed": "Error al {action} usuario",
+      "emailRequired": "El correo electrónico es obligatorio",
+      "invalidEmail": "Por favor ingrese un correo electrónico válido",
+      "inviteFailed": "Error al invitar usuario"
     }
   },
   "auth": {

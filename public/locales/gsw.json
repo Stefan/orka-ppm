@@ -881,6 +881,7 @@
     "inviteUser": "Benutzer ylade",
     "searchByEmail": "Nach E-Mail sueche",
     "enterEmail": "E-Mail ygäh...",
+    "email": "E-Mail",
     "status": "Status",
     "allStatuses": "Alli Status",
     "active": "Aktiv",
@@ -892,11 +893,20 @@
     "manager": "Manager",
     "user": "Benutzer",
     "viewer": "Betrachter",
+    "teamMember": "Teammitglied",
+    "projectManager": "Projektmanager",
+    "portfolioManager": "Portfoliomanager",
+    "resourceManager": "Ressourcemanager",
     "usersSelected": "Benutzer usgwählt",
     "activate": "Aktiviere",
     "deactivate": "Deaktiviere",
     "delete": "Lösche",
     "clear": "Lösche",
+    "cancel": "Abbräche",
+    "sendInvite": "Yladig schicke",
+    "sending": "Wird gschickt...",
+    "inviteNote": "Es E-Mail mit Yladig wird a de Benutzer gschickt mit Aaleitige zum Yrichte vom Konto.",
+    "inviteSuccess": "Yladig erfolgriich a {email} gschickt",
     "tableHeaders": {
       "user": "Benutzer",
       "role": "Roll",
@@ -925,7 +935,10 @@
     "errors": {
       "fetchFailed": "Fähler bim Lade vo de Benutzer",
       "timeout": "Zytüberschrytig vo de Aafrag. Bitte versuech's nomol.",
-      "actionFailed": "Fähler bim {action} vom Benutzer"
+      "actionFailed": "Fähler bim {action} vom Benutzer",
+      "emailRequired": "E-Mail isch erforderlich",
+      "invalidEmail": "Bitte gib e gültigi E-Mail-Adrässe yy",
+      "inviteFailed": "Fähler bim Ylade vom Benutzer"
     }
   },
   "auth": {

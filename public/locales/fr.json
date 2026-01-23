@@ -881,6 +881,7 @@
     "inviteUser": "Inviter un Utilisateur",
     "searchByEmail": "Rechercher par e-mail",
     "enterEmail": "Entrer l'e-mail...",
+    "email": "E-mail",
     "status": "Statut",
     "allStatuses": "Tous les statuts",
     "active": "Actif",
@@ -892,11 +893,20 @@
     "manager": "Gestionnaire",
     "user": "Utilisateur",
     "viewer": "Observateur",
+    "teamMember": "Membre de l'équipe",
+    "projectManager": "Chef de projet",
+    "portfolioManager": "Gestionnaire de portefeuille",
+    "resourceManager": "Gestionnaire de ressources",
     "usersSelected": "utilisateur(s) sélectionné(s)",
     "activate": "Activer",
     "deactivate": "Désactiver",
     "delete": "Supprimer",
     "clear": "Effacer",
+    "cancel": "Annuler",
+    "sendInvite": "Envoyer l'Invitation",
+    "sending": "Envoi en cours...",
+    "inviteNote": "Un e-mail d'invitation sera envoyé à l'utilisateur avec des instructions pour configurer son compte.",
+    "inviteSuccess": "Invitation envoyée avec succès à {email}",
     "tableHeaders": {
       "user": "Utilisateur",
       "role": "Rôle",
@@ -925,7 +935,10 @@
     "errors": {
       "fetchFailed": "Échec du chargement des utilisateurs",
       "timeout": "Délai d'attente dépassé. Veuillez réessayer.",
-      "actionFailed": "Échec de {action} l'utilisateur"
+      "actionFailed": "Échec de {action} l'utilisateur",
+      "emailRequired": "L'e-mail est obligatoire",
+      "invalidEmail": "Veuillez entrer une adresse e-mail valide",
+      "inviteFailed": "Échec de l'invitation de l'utilisateur"
     }
   },
   "auth": {

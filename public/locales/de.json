@@ -887,6 +887,7 @@
     "inviteUser": "Benutzer einladen",
     "searchByEmail": "Nach E-Mail suchen",
     "enterEmail": "E-Mail eingeben...",
+    "email": "E-Mail",
     "status": "Status",
     "allStatuses": "Alle Status",
     "active": "Aktiv",
@@ -898,11 +899,20 @@
     "manager": "Manager",
     "user": "Benutzer",
     "viewer": "Betrachter",
+    "teamMember": "Teammitglied",
+    "projectManager": "Projektmanager",
+    "portfolioManager": "Portfoliomanager",
+    "resourceManager": "Ressourcenmanager",
     "usersSelected": "Benutzer ausgewählt",
     "activate": "Aktivieren",
     "deactivate": "Deaktivieren",
     "delete": "Löschen",
     "clear": "Löschen",
+    "cancel": "Abbrechen",
+    "sendInvite": "Einladung senden",
+    "sending": "Wird gesendet...",
+    "inviteNote": "Eine Einladungs-E-Mail wird an den Benutzer mit Anweisungen zur Einrichtung des Kontos gesendet.",
+    "inviteSuccess": "Einladung erfolgreich an {email} gesendet",
     "tableHeaders": {
       "user": "Benutzer",
       "role": "Rolle",
@@ -931,7 +941,10 @@
     "errors": {
       "fetchFailed": "Fehler beim Laden der Benutzer",
       "timeout": "Zeitüberschreitung der Anfrage. Bitte versuchen Sie es erneut.",
-      "actionFailed": "Fehler beim {action} des Benutzers"
+      "actionFailed": "Fehler beim {action} des Benutzers",
+      "emailRequired": "E-Mail ist erforderlich",
+      "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "inviteFailed": "Fehler beim Einladen des Benutzers"
     }
   },
   "auth": {

@@ -891,6 +891,7 @@
     "inviteUser": "Invite User",
     "searchByEmail": "Search by email",
     "enterEmail": "Enter email...",
+    "email": "Email",
     "status": "Status",
     "allStatuses": "All statuses",
     "active": "Active",
@@ -902,11 +903,20 @@
     "manager": "Manager",
     "user": "User",
     "viewer": "Viewer",
+    "teamMember": "Team Member",
+    "projectManager": "Project Manager",
+    "portfolioManager": "Portfolio Manager",
+    "resourceManager": "Resource Manager",
     "usersSelected": "user(s) selected",
     "activate": "Activate",
     "deactivate": "Deactivate",
     "delete": "Delete",
     "clear": "Clear",
+    "cancel": "Cancel",
+    "sendInvite": "Send Invite",
+    "sending": "Sending...",
+    "inviteNote": "An invitation email will be sent to the user with instructions to set up their account.",
+    "inviteSuccess": "Invitation sent successfully to {email}",
     "tableHeaders": {
       "user": "User",
       "role": "Role",
@@ -935,7 +945,10 @@
     "errors": {
       "fetchFailed": "Failed to fetch users",
       "timeout": "Request timed out. Please try again.",
-      "actionFailed": "Failed to {action} user"
+      "actionFailed": "Failed to {action} user",
+      "emailRequired": "Email is required",
+      "invalidEmail": "Please enter a valid email address",
+      "inviteFailed": "Failed to invite user"
     }
   },
   "auth": {

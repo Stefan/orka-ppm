@@ -881,6 +881,7 @@
     "inviteUser": "Zaproś Użytkownika",
     "searchByEmail": "Szukaj po e-mailu",
     "enterEmail": "Wprowadź e-mail...",
+    "email": "E-mail",
     "status": "Status",
     "allStatuses": "Wszystkie statusy",
     "active": "Aktywny",
@@ -892,11 +893,20 @@
     "manager": "Menedżer",
     "user": "Użytkownik",
     "viewer": "Obserwator",
+    "teamMember": "Członek zespołu",
+    "projectManager": "Kierownik projektu",
+    "portfolioManager": "Kierownik portfela",
+    "resourceManager": "Kierownik zasobów",
     "usersSelected": "użytkownik(ów) wybranych",
     "activate": "Aktywuj",
     "deactivate": "Dezaktywuj",
     "delete": "Usuń",
     "clear": "Wyczyść",
+    "cancel": "Anuluj",
+    "sendInvite": "Wyślij Zaproszenie",
+    "sending": "Wysyłanie...",
+    "inviteNote": "E-mail z zaproszeniem zostanie wysłany do użytkownika z instrukcjami konfiguracji konta.",
+    "inviteSuccess": "Zaproszenie wysłane pomyślnie do {email}",
     "tableHeaders": {
       "user": "Użytkownik",
       "role": "Rola",
@@ -925,7 +935,10 @@
     "errors": {
       "fetchFailed": "Nie udało się załadować użytkowników",
       "timeout": "Przekroczono limit czasu żądania. Spróbuj ponownie.",
-      "actionFailed": "Nie udało się {action} użytkownika"
+      "actionFailed": "Nie udało się {action} użytkownika",
+      "emailRequired": "E-mail jest wymagany",
+      "invalidEmail": "Proszę wprowadzić prawidłowy adres e-mail",
+      "inviteFailed": "Nie udało się zaprosić użytkownika"
     }
   },
   "auth": {
