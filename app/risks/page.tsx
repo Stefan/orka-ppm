@@ -657,77 +657,121 @@ export default function Risks() {
               </div>
             </div>
             
-            {/* Mobile-Optimized Action Buttons */}
-            <div className="flex flex-wrap items-center gap-2">
+            {/* Action Buttons - Consistent Design */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Primary Actions */}
               <button
-                onClick={() => setViewMode(
-                  viewMode === 'overview' ? 'matrix' : 
-                  viewMode === 'matrix' ? 'trends' : 
-                  viewMode === 'trends' ? 'detailed' : 'overview'
-                )}
-                className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 text-sm font-medium"
+                onClick={() => setShowAddModal(true)}
+                className="inline-flex items-center justify-center h-10 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm text-sm font-medium"
               >
-                {viewMode === 'overview' ? <BarChart3 className="h-4 w-4 mr-2 flex-shrink-0" /> : 
-                 viewMode === 'matrix' ? <Target className="h-4 w-4 mr-2 flex-shrink-0" /> : 
-                 viewMode === 'trends' ? <TrendingUp className="h-4 w-4 mr-2 flex-shrink-0" /> :
-                 <Activity className="h-4 w-4 mr-2 flex-shrink-0" />}
-                <span className="hidden sm:inline">
-                  {viewMode === 'overview' ? t('risks.matrix') : 
-                   viewMode === 'matrix' ? t('risks.trends') : 
-                   viewMode === 'trends' ? t('risks.detailed') : t('risks.overview')}
-                </span>
+                <Plus className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">{t('risks.addRisk') || 'Neues Risiko'}</span>
               </button>
               
-              <button
-                onClick={() => setShowAIAnalysis(!showAIAnalysis)}
-                className={`flex items-center justify-center min-h-[44px] px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
-                  showAIAnalysis 
-                    ? 'bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800' 
-                    : 'bg-purple-100 text-purple-700 hover:bg-purple-200 active:bg-purple-300'
-                }`}
-              >
-                <Zap className="h-4 w-4 mr-2 flex-shrink-0" />
-                <span className="hidden sm:inline">{t('risks.aiAnalysis')}</span>
-                <span className="sm:hidden">{t('risks.ai')}</span>
-              </button>
+              {/* Secondary Actions */}
+              <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-lg">
+                <button
+                  onClick={() => setViewMode('overview')}
+                  className={`inline-flex items-center justify-center h-8 px-3 rounded-md text-sm font-medium transition-colors ${
+                    viewMode === 'overview' 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  <BarChart3 className="h-4 w-4" />
+                  <span className="hidden lg:inline ml-2">{t('risks.overview') || 'Übersicht'}</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('matrix')}
+                  className={`inline-flex items-center justify-center h-8 px-3 rounded-md text-sm font-medium transition-colors ${
+                    viewMode === 'matrix' 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  <Target className="h-4 w-4" />
+                  <span className="hidden lg:inline ml-2">{t('risks.matrix') || 'Matrix'}</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('trends')}
+                  className={`inline-flex items-center justify-center h-8 px-3 rounded-md text-sm font-medium transition-colors ${
+                    viewMode === 'trends' 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  <TrendingUp className="h-4 w-4" />
+                  <span className="hidden lg:inline ml-2">{t('risks.trends') || 'Trends'}</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('detailed')}
+                  className={`inline-flex items-center justify-center h-8 px-3 rounded-md text-sm font-medium transition-colors ${
+                    viewMode === 'detailed' 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  <Activity className="h-4 w-4" />
+                  <span className="hidden lg:inline ml-2">{t('risks.detailed') || 'Details'}</span>
+                </button>
+              </div>
               
-              <button
-                onClick={() => setShowMonteCarloModal(true)}
-                disabled={filteredRisks.length === 0}
-                className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 active:bg-purple-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-              >
-                <Zap className="h-4 w-4 mr-2 flex-shrink-0" />
-                <span className="hidden sm:inline">{t('risks.monteCarlo')}</span>
-                <span className="sm:hidden">{t('risks.mc')}</span>
-              </button>
+              {/* Tool Buttons */}
+              <div className="hidden sm:flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                <button
+                  onClick={() => setShowAIAnalysis(!showAIAnalysis)}
+                  className={`inline-flex items-center justify-center h-10 px-3 rounded-lg text-sm font-medium transition-colors ${
+                    showAIAnalysis 
+                      ? 'bg-purple-600 text-white hover:bg-purple-700' 
+                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  }`}
+                  title="KI-Analyse"
+                >
+                  <Zap className="h-4 w-4" />
+                  <span className="hidden xl:inline ml-2">{t('risks.ai') || 'KI'}</span>
+                </button>
+                
+                <button
+                  onClick={() => setShowMonteCarloModal(true)}
+                  disabled={filteredRisks.length === 0}
+                  className="inline-flex items-center justify-center h-10 px-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+                  title="Monte Carlo Simulation"
+                >
+                  <Activity className="h-4 w-4" />
+                  <span className="hidden xl:inline ml-2">{t('risks.mc') || 'MC'}</span>
+                </button>
+              </div>
               
-              <button
-                onClick={exportRiskData}
-                className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 active:bg-green-300 text-sm font-medium"
-              >
-                <Download className="h-4 w-4 mr-2 flex-shrink-0" />
-                <span className="hidden sm:inline">{t('risks.export')}</span>
-              </button>
-              
-              <button
-                onClick={fetchRisks}
-                className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 active:bg-blue-300 text-sm font-medium"
-              >
-                <RefreshCw className="h-4 w-4 mr-2 flex-shrink-0" />
-                <span className="hidden sm:inline">{t('risks.refresh')}</span>
-              </button>
-              
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center justify-center min-h-[44px] px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
-                  showFilters 
-                    ? 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800' 
-                    : 'bg-blue-100 text-blue-700 hover:bg-blue-200 active:bg-blue-300'
-                }`}
-              >
-                <Filter className="h-4 w-4 mr-2 flex-shrink-0" />
-                <span className="hidden sm:inline">{t('risks.filters')}</span>
-              </button>
+              {/* Utility Buttons */}
+              <div className="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`inline-flex items-center justify-center h-10 w-10 rounded-lg transition-colors ${
+                    showFilters 
+                      ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  }`}
+                  title="Filter"
+                >
+                  <Filter className="h-4 w-4" />
+                </button>
+                
+                <button
+                  onClick={exportRiskData}
+                  className="inline-flex items-center justify-center h-10 w-10 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  title="Exportieren"
+                >
+                  <Download className="h-4 w-4" />
+                </button>
+                
+                <button
+                  onClick={fetchRisks}
+                  className="inline-flex items-center justify-center h-10 w-10 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  title="Aktualisieren"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
