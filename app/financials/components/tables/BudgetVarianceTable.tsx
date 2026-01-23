@@ -51,11 +51,15 @@ export default function BudgetVarianceTable({
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {budgetVariances
-              .sort((a, b) => Math.abs(b.variance_percentage) - Math.abs(a.variance_percentage))
+              .sort((a, b) => Math.abs(b.variance_percentage || 0) - Math.abs(a.variance_percentage || 0))
               .map((variance) => {
                 const project = projects.find(p => p.id === variance.project_id)
-                const efficiency = variance.total_planned > 0 ? 
-                  Math.max(0, 100 - Math.abs(variance.variance_percentage)) : 0
+                const totalPlanned = variance.total_planned ?? 0
+                const totalActual = variance.total_actual ?? 0
+                const varianceAmount = variance.variance_amount ?? 0
+                const variancePercentage = variance.variance_percentage ?? 0
+                const efficiency = totalPlanned > 0 ? 
+                  Math.max(0, 100 - Math.abs(variancePercentage)) : 0
                 
                 return (
                   <tr key={variance.project_id} className="hover:bg-gray-50">
@@ -65,19 +69,19 @@ export default function BudgetVarianceTable({
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {variance.total_planned.toLocaleString()}
+                      {totalPlanned.toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {variance.total_actual.toLocaleString()}
+                      {totalActual.toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={variance.variance_amount >= 0 ? 'text-red-600' : 'text-green-600'}>
-                        {variance.variance_amount >= 0 ? '+' : ''}{variance.variance_amount.toLocaleString()}
+                      <span className={varianceAmount >= 0 ? 'text-red-600' : 'text-green-600'}>
+                        {varianceAmount >= 0 ? '+' : ''}{varianceAmount.toLocaleString()}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={variance.variance_percentage >= 0 ? 'text-red-600' : 'text-green-600'}>
-                        {variance.variance_percentage >= 0 ? '+' : ''}{variance.variance_percentage.toFixed(1)}%
+                      <span className={variancePercentage >= 0 ? 'text-red-600' : 'text-green-600'}>
+                        {variancePercentage >= 0 ? '+' : ''}{variancePercentage.toFixed(1)}%
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
