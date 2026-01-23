@@ -749,27 +749,27 @@ export default function Risks() {
                   className={`inline-flex items-center justify-center h-10 w-10 rounded-lg transition-colors ${
                     showFilters 
                       ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                   title="Filter"
                 >
-                  <Filter className="h-4 w-4" />
+                  <Filter className="h-5 w-5" />
                 </button>
                 
                 <button
                   onClick={exportRiskData}
-                  className="inline-flex items-center justify-center h-10 w-10 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="inline-flex items-center justify-center h-10 w-10 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   title="Exportieren"
                 >
-                  <Download className="h-4 w-4" />
+                  <Download className="h-5 w-5" />
                 </button>
                 
                 <button
                   onClick={fetchRisks}
-                  className="inline-flex items-center justify-center h-10 w-10 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="inline-flex items-center justify-center h-10 w-10 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   title="Aktualisieren"
                 >
-                  <RefreshCw className="h-4 w-4" />
+                  <RefreshCw className="h-5 w-5" />
                 </button>
               </div>
             </div>
