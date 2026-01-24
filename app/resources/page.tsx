@@ -707,28 +707,29 @@ export default function Resources() {
           </div>
         </Suspense>
 
-        {/* Mobile-First Resource Cards */}
-        {viewMode === 'cards' && (
-          <div data-testid="resources-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {filteredResources.map((resource) => (
-              <ResourceCard key={resource.id} resource={resource} />
-            ))}
-          </div>
-        )}
+        {/* Mobile-First Resource Views - Always render container with test ID */}
+        <div data-testid="resources-grid">
+          {viewMode === 'cards' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {filteredResources.map((resource) => (
+                <ResourceCard key={resource.id} resource={resource} />
+              ))}
+            </div>
+          )}
 
-        {viewMode === 'table' && (
-          <Suspense fallback={<SkeletonCard variant="resource" />}>
-            <VirtualizedResourceTable 
-              resources={filteredResources}
-              height={600}
-              itemHeight={80}
-            />
-          </Suspense>
-        )}
+          {viewMode === 'table' && (
+            <Suspense fallback={<SkeletonCard variant="resource" />}>
+              <VirtualizedResourceTable 
+                resources={filteredResources}
+                height={600}
+                itemHeight={80}
+              />
+            </Suspense>
+          )}
 
-        {/* Enhanced Touch-Optimized Heatmap */}
-        {viewMode === 'heatmap' && (
-          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
+          {/* Enhanced Touch-Optimized Heatmap */}
+          {viewMode === 'heatmap' && (
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-2 sm:space-y-0">
               <h3 className="text-lg font-semibold text-gray-900">Resource Utilization Heatmap</h3>
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-700">
@@ -901,8 +902,8 @@ export default function Resources() {
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Enhanced Mobile-First Add Resource Modal */}
         {showAddModal && (
