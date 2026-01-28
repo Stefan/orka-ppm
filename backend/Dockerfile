@@ -18,11 +18,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
-# Copy only requirements first for better Docker layer caching
-COPY requirements.txt .
+# Copy only minimal requirements for fastest deployment
+COPY requirements-simple.txt .
 
-# Install Python dependencies with optimizations
-RUN pip install --no-cache-dir -r requirements.txt
+# Install minimal Python dependencies
+RUN pip install --no-cache-dir -r requirements-simple.txt
 
 # Copy all backend files
 COPY . .
