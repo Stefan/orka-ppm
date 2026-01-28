@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '../providers/SupabaseAuthProvider'
+import AppLayout from '@/components/shared/AppLayout'
 import WorkflowStatusBadge from '@/components/workflow/WorkflowStatusBadge'
 import WorkflowApprovalModal from '@/components/workflow/WorkflowApprovalModal'
 import ShareButton from '@/components/projects/ShareButton'
@@ -27,20 +29,30 @@ interface Project {
 
 export default function ProjectsPage() {
   const router = useRouter()
+  const { session, loading: authLoading } = useAuth()
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedWorkflow, setSelectedWorkflow] = useState<string | null>(null)
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [notification, setNotification] = useState<string | null>(null)
   const [userPermissions, setUserPermissions] = useState<string[]>([])
 
+  const currentUserId = session?.user?.id || null
   const { subscribe } = useWorkflowNotifications(currentUserId)
 
+  // Redirect to login if not authenticated
   useEffect(() => {
-    fetchProjects()
-    fetchCurrentUser()
-  }, [])
+    if (!authLoading && !session) {
+      router.push('/')
+    }
+  }, [authLoading, session, router])
+
+  useEffect(() => {
+    if (session) {
+      fetchProjects()
+      fetchUserPermissions()
+    }
+  }, [session])
 
   useEffect(() => {
     if (currentUserId) {
@@ -60,24 +72,24 @@ export default function ProjectsPage() {
     }
   }, [currentUserId, subscribe])
 
-  const fetchCurrentUser = async () => {
+  const fetchUserPermissions = async () => {
     try {
-      const token = localStorage.getItem('token')
-      if (!token) return
+      if (!session?.access_token) return
 
-      const response = await fetch('/api/auth/me', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+      const response = await fetch(`${apiUrl}/api/rbac/user-permissions`, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${session.access_token}`
         }
       })
 
       if (response.ok) {
         const data = await response.json()
-        setCurrentUserId(data.user_id)
         setUserPermissions(data.permissions || [])
       }
     } catch (err) {
-      console.error('Failed to fetch current user:', err)
+      // Silently fail - permissions are optional for viewing projects
+      console.warn('Could not fetch user permissions (backend may not be running):', err)
     }
   }
 
@@ -86,15 +98,14 @@ export default function ProjectsPage() {
       setLoading(true)
       setError(null)
       
-      const token = localStorage.getItem('token')
-      if (!token) {
-        router.push('/login')
+      if (!session?.access_token) {
         return
       }
 
-      const response = await fetch('/api/projects', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+      const response = await fetch(`${apiUrl}/api/projects`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json'
         }
       })
@@ -106,7 +117,14 @@ export default function ProjectsPage() {
       const data = await response.json()
       setProjects(data.projects || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred'
+      
+      // Check if it's a connection error
+      if (errorMessage.includes('fetch') || errorMessage.includes('Failed to fetch')) {
+        setError('Backend server is not running. Please start the backend server at http://localhost:8000')
+      } else {
+        setError(errorMessage)
+      }
     } finally {
       setLoading(false)
     }
@@ -122,148 +140,155 @@ export default function ProjectsPage() {
     fetchProjects()
   }
 
-  if (loading) {
+  // Show loading while checking auth
+  if (authLoading || !session) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-32 bg-gray-200 rounded"></div>
-              ))}
+      <AppLayout>
+        <div className="p-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-32 bg-gray-200 rounded"></div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </AppLayout>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-800">{error}</p>
-            <button
-              onClick={fetchProjects}
-              className="mt-2 text-red-600 hover:text-red-800 underline"
-            >
-              Retry
-            </button>
+      <AppLayout>
+        <div className="p-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-800">{error}</p>
+              <button
+                onClick={fetchProjects}
+                className="mt-2 text-red-600 hover:text-red-800 underline"
+              >
+                Retry
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </AppLayout>
     )
   }
 
   return (
-    <div data-testid="projects-page" className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div data-testid="projects-header" className="mb-8">
-          <h1 data-testid="projects-title" className="text-3xl font-bold text-gray-900">Projects</h1>
-          <p className="text-gray-600 mt-2">Manage your projects and workflow approvals</p>
-        </div>
-
-        {/* Realtime Notification Banner */}
-        {notification && (
-          <div data-testid="projects-notification" className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
-            <p className="text-blue-800">{notification}</p>
-            <button
-              onClick={() => setNotification(null)}
-              className="text-blue-600 hover:text-blue-800"
-            >
-              Dismiss
-            </button>
+    <AppLayout>
+      <div data-testid="projects-page" className="p-8">
+        <div className="max-w-7xl mx-auto">
+          <div data-testid="projects-header" className="mb-8">
+            <h1 data-testid="projects-title" className="text-3xl font-bold text-gray-900">Projects</h1>
+            <p className="text-gray-600 mt-2">Manage your projects and workflow approvals</p>
           </div>
-        )}
 
-        <div data-testid="projects-list" className="space-y-4">
-          {projects.length === 0 ? (
-            <div data-testid="projects-empty" className="bg-white rounded-lg shadow p-8 text-center">
-              <p className="text-gray-500">No projects found</p>
-            </div>
-          ) : (
-            projects.map((project) => (
-              <div
-                key={project.id}
-                data-testid="project-card"
-                className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6"
+          {/* Realtime Notification Banner */}
+          {notification && (
+            <div data-testid="projects-notification" className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
+              <p className="text-blue-800">{notification}</p>
+              <button
+                onClick={() => setNotification(null)}
+                className="text-blue-600 hover:text-blue-800"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h2 className="text-xl font-semibold text-gray-900">
-                        {project.name}
-                      </h2>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        project.status === 'active' ? 'bg-green-100 text-green-800' :
-                        project.status === 'completed' ? 'bg-blue-100 text-blue-800' :
-                        project.status === 'planning' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {project.status}
-                      </span>
+                Dismiss
+              </button>
+            </div>
+          )}
+
+          <div data-testid="projects-list" className="space-y-4">
+            {projects.length === 0 ? (
+              <div data-testid="projects-empty" className="bg-white rounded-lg shadow p-8 text-center">
+                <p className="text-gray-500">No projects found</p>
+              </div>
+            ) : (
+              projects.map((project) => (
+                <div
+                  key={project.id}
+                  data-testid="project-card"
+                  className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                          {project.name}
+                        </h2>
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          project.status === 'active' ? 'bg-green-100 text-green-800' :
+                          project.status === 'completed' ? 'bg-blue-100 text-blue-800' :
+                          project.status === 'planning' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {project.status}
+                        </span>
+                      </div>
+                      
+                      <p className="text-gray-600 mb-4">{project.description}</p>
+                      
+                      <div className="flex items-center gap-6 text-sm text-gray-500">
+                        <div>
+                          <span className="font-medium">Start:</span> {project.start_date}
+                        </div>
+                        <div>
+                          <span className="font-medium">End:</span> {project.end_date}
+                        </div>
+                        <div>
+                          <span className="font-medium">Budget:</span> ${project.budget.toLocaleString()}
+                        </div>
+                      </div>
                     </div>
-                    
-                    <p className="text-gray-600 mb-4">{project.description}</p>
-                    
-                    <div className="flex items-center gap-6 text-sm text-gray-500">
-                      <div>
-                        <span className="font-medium">Start:</span> {project.start_date}
-                      </div>
-                      <div>
-                        <span className="font-medium">End:</span> {project.end_date}
-                      </div>
-                      <div>
-                        <span className="font-medium">Budget:</span> ${project.budget.toLocaleString()}
-                      </div>
-                    </div>
-                  </div>
 
-                  <div className="ml-6 flex items-center gap-2">
-                    {/* Project Action Buttons with RBAC */}
-                    <ProjectActionButtons
-                      projectId={project.id}
-                      onEdit={() => router.push(`/projects/${project.id}/edit`)}
-                      onBudgetUpdate={() => router.push(`/projects/${project.id}/budget`)}
-                      onResourceManage={() => router.push(`/projects/${project.id}/resources`)}
-                      onReportGenerate={() => router.push(`/projects/${project.id}/reports`)}
-                      variant="compact"
-                    />
-
-                    {/* Share Button */}
-                    <ShareButton
-                      projectId={project.id}
-                      projectName={project.name}
-                      userPermissions={userPermissions}
-                      variant="secondary"
-                      size="sm"
-                    />
-
-                    {project.workflow_instance && (
-                      <WorkflowStatusBadge
-                        status={project.workflow_instance.status}
-                        currentStep={project.workflow_instance.current_step}
-                        workflowName={project.workflow_instance.workflow_name}
-                        pendingApprovals={project.workflow_instance.pending_approvals}
-                        onClick={() => handleWorkflowClick(project.workflow_instance!.id)}
+                    <div className="ml-6 flex items-center gap-2">
+                      {/* Project Action Buttons with RBAC */}
+                      <ProjectActionButtons
+                        projectId={project.id}
+                        onEdit={() => router.push(`/projects/${project.id}/edit`)}
+                        onBudgetUpdate={() => router.push(`/projects/${project.id}/budget`)}
+                        onResourceManage={() => router.push(`/projects/${project.id}/resources`)}
+                        onReportGenerate={() => router.push(`/projects/${project.id}/reports`)}
+                        variant="compact"
                       />
-                    )}
+
+                      {/* Share Button */}
+                      <ShareButton
+                        projectId={project.id}
+                        projectName={project.name}
+                        userPermissions={userPermissions}
+                        variant="secondary"
+                        size="sm"
+                      />
+
+                      {project.workflow_instance && (
+                        <WorkflowStatusBadge
+                          status={project.workflow_instance.status}
+                          currentStep={project.workflow_instance.current_step}
+                          workflowName={project.workflow_instance.workflow_name}
+                          pendingApprovals={project.workflow_instance.pending_approvals}
+                          onClick={() => handleWorkflowClick(project.workflow_instance!.id)}
+                        />
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
-          )}
+              ))
+            )}
+          </div>
         </div>
-      </div>
 
-      {selectedWorkflow && (
-        <WorkflowApprovalModal
-          workflowInstanceId={selectedWorkflow}
-          onClose={handleWorkflowClose}
-        />
-      )}
-    </div>
+        {selectedWorkflow && (
+          <WorkflowApprovalModal
+            workflowInstanceId={selectedWorkflow}
+            onClose={handleWorkflowClose}
+          />
+        )}
+      </div>
+    </AppLayout>
   )
 }

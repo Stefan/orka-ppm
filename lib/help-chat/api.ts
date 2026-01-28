@@ -866,13 +866,22 @@ export class HelpChatAPIService {
    */
   async getSupportedLanguages(): Promise<any[]> {
     try {
+      // Set a short timeout for this request (3 seconds)
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 3000)
+      
       const response = await apiRequest(HELP_CHAT_CONFIG.endpoints.languages, {
-        method: 'GET'
+        method: 'GET',
+        signal: controller.signal
       })
+      
+      clearTimeout(timeoutId)
       return response.data || []
     } catch (error) {
-      this.handleError('Failed to get supported languages', error)
-      throw error
+      // Silently return empty array if endpoint is not available
+      // This allows the app to work with fallback languages
+      console.warn('Help chat languages endpoint not available, using fallback languages')
+      return []
     }
   }
 

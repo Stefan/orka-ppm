@@ -3,7 +3,7 @@
 import { useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { LogOut, Activity, MessageSquare, X, Users, BarChart3 } from 'lucide-react'
+import { LogOut, Activity, MessageSquare, X, Users, BarChart3, FileText } from 'lucide-react'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
 import { GlobalLanguageSelector } from './GlobalLanguageSelector'
 import { usePermissions } from '@/hooks/usePermissions'
@@ -80,12 +80,12 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             </li>
             <li>
               <Link 
-                href="/scenarios" 
+                href="/projects" 
                 prefetch={true}
                 className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
                 onClick={handleLinkClick}
               >
-                What-If Scenarios
+                Projects
               </Link>
             </li>
             <PermissionGuard permission="resource_read">
@@ -97,18 +97,6 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
                   onClick={handleLinkClick}
                 >
                   Resource Management
-                </Link>
-              </li>
-            </PermissionGuard>
-            <PermissionGuard permission={['report_read', 'analytics_read']}>
-              <li>
-                <Link 
-                  href="/reports" 
-                  prefetch={true}
-                  className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
-                  onClick={handleLinkClick}
-                >
-                  AI Reports & Analytics
                 </Link>
               </li>
             </PermissionGuard>
@@ -136,6 +124,28 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
                 </Link>
               </li>
             </PermissionGuard>
+            <PermissionGuard permission={['report_read', 'analytics_read']}>
+              <li>
+                <Link 
+                  href="/reports" 
+                  prefetch={true}
+                  className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
+                  onClick={handleLinkClick}
+                >
+                  AI Reports & Analytics
+                </Link>
+              </li>
+            </PermissionGuard>
+            <li>
+              <Link 
+                href="/scenarios" 
+                prefetch={true}
+                className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
+                onClick={handleLinkClick}
+              >
+                What-If Scenarios
+              </Link>
+            </li>
             <PermissionGuard permission="analytics_read">
               <li>
                 <Link 
@@ -158,6 +168,19 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
                   onClick={handleLinkClick}
                 >
                   Change Management
+                </Link>
+              </li>
+            </PermissionGuard>
+            <PermissionGuard permission="audit_read">
+              <li>
+                <Link 
+                  href="/audit" 
+                  prefetch={true}
+                  className="flex items-center py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
+                  onClick={handleLinkClick}
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  Audit Trail
                 </Link>
               </li>
             </PermissionGuard>
@@ -272,7 +295,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
         </li>
         <li style={{ display: 'block', width: '100%' }}>
           <Link 
-            href="/scenarios" 
+            href="/projects" 
             prefetch={true}
             style={{ 
               display: 'block', 
@@ -283,7 +306,7 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
               transition: 'background-color 0.2s'
             }}
           >
-            What-If Scenarios
+            Projects
           </Link>
         </li>
         {hasPermission('resource_read') && (
@@ -301,24 +324,6 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
               }}
             >
               Resource Management
-            </Link>
-          </li>
-        )}
-        {(hasPermission('report_read') || hasPermission('analytics_read')) && (
-          <li style={{ display: 'block', width: '100%' }}>
-            <Link 
-              href="/reports" 
-              prefetch={true}
-              style={{ 
-                display: 'block', 
-                padding: '0.5rem 1rem', 
-                borderRadius: '0.375rem', 
-                color: '#ffffff', 
-                textDecoration: 'none',
-                transition: 'background-color 0.2s'
-              }}
-            >
-              AI Reports & Analytics
             </Link>
           </li>
         )}
@@ -358,6 +363,40 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             </Link>
           </li>
         )}
+        {(hasPermission('report_read') || hasPermission('analytics_read')) && (
+          <li style={{ display: 'block', width: '100%' }}>
+            <Link 
+              href="/reports" 
+              prefetch={true}
+              style={{ 
+                display: 'block', 
+                padding: '0.5rem 1rem', 
+                borderRadius: '0.375rem', 
+                color: '#ffffff', 
+                textDecoration: 'none',
+                transition: 'background-color 0.2s'
+              }}
+            >
+              AI Reports & Analytics
+            </Link>
+          </li>
+        )}
+        <li style={{ display: 'block', width: '100%' }}>
+          <Link 
+            href="/scenarios" 
+            prefetch={true}
+            style={{ 
+              display: 'block', 
+              padding: '0.5rem 1rem', 
+              borderRadius: '0.375rem', 
+              color: '#ffffff', 
+              textDecoration: 'none',
+              transition: 'background-color 0.2s'
+            }}
+          >
+            What-If Scenarios
+          </Link>
+        </li>
         {hasPermission('analytics_read') && (
           <li style={{ display: 'block', width: '100%' }}>
             <Link 
@@ -393,6 +432,26 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
               }}
             >
               Change Management
+            </Link>
+          </li>
+        )}
+        {hasPermission('audit_read') && (
+          <li style={{ display: 'block', width: '100%' }}>
+            <Link 
+              href="/audit" 
+              prefetch={true}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                padding: '0.5rem 1rem', 
+                borderRadius: '0.375rem', 
+                color: '#ffffff', 
+                textDecoration: 'none',
+                transition: 'background-color 0.2s'
+              }}
+            >
+              <FileText className="mr-2 h-4 w-4" />
+              Audit Trail
             </Link>
           </li>
         )}

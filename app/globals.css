@@ -76,12 +76,13 @@ button {
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
+/* Dark mode is disabled for now - will be implemented with proper theme switcher */
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-}
+} */
 
 body {
   background: var(--background);

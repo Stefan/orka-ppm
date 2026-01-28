@@ -11,12 +11,13 @@ import {
   Bell,
   ChevronDown,
   MoreHorizontal,
-  AlertTriangle,
   BarChart3,
   GitPullRequest,
   MessageSquare,
   Activity,
-  Users
+  Users,
+  FileText,
+  Layers
 } from 'lucide-react'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
 import { GlobalLanguageSelector } from './GlobalLanguageSelector'
@@ -88,9 +89,9 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   const userName = session?.user?.user_metadata?.full_name || userEmail.split('@')[0]
 
   // Navigation link styles
-  const navLinkBase = 'px-3 py-1.5 rounded-md text-sm font-medium transition-all'
+  const navLinkBase = 'px-3 py-2 rounded-md text-sm font-medium transition-all'
   const navLinkActive = 'bg-blue-600 text-white shadow-sm'
-  const navLinkInactive = 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+  const navLinkInactive = 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
 
   return (
     <header data-testid="top-bar" className="bg-white border-b border-gray-200 w-full shadow-sm" style={{ position: 'sticky', top: 0, zIndex: 9999, flexShrink: 0, minHeight: '56px' }}>
@@ -117,10 +118,10 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           </Link>
         </div>
 
-        {/* Center Section: Navigation Links */}
+        {/* Left-aligned Navigation Links */}
         <nav 
           data-testid="top-bar-nav"
-          className="items-center space-x-1 flex-1 justify-center"
+          className="items-center space-x-1 flex-1"
           style={{ 
             display: showNav ? 'flex' : 'none'
           }}
@@ -132,10 +133,10 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             {t('nav.dashboards')}
           </Link>
           <Link
-            href="/scenarios"
-            className={`${navLinkBase} ${pathname === '/scenarios' ? navLinkActive : navLinkInactive}`}
+            href="/projects"
+            className={`${navLinkBase} ${pathname === '/projects' || pathname.startsWith('/projects/') ? navLinkActive : navLinkInactive}`}
           >
-            {t('nav.scenarios')}
+            Projects
           </Link>
           <Link
             href="/resources"
@@ -144,16 +145,22 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             {t('nav.resources')}
           </Link>
           <Link
-            href="/reports"
-            className={`${navLinkBase} ${pathname === '/reports' ? navLinkActive : navLinkInactive}`}
-          >
-            {t('nav.reports')}
-          </Link>
-          <Link
             href="/financials"
             className={`${navLinkBase} ${pathname === '/financials' ? navLinkActive : navLinkInactive}`}
           >
             {t('nav.financials')}
+          </Link>
+          <Link
+            href="/risks"
+            className={`${navLinkBase} ${pathname === '/risks' ? navLinkActive : navLinkInactive}`}
+          >
+            {t('nav.risks')}
+          </Link>
+          <Link
+            href="/reports"
+            className={`${navLinkBase} ${pathname === '/reports' ? navLinkActive : navLinkInactive}`}
+          >
+            {t('nav.reports')}
           </Link>
 
           {/* More Menu Dropdown */}
@@ -161,7 +168,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             <button
               onClick={() => setMoreMenuOpen(!moreMenuOpen)}
               className={`flex items-center space-x-1 ${navLinkBase} ${
-                moreMenuOpen || ['/risks', '/monte-carlo', '/changes', '/feedback', '/admin/performance', '/admin/users'].includes(pathname)
+                moreMenuOpen || ['/scenarios', '/monte-carlo', '/changes', '/audit', '/feedback', '/admin/performance', '/admin/users'].includes(pathname)
                   ? navLinkActive
                   : navLinkInactive
               }`}
@@ -174,23 +181,23 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             {moreMenuOpen && (
               <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                 <Link
-                  href="/risks"
+                  href="/scenarios"
                   className={`flex items-center px-3 py-2 mx-2 rounded-md text-sm transition-all ${
-                    pathname === '/risks'
-                      ? 'bg-blue-50 text-blue-700 font-medium'
-                      : 'text-gray-800 hover:bg-gray-50'
+                    pathname === '/scenarios'
+                      ? 'bg-blue-600 text-white font-medium'
+                      : 'text-gray-900 hover:bg-blue-50 hover:text-blue-700'
                   }`}
                   onClick={() => setMoreMenuOpen(false)}
                 >
-                  <AlertTriangle className="h-4 w-4 mr-3 flex-shrink-0" />
-                  {t('nav.risks')}
+                  <Layers className="h-4 w-4 mr-3 flex-shrink-0" />
+                  What-If Scenarios
                 </Link>
                 <Link
                   href="/monte-carlo"
                   className={`flex items-center px-3 py-2 mx-2 rounded-md text-sm transition-all ${
                     pathname === '/monte-carlo'
-                      ? 'bg-blue-50 text-blue-700 font-medium'
-                      : 'text-gray-800 hover:bg-gray-50'
+                      ? 'bg-blue-600 text-white font-medium'
+                      : 'text-gray-900 hover:bg-blue-50 hover:text-blue-700'
                   }`}
                   onClick={() => setMoreMenuOpen(false)}
                 >
@@ -201,8 +208,8 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   href="/changes"
                   className={`flex items-center px-3 py-2 mx-2 rounded-md text-sm transition-all ${
                     pathname === '/changes'
-                      ? 'bg-blue-50 text-blue-700 font-medium'
-                      : 'text-gray-800 hover:bg-gray-50'
+                      ? 'bg-blue-600 text-white font-medium'
+                      : 'text-gray-900 hover:bg-blue-50 hover:text-blue-700'
                   }`}
                   onClick={() => setMoreMenuOpen(false)}
                 >
@@ -210,11 +217,23 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   Change Management
                 </Link>
                 <Link
+                  href="/audit"
+                  className={`flex items-center px-3 py-2 mx-2 rounded-md text-sm transition-all ${
+                    pathname === '/audit'
+                      ? 'bg-blue-600 text-white font-medium'
+                      : 'text-gray-900 hover:bg-blue-50 hover:text-blue-700'
+                  }`}
+                  onClick={() => setMoreMenuOpen(false)}
+                >
+                  <FileText className="h-4 w-4 mr-3 flex-shrink-0" />
+                  Audit Trail
+                </Link>
+                <Link
                   href="/feedback"
                   className={`flex items-center px-3 py-2 mx-2 rounded-md text-sm transition-all ${
                     pathname === '/feedback'
-                      ? 'bg-blue-50 text-blue-700 font-medium'
-                      : 'text-gray-800 hover:bg-gray-50'
+                      ? 'bg-blue-600 text-white font-medium'
+                      : 'text-gray-900 hover:bg-blue-50 hover:text-blue-700'
                   }`}
                   onClick={() => setMoreMenuOpen(false)}
                 >
@@ -228,8 +247,8 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   href="/admin/performance"
                   className={`flex items-center px-3 py-2 mx-2 rounded-md text-sm transition-all ${
                     pathname === '/admin/performance'
-                      ? 'bg-blue-50 text-blue-700 font-medium'
-                      : 'text-gray-800 hover:bg-gray-50'
+                      ? 'bg-blue-600 text-white font-medium'
+                      : 'text-gray-900 hover:bg-blue-50 hover:text-blue-700'
                   }`}
                   onClick={() => setMoreMenuOpen(false)}
                 >
@@ -240,8 +259,8 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   href="/admin/users"
                   className={`flex items-center px-3 py-2 mx-2 rounded-md text-sm transition-all ${
                     pathname === '/admin/users'
-                      ? 'bg-blue-50 text-blue-700 font-medium'
-                      : 'text-gray-800 hover:bg-gray-50'
+                      ? 'bg-blue-600 text-white font-medium'
+                      : 'text-gray-900 hover:bg-blue-50 hover:text-blue-700'
                   }`}
                   onClick={() => setMoreMenuOpen(false)}
                 >

@@ -18,7 +18,8 @@ import {
   Settings,
   Zap,
   Clock,
-  Star
+  Star,
+  FileText
 } from 'lucide-react'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
 import { useNavigationAnalytics } from '../../hooks/useNavigationAnalytics'
@@ -95,6 +96,14 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
     href: '/changes',
     category: 'secondary',
     description: 'Track and manage project changes'
+  },
+  {
+    id: 'audit',
+    label: 'Audit Trail',
+    icon: FileText,
+    href: '/audit',
+    category: 'secondary',
+    description: 'View comprehensive audit logs and compliance tracking'
   },
   {
     id: 'feedback',

@@ -42,3 +42,9 @@ PuLP==2.7.0
 
 # User agent parsing for access analytics
 user-agents==2.2.0
+
+# Machine learning for audit anomaly detection
+scikit-learn==1.8.0
+
+# Statistical models for AI agents
+statsmodels==0.14.6

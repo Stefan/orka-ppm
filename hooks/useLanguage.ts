@@ -158,13 +158,28 @@ export function useLanguage(): UseLanguageReturn {
       setError(null)
 
       const languages = await helpChatAPI.getSupportedLanguages()
+      
+      // If API returns empty array, use fallback languages
+      if (!languages || languages.length === 0) {
+        console.info('Using fallback languages (API returned empty)')
+        const defaultLanguages: SupportedLanguage[] = [
+          { code: 'en', name: 'English', native_name: 'English', formal_tone: false },
+          { code: 'de', name: 'German', native_name: 'Deutsch', formal_tone: true },
+          { code: 'fr', name: 'French', native_name: 'Français', formal_tone: true },
+          { code: 'es', name: 'Spanish', native_name: 'Español', formal_tone: false },
+          { code: 'pl', name: 'Polish', native_name: 'Polski', formal_tone: false },
+          { code: 'gsw', name: 'Swiss German', native_name: 'Baseldytsch', formal_tone: false },
+        ]
+        setSupportedLanguages(defaultLanguages)
+        return defaultLanguages
+      }
+      
       setSupportedLanguages(languages)
       return languages
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to get supported languages'
-      setError(errorMessage)
+      // Silently fallback to default languages if API call fails
+      console.warn('Help chat API error, using default languages:', err instanceof Error ? err.message : 'Unknown error')
       
-      // Fallback to default languages matching the i18n system
       const defaultLanguages: SupportedLanguage[] = [
         { code: 'en', name: 'English', native_name: 'English', formal_tone: false },
         { code: 'de', name: 'German', native_name: 'Deutsch', formal_tone: true },
