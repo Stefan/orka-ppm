@@ -497,6 +497,7 @@
   },
   "risks": {
     "title": "Risk Management",
+    "addRisk": "Add risk",
     "total": "Total",
     "highRisk": "High Risk",
     "avg": "Avg",

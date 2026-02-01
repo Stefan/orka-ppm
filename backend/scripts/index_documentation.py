@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
 Index Documentation Script
-Automatically indexes all documentation in docs/ folder for the Help Chat RAG system
+Automatically indexes documentation for the Help Chat RAG system:
+- docs/ folder (user and developer guides)
+- .kiro/specs/ (requirements, design, tasks - single source of truth for features)
 """
 
 import os
@@ -43,22 +45,33 @@ async def index_documentation():
     print("✓ RAG agent initialized")
     print()
     
-    # Find all documentation files
-    docs_dir = Path(__file__).parent.parent.parent / "docs"
-    if not docs_dir.exists():
-        print(f"❌ Error: Documentation directory not found: {docs_dir}")
+    # Find all documentation files: docs/ and .kiro/specs/
+    repo_root = Path(__file__).parent.parent.parent
+    docs_dir = repo_root / "docs"
+    specs_dir = repo_root / ".kiro" / "specs"
+
+    doc_files = []
+    if docs_dir.exists():
+        doc_files.extend(docs_dir.glob("**/*.md"))
+        print(f"📂 Scanning documentation directory: {docs_dir}")
+        print(f"   Found {len(list(docs_dir.glob('**/*.md')))} docs/*.md files")
+    if specs_dir.exists():
+        spec_files = list(specs_dir.glob("**/*.md"))
+        doc_files.extend(spec_files)
+        print(f"📂 Scanning specs directory: {specs_dir}")
+        print(f"   Found {len(spec_files)} .kiro/specs/*.md files (requirements, design, tasks)")
+    if not doc_files:
+        print("❌ Error: No documentation or spec files found (docs/ or .kiro/specs/)")
         return False
-    
-    print(f"📂 Scanning documentation directory: {docs_dir}")
-    doc_files = list(docs_dir.glob("**/*.md"))
-    print(f"✓ Found {len(doc_files)} documentation files")
+
+    print(f"✓ Total: {len(doc_files)} markdown files to index")
     print()
-    
+
     # Index documentation files
     print("📝 Indexing documentation files...")
     indexed_count = 0
     errors = []
-    
+
     for doc_file in doc_files:
         try:
             # Read file content
@@ -70,25 +83,31 @@ async def index_documentation():
                 print(f"⏭️  Skipping empty file: {doc_file.name}")
                 continue
             
-            # Generate content ID
-            relative_path = doc_file.relative_to(docs_dir)
-            content_id = f"doc_{str(relative_path).replace('/', '_').replace('.md', '')}"
-            
+            # Generate content ID and relative path (docs vs specs)
+            try:
+                relative_path = doc_file.relative_to(repo_root)
+            except ValueError:
+                relative_path = doc_file
+            path_str = str(relative_path).replace('\\', '/')
+            content_id = f"doc_{path_str.replace('/', '_').replace('.md', '')}"
+            source = "specs" if ".kiro" in path_str and "specs" in path_str else "docs"
+
             # Extract title from first heading or filename
             title = doc_file.stem.replace('-', ' ').replace('_', ' ').title()
-            first_line = content.split('\n')[0]
+            first_line = content.split('\n')[0] if content.strip() else ''
             if first_line.startswith('#'):
                 title = first_line.lstrip('#').strip()
-            
+
             # Store embedding (use 'document' as content_type - it's allowed by the DB constraint)
             await agent.store_content_embedding(
                 content_type="document",
                 content_id=content_id,
                 content_text=content,
                 metadata={
-                    "file_path": str(relative_path),
+                    "file_path": path_str,
                     "file_name": doc_file.name,
                     "title": title,
+                    "source": source,
                     "indexed_at": datetime.now().isoformat()
                 }
             )

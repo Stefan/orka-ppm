@@ -210,7 +210,7 @@ jobs:
         if: always()
         with:
           name: E2E Structure Test Results
-          path: test-results/junit.xml
+          path: test-results/results.xml
           reporter: java-junit
           fail-on-error: false
       

@@ -15,7 +15,8 @@ import {
   GitPullRequest,
   MessageSquare,
   Activity,
-  UserCog
+  UserCog,
+  Layers
 } from 'lucide-react'
 
 export interface MobileNavProps {
@@ -33,6 +34,7 @@ const NAV_ITEMS = [
   { href: '/monte-carlo', label: 'Monte Carlo Analysis', icon: BarChart3 },
   { href: '/changes', label: 'Change Management', icon: GitPullRequest },
   { href: '/feedback', label: 'Feedback & Ideas', icon: MessageSquare },
+  { href: '/features', label: 'Features Overview', icon: Layers },
   { href: '/admin/performance', label: 'Performance Monitor', icon: Activity },
   { href: '/admin/users', label: 'User Management', icon: UserCog },
 ]

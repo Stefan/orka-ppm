@@ -480,6 +480,7 @@
   },
   "risks": {
     "title": "Risiko-Verwaltung",
+    "addRisk": "Risiko hinzufüge",
     "total": "Total",
     "highRisk": "Hohes Risiko",
     "avg": "Durchschn",

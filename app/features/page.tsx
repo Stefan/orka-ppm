@@ -2,10 +2,10 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import AppLayout from '@/components/shared/AppLayout'
-import { FeatureTree, FeatureDetailCard, FeatureSearchBar } from '@/components/features'
-import { buildFeatureTree, findNodeById, searchFeatures } from '@/lib/features'
+import { PageFeatureTree, FeatureDetailCard, FeatureSearchBar, PageDetailCard } from '@/components/features'
+import { buildPageTree, findPageOrFeatureNode, flattenPageTree, searchFeatures } from '@/lib/features'
 import { supabase } from '@/lib/api/supabase'
-import type { Feature, FeatureTreeNode } from '@/types/features'
+import type { Feature, FeatureSearchResult, PageOrFeatureNode, DocItem } from '@/types/features'
 import { Layers } from 'lucide-react'
 
 const DEFAULT_FEATURES: Feature[] = [
@@ -69,10 +69,27 @@ const DEFAULT_FEATURES: Feature[] = [
 
 function FeaturesContent() {
   const [features, setFeatures] = useState<Feature[]>(DEFAULT_FEATURES)
+  const [routes, setRoutes] = useState<DocItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [routesLoading, setRoutesLoading] = useState(true)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [treeOpen, setTreeOpen] = useState(true)
+  const [searchResults, setSearchResults] = useState<FeatureSearchResult[]>([])
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([])
+      return
+    }
+    let cancelled = false
+    searchFeatures(features, searchQuery).then((results) => {
+      if (!cancelled) setSearchResults(results)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [features, searchQuery])
 
   useEffect(() => {
     let cancelled = false
@@ -98,35 +115,65 @@ function FeaturesContent() {
     }
   }, [])
 
-  const tree = useMemo(() => buildFeatureTree(features), [features])
-  const searchResults = useMemo(
-    () => (searchQuery.trim() ? searchFeatures(features, searchQuery) : []),
-    [features, searchQuery]
-  )
-  const highlightIds = useMemo(
-    () => new Set(searchResults.map((r) => r.feature.id)),
-    [searchResults]
-  )
-  const filteredTree = useMemo(() => {
-    if (!searchQuery.trim()) return tree
-    const ids = highlightIds
-    function keepNode(n: FeatureTreeNode): FeatureTreeNode | null {
-      if (ids.has(n.id)) return n
-      const keptChildren = n.children.map(keepNode).filter(Boolean) as FeatureTreeNode[]
-      if (keptChildren.length > 0) {
-        return { ...n, children: keptChildren }
-      }
-      return null
+  useEffect(() => {
+    let cancelled = false
+    setRoutesLoading(true)
+    fetch('/api/features/docs')
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('Failed to load docs'))))
+      .then((json) => {
+        // #region agent log
+        const firstRoute = Array.isArray(json.routes) ? json.routes[0] : null
+        fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'app/features/page.tsx:docs fetch',
+            message: 'Client received docs response',
+            data: {
+              routesLen: json.routes?.length ?? 0,
+              firstRouteId: firstRoute?.id,
+              firstRouteDescLen: firstRoute?.description?.length ?? 0,
+              hasFeatureDescriptionsKey: 'featureDescriptions' in json,
+              featureDescriptionsCount: json.featureDescriptions ? Object.keys(json.featureDescriptions).length : 0,
+            },
+            timestamp: Date.now(),
+            sessionId: 'debug-session',
+            hypothesisId: 'H3,H4,H5',
+          }),
+        }).catch(() => {})
+        // #endregion
+        if (!cancelled && Array.isArray(json.routes)) setRoutes(json.routes)
+      })
+      .catch(() => {
+        if (!cancelled) setRoutes([])
+      })
+      .finally(() => {
+        if (!cancelled) setRoutesLoading(false)
+      })
+    return () => {
+      cancelled = true
     }
-    return tree.map(keepNode).filter(Boolean) as FeatureTreeNode[]
-  }, [tree, searchQuery, highlightIds])
+  }, [])
 
-  const selectedFeature = useMemo(
-    () => (selectedId ? features.find((f) => f.id === selectedId) ?? null : null),
-    [features, selectedId]
+  const pageTree = useMemo(() => buildPageTree(routes, features), [routes, features])
+  const flatNodes = useMemo(() => flattenPageTree(pageTree), [pageTree])
+  const highlightIds = useMemo(() => {
+    const ids = new Set<string>()
+    searchResults.forEach((r) => ids.add(r.feature.id))
+    flatNodes.forEach((n) => {
+      if (n.feature && ids.has(n.feature.id)) ids.add(n.id)
+      if (searchQuery.trim() && n.name.toLowerCase().includes(searchQuery.trim().toLowerCase())) ids.add(n.id)
+    })
+    return ids
+  }, [searchResults, flatNodes, searchQuery])
+
+  const selectedNode = useMemo(
+    () => (selectedId ? findPageOrFeatureNode(pageTree, selectedId) ?? null : null),
+    [pageTree, selectedId]
   )
+  const selectedFeature = selectedNode?.feature ?? null
 
-  const handleSelect = useCallback((node: FeatureTreeNode) => {
+  const handleSelect = useCallback((node: PageOrFeatureNode) => {
     setSelectedId(node.id)
   }, [])
 
@@ -146,7 +193,6 @@ function FeaturesContent() {
   }, [])
 
   const handleExplain = useCallback((feature: Feature) => {
-    // Optional: open help chat with context
     if (typeof window !== 'undefined' && (window as unknown as { openHelpChat?: (msg: string) => void }).openHelpChat) {
       (window as unknown as { openHelpChat: (msg: string) => void }).openHelpChat(`Explain: ${feature.name}`)
     } else {
@@ -154,7 +200,9 @@ function FeaturesContent() {
     }
   }, [])
 
-  if (loading) {
+  const isLoading = loading || routesLoading
+
+  if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center" data-testid="features-loading">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
@@ -168,14 +216,17 @@ function FeaturesContent() {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Layers className="h-6 w-6 text-blue-600" />
-            <h1 className="text-lg font-semibold text-gray-900">Features</h1>
+            <div>
+              <h1 className="text-lg font-semibold text-gray-900">Features</h1>
+              <p className="text-xs text-gray-500">By page · descriptions and screenshots</p>
+            </div>
           </div>
           <div className="flex-1 min-w-0 max-w-xl">
             <FeatureSearchBar
               value={searchQuery}
               onChange={setSearchQuery}
               onAISuggest={handleAISuggest}
-              placeholder="Search features… (e.g. Import Builder)"
+              placeholder="Search features…"
             />
           </div>
           <button
@@ -199,8 +250,8 @@ function FeaturesContent() {
           data-testid="features-tree-sidebar"
         >
           <div className="p-3">
-            <FeatureTree
-              nodes={filteredTree}
+            <PageFeatureTree
+              nodes={pageTree}
               selectedId={selectedId}
               onSelect={handleSelect}
               highlightIds={highlightIds}
@@ -209,7 +260,11 @@ function FeaturesContent() {
         </aside>
 
         <main className="flex-1 min-w-0 overflow-y-auto p-4 lg:p-6" data-testid="features-detail-main">
-          <FeatureDetailCard feature={selectedFeature} onExplain={handleExplain} />
+          {selectedNode?.feature ? (
+            <FeatureDetailCard feature={selectedFeature!} onExplain={handleExplain} />
+          ) : (
+            <PageDetailCard node={selectedNode} />
+          )}
         </main>
       </div>
     </div>
