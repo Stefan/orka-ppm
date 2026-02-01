@@ -583,25 +583,30 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <div 
+        <div
           ref={chartRef}
-          className="w-full h-full transition-transform duration-200 ease-out"
-          style={{ 
+          className="w-full transition-transform duration-200 ease-out"
+          style={{
+            height: '300px', // Fixed height instead of h-full
             transform: chartTransform,
             transformOrigin: 'center center',
-            minHeight: '200px', // Ensure chart wrapper has minimum height
-            minWidth: '300px' // Ensure chart wrapper has minimum width
+            minWidth: '400px' // Increased minimum width
           }}
         >
-          <ResponsiveContainer 
-            width="100%" 
-            height="100%"
-            minWidth={300}
-            minHeight={200}
-            debounce={50} // Add debounce to prevent rapid resize calculations
-          >
-            {renderChart()}
-          </ResponsiveContainer>
+          {isMounted ? (
+            <ResponsiveContainer
+              width="100%"
+              height={300} // Fixed height instead of 100%
+              minWidth={400} // Increased minimum width
+              debounce={50} // Add debounce to prevent rapid resize calculations
+            >
+              {renderChart()}
+            </ResponsiveContainer>
+          ) : (
+            <div className="w-full h-full bg-gray-100 animate-pulse rounded flex items-center justify-center">
+              <div className="text-gray-400 text-sm">Loading chart...</div>
+            </div>
+          )}
         </div>
         
         {/* Touch interaction hints */}

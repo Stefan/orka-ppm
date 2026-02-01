@@ -81,7 +81,10 @@ export const CLSSafeImage: React.FC<CLSSafeImageProps> = ({
       className={cn('relative overflow-hidden', className)}
       style={{
         aspectRatio: calculatedAspectRatio,
-        contain: 'layout style paint'
+        contain: 'layout style paint',
+        // Reserve space to prevent CLS
+        minHeight: height || 'auto',
+        minWidth: width || 'auto'
       }}
     >
       <img

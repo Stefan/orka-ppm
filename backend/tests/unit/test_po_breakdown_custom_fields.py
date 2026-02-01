@@ -26,7 +26,7 @@ import os
 # Add backend to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
 
-from services.roche_construction_services import POBreakdownService
+from services.generic_construction_services import POBreakdownService
 
 
 # ============================================================================

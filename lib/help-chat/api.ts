@@ -866,15 +866,15 @@ export class HelpChatAPIService {
    */
   async getSupportedLanguages(): Promise<any[]> {
     try {
-      // Set a short timeout for this request (3 seconds)
+      // Set a very short timeout for this request (1 second for faster startup)
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 3000)
-      
+      const timeoutId = setTimeout(() => controller.abort(), 1000)
+
       const response = await apiRequest(HELP_CHAT_CONFIG.endpoints.languages, {
         method: 'GET',
         signal: controller.signal
       })
-      
+
       clearTimeout(timeoutId)
       return response.data || []
     } catch (error) {

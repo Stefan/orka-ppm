@@ -36,7 +36,7 @@ Configure XAI (Grok) API to work with the help chat system.
 # backend/.env
 OPENAI_API_KEY=your-xai-api-key-here  ← Replace this!
 OPENAI_BASE_URL=https://api.x.ai/v1
-OPENAI_MODEL=grok-beta
+OPENAI_MODEL=grok-4-fast-reasoning
 USE_LOCAL_EMBEDDINGS=true
 ```
 
@@ -45,7 +45,7 @@ USE_LOCAL_EMBEDDINGS=true
 # backend/.env
 OPENAI_API_KEY=xai-abc123def456...     ← Your actual key
 OPENAI_BASE_URL=https://api.x.ai/v1
-OPENAI_MODEL=grok-beta
+OPENAI_MODEL=grok-4-fast-reasoning
 USE_LOCAL_EMBEDDINGS=true
 ```
 

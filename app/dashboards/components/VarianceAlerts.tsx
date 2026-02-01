@@ -143,9 +143,15 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
   const activeAlerts = alerts?.filter(alert => !alert?.resolved) || []
   const displayAlerts = showAll ? alerts : activeAlerts?.slice(0, 3) || []
 
+  // Always reserve the same space to prevent CLS
+  const containerStyle: React.CSSProperties = {
+    minHeight: '200px', // Reserve consistent space
+    contain: 'layout style paint' // Performance isolation
+  }
+
   if ((activeAlerts?.length || 0) === 0) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+      <div className="bg-green-50 border border-green-200 rounded-lg p-4" style={containerStyle}>
         <div className="flex items-center">
           <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
           <span className="text-sm text-green-800">
@@ -157,7 +163,7 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
   }
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200" style={containerStyle}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900">
           Variance Alerts ({activeAlerts?.length || 0})

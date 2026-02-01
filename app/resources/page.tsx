@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useDeferredValue, useReducer, lazy, Suspense } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { Users, Plus, Search, Filter, TrendingUp, AlertCircle, BarChart3, PieChart as PieChartIcon, Target, Zap, RefreshCw, Download, MapPin } from 'lucide-react'
+import { Users, Plus, Search, Filter, TrendingUp, AlertCircle, BarChart3, PieChart as PieChartIcon, Target, Zap, RefreshCw, Download, MapPin, RotateCcw } from 'lucide-react'
 import AppLayout from '../../components/shared/AppLayout'
 import ResourceCard from './components/ResourceCard'
 import ResourceActionButtons from '../../components/resources/ResourceActionButtons'
@@ -383,7 +383,7 @@ export default function Resources() {
             </div>
             
             {/* Mobile-Optimized Action Buttons */}
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 mb-4">
               {/* Resource Action Buttons with RBAC */}
               <ResourceActionButtons
                 onAssignResource={() => {/* Handle assign */}}
@@ -391,32 +391,42 @@ export default function Resources() {
                 variant="compact"
               />
               
-              <button
-                onClick={() => setAutoRefresh(!autoRefresh)}
-                className={`flex items-center justify-center min-h-[44px] px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
-                  autoRefresh 
-                    ? 'bg-green-100 text-green-700 hover:bg-green-200 active:bg-green-300' 
-                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300'
-                }`}
-              >
-                <RefreshCw className={`h-4 w-4 mr-2 flex-shrink-0 ${autoRefresh ? 'animate-spin' : ''}`} />
-                <span className="hidden sm:inline">{autoRefresh ? 'Auto On' : 'Auto Off'}</span>
-                <span className="sm:hidden">Auto</span>
-              </button>
-              
-              <button
-                onClick={() => {
-                  fetchResources()
-                }}
-                className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 active:bg-gray-300 text-sm font-medium"
-              >
-                <RefreshCw className="h-4 w-4 mr-2 flex-shrink-0" />
-                <span className="hidden sm:inline">Refresh</span>
-              </button>
+              {/* Combined Refresh Controls */}
+              <div className="flex items-center bg-white border border-gray-200 rounded-lg p-1 gap-1">
+                {/* Manual Refresh Button */}
+                <button
+                  onClick={() => {
+                    fetchResources()
+                  }}
+                  className="flex items-center justify-center min-h-[44px] min-w-[44px] px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors text-sm font-medium"
+                  title="Daten jetzt aktualisieren"
+                  aria-label="Daten jetzt aktualisieren"
+                >
+                  <RotateCcw className="h-5 w-5" />
+                  <span className="hidden sm:inline ml-2">Refresh</span>
+                </button>
+
+                {/* Auto-Refresh Toggle */}
+                <button
+                  onClick={() => setAutoRefresh(!autoRefresh)}
+                  className={`flex items-center justify-center min-h-[44px] min-w-[44px] px-4 py-2 rounded-md transition-colors text-sm font-medium ${
+                    autoRefresh
+                      ? 'bg-green-600 text-white hover:bg-green-700 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                  title={autoRefresh ? 'Auto-Aktualisierung deaktivieren' : 'Auto-Aktualisierung aktivieren (30s)'}
+                  aria-label={autoRefresh ? 'Auto-Aktualisierung deaktivieren' : 'Auto-Aktualisierung aktivieren (30s)'}
+                >
+                  <RefreshCw className={`h-5 w-5 ${autoRefresh ? 'animate-spin' : ''}`} />
+                  <span className="hidden sm:inline ml-2">Auto</span>
+                </button>
+              </div>
               
               <button
                 onClick={() => setViewMode(viewMode === 'cards' ? 'table' : viewMode === 'table' ? 'heatmap' : 'cards')}
                 className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 active:bg-gray-300 text-sm font-medium"
+                title={viewMode === 'cards' ? 'Zur Tabellenansicht wechseln' : viewMode === 'table' ? 'Zur Heatmap-Ansicht wechseln' : 'Zur Kartenansicht wechseln'}
+                aria-label={viewMode === 'cards' ? 'Zur Tabellenansicht wechseln' : viewMode === 'table' ? 'Zur Heatmap-Ansicht wechseln' : 'Zur Kartenansicht wechseln'}
               >
                 {viewMode === 'cards' ? <BarChart3 className="h-4 w-4 mr-2 flex-shrink-0" /> : 
                  viewMode === 'table' ? <PieChartIcon className="h-4 w-4 mr-2 flex-shrink-0" /> : 
@@ -431,10 +441,12 @@ export default function Resources() {
                   setShowOptimization(!showOptimization)
                 }}
                 className={`flex items-center justify-center min-h-[44px] px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
-                  showOptimization 
-                    ? 'bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800' 
+                  showOptimization
+                    ? 'bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800'
                     : 'bg-purple-100 text-purple-700 hover:bg-purple-200 active:bg-purple-300'
                 }`}
+                title={showOptimization ? 'KI-Optimierung ausblenden' : 'KI-Optimierung anzeigen'}
+                aria-label={showOptimization ? 'KI-Optimierung ausblenden' : 'KI-Optimierung anzeigen'}
               >
                 <Zap className="h-4 w-4 mr-2 flex-shrink-0" />
                 <span className="hidden sm:inline">AI Optimize</span>
@@ -444,6 +456,8 @@ export default function Resources() {
               <button
                 onClick={exportResourceData}
                 className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 active:bg-green-300 text-sm font-medium"
+                  title="Ressourcendaten exportieren"
+                aria-label="Ressourcendaten exportieren"
               >
                 <Download className="h-4 w-4 mr-2 flex-shrink-0" />
                 <span className="hidden sm:inline">Export</span>
@@ -452,18 +466,22 @@ export default function Resources() {
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className={`flex items-center justify-center min-h-[44px] px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
-                  showFilters 
-                    ? 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800' 
+                  showFilters
+                    ? 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
                     : 'bg-blue-100 text-blue-700 hover:bg-blue-200 active:bg-blue-300'
                 }`}
+                title={showFilters ? 'Filter-Optionen ausblenden' : 'Filter-Optionen anzeigen'}
+                aria-label={showFilters ? 'Filter-Optionen ausblenden' : 'Filter-Optionen anzeigen'}
               >
                 <Filter className="h-4 w-4 mr-2 flex-shrink-0" />
                 <span className="hidden sm:inline">Filters</span>
               </button>
               
-              <button 
+              <button
                 onClick={() => setShowAddModal(true)}
                 className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 text-sm font-medium"
+                title="Ressource hinzufügen"
+                aria-label="Ressource hinzufügen"
               >
                 <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
                 <span className="hidden sm:inline">Add Resource</span>
@@ -518,16 +536,18 @@ export default function Resources() {
 
         {/* AI Optimization Panel */}
         {showOptimization && (
-          <Suspense fallback={<SkeletonCard variant="stat" />}>
-            <AIResourceOptimizer
-              authToken={session?.access_token || ''}
-              onOptimizationApplied={(_suggestionId) => {
-                // Refresh resources data when optimization is applied
-                fetchResources()
-              }}
-              className="mb-6"
-            />
-          </Suspense>
+          <div className="mb-6">
+            <Suspense fallback={<SkeletonCard variant="stat" />}>
+              <AIResourceOptimizer
+                authToken={session?.access_token || ''}
+                onOptimizationApplied={(_suggestionId) => {
+                  // Refresh resources data when optimization is applied
+                  fetchResources()
+                }}
+                className="max-h-96 overflow-y-auto"
+              />
+            </Suspense>
+          </div>
         )}
 
         {/* Enhanced Mobile-First Filter Panel */}
@@ -619,6 +639,8 @@ export default function Resources() {
                 <button
                   onClick={clearFilters}
                   className="w-full min-h-[44px] px-4 py-2 bg-gray-100 text-gray-900 rounded-md hover:bg-gray-200 active:bg-gray-300 font-medium"
+                  title="Alle Filter zurücksetzen"
+                  aria-label="Alle Filter zurücksetzen"
                 >
                   Clear Filters
                 </button>

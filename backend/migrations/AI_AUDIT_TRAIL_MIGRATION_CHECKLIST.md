@@ -8,7 +8,7 @@ Use this checklist to ensure a successful migration of the AI-Empowered Audit Tr
 - [ ] Verify Supabase connection is working
 - [ ] Confirm you have service role key access
 - [ ] Check that pgvector extension is enabled
-- [ ] Verify roche_audit_logs table exists
+- [ ] Verify audit_logs table exists
 - [ ] Create database backup (recommended)
 - [ ] Review migration SQL file: `023_ai_empowered_audit_trail.sql`
 
@@ -29,7 +29,7 @@ Use this checklist to ensure a successful migration of the AI-Empowered Audit Tr
 
 ### Step 1: Backup
 - [ ] Create full database backup
-- [ ] Export current roche_audit_logs data
+- [ ] Export current audit_logs data
 - [ ] Document current schema state
 - [ ] Test backup restoration process
 
@@ -52,21 +52,21 @@ Use this checklist to ensure a successful migration of the AI-Empowered Audit Tr
 - [ ] Check audit_ai_predictions table exists
 
 ### Step 4: Verify Columns Added
-- [ ] Verify roche_audit_logs.anomaly_score exists
-- [ ] Verify roche_audit_logs.is_anomaly exists
-- [ ] Verify roche_audit_logs.category exists
-- [ ] Verify roche_audit_logs.risk_level exists
-- [ ] Verify roche_audit_logs.tags exists
-- [ ] Verify roche_audit_logs.ai_insights exists
-- [ ] Verify roche_audit_logs.tenant_id exists
-- [ ] Verify roche_audit_logs.hash exists
-- [ ] Verify roche_audit_logs.previous_hash exists
+- [ ] Verify audit_logs.anomaly_score exists
+- [ ] Verify audit_logs.is_anomaly exists
+- [ ] Verify audit_logs.category exists
+- [ ] Verify audit_logs.risk_level exists
+- [ ] Verify audit_logs.tags exists
+- [ ] Verify audit_logs.ai_insights exists
+- [ ] Verify audit_logs.tenant_id exists
+- [ ] Verify audit_logs.hash exists
+- [ ] Verify audit_logs.previous_hash exists
 
 ### Step 5: Verify Indexes
 - [ ] Check vector index on audit_embeddings.embedding
 - [ ] Check tenant_id indexes on all tables
 - [ ] Check timestamp indexes for time-range queries
-- [ ] Check GIN index on roche_audit_logs.tags
+- [ ] Check GIN index on audit_logs.tags
 - [ ] Check partial indexes for active records
 - [ ] Run index usage query to verify creation
 
@@ -117,7 +117,7 @@ Use this checklist to ensure a successful migration of the AI-Empowered Audit Tr
 ## Configuration
 
 ### Row-Level Security (Optional)
-- [ ] Enable RLS on roche_audit_logs
+- [ ] Enable RLS on audit_logs
 - [ ] Enable RLS on audit_embeddings
 - [ ] Enable RLS on audit_anomalies
 - [ ] Enable RLS on audit_integrations
@@ -189,7 +189,7 @@ Use this checklist to ensure a successful migration of the AI-Empowered Audit Tr
 
 ### Functional Validation
 - [ ] All 8 new tables created successfully
-- [ ] All 9 columns added to roche_audit_logs
+- [ ] All 9 columns added to audit_logs
 - [ ] All 43 indexes created successfully
 - [ ] All 8 constraints added successfully
 - [ ] All foreign keys working correctly
@@ -222,7 +222,7 @@ Use this checklist to ensure a successful migration of the AI-Empowered Audit Tr
 
 ### Rollback Execution
 - [ ] Drop new tables in reverse order
-- [ ] Remove added columns from roche_audit_logs
+- [ ] Remove added columns from audit_logs
 - [ ] Restore from backup if needed
 - [ ] Verify system functionality
 - [ ] Document rollback completion
@@ -277,7 +277,7 @@ WHERE table_schema = 'public' AND table_name LIKE 'audit_%';
 ### Verify Columns
 ```sql
 SELECT column_name, data_type FROM information_schema.columns 
-WHERE table_name = 'roche_audit_logs' 
+WHERE table_name = 'audit_logs' 
 AND column_name IN ('anomaly_score', 'category', 'risk_level', 'tenant_id');
 ```
 
@@ -295,7 +295,7 @@ FROM pg_constraint WHERE conname LIKE 'valid_%';
 
 ### Test Insert
 ```sql
-INSERT INTO roche_audit_logs (
+INSERT INTO audit_logs (
     event_type, entity_type, action_details, tenant_id
 ) VALUES (
     'test_event', 'test_entity', '{}'::jsonb, gen_random_uuid()

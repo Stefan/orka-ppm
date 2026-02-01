@@ -119,7 +119,7 @@ export default function OverviewView({
       {/* Existing Charts */}
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Enhanced Budget Status Distribution - 1/3 width */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 lg:w-1/3">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 lg:w-1/3" style={{ contain: 'layout style paint' }}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">Budget Status Distribution</h3>
             <span className="text-sm text-gray-500">{summary?.projectCount || analyticsData.totalProjects} projects</span>

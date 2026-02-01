@@ -340,7 +340,7 @@ class SecurityAudit:
         try:
             # SQL injection test payloads
             injection_payloads = [
-                "'; DROP TABLE roche_audit_logs; --",
+                "'; DROP TABLE audit_logs; --",
                 "1' OR '1'='1",
                 "admin'--",
                 "' UNION SELECT * FROM users--",

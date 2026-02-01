@@ -396,7 +396,7 @@ class AuditFeatureExtractor:
             # Get last 30 days of audit events for statistics
             start_date = datetime.now() - timedelta(days=30)
             
-            response = self.supabase.table("roche_audit_logs").select(
+            response = self.supabase.table("audit_logs").select(
                 "event_type, user_id, entity_type, entity_id, timestamp"
             ).gte("timestamp", start_date.isoformat()).execute()
             

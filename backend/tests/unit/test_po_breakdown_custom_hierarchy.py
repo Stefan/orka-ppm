@@ -13,7 +13,7 @@ from datetime import datetime
 from unittest.mock import Mock, AsyncMock, patch
 from decimal import Decimal
 
-from services.roche_construction_services import POBreakdownService
+from services.generic_construction_services import POBreakdownService
 
 
 @pytest.fixture

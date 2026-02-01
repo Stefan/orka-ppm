@@ -46,7 +46,7 @@
 | `SUPABASE_SERVICE_ROLE_KEY` | ☐ | (gesetzt) |
 | `OPENAI_API_KEY` | ☐ | (XAI Key gesetzt) |
 | `OPENAI_BASE_URL` | ☐ | `https://api.x.ai/v1` |
-| `OPENAI_MODEL` | ☐ | `grok-4-1-fast-non-reasoning` |
+| `OPENAI_MODEL` | ☐ | `grok-4-fast-reasoning` |
 | `USE_LOCAL_EMBEDDINGS` | ☐ | `true` |
 
 - [ ] **Schritt 12**: Fehlende Variables hinzugefügt (falls nötig)

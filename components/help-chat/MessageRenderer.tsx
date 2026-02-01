@@ -4,13 +4,15 @@ import React, { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
-import { 
-  ExternalLink, 
+import {
+  ExternalLink,
   Star,
   AlertCircle,
   Info,
   Lightbulb,
-  MessageSquare
+  MessageSquare,
+  Copy,
+  MessageCircle
 } from 'lucide-react'
 import { cn } from '../../lib/design-system'
 import { FeedbackInterface } from './FeedbackInterface'
@@ -28,6 +30,16 @@ interface MessageRendererProps {
   onQuickAction: (action: QuickAction) => void
   feedbackMessageId: string | null
   setFeedbackMessageId: (id: string | null) => void
+  messageIndex?: number
+  totalMessages?: number
+  ragData?: {
+    citations?: any[]
+    sources?: any[]
+    confidence?: number
+    cache_hit?: boolean
+    is_fallback?: boolean
+    error_message?: string
+  }
   className?: string
 }
 
@@ -38,6 +50,9 @@ export function MessageRenderer({
   onQuickAction,
   feedbackMessageId,
   setFeedbackMessageId,
+  messageIndex,
+  totalMessages,
+  ragData,
   className
 }: MessageRendererProps) {
   const [expandedSources, setExpandedSources] = useState(false)
@@ -212,50 +227,126 @@ export function MessageRenderer({
             )}
           </div>
 
-          {message.confidence && (
-            <div className="flex items-center space-x-2">
+          {(message.confidence || ragData?.confidence) && (
+            <div className="flex items-center space-x-2 mt-2">
               <Star className="h-3 w-3 text-gray-600" />
               <span className="text-xs font-semibold text-gray-700">Confidence:</span>
               <div className={cn(
                 'px-2 py-1 rounded-full text-xs font-medium border',
-                getConfidenceColor(message.confidence)
+                getConfidenceColor(message.confidence || ragData?.confidence || 0)
               )}>
-                {Math.round(message.confidence * 100)}%
+                {Math.round((message.confidence || ragData?.confidence || 0) * 100)}%
               </div>
-              {message.confidence < 0.6 && (
+              {(message.confidence || ragData?.confidence) && (message.confidence || ragData?.confidence)! < 0.6 && (
                 <div className="flex items-center space-x-1 text-xs text-gray-600">
                   <AlertCircle className="h-3 w-3" />
                   <span>Low confidence - please verify</span>
                 </div>
               )}
+              {ragData?.cache_hit && (
+                <div className="flex items-center space-x-1 text-xs text-blue-600">
+                  <Info className="h-3 w-3" />
+                  <span>(cached)</span>
+                </div>
+              )}
+              {ragData?.is_fallback && (
+                <div className="flex items-center space-x-1 text-xs text-orange-600">
+                  <AlertCircle className="h-3 w-3" />
+                  <span>(limited response)</span>
+                </div>
+              )}
             </div>
           )}
 
-          {message.sources && message.sources.length > 0 && (
+          {((message.sources && message.sources.length > 0) || (ragData?.citations && ragData.citations.length > 0) || (ragData?.sources && ragData.sources.length > 0)) && (
             <div className="mt-3">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="text-xs font-medium text-gray-700">
-                  Sources ({message.sources.length})
-                </h4>
-                {message.sources.length > 2 && (
-                  <button
-                    onClick={() => setExpandedSources(!expandedSources)}
-                    className="text-xs text-blue-600 hover:text-blue-800"
-                  >
-                    {expandedSources ? 'Show less' : 'Show all'}
-                  </button>
-                )}
-              </div>
-              <div
-                id={`${messageId}-sources`}
-                className="space-y-2"
-              >
-                {(expandedSources ? message.sources : message.sources.slice(0, 2)).map((source, index) => (
-                  <div key={source.id || `source-${index}`}>
-                    <SourceCard source={source} />
+              {/* Citations */}
+              {ragData?.citations && ragData.citations.length > 0 && (
+                <div className="mb-3">
+                  <h4 className="text-xs font-medium text-gray-700 mb-2">References</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {ragData.citations.map((citation: any, index: number) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full border border-blue-200"
+                      >
+                        [{citation.number}]
+                      </span>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
+
+              {/* RAG Sources */}
+              {ragData?.sources && ragData.sources.length > 0 && (
+                <div className="mb-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-xs font-medium text-gray-700">
+                      Referenced Documents ({ragData.sources.length})
+                    </h4>
+                    {ragData.sources.length > 2 && (
+                      <button
+                        onClick={() => setExpandedSources(!expandedSources)}
+                        className="text-xs text-blue-600 hover:text-blue-800"
+                      >
+                        {expandedSources ? 'Show less' : 'Show all'}
+                      </button>
+                    )}
+                  </div>
+                  <div
+                    id={`${messageId}-rag-sources`}
+                    className="space-y-2"
+                  >
+                    {(expandedSources ? ragData.sources : ragData.sources.slice(0, 2)).map((source: any, index: number) => (
+                      <div key={`rag-source-${index}`} className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                        <div className="flex items-start space-x-3">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Info className="w-4 h-4 text-blue-600" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-gray-900 text-sm mb-1">{source.title}</div>
+                            <div className="text-gray-600 text-sm leading-relaxed mb-2">{source.content_preview}</div>
+                            {source.category && (
+                              <div className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                                {source.category}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Provider Sources (fallback) */}
+              {message.sources && message.sources.length > 0 && (!ragData?.sources || ragData.sources.length === 0) && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-xs font-medium text-gray-700">
+                      Sources ({message.sources.length})
+                    </h4>
+                    {message.sources.length > 2 && (
+                      <button
+                        onClick={() => setExpandedSources(!expandedSources)}
+                        className="text-xs text-blue-600 hover:text-blue-800"
+                      >
+                        {expandedSources ? 'Show less' : 'Show all'}
+                      </button>
+                    )}
+                  </div>
+                  <div
+                    id={`${messageId}-sources`}
+                    className="space-y-2"
+                  >
+                    {(expandedSources ? message.sources : message.sources.slice(0, 2)).map((source, index) => (
+                      <div key={source.id || `source-${index}`}>
+                        <SourceCard source={source} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -273,6 +364,31 @@ export function MessageRenderer({
                   {action.label}
                 </button>
               ))}
+            </div>
+          )}
+
+          {/* Action buttons for assistant messages */}
+          {!isUser && !isSystem && (
+            <div
+              id={actionsId}
+              className="flex items-center space-x-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            >
+              <button
+                onClick={() => onCopy(message.content)}
+                className="inline-flex items-center space-x-1 px-2 py-1 text-xs text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+                aria-label="Copy message"
+              >
+                <Copy className="h-3 w-3" />
+                <span>Copy</span>
+              </button>
+              <button
+                onClick={() => setFeedbackMessageId(message.id)}
+                className="inline-flex items-center space-x-1 px-2 py-1 text-xs text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+                aria-label="Give feedback"
+              >
+                <MessageCircle className="h-3 w-3" />
+                <span>Feedback</span>
+              </button>
             </div>
           )}
         </div>

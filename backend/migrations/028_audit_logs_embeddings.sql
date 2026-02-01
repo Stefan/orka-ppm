@@ -1,21 +1,21 @@
 -- Migration 028: Add Embedding Column to Audit Logs for RAG Search
 -- Requirements: 14.1
--- Description: Adds vector embedding column to roche_audit_logs table for semantic search
+-- Description: Adds vector embedding column to audit_logs table for semantic search
 --              using RAG (Retrieval-Augmented Generation)
 
 -- Ensure pgvector extension is enabled
 CREATE EXTENSION IF NOT EXISTS vector;
 
 -- ============================================================================
--- 1. Add embedding column to roche_audit_logs table
+-- 1. Add embedding column to audit_logs table
 -- ============================================================================
 
 -- Add embedding column for semantic search
-ALTER TABLE roche_audit_logs 
+ALTER TABLE audit_logs 
     ADD COLUMN IF NOT EXISTS embedding vector(1536);
 
 -- Add comment to the new column
-COMMENT ON COLUMN roche_audit_logs.embedding IS 'Vector embedding (1536 dimensions for OpenAI text-embedding-ada-002) for semantic search';
+COMMENT ON COLUMN audit_logs.embedding IS 'Vector embedding (1536 dimensions for OpenAI text-embedding-ada-002) for semantic search';
 
 -- ============================================================================
 -- 2. Create vector similarity index for efficient search
@@ -23,8 +23,8 @@ COMMENT ON COLUMN roche_audit_logs.embedding IS 'Vector embedding (1536 dimensio
 
 -- Create IVFFlat index for fast approximate nearest neighbor search
 -- Using cosine distance operator for similarity search
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_embedding_vector 
-    ON roche_audit_logs USING ivfflat (embedding vector_cosine_ops)
+CREATE INDEX IF NOT EXISTS idx_audit_logs_embedding_vector 
+    ON audit_logs USING ivfflat (embedding vector_cosine_ops)
     WITH (lists = 100);
 
 -- Note: The lists parameter should be adjusted based on dataset size
@@ -39,13 +39,13 @@ CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_embedding_vector
 
 -- Composite index for tenant-scoped vector search
 -- This allows efficient filtering by tenant_id before vector search
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_tenant_timestamp 
-    ON roche_audit_logs(tenant_id, timestamp DESC)
+CREATE INDEX IF NOT EXISTS idx_audit_logs_tenant_timestamp 
+    ON audit_logs(tenant_id, timestamp DESC)
     WHERE embedding IS NOT NULL;
 
 -- Composite index for event type filtering with embeddings
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_event_type_embedding 
-    ON roche_audit_logs(event_type)
+CREATE INDEX IF NOT EXISTS idx_audit_logs_event_type_embedding 
+    ON audit_logs(event_type)
     WHERE embedding IS NOT NULL;
 
 -- ============================================================================
@@ -94,7 +94,7 @@ BEGIN
         l.category,
         l.risk_level,
         l.tags
-    FROM roche_audit_logs l
+    FROM audit_logs l
     WHERE 
         l.tenant_id = p_tenant_id
         AND l.embedding IS NOT NULL
@@ -139,7 +139,7 @@ BEGIN
         l.action_details,
         l.severity,
         l.timestamp
-    FROM roche_audit_logs l
+    FROM audit_logs l
     WHERE 
         l.tenant_id = p_tenant_id
         AND l.embedding IS NULL
@@ -172,7 +172,7 @@ BEGIN
     
     -- Update embeddings in batch
     FOR i IN 1..array_length(log_ids, 1) LOOP
-        UPDATE roche_audit_logs 
+        UPDATE audit_logs 
         SET embedding = embeddings[i]
         WHERE id = log_ids[i];
     END LOOP;
@@ -207,7 +207,7 @@ BEGIN
         ROUND((COUNT(l.embedding)::numeric / NULLIF(COUNT(*), 0) * 100), 2) as embedding_coverage_percent,
         MIN(l.timestamp) FILTER (WHERE l.embedding IS NULL) as oldest_unembedded_log,
         MAX(l.timestamp) FILTER (WHERE l.embedding IS NOT NULL) as newest_embedded_log
-    FROM roche_audit_logs l
+    FROM audit_logs l
     WHERE p_tenant_id IS NULL OR l.tenant_id = p_tenant_id;
 END;
 $$ LANGUAGE plpgsql STABLE;

@@ -37,8 +37,8 @@ from tests.property_tests.pbt_framework import (
 )
 
 # Import the services and models
-from services.roche_construction_services import ProjectModelingEngine
-from roche_construction_models import (
+from services.generic_construction_services import ProjectModelingEngine
+from generic_construction_models import (
     ProjectChanges,
     TimelineImpact,
     CostImpact,

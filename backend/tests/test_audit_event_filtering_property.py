@@ -120,11 +120,11 @@ async def test_filter_result_correctness(
         
         # Insert test events
         if test_events:
-            response = supabase.table("roche_audit_logs").insert(test_events).execute()
+            response = supabase.table("audit_logs").insert(test_events).execute()
             assert response.data, "Failed to insert test events"
         
         # Query with filters
-        query = supabase.table("roche_audit_logs").select("*")
+        query = supabase.table("audit_logs").select("*")
         query = query.eq("tenant_id", str(tenant_id))
         query = query.eq("event_type", filter_event_type)
         query = query.eq("severity", filter_severity)
@@ -154,7 +154,7 @@ async def test_filter_result_correctness(
         # Cleanup: delete test events
         if test_events:
             event_ids = [e["id"] for e in test_events]
-            supabase.table("roche_audit_logs").delete().in_("id", event_ids).execute()
+            supabase.table("audit_logs").delete().in_("id", event_ids).execute()
 
 
 # Feature: ai-empowered-audit-trail, Property 30: Tenant Isolation in Queries
@@ -197,11 +197,11 @@ async def test_tenant_isolation_in_queries(
         
         # Insert all events
         if test_events:
-            response = supabase.table("roche_audit_logs").insert(test_events).execute()
+            response = supabase.table("audit_logs").insert(test_events).execute()
             assert response.data, "Failed to insert test events"
         
         # Query for tenant 1 events
-        query1 = supabase.table("roche_audit_logs").select("*")
+        query1 = supabase.table("audit_logs").select("*")
         query1 = query1.eq("tenant_id", str(tenant1_id))
         result1 = query1.execute()
         
@@ -215,7 +215,7 @@ async def test_tenant_isolation_in_queries(
                 f"Cross-tenant data leak: found tenant {event['tenant_id']} in tenant 1 query"
         
         # Query for tenant 2 events
-        query2 = supabase.table("roche_audit_logs").select("*")
+        query2 = supabase.table("audit_logs").select("*")
         query2 = query2.eq("tenant_id", str(tenant2_id))
         result2 = query2.execute()
         
@@ -238,7 +238,7 @@ async def test_tenant_isolation_in_queries(
         # Cleanup: delete test events
         if test_events:
             event_ids = [e["id"] for e in test_events]
-            supabase.table("roche_audit_logs").delete().in_("id", event_ids).execute()
+            supabase.table("audit_logs").delete().in_("id", event_ids).execute()
 
 
 # Feature: ai-empowered-audit-trail, Property 4: Date Range Filter Correctness
@@ -297,11 +297,11 @@ async def test_date_range_filter_correctness(
         
         # Insert test events
         if test_events:
-            response = supabase.table("roche_audit_logs").insert(test_events).execute()
+            response = supabase.table("audit_logs").insert(test_events).execute()
             assert response.data, "Failed to insert test events"
         
         # Query with date range filter
-        query = supabase.table("roche_audit_logs").select("*")
+        query = supabase.table("audit_logs").select("*")
         query = query.eq("tenant_id", str(tenant_id))
         query = query.gte("timestamp", start_date.isoformat())
         query = query.lte("timestamp", end_date.isoformat())
@@ -324,7 +324,7 @@ async def test_date_range_filter_correctness(
         # Cleanup: delete test events
         if test_events:
             event_ids = [e["id"] for e in test_events]
-            supabase.table("roche_audit_logs").delete().in_("id", event_ids).execute()
+            supabase.table("audit_logs").delete().in_("id", event_ids).execute()
 
 
 
@@ -369,11 +369,11 @@ async def test_chronological_event_ordering(num_events: int):
         
         # Insert shuffled events
         if shuffled_events:
-            response = supabase.table("roche_audit_logs").insert(shuffled_events).execute()
+            response = supabase.table("audit_logs").insert(shuffled_events).execute()
             assert response.data, "Failed to insert test events"
         
         # Query events ordered by timestamp (ascending)
-        query = supabase.table("roche_audit_logs").select("*")
+        query = supabase.table("audit_logs").select("*")
         query = query.eq("tenant_id", str(tenant_id))
         query = query.order("timestamp", desc=False)
         
@@ -396,4 +396,4 @@ async def test_chronological_event_ordering(num_events: int):
         # Cleanup: delete test events
         if test_events:
             event_ids = [e["id"] for e in test_events]
-            supabase.table("roche_audit_logs").delete().in_("id", event_ids).execute()
+            supabase.table("audit_logs").delete().in_("id", event_ids).execute()

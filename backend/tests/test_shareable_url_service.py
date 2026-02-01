@@ -13,8 +13,8 @@ import json
 # Use anyio for async tests (already installed)
 pytestmark = pytest.mark.anyio
 
-from services.roche_construction_services import ShareableURLService, TokenManager
-from roche_construction_models import (
+from services.generic_construction_services import ShareableURLService, TokenManager
+from generic_construction_models import (
     ShareablePermissions,
     ShareableURLCreate,
     ShareableURLResponse,

@@ -80,6 +80,7 @@
     "configure": "Configurar",
     "remove": "Eliminar",
     "view": "Ver",
+    "send": "Enviar",
     "items": {
       "one": "{count} elemento",
       "other": "{count} elementos"
@@ -148,7 +149,11 @@
     "welcome": "¡Bienvenido al Asistente de Ayuda IA!",
     "welcomeMessage": "Pregúntame cualquier cosa sobre las funciones de la plataforma PPM y te ayudaré.",
     "typing": "La IA está escribiendo...",
-    "tryAgain": "Intentar de nuevo"
+    "tryAgain": "Intentar de nuevo",
+    "you": "Tú",
+    "sources": "Fuentes:",
+    "referencedDocuments": "Documentos referenciados:",
+    "confidence": "Confianza"
   },
   "variance": {
     "trends": "Tendencias de Variación",
@@ -315,6 +320,21 @@
     "aiOptimize": "Optimizar con IA",
     "ai": "IA",
     "addResource": "Agregar Recurso",
+    "refreshNow": "Actualizar ahora",
+    "enableAutoRefresh": "Habilitar actualización automática (30s)",
+    "disableAutoRefresh": "Deshabilitar actualización automática",
+    "exportData": "Exportar datos de recursos",
+    "showFilters": "Mostrar filtros",
+    "hideFilters": "Ocultar filtros",
+    "showOptimization": "Mostrar optimización de IA",
+    "hideOptimization": "Ocultar optimización de IA",
+    "switchToTable": "Cambiar a vista de tabla",
+    "switchToHeatmap": "Cambiar a vista de mapa de calor",
+    "switchToCards": "Cambiar a vista de tarjetas",
+    "assignResource": "Asignar recurso",
+    "scheduleResource": "Programar recurso",
+    "editAllocation": "Editar asignación",
+    "removeResource": "Eliminar recurso",
     "totalResources": "Total de Recursos",
     "avgUtilization": "Utilización Promedio",
     "search": "Buscar",

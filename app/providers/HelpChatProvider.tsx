@@ -379,8 +379,20 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
         fullRequest: JSON.stringify(request).substring(0, 500)
       })
 
-      // Use the new API service
-      const data: HelpQueryResponse = await helpChatAPI.submitQuery(request)
+      // Use direct API route call (with mock support)
+      const apiResponse = await fetch('/api/ai/help/query', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request)
+      })
+
+      if (!apiResponse.ok) {
+        throw new Error(`API Error: ${apiResponse.status} ${apiResponse.statusText}`)
+      }
+
+      const data: HelpQueryResponse = await apiResponse.json()
 
       // Create assistant message
       const assistantMessage: ChatMessage = {

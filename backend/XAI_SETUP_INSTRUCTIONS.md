@@ -22,7 +22,7 @@ Edit `backend/.env` and replace `your-xai-api-key-here` with your actual XAI API
 # Uses /v1/chat/completions endpoint (NOT the deprecated /v1/messages)
 OPENAI_API_KEY=xai-your-actual-key-here
 OPENAI_BASE_URL=https://api.x.ai/v1
-OPENAI_MODEL=grok-beta
+OPENAI_MODEL=grok-4-fast-reasoning
 
 # Use local embeddings since Grok doesn't support embeddings
 USE_LOCAL_EMBEDDINGS=true

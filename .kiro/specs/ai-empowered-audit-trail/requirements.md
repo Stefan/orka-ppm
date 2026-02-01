@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This document specifies the requirements for implementing advanced AI-empowered audit trail features for the PPM SaaS platform. The feature extends the existing audit logging infrastructure (`roche_audit_logs` and `audit_logs` tables) with AI-powered anomaly detection, visual timeline with insights, semantic search using RAG, auto-tagging with ML, and external tool integrations. The system must comply with FDA 21 CFR Part 11, GDPR, and SOC 2 requirements while handling 10,000+ audit events per day in a multi-tenant architecture.
+This document specifies the requirements for implementing advanced AI-empowered audit trail features for the PPM SaaS platform. The feature extends the existing audit logging infrastructure (`audit_logs` and `audit_logs` tables) with AI-powered anomaly detection, visual timeline with insights, semantic search using RAG, auto-tagging with ML, and external tool integrations. The system must comply with FDA 21 CFR Part 11, GDPR, and SOC 2 requirements while handling 10,000+ audit events per day in a multi-tenant architecture.
 
 ## Glossary
 

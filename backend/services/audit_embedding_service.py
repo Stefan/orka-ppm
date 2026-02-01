@@ -44,7 +44,7 @@ class AuditEmbeddingService:
     This service:
     - Monitors audit logs for entries without embeddings
     - Generates embeddings using OpenAI API
-    - Updates the embedding column in roche_audit_logs table
+    - Updates the embedding column in audit_logs table
     - Processes logs in batches for efficiency
     """
     
@@ -153,7 +153,7 @@ class AuditEmbeddingService:
         """
         try:
             # Query logs without embeddings, ordered by timestamp (oldest first)
-            response = self.supabase.table("roche_audit_logs").select(
+            response = self.supabase.table("audit_logs").select(
                 "id, event_type, user_id, entity_type, entity_id, action_details, "
                 "severity, timestamp, category, risk_level, tags, tenant_id"
             ).is_(
@@ -268,7 +268,7 @@ class AuditEmbeddingService:
             # Note: Supabase Python client doesn't support batch updates directly,
             # so we update one by one (could be optimized with RPC function)
             for data in embeddings_data:
-                self.supabase.table("roche_audit_logs").update({
+                self.supabase.table("audit_logs").update({
                     "embedding": data["embedding"]
                 }).eq(
                     "id", data["log_id"]
@@ -292,7 +292,7 @@ class AuditEmbeddingService:
         """
         try:
             # Fetch the log
-            response = self.supabase.table("roche_audit_logs").select(
+            response = self.supabase.table("audit_logs").select(
                 "id, event_type, user_id, entity_type, entity_id, action_details, "
                 "severity, timestamp, category, risk_level, tags, tenant_id"
             ).eq(
@@ -312,7 +312,7 @@ class AuditEmbeddingService:
             embedding = await self._generate_embedding(content_text)
             
             # Update the log
-            self.supabase.table("roche_audit_logs").update({
+            self.supabase.table("audit_logs").update({
                 "embedding": embedding
             }).eq(
                 "id", log_id

@@ -368,12 +368,12 @@ class TestParsingErrorHandling:
     ))
     def test_invalid_json_raises_error(self, parser, invalid_json):
         """
-        Test that invalid JSON raises appropriate error.
-        
-        Property: For any non-JSON string, parse_json() must
-        raise ParsingError.
+        Test that invalid JSON or valid JSON that's not an object raises appropriate error.
+
+        Property: For any string that's not valid JSON or valid JSON that's not an object,
+        parse_json() must raise ParsingError.
         """
-        with pytest.raises(ParsingError, match="Invalid JSON format"):
+        with pytest.raises(ParsingError, match="(Invalid JSON format|JSON document must be an object)"):
             parser.parse_json(invalid_json)
     
     @settings(max_examples=20, deadline=5000)

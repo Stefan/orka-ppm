@@ -87,7 +87,7 @@ async def test_tenant_isolation_in_queries(
     mock_supabase.table.return_value.execute.return_value = Mock(data=events_a)
     
     # Query should automatically filter by tenant_id
-    response_a = mock_supabase.table("roche_audit_logs").select("*").eq(
+    response_a = mock_supabase.table("audit_logs").select("*").eq(
         "tenant_id", tenant_a
     ).execute()
     
@@ -98,7 +98,7 @@ async def test_tenant_isolation_in_queries(
     # Mock query for tenant B
     mock_supabase.table.return_value.execute.return_value = Mock(data=events_b)
     
-    response_b = mock_supabase.table("roche_audit_logs").select("*").eq(
+    response_b = mock_supabase.table("audit_logs").select("*").eq(
         "tenant_id", tenant_b
     ).execute()
     
@@ -235,7 +235,7 @@ async def test_cross_tenant_data_access_prevention(
     # This should return empty results
     mock_supabase.table.return_value.execute.return_value = Mock(data=[])
     
-    response = mock_supabase.table("roche_audit_logs").select("*").eq(
+    response = mock_supabase.table("audit_logs").select("*").eq(
         "tenant_id", tenant_b  # Requesting tenant B
     ).eq(
         "id", events_a[0]["id"]  # But trying to access tenant A event

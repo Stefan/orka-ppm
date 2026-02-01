@@ -3,18 +3,18 @@
 -- Description: Comprehensive schema for AI-powered audit trail with anomaly detection, 
 --              semantic search, ML classification, and external integrations
 --
--- NOTE: This migration creates the base roche_audit_logs table if it doesn't exist,
+-- NOTE: This migration creates the base audit_logs table if it doesn't exist,
 --       then extends it with AI capabilities. Safe to run even if table already exists.
 
 -- Ensure pgvector extension is enabled (should already be enabled from ai_features_schema.sql)
 CREATE EXTENSION IF NOT EXISTS vector;
 
 -- ============================================================================
--- 0. Create base roche_audit_logs table if it doesn't exist
+-- 0. Create base audit_logs table if it doesn't exist
 -- ============================================================================
 
 -- Create base audit logs table (if not already created)
-CREATE TABLE IF NOT EXISTS roche_audit_logs (
+CREATE TABLE IF NOT EXISTS audit_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     event_type VARCHAR(100) NOT NULL,
     user_id UUID REFERENCES auth.users(id),
@@ -31,19 +31,19 @@ CREATE TABLE IF NOT EXISTS roche_audit_logs (
 );
 
 -- Create base indexes if they don't exist
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_event_type ON roche_audit_logs(event_type);
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_user_id ON roche_audit_logs(user_id);
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_entity_type ON roche_audit_logs(entity_type);
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_entity_id ON roche_audit_logs(entity_id);
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_timestamp ON roche_audit_logs(timestamp DESC);
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_severity ON roche_audit_logs(severity);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_event_type ON audit_logs(event_type);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_entity_type ON audit_logs(entity_type);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_entity_id ON audit_logs(entity_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON audit_logs(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_severity ON audit_logs(severity);
 
 -- ============================================================================
--- 1. Extend roche_audit_logs table with AI fields
+-- 1. Extend audit_logs table with AI fields
 -- ============================================================================
 
--- Add AI-related columns to roche_audit_logs table
-ALTER TABLE roche_audit_logs 
+-- Add AI-related columns to audit_logs table
+ALTER TABLE audit_logs 
     ADD COLUMN IF NOT EXISTS anomaly_score DECIMAL(3,2),
     ADD COLUMN IF NOT EXISTS is_anomaly BOOLEAN DEFAULT FALSE,
     ADD COLUMN IF NOT EXISTS category VARCHAR(50),
@@ -60,7 +60,7 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM pg_constraint WHERE conname = 'valid_anomaly_score'
     ) THEN
-        ALTER TABLE roche_audit_logs 
+        ALTER TABLE audit_logs 
             ADD CONSTRAINT valid_anomaly_score 
                 CHECK (anomaly_score IS NULL OR (anomaly_score >= 0 AND anomaly_score <= 1));
     END IF;
@@ -71,7 +71,7 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM pg_constraint WHERE conname = 'valid_risk_level'
     ) THEN
-        ALTER TABLE roche_audit_logs 
+        ALTER TABLE audit_logs 
             ADD CONSTRAINT valid_risk_level 
                 CHECK (risk_level IS NULL OR risk_level IN ('Low', 'Medium', 'High', 'Critical'));
     END IF;
@@ -82,7 +82,7 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM pg_constraint WHERE conname = 'valid_category'
     ) THEN
-        ALTER TABLE roche_audit_logs 
+        ALTER TABLE audit_logs 
             ADD CONSTRAINT valid_category 
                 CHECK (category IS NULL OR category IN (
                     'Security Change', 
@@ -95,36 +95,36 @@ BEGIN
 END $$;
 
 -- Create indexes on new fields for efficient querying
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_anomaly_score 
-    ON roche_audit_logs(anomaly_score) 
+CREATE INDEX IF NOT EXISTS idx_audit_logs_anomaly_score 
+    ON audit_logs(anomaly_score) 
     WHERE is_anomaly = TRUE;
 
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_category 
-    ON roche_audit_logs(category);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_category 
+    ON audit_logs(category);
 
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_risk_level 
-    ON roche_audit_logs(risk_level);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_risk_level 
+    ON audit_logs(risk_level);
 
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_tenant_id 
-    ON roche_audit_logs(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_tenant_id 
+    ON audit_logs(tenant_id);
 
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_tags 
-    ON roche_audit_logs USING GIN(tags);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_tags 
+    ON audit_logs USING GIN(tags);
 
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_is_anomaly 
-    ON roche_audit_logs(is_anomaly) 
+CREATE INDEX IF NOT EXISTS idx_audit_logs_is_anomaly 
+    ON audit_logs(is_anomaly) 
     WHERE is_anomaly = TRUE;
 
 -- Add comments to new columns
-COMMENT ON COLUMN roche_audit_logs.anomaly_score IS 'ML-computed anomaly score (0-1), NULL if not analyzed';
-COMMENT ON COLUMN roche_audit_logs.is_anomaly IS 'Flag indicating if event is classified as anomaly (score > 0.7)';
-COMMENT ON COLUMN roche_audit_logs.category IS 'ML-assigned category: Security Change, Financial Impact, Resource Allocation, Risk Event, Compliance Action';
-COMMENT ON COLUMN roche_audit_logs.risk_level IS 'ML-assigned risk level: Low, Medium, High, Critical';
-COMMENT ON COLUMN roche_audit_logs.tags IS 'AI-generated tags and metadata for the event';
-COMMENT ON COLUMN roche_audit_logs.ai_insights IS 'AI-generated insights and explanations for the event';
-COMMENT ON COLUMN roche_audit_logs.tenant_id IS 'Tenant identifier for multi-tenant isolation';
-COMMENT ON COLUMN roche_audit_logs.hash IS 'SHA-256 hash of event data for tamper detection';
-COMMENT ON COLUMN roche_audit_logs.previous_hash IS 'Hash of previous event in chain for integrity verification';
+COMMENT ON COLUMN audit_logs.anomaly_score IS 'ML-computed anomaly score (0-1), NULL if not analyzed';
+COMMENT ON COLUMN audit_logs.is_anomaly IS 'Flag indicating if event is classified as anomaly (score > 0.7)';
+COMMENT ON COLUMN audit_logs.category IS 'ML-assigned category: Security Change, Financial Impact, Resource Allocation, Risk Event, Compliance Action';
+COMMENT ON COLUMN audit_logs.risk_level IS 'ML-assigned risk level: Low, Medium, High, Critical';
+COMMENT ON COLUMN audit_logs.tags IS 'AI-generated tags and metadata for the event';
+COMMENT ON COLUMN audit_logs.ai_insights IS 'AI-generated insights and explanations for the event';
+COMMENT ON COLUMN audit_logs.tenant_id IS 'Tenant identifier for multi-tenant isolation';
+COMMENT ON COLUMN audit_logs.hash IS 'SHA-256 hash of event data for tamper detection';
+COMMENT ON COLUMN audit_logs.previous_hash IS 'Hash of previous event in chain for integrity verification';
 
 -- ============================================================================
 -- 2. Create audit_embeddings table for semantic search
@@ -132,7 +132,7 @@ COMMENT ON COLUMN roche_audit_logs.previous_hash IS 'Hash of previous event in c
 
 CREATE TABLE IF NOT EXISTS audit_embeddings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    audit_event_id UUID NOT NULL REFERENCES roche_audit_logs(id) ON DELETE CASCADE,
+    audit_event_id UUID NOT NULL REFERENCES audit_logs(id) ON DELETE CASCADE,
     embedding vector(1536),  -- OpenAI ada-002 embedding dimension
     content_text TEXT NOT NULL,
     tenant_id UUID NOT NULL,
@@ -166,7 +166,7 @@ COMMENT ON COLUMN audit_embeddings.tenant_id IS 'Tenant identifier for namespace
 
 CREATE TABLE IF NOT EXISTS audit_anomalies (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    audit_event_id UUID NOT NULL REFERENCES roche_audit_logs(id) ON DELETE CASCADE,
+    audit_event_id UUID NOT NULL REFERENCES audit_logs(id) ON DELETE CASCADE,
     anomaly_score DECIMAL(3,2) NOT NULL,
     detection_timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     features_used JSONB NOT NULL,
@@ -472,7 +472,7 @@ COMMENT ON COLUMN audit_bias_metrics.bias_threshold_exceeded IS 'Amount by which
 
 CREATE TABLE IF NOT EXISTS audit_ai_predictions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    audit_event_id UUID NOT NULL REFERENCES roche_audit_logs(id) ON DELETE CASCADE,
+    audit_event_id UUID NOT NULL REFERENCES audit_logs(id) ON DELETE CASCADE,
     prediction_type VARCHAR(50) NOT NULL,  -- 'anomaly', 'category', 'risk_level'
     predicted_value VARCHAR(100) NOT NULL,
     confidence_score DECIMAL(5,4) NOT NULL,
@@ -530,7 +530,7 @@ COMMENT ON COLUMN audit_ai_predictions.review_outcome IS 'Human review result: c
 -- Note: In production, use row-level security policies for tenant isolation
 
 -- Example RLS policies (uncomment and adjust based on your auth setup):
--- ALTER TABLE roche_audit_logs ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 -- ALTER TABLE audit_embeddings ENABLE ROW LEVEL SECURITY;
 -- ALTER TABLE audit_anomalies ENABLE ROW LEVEL SECURITY;
 -- ALTER TABLE audit_integrations ENABLE ROW LEVEL SECURITY;

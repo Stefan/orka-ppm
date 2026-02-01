@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState, lazy, Suspense } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
 import { HelpChatProvider } from '../../app/providers/HelpChatProvider'
 import { useRouter } from 'next/navigation'
@@ -10,8 +10,8 @@ import HelpChatToggle from '../HelpChatToggle'
 import { useIsMobile } from '@/hooks/useMediaQuery'
 import { useTranslations } from '@/lib/i18n/context'
 
-// Lazy load HelpChat for better performance
-const HelpChat = lazy(() => import('../HelpChat'))
+// Import HelpChat directly to prevent CLS (layout shift)
+import HelpChat from '../HelpChat'
 
 export interface AppLayoutProps {
   children: React.ReactNode
@@ -22,7 +22,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const router = useRouter()
   const mainContentRef = useRef<HTMLElement>(null)
   const { t } = useTranslations()
-  
   // Mobile navigation state management
   const isMobile = useIsMobile()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
@@ -68,10 +67,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
         
         {/* Main Content Area */}
-        <main 
+        <main
           data-testid="app-layout-main"
           ref={mainContentRef}
           className="flex-1"
+          style={{
+            // CSS containment for better performance isolation and CLS prevention
+            contain: 'layout style paint'
+          }}
         >
           {children}
         </main>
@@ -79,10 +82,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
         {/* Help Chat Toggle - Floating at bottom-right */}
         <HelpChatToggle />
 
-        {/* Help Chat Integration - Lazy loaded */}
-        <Suspense fallback={null}>
-          <HelpChat />
-        </Suspense>
+        {/* Help Chat Integration - Always rendered to prevent CLS */}
+        <HelpChat />
       </div>
     </HelpChatProvider>
   )

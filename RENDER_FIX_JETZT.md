@@ -52,7 +52,7 @@ Scrolle zu **"Environment Variables"** und stelle sicher, dass diese gesetzt sin
 | `SUPABASE_SERVICE_ROLE_KEY` | (dein Key) |
 | `OPENAI_API_KEY` | (dein XAI/Grok Key) |
 | `OPENAI_BASE_URL` | `https://api.x.ai/v1` |
-| `OPENAI_MODEL` | `grok-4-1-fast-non-reasoning` |
+| `OPENAI_MODEL` | `grok-4-fast-reasoning` |
 | `USE_LOCAL_EMBEDDINGS` | `true` |
 
 Falls eine fehlt, klicke auf **"Add Environment Variable"**

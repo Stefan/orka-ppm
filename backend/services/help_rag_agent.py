@@ -85,7 +85,7 @@ class HelpRAGAgent(RAGReporterAgent):
         super().__init__(supabase_client, openai_api_key, base_url)
         # Use configurable models from environment or defaults
         import os
-        self.help_model = os.getenv("OPENAI_MODEL", "gpt-4")
+        self.help_model = os.getenv("OPENAI_MODEL", "grok-beta")
         self.translation_model = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
         self.max_help_context_length = 6000
         self.ppm_domain_keywords = [

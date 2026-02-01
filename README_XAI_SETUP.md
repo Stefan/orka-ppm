@@ -146,7 +146,7 @@ Don't want to use Grok? Edit `backend/.env`:
 OPENAI_API_KEY=sk-your-openai-key-here
 # Remove or comment out:
 # OPENAI_BASE_URL=https://api.x.ai/v1
-OPENAI_MODEL=gpt-4
+OPENAI_MODEL=grok-4-fast-reasoning
 USE_LOCAL_EMBEDDINGS=false
 ```
 

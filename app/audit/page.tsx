@@ -16,13 +16,14 @@ import type { AuditFilters as AuditFiltersType } from '../../components/audit/Au
 type TabType = 'dashboard' | 'timeline' | 'anomalies' | 'search'
 
 interface DashboardStats {
-  total_events: number
-  anomalies_count: number
-  critical_events: number
+  total_events_24h: number
+  total_anomalies_24h: number
+  critical_events_24h: number
   top_users: Array<{ user_id: string; count: number }>
   top_event_types: Array<{ event_type: string; count: number }>
   category_breakdown: { [key: string]: number }
-  event_volume_24h: Array<{ hour: string; count: number }>
+  event_volume_chart: Array<{ hour: string; count: number }>
+  system_health: any
 }
 
 export default function AuditDashboard() {
@@ -342,9 +343,9 @@ export default function AuditDashboard() {
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-sm text-gray-600">
                 {stats && (
                   <>
-                    <span>{stats.total_events} {t('audit.events')}</span>
-                    <span>{stats.anomalies_count} {t('audit.anomalies')}</span>
-                    <span>{stats.critical_events} {t('audit.critical')}</span>
+                    <span>{(stats.total_events_24h || 0)} {t('audit.events')}</span>
+                    <span>{(stats.total_anomalies_24h || 0)} {t('audit.anomalies')}</span>
+                    <span>{(stats.critical_events_24h || 0)} {t('audit.critical')}</span>
                   </>
                 )}
                 {lastUpdated && (
@@ -454,9 +455,9 @@ export default function AuditDashboard() {
               >
                 <AlertTriangle className="h-4 w-4 mr-2" />
                 {t('audit.tabs.anomalies')}
-                {stats && stats.anomalies_count > 0 && (
+                {stats && stats.total_anomalies_24h > 0 && (
                   <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded-full">
-                    {stats.anomalies_count}
+                    {stats.total_anomalies_24h}
                   </span>
                 )}
               </button>
@@ -492,7 +493,7 @@ export default function AuditDashboard() {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-600">{t('audit.stats.totalEvents')}</p>
-                            <p className="text-2xl font-bold text-blue-600">{stats.total_events.toLocaleString()}</p>
+                            <p className="text-2xl font-bold text-blue-600">{(stats.total_events_24h || 0).toLocaleString()}</p>
                           </div>
                           <FileText className="h-8 w-8 text-blue-600" />
                         </div>
@@ -502,7 +503,7 @@ export default function AuditDashboard() {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-600">{t('audit.stats.anomalies')}</p>
-                            <p className="text-2xl font-bold text-red-600">{stats.anomalies_count.toLocaleString()}</p>
+                            <p className="text-2xl font-bold text-red-600">{(stats.total_anomalies_24h || 0).toLocaleString()}</p>
                           </div>
                           <AlertTriangle className="h-8 w-8 text-red-600" />
                         </div>
@@ -512,7 +513,7 @@ export default function AuditDashboard() {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-600">{t('audit.stats.criticalEvents')}</p>
-                            <p className="text-2xl font-bold text-orange-600">{stats.critical_events.toLocaleString()}</p>
+                            <p className="text-2xl font-bold text-orange-600">{(stats.critical_events_24h || 0).toLocaleString()}</p>
                           </div>
                           <AlertTriangle className="h-8 w-8 text-orange-600" />
                         </div>
@@ -523,8 +524,8 @@ export default function AuditDashboard() {
                           <div>
                             <p className="text-sm font-medium text-gray-600">{t('audit.stats.eventRate')}</p>
                             <p className="text-2xl font-bold text-green-600">
-                              {stats.event_volume_24h.length > 0 
-                                ? Math.round(stats.total_events / 24) 
+                              {stats.event_volume_chart.length > 0
+                                ? Math.round((stats.total_events_24h || 0) / 24)
                                 : 0}/hr
                             </p>
                           </div>
@@ -538,8 +539,8 @@ export default function AuditDashboard() {
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('audit.categoryBreakdown')}</h3>
                       <div className="space-y-3">
                         {Object.entries(stats.category_breakdown).map(([category, count]) => {
-                          const percentage = stats.total_events > 0 
-                            ? ((count / stats.total_events) * 100).toFixed(1) 
+                          const percentage = (stats.total_events_24h || 0) > 0
+                            ? ((count / (stats.total_events_24h || 0)) * 100).toFixed(1)
                             : 0
                           const categoryColors: { [key: string]: string } = {
                             'Security Change': 'bg-red-500',
@@ -627,10 +628,10 @@ export default function AuditDashboard() {
                     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('audit.eventVolume24h')}</h3>
                       <div className="h-64">
-                        {stats.event_volume_24h.length > 0 ? (
+                        {stats.event_volume_chart.length > 0 ? (
                           <div className="flex items-end justify-between h-full space-x-1">
-                            {stats.event_volume_24h.map((item, index) => {
-                              const maxCount = Math.max(...stats.event_volume_24h.map(i => i.count), 1)
+                            {stats.event_volume_chart.map((item, index) => {
+                              const maxCount = Math.max(...stats.event_volume_chart.map(i => i.count), 1)
                               const height = (item.count / maxCount) * 100
                               
                               return (

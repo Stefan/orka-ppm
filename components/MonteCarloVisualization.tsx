@@ -61,20 +61,44 @@ export default function MonteCarloVisualization({
             'Authorization': `Bearer ${session.access_token}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(config)
+          body: JSON.stringify(config)  // Remove simulation_id from body, it's in the path
         }
       )
 
       if (!response.ok) {
-        // Silently handle 404 - endpoint not implemented yet
+        const errorData = await response.json().catch(() => ({}))
+        console.error('Monte Carlo visualization error:', response.status, errorData)
+
+        const detail = errorData.detail
+        const detailMsg = Array.isArray(detail)
+          ? detail
+              .map((d: { msg?: string; loc?: (string | number)[] }) => {
+                const loc = Array.isArray(d.loc) ? d.loc.filter((x): x is string => typeof x === 'string').join('.') : ''
+                return loc ? `${loc}: ${d.msg || ''}` : (d.msg || '')
+              })
+              .filter(Boolean)
+              .join('; ')
+          : typeof detail === 'string'
+            ? detail
+            : null
+
         if (response.status === 404) {
-          console.log('Monte Carlo visualization endpoint not yet implemented')
+          setError('Simulation results not found. Run a simulation first to generate charts.')
           setLoading(false)
           return
         }
-        
-        const errorData = await response.json()
-        throw new Error(errorData.detail || `Failed to generate charts: ${response.status}`)
+        if (response.status === 422) {
+          setError(detailMsg || 'Invalid request format. Please check chart configuration and try again.')
+          setLoading(false)
+          return
+        }
+        if (response.status === 500 && detailMsg?.includes('query.args')) {
+          setError('Chart generation failed due to incomplete simulation data. Some chart types may be unavailable.')
+          setLoading(false)
+          return
+        }
+
+        throw new Error(detailMsg || detail || `Failed to generate charts: ${response.status}`)
       }
 
       const data = await response.json()
@@ -290,57 +314,81 @@ export default function MonteCarloVisualization({
       {/* Charts Display */}
       {Object.keys(charts).length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {Object.entries(charts).map(([chartName, chart]) => (
-            <div key={chartName} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-lg font-medium text-gray-900">{chart.title}</h4>
-                    {chart.subtitle && (
-                      <p className="text-sm text-gray-600 mt-1">{chart.subtitle}</p>
+          {Object.entries(charts).map(([chartName, chart]) => {
+            // Check if this is an error entry
+            const isError = chartName.includes('_error') || (typeof chart === 'string')
+
+            return (
+              <div key={chartName} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-lg font-medium text-gray-900">
+                        {isError ? `Chart Generation Issue` : chart.title}
+                      </h4>
+                      {chart.subtitle && !isError && (
+                        <p className="text-sm text-gray-600 mt-1">{chart.subtitle}</p>
+                      )}
+                    </div>
+                    {!isError && (
+                      <button
+                        onClick={() => downloadChart(chartName, chart)}
+                        className="flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                        disabled={!chart.base64_image}
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Download
+                      </button>
                     )}
                   </div>
-                  <button
-                    onClick={() => downloadChart(chartName, chart)}
-                    className="flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Download
-                  </button>
                 </div>
-              </div>
-              
-              <div className="p-6">
-                <div className="flex justify-center">
-                  <ImageWithStabilizedLayout
-                    src={chart.base64_image}
-                    alt={chart.title}
-                    className="max-w-full rounded-lg shadow-sm"
-                    aspectRatio="16/9"
-                    fallbackHeight={300}
-                    fallbackWidth={500}
-                  />
-                </div>
-                
-                {/* Chart Metadata */}
-                {chart.metadata && Object.keys(chart.metadata).length > 0 && (
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                    <h5 className="text-sm font-medium text-gray-700 mb-2">Chart Statistics</h5>
-                    <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-                      {Object.entries(chart.metadata).map(([key, value]) => (
-                        <div key={key} className="flex justify-between">
-                          <span className="capitalize">{key.replace(/_/g, ' ')}:</span>
-                          <span className="font-medium">
-                            {typeof value === 'number' ? value.toLocaleString() : String(value)}
-                          </span>
-                        </div>
-                      ))}
+
+                <div className="p-6">
+                  {isError ? (
+                    <div className="flex items-center justify-center h-64 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <div className="text-center">
+                        <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
+                        <h5 className="text-lg font-medium text-yellow-800 mb-2">Chart Unavailable</h5>
+                        <p className="text-sm text-yellow-700">
+                          {typeof chart === 'string' ? chart : 'This chart type is temporarily unavailable for the current simulation data.'}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <>
+                      <div className="flex justify-center">
+                        <ImageWithStabilizedLayout
+                          src={chart.base64_image}
+                          alt={chart.title}
+                          className="max-w-full rounded-lg shadow-sm"
+                          aspectRatio="16/9"
+                          fallbackHeight={300}
+                          fallbackWidth={500}
+                        />
+                      </div>
+
+                      {/* Chart Metadata */}
+                      {chart.metadata && Object.keys(chart.metadata).length > 0 && (
+                        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                          <h5 className="text-sm font-medium text-gray-700 mb-2">Chart Statistics</h5>
+                          <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                            {Object.entries(chart.metadata).map(([key, value]) => (
+                              <div key={key} className="flex justify-between">
+                                <span className="capitalize">{key.replace(/_/g, ' ')}:</span>
+                                <span className="font-medium">
+                                  {typeof value === 'number' ? value.toLocaleString() : String(value)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 

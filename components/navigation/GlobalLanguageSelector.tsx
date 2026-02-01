@@ -82,8 +82,8 @@ export function GlobalLanguageSelector({ variant = 'sidebar' }: GlobalLanguageSe
           ) : (
             <Globe className="h-4 w-4 text-gray-600" />
           )}
-          <span className="text-sm font-medium text-gray-700 hidden md:inline">
-            {selectedLanguage.flag}
+          <span className="text-sm font-medium text-gray-700">
+            {selectedLanguage.code.toUpperCase()}
           </span>
         </button>
         
@@ -95,13 +95,26 @@ export function GlobalLanguageSelector({ variant = 'sidebar' }: GlobalLanguageSe
                 onClick={() => handleLanguageChange(lang.code)}
                 disabled={isLoadingState}
                 className={`
-                  flex items-center w-full px-3 py-2 mx-2 rounded-lg text-sm text-left transition-all
-                  ${locale === lang.code 
-                    ? 'bg-blue-50 text-blue-700 font-medium' 
-                    : 'text-gray-900 hover:bg-gray-50'
+                  flex items-center w-full px-3 py-2 mx-2 rounded-lg text-sm text-left transition-all duration-200
+                  ${locale === lang.code
+                    ? 'bg-blue-50 text-blue-700'
+                    : 'text-gray-900'
                   }
                   ${isLoadingState ? 'opacity-50 cursor-not-allowed' : ''}
                 `}
+                style={{
+                  backgroundColor: locale === lang.code ? undefined : 'transparent'
+                }}
+                onMouseEnter={(e) => {
+                  if (locale !== lang.code) {
+                    e.currentTarget.style.backgroundColor = '#f3f4f6';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (locale !== lang.code) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                }}
               >
                 <span className="mr-2">{lang.flag}</span>
                 <span>{lang.label}</span>
@@ -127,13 +140,26 @@ export function GlobalLanguageSelector({ variant = 'sidebar' }: GlobalLanguageSe
             onClick={() => handleLanguageChange(lang.code)}
             disabled={isLoadingState}
             className={`
-              flex items-center w-full px-2 py-1.5 text-sm text-left transition-colors rounded
-              ${locale === lang.code 
-                ? 'bg-blue-50 text-blue-700 font-medium' 
-                : 'text-gray-900 hover:bg-gray-50'
+              flex items-center w-full px-2 py-1.5 text-sm text-left transition-all duration-200 rounded
+              ${locale === lang.code
+                ? 'bg-blue-50 text-blue-700'
+                : 'text-gray-900'
               }
               ${isLoadingState ? 'opacity-50 cursor-not-allowed' : ''}
             `}
+            style={{
+              backgroundColor: locale === lang.code ? undefined : 'transparent'
+            }}
+            onMouseEnter={(e) => {
+              if (locale !== lang.code) {
+                e.currentTarget.style.backgroundColor = '#f3f4f6';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (locale !== lang.code) {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }
+            }}
           >
             <span className="mr-2">{lang.flag}</span>
             <span>{lang.label}</span>
@@ -166,10 +192,10 @@ export function GlobalLanguageSelector({ variant = 'sidebar' }: GlobalLanguageSe
             onClick={() => handleLanguageChange(lang.code)}
             disabled={isLoadingState}
             className={`
-              flex items-center w-full px-4 py-2 text-sm text-left transition-colors first:rounded-t-lg last:rounded-b-lg
-              ${locale === lang.code 
-                ? 'bg-blue-600 text-white' 
-                : 'text-gray-300 hover:bg-gray-600 hover:text-white'
+              flex items-center w-full px-4 py-2 text-sm text-left transition-all duration-200 first:rounded-t-lg last:rounded-b-lg
+              ${locale === lang.code
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'text-gray-300 hover:bg-blue-600 hover:text-white hover:shadow-md'
               }
               ${isLoadingState ? 'opacity-50 cursor-not-allowed' : ''}
             `}

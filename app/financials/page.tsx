@@ -28,6 +28,7 @@ import { ViewMode } from './types'
 
 // Lazy load heavy components
 const CommitmentsActualsView = lazy(() => import('./components/CommitmentsActualsView'))
+const Costbook = lazy(() => import('../../components/costbook/Costbook'))
 
 export default function Financials() {
   const { session } = useAuth()
@@ -50,7 +51,7 @@ export default function Financials() {
     error,
     refetch
   } = useFinancialData({
-    accessToken: session?.access_token,
+    accessToken: session?.access_token || undefined,
     selectedCurrency
   })
 
@@ -293,6 +294,21 @@ export default function Financials() {
                 session={session}
                 selectedCurrency={selectedCurrency}
                 onRefresh={refetch}
+              />
+            </Suspense>
+          </div>
+        )}
+
+        {viewMode === 'costbook' && (
+          <div data-testid="financials-costbook-view">
+            <Suspense fallback={
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
+            }>
+              <Costbook
+                useMockData={true}
+                initialCurrency={selectedCurrency as any}
               />
             </Suspense>
           </div>

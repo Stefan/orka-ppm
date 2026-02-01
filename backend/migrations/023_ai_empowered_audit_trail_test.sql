@@ -5,7 +5,7 @@
 CREATE EXTENSION IF NOT EXISTS vector;
 
 -- Create base audit logs table
-CREATE TABLE IF NOT EXISTS roche_audit_logs (
+CREATE TABLE IF NOT EXISTS audit_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     event_type VARCHAR(100) NOT NULL,
     user_id UUID,
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS roche_audit_logs (
 );
 
 -- Add AI columns
-ALTER TABLE roche_audit_logs 
+ALTER TABLE audit_logs 
     ADD COLUMN IF NOT EXISTS anomaly_score DECIMAL(3,2),
     ADD COLUMN IF NOT EXISTS is_anomaly BOOLEAN DEFAULT FALSE,
     ADD COLUMN IF NOT EXISTS category VARCHAR(50),
@@ -31,7 +31,7 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM pg_constraint WHERE conname = 'valid_anomaly_score'
     ) THEN
-        ALTER TABLE roche_audit_logs 
+        ALTER TABLE audit_logs 
             ADD CONSTRAINT valid_anomaly_score 
                 CHECK (anomaly_score IS NULL OR (anomaly_score >= 0 AND anomaly_score <= 1));
     END IF;
@@ -40,7 +40,7 @@ END $$;
 -- Create audit_embeddings table
 CREATE TABLE IF NOT EXISTS audit_embeddings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    audit_event_id UUID NOT NULL REFERENCES roche_audit_logs(id) ON DELETE CASCADE,
+    audit_event_id UUID NOT NULL REFERENCES audit_logs(id) ON DELETE CASCADE,
     embedding vector(1536),
     content_text TEXT NOT NULL,
     tenant_id UUID NOT NULL,

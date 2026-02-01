@@ -3,7 +3,7 @@
 Apply AI-Empowered Audit Trail Migration
 
 This script applies the AI-empowered audit trail schema migration to the database.
-It extends the roche_audit_logs table and creates new tables for:
+It extends the audit_logs table and creates new tables for:
 - audit_embeddings (semantic search with pgvector)
 - audit_anomalies (anomaly detection tracking)
 - audit_ml_models (ML model version management)
@@ -66,7 +66,7 @@ def apply_migration(client: Client, sql: str) -> None:
         print("Migration SQL file: backend/migrations/023_ai_empowered_audit_trail.sql")
         print()
         print("Tables to be created/modified:")
-        print("  1. roche_audit_logs (extended with AI fields)")
+        print("  1. audit_logs (extended with AI fields)")
         print("  2. audit_embeddings (new)")
         print("  3. audit_anomalies (new)")
         print("  4. audit_ml_models (new)")

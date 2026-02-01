@@ -2,18 +2,19 @@
 
 import { memo } from 'react'
 // Selective Recharts imports - nur was benötigt wird
-import { 
-  BarChart, 
-  Bar, 
-  PieChart, 
-  Pie, 
+import {
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
   Cell,
-  XAxis, 
-  YAxis, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer 
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
 } from 'recharts'
+import { ContentReservoir } from '../../../components/ui/ContentReservoir'
 
 interface DashboardChartsProps {
   projects: any[]
@@ -39,7 +40,7 @@ const DashboardCharts = memo(({ projects }: DashboardChartsProps) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Budget Chart */}
-      <div className="bg-white p-6 rounded-lg shadow-sm">
+      <ContentReservoir reserveHeight={400} className="bg-white p-6 rounded-lg shadow-sm">
         <h3 className="text-lg font-semibold mb-4">Budget Overview</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData}>
@@ -51,10 +52,10 @@ const DashboardCharts = memo(({ projects }: DashboardChartsProps) => {
             <Bar dataKey="spent" fill="#10B981" />
           </BarChart>
         </ResponsiveContainer>
-      </div>
+      </ContentReservoir>
 
       {/* Status Distribution */}
-      <div className="bg-white p-6 rounded-lg shadow-sm">
+      <ContentReservoir reserveHeight={400} className="bg-white p-6 rounded-lg shadow-sm">
         <h3 className="text-lg font-semibold mb-4">Project Status</h3>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
@@ -76,7 +77,7 @@ const DashboardCharts = memo(({ projects }: DashboardChartsProps) => {
             <Legend />
           </PieChart>
         </ResponsiveContainer>
-      </div>
+      </ContentReservoir>
     </div>
   )
 })

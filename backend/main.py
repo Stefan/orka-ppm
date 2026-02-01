@@ -47,6 +47,7 @@ from routers.workflows import router as workflows_router
 from routers.rbac import router as rbac_router
 from routers.viewer_restrictions_router import router as viewer_restrictions_router
 from routers.imports import router as imports_router
+from routers.rundown import router as rundown_router
 
 # Import performance tracking middleware
 from middleware.performance_tracker import PerformanceMiddleware, performance_tracker
@@ -213,6 +214,7 @@ app.include_router(workflows_router)
 app.include_router(rbac_router)
 app.include_router(viewer_restrictions_router)
 app.include_router(imports_router)
+app.include_router(rundown_router)
 
 # Add performance tracking middleware
 app.add_middleware(PerformanceMiddleware, tracker=performance_tracker)
@@ -460,6 +462,38 @@ async def get_dashboard_data(request: Request, current_user = Depends(get_curren
 # app.include_router(simulations_router)
 # app.include_router(shareable_urls_router)
 # app.include_router(change_management_router)
+
+# Initialize Rundown Profile Scheduler
+try:
+    from services.rundown_scheduler import get_rundown_scheduler
+    rundown_scheduler = get_rundown_scheduler()
+    print("✅ Rundown profile scheduler available")
+except ImportError as e:
+    print(f"⚠️ Rundown scheduler not available: {e}")
+    rundown_scheduler = None
+
+# Startup event for scheduler
+@app.on_event("startup")
+async def startup_event():
+    """Application startup handler."""
+    if rundown_scheduler:
+        try:
+            await rundown_scheduler.start()
+            next_run = rundown_scheduler.get_next_run_time()
+            if next_run:
+                print(f"📅 Next rundown profile generation scheduled for: {next_run}")
+        except Exception as e:
+            print(f"⚠️ Failed to start rundown scheduler: {e}")
+
+# Shutdown event for scheduler
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Application shutdown handler."""
+    if rundown_scheduler:
+        try:
+            await rundown_scheduler.stop()
+        except Exception as e:
+            print(f"⚠️ Error stopping rundown scheduler: {e}")
 
 # For deployment - Vercel serverless function handler
 handler = app

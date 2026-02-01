@@ -156,7 +156,7 @@ Run database migrations in order:
 ✓ Step 1: Create audit_embeddings table
 psql $DATABASE_URL -f backend/migrations/001_create_audit_embeddings.sql
 
-✓ Step 2: Extend roche_audit_logs table
+✓ Step 2: Extend audit_logs table
 psql $DATABASE_URL -f backend/migrations/002_extend_audit_logs.sql
 
 ✓ Step 3: Create audit_anomalies table
@@ -183,7 +183,7 @@ psql $DATABASE_URL -f backend/migrations/007_create_access_log.sql
   AND tablename LIKE 'audit%';
 
 Expected tables:
-- roche_audit_logs (existing, extended)
+- audit_logs (existing, extended)
 - audit_embeddings
 - audit_anomalies
 - audit_ml_models
@@ -207,12 +207,12 @@ Verify indexes:
 #### Enable Row-Level Security
 
 ```sql
-✓ ALTER TABLE roche_audit_logs ENABLE ROW LEVEL SECURITY;
+✓ ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 ✓ ALTER TABLE audit_embeddings ENABLE ROW LEVEL SECURITY;
 ✓ ALTER TABLE audit_anomalies ENABLE ROW LEVEL SECURITY;
 
 -- Create tenant isolation policies
-✓ CREATE POLICY tenant_isolation_audit_logs ON roche_audit_logs
+✓ CREATE POLICY tenant_isolation_audit_logs ON audit_logs
   USING (tenant_id = current_setting('app.current_tenant_id')::uuid);
 
 ✓ CREATE POLICY tenant_isolation_embeddings ON audit_embeddings
@@ -561,7 +561,7 @@ curl -X POST "https://api.yourplatform.com/api/admin/audit/verify-hash-chain" \
 
 ✓ Test encryption at rest
 # Query database directly
-psql $DATABASE_URL -c "SELECT ip_address FROM roche_audit_logs LIMIT 1;"
+psql $DATABASE_URL -c "SELECT ip_address FROM audit_logs LIMIT 1;"
 # Should show encrypted value, not plaintext
 
 ✓ Test access logging

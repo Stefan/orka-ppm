@@ -27,7 +27,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 ```
 OPENAI_API_KEY=<your-xai-api-key>
 OPENAI_BASE_URL=https://api.x.ai/v1
-OPENAI_MODEL=grok-4-1-fast-non-reasoning
+OPENAI_MODEL=grok-4-fast-reasoning
 ```
 
 #### Application Configuration

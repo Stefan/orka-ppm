@@ -41,7 +41,7 @@ If you want to use Grok or another OpenAI-compatible API:
 ```bash
 OPENAI_API_KEY=your-grok-api-key
 OPENAI_BASE_URL=https://api.x.ai/v1
-OPENAI_MODEL=grok-beta
+OPENAI_MODEL=grok-4-fast-reasoning
 ```
 
 ## Step 2: Apply Database Migration

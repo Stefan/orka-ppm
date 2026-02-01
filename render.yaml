@@ -34,7 +34,7 @@ services:
       - key: OPENAI_BASE_URL
         value: https://api.x.ai/v1
       - key: OPENAI_MODEL
-        value: grok-4-1-fast-non-reasoning
+        value: grok-4-fast-reasoning
       - key: USE_LOCAL_EMBEDDINGS
         value: true
     autoDeploy: true

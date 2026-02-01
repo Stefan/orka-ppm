@@ -42,7 +42,7 @@ class AuditRAGAgent(AIAgentBase):
         # Use configurable models from environment or defaults
         import os
         self.embedding_model = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-ada-002")
-        self.chat_model = os.getenv("OPENAI_MODEL", "gpt-4")
+        self.chat_model = os.getenv("OPENAI_MODEL", "grok-beta")
         self.embedding_dimension = 1536  # OpenAI ada-002 dimension
         self.cache_ttl = 600  # 10 minutes for search results
         
@@ -234,7 +234,7 @@ class AuditRAGAgent(AIAgentBase):
                     al.anomaly_score,
                     al.is_anomaly
                 FROM audit_embeddings ae
-                JOIN roche_audit_logs al ON ae.audit_event_id = al.id
+                JOIN audit_logs al ON ae.audit_event_id = al.id
                 WHERE ae.tenant_id = %s
             """
             
@@ -369,7 +369,7 @@ class AuditRAGAgent(AIAgentBase):
     ) -> List[Dict[str, Any]]:
         """Fetch audit events within time window"""
         try:
-            query = self.supabase.table("roche_audit_logs").select("*").eq(
+            query = self.supabase.table("audit_logs").select("*").eq(
                 "tenant_id", tenant_id
             ).gte("timestamp", start_time.isoformat()).lte(
                 "timestamp", end_time.isoformat()
@@ -519,7 +519,7 @@ Provide a 3-4 sentence executive summary highlighting the most important insight
                 raise ValueError("Tenant ID is required for event explanation")
             
             # Fetch event
-            response = self.supabase.table("roche_audit_logs").select("*").eq(
+            response = self.supabase.table("audit_logs").select("*").eq(
                 "id", event_id
             ).eq("tenant_id", tenant_id).execute()
             

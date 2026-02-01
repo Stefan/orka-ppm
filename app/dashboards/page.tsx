@@ -22,25 +22,26 @@ import {
   BarChart3, Users, FileText, ChevronDown, X, Filter, Upload 
 } from 'lucide-react'
 import ProjectImportModal from '@/components/projects/ProjectImportModal'
+import { ChartSkeleton } from '../../components/ui/Skeleton'
 // Charts werden nicht auf der Dashboard-Hauptseite verwendet, daher entfernen
 // import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
-// Dynamic imports for code splitting (existing pattern maintained)
-const VarianceKPIs = dynamic(() => import('./components/VarianceKPIs'), { 
+// Dynamic imports for code splitting with stable dimensions to prevent CLS
+const VarianceKPIs = dynamic(() => import('./components/VarianceKPIs'), {
   ssr: false,
-  loading: () => <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+  loading: () => <div className="h-32 bg-gray-100 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
 })
-const VarianceTrends = dynamic(() => import('./components/VarianceTrends'), { 
+const VarianceTrends = dynamic(() => import('./components/VarianceTrends'), {
   ssr: false,
-  loading: () => <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+  loading: () => <ChartSkeleton className="h-64" />
 })
-const VarianceAlerts = dynamic(() => import('./components/VarianceAlerts'), { 
+const VarianceAlerts = dynamic(() => import('./components/VarianceAlerts'), {
   ssr: false,
-  loading: () => <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+  loading: () => <div className="h-40 bg-gray-100 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
 })
 const WorkflowDashboard = dynamic(() => import('@/components/workflow/WorkflowDashboard'), {
   ssr: false,
-  loading: () => <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+  loading: () => <div className="h-48 bg-gray-100 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
 })
 
 // KPI Card Component - balanced sizing with design tokens

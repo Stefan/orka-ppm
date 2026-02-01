@@ -73,7 +73,7 @@ SUPABASE_ANON_KEY=<dein-key>
 SUPABASE_SERVICE_ROLE_KEY=<dein-key>
 OPENAI_API_KEY=<dein-xai-key>
 OPENAI_BASE_URL=https://api.x.ai/v1
-OPENAI_MODEL=grok-4-1-fast-non-reasoning
+OPENAI_MODEL=grok-4-fast-reasoning
 USE_LOCAL_EMBEDDINGS=true
 ```
 

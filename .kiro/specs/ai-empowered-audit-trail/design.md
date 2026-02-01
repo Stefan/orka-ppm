@@ -2,7 +2,7 @@
 
 ## Overview
 
-The AI-Empowered Audit Trail feature extends the existing audit logging infrastructure with advanced AI capabilities including anomaly detection, semantic search, auto-tagging, and intelligent insights. The system leverages the existing `roche_audit_logs` and `audit_logs` tables, integrates with the current AI agents infrastructure (`RAGReporterAgent`, `ResourceOptimizerAgent`, `RiskForecasterAgent`), and extends the help chat RAG system for audit log queries.
+The AI-Empowered Audit Trail feature extends the existing audit logging infrastructure with advanced AI capabilities including anomaly detection, semantic search, auto-tagging, and intelligent insights. The system leverages the existing `audit_logs` and `audit_logs` tables, integrates with the current AI agents infrastructure (`RAGReporterAgent`, `ResourceOptimizerAgent`, `RiskForecasterAgent`), and extends the help chat RAG system for audit log queries.
 
 ### Key Components
 
@@ -109,7 +109,7 @@ graph TB
 
 #### Audit Event Creation Flow
 1. User action triggers audit event creation
-2. Event is inserted into `roche_audit_logs` table
+2. Event is inserted into `audit_logs` table
 3. ML Classification Service tags event with category and risk level
 4. Embedding Generation Job creates vector embedding for semantic search
 5. Event is available for querying and analysis
@@ -628,26 +628,26 @@ export function SemanticSearch({ onSearch, results, loading }: SemanticSearchPro
 
 ### Database Schema Extensions
 
-#### Audit Events Table (Existing: `roche_audit_logs`)
+#### Audit Events Table (Existing: `audit_logs`)
 
 ```sql
 -- Extend existing table with new fields
-ALTER TABLE roche_audit_logs ADD COLUMN IF NOT EXISTS anomaly_score DECIMAL(3,2);
-ALTER TABLE roche_audit_logs ADD COLUMN IF NOT EXISTS is_anomaly BOOLEAN DEFAULT FALSE;
-ALTER TABLE roche_audit_logs ADD COLUMN IF NOT EXISTS category VARCHAR(50);
-ALTER TABLE roche_audit_logs ADD COLUMN IF NOT EXISTS risk_level VARCHAR(20);
-ALTER TABLE roche_audit_logs ADD COLUMN IF NOT EXISTS tags JSONB;
-ALTER TABLE roche_audit_logs ADD COLUMN IF NOT EXISTS ai_insights JSONB;
-ALTER TABLE roche_audit_logs ADD COLUMN IF NOT EXISTS tenant_id UUID;
-ALTER TABLE roche_audit_logs ADD COLUMN IF NOT EXISTS hash VARCHAR(64);
-ALTER TABLE roche_audit_logs ADD COLUMN IF NOT EXISTS previous_hash VARCHAR(64);
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS anomaly_score DECIMAL(3,2);
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS is_anomaly BOOLEAN DEFAULT FALSE;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS category VARCHAR(50);
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS risk_level VARCHAR(20);
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS tags JSONB;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS ai_insights JSONB;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS tenant_id UUID;
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS hash VARCHAR(64);
+ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS previous_hash VARCHAR(64);
 
 -- Add indexes for new fields
-CREATE INDEX IF NOT EXISTS idx_audit_anomaly_score ON roche_audit_logs(anomaly_score) WHERE is_anomaly = TRUE;
-CREATE INDEX IF NOT EXISTS idx_audit_category ON roche_audit_logs(category);
-CREATE INDEX IF NOT EXISTS idx_audit_risk_level ON roche_audit_logs(risk_level);
-CREATE INDEX IF NOT EXISTS idx_audit_tenant_id ON roche_audit_logs(tenant_id);
-CREATE INDEX IF NOT EXISTS idx_audit_tags ON roche_audit_logs USING GIN(tags);
+CREATE INDEX IF NOT EXISTS idx_audit_anomaly_score ON audit_logs(anomaly_score) WHERE is_anomaly = TRUE;
+CREATE INDEX IF NOT EXISTS idx_audit_category ON audit_logs(category);
+CREATE INDEX IF NOT EXISTS idx_audit_risk_level ON audit_logs(risk_level);
+CREATE INDEX IF NOT EXISTS idx_audit_tenant_id ON audit_logs(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_audit_tags ON audit_logs USING GIN(tags);
 ```
 
 #### Audit Embeddings Table (New)
@@ -655,7 +655,7 @@ CREATE INDEX IF NOT EXISTS idx_audit_tags ON roche_audit_logs USING GIN(tags);
 ```sql
 CREATE TABLE IF NOT EXISTS audit_embeddings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    audit_event_id UUID NOT NULL REFERENCES roche_audit_logs(id) ON DELETE CASCADE,
+    audit_event_id UUID NOT NULL REFERENCES audit_logs(id) ON DELETE CASCADE,
     embedding vector(1536),  -- OpenAI ada-002 embedding dimension
     content_text TEXT NOT NULL,
     tenant_id UUID NOT NULL,
@@ -679,7 +679,7 @@ CREATE INDEX IF NOT EXISTS idx_audit_embeddings_tenant
 ```sql
 CREATE TABLE IF NOT EXISTS audit_anomalies (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    audit_event_id UUID NOT NULL REFERENCES roche_audit_logs(id) ON DELETE CASCADE,
+    audit_event_id UUID NOT NULL REFERENCES audit_logs(id) ON DELETE CASCADE,
     anomaly_score DECIMAL(3,2) NOT NULL,
     detection_timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     features_used JSONB NOT NULL,
@@ -906,7 +906,7 @@ Property 10: Business Rule Tag Application
 **Validates: Requirements 4.5, 4.6, 4.7**
 
 Property 11: Tag Persistence
-*For any* audit event that has been classified by the ML classifier, the assigned tags should be persisted in the tags JSONB field of the roche_audit_logs table and should be retrievable in subsequent queries.
+*For any* audit event that has been classified by the ML classifier, the assigned tags should be persisted in the tags JSONB field of the audit_logs table and should be retrievable in subsequent queries.
 **Validates: Requirements 4.8**
 
 Property 12: Export Content Completeness
@@ -926,7 +926,7 @@ Property 15: Integration Configuration Validation
 **Validates: Requirements 5.11**
 
 Property 16: Append-Only Audit Log Immutability
-*For any* audit event in the roche_audit_logs table, there should be no update or delete operations exposed through the API, ensuring that once an event is created, it cannot be modified or removed.
+*For any* audit event in the audit_logs table, there should be no update or delete operations exposed through the API, ensuring that once an event is created, it cannot be modified or removed.
 **Validates: Requirements 6.1**
 
 Property 17: Hash Chain Integrity

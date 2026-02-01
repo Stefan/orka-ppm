@@ -217,7 +217,11 @@ class DocumentParser:
             data = json.loads(content)
         except json.JSONDecodeError as e:
             raise ParsingError(f"Invalid JSON format: {str(e)}") from e
-        
+
+        # Ensure data is a dictionary
+        if not isinstance(data, dict):
+            raise ParsingError(f"JSON document must be an object, got {type(data).__name__}")
+
         # Extract fields
         title = data.get("title")
         main_content = data.get("content", "")

@@ -159,9 +159,12 @@ export function ConditionalContent({
   }
 
   const containerStyle: React.CSSProperties = {
+    // Always reserve the same space to prevent CLS
     minHeight: typeof minHeight === 'number' ? `${minHeight}px` : minHeight,
+    height: typeof minHeight === 'number' ? `${minHeight}px` : minHeight,
     visibility: show ? 'visible' : 'hidden',
-    height: show ? 'auto' : minHeight || 'auto'
+    // CSS containment for performance
+    contain: 'layout style paint'
   }
 
   return (

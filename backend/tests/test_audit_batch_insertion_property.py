@@ -110,7 +110,7 @@ async def test_batch_insertion_support(batch_size: int, events: List[Dict[str, A
     
     try:
         # Attempt batch insertion
-        response = supabase.table("roche_audit_logs").insert(events_to_insert).execute()
+        response = supabase.table("audit_logs").insert(events_to_insert).execute()
         
         # Verify all events were inserted
         assert response.data is not None, "Batch insertion should return data"
@@ -125,7 +125,7 @@ async def test_batch_insertion_support(batch_size: int, events: List[Dict[str, A
         # Clean up: delete inserted events
         event_ids = [event['id'] for event in response.data]
         if event_ids:
-            supabase.table("roche_audit_logs").delete().in_("id", event_ids).execute()
+            supabase.table("audit_logs").delete().in_("id", event_ids).execute()
         
     except Exception as e:
         pytest.fail(f"Batch insertion failed with error: {str(e)}")
@@ -152,7 +152,7 @@ async def test_batch_insertion_atomicity(events: List[Dict[str, Any]]):
     
     # Get initial count of events for this tenant
     tenant_id = events[0]['tenant_id']
-    initial_count_response = supabase.table("roche_audit_logs") \
+    initial_count_response = supabase.table("audit_logs") \
         .select("*", count="exact") \
         .eq("tenant_id", tenant_id) \
         .execute()
@@ -161,10 +161,10 @@ async def test_batch_insertion_atomicity(events: List[Dict[str, Any]]):
     
     try:
         # Attempt batch insertion
-        response = supabase.table("roche_audit_logs").insert(events).execute()
+        response = supabase.table("audit_logs").insert(events).execute()
         
         # Verify count increased by exactly the batch size
-        final_count_response = supabase.table("roche_audit_logs") \
+        final_count_response = supabase.table("audit_logs") \
             .select("*", count="exact") \
             .eq("tenant_id", tenant_id) \
             .execute()
@@ -177,11 +177,11 @@ async def test_batch_insertion_atomicity(events: List[Dict[str, Any]]):
         # Clean up
         event_ids = [event['id'] for event in response.data]
         if event_ids:
-            supabase.table("roche_audit_logs").delete().in_("id", event_ids).execute()
+            supabase.table("audit_logs").delete().in_("id", event_ids).execute()
         
     except Exception as e:
         # Verify count did not change (rollback)
-        final_count_response = supabase.table("roche_audit_logs") \
+        final_count_response = supabase.table("audit_logs") \
             .select("*", count="exact") \
             .eq("tenant_id", tenant_id) \
             .execute()
@@ -227,7 +227,7 @@ async def test_batch_size_limit(batch_size: int):
     if batch_size <= 1000:
         # Should succeed
         try:
-            response = supabase.table("roche_audit_logs").insert(events).execute()
+            response = supabase.table("audit_logs").insert(events).execute()
             assert response.data is not None, "Batch insertion should succeed for valid batch size"
             assert len(response.data) == batch_size, \
                 f"Expected {batch_size} events inserted, got {len(response.data)}"
@@ -235,7 +235,7 @@ async def test_batch_size_limit(batch_size: int):
             # Clean up
             event_ids = [event['id'] for event in response.data]
             if event_ids:
-                supabase.table("roche_audit_logs").delete().in_("id", event_ids).execute()
+                supabase.table("audit_logs").delete().in_("id", event_ids).execute()
         except Exception as e:
             pytest.fail(f"Batch insertion failed for valid batch size {batch_size}: {str(e)}")
     else:
@@ -265,7 +265,7 @@ async def test_batch_insertion_preserves_event_data(events: List[Dict[str, Any]]
     
     try:
         # Insert events
-        response = supabase.table("roche_audit_logs").insert(events).execute()
+        response = supabase.table("audit_logs").insert(events).execute()
         
         assert response.data is not None, "Batch insertion should return data"
         
@@ -293,7 +293,7 @@ async def test_batch_insertion_preserves_event_data(events: List[Dict[str, Any]]
         # Clean up
         event_ids = [event['id'] for event in response.data]
         if event_ids:
-            supabase.table("roche_audit_logs").delete().in_("id", event_ids).execute()
+            supabase.table("audit_logs").delete().in_("id", event_ids).execute()
         
     except Exception as e:
         pytest.fail(f"Batch insertion failed: {str(e)}")

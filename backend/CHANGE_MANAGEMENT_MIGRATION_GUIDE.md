@@ -18,7 +18,7 @@
    - You'll see: `✅ Cleanup complete!`
 
 2. **Run migration 011 (fresh start):**
-   - Copy and execute: `backend/migrations/011_roche_construction_ppm_features.sql`
+   - Copy and execute: `backend/migrations/011_generic_construction_ppm_features.sql`
    - This recreates everything cleanly
 
 3. **Run migration 012:**
@@ -48,7 +48,7 @@ The property tests for Change Management (Task 6.3) require the following databa
 
 The required migrations are located in:
 
-- `backend/migrations/011_roche_construction_ppm_features.sql` - Creates base tables
+- `backend/migrations/011_generic_construction_ppm_features.sql` - Creates base tables
 - `backend/migrations/012_integrated_change_management.sql` - Creates change management specific tables
 
 ## Migration Steps
@@ -60,7 +60,7 @@ The required migrations are located in:
    - Go to: **SQL Editor** → **New Query**
 
 2. **Execute Migration 011**
-   - Copy the entire contents of `backend/migrations/011_roche_construction_ppm_features.sql`
+   - Copy the entire contents of `backend/migrations/011_generic_construction_ppm_features.sql`
    - Paste into the SQL Editor
    - Click **Run** to execute
    - Verify no errors in the output

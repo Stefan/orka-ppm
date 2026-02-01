@@ -14,11 +14,11 @@ from uuid import uuid4
 # Add the backend directory to Python path
 sys.path.append('.')
 
-from roche_construction_models import (
+from generic_construction_models import (
     ReportTemplateCreate, ReportTemplate, ReportConfig, ReportGenerationRequest, GeneratedReport,
     ReportTemplateType, ReportGenerationStatus, ChartConfig
 )
-from roche_construction_services import GoogleSuiteReportGenerator, TemplateEngine
+from services.generic_construction_services import GoogleSuiteReportGenerator, TemplateEngine
 
 # Mock Supabase client for testing
 class MockSupabaseTable:

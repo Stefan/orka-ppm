@@ -18,7 +18,7 @@
 - ✅ Response times reduced from 41s → 2.5-3.7s (16x faster)
 - ✅ In-memory caching with 5-minute TTL
 - ✅ Optimized prompts and token limits
-- ✅ Using `grok-4-1-fast-non-reasoning` model
+- ✅ Using `grok-4-fast-reasoning` model
 - ✅ Cached responses return in ~0ms
 
 ### 3. UI Improvements
@@ -63,7 +63,7 @@ SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
 # XAI/Grok API
 OPENAI_API_KEY=<your-xai-api-key>
 OPENAI_BASE_URL=https://api.x.ai/v1
-OPENAI_MODEL=grok-4-1-fast-non-reasoning
+OPENAI_MODEL=grok-4-fast-reasoning
 
 # Configuration
 USE_LOCAL_EMBEDDINGS=true

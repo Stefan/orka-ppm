@@ -97,7 +97,7 @@ class AuditExportService:
             self.openai_client = None
         
         # Use configurable model from environment or default
-        self.chat_model = os.getenv("OPENAI_MODEL", "gpt-4")
+        self.chat_model = os.getenv("OPENAI_MODEL", "grok-beta")
         
         # PDF styling - only if reportlab is available
         if REPORTLAB_AVAILABLE:
@@ -585,7 +585,7 @@ Provide a 4-5 sentence executive summary highlighting:
             List of matching audit events
         """
         try:
-            query = self.supabase.table("roche_audit_logs").select("*")
+            query = self.supabase.table("audit_logs").select("*")
             
             # Apply tenant isolation
             if tenant_id:

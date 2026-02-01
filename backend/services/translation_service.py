@@ -82,7 +82,7 @@ class TranslationService:
             self.openai_client = OpenAI(api_key=openai_api_key)
         # Use configurable model from environment or default
         import os
-        self.translation_model = os.getenv("OPENAI_MODEL", "gpt-4")
+        self.translation_model = os.getenv("OPENAI_MODEL", "grok-beta")
         self.detection_model = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
         self.cache_ttl_hours = 24 * 7  # 1 week cache
         

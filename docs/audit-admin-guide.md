@@ -888,20 +888,20 @@ Monitor system health and perform maintenance tasks.
 
 1. **Vacuum Database:**
    ```sql
-   VACUUM ANALYZE roche_audit_logs;
+   VACUUM ANALYZE audit_logs;
    VACUUM ANALYZE audit_embeddings;
    VACUUM ANALYZE audit_anomalies;
    ```
 
 2. **Rebuild Indexes:**
    ```sql
-   REINDEX TABLE roche_audit_logs;
+   REINDEX TABLE audit_logs;
    REINDEX TABLE audit_embeddings;
    ```
 
 3. **Update Statistics:**
    ```sql
-   ANALYZE roche_audit_logs;
+   ANALYZE audit_logs;
    ANALYZE audit_embeddings;
    ```
 
@@ -1194,18 +1194,18 @@ AUDIT_ENABLE_ACCESS_LOGGING=true
 
 ```sql
 -- Core indexes
-CREATE INDEX idx_audit_timestamp ON roche_audit_logs(timestamp DESC);
-CREATE INDEX idx_audit_event_type ON roche_audit_logs(event_type);
-CREATE INDEX idx_audit_user_id ON roche_audit_logs(user_id);
-CREATE INDEX idx_audit_entity ON roche_audit_logs(entity_type, entity_id);
-CREATE INDEX idx_audit_severity ON roche_audit_logs(severity);
-CREATE INDEX idx_audit_tenant ON roche_audit_logs(tenant_id);
+CREATE INDEX idx_audit_timestamp ON audit_logs(timestamp DESC);
+CREATE INDEX idx_audit_event_type ON audit_logs(event_type);
+CREATE INDEX idx_audit_user_id ON audit_logs(user_id);
+CREATE INDEX idx_audit_entity ON audit_logs(entity_type, entity_id);
+CREATE INDEX idx_audit_severity ON audit_logs(severity);
+CREATE INDEX idx_audit_tenant ON audit_logs(tenant_id);
 
 -- AI-specific indexes
-CREATE INDEX idx_audit_anomaly ON roche_audit_logs(anomaly_score) WHERE is_anomaly = TRUE;
-CREATE INDEX idx_audit_category ON roche_audit_logs(category);
-CREATE INDEX idx_audit_risk_level ON roche_audit_logs(risk_level);
-CREATE INDEX idx_audit_tags ON roche_audit_logs USING GIN(tags);
+CREATE INDEX idx_audit_anomaly ON audit_logs(anomaly_score) WHERE is_anomaly = TRUE;
+CREATE INDEX idx_audit_category ON audit_logs(category);
+CREATE INDEX idx_audit_risk_level ON audit_logs(risk_level);
+CREATE INDEX idx_audit_tags ON audit_logs USING GIN(tags);
 
 -- Vector index
 CREATE INDEX idx_embeddings_vector ON audit_embeddings 

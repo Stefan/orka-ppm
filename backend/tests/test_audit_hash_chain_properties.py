@@ -523,7 +523,7 @@ class TestChainBreakDetection:
         tampered_event_id = events[2]["id"]
         tampered_hash = "tampered" + "0" * 56  # Invalid hash
         
-        audit_service.db.table("roche_audit_logs").update({
+        audit_service.db.table("audit_logs").update({
             "hash": tampered_hash
         }).eq("id", tampered_event_id).execute()
         

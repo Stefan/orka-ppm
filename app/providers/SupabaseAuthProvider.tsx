@@ -53,11 +53,16 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     if (!isClient) return
 
-    // Get initial session
+    // Get initial session (with timeout to prevent infinite loading if Supabase is unreachable)
+    const AUTH_TIMEOUT_MS = 8000
     const initializeAuth = async () => {
       try {
         console.log('🔐 Initializing authentication...')
-        const { data: { session }, error } = await supabase.auth.getSession()
+        const sessionPromise = supabase.auth.getSession()
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Auth timeout')), AUTH_TIMEOUT_MS)
+        )
+        const { data: { session }, error } = await Promise.race([sessionPromise, timeoutPromise])
         
         if (error) {
           console.error('❌ Error getting session:', error)
@@ -74,8 +79,13 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         }
       } catch (err: unknown) {
         console.error('🚨 Unexpected error getting session:', err)
-        // Clear session on any auth error
-        await clearSession()
+        const isTimeout = err instanceof Error && err.message === 'Auth timeout'
+        if (isTimeout) {
+          console.warn('⏱️ Auth check timed out - showing login form. Supabase may be unreachable.')
+          setSession(null)
+        } else {
+          await clearSession()
+        }
       } finally {
         console.log('✅ Auth initialization complete')
         setLoading(false)

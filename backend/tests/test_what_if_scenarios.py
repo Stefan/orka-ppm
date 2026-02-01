@@ -14,11 +14,11 @@ from typing import Dict, Any
 # Add backend to path
 sys.path.append('.')
 
-from roche_construction_models import (
+from generic_construction_models import (
     ScenarioCreate, ScenarioConfig, ProjectChanges,
     TimelineImpact, CostImpact, ResourceImpact
 )
-from roche_construction_services import ScenarioAnalyzer
+from services.generic_construction_services import ScenarioAnalyzer
 
 
 def test_scenario_models():

@@ -17,13 +17,13 @@ LINE 27: ADD CONSTRAINT IF NOT EXISTS valid_anomaly_score
 
 ### Issue 2: Missing Base Table
 
-The migration assumed `roche_audit_logs` table already existed, causing:
+The migration assumed `audit_logs` table already existed, causing:
 
 ```
-ERROR: 42P01: relation "roche_audit_logs" does not exist
+ERROR: 42P01: relation "audit_logs" does not exist
 ```
 
-**Root Cause**: The base `roche_audit_logs` table may not exist in all database instances.
+**Root Cause**: The base `audit_logs` table may not exist in all database instances.
 
 **Solution**: Added creation of the base table with `CREATE TABLE IF NOT EXISTS` at the beginning of the migration.
 
@@ -37,7 +37,7 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM pg_constraint WHERE conname = 'valid_anomaly_score'
     ) THEN
-        ALTER TABLE roche_audit_logs 
+        ALTER TABLE audit_logs 
             ADD CONSTRAINT valid_anomaly_score 
                 CHECK (anomaly_score IS NULL OR (anomaly_score >= 0 AND anomaly_score <= 1));
     END IF;
@@ -48,14 +48,14 @@ END $$;
 
 ### 1. Fixed Constraint Syntax
 
-Fixed 3 constraint additions on `roche_audit_logs`:
+Fixed 3 constraint additions on `audit_logs`:
 1. `valid_anomaly_score` - Checks anomaly_score is between 0 and 1
 2. `valid_risk_level` - Checks risk_level is in allowed values
 3. `valid_category` - Checks category is in allowed values
 
 ### 2. Added Base Table Creation
 
-Added creation of `roche_audit_logs` table with base columns:
+Added creation of `audit_logs` table with base columns:
 - `id`, `event_type`, `user_id`, `entity_type`, `entity_id`
 - `action_details`, `severity`, `ip_address`, `user_agent`
 - `project_id`, `performance_metrics`, `timestamp`, `created_at`

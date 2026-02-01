@@ -26,7 +26,7 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 from unittest.mock import Mock, AsyncMock, MagicMock, patch
 
-from services.roche_construction_services import POBreakdownService
+from services.generic_construction_services import POBreakdownService
 from models.po_breakdown import (
     POBreakdownCreate,
     POBreakdownResponse,

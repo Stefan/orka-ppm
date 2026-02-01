@@ -1568,9 +1568,9 @@ The following are specific scenarios that should be tested with example-based un
 
 ### Overview
 
-Die Contingency Rundown Profiles Erweiterung ersetzt das externe Roche-Script durch eine vollständig integrierte Lösung. Das Feature generiert automatisch monatliche Budget-Progressionen (Planned vs Actual) für jedes Projekt und visualisiert diese als Sparklines in den Project Cards.
+Die Contingency Rundown Profiles Erweiterung ersetzt das externe Generic-Script durch eine vollständig integrierte Lösung. Das Feature generiert automatisch monatliche Budget-Progressionen (Planned vs Actual) für jedes Projekt und visualisiert diese als Sparklines in den Project Cards.
 
-### Vorteile gegenüber Roche-Script
+### Vorteile gegenüber Generic-Script
 
 1. **Vollständig integriert**: Keine externen Scripts oder manuelle Uploads
 2. **AI-Prediction**: Automatische Trend-Vorhersagen für zukünftige Monate

@@ -23,8 +23,9 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
     try:
         # Handle missing credentials in development mode
         if not credentials:
+            default_user_id = "00000000-0000-0000-0000-000000000001"
             print("🔧 Development mode: No credentials provided, using default user")
-            return {"user_id": "00000000-0000-0000-0000-000000000001", "email": "dev@example.com"}
+            return {"user_id": default_user_id, "email": "dev@example.com", "tenant_id": default_user_id}
         
         token = credentials.credentials
         
@@ -37,13 +38,16 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
             user_info = await bridge.get_user_from_jwt(token)
             
             if user_info:
+                user_id = user_info.get("user_id")
                 # Return enhanced user info with roles and permissions
+                # tenant_id: use from user_info or fallback to user_id (single-tenant)
                 return {
-                    "user_id": user_info.get("user_id"),
+                    "user_id": user_id,
                     "email": user_info.get("email", "dev@example.com"),
                     "roles": user_info.get("roles", []),
                     "permissions": user_info.get("permissions", []),
-                    "effective_roles": user_info.get("effective_roles", [])
+                    "effective_roles": user_info.get("effective_roles", []),
+                    "tenant_id": user_info.get("tenant_id") or user_id,
                 }
         except ImportError:
             print("🔧 SupabaseRBACBridge not available, using basic JWT decode")
@@ -64,12 +68,14 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
             "user_id": user_id,
             "email": payload.get("email", "dev@example.com"),
             "roles": payload.get("roles", []),
-            "permissions": payload.get("permissions", [])
+            "permissions": payload.get("permissions", []),
+            "tenant_id": payload.get("tenant_id") or payload.get("app_metadata", {}).get("tenant_id") or user_id,
         }
     except Exception as e:
+        default_user_id = "00000000-0000-0000-0000-000000000001"
         print(f"🔧 Development mode: Auth error ({e}), using default user")
         # In development mode, fall back to default user instead of failing
-        return {"user_id": "00000000-0000-0000-0000-000000000001", "email": "dev@example.com"}
+        return {"user_id": default_user_id, "email": "dev@example.com", "tenant_id": default_user_id}
 
 def get_current_user_id(current_user: Dict[str, Any] = Depends(get_current_user)) -> str:
     """Extract user ID from current user"""

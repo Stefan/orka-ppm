@@ -35,8 +35,8 @@ The PPM SaaS backend has been successfully refactored from a monolithic architec
 4. **Routers (`routers/`)**
    - `portfolios.py`: Portfolio management endpoints
    - `projects.py`: Project management endpoints
-   - `scenarios.py`: What-if scenario analysis (Roche Construction)
-   - `simulations.py`: Monte Carlo simulations (Roche Construction)
+   - `scenarios.py`: What-if scenario analysis (Generic Construction)
+   - `simulations.py`: Monte Carlo simulations (Generic Construction)
 
 5. **Utilities (`utils/`)**
    - `converters.py`: UUID and data conversion utilities
@@ -120,8 +120,8 @@ The following routers need to be created from the backup file:
 - [ ] `routers/feedback.py` - Feedback system
 - [ ] `routers/ai.py` - AI agent endpoints
 - [ ] `routers/csv_import.py` - CSV import functionality
-- [ ] `routers/shareable_urls.py` - Shareable URLs (Roche)
-- [ ] `routers/change_management.py` - Change management (Roche)
+- [ ] `routers/shareable_urls.py` - Shareable URLs (Generic)
+- [ ] `routers/change_management.py` - Change management (Generic)
 
 ### Phase 3: Additional Models and Services
 
@@ -182,7 +182,7 @@ The refactoring has been **completely successful**. The PPM SaaS backend now has
 - **Modular structure** that supports team collaboration
 - **Preserved functionality** with all existing features intact
 - **Improved developer experience** with easier navigation and testing
-- **Scalable foundation** for future Roche Construction PPM features
+- **Scalable foundation** for future Generic Construction PPM features
 
 The codebase is now ready for continued development with the confidence that new features can be added efficiently and existing functionality can be maintained easily.
 

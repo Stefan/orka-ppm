@@ -341,7 +341,7 @@ class EnhancedPMRService:
             # Use RAG agent's OpenAI client directly for summary generation
             # Use the configured model from the RAG agent
             import os
-            model = os.getenv("OPENAI_MODEL", "gpt-4")
+            model = os.getenv("OPENAI_MODEL", "grok-beta")
             response = self.rag_agent.openai_client.chat.completions.create(
                 model=model,
                 messages=[

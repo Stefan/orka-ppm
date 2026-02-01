@@ -335,6 +335,58 @@ class TestChunkingErrorHandling:
 
 
 @pytest.mark.property_test
+class TestDocumentChunkability:
+    """
+    Property tests for document chunkability.
+    Property 4: Document Chunkability
+    Validates: Requirements 1.5
+    """
+
+    @settings(max_examples=50, deadline=15000)
+    @given(text=text_document_strategy())
+    def test_any_document_can_be_chunked(self, default_chunker, text):
+        """
+        Test that any valid document can be chunked without errors.
+
+        Property 4: For any valid document, the chunking process must
+        succeed and produce at least one chunk.
+        """
+        # Should not raise any exceptions
+        chunks = default_chunker.chunk_text(text, preserve_boundaries=True)
+
+        # Must produce at least one chunk
+        assert len(chunks) >= 1, "Chunking must produce at least one chunk"
+
+        # All chunks must have content
+        for chunk in chunks:
+            assert len(chunk.content.strip()) > 0, "All chunks must have non-empty content"
+
+    @settings(max_examples=30, deadline=10000)
+    @given(text=st.text(min_size=1000, max_size=5000))
+    def test_large_documents_chunk_successfully(self, text):
+        """
+        Test that large documents can be chunked successfully.
+
+        Property 4: Large documents must be chunkable without
+        memory issues or failures.
+        """
+        assume(text.strip())  # Ensure non-empty text
+
+        chunker = TextChunker(chunk_size=512, overlap=50)
+
+        # Should handle large documents
+        chunks = chunker.chunk_text(text, preserve_boundaries=False)
+
+        # Should produce reasonable number of chunks
+        expected_chunks = max(1, len(text) // (512 - 50))  # Approximate
+        assert len(chunks) <= expected_chunks * 2, "Should not produce excessive chunks"
+
+        # Verify chunk content integrity
+        total_content_length = sum(len(chunk.content) for chunk in chunks)
+        assert total_content_length >= len(text) * 0.8, "Should preserve most content"
+
+
+@pytest.mark.property_test
 class TestChunkValidation:
     """
     Property tests for chunk validation.

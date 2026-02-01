@@ -237,7 +237,7 @@ pytest tests/test_monte_carlo*.py --cov=monte_carlo --cov-report=html
 | Property-Based Tests | 32 | 31 | 96.9% | ✅ Excellent |
 | Core Integration | 6 | 6 | 100% | ✅ Complete |
 | Data Models | 8 | 8 | 100% | ✅ Complete |
-| Roche Construction | 10 | 10 | 100% | ✅ Complete |
+| Generic Construction | 10 | 10 | 100% | ✅ Complete |
 | API Validation | 8 | 7 | 87.5% | ✅ Good |
 
 ## Performance

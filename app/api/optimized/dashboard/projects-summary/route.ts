@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8001'
 
 export async function GET(request: NextRequest) {
   try {
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Cache-Control': 'public, max-age=30, s-maxage=60', // Cache for 30 seconds
         'X-Data-Source': 'backend-real'
       },
     })

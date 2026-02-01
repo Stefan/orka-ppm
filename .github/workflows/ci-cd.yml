@@ -1,0 +1,660 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+# Cancel in-progress runs for the same workflow and branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+# Environment variables for different stages
+# Test environment - minimal configuration for CI
+env-test:
+  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+  NEXT_PUBLIC_API_URL: 'http://localhost:8000'
+
+# Staging environment
+env-staging:
+  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+  NEXT_PUBLIC_API_URL: ${{ secrets.STAGING_BACKEND_URL }}
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+# Production environment
+env-production:
+  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+  NEXT_PUBLIC_API_URL: ${{ secrets.PRODUCTION_BACKEND_URL }}
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+jobs:
+  # Job to detect what has changed in the monorepo
+  detect-changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+      shared: ${{ steps.filter.outputs.shared }}
+      docs: ${{ steps.filter.outputs.docs }}
+      ci: ${{ steps.filter.outputs.ci }}
+      docker: ${{ steps.filter.outputs.docker }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect file changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'app/**'
+              - 'components/**'
+              - 'contexts/**'
+              - 'hooks/**'
+              - 'lib/**'
+              - 'styles/**'
+              - 'public/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'next.config.ts'
+              - 'postcss.config.mjs'
+              - 'tailwind.config.js'
+              - 'tsconfig.json'
+              - 'jest.config.js'
+              - 'jest.env.js'
+              - 'jest.setup.js'
+              - '.eslintrc.*'
+              - 'eslint.config.mjs'
+            backend:
+              - 'backend/**'
+              - 'pyproject.toml'
+              - 'pytest.ini'
+              - 'requirements*.txt'
+              - 'Dockerfile'
+              - 'docker-compose.yml'
+              - 'docker-compose.override.yml'
+            shared:
+              - 'types/**'
+              - 'utils/**'
+              - 'data/**'
+            docs:
+              - 'docs/**'
+              - '*.md'
+              - '.kiro/**'
+            ci:
+              - '.github/**'
+              - 'scripts/**'
+            docker:
+              - 'Dockerfile'
+              - 'docker-compose.yml'
+              - 'docker-compose.override.yml'
+              - '.dockerignore'
+
+  # Frontend linting and validation
+  frontend-lint:
+    name: Frontend Lint
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    timeout-minutes: 10
+    if: needs.detect-changes.outputs.frontend == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache Next.js build cache
+        uses: actions/cache@v3
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+            ${{ runner.os }}-nextjs-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Check Prettier formatting
+        run: npm run format:check
+
+      - name: Check TypeScript compilation
+        run: npx tsc --noEmit
+
+  # Backend linting and validation
+  backend-lint:
+    name: Backend Lint
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    timeout-minutes: 10
+    if: needs.detect-changes.outputs.backend == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-lint-${{ hashFiles('**/requirements-test.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-lint-
+            ${{ runner.os }}-pip-
+
+      - name: Cache pre-commit hooks
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pre-commit
+          key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pre-commit-
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements-test.txt
+
+      - name: Run Black formatting check
+        run: black --check --diff --fast backend/
+
+      - name: Run isort import sorting check
+        run: isort --check-only --diff --fast backend/
+
+      - name: Run Flake8 linting
+        run: flake8 backend/
+
+  # Frontend testing
+  frontend-test:
+    name: Frontend Test
+    runs-on: ubuntu-latest
+    needs: [detect-changes, frontend-lint]
+    timeout-minutes: 15
+    if: needs.detect-changes.outputs.frontend == 'true' && needs.frontend-lint.result == 'success'
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [18, 20]
+        include:
+          - node-version: 18
+            is-primary: true
+          - node-version: 20
+            is-primary: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm test -- --coverage --watchAll=false --passWithNoTests
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          flags: frontend
+          name: Frontend Coverage
+          fail_ci_if_error: false
+
+  # Backend testing
+  backend-test:
+    name: Backend Test
+    runs-on: ubuntu-latest
+    needs: [detect-changes, backend-lint]
+    timeout-minutes: 20
+    if: needs.detect-changes.outputs.backend == 'true' && needs.backend-lint.result == 'success'
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements-test.txt
+
+      - name: Run backend tests
+        run: |
+          cd backend
+          python -m pytest -v --tb=short --cov=. --cov-report=xml --cov-report=term-missing --cov-fail-under=85
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./backend/coverage.xml
+          flags: backend
+          name: Backend Coverage
+          fail_ci_if_error: false
+
+  # Frontend build validation
+  frontend-build:
+    name: Frontend Build
+    runs-on: ubuntu-latest
+    needs: [detect-changes, frontend-lint, frontend-test]
+    timeout-minutes: 15
+    if: needs.detect-changes.outputs.frontend == 'true'
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_API_URL: 'http://localhost:8000'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js application
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: nextjs-build
+          path: .next/
+          retention-days: 7
+
+  # Backend build validation
+  backend-build:
+    name: Backend Build
+    runs-on: ubuntu-latest
+    needs: [detect-changes, backend-lint, backend-test]
+    timeout-minutes: 15
+    if: needs.detect-changes.outputs.backend == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Validate FastAPI application startup
+        run: |
+          cd backend
+          timeout 30s python -c "
+          import sys
+          sys.path.insert(0, '.')
+          try:
+              from main import app
+              print('✅ FastAPI app imports successfully')
+          except Exception as e:
+              print(f'❌ FastAPI app import failed: {e}')
+              sys.exit(1)
+          "
+
+      - name: Build Docker image (if Dockerfile changed)
+        if: needs.detect-changes.outputs.docker == 'true'
+        run: |
+          docker build -t ${{ env.IMAGE_NAME }}:test .
+
+  # Environment and secrets validation
+  validate-secrets:
+    name: Validate Secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate required secrets
+        run: |
+          # Check for required secrets
+          required_secrets=(
+            "NEXT_PUBLIC_SUPABASE_URL"
+            "NEXT_PUBLIC_SUPABASE_ANON_KEY"
+          )
+
+          missing_secrets=()
+
+          for secret in "${required_secrets[@]}"; do
+            if [[ -z "${!secret}" ]]; then
+              missing_secrets+=("$secret")
+            fi
+          done
+
+          if [[ ${#missing_secrets[@]} -gt 0 ]]; then
+            echo "❌ Missing required secrets: ${missing_secrets[*]}"
+            echo "Please configure these secrets in GitHub repository settings."
+            exit 1
+          else
+            echo "✅ All required secrets are configured"
+          fi
+
+  # Security scanning
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: [detect-changes, validate-secrets]
+    if: needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.backend == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Deploy to staging
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [detect-changes, ci-status]
+    if: github.ref == 'refs/heads/develop' && needs.ci-status.result == 'success'
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy frontend to Vercel (staging)
+        if: needs.detect-changes.outputs.frontend == 'true'
+        run: |
+          npm i -g vercel
+          vercel --prod=false --yes --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_STAGING }}
+
+      - name: Deploy backend to Render (staging)
+        if: needs.detect-changes.outputs.backend == 'true'
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{"branch": "develop"}' \
+            ${{ secrets.RENDER_DEPLOY_HOOK_STAGING }}
+
+      - name: Post deployment URLs to PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = `## 🚀 Staging Deployment Ready
+
+            **Frontend:** ${{ secrets.STAGING_FRONTEND_URL }}
+            **Backend:** ${{ secrets.STAGING_BACKEND_URL }}
+
+            ✅ All tests passed and deployment completed successfully.
+
+            ### Test Results
+            - **Frontend Tests:** ${{ needs.frontend-test.result == 'success' && '✅ Passed' || '❌ Failed' }}
+            - **Backend Tests:** ${{ needs.backend-test.result == 'success' && '✅ Passed' || '❌ Failed' }}
+            - **Security Scan:** ${{ needs.security-scan.result == 'success' && '✅ Passed' || '❌ Failed' }}
+
+            ### Coverage
+            - **Frontend:** [View Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - **Backend:** [View Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})`
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })
+
+  # Deploy to production
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [detect-changes, ci-status]
+    if: github.ref == 'refs/heads/main' && needs.ci-status.result == 'success'
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy frontend to Vercel (production)
+        if: needs.detect-changes.outputs.frontend == 'true'
+        run: |
+          npm i -g vercel
+          vercel --prod=true --yes --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_PRODUCTION }}
+
+      - name: Deploy backend to Render (production)
+        if: needs.detect-changes.outputs.backend == 'true'
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{"branch": "main"}' \
+            ${{ secrets.RENDER_DEPLOY_HOOK_PRODUCTION }}
+
+      - name: Create GitHub release
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, 'release')
+        run: |
+          # Extract version from package.json or use commit hash
+          VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "${GITHUB_SHA:0:7}")
+
+          gh release create "v${VERSION}" \
+            --title "Release v${VERSION}" \
+            --notes "Automated release from main branch"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create deployment notification
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = `## 🎉 Production Deployment Complete
+
+            **Frontend:** ${{ secrets.PRODUCTION_FRONTEND_URL }}
+            **Backend:** ${{ secrets.PRODUCTION_BACKEND_URL }}
+
+            🚀 Application is now live in production!
+
+            ### Deployment Details
+            - **Commit:** \`${{ github.sha }}\`
+            - **Branch:** \`${{ github.ref_name }}\`
+            - **Triggered by:** @${{ github.actor }}
+
+            ### Quality Gates Passed
+            - **Frontend Tests:** ${{ needs.frontend-test.result == 'success' && '✅ Passed' || '❌ Failed' }}
+            - **Backend Tests:** ${{ needs.backend-test.result == 'success' && '✅ Passed' || '❌ Failed' }}
+            - **Security Scan:** ${{ needs.security-scan.result == 'success' && '✅ Passed' || '❌ Failed' }}
+            - **Build Validation:** ${{ needs.frontend-build.result == 'success' && needs.backend-build.result == 'success' && '✅ Passed' || '❌ Failed' }}
+
+            ### Rollback Information
+            If issues are discovered, the previous deployment can be restored using the rollback button in Vercel/Render dashboards.`
+
+            // Create a commit status for the deployment
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'success',
+              target_url: '${{ secrets.PRODUCTION_FRONTEND_URL }}',
+              description: 'Production deployment completed successfully',
+              context: 'deployment/production'
+            })
+
+            // Post comment on the commit/merge
+            if (context.issue) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              })
+            }
+
+  # Failure notification
+  failure-notification:
+    name: Failure Notification
+    runs-on: ubuntu-latest
+    needs: [validate-secrets, frontend-lint, frontend-test, frontend-build, backend-lint, backend-test, backend-build, security-scan]
+    if: failure() && github.event_name == 'pull_request'
+    steps:
+      - name: Create failure report
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const failedJobs = []
+            const jobResults = {
+              'validate-secrets': '${{ needs.validate-secrets.result }}',
+              'frontend-lint': '${{ needs.frontend-lint.result }}',
+              'frontend-test': '${{ needs.frontend-test.result }}',
+              'frontend-build': '${{ needs.frontend-build.result }}',
+              'backend-lint': '${{ needs.backend-lint.result }}',
+              'backend-test': '${{ needs.backend-test.result }}',
+              'backend-build': '${{ needs.backend-build.result }}',
+              'security-scan': '${{ needs.security-scan.result }}'
+            }
+
+            Object.entries(jobResults).forEach(([job, result]) => {
+              if (result === 'failure') {
+                failedJobs.push(job)
+              }
+            })
+
+            const body = `## ❌ CI Pipeline Failed
+
+            The following jobs failed: ${failedJobs.map(job => \`**\${job}**\`).join(', ')}
+
+            ### 🔍 Next Steps
+            1. **Check the failed job logs** above for detailed error messages
+            2. **Review the error output** to understand what went wrong
+            3. **Fix the issues** and push your changes
+            4. **Re-run the CI pipeline** if needed
+
+            ### 📋 Common Issues
+            - **Linting errors:** Run \`npm run lint:fix\` or \`black backend/\` to auto-fix
+            - **Test failures:** Check test output for assertion failures
+            - **Build failures:** Verify dependencies and TypeScript errors
+            - **Security issues:** Review vulnerability reports
+
+            ### 📊 Pipeline Status
+            - **Commit:** \`${{ github.sha }}\`
+            - **Branch:** \`${{ github.head_ref }}\`
+            - **PR:** #${{ github.event.number }}
+
+            [View full pipeline logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})`
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })
+
+  # Final status check
+  ci-status:
+    name: CI Status Check
+    runs-on: ubuntu-latest
+    needs: [validate-secrets, frontend-lint, frontend-test, frontend-build, backend-lint, backend-test, backend-build, security-scan]
+    if: always()
+    steps:
+      - name: Check all jobs status
+        run: |
+          if [[ "${{ needs.validate-secrets.result }}" == "failure" ]] || \
+             [[ "${{ needs.frontend-lint.result }}" == "failure" ]] || \
+             [[ "${{ needs.frontend-test.result }}" == "failure" ]] || \
+             [[ "${{ needs.frontend-build.result }}" == "failure" ]] || \
+             [[ "${{ needs.backend-lint.result }}" == "failure" ]] || \
+             [[ "${{ needs.backend-test.result }}" == "failure" ]] || \
+             [[ "${{ needs.backend-build.result }}" == "failure" ]] || \
+             [[ "${{ needs.security-scan.result }}" == "failure" ]]; then
+            echo "❌ Some CI jobs failed"
+            exit 1
+          else
+            echo "✅ All CI jobs passed"
+          fi

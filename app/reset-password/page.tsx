@@ -1,14 +1,12 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useRouter } from 'next/navigation'
+import { supabase } from '@/lib/api/supabase-minimal'
 import { AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react'
 
 function ResetPasswordContent() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const supabase = createClientComponentClient()
   
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -38,7 +36,7 @@ function ResetPasswordContent() {
     }
 
     checkSession()
-  }, [supabase])
+  }, [])
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()

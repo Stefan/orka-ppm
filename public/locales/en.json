@@ -80,6 +80,7 @@
     "configure": "Configure",
     "remove": "Remove",
     "view": "View",
+    "send": "Send",
     "items": {
       "one": "{count} item",
       "other": "{count} items"
@@ -148,7 +149,11 @@
     "welcome": "Welcome to AI Help Assistant!",
     "welcomeMessage": "Ask me anything about the PPM platform features and I'll help you out.",
     "typing": "AI is typing...",
-    "tryAgain": "Try again"
+    "tryAgain": "Try again",
+    "you": "You",
+    "sources": "Sources:",
+    "referencedDocuments": "Referenced Documents:",
+    "confidence": "Confidence"
   },
   "variance": {
     "trends": "Variance Trends",
@@ -324,6 +329,21 @@
     "aiOptimize": "AI Optimize",
     "ai": "AI",
     "addResource": "Add Resource",
+    "refreshNow": "Refresh now",
+    "enableAutoRefresh": "Enable auto-refresh (30s)",
+    "disableAutoRefresh": "Disable auto-refresh",
+    "exportData": "Export resource data",
+    "showFilters": "Show filters",
+    "hideFilters": "Hide filters",
+    "showOptimization": "Show AI optimization",
+    "hideOptimization": "Hide AI optimization",
+    "switchToTable": "Switch to table view",
+    "switchToHeatmap": "Switch to heatmap view",
+    "switchToCards": "Switch to cards view",
+    "assignResource": "Assign Resource",
+    "scheduleResource": "Schedule Resource",
+    "editAllocation": "Edit Allocation",
+    "removeResource": "Remove Resource",
     "totalResources": "Total Resources",
     "avgUtilization": "Avg. Utilization",
     "available": "Available",

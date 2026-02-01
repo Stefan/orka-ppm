@@ -14,9 +14,9 @@ LINE 27: ADD CONSTRAINT IF NOT EXISTS valid_anomaly_score
 
 ---
 
-### Error 2: "relation 'roche_audit_logs' does not exist"
+### Error 2: "relation 'audit_logs' does not exist"
 ```
-ERROR: 42P01: relation "roche_audit_logs" does not exist
+ERROR: 42P01: relation "audit_logs" does not exist
 ```
 
 **Cause**: Base table not created yet.
@@ -55,7 +55,7 @@ Break the migration into sections and execute separately:
 ```sql
 CREATE EXTENSION IF NOT EXISTS vector;
 
-CREATE TABLE IF NOT EXISTS roche_audit_logs (
+CREATE TABLE IF NOT EXISTS audit_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     event_type VARCHAR(100) NOT NULL,
     user_id UUID,
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS roche_audit_logs (
 
 **Section 2: Add AI Columns**
 ```sql
-ALTER TABLE roche_audit_logs 
+ALTER TABLE audit_logs 
     ADD COLUMN IF NOT EXISTS anomaly_score DECIMAL(3,2),
     ADD COLUMN IF NOT EXISTS is_anomaly BOOLEAN DEFAULT FALSE,
     ADD COLUMN IF NOT EXISTS category VARCHAR(50),
@@ -93,7 +93,7 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM pg_constraint WHERE conname = 'valid_anomaly_score'
     ) THEN
-        ALTER TABLE roche_audit_logs 
+        ALTER TABLE audit_logs 
             ADD CONSTRAINT valid_anomaly_score 
                 CHECK (anomaly_score IS NULL OR (anomaly_score >= 0 AND anomaly_score <= 1));
     END IF;
@@ -132,7 +132,7 @@ This avoids any CLI or file encoding issues.
 
 ### Error 4: "column already exists"
 ```
-ERROR: 42701: column "anomaly_score" of relation "roche_audit_logs" already exists
+ERROR: 42701: column "anomaly_score" of relation "audit_logs" already exists
 ```
 
 **Cause**: Migration was partially applied.
@@ -142,7 +142,7 @@ ERROR: 42701: column "anomaly_score" of relation "roche_audit_logs" already exis
 -- Check which columns exist
 SELECT column_name 
 FROM information_schema.columns 
-WHERE table_name = 'roche_audit_logs';
+WHERE table_name = 'audit_logs';
 
 -- The migration will skip existing columns automatically
 ```
@@ -151,7 +151,7 @@ WHERE table_name = 'roche_audit_logs';
 
 ### Error 5: "constraint already exists"
 ```
-ERROR: 42710: constraint "valid_anomaly_score" for relation "roche_audit_logs" already exists
+ERROR: 42710: constraint "valid_anomaly_score" for relation "audit_logs" already exists
 ```
 
 **Cause**: Constraint was already added.
@@ -217,7 +217,7 @@ ORDER BY table_name;
 ```sql
 SELECT column_name, data_type 
 FROM information_schema.columns 
-WHERE table_name = 'roche_audit_logs' 
+WHERE table_name = 'audit_logs' 
 AND column_name IN (
     'anomaly_score', 'is_anomaly', 'category', 
     'risk_level', 'tags', 'ai_insights', 
@@ -260,14 +260,14 @@ ORDER BY table_name, conname;
 ### 5. Test Insert
 ```sql
 -- Test basic insert
-INSERT INTO roche_audit_logs (
+INSERT INTO audit_logs (
     event_type, entity_type, action_details, tenant_id
 ) VALUES (
     'test_event', 'test_entity', '{}'::jsonb, gen_random_uuid()
 ) RETURNING id;
 
 -- Test with AI fields
-INSERT INTO roche_audit_logs (
+INSERT INTO audit_logs (
     event_type, entity_type, action_details,
     anomaly_score, is_anomaly, category, risk_level,
     tags, tenant_id
@@ -278,7 +278,7 @@ INSERT INTO roche_audit_logs (
 ) RETURNING id;
 
 -- Clean up test data
-DELETE FROM roche_audit_logs WHERE event_type LIKE 'test%';
+DELETE FROM audit_logs WHERE event_type LIKE 'test%';
 ```
 
 ## Getting Help

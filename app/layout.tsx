@@ -17,13 +17,12 @@ import './critical.css'
 // Import globals.css - Next.js will handle optimization
 import './globals.css'
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
-  display: 'swap',
-  // Use variable font (default) - loads single file with all weights
-  // This prevents multiple font files from being preloaded
-  preload: true,
+  display: 'swap', // Optimizes font loading to prevent layout shifts
+  // Font preloading disabled to prevent unused preload warnings
+  preload: false,
 })
 
 export const metadata: Metadata = {
@@ -66,7 +65,7 @@ export const viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de" className={`${inter.variable} chrome-optimized`}>
+    <html lang="de" className={`${inter.variable} chrome-optimized`} suppressHydrationWarning>
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -106,9 +105,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           WebkitOverflowScrolling: 'touch',
           overscrollBehavior: 'contain',
           backgroundAttachment: 'local',
-          backgroundColor: '#ffffff'
+          backgroundColor: '#f9fafb'
         } as React.CSSProperties}
       >
+        {/* Visible fallback before React hydrates or if JS fails - prevents white page */}
+        <noscript>
+          <div style={{ padding: 24, textAlign: 'center', color: '#374151', fontFamily: 'system-ui, sans-serif' }}>
+            Orka PPM – Please enable JavaScript to use this app.
+          </div>
+        </noscript>
+        <div id="root-loading" style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f9fafb', color: '#4b5563', fontFamily: 'system-ui, sans-serif', fontSize: 16, zIndex: 0 }} aria-hidden="true">
+          Loading…
+        </div>
         <FirefoxSidebarFix />
         <ResourcePreloader />
         <PredictivePrefetcher enabled={true} />

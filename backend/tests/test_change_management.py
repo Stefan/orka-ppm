@@ -14,11 +14,11 @@ from uuid import uuid4
 # Add the backend directory to Python path
 sys.path.append('.')
 
-from roche_construction_models import (
+from generic_construction_models import (
     ChangeRequestCreate, ChangeRequestUpdate, ChangeRequest, ApprovalDecision,
     ImpactAssessment, ChangeRequestType, ChangeRequestStatus, Priority
 )
-from roche_construction_services import ChangeManagementService
+from services.generic_construction_services import ChangeManagementService
 
 # Mock Supabase client for testing
 class MockSupabaseTable:

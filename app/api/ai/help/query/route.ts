@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000'
-const USE_MOCK = process.env.HELP_CHAT_USE_MOCK === 'true' // Backend fix applied
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8001'
+const USE_MOCK = false // Use real Knowledge Base RAG system
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,45 +9,55 @@ export async function POST(request: NextRequest) {
     
     console.log('[Help Chat Proxy] Received request body:', JSON.stringify(body, null, 2))
     
-    // TEMPORARY: Return mock response until backend issue is resolved
+    // Use mock response for testing when backend is not available
     if (USE_MOCK) {
-      console.log('[Help Chat Proxy] Using mock response (backend has validation issue)')
+      console.log('[Help Chat Proxy] Using mock response (backend unavailable)')
       
       const mockResponse = {
+        query_id: `query-${Date.now()}`,
         response: `Ich verstehe deine Frage: "${body.query}"\n\nDiese App ist ein umfassendes PPM (Project Portfolio Management) System mit folgenden Hauptfunktionen:\n\n1. **Dashboard & Übersicht**: Visualisierung von Projektportfolios, KPIs und Gesundheitsindikatoren\n2. **Projektmanagement**: Erstellung, Verwaltung und Tracking von Projekten\n3. **Ressourcenplanung**: Optimierung der Ressourcenzuweisung\n4. **Finanzmanagement**: Budget-Tracking und Kostenanalyse\n5. **Risikomanagement**: Identifikation und Bewertung von Projektrisiken\n6. **Berichtswesen**: Generierung von Berichten und Analysen\n7. **Monte-Carlo-Simulationen**: Risikoanalyse und Prognosen\n8. **AI-gestützte Features**: Intelligente Empfehlungen und Optimierungen\n\nWie kann ich dir bei einem spezifischen Feature helfen?`,
-        sessionId: body.sessionId || `mock-${Date.now()}`,
+        citations: [
+          {
+            number: 1,
+            type: "reference"
+          },
+          {
+            number: 2,
+            type: "reference"
+          },
+          {
+            number: 3,
+            type: "reference"
+          }
+        ],
         sources: [
           {
+            id: 1,
             title: "PPM Dashboard Documentation",
-            url: "/docs/dashboard",
-            relevance: 0.9
+            category: "Documentation",
+            content_preview: "Comprehensive guide to using the PPM dashboard features including KPIs, project health indicators, and portfolio visualization.",
+            similarity_score: 0.95
           },
           {
-            title: "Feature Overview",
-            url: "/docs/features",
-            relevance: 0.85
-          }
-        ],
-        confidence: 0.8,
-        responseTimeMs: 50,
-        proactiveTips: [],
-        suggestedActions: [
-          {
-            id: "action-create-project",
-            label: "Projekt erstellen",
-            action: () => console.log("Navigate to create project"),
-            icon: "plus"
+            id: 2,
+            title: "Feature Overview Guide",
+            category: "User Guide",
+            content_preview: "Complete overview of all PPM system features including project management, resource planning, financial tracking, and AI capabilities.",
+            similarity_score: 0.88
           },
           {
-            id: "action-view-dashboard",
-            label: "Dashboard ansehen",
-            action: () => console.log("Navigate to dashboard"),
-            icon: "dashboard"
+            id: 3,
+            title: "Getting Started Tutorial",
+            category: "Tutorial",
+            content_preview: "Step-by-step guide for new users covering basic navigation, project creation, and essential features.",
+            similarity_score: 0.76
           }
         ],
-        relatedGuides: [],
-        isCached: false,
-        isFallback: true
+        confidence: 0.85,
+        cache_hit: false,
+        is_fallback: false,
+        session_id: body.sessionId || `mock-${Date.now()}`,
+        processed_at: new Date().toISOString()
       }
       
       return NextResponse.json(mockResponse)

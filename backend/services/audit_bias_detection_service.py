@@ -114,7 +114,7 @@ class AuditBiasDetectionService:
             )
             
             # Fetch all audit events in time range
-            query = self.supabase.table("roche_audit_logs").select("*")
+            query = self.supabase.table("audit_logs").select("*")
             query = query.gte("timestamp", start_time.isoformat())
             query = query.lte("timestamp", end_time.isoformat())
             

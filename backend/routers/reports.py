@@ -13,8 +13,8 @@ from auth.dependencies import get_current_user
 from auth.rbac import require_permission, Permission
 
 # Import Roche Construction services and models
-from services.roche_construction_services import GoogleSuiteReportGenerator
-from roche_construction_models import (
+from services.generic_construction_services import GoogleSuiteReportGenerator
+from generic_construction_models import (
     ReportTemplateCreate, ReportTemplate, ReportConfig, ReportGenerationRequest, GeneratedReport,
     ReportTemplateType, ReportGenerationStatus, ChartConfig
 )

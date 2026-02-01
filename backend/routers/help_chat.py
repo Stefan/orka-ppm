@@ -23,15 +23,16 @@ from services.help_chat_performance import get_help_chat_performance
 from services.help_chat_cache import get_cached_response, set_cached_response  # Neues Caching
 
 # Import rate limiting
+from services.rate_limiter import check_user_rate_limit, RateLimitExceeded
+
+# Import limiter from performance optimization
 try:
     from performance_optimization import limiter
 except ImportError:
-    # Fallback if performance optimization not available
-    def limiter_fallback(rate: str):
-        def decorator(func):
-            return func
-        return decorator
-    limiter = type('MockLimiter', (), {'limit': limiter_fallback})()
+    # Fallback if performance optimization is not available
+    from slowapi import Limiter
+    from slowapi.util import get_remote_address
+    limiter = Limiter(key_func=get_remote_address)
 
 logger = logging.getLogger(__name__)
 
@@ -187,7 +188,6 @@ def get_translation_service() -> TranslationService:
     return translation_service
 
 @router.post("/query", response_model=HelpQueryResponse)
-# Rate limiting temporarily disabled for debugging
 async def process_help_query(
     help_request: HelpQueryRequest,
     request: Request = None,
@@ -196,14 +196,24 @@ async def process_help_query(
     """Process user help query and return AI-generated response with Supabase caching"""
     start_time = time.time()
     performance_service = get_help_chat_performance()
-    
+
     try:
         if supabase is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        
+
+        # Check rate limiting
+        user_role = current_user.get("role", "user")
+        try:
+            await check_user_rate_limit(current_user["user_id"], user_role)
+        except RateLimitExceeded as e:
+            raise HTTPException(
+                status_code=429,
+                detail=str(e)
+            )
+
         # Log incoming request language for debugging
         logger.info(f"Help query received - language: {help_request.language}, query: {help_request.query[:50]}...")
-        
+
         # 1. Check Supabase cache first (NEW) - include language in cache key
         cached_response = await get_cached_response(
             query=help_request.query,
@@ -512,6 +522,23 @@ async def submit_help_feedback(
                 detail="Failed to submit feedback"
             )
         
+        # Check for negative feedback and flag if needed
+        is_negative = False
+        if feedback_request.rating and feedback_request.rating <= 2:
+            is_negative = True
+        elif feedback_request.feedback_type in ["incorrect", "unhelpful", "offensive"]:
+            is_negative = True
+        elif feedback_request.feedback_text and any(word in feedback_request.feedback_text.lower()
+                                                    for word in ["wrong", "incorrect", "bad", "terrible", "useless"]):
+            is_negative = True
+
+        if is_negative:
+            logger.warning(f"Negative feedback flagged for message {feedback_request.message_id}: "
+                         f"rating={feedback_request.rating}, type={feedback_request.feedback_type}")
+
+            # In a real implementation, this could trigger alerts or reviews
+            # For now, just log it for monitoring
+
         # Track analytics for feedback
         analytics_tracker = get_analytics_tracker()
         await analytics_tracker.track_feedback(
@@ -521,7 +548,8 @@ async def submit_help_feedback(
             feedback_text=feedback_request.feedback_text,
             feedback_type=feedback_request.feedback_type,
             page_context={},  # Could be enhanced to include current page context
-            session_id=None
+            session_id=None,
+            flagged_negative=is_negative
         )
         
         return FeedbackResponse(

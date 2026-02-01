@@ -201,7 +201,7 @@ class AuditScheduledJobs:
             logger.info("Starting scheduled embedding generation job")
             
             # Fetch events without embeddings (batch of 100)
-            response = self.supabase.table("roche_audit_logs").select(
+            response = self.supabase.table("audit_logs").select(
                 "id, event_type, action_details, user_id, entity_type, timestamp"
             ).is_("embedding_id", "null").limit(100).execute()
             
@@ -281,7 +281,7 @@ class AuditScheduledJobs:
             # Fetch labeled training data from past 30 days
             start_date = datetime.now() - timedelta(days=30)
             
-            response = self.supabase.table("roche_audit_logs").select("*").gte(
+            response = self.supabase.table("audit_logs").select("*").gte(
                 "timestamp", start_date.isoformat()
             ).not_.is_("category", "null").not_.is_("risk_level", "null").execute()
             

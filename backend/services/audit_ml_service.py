@@ -889,7 +889,7 @@ class AuditMLService:
             start_date = datetime.now() - timedelta(days=days_of_history)
             
             # Fetch events that have been labeled (have category and risk_level)
-            response = self.supabase.table("roche_audit_logs").select("*").gte(
+            response = self.supabase.table("audit_logs").select("*").gte(
                 "timestamp", start_date.isoformat()
             ).not_.is_("category", "null").not_.is_("risk_level", "null").limit(10000).execute()
             

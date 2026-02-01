@@ -80,6 +80,7 @@
     "configure": "Konfigurieren",
     "remove": "Entfernen",
     "view": "Ansehen",
+    "send": "Senden",
     "items": {
       "one": "{count} Element",
       "other": "{count} Elemente"
@@ -148,7 +149,11 @@
     "welcome": "Willkommen beim KI-Hilfe-Assistenten!",
     "welcomeMessage": "Fragen Sie mich alles über die PPM-Plattform-Funktionen und ich helfe Ihnen gerne weiter.",
     "typing": "KI tippt...",
-    "tryAgain": "Erneut versuchen"
+    "tryAgain": "Erneut versuchen",
+    "you": "Sie",
+    "sources": "Quellen:",
+    "referencedDocuments": "Referenzierte Dokumente:",
+    "confidence": "Vertrauenswert"
   },
   "variance": {
     "trends": "Varianz-Trends",
@@ -323,6 +328,21 @@
     "aiOptimize": "KI Optimieren",
     "ai": "KI",
     "addResource": "Ressource hinzufügen",
+    "refreshNow": "Jetzt aktualisieren",
+    "enableAutoRefresh": "Auto-Aktualisierung aktivieren (30s)",
+    "disableAutoRefresh": "Auto-Aktualisierung deaktivieren",
+    "exportData": "Ressourcendaten exportieren",
+    "showFilters": "Filter anzeigen",
+    "hideFilters": "Filter ausblenden",
+    "showOptimization": "KI-Optimierung anzeigen",
+    "hideOptimization": "KI-Optimierung ausblenden",
+    "switchToTable": "Zur Tabellenansicht wechseln",
+    "switchToHeatmap": "Zur Heatmap-Ansicht wechseln",
+    "switchToCards": "Zur Kartenansicht wechseln",
+    "assignResource": "Ressource zuweisen",
+    "scheduleResource": "Ressource planen",
+    "editAllocation": "Zuweisung bearbeiten",
+    "removeResource": "Ressource entfernen",
     "totalResources": "Ressourcen Gesamt",
     "avgUtilization": "Durchschn. Auslastung",
     "search": "Suchen",

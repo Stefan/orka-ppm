@@ -20,7 +20,7 @@ def test_no_update_endpoints_exist():
     """
     Property 16: Append-Only Audit Log Immutability
     
-    For any audit event in the roche_audit_logs table, there should be no 
+    For any audit event in the audit_logs table, there should be no 
     update or delete operations exposed through the API, ensuring that once 
     an event is created, it cannot be modified or removed.
     

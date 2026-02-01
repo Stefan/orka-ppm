@@ -8,13 +8,13 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
 
 ## Tasks
 
-- [ ] 1. Set up TypeScript interfaces and data models
+- [x] 1. Set up TypeScript interfaces and data models
   - Create `types/costbook.ts` with all TypeScript interfaces: Project, Commitment, Actual, ProjectWithFinancials, KPIMetrics, Currency enum, ProjectStatus enum, POStatus enum, ActualStatus enum
   - Define exchange rate constants and currency symbols
   - _Requirements: 1.1, 1.2, 1.3_
 
-- [ ] 2. Implement core calculation functions
-  - [ ] 2.1 Create `lib/costbook-calculations.ts` with calculation functions
+- [x] 2. Implement core calculation functions
+  - [x] 2.1 Create `lib/costbook-calculations.ts` with calculation functions
     - Implement `calculateTotalSpend(commitments: number, actuals: number): number`
     - Implement `calculateVariance(budget: number, totalSpend: number): number`
     - Implement `calculateSpendPercentage(totalSpend: number, budget: number): number`
@@ -23,51 +23,51 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Handle null/undefined values gracefully (treat as zero)
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 1.5_
   
-  - [ ] 2.2 Write property test for total spend calculation
+  - [x] 2.2 Write property test for total spend calculation
     - **Property 1: Total Spend Calculation Correctness**
     - **Validates: Requirements 2.1**
     - Generate random commitment and actual arrays, verify sum correctness
     - Test with empty arrays (edge case)
   
-  - [ ] 2.3 Write property test for variance calculation
+  - [x] 2.3 Write property test for variance calculation
     - **Property 2: Variance Calculation Correctness**
     - **Validates: Requirements 2.2**
     - Generate random budget and spend values, verify variance = budget - spend
   
-  - [ ] 2.4 Write property test for KPI aggregation
+  - [x] 2.4 Write property test for KPI aggregation
     - **Property 3: KPI Aggregation Correctness**
     - **Validates: Requirements 2.3**
     - Generate random project arrays, verify all KPI sums are correct
   
-  - [ ] 2.5 Write property test for currency precision
+  - [x] 2.5 Write property test for currency precision
     - **Property 4: Currency Precision Preservation**
     - **Validates: Requirements 2.6**
     - Generate random floats, verify formatting to 2 decimal places
   
-  - [ ] 2.6 Write property test for null value handling
+  - [x] 2.6 Write property test for null value handling
     - **Property 5: Null Value Handling in Calculations**
     - **Validates: Requirements 1.5**
     - Generate projects with null/undefined values, verify no errors and valid results
 
-- [ ] 3. Implement currency conversion and formatting functions
-  - [ ] 3.1 Create `lib/currency-utils.ts` with currency functions
+- [x] 3. Implement currency conversion and formatting functions
+  - [x] 3.1 Create `lib/currency-utils.ts` with currency functions
     - Implement `convertCurrency(amount: number, from: Currency, to: Currency): number`
     - Implement `formatCurrency(amount: number, currency: Currency): string`
     - Use hardcoded exchange rates for Phase 1
     - _Requirements: 5.2, 5.4, 2.6_
   
-  - [ ] 3.2 Write property test for currency conversion round-trip
+  - [x] 3.2 Write property test for currency conversion round-trip
     - **Property 7: Currency Conversion Consistency**
     - **Validates: Requirements 5.2**
     - Generate random amounts and currency pairs, verify round-trip within 0.01
   
-  - [ ] 3.3 Write property test for currency symbol inclusion
+  - [x] 3.3 Write property test for currency symbol inclusion
     - **Property 8: Currency Symbol Inclusion**
     - **Validates: Requirements 5.4**
     - Generate random amounts and currencies, verify symbol is present in formatted string
 
-- [ ] 4. Implement Supabase data fetching functions
-  - [ ] 4.1 Create `lib/supabase-queries.ts` with data fetching functions
+- [x] 4. Implement Supabase data fetching functions
+  - [x] 4.1 Create `lib/supabase-queries.ts` with data fetching functions
     - Implement `fetchProjectsWithFinancials(): Promise<ProjectWithFinancials[]>`
     - Use Supabase joins to aggregate commitments and actuals by project_id
     - Calculate total_spend, variance, and spend_percentage for each project
@@ -76,30 +76,30 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Handle errors gracefully with try-catch
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 2.1, 2.2_
   
-  - [ ] 4.2 Write unit tests for Supabase query error handling
+  - [x] 4.2 Write unit tests for Supabase query error handling
     - Test error handling when Supabase returns errors
     - Test handling of empty result sets
     - _Requirements: 1.5_
 
-- [ ] 5. Checkpoint - Ensure data layer tests pass
+- [x] 5. Checkpoint - Ensure data layer tests pass
   - Run all tests for calculation functions, currency utilities, and data fetching
   - Verify no TypeScript compilation errors
   - Ensure all tests pass, ask the user if questions arise
 
-- [ ] 6. Implement CurrencySelector component
-  - [ ] 6.1 Create `components/costbook/CurrencySelector.tsx`
+- [x] 6. Implement CurrencySelector component
+  - [x] 6.1 Create `components/costbook/CurrencySelector.tsx`
     - Render dropdown with all Currency enum values
     - Emit onChange event when currency is selected
     - Style with Tailwind CSS
     - _Requirements: 5.1, 5.5_
   
-  - [ ] 6.2 Write unit test for CurrencySelector
+  - [x] 6.2 Write unit test for CurrencySelector
     - Test that all currency options are rendered
     - Test onChange handler is called with correct currency
     - _Requirements: 5.1_
 
-- [ ] 7. Implement KPIBadges component
-  - [ ] 7.1 Create `components/costbook/KPIBadges.tsx`
+- [x] 7. Implement KPIBadges component
+  - [x] 7.1 Create `components/costbook/KPIBadges.tsx`
     - Accept KPIMetrics and Currency as props
     - Render 7 badges: Total Budget, Commitments, Actuals, Total Spend, Net Variance, Over Count, Under Count
     - Apply color coding to Net Variance (green if >= 0, red if < 0)
@@ -107,18 +107,18 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Style with Tailwind CSS (flex gap-3)
     - _Requirements: 4.3, 4.4, 5.4_
   
-  - [ ] 7.2 Write property test for variance color coding
+  - [x] 7.2 Write property test for variance color coding
     - **Property 6: Variance Color Coding Consistency**
     - **Validates: Requirements 4.4**
     - Generate random variance values, verify correct color class applied
   
-  - [ ] 7.3 Write unit test for KPI badge rendering
+  - [x] 7.3 Write unit test for KPI badge rendering
     - Test that all 7 badges are rendered
     - Test that values are formatted correctly
     - _Requirements: 4.3_
 
-- [ ] 8. Implement ProjectCard component
-  - [ ] 8.1 Create `components/costbook/ProjectCard.tsx`
+- [x] 8. Implement ProjectCard component
+  - [x] 8.1 Create `components/costbook/ProjectCard.tsx`
     - Accept ProjectWithFinancials and Currency as props
     - Render project name, status dot (color-coded), budget, commitments, actuals, total spend, variance
     - Apply color coding to variance (green if >= 0, red if < 0)
@@ -127,17 +127,17 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Style with Tailwind CSS (bg-white rounded-lg shadow-md p-4)
     - _Requirements: 6.3, 6.6, 5.4_
   
-  - [ ] 8.2 Write property test for project card completeness
+  - [x] 8.2 Write property test for project card completeness
     - **Property 9: Project Card Completeness**
     - **Validates: Requirements 6.3**
     - Generate random projects, verify all required fields are rendered
   
-  - [ ] 8.3 Write unit test for project card hover
+  - [x] 8.3 Write unit test for project card hover
     - Test hover effect shows additional details
     - _Requirements: 6.5_
 
-- [ ] 9. Implement ProjectsGrid component
-  - [ ] 9.1 Create `components/costbook/ProjectsGrid.tsx`
+- [x] 9. Implement ProjectsGrid component
+  - [x] 9.1 Create `components/costbook/ProjectsGrid.tsx`
     - Accept array of ProjectWithFinancials and Currency as props
     - Render grid with responsive columns (grid-cols-1 md:grid-cols-2 lg:grid-cols-3)
     - Apply max-h-[calc(100vh-220px)] overflow-y-auto for scrolling
@@ -145,13 +145,13 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Style with Tailwind CSS (gap-4)
     - _Requirements: 6.1, 6.2, 6.4_
   
-  - [ ] 9.2 Write unit test for projects grid rendering
+  - [x] 9.2 Write unit test for projects grid rendering
     - Test that correct number of project cards are rendered
     - Test responsive grid classes are applied
     - _Requirements: 6.1, 6.2_
 
-- [ ] 10. Implement visualization chart components
-  - [ ] 10.1 Create `components/costbook/VarianceWaterfall.tsx`
+- [x] 10. Implement visualization chart components
+  - [x] 10.1 Create `components/costbook/VarianceWaterfall.tsx`
     - Accept totalBudget, totalCommitments, totalActuals, variance, currency as props
     - Use Recharts BarChart to render waterfall chart
     - Data points: Budget (starting), Commitments (decrease), Actuals (decrease), Variance (ending)
@@ -159,7 +159,7 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Style container with h-full
     - _Requirements: 7.2_
   
-  - [ ] 10.2 Create `components/costbook/HealthBubbleChart.tsx`
+  - [x] 10.2 Create `components/costbook/HealthBubbleChart.tsx`
     - Accept array of ProjectWithFinancials and Currency as props
     - Use Recharts ScatterChart to plot health vs variance
     - X-axis: variance, Y-axis: health score, bubble size: total spend
@@ -167,7 +167,7 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Style container with h-full
     - _Requirements: 7.3_
   
-  - [ ] 10.3 Create `components/costbook/TrendSparkline.tsx`
+  - [x] 10.3 Create `components/costbook/TrendSparkline.tsx`
     - Accept array of ProjectWithFinancials and Currency as props
     - Use Recharts LineChart to show spending trends
     - Aggregate cumulative spend over time (use mock time data for Phase 1)
@@ -175,13 +175,13 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Style container with h-full
     - _Requirements: 7.4_
   
-  - [ ] 10.4 Write unit tests for chart components
+  - [x] 10.4 Write unit tests for chart components
     - Test that each chart renders without errors
     - Test that correct data is passed to Recharts
     - _Requirements: 7.2, 7.3, 7.4_
 
-- [ ] 11. Implement VisualizationPanel component
-  - [ ] 11.1 Create `components/costbook/VisualizationPanel.tsx`
+- [x] 11. Implement VisualizationPanel component
+  - [x] 11.1 Create `components/costbook/VisualizationPanel.tsx`
     - Accept array of ProjectWithFinancials and Currency as props
     - Calculate aggregate values for VarianceWaterfall
     - Render three charts in flex flex-col gap-3 layout
@@ -189,12 +189,12 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Pass appropriate props to each chart component
     - _Requirements: 7.1_
   
-  - [ ] 11.2 Write unit test for visualization panel
+  - [x] 11.2 Write unit test for visualization panel
     - Test that all three charts are rendered
     - _Requirements: 7.1_
 
-- [ ] 12. Implement CostbookHeader component
-  - [ ] 12.1 Create `components/costbook/CostbookHeader.tsx`
+- [x] 12. Implement CostbookHeader component
+  - [x] 12.1 Create `components/costbook/CostbookHeader.tsx`
     - Accept kpis, selectedCurrency, onCurrencyChange, onRefresh, onPerformance, onHelp as props
     - Render flex justify-between layout
     - Left section: h1 "Costbook" + CurrencySelector
@@ -203,13 +203,13 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Style with Tailwind CSS
     - _Requirements: 4.1, 4.2, 4.5_
   
-  - [ ] 12.2 Write unit test for header components
+  - [x] 12.2 Write unit test for header components
     - Test that title, currency selector, KPI badges, and action buttons are rendered
     - Test button click handlers are called
     - _Requirements: 4.2, 4.5_
 
-- [ ] 13. Implement CostbookFooter component
-  - [ ] 13.1 Create `components/costbook/CostbookFooter.tsx`
+- [x] 13. Implement CostbookFooter component
+  - [x] 13.1 Create `components/costbook/CostbookFooter.tsx`
     - Accept handler functions for 8 actions as props
     - Render flex gap-4 justify-center layout
     - Render 8 icon buttons: Scenarios, Resources, Reports, PO Breakdown, CSV Import, Forecast, Vendor Score, Settings
@@ -218,44 +218,44 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Style with Tailwind CSS
     - _Requirements: 8.1, 8.2, 8.4, 8.5_
   
-  - [ ] 13.2 Write unit test for footer buttons
+  - [x] 13.2 Write unit test for footer buttons
     - Test that all 8 buttons are rendered
     - Test tooltips appear on hover
     - Test that Phase 2/3 buttons are disabled
     - _Requirements: 8.2, 8.4, 8.5_
 
-- [ ] 14. Implement error handling components
-  - [ ] 14.1 Create `components/costbook/CostbookErrorBoundary.tsx`
+- [x] 14. Implement error handling components
+  - [x] 14.1 Create `components/costbook/CostbookErrorBoundary.tsx`
     - Implement React error boundary class component
     - Catch errors and display user-friendly error message
     - Provide "Reload Page" button
     - Log errors to console (can be extended to error tracking service)
     - _Requirements: 18.6_
   
-  - [ ] 14.2 Create `components/costbook/ErrorDisplay.tsx`
+  - [x] 14.2 Create `components/costbook/ErrorDisplay.tsx`
     - Accept error and onRetry props
     - Render error message with red styling
     - Show "Try again" button if onRetry provided
     - Style with Tailwind CSS (bg-red-50 border-red-200)
     - _Requirements: 18.6_
   
-  - [ ] 14.3 Create `components/costbook/LoadingSpinner.tsx`
+  - [x] 14.3 Create `components/costbook/LoadingSpinner.tsx`
     - Render animated spinner
     - Accept optional message prop
     - Style with Tailwind CSS (animate-spin)
     - _Requirements: 16.3_
   
-  - [ ] 14.4 Write unit test for error boundary
+  - [x] 14.4 Write unit test for error boundary
     - Test that errors are caught and error UI is displayed
     - _Requirements: 18.6_
 
-- [ ] 15. Checkpoint - Ensure component tests pass
+- [x] 15. Checkpoint - Ensure component tests pass
   - Run all component unit tests and property tests
   - Verify components render correctly in isolation
   - Ensure all tests pass, ask the user if questions arise
 
-- [ ] 16. Implement main Costbook4_0 component
-  - [ ] 16.1 Create `components/costbook/Costbook4_0.tsx`
+- [x] 16. Implement main Costbook4_0 component
+  - [x] 16.1 Create `components/costbook/Costbook4_0.tsx`
     - Implement main container component with state management
     - State: projects, selectedCurrency, isLoading, error, lastRefreshTime
     - Implement `fetchProjectData()` using Supabase queries
@@ -270,27 +270,27 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Show ErrorDisplay if error
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 4.6, 5.2, 5.5, 16.2, 16.3, 18.1, 18.5_
   
-  - [ ] 16.2 Write integration test for Costbook4_0
+  - [x] 16.2 Write integration test for Costbook4_0
     - Test that all sections render correctly
     - Test currency change updates all values
     - Test refresh button re-fetches data
     - _Requirements: 4.6, 5.2, 5.5_
 
-- [ ] 17. Integrate Costbook4_0 into Financials page
-  - [ ] 17.1 Update `/app/financials/page.tsx`
+- [x] 17. Integrate Costbook4_0 into Financials page
+  - [x] 17.1 Update `/app/financials/page.tsx`
     - Add tab navigation with tabs: Overview, Costbook, Invoices, Reports
     - Import and render Costbook4_0 component in Costbook tab
     - Ensure tab switching works correctly
     - Style with Tailwind CSS
     - _Requirements: 9.1, 18.2_
   
-  - [ ] 17.2 Write integration test for Financials page
+  - [x] 17.2 Write integration test for Financials page
     - Test that Costbook tab is present
     - Test that clicking Costbook tab displays Costbook4_0 component
     - _Requirements: 9.1_
 
-- [ ] 18. Implement Collapsible Panel infrastructure
-  - [ ] 18.1 Create `components/costbook/CollapsiblePanel.tsx`
+- [x] 18. Implement Collapsible Panel infrastructure
+  - [x] 18.1 Create `components/costbook/CollapsiblePanel.tsx`
     - Accept title, icon, isOpen, onToggle, children, defaultHeight props
     - Implement smooth height transition animation
     - Render collapsed state with compact header and expand button
@@ -298,20 +298,20 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Style with Tailwind CSS (bg-gray-50, rounded, transition-all duration-300)
     - _Requirements: 19.1, 19.2, 19.3, 19.4_
   
-  - [ ] 18.2 Write unit test for CollapsiblePanel
+  - [x] 18.2 Write unit test for CollapsiblePanel
     - Test collapsed and expanded states
     - Test toggle functionality
     - Test animation classes are applied
     - _Requirements: 19.3, 19.4_
 
-- [ ] 19. Implement Transaction List Panel
-  - [ ] 19.1 Create `components/costbook/TransactionFilters.tsx`
+- [x] 19. Implement Transaction List Panel
+  - [x] 19.1 Create `components/costbook/TransactionFilters.tsx`
     - Render filter controls for project, vendor, date range, type, status
     - Emit onFilterChange when filters are updated
     - Style with Tailwind CSS (flex flex-wrap gap-2)
     - _Requirements: 21.4_
   
-  - [ ] 19.2 Create `components/costbook/VirtualizedTransactionTable.tsx`
+  - [x] 19.2 Create `components/costbook/VirtualizedTransactionTable.tsx`
     - Use @tanstack/react-virtual for row virtualization
     - Accept transactions, currency, visibleColumns, sortColumn, sortDirection props
     - Render table with fixed 48px row height
@@ -319,58 +319,58 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Support custom column visibility
     - _Requirements: 21.1, 21.3, 21.5, 21.6_
   
-  - [ ] 19.3 Create `lib/transaction-queries.ts`
+  - [x] 19.3 Create `lib/transaction-queries.ts`
     - Implement fetchTransactionsWithPOJoin() using po_no for related grouping
     - Transform commitments and actuals to unified Transaction format
     - _Requirements: 21.2, 21.7_
   
-  - [ ] 19.4 Write unit tests for Transaction List components
+  - [x] 19.4 Write unit tests for Transaction List components
     - Test filter changes update transaction list
     - Test virtualization renders correct number of rows
     - Test sorting works correctly
     - _Requirements: 21.1, 21.4, 21.6_
 
-- [ ] 20. Implement CES/WBS Hierarchy Tree View
-  - [ ] 20.1 Create `components/costbook/HierarchyTreeView.tsx`
+- [x] 20. Implement CES/WBS Hierarchy Tree View
+  - [x] 20.1 Create `components/costbook/HierarchyTreeView.tsx`
     - Accept data, viewType (ces/wbs), currency, onNodeSelect props
     - Render collapsible tree structure with indentation
     - Show aggregated totals at each level
     - Highlight selected node
     - _Requirements: 22.1, 22.2, 22.3, 22.5_
   
-  - [ ] 20.2 Create `lib/hierarchy-builders.ts`
+  - [x] 20.2 Create `lib/hierarchy-builders.ts`
     - Implement buildCESHierarchy() from commitments
     - Implement buildWBSHierarchy() from commitments
     - Calculate subtotals at each hierarchy level
     - _Requirements: 22.1, 22.2, 22.6_
   
-  - [ ] 20.3 Write unit tests for Hierarchy Tree
+  - [x] 20.3 Write unit tests for Hierarchy Tree
     - Test CES hierarchy builds correctly from sample data
     - Test WBS hierarchy builds correctly from sample data
     - Test subtotals are calculated correctly
     - _Requirements: 22.3, 22.6_
 
-- [ ] 21. Implement Cash Out Forecast Panel
-  - [ ] 21.1 Create `components/costbook/CashOutGantt.tsx`
+- [x] 21. Implement Cash Out Forecast Panel
+  - [x] 21.1 Create `components/costbook/CashOutGantt.tsx`
     - Use Recharts BarChart (horizontal) for Gantt-style display
     - Accept commitments, projects, currency, timeRange props
     - Aggregate cash out by time buckets (weekly/monthly)
     - Color-code bars by project
     - _Requirements: 20.1, 20.2, 20.3, 20.4_
   
-  - [ ] 21.2 Write unit test for Cash Out Gantt
+  - [x] 21.2 Write unit test for Cash Out Gantt
     - Test chart renders with sample commitment data
     - Test time bucket aggregation is correct
     - _Requirements: 20.2, 20.3_
 
-- [ ] 22. Implement Mobile Responsive Layout
-  - [ ] 22.1 Create `components/costbook/MobileAccordion.tsx`
+- [x] 22. Implement Mobile Responsive Layout
+  - [x] 22.1 Create `components/costbook/MobileAccordion.tsx`
     - Accept sections array with id, title, icon, content
     - Render full-width stacked sections
     - Ensure touch targets are at least 44x44px
     - _Requirements: 23.2, 23.5_
   
-  - [ ] 22.2 Update Costbook4_0 for responsive breakpoints
+  - [x] 22.2 Update Costbook4_0 for responsive breakpoints
     - Add media query detection for viewport < 768px
     - Switch to grid-cols-1 on mobile
     - Convert panels to accordion on mobile
@@ -378,14 +378,14 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Hide charts behind expandable section
     - _Requirements: 23.1, 23.3, 23.4_
   
-  - [ ] 22.3 Write responsive layout tests
+  - [x] 22.3 Write responsive layout tests
     - Test layout changes at 768px breakpoint
     - Test accordion behavior on mobile
     - Test touch target sizes
     - _Requirements: 23.1, 23.2, 23.5_
 
-- [ ] 23. Implement CSV import functionality
-  - [ ] 23.1 Create `lib/csv-import.ts` with CSV parsing and validation
+- [x] 23. Implement CSV import functionality
+  - [x] 23.1 Create `lib/csv-import.ts` with CSV parsing and validation
     - Implement `validateCSVFormat(file: File): Promise<boolean>`
     - Implement `parseCSVToCommitments(file: File): Promise<Commitment[]>`
     - Implement `parseCSVToActuals(file: File): Promise<Actual[]>`
@@ -394,7 +394,7 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Return detailed errors with row numbers for invalid data
     - _Requirements: 17.2, 17.3, 17.4, 17.6_
   
-  - [ ] 23.2 Create `components/costbook/CSVImportDialog.tsx`
+  - [x] 23.2 Create `components/costbook/CSVImportDialog.tsx`
     - Accept onImport callback prop
     - Render file upload dialog
     - Show file selection button
@@ -402,90 +402,90 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Style with Tailwind CSS
     - _Requirements: 17.1, 17.5_
   
-  - [ ] 23.3 Integrate CSV import into Costbook4_0
+  - [x] 23.3 Integrate CSV import into Costbook4_0
     - Add state for CSV import dialog visibility
     - Implement `handleCSVImport()` to open dialog
     - Connect CSV Import footer button to handler
     - _Requirements: 17.1_
   
-  - [ ] 23.4 Write property test for CSV column mapping
+  - [x] 23.4 Write property test for CSV column mapping
     - **Property 10: CSV Column Mapping Correctness**
     - **Validates: Requirements 17.3, 17.4**
     - Generate random valid CSV rows, verify mapping produces correct schema
   
-  - [ ] 23.5 Write property test for CSV error reporting
+  - [x] 23.5 Write property test for CSV error reporting
     - **Property 11: CSV Import Error Reporting**
     - **Validates: Requirements 17.6**
     - Generate CSV with errors at specific rows, verify error messages include row numbers
   
-  - [ ] 23.6 Write unit test for CSV import dialog
+  - [x] 23.6 Write unit test for CSV import dialog
     - Test dialog opens when button clicked
     - Test import results are displayed
     - _Requirements: 17.1, 17.5_
 
-- [ ] 24. Implement Performance monitoring feature
-  - [ ] 24.1 Create `components/costbook/PerformanceDialog.tsx`
+- [x] 24. Implement Performance monitoring feature
+  - [x] 24.1 Create `components/costbook/PerformanceDialog.tsx`
     - Accept query execution times and data statistics as props
     - Display metrics: query time, data fetch time, render time, project count
     - Style with Tailwind CSS
     - _Requirements: 16.5_
   
-  - [ ] 24.2 Add performance tracking to Costbook4_0
+  - [x] 24.2 Add performance tracking to Costbook4_0
     - Track query execution times using performance.now()
     - Calculate data statistics (project count, total records)
     - Implement `handlePerformance()` to show PerformanceDialog
     - Connect Performance footer button to handler
     - _Requirements: 16.5_
   
-  - [ ] 24.3 Write unit test for performance dialog
+  - [x] 24.3 Write unit test for performance dialog
     - Test that performance metrics are displayed
     - _Requirements: 16.5_
 
-- [ ] 25. Integrate react-query for data fetching
-  - [ ] 25.1 Create `lib/costbook-queries.ts` with react-query hooks
+- [x] 25. Integrate react-query for data fetching
+  - [x] 25.1 Create `lib/costbook-queries.ts` with react-query hooks
     - Implement `useProjectsWithFinancials()` hook with caching
     - Implement `useTransactions()` hook with filtering
     - Implement `useCESHierarchy()` and `useWBSHierarchy()` hooks
     - Configure stale time and cache time
     - _Requirements: 9.7_
   
-  - [ ] 25.2 Update Costbook4_0 to use react-query hooks
+  - [x] 25.2 Update Costbook4_0 to use react-query hooks
     - Replace useState/useEffect with react-query hooks
     - Add QueryClientProvider wrapper
     - Implement automatic refetching on focus
     - _Requirements: 9.7, 16.4_
   
-  - [ ] 25.3 Write unit tests for react-query integration
+  - [x] 25.3 Write unit tests for react-query integration
     - Test caching behavior
     - Test automatic refetching
     - _Requirements: 9.7, 16.4_
 
-- [ ] 26. Final integration and polish
-  - [ ] 26.1 Add Help dialog with feature documentation
+- [x] 26. Final integration and polish
+  - [x] 26.1 Add Help dialog with feature documentation
     - Create `components/costbook/HelpDialog.tsx`
     - Document KPI meanings, chart interpretations, and feature usage
     - Connect Help button to dialog
     - _Requirements: 4.5_
   
-  - [ ] 26.2 Implement action button handlers for Phase 1 features
+  - [x] 26.2 Implement action button handlers for Phase 1 features
     - Implement `handleReports()` - placeholder for future reports feature
     - Implement `handlePOBreakdown()` - placeholder for PO detail view
     - Implement `handleSettings()` - placeholder for settings panel
     - Connect buttons to handlers
     - _Requirements: 8.3_
   
-  - [ ] 26.3 Add responsive design improvements
+  - [x] 26.3 Add responsive design improvements
     - Test layout on different screen sizes
     - Adjust grid breakpoints if needed
     - Ensure mobile usability
     - _Requirements: 6.2, 23.1_
   
-  - [ ] 26.4 Write end-to-end integration test
+  - [x] 26.4 Write end-to-end integration test
     - Test complete user workflow: load dashboard â†’ change currency â†’ refresh data â†’ hover project â†’ expand panel â†’ filter transactions
     - Verify all components work together correctly
     - _Requirements: 3.1, 4.6, 5.2, 6.5, 8.3, 19.1, 21.4_
 
-- [ ] 27. Final checkpoint - Comprehensive testing
+- [x] 27. Final checkpoint - Comprehensive testing
   - Run all unit tests, property tests, and integration tests
   - Verify test coverage meets goals (80%+ for business logic, 70%+ for components)
   - Run property tests with 100+ iterations
@@ -514,120 +514,120 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
 
 > **Hinweis:** Diese Tasks sollten erst nach Abschluss aller Phase 1 Tasks implementiert werden.
 
-- [ ] P2.1. Implement Anomaly Detection
-  - [ ] P2.1.1 Create `lib/anomaly-detection.ts`
+- [x] P2.1. Implement Anomaly Detection
+  - [x] P2.1.1 Create `lib/anomaly-detection.ts`
     - Implement statistical analysis for spending pattern detection
     - Calculate z-scores for variance outliers
     - Identify projects with unusual spending velocity
     - _Requirements: 10.1_
   
-  - [ ] P2.1.2 Create `components/costbook/AnomalyIndicator.tsx`
+  - [x] P2.1.2 Create `components/costbook/AnomalyIndicator.tsx`
     - Render red highlighting on affected project cards
     - Show anomaly icon with tooltip
     - _Requirements: 10.2_
   
-  - [ ] P2.1.3 Create `components/costbook/AnomalyDetailDialog.tsx`
+  - [x] P2.1.3 Create `components/costbook/AnomalyDetailDialog.tsx`
     - Display detailed anomaly explanation
     - Show supporting data and metrics
     - Provide dismiss/acknowledge actions
     - _Requirements: 10.3, 10.4, 10.5_
   
-  - [ ] P2.1.4 Integrate anomaly detection into Costbook4_0
+  - [x] P2.1.4 Integrate anomaly detection into Costbook4_0
     - Run anomaly detection on data load
     - Mark affected projects
     - Connect click handlers to detail dialog
     - _Requirements: 10.2, 10.4_
   
-  - [ ] P2.1.5 Write property test for anomaly detection
+  - [x] P2.1.5 Write property test for anomaly detection
     - **Property 12: Anomaly Detection Consistency**
     - **Validates: Requirements 10.1**
     - Generate projects with known outliers, verify detection
 
-- [ ] P2.2. Implement Natural Language Search
-  - [ ] P2.2.1 Create `lib/nl-query-parser.ts`
+- [x] P2.2. Implement Natural Language Search
+  - [x] P2.2.1 Create `lib/nl-query-parser.ts`
     - Parse natural language queries to filter criteria
     - Support queries: "over budget", "high variance", "vendor X"
     - Extract numeric thresholds from queries
     - _Requirements: 11.2, 11.3_
   
-  - [ ] P2.2.2 Create `components/costbook/NLSearchInput.tsx`
+  - [x] P2.2.2 Create `components/costbook/NLSearchInput.tsx`
     - Render search input field in header
     - Show autocomplete suggestions
     - Display parsed filter interpretation
     - _Requirements: 11.1, 11.4_
   
-  - [ ] P2.2.3 Create `components/costbook/SearchSuggestions.tsx`
+  - [x] P2.2.3 Create `components/costbook/SearchSuggestions.tsx`
     - Show helpful suggestions when no results match
     - Provide example queries
     - _Requirements: 11.5_
   
-  - [ ] P2.2.4 Integrate NL search into Costbook4_0
+  - [x] P2.2.4 Integrate NL search into Costbook4_0
     - Add search state management
     - Filter projects based on parsed query
     - Update UI with search results
     - _Requirements: 11.3, 11.4_
   
-  - [ ] P2.2.5 Write property test for NL query parsing
+  - [x] P2.2.5 Write property test for NL query parsing
     - **Property 13: NL Query Parsing Correctness**
     - **Validates: Requirements 11.2, 11.3**
     - Generate various query phrasings, verify correct filter extraction
 
-- [ ] P2.3. Implement Smart Recommendations
-  - [ ] P2.3.1 Create `lib/recommendation-engine.ts`
+- [x] P2.3. Implement Smart Recommendations
+  - [x] P2.3.1 Create `lib/recommendation-engine.ts`
     - Analyze project financial patterns
     - Generate budget reallocation recommendations
     - Identify vendor optimization opportunities
     - _Requirements: 12.1, 12.3_
   
-  - [ ] P2.3.2 Create `components/costbook/RecommendationsPanel.tsx`
+  - [x] P2.3.2 Create `components/costbook/RecommendationsPanel.tsx`
     - Display recommendations in dedicated section
     - Show recommendation cards with action buttons
     - _Requirements: 12.2_
   
-  - [ ] P2.3.3 Create `components/costbook/RecommendationDetail.tsx`
+  - [x] P2.3.3 Create `components/costbook/RecommendationDetail.tsx`
     - Show supporting data and rationale
     - Provide accept/reject/defer actions
     - _Requirements: 12.4, 12.5_
   
-  - [ ] P2.3.4 Integrate recommendations into Costbook4_0
+  - [x] P2.3.4 Integrate recommendations into Costbook4_0
     - Generate recommendations on data load
     - Add recommendations panel to layout
     - Handle user actions on recommendations
     - _Requirements: 12.2, 12.5_
 
-- [ ] P2.4. Implement Predictive EAC/ETC
-  - [ ] P2.4.1 Create `lib/predictive-calculations.ts`
+- [x] P2.4. Implement Predictive EAC/ETC
+  - [x] P2.4.1 Create `lib/predictive-calculations.ts`
     - Implement trend-based EAC calculation
     - Calculate ETC with velocity adjustments
     - Project future spend based on historical patterns
     - _Requirements: 2.4 (enhanced)_
   
-  - [ ] P2.4.2 Update ProjectCard with predictive metrics
+  - [x] P2.4.2 Update ProjectCard with predictive metrics
     - Display predictive EAC alongside current EAC
     - Show confidence intervals
     - _Requirements: 2.4_
   
-  - [ ] P2.4.3 Write property test for predictive calculations
+  - [x] P2.4.3 Write property test for predictive calculations
     - **Property 14: Predictive EAC Bounds**
     - Verify EAC predictions are within reasonable bounds
 
-- [ ] P2.5. Implement Cash Out Forecast Drag-Adjust
-  - [ ] P2.5.1 Integrate react-dnd into CashOutGantt
+- [x] P2.5. Implement Cash Out Forecast Drag-Adjust
+  - [x] P2.5.1 Integrate react-dnd into CashOutGantt
     - Enable drag-and-drop for forecast bars
     - Update dates on drop
     - _Requirements: 20.5_
   
-  - [ ] P2.5.2 Create `components/costbook/ScenarioSelector.tsx`
+  - [x] P2.5.2 Create `components/costbook/ScenarioSelector.tsx`
     - Allow creating multiple forecast scenarios
     - Switch between scenarios
     - _Requirements: 20.6_
   
-  - [ ] P2.5.3 Implement scenario persistence
+  - [x] P2.5.3 Implement scenario persistence
     - Save scenarios to Supabase
     - Load user's saved scenarios
     - _Requirements: 20.6_
 
-- [ ] P2.6. Phase 2 Checkpoint
+- [x] P2.6. Phase 2 Checkpoint
   - Run all Phase 2 tests
   - Verify AI features work correctly
   - Test NL search with various queries
@@ -763,131 +763,131 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
 
 ## Contingency Rundown Profiles Tasks
 
-> **Hinweis:** Diese Tasks implementieren das Contingency Rundown Profiles Feature, das das externe Roche-Script ersetzt.
+> **Hinweis:** Diese Tasks implementieren das Contingency Rundown Profiles Feature, das das externe Generic-Script ersetzt.
 
-- [ ] 28. Set up Rundown Profile data model
-  - [ ] 28.1 Create Supabase migration for rundown_profiles table
+- [x] 28. Set up Rundown Profile data model
+  - [x] 28.1 Create Supabase migration for rundown_profiles table
     - Create table with fields: id, project_id, month, planned_value, actual_value, predicted_value, profile_type, scenario_name, created_at, updated_at
     - Add foreign key constraint to projects table
     - Create indexes for project_id and month
     - _Requirements: 24.1, 24.2, 24.3_
   
-  - [ ] 28.2 Create Supabase migration for rundown_generation_logs table
+  - [x] 28.2 Create Supabase migration for rundown_generation_logs table
     - Create table with fields: id, execution_id, project_id, status, message, projects_processed, profiles_created, errors_count, execution_time_ms, created_at
     - Create index for execution_id
     - _Requirements: 24.5_
   
-  - [ ] 28.3 Create TypeScript interfaces for rundown profiles
+  - [x] 28.3 Create TypeScript interfaces for rundown profiles
     - Define RundownProfile, RundownProfileSummary, GenerationResult, GenerationError, RundownScenario interfaces in `types/rundown.ts`
     - _Requirements: 24.1, 24.4_
 
-- [ ] 29. Implement Rundown Generator Backend Service
-  - [ ] 29.1 Create `backend/services/rundown_generator.py`
+- [x] 29. Implement Rundown Generator Backend Service
+  - [x] 29.1 Create `backend/services/rundown_generator.py`
     - Implement RundownGenerator class with generate() method
     - Implement _generate_project_profiles() for single project processing
     - Implement _get_months_between() helper for date range calculation
     - Implement _log_execution() for audit logging
     - _Requirements: 25.1, 25.2, 26.1, 27.2, 27.3_
   
-  - [ ] 29.2 Implement planned profile calculation
+  - [x] 29.2 Implement planned profile calculation
     - Implement _calculate_planned_profile() with linear budget distribution
     - Calculate monthly_value as budget / total_months
     - Generate cumulative values for each month in YYYYMM format
     - _Requirements: 25.1, 25.2, 25.4_
   
-  - [ ] 29.3 Implement actual profile calculation
+  - [x] 29.3 Implement actual profile calculation
     - Implement _calculate_actual_profile() starting from planned values
     - Implement _get_budget_changes() to aggregate changes from commitments/actuals
     - Adjust values from change month onwards
     - _Requirements: 26.1, 26.2, 26.3, 26.4, 26.5_
   
-  - [ ] 29.4 Implement AI prediction engine
+  - [x] 29.4 Implement AI prediction engine
     - Implement _calculate_predictions() using linear regression
     - Use numpy for regression calculation on last 6 months
     - Generate predictions for future months
     - _Requirements: 30.1, 30.2, 30.3_
   
-  - [ ] 29.5 Write property test for planned profile linear distribution
+  - [x] 29.5 Write property test for planned profile linear distribution
     - **Property 22: Planned Profile Linear Distribution**
     - **Validates: Requirements 25.1, 25.4, 25.5**
     - Generate random projects, verify sum equals budget
   
-  - [ ] 29.6 Write property test for month coverage
+  - [x] 29.6 Write property test for month coverage
     - **Property 23: Planned Profile Month Coverage**
     - **Validates: Requirements 25.2**
     - Verify correct number of months and YYYYMM format
   
-  - [ ] 29.7 Write property test for actual profile adjustment
+  - [x] 29.7 Write property test for actual profile adjustment
     - **Property 24: Actual Profile Adjustment Correctness**
     - **Validates: Requirements 26.1, 26.2, 26.4**
     - Verify changes are applied from correct month
   
-  - [ ] 29.8 Write property test for idempotency
+  - [x] 29.8 Write property test for idempotency
     - **Property 25: Profile Generation Idempotency**
     - **Validates: Requirements 27.3**
     - Generate twice, verify identical results
 
-- [ ] 30. Implement Rundown API Endpoints
-  - [ ] 30.1 Create `backend/routers/rundown.py`
+- [x] 30. Implement Rundown API Endpoints
+  - [x] 30.1 Create `backend/routers/rundown.py`
     - Implement POST `/api/rundown/generate` endpoint
     - Accept optional project_id parameter for single project generation
     - Return GenerateResponse with execution statistics
     - _Requirements: 27.1, 27.4, 27.6_
   
-  - [ ] 30.2 Implement GET `/api/rundown/profiles/{project_id}` endpoint
+  - [x] 30.2 Implement GET `/api/rundown/profiles/{project_id}` endpoint
     - Fetch profiles for specific project
     - Support profile_type and scenario_name query parameters
     - _Requirements: 27.1_
   
-  - [ ] 30.3 Implement error handling and logging
+  - [x] 30.3 Implement error handling and logging
     - Log errors with project context
     - Continue processing remaining projects on error
     - Return error summary in response
     - _Requirements: 27.5_
   
-  - [ ] 30.4 Register router in main.py
+  - [x] 30.4 Register router in main.py
     - Import and include rundown router
     - _Requirements: 27.1_
   
-  - [ ] 30.5 Write unit tests for API endpoints
+  - [x] 30.5 Write unit tests for API endpoints
     - Test generate endpoint with and without project_id
     - Test error response format
     - Test profiles endpoint
     - _Requirements: 27.1, 27.4, 27.5, 27.6_
 
-- [ ] 31. Implement Daily Cron Job
-  - [ ] 31.1 Add APScheduler to backend dependencies
+- [x] 31. Implement Daily Cron Job
+  - [x] 31.1 Add APScheduler to backend dependencies
     - Add apscheduler to requirements.txt
     - _Requirements: 28.1_
   
-  - [ ] 31.2 Configure cron job in `backend/main.py`
+  - [x] 31.2 Configure cron job in `backend/main.py`
     - Set up AsyncIOScheduler
     - Schedule daily job at 02:00 UTC (configurable)
     - Add startup and shutdown event handlers
     - _Requirements: 28.1, 28.2, 28.3_
   
-  - [ ] 31.3 Implement cron job execution logging
+  - [x] 31.3 Implement cron job execution logging
     - Log start, completion, and errors to rundown_generation_logs
     - _Requirements: 28.4_
   
-  - [ ] 31.4 Implement alert notification on failure
+  - [x] 31.4 Implement alert notification on failure
     - Send alert when cron job fails
     - Use configurable notification channel (email/Slack)
     - _Requirements: 28.5_
   
-  - [ ] 31.5 Write unit test for cron job scheduling
+  - [x] 31.5 Write unit test for cron job scheduling
     - Test job is scheduled correctly
     - Test execution logging
     - _Requirements: 28.1, 28.4_
 
-- [ ] 32. Checkpoint - Backend Rundown Profile Tests
+- [x] 32. Checkpoint - Backend Rundown Profile Tests
   - Run all backend tests for rundown generator
   - Verify API endpoints work correctly
   - Test cron job scheduling
   - Ensure all tests pass, ask the user if questions arise
 
-- [ ] 33. Implement RundownSparkline Component
-  - [ ] 33.1 Create `components/costbook/RundownSparkline.tsx`
+- [x] 33. Implement RundownSparkline Component
+  - [x] 33.1 Create `components/costbook/RundownSparkline.tsx`
     - Use Recharts LineChart with minimal styling
     - Render planned values as dashed line
     - Render actual values as solid line
@@ -895,157 +895,157 @@ The implementation follows a bottom-up approach: data layer â†’ business logic â
     - Add current month vertical indicator
     - _Requirements: 29.1, 29.2, 29.3, 29.4_
   
-  - [ ] 33.2 Implement RundownTooltip component
+  - [x] 33.2 Implement RundownTooltip component
     - Display month, planned, actual, and predicted values
     - Apply color coding based on over/under budget
     - _Requirements: 29.5_
   
-  - [ ] 33.3 Implement warning indicator
+  - [x] 33.3 Implement warning indicator
     - Show animated indicator when predicted > planned
     - Apply ring highlight to sparkline container
     - _Requirements: 30.4_
   
-  - [ ] 33.4 Add color coding for over-budget
+  - [x] 33.4 Add color coding for over-budget
     - Green when actual <= planned
     - Red when actual > planned
     - _Requirements: 29.6_
   
-  - [ ] 33.5 Write property test for sparkline data completeness
+  - [x] 33.5 Write property test for sparkline data completeness
     - **Property 27: Sparkline Data Completeness**
     - **Validates: Requirements 29.1, 29.3, 29.4**
     - Verify all months have required data points
   
-  - [ ] 33.6 Write unit test for sparkline rendering
+  - [x] 33.6 Write unit test for sparkline rendering
     - Test all line types are rendered
     - Test tooltip displays correct values
     - Test warning indicator appears when needed
     - _Requirements: 29.1, 29.3, 29.5, 30.4_
 
-- [ ] 34. Integrate Sparkline into ProjectCard
-  - [ ] 34.1 Update ProjectCard component
+- [x] 34. Integrate Sparkline into ProjectCard
+  - [x] 34.1 Update ProjectCard component
     - Add rundownProfiles prop
     - Render RundownSparkline in card footer
     - Add "Contingency Rundown" label
     - _Requirements: 29.1_
   
-  - [ ] 34.2 Update ProjectsGrid to fetch rundown profiles
+  - [x] 34.2 Update ProjectsGrid to fetch rundown profiles
     - Use useAllRundownProfiles hook
     - Pass profiles to each ProjectCard
     - _Requirements: 29.1_
   
-  - [ ] 34.3 Write integration test for ProjectCard with Sparkline
+  - [x] 34.3 Write integration test for ProjectCard with Sparkline
     - Test sparkline renders in card
     - Test profiles are passed correctly
     - _Requirements: 29.1_
 
-- [ ] 35. Implement React Query Hooks for Rundown Profiles
-  - [ ] 35.1 Create `lib/rundown-queries.ts`
+- [x] 35. Implement React Query Hooks for Rundown Profiles
+  - [x] 35.1 Create `lib/rundown-queries.ts`
     - Implement useRundownProfiles(projectId) hook
     - Implement useAllRundownProfiles(projectIds) hook
     - Implement useGenerateRundownProfiles() mutation hook
     - Configure stale time and cache invalidation
     - _Requirements: 29.1, 27.1_
   
-  - [ ] 35.2 Implement fetchRundownProfiles function
+  - [x] 35.2 Implement fetchRundownProfiles function
     - Fetch profiles from API endpoint
     - Handle errors gracefully
     - _Requirements: 29.1_
   
-  - [ ] 35.3 Write unit tests for rundown query hooks
+  - [x] 35.3 Write unit tests for rundown query hooks
     - Test caching behavior
     - Test mutation invalidates queries
     - _Requirements: 29.1_
 
-- [ ] 36. Implement Real-Time Profile Updates
-  - [ ] 36.1 Create Supabase database trigger for commitments
+- [x] 36. Implement Real-Time Profile Updates
+  - [x] 36.1 Create Supabase database trigger for commitments
     - Trigger on INSERT, UPDATE, DELETE
     - Call profile regeneration function
     - _Requirements: 31.1, 31.2_
   
-  - [ ] 36.2 Create Supabase database trigger for actuals
+  - [x] 36.2 Create Supabase database trigger for actuals
     - Trigger on INSERT, UPDATE, DELETE
     - Call profile regeneration function
     - _Requirements: 31.1, 31.2_
   
-  - [ ] 36.3 Implement debounce logic for rapid changes
+  - [x] 36.3 Implement debounce logic for rapid changes
     - Prevent excessive regeneration
     - Use 2-second debounce window
     - _Requirements: 31.5_
   
-  - [ ] 36.4 Add refresh indicator to UI
+  - [x] 36.4 Add refresh indicator to UI
     - Show subtle indicator when profiles are updating
     - _Requirements: 31.4_
   
-  - [ ] 36.5 Write property test for real-time update trigger
+  - [x] 36.5 Write property test for real-time update trigger
     - **Property 28: Real-Time Update Trigger**
     - **Validates: Requirements 31.1, 31.3**
     - Verify regeneration within 5 seconds
 
-- [ ] 37. Implement Multi-Scenario Support
-  - [ ] 37.1 Create `components/costbook/ScenarioManager.tsx`
+- [x] 37. Implement Multi-Scenario Support
+  - [x] 37.1 Create `components/costbook/ScenarioManager.tsx`
     - Allow creating named scenarios
     - Support percentage and absolute adjustments
     - _Requirements: 32.1, 32.2_
   
-  - [ ] 37.2 Update RundownSparkline for scenario toggle
+  - [x] 37.2 Update RundownSparkline for scenario toggle
     - Add scenario selector dropdown
     - Switch between scenarios
     - _Requirements: 32.3_
   
-  - [ ] 37.3 Implement scenario persistence
+  - [x] 37.3 Implement scenario persistence
     - Save scenarios to Supabase with user attribution
     - _Requirements: 32.4_
   
-  - [ ] 37.4 Create scenario comparison view
+  - [x] 37.4 Create scenario comparison view
     - Overlay multiple scenarios in sparkline
     - _Requirements: 32.5_
   
-  - [ ] 37.5 Write property test for scenario isolation
+  - [x] 37.5 Write property test for scenario isolation
     - **Property 29: Multi-Scenario Isolation**
     - **Validates: Requirements 32.1, 32.4**
     - Verify changes to one scenario don't affect others
 
-- [ ] 38. Implement AI Prediction Visualization
-  - [ ] 38.1 Update RundownSparkline for predictions
+- [x] 38. Implement AI Prediction Visualization
+  - [x] 38.1 Update RundownSparkline for predictions
     - Render predicted values as dotted line
     - Extend beyond current month
     - _Requirements: 30.3_
   
-  - [ ] 38.2 Implement prediction warning logic
+  - [x] 38.2 Implement prediction warning logic
     - Detect when predicted exceeds planned by >10%
     - Highlight project card with warning
     - _Requirements: 30.4_
   
-  - [ ] 38.3 Add prediction recalculation on new data
+  - [x] 38.3 Add prediction recalculation on new data
     - Trigger prediction update when actuals change
     - _Requirements: 30.5_
   
-  - [ ] 38.4 Write property test for prediction trend consistency
+  - [x] 38.4 Write property test for prediction trend consistency
     - **Property 26: Prediction Trend Consistency**
     - **Validates: Requirements 30.1, 30.2**
     - Verify predictions follow historical trend
 
-- [ ] 39. Final Rundown Profile Integration
-  - [ ] 39.1 Add manual regeneration button to Costbook header
+- [x] 39. Final Rundown Profile Integration
+  - [x] 39.1 Add manual regeneration button to Costbook header
     - Add "Regenerate Profiles" action button
     - Show loading state during regeneration
     - _Requirements: 27.1_
   
-  - [ ] 39.2 Add rundown profile status to Performance dialog
+  - [x] 39.2 Add rundown profile status to Performance dialog
     - Show last generation time
     - Show profile count and any errors
     - _Requirements: 28.4_
   
-  - [ ] 39.3 Update Costbook4_0 to load rundown profiles
+  - [x] 39.3 Update Costbook4_0 to load rundown profiles
     - Fetch profiles alongside project data
     - Pass to ProjectsGrid
     - _Requirements: 29.1_
   
-  - [ ] 39.4 Write end-to-end integration test
+  - [x] 39.4 Write end-to-end integration test
     - Test complete workflow: generate profiles â†’ view sparklines â†’ update data â†’ verify regeneration
     - _Requirements: 24.1, 25.1, 26.1, 27.1, 29.1, 31.1_
 
-- [ ] 40. Rundown Profiles Checkpoint
+- [x] 40. Rundown Profiles Checkpoint
   - Run all rundown profile tests (unit, property, integration)
   - Verify sparklines display correctly in project cards
   - Test cron job execution

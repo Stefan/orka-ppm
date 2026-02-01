@@ -5,7 +5,7 @@ Verify AI-Empowered Audit Trail Migration
 This script verifies that the AI-empowered audit trail schema migration
 was applied successfully by checking:
 1. All required tables exist
-2. All required columns exist in roche_audit_logs
+2. All required columns exist in audit_logs
 3. All required indexes exist
 4. Constraints are properly configured
 """
@@ -51,7 +51,7 @@ def verify_tables(client: Client) -> Dict[str, bool]:
     print("-" * 80)
     
     required_tables = [
-        "roche_audit_logs",
+        "audit_logs",
         "audit_embeddings",
         "audit_anomalies",
         "audit_ml_models",
@@ -71,9 +71,9 @@ def verify_tables(client: Client) -> Dict[str, bool]:
     
     return results
 
-def verify_roche_audit_logs_columns(client: Client) -> Dict[str, bool]:
-    """Verify that roche_audit_logs has all required AI columns."""
-    print("\nChecking roche_audit_logs AI columns...")
+def verify_audit_logs_columns(client: Client) -> Dict[str, bool]:
+    """Verify that audit_logs has all required AI columns."""
+    print("\nChecking audit_logs AI columns...")
     print("-" * 80)
     
     required_columns = [
@@ -95,7 +95,7 @@ def verify_roche_audit_logs_columns(client: Client) -> Dict[str, bool]:
     print("  ⚠️  Manual verification required via SQL:")
     print("  SELECT column_name, data_type")
     print("  FROM information_schema.columns")
-    print("  WHERE table_name = 'roche_audit_logs'")
+    print("  WHERE table_name = 'audit_logs'")
     print("  AND column_name IN (")
     for col in required_columns:
         print(f"    '{col}',")
@@ -110,11 +110,11 @@ def verify_indexes() -> None:
     print("-" * 80)
     
     required_indexes = [
-        "idx_roche_audit_logs_anomaly_score",
-        "idx_roche_audit_logs_category",
-        "idx_roche_audit_logs_risk_level",
-        "idx_roche_audit_logs_tenant_id",
-        "idx_roche_audit_logs_tags",
+        "idx_audit_logs_anomaly_score",
+        "idx_audit_logs_category",
+        "idx_audit_logs_risk_level",
+        "idx_audit_logs_tenant_id",
+        "idx_audit_logs_tags",
         "idx_audit_embeddings_vector",
         "idx_audit_embeddings_tenant",
         "idx_anomalies_score",
@@ -147,9 +147,9 @@ def verify_constraints() -> None:
     print("-" * 80)
     
     required_constraints = [
-        ("roche_audit_logs", "valid_anomaly_score"),
-        ("roche_audit_logs", "valid_risk_level"),
-        ("roche_audit_logs", "valid_category"),
+        ("audit_logs", "valid_anomaly_score"),
+        ("audit_logs", "valid_risk_level"),
+        ("audit_logs", "valid_category"),
         ("audit_anomalies", "valid_anomaly_score"),
         ("audit_anomalies", "valid_severity"),
         ("audit_ml_models", "valid_model_type"),
@@ -221,7 +221,7 @@ def main():
         table_results = verify_tables(client)
         
         # Verify columns
-        verify_roche_audit_logs_columns(client)
+        verify_audit_logs_columns(client)
         
         # Verify indexes
         verify_indexes()

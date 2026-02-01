@@ -2,7 +2,7 @@
 """
 Apply Audit Logs Embeddings Migration (028)
 
-This script applies the migration to add embedding column to roche_audit_logs table
+This script applies the migration to add embedding column to audit_logs table
 for semantic search using RAG (Retrieval-Augmented Generation).
 
 Requirements: 14.1
@@ -83,7 +83,7 @@ def apply_migration(supabase: Client) -> bool:
             cursor.execute("""
                 SELECT column_name, data_type 
                 FROM information_schema.columns 
-                WHERE table_name = 'roche_audit_logs' 
+                WHERE table_name = 'audit_logs' 
                 AND column_name = 'embedding'
             """)
             result = cursor.fetchone()

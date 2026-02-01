@@ -152,6 +152,13 @@ const nextConfig: NextConfig = {
     unoptimized: false,
   },
 
+  // Redirect root to /login (workaround for Next.js 16 root route 404 with Turbopack/webpack)
+  async redirects() {
+    return [
+      { source: '/', destination: '/login', permanent: false },
+    ];
+  },
+
   // Redirects for API calls
   async rewrites() {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'https://orka-ppm.onrender.com';

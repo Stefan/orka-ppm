@@ -7,7 +7,7 @@
 -- 1. Enable Row-Level Security on all audit tables
 -- ============================================================================
 
-ALTER TABLE roche_audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_embeddings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_anomalies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_ml_models ENABLE ROW LEVEL SECURITY;
@@ -39,29 +39,29 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ============================================================================
--- 3. Row-Level Security Policies for roche_audit_logs
+-- 3. Row-Level Security Policies for audit_logs
 -- ============================================================================
 
 -- Policy: Users can only SELECT audit logs from their own tenant
-CREATE POLICY tenant_isolation_select_roche_audit_logs
-    ON roche_audit_logs
+CREATE POLICY tenant_isolation_select_audit_logs
+    ON audit_logs
     FOR SELECT
     USING (tenant_id = get_current_tenant_id() OR tenant_id IS NULL);
 
 -- Policy: Users can only INSERT audit logs for their own tenant
-CREATE POLICY tenant_isolation_insert_roche_audit_logs
-    ON roche_audit_logs
+CREATE POLICY tenant_isolation_insert_audit_logs
+    ON audit_logs
     FOR INSERT
     WITH CHECK (tenant_id = get_current_tenant_id() OR tenant_id IS NULL);
 
 -- Policy: Prevent UPDATE and DELETE operations (append-only requirement)
-CREATE POLICY prevent_update_roche_audit_logs
-    ON roche_audit_logs
+CREATE POLICY prevent_update_audit_logs
+    ON audit_logs
     FOR UPDATE
     USING (false);
 
-CREATE POLICY prevent_delete_roche_audit_logs
-    ON roche_audit_logs
+CREATE POLICY prevent_delete_audit_logs
+    ON audit_logs
     FOR DELETE
     USING (false);
 
@@ -302,7 +302,7 @@ CREATE POLICY prevent_delete_audit_ai_predictions
 -- Adjust role name based on your setup
 
 -- Example: Grant bypass to service role
--- ALTER TABLE roche_audit_logs FORCE ROW LEVEL SECURITY;
+-- ALTER TABLE audit_logs FORCE ROW LEVEL SECURITY;
 -- GRANT USAGE ON SCHEMA public TO service_role;
 -- GRANT ALL ON ALL TABLES IN SCHEMA public TO service_role;
 
@@ -313,13 +313,13 @@ CREATE POLICY prevent_delete_audit_ai_predictions
 COMMENT ON FUNCTION get_current_tenant_id() IS 
     'Retrieves the current user tenant_id from JWT claims or session variable';
 
-COMMENT ON POLICY tenant_isolation_select_roche_audit_logs ON roche_audit_logs IS 
+COMMENT ON POLICY tenant_isolation_select_audit_logs ON audit_logs IS 
     'Enforces tenant isolation: users can only SELECT audit logs from their own tenant';
 
-COMMENT ON POLICY prevent_update_roche_audit_logs ON roche_audit_logs IS 
+COMMENT ON POLICY prevent_update_audit_logs ON audit_logs IS 
     'Enforces append-only requirement: prevents UPDATE operations on audit logs';
 
-COMMENT ON POLICY prevent_delete_roche_audit_logs ON roche_audit_logs IS 
+COMMENT ON POLICY prevent_delete_audit_logs ON audit_logs IS 
     'Enforces append-only requirement: prevents DELETE operations on audit logs';
 
 -- ============================================================================

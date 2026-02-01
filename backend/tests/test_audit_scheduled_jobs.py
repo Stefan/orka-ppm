@@ -219,7 +219,7 @@ async def test_embedding_generation_job_processes_events(scheduled_jobs):
         for _ in range(5)
     ]
     
-    scheduled_jobs.supabase.table("roche_audit_logs").select(
+    scheduled_jobs.supabase.table("audit_logs").select(
         "id, event_type, action_details, user_id, entity_type, timestamp"
     ).is_("embedding_id", "null").limit(100).execute = Mock(return_value=Mock(data=events))
     
@@ -241,7 +241,7 @@ async def test_embedding_generation_job_handles_no_events(scheduled_jobs):
     Requirements: 3.10
     """
     # Mock no events
-    scheduled_jobs.supabase.table("roche_audit_logs").select(
+    scheduled_jobs.supabase.table("audit_logs").select(
         "id, event_type, action_details, user_id, entity_type, timestamp"
     ).is_("embedding_id", "null").limit(100).execute = Mock(return_value=Mock(data=[]))
     
@@ -262,7 +262,7 @@ async def test_embedding_generation_job_continues_on_individual_failures(schedul
     # Mock events
     events = [{'id': str(uuid4()), 'event_type': 'test'} for _ in range(3)]
     
-    scheduled_jobs.supabase.table("roche_audit_logs").select(
+    scheduled_jobs.supabase.table("audit_logs").select(
         "id, event_type, action_details, user_id, entity_type, timestamp"
     ).is_("embedding_id", "null").limit(100).execute = Mock(return_value=Mock(data=events))
     
@@ -331,7 +331,7 @@ async def test_classifier_training_job_executes(scheduled_jobs):
         for _ in range(150)
     ]
     
-    scheduled_jobs.supabase.table("roche_audit_logs").select("*").gte(
+    scheduled_jobs.supabase.table("audit_logs").select("*").gte(
         "timestamp", (datetime.now() - timedelta(days=30)).isoformat()
     ).not_.is_("category", "null").not_.is_("risk_level", "null").execute = Mock(
         return_value=Mock(data=labeled_data)
@@ -370,7 +370,7 @@ async def test_classifier_training_job_skips_insufficient_data(scheduled_jobs):
     # Mock insufficient labeled data (< 100 events)
     labeled_data = [{'id': str(uuid4())} for _ in range(50)]
     
-    scheduled_jobs.supabase.table("roche_audit_logs").select("*").gte(
+    scheduled_jobs.supabase.table("audit_logs").select("*").gte(
         "timestamp", (datetime.now() - timedelta(days=30)).isoformat()
     ).not_.is_("category", "null").not_.is_("risk_level", "null").execute = Mock(
         return_value=Mock(data=labeled_data)

@@ -40,7 +40,7 @@ class AIInsightsEngine:
             self.openai_client = OpenAI(api_key=openai_api_key)
         # Use configurable model from environment or default
         import os
-        self.model = os.getenv("OPENAI_MODEL", "gpt-4")
+        self.model = os.getenv("OPENAI_MODEL", "grok-beta")
         self.temperature = 0.7
         self.max_tokens = 2000
         self.confidence_threshold = 0.7

@@ -195,9 +195,10 @@ async def get_financial_tracking_budget_alerts(
             budget = float(project['budget'])
             
             # Calculate total spent for this project
-            expenses_response = supabase.table("financial_tracking").select("amount").eq("project_id", project_id).eq("transaction_type", "expense").execute()
-            
-            total_spent = sum(float(expense.get('amount', 0)) for expense in expenses_response.data or [])
+            # Use actual_amount for expenses (positive values represent spending)
+            expenses_response = supabase.table("financial_tracking").select("actual_amount").eq("project_id", project_id).execute()
+
+            total_spent = sum(float(expense.get('actual_amount', 0)) for expense in expenses_response.data or [] if float(expense.get('actual_amount', 0)) > 0)
             current_percentage = (total_spent / budget * 100) if budget > 0 else 0
             
             if current_percentage >= threshold_percentage:

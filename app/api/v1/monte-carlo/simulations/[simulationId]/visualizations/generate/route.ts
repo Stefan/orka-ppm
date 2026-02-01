@@ -38,12 +38,15 @@ export async function POST(
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Backend Monte Carlo visualization error:', response.status, errorText)
-      
+      console.error('Response headers:', Object.fromEntries(response.headers.entries()))
+
       // Return the actual error from backend for debugging
       try {
         const errorJson = JSON.parse(errorText)
+        console.error('Parsed error JSON:', errorJson)
         return NextResponse.json(errorJson, { status: response.status })
-      } catch {
+      } catch (parseError) {
+        console.error('Failed to parse error as JSON:', parseError)
         return NextResponse.json(
           { error: `Backend error: ${response.statusText}`, details: errorText },
           { status: response.status }

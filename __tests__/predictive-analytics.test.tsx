@@ -440,7 +440,7 @@ describe('PredictiveInsightsWidget Component', () => {
       ],
       isLoading: false,
       error: null,
-      loadAllData: jest.fn()
+      loadAllData: jest.fn().mockResolvedValue(undefined)
     })
   })
 
@@ -455,7 +455,9 @@ describe('PredictiveInsightsWidget Component', () => {
   it('should expand to show additional details', () => {
     render(<PredictiveInsightsWidget />)
 
-    const expandButton = screen.getByRole('button')
+    // Find the expand button (contains ChevronRight icon in header)
+    const buttons = screen.getAllByRole('button')
+    const expandButton = buttons[0] // First button is the expand toggle
     fireEvent.click(expandButton)
 
     expect(screen.getByText('Model Accuracy')).toBeInTheDocument()
@@ -467,13 +469,12 @@ describe('PredictiveInsightsWidget Component', () => {
       dashboardData: null,
       isLoading: true,
       error: null,
-      loadAllData: jest.fn()
+      loadAllData: jest.fn().mockResolvedValue(undefined)
     })
 
     render(<PredictiveInsightsWidget />)
     
-    // Check for loading animation class instead of test id
-    expect(screen.getByText('AI Insights')).toBeInTheDocument()
+    // Loading state shows skeleton with animate-pulse class, no "AI Insights" text
     expect(document.querySelector('.animate-pulse')).toBeInTheDocument()
   })
 })

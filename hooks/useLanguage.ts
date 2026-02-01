@@ -83,11 +83,24 @@ export function useLanguage(): UseLanguageReturn {
   const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [languagesLoaded, setLanguagesLoaded] = useState(false)
 
-  // Initialize supported languages on mount
+  // Initialize supported languages on mount (only once)
   useEffect(() => {
-    getSupportedLanguages()
-  }, [])
+    if (!languagesLoaded) {
+      // Use requestIdleCallback for non-blocking initialization
+      if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+          getSupportedLanguages()
+        })
+      } else {
+        // Fallback for browsers without requestIdleCallback
+        setTimeout(() => {
+          getSupportedLanguages()
+        }, 100)
+      }
+    }
+  }, [languagesLoaded])
 
   // Sync with server preference on language change (only if authenticated)
   // DISABLED: Server sync is optional, local preference works fine
@@ -175,6 +188,7 @@ export function useLanguage(): UseLanguageReturn {
       }
       
       setSupportedLanguages(languages)
+      setLanguagesLoaded(true)
       return languages
     } catch (err) {
       // Silently fallback to default languages if API call fails
@@ -189,6 +203,7 @@ export function useLanguage(): UseLanguageReturn {
         { code: 'gsw', name: 'Swiss German', native_name: 'Baseldytsch', formal_tone: false },
       ]
       setSupportedLanguages(defaultLanguages)
+      setLanguagesLoaded(true)
       return defaultLanguages
     } finally {
       setIsLoading(false)

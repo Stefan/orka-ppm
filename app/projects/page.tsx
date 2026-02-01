@@ -102,8 +102,7 @@ export default function ProjectsPage() {
         return
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-      const response = await fetch(`${apiUrl}/api/projects`, {
+      const response = await fetch('/api/projects', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json'
@@ -115,7 +114,7 @@ export default function ProjectsPage() {
       }
 
       const data = await response.json()
-      setProjects(data.projects || [])
+      setProjects(Array.isArray(data) ? data : (data.projects || []))
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred'
       
@@ -203,7 +202,30 @@ export default function ProjectsPage() {
           )}
 
           <div data-testid="projects-list" className="space-y-4">
-            {projects.length === 0 ? (
+            {loading ? (
+              <div className="space-y-4">
+                {/* Loading skeleton */}
+                {Array.from({ length: 3 }, (_, i) => (
+                  <div key={i} className="bg-white rounded-lg shadow p-6 animate-pulse">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="h-6 bg-gray-200 rounded w-1/3 mb-2"></div>
+                        <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                      </div>
+                      <div className="h-6 bg-gray-200 rounded w-16"></div>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {Array.from({ length: 4 }, (_, j) => (
+                        <div key={j} className="text-center">
+                          <div className="h-4 bg-gray-200 rounded w-full mb-1"></div>
+                          <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto"></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : projects.length === 0 ? (
               <div data-testid="projects-empty" className="bg-white rounded-lg shadow p-8 text-center">
                 <p className="text-gray-500">No projects found</p>
               </div>
@@ -240,7 +262,7 @@ export default function ProjectsPage() {
                           <span className="font-medium">End:</span> {project.end_date}
                         </div>
                         <div>
-                          <span className="font-medium">Budget:</span> ${project.budget.toLocaleString()}
+                          <span className="font-medium">Budget:</span> ${(project.budget ?? 0).toLocaleString()}
                         </div>
                       </div>
                     </div>

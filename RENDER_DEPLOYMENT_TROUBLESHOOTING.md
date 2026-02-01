@@ -94,7 +94,7 @@ services:
       - key: OPENAI_BASE_URL
         value: https://api.x.ai/v1
       - key: OPENAI_MODEL
-        value: grok-4-1-fast-non-reasoning
+        value: grok-4-fast-reasoning
       - key: USE_LOCAL_EMBEDDINGS
         value: true
     autoDeploy: true
@@ -116,7 +116,7 @@ SUPABASE_SERVICE_ROLE_KEY=<dein-service-role-key>
 # XAI/Grok API
 OPENAI_API_KEY=<dein-xai-key>
 OPENAI_BASE_URL=https://api.x.ai/v1
-OPENAI_MODEL=grok-4-1-fast-non-reasoning
+OPENAI_MODEL=grok-4-fast-reasoning
 
 # Konfiguration
 USE_LOCAL_EMBEDDINGS=true

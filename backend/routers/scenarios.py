@@ -1,5 +1,5 @@
 """
-What-If Scenario Analysis endpoints (Roche Construction feature)
+What-If Scenario Analysis endpoints (Generic Construction feature)
 """
 
 from fastapi import APIRouter, HTTPException, Depends, Query
@@ -10,8 +10,8 @@ from datetime import datetime
 from auth.rbac import require_permission, Permission
 from auth.dependencies import get_current_user
 from config.database import supabase
-from services.roche_construction_services import ScenarioAnalyzer
-from roche_construction_models import (
+from services.generic_construction_services import ScenarioAnalyzer
+from generic_construction_models import (
     ScenarioCreate, ScenarioAnalysis, ScenarioComparison, ScenarioConfig
 )
 from utils.converters import convert_uuids

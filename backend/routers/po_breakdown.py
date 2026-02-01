@@ -1,5 +1,5 @@
 """
-PO Breakdown Management endpoints for Roche Construction PPM Features
+PO Breakdown Management endpoints for Generic Construction PPM Features
 """
 
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
@@ -11,7 +11,7 @@ import json
 from auth.rbac import require_permission, Permission
 from auth.dependencies import get_current_user
 from config.database import supabase
-from models.roche_construction import (
+from models.generic_construction import (
     POBreakdownCreate,
     POBreakdownUpdate,
     POBreakdown,
@@ -20,7 +20,7 @@ from models.roche_construction import (
     POBreakdownSummary,
     POBreakdownType
 )
-from services.roche_construction_services import POBreakdownService
+from services.generic_construction_services import POBreakdownService
 from services.po_breakdown_export_service import POBreakdownExportService
 from services.po_breakdown_scheduled_export_service import (
     POBreakdownScheduledExportService,

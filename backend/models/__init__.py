@@ -12,7 +12,7 @@ from .change_management import *
 from .feedback import *
 from .help_content import *
 from .project_controls import *
-from .roche_construction import *
+from .generic_construction import *
 from .knowledge import *
 from .po_breakdown import *
 from .workflow import *

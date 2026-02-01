@@ -34,7 +34,7 @@ class MockAuditService(TenantIsolationMixin):
     
     async def get_events(self, tenant_id: UUID = None) -> List[Dict[str, Any]]:
         """Get audit events with tenant isolation."""
-        query = self.supabase.table("roche_audit_logs").select("*")
+        query = self.supabase.table("audit_logs").select("*")
         query = self.add_tenant_filter(query, tenant_id)
         response = query.execute()
         return response.data or []

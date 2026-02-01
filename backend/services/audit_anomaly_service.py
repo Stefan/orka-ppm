@@ -113,7 +113,7 @@ class AuditAnomalyService:
         """
         try:
             # Fetch audit events in time range
-            query = self.supabase.table("roche_audit_logs").select("*")
+            query = self.supabase.table("audit_logs").select("*")
             query = query.gte("timestamp", start_time.isoformat())
             query = query.lte("timestamp", end_time.isoformat())
             
@@ -247,7 +247,7 @@ class AuditAnomalyService:
             if training_data is None:
                 start_date = datetime.now() - timedelta(days=days_of_history)
                 
-                response = self.supabase.table("roche_audit_logs").select("*").gte(
+                response = self.supabase.table("audit_logs").select("*").gte(
                     "timestamp", start_date.isoformat()
                 ).limit(10000).execute()
                 
@@ -541,7 +541,7 @@ class AuditAnomalyService:
             is_anomaly: Whether event is classified as anomaly
         """
         try:
-            self.supabase.table("roche_audit_logs").update({
+            self.supabase.table("audit_logs").update({
                 "anomaly_score": anomaly_score,
                 "is_anomaly": is_anomaly
             }).eq("id", event_id).execute()

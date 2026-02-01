@@ -163,7 +163,7 @@ class AuditComplianceService:
             str: Hash of the latest event, or None if no events exist
         """
         try:
-            query = self.db.table("roche_audit_logs").select("hash").order(
+            query = self.db.table("audit_logs").select("hash").order(
                 "timestamp", desc=True
             ).limit(1)
             
@@ -258,7 +258,7 @@ class AuditComplianceService:
                 event_data["performance_metrics"] = json.dumps(performance_metrics)
             
             # Insert into database
-            result = self.db.table("roche_audit_logs").insert(event_data).execute()
+            result = self.db.table("audit_logs").insert(event_data).execute()
             
             if not result.data:
                 raise RuntimeError("Failed to create audit event")
@@ -308,7 +308,7 @@ class AuditComplianceService:
             verification_start = datetime.utcnow()
             
             # Build query for audit events
-            query = self.db.table("roche_audit_logs").select(
+            query = self.db.table("audit_logs").select(
                 "id", "hash", "previous_hash", "timestamp"
             ).order("timestamp", desc=False).limit(limit)
             

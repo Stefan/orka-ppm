@@ -14,15 +14,15 @@ This document provides a comprehensive summary of the database schema for the AI
 ## Schema Statistics
 
 - **Tables Created**: 8 new tables
-- **Tables Modified**: 1 (roche_audit_logs)
-- **Columns Added**: 9 to roche_audit_logs
+- **Tables Modified**: 1 (audit_logs)
+- **Columns Added**: 9 to audit_logs
 - **Indexes Created**: 43
 - **Constraints Added**: 8
 - **Comments Added**: 54
 
 ## Tables Overview
 
-### 1. roche_audit_logs (Extended)
+### 1. audit_logs (Extended)
 
 **Purpose**: Core audit log table extended with AI capabilities
 
@@ -46,7 +46,7 @@ This document provides a comprehensive summary of the database schema for the AI
 
 **Key Columns**:
 - `id` (UUID) - Primary key
-- `audit_event_id` (UUID) - Foreign key to roche_audit_logs
+- `audit_event_id` (UUID) - Foreign key to audit_logs
 - `embedding` (vector(1536)) - OpenAI ada-002 embedding
 - `content_text` (TEXT) - Source text for embedding
 - `tenant_id` (UUID) - Tenant isolation
@@ -60,7 +60,7 @@ This document provides a comprehensive summary of the database schema for the AI
 
 **Key Columns**:
 - `id` (UUID) - Primary key
-- `audit_event_id` (UUID) - Foreign key to roche_audit_logs
+- `audit_event_id` (UUID) - Foreign key to audit_logs
 - `anomaly_score` (DECIMAL) - Isolation Forest score
 - `detection_timestamp` (TIMESTAMP) - When detected
 - `features_used` (JSONB) - Feature vector
@@ -164,7 +164,7 @@ This document provides a comprehensive summary of the database schema for the AI
 
 **Key Columns**:
 - `id` (UUID) - Primary key
-- `audit_event_id` (UUID) - Foreign key to roche_audit_logs
+- `audit_event_id` (UUID) - Foreign key to audit_logs
 - `prediction_type` (VARCHAR) - Type: anomaly, category, risk_level
 - `predicted_value` (VARCHAR) - Prediction result
 - `confidence_score` (DECIMAL) - Confidence 0-1
@@ -187,7 +187,7 @@ This document provides a comprehensive summary of the database schema for the AI
 - Composite indexes for common query patterns
 
 ### Specialized Indexes
-- **GIN** index on roche_audit_logs.tags for JSONB queries
+- **GIN** index on audit_logs.tags for JSONB queries
 - **Partial** indexes for active records only
 - **Partial** indexes for anomaly filtering
 
@@ -199,7 +199,7 @@ This document provides a comprehensive summary of the database schema for the AI
 - Format constraints on report types
 
 ### Referential Integrity
-- Foreign keys to roche_audit_logs
+- Foreign keys to audit_logs
 - Foreign keys to auth.users
 - CASCADE DELETE for dependent records
 
@@ -242,7 +242,7 @@ LIMIT 50;
 2. **Semantic Search**
 ```sql
 SELECT a.*, e.embedding <=> $1 AS similarity
-FROM roche_audit_logs a
+FROM audit_logs a
 JOIN audit_embeddings e ON e.audit_event_id = a.id
 WHERE a.tenant_id = $2
 ORDER BY e.embedding <=> $1
@@ -251,7 +251,7 @@ LIMIT 10;
 
 3. **Filter by Category and Risk**
 ```sql
-SELECT * FROM roche_audit_logs
+SELECT * FROM audit_logs
 WHERE tenant_id = $1
 AND category = $2
 AND risk_level = $3
@@ -282,7 +282,7 @@ ORDER BY next_run;
 - Row-level security policies (to be enabled)
 
 ### Tamper Detection
-- Hash chain in roche_audit_logs
+- Hash chain in audit_logs
 - SHA-256 hashing of event data
 - previous_hash linking for integrity
 
@@ -326,7 +326,7 @@ ORDER BY next_run;
 - Redis caching for dashboard stats (30 seconds TTL)
 
 ### Partitioning Strategy
-- Consider monthly partitioning for roche_audit_logs
+- Consider monthly partitioning for audit_logs
 - Partition by tenant_id for large multi-tenant deployments
 - Archive old partitions to cold storage
 
@@ -377,7 +377,7 @@ ORDER BY next_run;
 If migration needs to be rolled back:
 
 1. Drop new tables in reverse dependency order
-2. Remove added columns from roche_audit_logs
+2. Remove added columns from audit_logs
 3. Restore from backup if needed
 4. Document rollback reason
 5. Fix issues before re-attempting

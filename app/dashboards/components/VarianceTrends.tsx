@@ -4,6 +4,7 @@ import { useState, useEffect, memo, useRef } from 'react'
 import { Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Bar, ComposedChart } from 'recharts'
 import { Calendar, Filter } from 'lucide-react'
 import { useTranslations } from '../../../lib/i18n/context'
+import { ChartSkeleton } from '../../../components/ui/Skeleton'
 
 interface VarianceTrend {
   date: string
@@ -37,7 +38,7 @@ function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsPro
     const checkContainer = () => {
       if (containerRef.current) {
         const { offsetWidth, offsetHeight } = containerRef.current
-        if (offsetWidth > 0 && offsetHeight > 0) {
+        if (offsetWidth >= 400 && offsetHeight >= 200) {
           setIsContainerReady(true)
         }
       }
@@ -163,9 +164,9 @@ function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsPro
         </div>
       </div>
       
-      <div data-testid="variance-trends-chart" ref={containerRef} className="flex-1 min-h-0" style={{ minHeight: '180px' }}>
+      <div data-testid="variance-trends-chart" ref={containerRef} className="flex-1 min-h-0" style={{ minHeight: '300px' }}>
         {isContainerReady ? (
-          <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+          <ResponsiveContainer width="100%" height={300} minWidth={400}>
             <ComposedChart data={trendData}>
           <XAxis 
             dataKey="date" 
@@ -207,9 +208,7 @@ function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsPro
         </ComposedChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex items-center justify-center h-full bg-gray-50 rounded">
-            <div className="text-xs text-gray-500">Loading chart...</div>
-          </div>
+          <ChartSkeleton className="h-full" />
         )}
       </div>
     </div>

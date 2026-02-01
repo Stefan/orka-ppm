@@ -22,9 +22,9 @@ python verify_ai_audit_trail_migration.py
 SELECT table_name FROM information_schema.tables 
 WHERE table_schema = 'public' AND table_name LIKE 'audit_%';
 
--- Check roche_audit_logs columns
+-- Check audit_logs columns
 SELECT column_name FROM information_schema.columns 
-WHERE table_name = 'roche_audit_logs' 
+WHERE table_name = 'audit_logs' 
 AND column_name IN ('anomaly_score', 'category', 'risk_level', 'tenant_id');
 ```
 
@@ -32,7 +32,7 @@ AND column_name IN ('anomaly_score', 'category', 'risk_level', 'tenant_id');
 
 | Table | Purpose | Key Columns |
 |-------|---------|-------------|
-| `roche_audit_logs` | Core audit events (extended) | anomaly_score, category, risk_level, tenant_id, hash |
+| `audit_logs` | Core audit events (extended) | anomaly_score, category, risk_level, tenant_id, hash |
 | `audit_embeddings` | Semantic search vectors | embedding (vector 1536), content_text |
 | `audit_anomalies` | Anomaly detections | anomaly_score, is_false_positive, alert_sent |
 | `audit_ml_models` | ML model versions | model_type, model_version, metrics, is_active |
@@ -48,7 +48,7 @@ AND column_name IN ('anomaly_score', 'category', 'risk_level', 'tenant_id');
 ```sql
 SELECT a.*, e.event_type, e.severity
 FROM audit_anomalies a
-JOIN roche_audit_logs e ON e.id = a.audit_event_id
+JOIN audit_logs e ON e.id = a.audit_event_id
 WHERE a.tenant_id = :tenant_id
 AND a.detection_timestamp > NOW() - INTERVAL '24 hours'
 ORDER BY a.anomaly_score DESC
@@ -60,7 +60,7 @@ LIMIT 50;
 SELECT 
     a.*,
     e.embedding <=> :query_embedding AS similarity
-FROM roche_audit_logs a
+FROM audit_logs a
 JOIN audit_embeddings e ON e.audit_event_id = a.id
 WHERE a.tenant_id = :tenant_id
 ORDER BY e.embedding <=> :query_embedding
@@ -69,7 +69,7 @@ LIMIT 10;
 
 ### Filter by Category and Risk
 ```sql
-SELECT * FROM roche_audit_logs
+SELECT * FROM audit_logs
 WHERE tenant_id = :tenant_id
 AND category = :category
 AND risk_level = :risk_level
@@ -105,7 +105,7 @@ ORDER BY calculation_date DESC;
 ```sql
 SELECT p.*, a.event_type, a.severity
 FROM audit_ai_predictions p
-JOIN roche_audit_logs a ON a.id = p.audit_event_id
+JOIN audit_logs a ON a.id = p.audit_event_id
 WHERE p.tenant_id = :tenant_id
 AND p.review_required = true
 AND p.reviewed_by IS NULL
@@ -116,7 +116,7 @@ ORDER BY p.prediction_timestamp DESC;
 
 ### Create Audit Event with AI Fields
 ```sql
-INSERT INTO roche_audit_logs (
+INSERT INTO audit_logs (
     event_type, entity_type, action_details,
     anomaly_score, is_anomaly, category, risk_level,
     tags, tenant_id, hash, previous_hash
@@ -248,16 +248,16 @@ ORDER BY anomaly_score DESC;
 
 ### Time-Range Queries
 ```sql
--- Uses idx_roche_audit_logs_timestamp
-SELECT * FROM roche_audit_logs
+-- Uses idx_audit_logs_timestamp
+SELECT * FROM audit_logs
 WHERE timestamp BETWEEN :start AND :end
 ORDER BY timestamp DESC;
 ```
 
 ### Tenant Isolation
 ```sql
--- Uses idx_roche_audit_logs_tenant_id
-SELECT * FROM roche_audit_logs
+-- Uses idx_audit_logs_tenant_id
+SELECT * FROM audit_logs
 WHERE tenant_id = :tenant_id;
 ```
 
@@ -287,7 +287,7 @@ WHERE tenant_id = :tenant_id;
 
 ### Vacuum and Analyze
 ```sql
-VACUUM ANALYZE roche_audit_logs;
+VACUUM ANALYZE audit_logs;
 VACUUM ANALYZE audit_embeddings;
 VACUUM ANALYZE audit_anomalies;
 ```
@@ -331,7 +331,7 @@ CREATE EXTENSION IF NOT EXISTS vector;
 ### Foreign Key Violations
 ```sql
 -- Check if referenced records exist
-SELECT id FROM roche_audit_logs WHERE id = :event_id;
+SELECT id FROM audit_logs WHERE id = :event_id;
 SELECT id FROM auth.users WHERE id = :user_id;
 ```
 

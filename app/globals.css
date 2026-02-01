@@ -243,3 +243,55 @@ body {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* ========================================
+   PERFORMANCE OPTIMIZATIONS
+   Core Web Vitals improvements
+   ======================================== */
+
+/* Font loading optimization */
+* {
+  font-display: swap;
+}
+
+/* Image loading optimization to prevent CLS */
+img {
+  /* Reserve aspect ratio space */
+  aspect-ratio: attr(width) / attr(height);
+  /* Smooth loading */
+  transition: opacity 0.3s ease;
+}
+
+/* CSS containment for better performance isolation */
+.cls-safe {
+  contain: layout style paint;
+}
+
+.content-reserve {
+  min-height: var(--min-height, auto);
+  contain: layout;
+}
+
+/* GPU acceleration for better animation performance */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Optimize scrolling performance */
+.smooth-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Reduce paint on hover for better performance */
+@media (hover: hover) and (pointer: fine) {
+  .hover-optimized:hover {
+    will-change: transform;
+  }
+
+  .hover-optimized:not(:hover) {
+    will-change: auto;
+  }
+}

@@ -24,20 +24,20 @@ $$ LANGUAGE plpgsql;
 COMMENT ON FUNCTION notify_new_audit_log IS 'Trigger function for new audit log insertions to support background embedding generation';
 
 -- ============================================================================
--- 2. Create trigger on roche_audit_logs table
+-- 2. Create trigger on audit_logs table
 -- ============================================================================
 
 -- Drop trigger if it exists (for idempotency)
-DROP TRIGGER IF NOT EXISTS audit_log_embedding_trigger ON roche_audit_logs;
+DROP TRIGGER IF NOT EXISTS audit_log_embedding_trigger ON audit_logs;
 
 -- Create trigger that fires after insert
 CREATE TRIGGER audit_log_embedding_trigger
-    AFTER INSERT ON roche_audit_logs
+    AFTER INSERT ON audit_logs
     FOR EACH ROW
     EXECUTE FUNCTION notify_new_audit_log();
 
 -- Add comment to the trigger
-COMMENT ON TRIGGER audit_log_embedding_trigger ON roche_audit_logs IS 'Trigger to notify background service of new audit logs needing embeddings';
+COMMENT ON TRIGGER audit_log_embedding_trigger ON audit_logs IS 'Trigger to notify background service of new audit logs needing embeddings';
 
 -- ============================================================================
 -- 3. Create function to manually trigger embedding generation for existing logs
@@ -58,7 +58,7 @@ DECLARE
 BEGIN
     -- Set embedding to NULL for logs matching criteria
     -- This will cause them to be picked up by the background service
-    UPDATE roche_audit_logs
+    UPDATE audit_logs
     SET embedding = NULL
     WHERE 
         (p_tenant_id IS NULL OR tenant_id = p_tenant_id)
@@ -66,7 +66,7 @@ BEGIN
         AND (p_end_date IS NULL OR timestamp <= p_end_date)
         AND id IN (
             SELECT id 
-            FROM roche_audit_logs 
+            FROM audit_logs 
             WHERE 
                 (p_tenant_id IS NULL OR tenant_id = p_tenant_id)
                 AND (p_start_date IS NULL OR timestamp >= p_start_date)
@@ -108,7 +108,7 @@ BEGIN
     -- Calculate average embedding generation rate (logs per minute)
     -- Based on logs embedded in the last hour
     SELECT COUNT(*)::numeric / 60.0 INTO avg_generation_rate
-    FROM roche_audit_logs
+    FROM audit_logs
     WHERE 
         embedding IS NOT NULL
         AND timestamp >= NOW() - INTERVAL '1 hour'
@@ -116,7 +116,7 @@ BEGIN
     
     -- Get logs without embeddings
     SELECT COUNT(*) INTO logs_remaining
-    FROM roche_audit_logs
+    FROM audit_logs
     WHERE 
         embedding IS NULL
         AND (p_tenant_id IS NULL OR tenant_id = p_tenant_id);
@@ -134,7 +134,7 @@ BEGIN
             WHEN avg_generation_rate > 0 THEN ROUND(logs_remaining / avg_generation_rate, 2)
             ELSE NULL
         END as estimated_time_remaining_minutes
-    FROM roche_audit_logs l
+    FROM audit_logs l
     WHERE p_tenant_id IS NULL OR l.tenant_id = p_tenant_id;
 END;
 $$ LANGUAGE plpgsql STABLE;

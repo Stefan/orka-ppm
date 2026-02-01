@@ -21,7 +21,7 @@ This migration adds comprehensive AI-powered audit trail capabilities to the PPM
 ## Prerequisites
 
 1. **pgvector Extension**: Must be enabled (should already be enabled from `ai_features_schema.sql`)
-2. **Existing Tables**: `roche_audit_logs` table must exist
+2. **Existing Tables**: `audit_logs` table must exist
 3. **Database Access**: Service role key with schema modification permissions
 
 ## Tables Created
@@ -93,7 +93,7 @@ Logging of all AI model predictions for transparency.
 
 ## Schema Changes to Existing Tables
 
-### roche_audit_logs (Extended)
+### audit_logs (Extended)
 
 New columns added:
 - `anomaly_score` - ML-computed anomaly score (0-1)
@@ -129,7 +129,7 @@ New columns added:
 - Report format enumeration
 
 ### Referential Integrity
-- Foreign keys to roche_audit_logs
+- Foreign keys to audit_logs
 - Foreign keys to auth.users
 - Cascade delete for dependent records
 
@@ -174,7 +174,7 @@ psql $DATABASE_URL
 After applying the migration, verify:
 
 - [ ] All 8 new tables exist
-- [ ] roche_audit_logs has 9 new columns
+- [ ] audit_logs has 9 new columns
 - [ ] pgvector extension is enabled
 - [ ] Vector indexes are created
 - [ ] All constraints are in place
@@ -190,10 +190,10 @@ FROM information_schema.tables
 WHERE table_schema = 'public' 
 AND table_name LIKE 'audit_%';
 
--- Check roche_audit_logs columns
+-- Check audit_logs columns
 SELECT column_name, data_type 
 FROM information_schema.columns 
-WHERE table_name = 'roche_audit_logs' 
+WHERE table_name = 'audit_logs' 
 AND column_name IN (
     'anomaly_score', 'is_anomaly', 'category', 
     'risk_level', 'tags', 'ai_insights', 
@@ -224,7 +224,7 @@ SELECT * FROM pg_extension WHERE extname = 'vector';
 ### 1. Test Audit Event with AI Fields
 
 ```sql
-INSERT INTO roche_audit_logs (
+INSERT INTO audit_logs (
     event_type, entity_type, action_details, 
     anomaly_score, is_anomaly, category, risk_level,
     tags, tenant_id
@@ -241,7 +241,7 @@ INSERT INTO roche_audit_logs (
 INSERT INTO audit_embeddings (
     audit_event_id, embedding, content_text, tenant_id
 ) VALUES (
-    (SELECT id FROM roche_audit_logs LIMIT 1),
+    (SELECT id FROM audit_logs LIMIT 1),
     array_fill(0.1, ARRAY[1536])::vector,
     'Test embedding content',
     gen_random_uuid()
@@ -255,7 +255,7 @@ INSERT INTO audit_anomalies (
     audit_event_id, anomaly_score, features_used,
     model_version, tenant_id
 ) VALUES (
-    (SELECT id FROM roche_audit_logs LIMIT 1),
+    (SELECT id FROM audit_logs LIMIT 1),
     0.92,
     '{"feature1": 0.5, "feature2": 0.8}'::jsonb,
     'v1.0.0',
@@ -278,8 +278,8 @@ DROP TABLE IF EXISTS audit_ml_models CASCADE;
 DROP TABLE IF EXISTS audit_anomalies CASCADE;
 DROP TABLE IF EXISTS audit_embeddings CASCADE;
 
--- Remove columns from roche_audit_logs
-ALTER TABLE roche_audit_logs 
+-- Remove columns from audit_logs
+ALTER TABLE audit_logs 
     DROP COLUMN IF EXISTS anomaly_score,
     DROP COLUMN IF EXISTS is_anomaly,
     DROP COLUMN IF EXISTS category,
@@ -314,9 +314,9 @@ ALTER TABLE roche_audit_logs
 The migration includes commented-out RLS policy examples. Enable and customize based on your auth setup:
 
 ```sql
-ALTER TABLE roche_audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY tenant_isolation ON roche_audit_logs
+CREATE POLICY tenant_isolation ON audit_logs
     FOR ALL
     USING (tenant_id = current_setting('app.current_tenant_id')::uuid);
 ```
@@ -360,7 +360,7 @@ CREATE EXTENSION IF NOT EXISTS vector;
 - Check for existing data in table
 
 **Issue: Foreign key constraint violations**
-- Ensure roche_audit_logs table exists
+- Ensure audit_logs table exists
 - Verify auth.users table exists
 - Check for orphaned records
 

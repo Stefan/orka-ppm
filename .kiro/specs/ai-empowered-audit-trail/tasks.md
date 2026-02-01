@@ -13,13 +13,13 @@ This implementation plan breaks down the AI-Empowered Audit Trail feature into d
     - Add tenant isolation indexes
     - _Requirements: 3.10, 9.4_
   
-  - [x] 1.2 Extend roche_audit_logs table with AI fields
+  - [x] 1.2 Extend audit_logs table with AI fields
     - Add columns: anomaly_score, is_anomaly, category, risk_level, tags, ai_insights, tenant_id, hash, previous_hash
     - Create indexes on new fields (anomaly_score, category, risk_level, tenant_id, tags GIN index)
     - _Requirements: 1.3, 4.1, 6.2, 9.1_
   
   - [x] 1.3 Create audit anomalies table
-    - Create `audit_anomalies` table with foreign key to roche_audit_logs
+    - Create `audit_anomalies` table with foreign key to audit_logs
     - Add fields for detection metadata, feedback, and model version
     - Create indexes on score, timestamp, tenant_id, is_false_positive
     - _Requirements: 1.4, 1.8_

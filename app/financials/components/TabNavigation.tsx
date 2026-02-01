@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { 
   BarChart3, TrendingUp, PieChart, Target, Upload, FileText, 
-  CheckCircle, FolderTree 
+  CheckCircle, FolderTree, BookOpen 
 } from 'lucide-react'
 import { ViewMode } from '../types'
 import { useTranslations } from '../../../lib/i18n/context'
@@ -63,17 +63,19 @@ export default function TabNavigation({ viewMode, onViewModeChange }: TabNavigat
   
   const tabConfig = useMemo((): TabConfig[] => [
     { key: 'overview', label: t('financials.tabs.overview'), icon: BarChart3, description: t('financials.descriptions.overview') },
+    { key: 'costbook', label: 'Costbook', icon: BookOpen, description: 'Advanced financial tracking with KPIs and visualizations', highlight: true },
     { key: 'detailed', label: t('financials.tabs.detailed'), icon: TrendingUp, description: t('financials.descriptions.detailed') },
     { key: 'trends', label: t('financials.tabs.trends'), icon: PieChart, description: t('financials.descriptions.trends') },
     { key: 'analysis', label: t('financials.tabs.analysis'), icon: Target, description: t('financials.descriptions.analysis') },
     { key: 'po-breakdown', label: t('financials.tabs.poBreakdown'), icon: FolderTree, description: t('financials.descriptions.poBreakdown') },
-    { key: 'csv-import', label: t('financials.tabs.csvImport'), icon: Upload, description: t('financials.descriptions.csvImport'), highlight: true },
+    { key: 'csv-import', label: t('financials.tabs.csvImport'), icon: Upload, description: t('financials.descriptions.csvImport') },
     { key: 'commitments-actuals', label: t('financials.tabs.commitmentsActuals'), icon: FileText, description: t('financials.descriptions.commitmentsActuals') }
   ], [t])
 
   const currentViewLabel = useMemo(() => {
     switch (viewMode) {
       case 'overview': return t('financials.tabs.overview')
+      case 'costbook': return 'Costbook'
       case 'detailed': return t('financials.tabs.detailed')
       case 'trends': return t('financials.tabs.trends')
       case 'analysis': return t('financials.tabs.analysis')

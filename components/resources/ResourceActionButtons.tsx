@@ -4,6 +4,7 @@ import React from 'react'
 import { UserPlus, Calendar, Edit, Trash2, Lock } from 'lucide-react'
 import PermissionGuard from '../auth/PermissionGuard'
 import { usePermissions } from '@/hooks/usePermissions'
+import { useTranslations } from '@/lib/i18n/context'
 import type { PermissionContext } from '@/types/rbac'
 
 interface ResourceActionButtonsProps {
@@ -43,6 +44,7 @@ export const ResourceActionButtons: React.FC<ResourceActionButtonsProps> = ({
   variant = 'default'
 }) => {
   const { hasPermission } = usePermissions()
+  const { t } = useTranslations()
   
   const context: PermissionContext = {}
   if (projectId) context.project_id = projectId
@@ -53,19 +55,19 @@ export const ResourceActionButtons: React.FC<ResourceActionButtonsProps> = ({
   const isViewer = !hasPermission('resource_update', context) && hasPermission('resource_read', context)
   
   const buttonClass = variant === 'compact'
-    ? 'p-2 rounded hover:bg-gray-100 transition-colors'
+    ? 'min-h-[44px] min-w-[44px] p-3 rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-center'
     : 'px-4 py-2 rounded-md font-medium transition-colors flex items-center gap-2'
-  
+
   const primaryButtonClass = variant === 'compact'
-    ? `${buttonClass} text-blue-600 hover:bg-blue-50`
+    ? `${buttonClass} text-blue-600 hover:bg-blue-50 border border-blue-200`
     : `${buttonClass} bg-blue-600 text-white hover:bg-blue-700`
-  
+
   const secondaryButtonClass = variant === 'compact'
-    ? `${buttonClass} text-gray-600 hover:bg-gray-100`
+    ? `${buttonClass} text-gray-600 hover:bg-gray-100 border border-gray-200`
     : `${buttonClass} bg-gray-200 text-gray-700 hover:bg-gray-300`
-  
+
   const dangerButtonClass = variant === 'compact'
-    ? `${buttonClass} text-red-600 hover:bg-red-50`
+    ? `${buttonClass} text-red-600 hover:bg-red-50 border border-red-200`
     : `${buttonClass} bg-red-600 text-white hover:bg-red-700`
 
   return (
@@ -85,7 +87,8 @@ export const ResourceActionButtons: React.FC<ResourceActionButtonsProps> = ({
             <button
               onClick={onAssignResource}
               className={primaryButtonClass}
-              title="Assign Resource"
+              title="Ressource zuweisen"
+              aria-label="Ressource zuweisen"
             >
               <UserPlus className="h-4 w-4" />
               {variant === 'default' && <span>Assign</span>}
@@ -99,7 +102,8 @@ export const ResourceActionButtons: React.FC<ResourceActionButtonsProps> = ({
             <button
               onClick={onScheduleResource}
               className={secondaryButtonClass}
-              title="Schedule Resource"
+              title="Ressource planen"
+              aria-label="Ressource planen"
             >
               <Calendar className="h-4 w-4" />
               {variant === 'default' && <span>Schedule</span>}
@@ -113,7 +117,8 @@ export const ResourceActionButtons: React.FC<ResourceActionButtonsProps> = ({
             <button
               onClick={onEditAllocation}
               className={secondaryButtonClass}
-              title="Edit Allocation"
+              title="Zuteilung bearbeiten"
+              aria-label="Zuteilung bearbeiten"
             >
               <Edit className="h-4 w-4" />
               {variant === 'default' && <span>Edit</span>}
@@ -127,7 +132,8 @@ export const ResourceActionButtons: React.FC<ResourceActionButtonsProps> = ({
             <button
               onClick={onRemoveResource}
               className={dangerButtonClass}
-              title="Remove Resource"
+              title="Ressource entfernen"
+              aria-label="Ressource entfernen"
             >
               <Trash2 className="h-4 w-4" />
               {variant === 'default' && <span>Remove</span>}

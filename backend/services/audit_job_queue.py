@@ -428,7 +428,7 @@ async def process_audit_event_job(job: Dict[str, Any]):
         logger.info(f"Processing audit event job {job_id}")
         
         # Insert event into database
-        response = supabase.table("roche_audit_logs").insert(event).execute()
+        response = supabase.table("audit_logs").insert(event).execute()
         
         if not response.data:
             raise Exception("Failed to insert audit event")

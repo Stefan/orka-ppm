@@ -79,14 +79,14 @@ The system recognizes PPM-related keywords in all 6 languages, including:
 # XAI/Grok Configuration
 OPENAI_API_KEY=xai-your-key-here
 OPENAI_BASE_URL=https://api.x.ai/v1
-OPENAI_MODEL=grok-4-1-fast-non-reasoning
+OPENAI_MODEL=grok-4-fast-reasoning
 
 # Local Embeddings (Grok doesn't support embeddings)
 USE_LOCAL_EMBEDDINGS=true
 ```
 
 ### Model Settings
-- **Model**: `grok-4-1-fast-non-reasoning`
+- **Model**: `grok-4-fast-reasoning`
 - **Temperature**: 0 (deterministic)
 - **Max Tokens**: 300 (concise responses)
 
@@ -139,7 +139,7 @@ USE_LOCAL_EMBEDDINGS=true
 
 ### Slow Responses
 1. Check if query is cached (should be instant)
-2. Verify backend is using `grok-4-1-fast-non-reasoning`
+2. Verify backend is using `grok-4-fast-reasoning`
 3. Check network latency
 4. Review backend logs for errors
 

@@ -50,7 +50,7 @@ Our current configuration in `backend/.env`:
 ```bash
 OPENAI_API_KEY=xai-your-key-here
 OPENAI_BASE_URL=https://api.x.ai/v1
-OPENAI_MODEL=grok-beta
+OPENAI_MODEL=grok-4-fast-reasoning
 USE_LOCAL_EMBEDDINGS=true
 ```
 

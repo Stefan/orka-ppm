@@ -312,7 +312,7 @@ async def semantic_search(query: str):
 
 **Breakdown by**:
 - Query type (select, insert, update)
-- Table (roche_audit_logs, audit_embeddings, etc.)
+- Table (audit_logs, audit_embeddings, etc.)
 
 **Target SLA**:
 - Simple queries: < 10ms
@@ -328,7 +328,7 @@ async def semantic_search(query: str):
 **Description**: Size of audit tables
 
 **What to Monitor**:
-- roche_audit_logs size
+- audit_logs size
 - audit_embeddings size
 - audit_anomalies size
 
@@ -586,7 +586,7 @@ async def semantic_search(query: str):
    -- Find slow queries
    SELECT query, mean_exec_time, calls
    FROM pg_stat_statements
-   WHERE query LIKE '%roche_audit_logs%'
+   WHERE query LIKE '%audit_logs%'
    ORDER BY mean_exec_time DESC
    LIMIT 10;
    ```
@@ -639,7 +639,7 @@ async def semantic_search(query: str):
 1. **Check Event Volume**
    ```sql
    SELECT COUNT(*) 
-   FROM roche_audit_logs 
+   FROM audit_logs 
    WHERE timestamp > NOW() - INTERVAL '24 hours';
    ```
 
@@ -800,7 +800,7 @@ async def semantic_search(query: str):
 2. **Analyze Recent Predictions**
    ```sql
    SELECT category, risk_level, COUNT(*)
-   FROM roche_audit_logs
+   FROM audit_logs
    WHERE timestamp > NOW() - INTERVAL '7 days'
    GROUP BY category, risk_level;
    ```
@@ -842,16 +842,16 @@ async def semantic_search(query: str):
 -- Analyze query patterns
 SELECT query, calls, mean_exec_time
 FROM pg_stat_statements
-WHERE query LIKE '%roche_audit_logs%'
+WHERE query LIKE '%audit_logs%'
 ORDER BY mean_exec_time * calls DESC
 LIMIT 20;
 
 -- Add indexes for common queries
 CREATE INDEX CONCURRENTLY idx_audit_timestamp_tenant 
-  ON roche_audit_logs(tenant_id, timestamp DESC);
+  ON audit_logs(tenant_id, timestamp DESC);
 
 CREATE INDEX CONCURRENTLY idx_audit_category_risk 
-  ON roche_audit_logs(category, risk_level) 
+  ON audit_logs(category, risk_level) 
   WHERE is_anomaly = TRUE;
 ```
 
@@ -859,12 +859,12 @@ CREATE INDEX CONCURRENTLY idx_audit_category_risk
 
 ```sql
 -- Partition by month
-CREATE TABLE roche_audit_logs_2024_01 
-  PARTITION OF roche_audit_logs
+CREATE TABLE audit_logs_2024_01 
+  PARTITION OF audit_logs
   FOR VALUES FROM ('2024-01-01') TO ('2024-02-01');
 
-CREATE TABLE roche_audit_logs_2024_02 
-  PARTITION OF roche_audit_logs
+CREATE TABLE audit_logs_2024_02 
+  PARTITION OF audit_logs
   FOR VALUES FROM ('2024-02-01') TO ('2024-03-01');
 ```
 
@@ -872,7 +872,7 @@ CREATE TABLE roche_audit_logs_2024_02
 
 ```sql
 -- Adjust autovacuum settings
-ALTER TABLE roche_audit_logs SET (
+ALTER TABLE audit_logs SET (
   autovacuum_vacuum_scale_factor = 0.05,
   autovacuum_analyze_scale_factor = 0.02
 );

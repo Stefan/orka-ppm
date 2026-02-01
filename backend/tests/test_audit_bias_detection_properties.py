@@ -395,9 +395,9 @@ async def test_property_27_ai_prediction_logging(
     from config.database import supabase
     try:
         # First check if event exists, if not create it
-        existing = supabase.table("roche_audit_logs").select("id").eq("id", str(audit_event_id)).execute()
+        existing = supabase.table("audit_logs").select("id").eq("id", str(audit_event_id)).execute()
         if not existing.data:
-            supabase.table("roche_audit_logs").insert({
+            supabase.table("audit_logs").insert({
                 "id": str(audit_event_id),
                 "event_type": "test_event",
                 "user_id": str(uuid4()),
@@ -474,9 +474,9 @@ async def test_property_28_low_confidence_flagging(confidence_score):
     from config.database import supabase
     try:
         # First check if event exists, if not create it
-        existing = supabase.table("roche_audit_logs").select("id").eq("id", str(audit_event_id)).execute()
+        existing = supabase.table("audit_logs").select("id").eq("id", str(audit_event_id)).execute()
         if not existing.data:
-            supabase.table("roche_audit_logs").insert({
+            supabase.table("audit_logs").insert({
                 "id": str(audit_event_id),
                 "event_type": "test_event",
                 "user_id": str(uuid4()),

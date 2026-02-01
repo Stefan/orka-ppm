@@ -7,7 +7,7 @@ This document describes the refactoring of the PPM SaaS backend from a monolithi
 ## Problem Statement
 
 The original `backend/main.py` file had grown to over 8,000 lines and contained multiple concerns:
-- API endpoints for different domains (projects, portfolios, resources, financial, risks, users, feedback, AI, CSV import, Roche Construction features)
+- API endpoints for different domains (projects, portfolios, resources, financial, risks, users, feedback, AI, CSV import, Generic Construction features)
 - Authentication and RBAC logic
 - Pydantic models
 - Business logic and calculations
@@ -41,7 +41,7 @@ backend/
 │   ├── risks.py             # Risk and issue models
 │   ├── users.py             # User management models
 │   ├── feedback.py          # Feedback system models
-│   └── roche_construction.py # Roche Construction models (existing)
+│   └── roche_construction.py # Generic Construction models (existing)
 ├── services/
 │   ├── __init__.py
 │   ├── projects.py          # Project business logic
@@ -50,7 +50,7 @@ backend/
 │   ├── risks.py             # Risk management
 │   ├── users.py             # User management
 │   ├── feedback.py          # Feedback system
-│   └── roche_construction.py # Roche Construction services (existing)
+│   └── roche_construction.py # Generic Construction services (existing)
 ├── routers/
 │   ├── __init__.py
 │   ├── projects.py          # Project endpoints
@@ -62,10 +62,10 @@ backend/
 │   ├── feedback.py          # Feedback system endpoints
 │   ├── ai.py                # AI endpoints
 │   ├── csv_import.py        # CSV import endpoints
-│   ├── scenarios.py         # What-if scenarios (Roche)
-│   ├── simulations.py       # Monte Carlo simulations (Roche)
-│   ├── shareable_urls.py    # Shareable URLs (Roche)
-│   └── change_management.py # Change management (Roche)
+│   ├── scenarios.py         # What-if scenarios (Generic)
+│   ├── simulations.py       # Monte Carlo simulations (Generic)
+│   ├── shareable_urls.py    # Shareable URLs (Generic)
+│   └── change_management.py # Change management (Generic)
 └── utils/
     ├── __init__.py
     ├── calculations.py      # Financial and resource calculations
@@ -104,8 +104,8 @@ backend/
 ✅ **Core Routers**
 - `routers/portfolios.py`: Portfolio management endpoints
 - `routers/projects.py`: Project management endpoints
-- `routers/scenarios.py`: What-if scenario analysis (Roche feature)
-- `routers/simulations.py`: Monte Carlo simulations (Roche feature)
+- `routers/scenarios.py`: What-if scenario analysis (Generic feature)
+- `routers/simulations.py`: Monte Carlo simulations (Generic feature)
 
 ✅ **New Main Application**
 - `main_new.py`: Minimal FastAPI app with router registration
@@ -120,8 +120,8 @@ backend/
 - `routers/feedback.py`: Feedback system endpoints
 - `routers/ai.py`: AI agent endpoints
 - `routers/csv_import.py`: CSV import functionality
-- `routers/shareable_urls.py`: Shareable URLs (Roche feature)
-- `routers/change_management.py`: Change management (Roche feature)
+- `routers/shareable_urls.py`: Shareable URLs (Generic feature)
+- `routers/change_management.py`: Change management (Generic feature)
 
 🔄 **Additional Models to Create**
 - `models/resources.py`: Resource-related models
@@ -138,7 +138,7 @@ backend/
 ⏳ **Testing**
 - Unit tests for each module
 - Integration tests for API endpoints
-- Property-based tests for Roche Construction features
+- Property-based tests for Generic Construction features
 
 ⏳ **Performance Optimization**
 - Caching strategies
@@ -206,7 +206,7 @@ curl -X POST http://localhost:8000/portfolios/ \
 curl -X GET http://localhost:8000/projects/
 ```
 
-### 3. Roche Construction Features Test
+### 3. Generic Construction Features Test
 
 ```bash
 # Test scenario endpoints
@@ -315,4 +315,4 @@ When adding new features to the refactored codebase:
 
 This refactoring transforms the PPM SaaS backend from a monolithic structure to a maintainable, scalable, and testable modular architecture. The new structure follows industry best practices and will support the continued growth and development of the platform.
 
-The migration preserves all existing functionality while providing a solid foundation for future enhancements, particularly the Roche Construction PPM features that require sophisticated risk analysis, scenario modeling, and change management capabilities.
+The migration preserves all existing functionality while providing a solid foundation for future enhancements, particularly the Generic Construction PPM features that require sophisticated risk analysis, scenario modeling, and change management capabilities.

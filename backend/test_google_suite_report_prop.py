@@ -18,7 +18,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from services.roche_construction_services import GoogleSuiteReportGenerator, TemplateEngine
+from services.generic_construction_services import GoogleSuiteReportGenerator, TemplateEngine
 
 
 class MockSupabaseTable:

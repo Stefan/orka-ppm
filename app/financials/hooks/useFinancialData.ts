@@ -37,8 +37,39 @@ export function useFinancialData({ accessToken, selectedCurrency }: UseFinancial
   const [error, setError] = useState<string | null>(null)
 
   const fetchAllProjects = useCallback(async () => {
-    if (!accessToken) return
-    
+    if (!accessToken) {
+      // Use mock data when not authenticated
+      console.log('No access token, using mock project data')
+      const mockProjects: Project[] = [
+        {
+          id: 'mock-project-1',
+          name: 'Project Alpha',
+          budget: 50000,
+          actual_cost: 45000,
+          status: 'active',
+          health: 'yellow'
+        },
+        {
+          id: 'mock-project-2',
+          name: 'Project Beta',
+          budget: 75000,
+          actual_cost: 78000,
+          status: 'active',
+          health: 'red'
+        },
+        {
+          id: 'mock-project-3',
+          name: 'Project Gamma',
+          budget: 30000,
+          actual_cost: 25000,
+          status: 'active',
+          health: 'green'
+        }
+      ]
+      setProjects(mockProjects)
+      return mockProjects
+    }
+
     try {
       const projectsData = await fetchProjects(accessToken)
       setProjects(projectsData)
@@ -51,24 +82,65 @@ export function useFinancialData({ accessToken, selectedCurrency }: UseFinancial
   }, [accessToken])
 
   const fetchAllBudgetVariances = useCallback(async (projectsList: Project[]) => {
-    if (!accessToken || !projectsList.length) return
-    
+    if (!accessToken || !projectsList.length) {
+      // Use mock data when not authenticated
+      const mockVariances: BudgetVariance[] = projectsList.map(project => ({
+        project_id: project.id,
+        total_planned: project.budget || 0,
+        total_actual: project.actual_cost || 0,
+        variance_amount: (project.actual_cost || 0) - (project.budget || 0),
+        variance_percentage: project.budget ? (((project.actual_cost || 0) - project.budget) / project.budget) * 100 : 0,
+        currency: selectedCurrency,
+        categories: [],
+        status: 'active'
+      }))
+      setBudgetVariances(mockVariances)
+      return mockVariances
+    }
+
     const variances: BudgetVariance[] = []
-    
+
     for (const project of projectsList) {
       const variance = await fetchBudgetVariance(project.id, selectedCurrency, accessToken)
       if (variance) {
         variances.push(variance)
       }
     }
-    
+
     setBudgetVariances(variances)
     return variances
   }, [accessToken, selectedCurrency])
 
   const fetchAllFinancialAlerts = useCallback(async () => {
-    if (!accessToken) return
-    
+    if (!accessToken) {
+      // Use mock data when not authenticated
+      console.log('No access token, using mock financial alerts data')
+      const mockAlerts: FinancialAlert[] = [
+        {
+          project_id: 'mock-project-1',
+          project_name: 'Project Alpha',
+          budget: 50000,
+          actual_cost: 45000,
+          utilization_percentage: 90,
+          variance_amount: -5000,
+          alert_level: 'warning',
+          message: 'Budget utilization approaching 90% threshold'
+        },
+        {
+          project_id: 'mock-project-2',
+          project_name: 'Project Beta',
+          budget: 75000,
+          actual_cost: 78000,
+          utilization_percentage: 104,
+          variance_amount: 3000,
+          alert_level: 'critical',
+          message: 'Project is over budget by 4%'
+        }
+      ]
+      setFinancialAlerts(mockAlerts)
+      return
+    }
+
     try {
       const alerts = await fetchFinancialAlerts(accessToken)
       setFinancialAlerts(alerts)
@@ -205,8 +277,6 @@ export function useFinancialData({ accessToken, selectedCurrency }: UseFinancial
   }, [])
 
   const fetchAllData = useCallback(async () => {
-    if (!accessToken) return
-    
     setLoading(true)
     setError(null)
     

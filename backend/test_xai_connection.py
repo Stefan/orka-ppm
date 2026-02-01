@@ -18,7 +18,7 @@ def test_xai_connection():
     # Get configuration
     api_key = os.getenv("OPENAI_API_KEY")
     base_url = os.getenv("OPENAI_BASE_URL")
-    model = os.getenv("OPENAI_MODEL", "grok-beta")
+    model = os.getenv("OPENAI_MODEL", "grok-4-fast-reasoning")
     
     print("=" * 60)
     print("XAI/Grok API Connection Test")
