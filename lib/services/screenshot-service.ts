@@ -1,6 +1,7 @@
 /**
- * Screenshot Service
- * Provides screenshot capture and visual guide generation functionality
+ * Screenshot Service (extended / help-chat)
+ * Extended implementation with VisualGuideSystem integration and annotations.
+ * App entry for screenshot + VisualGuideBuilder is lib/screenshot-service.ts.
  */
 
 import type { ScreenshotAnnotation, VisualGuide, VisualGuideStep } from '../../components/help-chat/VisualGuideSystem'

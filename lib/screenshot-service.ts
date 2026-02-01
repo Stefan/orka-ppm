@@ -1,6 +1,8 @@
 /**
- * Screenshot Service
- * Handles screenshot capture and visual guide creation
+ * Screenshot Service (canonical app entry)
+ * Handles screenshot capture and visual guide creation.
+ * Used by VisualGuideManager and tests. For extended help-chat/VisualGuideSystem
+ * integration see lib/services/screenshot-service.ts.
  */
 
 export interface ScreenshotResult {

@@ -1,5 +1,6 @@
 /**
- * API utilities and configuration
+ * Legacy generic API helpers (get, post, put, del, apiRequest, getApiUrl).
+ * For app requests and Next.js proxy usage, prefer @/lib/api (client, supabase, auth).
  */
 
 // API Configuration
