@@ -1,0 +1,31 @@
+# Sentry error-triggered regression tests - Enterprise Test Strategy Task 21.2
+# Requirements: 3.7
+# Trigger: Sentry webhook on production error (configure in Sentry → Integrations → Webhooks)
+name: Sentry Error Triggered Tests
+
+on:
+  repository_dispatch:
+    types: [sentry-error]
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason (e.g. production error)'
+        required: false
+
+jobs:
+  regression:
+    name: Run regression on error
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run regression tests
+        run: npm run test:ci
+        env:
+          CI: true

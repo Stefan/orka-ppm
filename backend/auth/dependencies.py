@@ -24,8 +24,15 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
         # Handle missing credentials in development mode
         if not credentials:
             default_user_id = "00000000-0000-0000-0000-000000000001"
-            print("🔧 Development mode: No credentials provided, using default user")
-            return {"user_id": default_user_id, "email": "dev@example.com", "tenant_id": default_user_id}
+            print("🔧 Development mode: No credentials provided, using default admin user")
+            return {
+                "user_id": default_user_id,
+                "email": "dev@example.com",
+                "tenant_id": default_user_id,
+                "role": "admin",  # Add admin role for development
+                "roles": ["admin"],
+                "permissions": ["user_manage"]  # Add user_manage permission
+            }
         
         token = credentials.credentials
         
@@ -73,9 +80,16 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
         }
     except Exception as e:
         default_user_id = "00000000-0000-0000-0000-000000000001"
-        print(f"🔧 Development mode: Auth error ({e}), using default user")
+        print(f"🔧 Development mode: Auth error ({e}), using default admin user")
         # In development mode, fall back to default user instead of failing
-        return {"user_id": default_user_id, "email": "dev@example.com", "tenant_id": default_user_id}
+        return {
+            "user_id": default_user_id,
+            "email": "dev@example.com",
+            "tenant_id": default_user_id,
+            "role": "admin",  # Add admin role for development
+            "roles": ["admin"],
+            "permissions": ["user_manage"]  # Add user_manage permission
+        }
 
 def get_current_user_id(current_user: Dict[str, Any] = Depends(get_current_user)) -> str:
     """Extract user ID from current user"""
@@ -92,21 +106,27 @@ async def get_current_user_with_roles(credentials: Optional[HTTPAuthorizationCre
     
     # If roles are not in the token, fetch them from the bridge
     if "roles" not in user or not user["roles"]:
-        try:
-            from .supabase_rbac_bridge import get_supabase_rbac_bridge
-            from uuid import UUID
-            
-            bridge = get_supabase_rbac_bridge()
-            user_id = UUID(user["user_id"])
-            
-            # Get enhanced user info with roles
-            enhanced_info = await bridge.get_enhanced_user_info(user_id)
-            
-            if enhanced_info:
-                user["roles"] = enhanced_info.get("roles", [])
-                user["permissions"] = enhanced_info.get("permissions", [])
-                user["effective_roles"] = enhanced_info.get("effective_roles", [])
-        except Exception as e:
-            print(f"🔧 Could not fetch roles for user: {e}")
-    
+        # For development default user, provide admin roles
+        if user.get("user_id") == "00000000-0000-0000-0000-000000000001":
+            user["roles"] = ["admin"]
+            user["permissions"] = ["user_manage"]
+            user["effective_roles"] = ["admin"]
+        else:
+            try:
+                from .supabase_rbac_bridge import get_supabase_rbac_bridge
+                from uuid import UUID
+
+                bridge = get_supabase_rbac_bridge()
+                user_id = UUID(user["user_id"])
+
+                # Get enhanced user info with roles
+                enhanced_info = await bridge.get_enhanced_user_info(user_id)
+
+                if enhanced_info:
+                    user["roles"] = enhanced_info.get("roles", [])
+                    user["permissions"] = enhanced_info.get("permissions", [])
+                    user["effective_roles"] = enhanced_info.get("effective_roles", [])
+            except Exception as e:
+                print(f"🔧 Could not fetch roles for user: {e}")
+
     return user

@@ -3,7 +3,7 @@
 import { useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { LogOut, Activity, MessageSquare, X, Users, BarChart3, FileText, Layers } from 'lucide-react'
+import { LogOut, Activity, MessageSquare, X, Users, BarChart3, FileText, Layers, Shield } from 'lucide-react'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
 import { GlobalLanguageSelector } from './GlobalLanguageSelector'
 import { usePermissions } from '@/hooks/usePermissions'
@@ -207,6 +207,17 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
               </Link>
             </li>
             <PermissionGuard permission="admin_read">
+              <li>
+                <Link 
+                  href="/admin" 
+                  prefetch={true}
+                  className="flex items-center py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
+                  onClick={handleLinkClick}
+                >
+                  <Shield className="mr-2 h-4 w-4" />
+                  Admin
+                </Link>
+              </li>
               <li>
                 <Link 
                   href="/admin/performance" 
@@ -485,24 +496,44 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
           </Link>
         </li>
         {hasPermission('admin_read') && (
-          <li style={{ display: 'block', width: '100%' }}>
-            <Link 
-              href="/admin/performance" 
-              prefetch={true}
-              style={{ 
-                display: 'flex', 
-                alignItems: 'center',
-                padding: '0.5rem 1rem', 
-                borderRadius: '0.375rem', 
-                color: '#ffffff', 
-                textDecoration: 'none',
-                transition: 'background-color 0.2s'
-              }}
-            >
-              <Activity className="mr-2 h-4 w-4" />
-              Performance Monitor
-            </Link>
-          </li>
+          <>
+            <li style={{ display: 'block', width: '100%' }}>
+              <Link 
+                href="/admin" 
+                prefetch={true}
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  padding: '0.5rem 1rem', 
+                  borderRadius: '0.375rem', 
+                  color: '#ffffff', 
+                  textDecoration: 'none',
+                  transition: 'background-color 0.2s'
+                }}
+              >
+                <Shield className="mr-2 h-4 w-4" />
+                Admin
+              </Link>
+            </li>
+            <li style={{ display: 'block', width: '100%' }}>
+              <Link 
+                href="/admin/performance" 
+                prefetch={true}
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  padding: '0.5rem 1rem', 
+                  borderRadius: '0.375rem', 
+                  color: '#ffffff', 
+                  textDecoration: 'none',
+                  transition: 'background-color 0.2s'
+                }}
+              >
+                <Activity className="mr-2 h-4 w-4" />
+                Performance Monitor
+              </Link>
+            </li>
+          </>
         )}
         {hasPermission('user_management') && (
           <li style={{ display: 'block', width: '100%' }}>

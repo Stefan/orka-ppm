@@ -1,6 +1,6 @@
 'use client'
 
-import React, { lazy, Suspense } from 'react'
+import React, { lazy, Suspense, useEffect } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import { AlertTriangle } from 'lucide-react'
 import AppLayout from '../../components/shared/AppLayout'
@@ -22,6 +22,7 @@ import BudgetVarianceTable from './components/tables/BudgetVarianceTable'
 // Import hooks
 import { useFinancialData } from './hooks/useFinancialData'
 import { useAnalytics } from './hooks/useAnalytics'
+import { useFeatureFlag } from '../../contexts/FeatureFlagContext'
 
 // Import types
 import { ViewMode } from './types'
@@ -37,6 +38,16 @@ export default function Financials() {
   const [dateRange, setDateRange] = React.useState('all')
   const [showFilters, setShowFilters] = React.useState(false)
   const [viewMode, setViewMode] = React.useState<ViewMode>('overview')
+
+  // Feature flag checks
+  const { enabled: costbookEnabled } = useFeatureFlag('costbook_phase1')
+
+  // Redirect from costbook view if feature is disabled
+  useEffect(() => {
+    if (viewMode === 'costbook' && !costbookEnabled) {
+      setViewMode('overview')
+    }
+  }, [viewMode, costbookEnabled])
 
   // Use custom hooks for data management
   const {

@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import { ViewMode } from '../types'
 import { useTranslations } from '../../../lib/i18n/context'
+import { useFeatureFlag } from '../../../contexts/FeatureFlagContext'
 
 interface TabConfig {
   key: ViewMode
@@ -60,17 +61,26 @@ TabButton.displayName = 'TabButton'
 
 export default function TabNavigation({ viewMode, onViewModeChange }: TabNavigationProps) {
   const { t } = useTranslations()
-  
-  const tabConfig = useMemo((): TabConfig[] => [
-    { key: 'overview', label: t('financials.tabs.overview'), icon: BarChart3, description: t('financials.descriptions.overview') },
-    { key: 'costbook', label: 'Costbook', icon: BookOpen, description: 'Advanced financial tracking with KPIs and visualizations', highlight: true },
-    { key: 'detailed', label: t('financials.tabs.detailed'), icon: TrendingUp, description: t('financials.descriptions.detailed') },
-    { key: 'trends', label: t('financials.tabs.trends'), icon: PieChart, description: t('financials.descriptions.trends') },
-    { key: 'analysis', label: t('financials.tabs.analysis'), icon: Target, description: t('financials.descriptions.analysis') },
-    { key: 'po-breakdown', label: t('financials.tabs.poBreakdown'), icon: FolderTree, description: t('financials.descriptions.poBreakdown') },
-    { key: 'csv-import', label: t('financials.tabs.csvImport'), icon: Upload, description: t('financials.descriptions.csvImport') },
-    { key: 'commitments-actuals', label: t('financials.tabs.commitmentsActuals'), icon: FileText, description: t('financials.descriptions.commitmentsActuals') }
-  ], [t])
+  const { enabled: costbookEnabled } = useFeatureFlag('costbook_phase1')
+
+  const tabConfig = useMemo((): TabConfig[] => {
+    const tabs = [
+      { key: 'overview', label: t('financials.tabs.overview'), icon: BarChart3, description: t('financials.descriptions.overview') },
+      { key: 'detailed', label: t('financials.tabs.detailed'), icon: TrendingUp, description: t('financials.descriptions.detailed') },
+      { key: 'trends', label: t('financials.tabs.trends'), icon: PieChart, description: t('financials.descriptions.trends') },
+      { key: 'analysis', label: t('financials.tabs.analysis'), icon: Target, description: t('financials.descriptions.analysis') },
+      { key: 'po-breakdown', label: t('financials.tabs.poBreakdown'), icon: FolderTree, description: t('financials.descriptions.poBreakdown') },
+      { key: 'csv-import', label: t('financials.tabs.csvImport'), icon: Upload, description: t('financials.descriptions.csvImport') },
+      { key: 'commitments-actuals', label: t('financials.tabs.commitmentsActuals'), icon: FileText, description: t('financials.descriptions.commitmentsActuals') }
+    ]
+
+    // Add costbook tab only if feature is enabled
+    if (costbookEnabled) {
+      tabs.splice(1, 0, { key: 'costbook', label: 'Budget & Cost Management', icon: BookOpen, description: 'Comprehensive budget tracking, cost management, and financial oversight with detailed project analysis', highlight: true })
+    }
+
+    return tabs
+  }, [t, costbookEnabled])
 
   const currentViewLabel = useMemo(() => {
     switch (viewMode) {

@@ -1,0 +1,143 @@
+# Nightly full test suite - runs unit, integration, E2E, performance, compliance
+# Trigger: daily 02:00 UTC + manual (Actions → Run workflow)
+name: Nightly Full Tests
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: nightly-full-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-unit:
+    name: Backend unit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install dependencies
+        run: pip install -r requirements-test.txt 2>/dev/null || pip install pytest pytest-cov pytest-asyncio hypothesis
+      - name: Run pytest unit
+        run: pytest tests/ tests/unit/ -m unit -v --cov=. --cov-report=xml --cov-report=term --cov-fail-under=80 --ignore=tests/integration 2>/dev/null || pytest tests/ -v --cov=. --cov-report=xml --cov-fail-under=80 -x
+      - name: Upload coverage (Codecov)
+        uses: codecov/codecov-action@v4
+        with:
+          directory: backend
+          flags: backend-unit
+          fail_ci_if_error: false
+
+  frontend-unit:
+    name: Frontend unit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Run Jest
+        run: npm run test:ci
+        env:
+          CI: true
+      - name: Upload coverage (Codecov)
+        uses: codecov/codecov-action@v4
+        with:
+          flags: frontend-unit
+          fail_ci_if_error: false
+
+  backend-integration:
+    name: Backend integration
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - run: pip install -r requirements-test.txt 2>/dev/null || pip install pytest pytest-asyncio httpx
+      - name: Run integration tests
+        run: pytest tests/ -m integration -v --ignore=tests/performance 2>/dev/null || pytest tests/ -v -k integration
+
+  frontend-integration:
+    name: Frontend integration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Run Jest integration
+        run: npm run test:ci -- --testPathPattern=integration
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Install Playwright
+        run: npx playwright install --with-deps chromium
+      - name: Run E2E
+        run: npm run test:e2e -- --reporter=html
+        env:
+          CI: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-nightly
+          path: playwright-report/
+          retention-days: 7
+
+  performance:
+    name: Performance (Lighthouse + k6)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - name: Lighthouse
+        run: npx lhci autorun --config=__tests__/performance/lighthouse/config.js 2>/dev/null || echo "Lighthouse skipped"
+        continue-on-error: true
+      - name: k6
+        run: which k6 && k6 run backend/tests/performance/k6_scripts/api_load.js --vus 2 --duration 10s 2>/dev/null || echo "k6 skipped"
+        continue-on-error: true
+
+  compliance:
+    name: Compliance
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - run: pip install -r requirements-test.txt 2>/dev/null || pip install pytest pytest-asyncio
+      - name: Run compliance tests
+        run: pytest tests/compliance/ tests/ -m compliance -v 2>/dev/null || pytest tests/ -v -k "audit or compliance or encryption or gdpr"

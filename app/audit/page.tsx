@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import AppLayout from '../../components/shared/AppLayout'
 import { AlertTriangle, Clock, FileText, Search, BarChart3, Download, RefreshCw, FileDown } from 'lucide-react'
@@ -11,6 +11,7 @@ import type { AuditEvent, TimelineFilters } from '../../components/audit/Timelin
 import type { AnomalyDetection } from '../../components/audit/AnomalyDashboard'
 import type { SearchResponse } from '../../components/audit/SemanticSearch'
 import type { AuditFilters as AuditFiltersType } from '../../components/audit/AuditFilters'
+import { useFeatureFlag } from '../../contexts/FeatureFlagContext'
 
 // Tab types
 type TabType = 'dashboard' | 'timeline' | 'anomalies' | 'search'
@@ -32,6 +33,17 @@ export default function AuditDashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Feature flag checks
+  const { enabled: anomalyDetectionEnabled } = useFeatureFlag('ai_anomaly_detection')
+
+  // Redirect from anomalies tab if feature is disabled
+  useEffect(() => {
+    if (activeTab === 'anomalies' && !anomalyDetectionEnabled) {
+      setActiveTab('dashboard')
+    }
+  }, [activeTab, anomalyDetectionEnabled])
+
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [autoRefresh, setAutoRefresh] = useState(false)
@@ -445,22 +457,24 @@ export default function AuditDashboard() {
                 {t('audit.tabs.timeline')}
               </button>
               
-              <button
-                onClick={() => setActiveTab('anomalies')}
-                className={`flex items-center px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap ${
-                  activeTab === 'anomalies'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                {t('audit.tabs.anomalies')}
-                {stats && stats.total_anomalies_24h > 0 && (
-                  <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded-full">
-                    {stats.total_anomalies_24h}
-                  </span>
-                )}
-              </button>
+              {anomalyDetectionEnabled && (
+                <button
+                  onClick={() => setActiveTab('anomalies')}
+                  className={`flex items-center px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap ${
+                    activeTab === 'anomalies'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <AlertTriangle className="h-4 w-4 mr-2" />
+                  {t('audit.tabs.anomalies')}
+                  {stats && stats.total_anomalies_24h > 0 && (
+                    <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded-full">
+                      {stats.total_anomalies_24h}
+                    </span>
+                  )}
+                </button>
+              )}
               
               <button
                 onClick={() => setActiveTab('search')}

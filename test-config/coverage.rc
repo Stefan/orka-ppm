@@ -1,0 +1,37 @@
+# Coverage.py configuration - shared coverage rules and exclusions
+# Enterprise Test Strategy - Task 1.1
+# Used by: backend pytest-cov
+
+[run]
+source = backend
+branch = True
+omit =
+    */tests/*
+    */test_*
+    */__pycache__/*
+    */migrations/*
+    */venv/*
+    */.venv/*
+    */pre_startup_testing/*
+    */scripts/*
+    */examples/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise NotImplementedError
+    if TYPE_CHECKING:
+    if __name__ == .__main__.:
+    @abstractmethod
+    @abc.abstractmethod
+
+fail_under = 80
+show_missing = True
+skip_covered = False
+
+[html]
+directory = backend/tests/coverage_html
+
+[xml]
+output = backend/tests/coverage.xml

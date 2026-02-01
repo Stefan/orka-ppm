@@ -22,7 +22,6 @@
     "route:/projects/import": "Import projects",
     "route:/reports": "Reports",
     "route:/reports/pmr": "PMR Reports",
-    "route:/resources": "Resources",
-    "route:/risks": "Risk management"
+    "route:/resources": "Resources"
   }
 }

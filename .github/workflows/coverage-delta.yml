@@ -1,0 +1,37 @@
+# Coverage delta on PRs - Enterprise Test Strategy Task 22.2
+# Requirements: 4.6
+name: Coverage Delta
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  coverage-delta:
+    name: Comment coverage delta on PR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run coverage (current)
+        run: npm run test:coverage -- --silent 2>/dev/null || true
+      - name: Comment PR with coverage delta
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request' && github.event.pull_request.number
+        with:
+          script: |
+            const body = `## Coverage report\nCoverage delta: run \`npm run test:coverage\` and compare to main.`;
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });

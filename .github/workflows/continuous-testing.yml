@@ -1,0 +1,35 @@
+# Continuous testing on staging - Enterprise Test Strategy Task 21.1
+# Requirements: 3.6
+name: Continuous Testing
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: continuous-testing-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    name: Regression suite (staging)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run regression tests
+        run: npm run test:ci
+        env:
+          CI: true
+      - name: Notify on failure (placeholder)
+        if: failure()
+        run: echo "Regression failed - configure Slack webhook in repository secrets (SLACK_WEBHOOK_URL)"
+        continue-on-error: true

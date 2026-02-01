@@ -19,7 +19,8 @@ import {
   Zap,
   Clock,
   Star,
-  FileText
+  FileText,
+  Shield
 } from 'lucide-react'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
 import { useNavigationAnalytics } from '../../hooks/useNavigationAnalytics'
@@ -112,6 +113,14 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
     href: '/feedback',
     category: 'secondary',
     description: 'Submit feedback and improvement ideas'
+  },
+  {
+    id: 'admin',
+    label: 'Admin',
+    icon: Shield,
+    href: '/admin',
+    category: 'admin',
+    description: 'Admin dashboard and settings'
   },
   {
     id: 'performance',

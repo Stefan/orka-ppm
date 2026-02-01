@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react'
 import { useRouter } from 'next/navigation'
@@ -14,9 +15,6 @@ import { usePermissions } from '@/app/providers/EnhancedAuthProvider'
 import { useToast } from '@/components/shared/Toast'
 import {
   Search,
-  Plus,
-  Pencil,
-  Trash2,
   ArrowLeft,
   ToggleLeft,
   ToggleRight,
@@ -24,10 +22,21 @@ import {
 } from 'lucide-react'
 import { getApiUrl } from '@/lib/api'
 import { supabase } from '@/lib/api/supabase-minimal'
+import { PREDEFINED_FEATURE_FLAGS } from '@/lib/feature-flags/constants'
 import { filterFlagsBySearch } from '@/lib/feature-flags/filterFlags'
 import type { FeatureFlag } from '@/types/feature-flags'
 
+/** Row shown in the table: real flag from API or placeholder for a predefined flag not yet in DB */
+type FlagRow = (FeatureFlag & { displayName?: string }) | { id: ''; name: string; displayName: string; description: string; enabled: false; organization_id: null; created_at: ''; updated_at: '' }
+
+function isPlaceholder(row: FlagRow): row is { id: ''; name: string; displayName: string; description: string; enabled: false; organization_id: null; created_at: ''; updated_at: '' } {
+  return row.id === ''
+}
+
 const SEARCH_DEBOUNCE_MS = 300
+
+/** No-op for any leftover or cached debug calls; remove when not needed. */
+const DEBUG_LOG = (..._args: unknown[]) => {}
 
 function formatTimestamp(iso: string): string {
   try {
@@ -42,18 +51,16 @@ function formatTimestamp(iso: string): string {
 }
 
 export default function AdminFeatureTogglesPage() {
+  const DEBUG_LOG = (..._args: unknown[]) => {}
   const { session } = useAuth()
   const { hasPermission, loading: permissionsLoading } = usePermissions()
   const router = useRouter()
   const toast = useToast()
   const [flags, setFlags] = useState<FeatureFlag[]>([])
-  const [filteredFlags, setFilteredFlags] = useState<FeatureFlag[]>([])
   const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
   const [searchInput, setSearchInput] = useState('')
   const [showCreateModal, setShowCreateModal] = useState(false)
-  const [editingFlag, setEditingFlag] = useState<FeatureFlag | null>(null)
-  const [deletingFlag, setDeletingFlag] = useState<FeatureFlag | null>(null)
+  const [createPrefill, setCreatePrefill] = useState<{ name: string; displayName: string; description: string } | null>(null)
   const [togglingId, setTogglingId] = useState<string | null>(null)
   const isDevelopment =
     typeof window !== 'undefined' && window.location.hostname === 'localhost'
@@ -68,6 +75,9 @@ export default function AdminFeatureTogglesPage() {
     hasPermission('user_manage') ||
     (isDevelopment && (permissionTimeout || !permissionsLoading))
 
+  const hasLoadedOnce = useRef(false)
+  const fetchFlagsRef = useRef<() => Promise<void>>(() => Promise.resolve())
+
   useEffect(() => {
     if (!permissionsLoading && !isAdmin && session) {
       const t = setTimeout(() => router.push('/'), 2000)
@@ -77,7 +87,7 @@ export default function AdminFeatureTogglesPage() {
 
   const fetchFlags = useCallback(async () => {
     if (!session?.access_token) return
-    setLoading(true)
+    setLoading((prev) => (hasLoadedOnce.current ? prev : true))
     try {
       const url = getApiUrl('/api/features?list_all=true')
       const res = await fetch(url, {
@@ -85,22 +95,27 @@ export default function AdminFeatureTogglesPage() {
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
-      setFlags((data?.flags ?? []) as FeatureFlag[])
+      const next = (data?.flags ?? []) as FeatureFlag[]
+      setFlags(next)
+      hasLoadedOnce.current = true
     } catch (err) {
-      toast.addToast({
-        type: 'error',
-        title: 'Failed to load feature flags',
-        message: err instanceof Error ? err.message : String(err),
-      })
+      toast.error(
+        'Failed to load feature flags',
+        err instanceof Error ? err.message : String(err)
+      )
       setFlags([])
+      hasLoadedOnce.current = true
     } finally {
       setLoading(false)
     }
   }, [session?.access_token, toast])
 
+  fetchFlagsRef.current = fetchFlags
   useEffect(() => {
-    if (session && isAdmin) fetchFlags()
-  }, [session, isAdmin, fetchFlags])
+    if (session && isAdmin) {
+      fetchFlagsRef.current()
+    }
+  }, [session, isAdmin])
 
   useEffect(() => {
     const channel = supabase.channel('feature_flags_changes')
@@ -124,12 +139,42 @@ export default function AdminFeatureTogglesPage() {
     }
   }, [])
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setFilteredFlags(filterFlagsBySearch(flags, searchInput))
-    }, SEARCH_DEBOUNCE_MS)
-    return () => clearTimeout(t)
-  }, [searchInput, flags])
+  const mergedFlags: FlagRow[] = useMemo(() => {
+    const byName = new Map<string, FeatureFlag>()
+    for (const f of flags) {
+      if (f.organization_id == null) byName.set(f.name, f)
+    }
+    const rows: FlagRow[] = []
+    for (const pre of PREDEFINED_FEATURE_FLAGS) {
+      const existing = byName.get(pre.name)
+      if (existing) {
+        // Merge database flag with predefined metadata
+        rows.push({
+          ...existing,
+          displayName: pre.displayName,
+          description: pre.description
+        })
+      } else {
+        // Placeholder for predefined flag not in database
+        rows.push({
+          id: '',
+          name: pre.name,
+          displayName: pre.displayName,
+          description: pre.description,
+          enabled: false,
+          organization_id: null,
+          created_at: '',
+          updated_at: ''
+        })
+      }
+    }
+    return rows
+  }, [flags])
+
+  const filteredFlags = useMemo(
+    () => filterFlagsBySearch(mergedFlags, searchInput),
+    [mergedFlags, searchInput]
+  )
 
   const toggleEnabled = useCallback(
     async (flag: FeatureFlag) => {
@@ -157,16 +202,12 @@ export default function AdminFeatureTogglesPage() {
         setFlags((prev) =>
           prev.map((f) => (f.id === flag.id ? updated : f))
         )
-        toast.addToast({
-          type: 'success',
-          title: updated.enabled ? 'Flag enabled' : 'Flag disabled',
-        })
+        toast.success(updated.enabled ? 'Flag enabled' : 'Flag disabled')
       } catch (err) {
-        toast.addToast({
-          type: 'error',
-          title: 'Failed to update flag',
-          message: err instanceof Error ? err.message : String(err),
-        })
+        toast.error(
+          'Failed to update flag',
+          err instanceof Error ? err.message : String(err)
+        )
       } finally {
         setTogglingId(null)
       }
@@ -174,38 +215,8 @@ export default function AdminFeatureTogglesPage() {
     [session?.access_token, toast]
   )
 
-  const deleteFlag = useCallback(
-    async (flag: FeatureFlag) => {
-      if (!session?.access_token || !window.confirm(`Delete flag "${flag.name}"?`))
-        return
-      setDeletingFlag(flag)
-      try {
-        const url = getApiUrl(`/api/features/${encodeURIComponent(flag.name)}`)
-        const orgParam =
-          flag.organization_id != null
-            ? `?organization_id=${encodeURIComponent(flag.organization_id)}`
-            : ''
-        const res = await fetch(url + orgParam, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${session.access_token}` },
-        })
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        setFlags((prev) => prev.filter((f) => f.id !== flag.id))
-        toast.addToast({ type: 'success', title: 'Flag deleted' })
-      } catch (err) {
-        toast.addToast({
-          type: 'error',
-          title: 'Failed to delete flag',
-          message: err instanceof Error ? err.message : String(err),
-        })
-      } finally {
-        setDeletingFlag(null)
-      }
-    },
-    [session?.access_token, toast]
-  )
-
-  if (loading && flags.length === 0) {
+  const showSpinner = loading && flags.length === 0
+  if (showSpinner) {
     return (
       <AppLayout>
         <div className="flex h-64 items-center justify-center">
@@ -217,7 +228,7 @@ export default function AdminFeatureTogglesPage() {
 
   return (
     <AppLayout>
-      <div className="mx-auto max-w-5xl p-6" data-testid="admin-feature-toggles-page">
+      <div className="mx-auto max-w-7xl p-6" data-testid="admin-feature-toggles-page">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link
@@ -228,21 +239,12 @@ export default function AdminFeatureTogglesPage() {
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Feature toggles</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Feature Management</h1>
               <p className="text-sm text-gray-600">
-                Enable or disable features globally or per organization
+                Enable or disable predefined application features
               </p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-            data-testid="admin-feature-toggles-add"
-          >
-            <Plus className="h-4 w-4" />
-            Add new flag
-          </button>
         </div>
 
         <div className="relative mb-6">
@@ -259,87 +261,88 @@ export default function AdminFeatureTogglesPage() {
           />
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                  <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                   Name
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                   Description
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                   Scope
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                   Enabled
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                   Updated
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
-              {filteredFlags.map((flag) => (
-                <tr key={flag.id} className="hover:bg-gray-50">
-                  <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">
-                    {flag.name}
-                  </td>
-                  <td className="max-w-xs truncate px-4 py-3 text-sm text-gray-600">
-                    {flag.description ?? '—'}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-600">
-                    {flag.organization_id == null ? 'Global' : 'Organization'}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3">
-                    <button
-                      type="button"
-                      onClick={() => toggleEnabled(flag)}
-                      disabled={togglingId === flag.id}
-                      className="focus:outline-none"
-                      aria-label={flag.enabled ? 'Disable' : 'Enable'}
-                    >
-                      {togglingId === flag.id ? (
-                        <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-                      ) : flag.enabled ? (
-                        <ToggleRight className="h-6 w-6 text-green-600" />
+              {filteredFlags.map((flag) => {
+                const placeholder = isPlaceholder(flag)
+                  return (
+                    <tr key={placeholder ? `predefined-${flag.name}` : flag.id} className="hover:bg-gray-50">
+                    <td className="whitespace-nowrap px-6 py-3 text-sm font-medium text-gray-900">
+                      {'displayName' in flag ? flag.displayName : flag.name}
+                    </td>
+                    <td className="max-w-md px-6 py-3 text-sm text-gray-600 leading-relaxed">
+                      {'displayName' in flag ? flag.description : (flag.description ?? '—')}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-3 text-sm text-gray-600">
+                      {flag.organization_id == null ? 'Global' : 'Organization'}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-3">
+                      {placeholder ? (
+                        <span className="text-gray-400 text-xs">Not in DB</span>
                       ) : (
-                        <ToggleLeft className="h-6 w-6 text-gray-400" />
+                        <button
+                          type="button"
+                          onClick={() => toggleEnabled(flag)}
+                          disabled={togglingId === flag.id}
+                          className="focus:outline-none hover:bg-gray-50 rounded p-1 transition-colors"
+                          aria-label={flag.enabled ? 'Disable' : 'Enable'}
+                        >
+                          {togglingId === flag.id ? (
+                            <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                          ) : flag.enabled ? (
+                            <ToggleRight className="h-6 w-6 text-green-600" />
+                          ) : (
+                            <ToggleLeft className="h-6 w-6 text-gray-400" />
+                          )}
+                        </button>
                       )}
-                    </button>
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
-                    {formatTimestamp(flag.updated_at)}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-right">
-                    <button
-                      type="button"
-                      onClick={() => setEditingFlag(flag)}
-                      className="rounded p-2 text-gray-600 hover:bg-gray-200"
-                      aria-label="Edit"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => deleteFlag(flag)}
-                      disabled={deletingFlag?.id === flag.id}
-                      className="rounded p-2 text-red-600 hover:bg-red-50 disabled:opacity-50"
-                      aria-label="Delete"
-                    >
-                      {deletingFlag?.id === flag.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-3 text-sm text-gray-500">
+                      {placeholder ? '—' : formatTimestamp(flag.updated_at)}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-3 text-right">
+                      {placeholder ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCreatePrefill({ name: flag.name, displayName: 'displayName' in flag ? flag.displayName : flag.name, description: flag.description })
+                            setShowCreateModal(true)
+                          }}
+                          className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                          data-testid="admin-feature-toggles-enable-predefined"
+                        >
+                          Enable
+                        </button>
                       ) : (
-                        <Trash2 className="h-4 w-4" />
+                        <span className="text-xs text-gray-400">—</span>
                       )}
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
           {filteredFlags.length === 0 && (
@@ -352,23 +355,17 @@ export default function AdminFeatureTogglesPage() {
         </div>
       </div>
 
-      {showCreateModal && (
+      {showCreateModal && createPrefill && (
         <FeatureFlagModal
-          onClose={() => setShowCreateModal(false)}
+          key={`create-${createPrefill.name}`}
+          prefill={createPrefill}
+          onClose={() => {
+            setShowCreateModal(false)
+            setCreatePrefill(null)
+          }}
           onSuccess={() => {
             setShowCreateModal(false)
-            fetchFlags()
-          }}
-          session={session}
-          toast={toast}
-        />
-      )}
-      {editingFlag && (
-        <FeatureFlagModal
-          initial={editingFlag}
-          onClose={() => setEditingFlag(null)}
-          onSuccess={() => {
-            setEditingFlag(null)
+            setCreatePrefill(null)
             fetchFlags()
           }}
           session={session}
@@ -380,81 +377,61 @@ export default function AdminFeatureTogglesPage() {
 }
 
 function FeatureFlagModal({
-  initial,
+  prefill,
   onClose,
   onSuccess,
   session,
   toast,
 }: {
-  initial?: FeatureFlag
+  prefill: { name: string; displayName: string; description: string }
   onClose: () => void
   onSuccess: () => void
   session: { access_token?: string } | null
-  toast: { addToast: (t: { type: string; title: string; message?: string }) => void }
+  toast: {
+    success: (title: string, message?: string) => void
+    error: (title: string, message?: string) => void
+    warning: (title: string, message?: string) => void
+    info: (title: string, message?: string) => void
+    custom: (toast: any) => void
+    remove: (id: string) => void
+    clear: () => void
+  }
 }) {
-  const isEdit = !!initial
-  const [name, setName] = useState(initial?.name ?? '')
-  const [description, setDescription] = useState(initial?.description ?? '')
-  const [enabled, setEnabled] = useState(initial?.enabled ?? false)
+  const [name, setName] = useState(prefill.name)
+  const [displayName, setDisplayName] = useState(prefill.displayName)
+  const [description, setDescription] = useState(prefill.description)
+  const [enabled, setEnabled] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [validationError, setValidationError] = useState<string | null>(null)
-
-  const validateName = (v: string) =>
-    /^[a-zA-Z0-9_-]+$/.test(v) ? null : 'Name: only letters, numbers, underscore, hyphen'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const err = isEdit ? null : validateName(name)
-    setValidationError(err ?? null)
-    if (err || !session?.access_token) return
+    if (!session?.access_token) return
     setSaving(true)
     try {
-      if (isEdit) {
-        const url = getApiUrl(`/api/features/${encodeURIComponent(initial!.name)}`)
-        const orgParam =
-          initial!.organization_id != null
-            ? `?organization_id=${encodeURIComponent(initial!.organization_id)}`
-            : ''
-        const res = await fetch(url + orgParam, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({ description: description || undefined, enabled }),
-        })
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}))
-          throw new Error(data?.detail || `HTTP ${res.status}`)
-        }
-        toast.addToast({ type: 'success', title: 'Flag updated' })
-      } else {
-        const res = await fetch(getApiUrl('/api/features'), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            name: name.trim(),
-            description: description || undefined,
-            enabled,
-            organization_id: null,
-          }),
-        })
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}))
-          throw new Error(data?.detail || `HTTP ${res.status}`)
-        }
-        toast.addToast({ type: 'success', title: 'Flag created' })
+      const res = await fetch(getApiUrl('/api/features'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          name: name.trim(),
+          description: description || undefined,
+          enabled,
+          organization_id: null,
+        }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data?.detail || `HTTP ${res.status}`)
       }
+      toast.success('Feature flag enabled')
       onSuccess()
     } catch (err) {
-      toast.addToast({
-        type: 'error',
-        title: isEdit ? 'Failed to update flag' : 'Failed to create flag',
-        message: err instanceof Error ? err.message : String(err),
-      })
+      toast.error(
+        'Failed to enable feature flag',
+        err instanceof Error ? err.message : String(err)
+      )
     } finally {
       setSaving(false)
     }
@@ -464,30 +441,25 @@ function FeatureFlagModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-lg">
         <h2 className="mb-4 text-lg font-semibold text-gray-900">
-          {isEdit ? 'Edit flag' : 'Add new flag'}
+          Enable Feature Flag
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <label className="block text-sm font-medium text-gray-700">Feature</label>
             <input
               type="text"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value)
-                if (!isEdit) setValidationError(validateName(e.target.value))
-              }}
-              disabled={isEdit}
+              value={displayName}
+              disabled
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:bg-gray-100"
             />
-            {validationError && <p className="mt-1 text-sm text-red-600">{validationError}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Description</label>
             <textarea
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={2}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              disabled
+              rows={3}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:bg-gray-100"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -499,7 +471,7 @@ function FeatureFlagModal({
               className="h-4 w-4 rounded border-gray-300 text-blue-600"
             />
             <label htmlFor="modal-enabled" className="text-sm font-medium text-gray-700">
-              Enabled
+              Enable this feature
             </label>
           </div>
           <div className="flex justify-end gap-2 pt-2">
@@ -512,10 +484,10 @@ function FeatureFlagModal({
             </button>
             <button
               type="submit"
-              disabled={saving || (!isEdit && !name.trim())}
+              disabled={saving}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              {saving ? 'Saving…' : isEdit ? 'Update' : 'Create'}
+              {saving ? 'Enabling…' : 'Enable Feature'}
             </button>
           </div>
         </form>

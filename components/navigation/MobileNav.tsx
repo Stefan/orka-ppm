@@ -16,7 +16,8 @@ import {
   MessageSquare,
   Activity,
   UserCog,
-  Layers
+  Layers,
+  Shield
 } from 'lucide-react'
 
 export interface MobileNavProps {
@@ -25,18 +26,32 @@ export interface MobileNavProps {
 }
 
 const NAV_ITEMS = [
-  { href: '/dashboards', label: 'Portfolio Dashboards', icon: LayoutDashboard },
-  { href: '/scenarios', label: 'What-If Scenarios', icon: GitBranch },
-  { href: '/resources', label: 'Resource Management', icon: Users },
-  { href: '/reports', label: 'AI Reports & Analytics', icon: FileText },
-  { href: '/financials', label: 'Financial Tracking', icon: DollarSign },
-  { href: '/risks', label: 'Risk/Issue Registers', icon: AlertTriangle },
-  { href: '/monte-carlo', label: 'Monte Carlo Analysis', icon: BarChart3 },
-  { href: '/changes', label: 'Change Management', icon: GitPullRequest },
-  { href: '/feedback', label: 'Feedback & Ideas', icon: MessageSquare },
-  { href: '/features', label: 'Features Overview', icon: Layers },
-  { href: '/admin/performance', label: 'Performance Monitor', icon: Activity },
-  { href: '/admin/users', label: 'User Management', icon: UserCog },
+  // Overview
+  { href: '/dashboards', label: 'Portfolio Dashboards', icon: LayoutDashboard, group: 'Overview' },
+
+  // Projects & Resources
+  { href: '/projects', label: 'All Projects', icon: GitBranch, group: 'Projects' },
+  { href: '/resources', label: 'Resource Management', icon: Users, group: 'Projects' },
+
+  // Financial Management
+  { href: '/financials', label: 'Budget & Cost Tracking', icon: DollarSign, group: 'Financials' },
+  { href: '/reports', label: 'Reports & Analytics', icon: FileText, group: 'Financials' },
+
+  // Risk & Analysis
+  { href: '/risks', label: 'Risk Management', icon: AlertTriangle, group: 'Analysis' },
+  { href: '/scenarios', label: 'What-If Scenarios', icon: GitBranch, group: 'Analysis' },
+  { href: '/monte-carlo', label: 'Monte Carlo Analysis', icon: BarChart3, group: 'Analysis' },
+  { href: '/audit', label: 'Audit Trail', icon: FileText, group: 'Analysis' },
+
+  // Change & Feedback
+  { href: '/changes', label: 'Change Management', icon: GitPullRequest, group: 'Management' },
+  { href: '/feedback', label: 'Feedback & Ideas', icon: MessageSquare, group: 'Management' },
+  { href: '/features', label: 'Features Overview', icon: Layers, group: 'Management' },
+
+  // Administration
+  { href: '/admin', label: 'System Admin', icon: Shield, group: 'Admin' },
+  { href: '/admin/performance', label: 'Performance Monitor', icon: Activity, group: 'Admin' },
+  { href: '/admin/users', label: 'User Management', icon: UserCog, group: 'Admin' },
 ]
 
 export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
@@ -110,31 +125,48 @@ export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
 
         {/* Navigation Links */}
         <nav data-testid="mobile-nav-links" className="p-3">
-          <ul className="space-y-1">
-            {NAV_ITEMS.map((item) => {
-              const Icon = item.icon
-              const isActive = pathname === item.href
-              
-              return (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    onClick={onClose}
-                    className={`
-                      flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all
-                      ${isActive 
-                        ? 'bg-blue-50 text-blue-700 font-medium' 
-                        : 'text-gray-900 hover:bg-gray-50'
-                      }
-                    `}
-                  >
-                    <Icon className="h-5 w-5 flex-shrink-0" />
-                    <span className="text-sm">{item.label}</span>
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
+          {(() => {
+            // Group items by their group property
+            const groups = NAV_ITEMS.reduce((acc, item) => {
+              const group = item.group || 'Other'
+              if (!acc[group]) acc[group] = []
+              acc[group].push(item)
+              return acc
+            }, {} as Record<string, typeof NAV_ITEMS>)
+
+            return Object.entries(groups).map(([groupName, items]) => (
+              <div key={groupName} className="mb-6">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-2">
+                  {groupName}
+                </h3>
+                <ul className="space-y-1">
+                  {items.map((item) => {
+                    const Icon = item.icon
+                    const isActive = pathname === item.href
+
+                    return (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          onClick={onClose}
+                          className={`
+                            flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all
+                            ${isActive
+                              ? 'bg-blue-50 text-blue-700 font-medium'
+                              : 'text-gray-900 hover:bg-gray-50'
+                            }
+                          `}
+                        >
+                          <Icon className="h-5 w-5 flex-shrink-0" />
+                          <span className="text-sm">{item.label}</span>
+                        </Link>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            ))
+          })()}
         </nav>
       </div>
     </>

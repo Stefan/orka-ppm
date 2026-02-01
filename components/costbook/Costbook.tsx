@@ -5,6 +5,7 @@ import { Layers } from 'lucide-react'
 import { ProjectWithFinancials, Currency, KPIMetrics } from '@/types/costbook'
 import { calculateKPIs } from '@/lib/costbook-calculations'
 import { convertCurrency } from '@/lib/currency-utils'
+import { useFeatureFlag } from '@/contexts/FeatureFlagContext'
 import {
   getMockProjectsWithFinancials,
   fetchProjectsWithFinancials
@@ -101,6 +102,10 @@ function CostbookInner({
   className = '',
   'data-testid': testId = 'costbook'
 }: CostbookProps) {
+  // Feature flag checks
+  const { enabled: anomalyDetectionEnabled } = useFeatureFlag('ai_anomaly_detection')
+  const { enabled: costbookPhase2Enabled } = useFeatureFlag('costbook_phase2')
+
   // State
   const [projects, setProjects] = useState<ProjectWithFinancials[]>([])
   const [anomalies, setAnomalies] = useState<AnomalyResult[]>([])
@@ -710,8 +715,8 @@ function CostbookInner({
                   onProjectSelect={handleProjectClick}
                   viewMode={viewMode}
                   searchTerm={searchTerm}
-                  anomalies={anomalies}
-                  onAnomalyClick={handleAnomalyClick}
+                  anomalies={anomalyDetectionEnabled ? anomalies : []}
+                  onAnomalyClick={anomalyDetectionEnabled ? handleAnomalyClick : undefined}
                   commentCounts={commentCounts}
                   onCommentsClick={handleCommentsClick}
                 />
@@ -841,7 +846,7 @@ function CostbookInner({
         onVendorScore={() => console.log('Vendor Score - Phase 3')}
         onSettings={handleSettings}
         onExport={handleExport}
-        currentPhase={1}
+        currentPhase={costbookPhase2Enabled ? 2 : 1}
         className="flex-shrink-0 mt-3"
       />
 
@@ -870,7 +875,7 @@ function CostbookInner({
       />
 
       {/* Anomaly Detail Dialog */}
-      {showAnomalyDialog && selectedAnomaly && (
+      {anomalyDetectionEnabled && showAnomalyDialog && selectedAnomaly && (
         <AnomalyDetailDialog
           anomaly={selectedAnomaly}
           projectName={projects.find(p => p.id === selectedAnomaly.projectId)?.name}
@@ -913,7 +918,7 @@ function CostbookInner({
       />
 
       {/* Distribution Settings Dialog (Phase 2) */}
-      {showDistributionDialog && selectedProjectId && (() => {
+      {costbookPhase2Enabled && showDistributionDialog && selectedProjectId && (() => {
         const project = projects.find(p => p.id === selectedProjectId)
         if (!project) return null
         
@@ -936,8 +941,8 @@ function CostbookInner({
         )
       })()}
 
-      {/* Distribution Rules Panel (Phase 3) */}
-      {showDistributionRules && (
+      {/* Distribution Rules Panel (Phase 2) */}
+      {costbookPhase2Enabled && showDistributionRules && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">

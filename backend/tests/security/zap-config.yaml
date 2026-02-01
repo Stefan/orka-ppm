@@ -1,0 +1,12 @@
+# OWASP ZAP DAST configuration - Enterprise Test Strategy Task 8.2
+# Requirements: 10.3
+# Use: zap-baseline.py -t http://localhost:3000 -c zap-config.yaml
+
+env:
+  config:
+    failOnWarn: true
+    failOnHigh: true
+    progressToStdout: true
+  report:
+    title: "ORKA PPM Baseline Scan"
+    template: "traditional-html-plus"

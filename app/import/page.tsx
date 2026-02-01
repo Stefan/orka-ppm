@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import AppLayout from '../../components/shared/AppLayout'
 import { Upload, FileText, Database, DollarSign } from 'lucide-react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
+import { useFeatureFlag } from '@/contexts/FeatureFlagContext'
+import { useRouter } from 'next/navigation'
 
 type EntityType = 'projects' | 'resources' | 'financials'
 
@@ -24,6 +26,16 @@ interface ImportResult {
 
 export default function ImportPage() {
   const { session } = useAuth()
+  const router = useRouter()
+  const { enabled: importEnabled } = useFeatureFlag('import_builder_ai')
+
+  // Redirect if feature is disabled
+  useEffect(() => {
+    if (!importEnabled) {
+      router.push('/')
+    }
+  }, [importEnabled, router])
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [entityType, setEntityType] = useState<EntityType>('projects')
   const [uploading, setUploading] = useState(false)

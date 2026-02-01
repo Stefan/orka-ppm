@@ -1,0 +1,17 @@
+# Example: test database isolation configuration
+# Enterprise Test Strategy - Task 3.3
+# Copy to conftest.py or merge into backend/tests/conftest.py
+# Requirements: 6.4, 18.5
+
+# Use separate test database via env:
+# export TEST_DATABASE_URL=postgresql://...test
+# In conftest.py:
+# @pytest.fixture(scope="session")
+# def test_db_url():
+#     return os.getenv("TEST_DATABASE_URL", os.getenv("SUPABASE_URL"))
+#
+# @pytest.fixture(autouse=True)
+# def cleanup_after_test():
+#     yield
+#     # Teardown: truncate test tables or rollback transaction
+#     pass

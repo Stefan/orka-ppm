@@ -1,0 +1,17 @@
+# Per-module coverage - Enterprise Test Strategy Task 22.5
+# Requirements: 4.7
+# Critical modules (auth, payments) can require 90%
+
+[run]
+source = backend
+branch = True
+omit = */tests/*, */migrations/*, */venv/*
+
+[report]
+fail_under = 80
+exclude_lines = pragma: no cover
+
+[report:critical]
+# Example: auth module 90%
+# [report:auth]
+# fail_under = 90
