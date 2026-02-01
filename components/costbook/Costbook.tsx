@@ -44,14 +44,18 @@ import { RecommendationsPanel, RecommendationsBadge } from './RecommendationsPan
 import { RecommendationDetail } from './RecommendationDetail'
 import { PerformanceDialog, PerformanceMetrics } from './PerformanceDialog'
 import { HelpDialog } from './HelpDialog'
+import { CommentsPanel } from './CommentsPanel'
 import { CSVImportDialog } from './CSVImportDialog'
 import { MobileAccordion, AccordionSection } from './MobileAccordion'
 import { HierarchyTreeView, ViewType as HierarchyViewType } from './HierarchyTreeView'
 import { VirtualizedTransactionTable } from './VirtualizedTransactionTable'
 import { CollapsiblePanel } from './CollapsiblePanel'
+import { DistributionSettingsDialog } from './DistributionSettingsDialog'
+import { DistributionRulesPanel } from './DistributionRulesPanel'
 import { buildCESHierarchy, buildWBSHierarchy } from '@/lib/costbook/hierarchy-builders'
 import { getMockTransactions, TransactionFilters as TxFilters, filterTransactions, sortTransactions, TransactionSortField, SortDirection } from '@/lib/costbook/transaction-queries'
-import { CSVImportResult, Commitment, Actual, HierarchyNode, Transaction } from '@/types/costbook'
+import { fetchCommentsCountBatch } from '@/lib/comments-service'
+import { CSVImportResult, Commitment, Actual, HierarchyNode, Transaction, DistributionSettings, DistributionRule } from '@/types/costbook'
 
 export interface CostbookProps {
   /** Use mock data instead of fetching from Supabase */
@@ -98,11 +102,21 @@ function CostbookInner({
   const [showCSVImportDialog, setShowCSVImportDialog] = useState(false)
   const [showAnomalyDialog, setShowAnomalyDialog] = useState(false)
   const [selectedAnomaly, setSelectedAnomaly] = useState<AnomalyResult | null>(null)
+  const [showDistributionDialog, setShowDistributionDialog] = useState(false)
+  const [showDistributionRules, setShowDistributionRules] = useState(false)
+  
+  // Distribution state (Phase 2 & 3)
+  const [distributionSettings, setDistributionSettings] = useState<Map<string, DistributionSettings>>(new Map())
+  const [distributionRules, setDistributionRules] = useState<DistributionRule[]>([])
   
   // Recommendations state
   const [recommendations, setRecommendations] = useState<EnhancedRecommendation[]>([])
   const [showRecommendationDetail, setShowRecommendationDetail] = useState(false)
   const [selectedRecommendation, setSelectedRecommendation] = useState<EnhancedRecommendation | null>(null)
+
+  // Comments state (Phase 3)
+  const [commentsPanelProjectId, setCommentsPanelProjectId] = useState<string | null>(null)
+  const [commentCounts, setCommentCounts] = useState<Map<string, number>>(new Map())
 
   // Performance tracking
   const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetrics>({
@@ -257,6 +271,20 @@ function CostbookInner({
     return filtered
   }, [convertedProjects, filterCriteria])
 
+  // Fetch comment counts when projects change (Phase 3)
+  const projectIdsKey = useMemo(
+    () => filteredProjects.map(p => p.id).sort().join(','),
+    [filteredProjects]
+  )
+  useEffect(() => {
+    if (filteredProjects.length === 0) {
+      setCommentCounts(new Map())
+      return
+    }
+    const projectIds = filteredProjects.map(p => p.id)
+    fetchCommentsCountBatch(projectIds).then(setCommentCounts).catch(() => setCommentCounts(new Map()))
+  }, [projectIdsKey, filteredProjects.length])
+
   // Calculate KPIs from filtered projects
   const kpis = useMemo(() => {
     return calculateKPIs(filteredProjects)
@@ -277,6 +305,10 @@ function CostbookInner({
       onProjectSelect(project)
     }
   }, [onProjectSelect])
+
+  const handleCommentsClick = useCallback((projectId: string) => {
+    setCommentsPanelProjectId(projectId)
+  }, [])
 
   const handleSearch = useCallback((term: string) => {
     setSearchTerm(term)
@@ -419,6 +451,80 @@ function CostbookInner({
     console.log('Selected hierarchy node:', node.label, node.total)
   }, [])
 
+  // Distribution handlers (Phase 2 & 3)
+  const handleDistributionSettings = useCallback((projectId: string) => {
+    setSelectedProjectId(projectId)
+    setShowDistributionDialog(true)
+  }, [])
+
+  const handleApplyDistribution = useCallback((settings: DistributionSettings) => {
+    if (selectedProjectId) {
+      // Save distribution settings for this project
+      setDistributionSettings(prev => {
+        const updated = new Map(prev)
+        updated.set(selectedProjectId, settings)
+        return updated
+      })
+      console.log('Applied distribution settings for project:', selectedProjectId, settings)
+      // In real app: API call to save settings
+    }
+    setShowDistributionDialog(false)
+  }, [selectedProjectId])
+
+  const handleCreateRule = useCallback((rule: Omit<DistributionRule, 'id' | 'created_at' | 'last_applied' | 'application_count'>) => {
+    const newRule: DistributionRule = {
+      ...rule,
+      id: `rule-${Date.now()}`,
+      created_at: new Date().toISOString(),
+      last_applied: '',
+      application_count: 0
+    }
+    setDistributionRules(prev => [...prev, newRule])
+    console.log('Created distribution rule:', newRule)
+    // In real app: API call to create rule
+  }, [])
+
+  const handleUpdateRule = useCallback((ruleId: string, updates: Partial<DistributionRule>) => {
+    setDistributionRules(prev => 
+      prev.map(rule => rule.id === ruleId ? { ...rule, ...updates } : rule)
+    )
+    console.log('Updated distribution rule:', ruleId, updates)
+    // In real app: API call to update rule
+  }, [])
+
+  const handleDeleteRule = useCallback((ruleId: string) => {
+    setDistributionRules(prev => prev.filter(rule => rule.id !== ruleId))
+    console.log('Deleted distribution rule:', ruleId)
+    // In real app: API call to delete rule
+  }, [])
+
+  const handleApplyRule = useCallback((ruleId: string, projectIds: string[]) => {
+    const rule = distributionRules.find(r => r.id === ruleId)
+    if (!rule) return
+
+    // Apply rule to projects
+    const targetProjects = projectIds.length > 0 
+      ? projects.filter(p => projectIds.includes(p.id))
+      : projects // Apply to all if no specific projects
+
+    targetProjects.forEach(project => {
+      setDistributionSettings(prev => {
+        const updated = new Map(prev)
+        updated.set(project.id, rule.settings)
+        return updated
+      })
+    })
+
+    // Update rule application count
+    handleUpdateRule(ruleId, {
+      last_applied: new Date().toISOString(),
+      application_count: rule.application_count + 1
+    })
+
+    console.log('Applied distribution rule to projects:', ruleId, targetProjects.length)
+    // In real app: API call to apply rule
+  }, [distributionRules, projects, handleUpdateRule])
+
   // Render mobile layout
   if (isMobile) {
     return (
@@ -467,6 +573,8 @@ function CostbookInner({
                 viewMode="list"
                 searchTerm={searchTerm}
                 isLoading={isLoading}
+                commentCounts={commentCounts}
+                onCommentsClick={handleCommentsClick}
               />
             )}
           </section>
@@ -584,6 +692,8 @@ function CostbookInner({
                   searchTerm={searchTerm}
                   anomalies={anomalies}
                   onAnomalyClick={handleAnomalyClick}
+                  commentCounts={commentCounts}
+                  onCommentsClick={handleCommentsClick}
                 />
               )}
             </div>
@@ -707,7 +817,7 @@ function CostbookInner({
         onReports={handleReports}
         onPOBreakdown={handlePOBreakdown}
         onCSVImport={handleCSVImport}
-        onForecast={() => console.log('Forecast - Phase 2')}
+        onForecast={() => setShowDistributionRules(true)} // Open Distribution Rules
         onVendorScore={() => console.log('Vendor Score - Phase 3')}
         onSettings={handleSettings}
         onExport={handleExport}
@@ -755,6 +865,19 @@ function CostbookInner({
         />
       )}
 
+      {/* Comments Panel (Phase 3) */}
+      {commentsPanelProjectId && (
+        <CommentsPanel
+          projectId={commentsPanelProjectId}
+          projectName={filteredProjects.find(p => p.id === commentsPanelProjectId)?.name}
+          isOpen={!!commentsPanelProjectId}
+          onClose={() => setCommentsPanelProjectId(null)}
+          onCommentCountChange={(count) => {
+            setCommentCounts(prev => new Map(prev).set(commentsPanelProjectId, count))
+          }}
+        />
+      )}
+
       {/* Recommendation Detail Dialog */}
       <RecommendationDetail
         recommendation={selectedRecommendation}
@@ -768,6 +891,57 @@ function CostbookInner({
         onDefer={handleRecommendationDefer}
         data-testid="recommendation-detail-dialog"
       />
+
+      {/* Distribution Settings Dialog (Phase 2) */}
+      {showDistributionDialog && selectedProjectId && (() => {
+        const project = projects.find(p => p.id === selectedProjectId)
+        if (!project) return null
+        
+        return (
+          <DistributionSettingsDialog
+            isOpen={showDistributionDialog}
+            onClose={() => {
+              setShowDistributionDialog(false)
+              setSelectedProjectId(undefined)
+            }}
+            onApply={handleApplyDistribution}
+            projectBudget={project.budget}
+            projectStartDate={project.start_date}
+            projectEndDate={project.end_date}
+            currentSpend={project.total_commitments + project.total_actuals}
+            currency={selectedCurrency}
+            initialSettings={distributionSettings.get(selectedProjectId)}
+            data-testid="distribution-settings-dialog"
+          />
+        )
+      })()}
+
+      {/* Distribution Rules Panel (Phase 3) */}
+      {showDistributionRules && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900">Distribution Rules Manager</h2>
+              <button
+                onClick={() => setShowDistributionRules(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6">
+              <DistributionRulesPanel
+                rules={distributionRules}
+                onCreateRule={handleCreateRule}
+                onUpdateRule={handleUpdateRule}
+                onDeleteRule={handleDeleteRule}
+                onApplyRule={handleApplyRule}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

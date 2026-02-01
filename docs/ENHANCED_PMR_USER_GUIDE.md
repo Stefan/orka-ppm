@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Enhanced Project Monthly Report (PMR) feature provides AI-powered insights, real-time collaboration, and professional multi-format exports to create comprehensive project reports that are "3x better than Cora."
+The Enhanced Project Monthly Report (PMR) feature provides AI-powered insights, real-time collaboration, and professional multi-format exports to create comprehensive, enterprise-grade project reports.
 
 ## Table of Contents
 

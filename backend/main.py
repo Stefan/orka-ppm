@@ -48,6 +48,7 @@ from routers.rbac import router as rbac_router
 from routers.viewer_restrictions_router import router as viewer_restrictions_router
 from routers.imports import router as imports_router
 from routers.rundown import router as rundown_router
+from routers.features import router as features_router
 
 # Import performance tracking middleware
 from middleware.performance_tracker import PerformanceMiddleware, performance_tracker
@@ -215,6 +216,7 @@ app.include_router(rbac_router)
 app.include_router(viewer_restrictions_router)
 app.include_router(imports_router)
 app.include_router(rundown_router)
+app.include_router(features_router)
 
 # Add performance tracking middleware
 app.add_middleware(PerformanceMiddleware, tracker=performance_tracker)

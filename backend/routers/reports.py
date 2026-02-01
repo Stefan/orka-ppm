@@ -12,7 +12,7 @@ from config.database import supabase
 from auth.dependencies import get_current_user
 from auth.rbac import require_permission, Permission
 
-# Import Roche Construction services and models
+# Import Generic Construction services and models
 from services.generic_construction_services import GoogleSuiteReportGenerator
 from generic_construction_models import (
     ReportTemplateCreate, ReportTemplate, ReportConfig, ReportGenerationRequest, GeneratedReport,

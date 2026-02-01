@@ -1,7 +1,7 @@
 """
 Property-Based Tests for Change Management Workflow Integration
 
-Feature: roche-construction-ppm-features
+Feature: generic-construction-ppm-features
 Property 6: Change Management Workflow Integration
 
 Validates: Requirements 4.1, 4.2, 4.3, 4.5

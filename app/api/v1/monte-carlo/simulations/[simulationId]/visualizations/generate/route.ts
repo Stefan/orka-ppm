@@ -5,7 +5,13 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 
-const BACKEND_URL = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+function getBackendUrl(): string {
+  // In development, prefer local backend so the proxy hits the correct server
+  if (process.env.NODE_ENV === 'development') {
+    return process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+  }
+  return process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+}
 
 export async function POST(
   request: NextRequest,
@@ -14,44 +20,59 @@ export async function POST(
   try {
     const { simulationId } = await params
     const authHeader = request.headers.get('authorization')
-    const body = await request.json()
-    
+    let body: unknown = {}
+    try {
+      body = await request.json()
+    } catch {
+      // Optional body
+    }
+
     if (!authHeader) {
       return NextResponse.json(
         { error: 'Authorization header required' },
         { status: 401 }
       )
     }
-    
-    // Forward request to backend
-    const url = `${BACKEND_URL}/api/v1/monte-carlo/simulations/${simulationId}/visualizations/generate`
-    
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authHeader
-      },
-      body: JSON.stringify(body)
-    })
+
+    const backendUrl = getBackendUrl()
+    const url = `${backendUrl}/api/v1/monte-carlo/simulations/${simulationId}/visualizations/generate`
+
+    let response: Response
+    try {
+      response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': authHeader
+        },
+        body: JSON.stringify(body)
+      })
+    } catch (fetchError) {
+      console.error('Monte Carlo visualization: backend unreachable', fetchError)
+      return NextResponse.json(
+        {
+          detail: 'Visualization service unavailable. Start the backend (e.g. port 8000) or check BACKEND_URL.',
+          backend_url: backendUrl
+        },
+        { status: 503 }
+      )
+    }
 
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Backend Monte Carlo visualization error:', response.status, errorText)
-      console.error('Response headers:', Object.fromEntries(response.headers.entries()))
 
-      // Return the actual error from backend for debugging
+      let errorJson: Record<string, unknown>
       try {
-        const errorJson = JSON.parse(errorText)
-        console.error('Parsed error JSON:', errorJson)
-        return NextResponse.json(errorJson, { status: response.status })
-      } catch (parseError) {
-        console.error('Failed to parse error as JSON:', parseError)
-        return NextResponse.json(
-          { error: `Backend error: ${response.statusText}`, details: errorText },
-          { status: response.status }
-        )
+        errorJson = errorText ? JSON.parse(errorText) : {}
+      } catch {
+        errorJson = { detail: errorText || response.statusText || 'Not Found' }
       }
+      // Ensure 404 has a message the frontend can show
+      if (response.status === 404 && !errorJson.detail) {
+        errorJson.detail = 'Simulation results not found. Run a simulation first to generate charts.'
+      }
+      return NextResponse.json(errorJson, { status: response.status })
     }
 
     const data = await response.json()
@@ -59,7 +80,7 @@ export async function POST(
   } catch (error) {
     console.error('Error proxying Monte Carlo visualization request:', error)
     return NextResponse.json(
-      { error: 'Failed to generate visualization', details: error instanceof Error ? error.message : 'Unknown error' },
+      { detail: error instanceof Error ? error.message : 'Failed to generate visualization' },
       { status: 500 }
     )
   }

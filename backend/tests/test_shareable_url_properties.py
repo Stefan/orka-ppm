@@ -4,7 +4,7 @@ Property-Based Tests for Shareable URL System
 This module contains property-based tests using Hypothesis to validate
 universal correctness properties of the shareable URL system.
 
-Feature: roche-construction-ppm-features
+Feature: generic-construction-ppm-features
 Property 1: Shareable URL Security and Access Control
 Property 2: URL Expiration and Lifecycle Management
 """
@@ -90,7 +90,7 @@ def test_property1_generated_tokens_are_cryptographically_secure(url_data):
     3. It contains the embedded payload
     4. It includes a unique nonce for each generation
     
-    Feature: roche-construction-ppm-features, Property 1: Shareable URL Security and Access Control
+    Feature: generic-construction-ppm-features, Property 1: Shareable URL Security and Access Control
     Validates: Requirements 1.1, 1.2, 1.3, 9.1
     """
     # Setup
@@ -139,7 +139,7 @@ def test_property1_different_tokens_for_same_permissions(url_data):
     
     This ensures that tokens cannot be predicted or reused.
     
-    Feature: roche-construction-ppm-features, Property 1: Shareable URL Security and Access Control
+    Feature: generic-construction-ppm-features, Property 1: Shareable URL Security and Access Control
     Validates: Requirements 1.1, 1.2, 1.3, 9.1
     """
     # Setup
@@ -186,7 +186,7 @@ def test_property1_permissions_are_preserved_in_token(url_data):
     
     Test that permissions embedded in tokens are preserved exactly.
     
-    Feature: roche-construction-ppm-features, Property 1: Shareable URL Security and Access Control
+    Feature: generic-construction-ppm-features, Property 1: Shareable URL Security and Access Control
     Validates: Requirements 1.1, 1.2, 1.3, 9.1
     """
     # Setup
@@ -226,7 +226,7 @@ def test_property2_token_expiration_is_enforced(url_data):
     
     Test that token expiration is correctly embedded and can be checked.
     
-    Feature: roche-construction-ppm-features, Property 2: URL Expiration and Lifecycle Management
+    Feature: generic-construction-ppm-features, Property 2: URL Expiration and Lifecycle Management
     Validates: Requirements 1.4, 1.5, 9.5
     """
     # Setup
@@ -269,7 +269,7 @@ def test_property2_invalid_tokens_are_rejected(url_data):
     
     Test that invalid or malformed tokens are always rejected.
     
-    Feature: roche-construction-ppm-features, Property 2: URL Expiration and Lifecycle Management
+    Feature: generic-construction-ppm-features, Property 2: URL Expiration and Lifecycle Management
     Validates: Requirements 1.4, 1.5, 9.5
     """
     # Setup
@@ -298,7 +298,7 @@ def test_property2_token_contains_audit_information(url_data):
     
     Test that tokens contain necessary audit information (timestamp, nonce).
     
-    Feature: roche-construction-ppm-features, Property 2: URL Expiration and Lifecycle Management
+    Feature: generic-construction-ppm-features, Property 2: URL Expiration and Lifecycle Management
     Validates: Requirements 1.4, 1.5, 9.5
     """
     # Setup

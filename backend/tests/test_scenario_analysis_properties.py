@@ -4,7 +4,7 @@ Property-Based Tests for What-If Scenario Analysis System
 This module contains property-based tests using Hypothesis to validate
 universal correctness properties of the scenario analysis system.
 
-Feature: roche-construction-ppm-features
+Feature: generic-construction-ppm-features
 Property 5: Scenario Analysis Consistency
 """
 
@@ -120,7 +120,7 @@ def test_property5_timeline_impact_calculations_are_deterministic(project_data, 
     Test that timeline impact calculations are deterministic - running the same
     calculation multiple times with the same inputs produces identical results.
     
-    Feature: roche-construction-ppm-features, Property 5: Scenario Analysis Consistency
+    Feature: generic-construction-ppm-features, Property 5: Scenario Analysis Consistency
     Validates: Requirements 3.1, 3.2, 3.3, 3.4
     """
     # Setup
@@ -150,7 +150,7 @@ def test_property5_cost_impact_calculations_are_deterministic(project_data, chan
     
     Test that cost impact calculations are deterministic.
     
-    Feature: roche-construction-ppm-features, Property 5: Scenario Analysis Consistency
+    Feature: generic-construction-ppm-features, Property 5: Scenario Analysis Consistency
     Validates: Requirements 3.1, 3.2, 3.3, 3.4
     """
     # Setup
@@ -176,7 +176,7 @@ def test_property5_cost_change_percentage_is_mathematically_correct(project_data
     
     Test that cost change percentage is always calculated correctly.
     
-    Feature: roche-construction-ppm-features, Property 5: Scenario Analysis Consistency
+    Feature: generic-construction-ppm-features, Property 5: Scenario Analysis Consistency
     Validates: Requirements 3.1, 3.2, 3.3, 3.4
     """
     # Setup
@@ -204,7 +204,7 @@ def test_property5_duration_change_is_consistent_with_dates(project_data, change
     Test that duration change is always consistent with the difference between
     original and new durations.
     
-    Feature: roche-construction-ppm-features, Property 5: Scenario Analysis Consistency
+    Feature: generic-construction-ppm-features, Property 5: Scenario Analysis Consistency
     Validates: Requirements 3.1, 3.2, 3.3, 3.4
     """
     # Setup
@@ -229,7 +229,7 @@ def test_property5_resource_over_allocation_detection_is_correct(project_data, r
     
     Test that resources with allocation > 1.0 are correctly identified as over-allocated.
     
-    Feature: roche-construction-ppm-features, Property 5: Scenario Analysis Consistency
+    Feature: generic-construction-ppm-features, Property 5: Scenario Analysis Consistency
     Validates: Requirements 3.1, 3.2, 3.3, 3.4
     """
     # Setup
@@ -257,7 +257,7 @@ def test_property5_utilization_changes_match_input_allocations(project_data, res
     
     Test that utilization changes in the impact match the input resource allocations.
     
-    Feature: roche-construction-ppm-features, Property 5: Scenario Analysis Consistency
+    Feature: generic-construction-ppm-features, Property 5: Scenario Analysis Consistency
     Validates: Requirements 3.1, 3.2, 3.3, 3.4
     """
     # Setup
@@ -280,7 +280,7 @@ def test_property5_cost_change_sign_is_consistent(project_data, changes):
     Test that cost change sign is consistent with the relationship between
     original and new costs.
     
-    Feature: roche-construction-ppm-features, Property 5: Scenario Analysis Consistency
+    Feature: generic-construction-ppm-features, Property 5: Scenario Analysis Consistency
     Validates: Requirements 3.1, 3.2, 3.3, 3.4
     """
     # Setup
@@ -314,7 +314,7 @@ def test_property5_timeline_change_sign_is_consistent(project_data, changes):
     Test that timeline change sign is consistent with the relationship between
     original and new durations.
     
-    Feature: roche-construction-ppm-features, Property 5: Scenario Analysis Consistency
+    Feature: generic-construction-ppm-features, Property 5: Scenario Analysis Consistency
     Validates: Requirements 3.1, 3.2, 3.3, 3.4
     """
     # Setup
@@ -348,7 +348,7 @@ def test_property5_affected_categories_are_non_empty_when_changes_exist(project_
     
     Test that affected_categories list is non-empty when there are actual changes.
     
-    Feature: roche-construction-ppm-features, Property 5: Scenario Analysis Consistency
+    Feature: generic-construction-ppm-features, Property 5: Scenario Analysis Consistency
     Validates: Requirements 3.1, 3.2, 3.3, 3.4
     """
     # Setup
@@ -375,7 +375,7 @@ def test_property5_scenario_comparison_includes_all_scenarios(project_list):
     
     Test that scenario comparison includes all provided scenarios in the comparison matrix.
     
-    Feature: roche-construction-ppm-features, Property 5: Scenario Analysis Consistency
+    Feature: generic-construction-ppm-features, Property 5: Scenario Analysis Consistency
     Validates: Requirements 3.1, 3.2, 3.3, 3.4
     """
     # This test would require mocking the database, so we'll test the logic directly
@@ -394,7 +394,7 @@ def test_property5_critical_path_flag_is_boolean(project_data, changes):
     
     Test that critical_path_affected is always a boolean value.
     
-    Feature: roche-construction-ppm-features, Property 5: Scenario Analysis Consistency
+    Feature: generic-construction-ppm-features, Property 5: Scenario Analysis Consistency
     Validates: Requirements 3.1, 3.2, 3.3, 3.4
     """
     # Setup
@@ -420,7 +420,7 @@ def test_property5_impact_models_are_serializable(project_data, changes):
     
     Test that all impact models can be serialized to dictionaries.
     
-    Feature: roche-construction-ppm-features, Property 5: Scenario Analysis Consistency
+    Feature: generic-construction-ppm-features, Property 5: Scenario Analysis Consistency
     Validates: Requirements 3.1, 3.2, 3.3, 3.4
     """
     # Setup

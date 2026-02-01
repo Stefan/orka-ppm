@@ -177,9 +177,10 @@ class WebSocketOptimizer:
         # Initialize Redis for pub/sub if available
         if REDIS_AVAILABLE:
             try:
-                redis_url = redis_url or os.getenv("REDIS_URL", "redis://localhost:6379/0")
+                explicit_redis_url = redis_url or os.getenv("REDIS_URL")
+                effective_url = explicit_redis_url or "redis://localhost:6379/0"
                 self.redis_client = redis.from_url(
-                    redis_url,
+                    effective_url,
                     decode_responses=True,
                     socket_connect_timeout=5
                 )
@@ -187,7 +188,16 @@ class WebSocketOptimizer:
                 self.redis_enabled = True
                 logger.info("WebSocket optimizer initialized with Redis pub/sub")
             except Exception as e:
-                logger.warning(f"Redis not available for WebSocket optimization: {e}")
+                # Only warn if Redis was explicitly configured (expected but unavailable)
+                if explicit_redis_url:
+                    logger.warning(
+                        "Redis not available for WebSocket optimization: %s", e
+                    )
+                else:
+                    logger.debug(
+                        "Redis not available (not configured); WebSocket optimizer running without pub/sub: %s",
+                        e,
+                    )
         
         # Background tasks will be started when first needed
         self._background_tasks_started = False

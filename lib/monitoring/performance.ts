@@ -127,11 +127,6 @@ class PerformanceMonitor {
     this.metrics.push(metric)
     this.checkBudget(name, value)
 
-    // Log in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`🎯 Core Web Vital: ${name} = ${value.toFixed(2)}${name === 'CLS' ? '' : 'ms'} (${rating})`, metadata)
-    }
-
     // Send to analytics
     this.sendToAnalytics(metric)
   }
@@ -150,10 +145,8 @@ class PerformanceMonitor {
     if (!budget) return
 
     if (value > budget.budget) {
-      console.warn(`🚨 Performance Budget Exceeded: ${metricName} = ${value} (budget: ${budget.budget})`)
       this.recordMetric(`budget_exceeded_${metricName}`, value, 'custom', { budget: budget.budget })
     } else if (value > budget.warning) {
-      console.warn(`⚠️ Performance Budget Warning: ${metricName} = ${value} (warning: ${budget.warning})`)
       this.recordMetric(`budget_warning_${metricName}`, value, 'custom', { warning: budget.warning })
     }
   }
@@ -247,11 +240,6 @@ class PerformanceMonitor {
     // Check budget for custom metrics too
     if (type === 'custom') {
       this.checkBudget(name, value)
-    }
-
-    // Log in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`📊 Performance: ${name} = ${value.toFixed(2)}ms${rating ? ` (${rating})` : ''}`, metadata)
     }
 
     // Send to analytics in production

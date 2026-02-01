@@ -16,8 +16,8 @@ from uuid import UUID, uuid4
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-# Import models
-from backend.models.generic_construction import (
+# Import models (run from backend/ so use models.*)
+from models.generic_construction import (
     ShareableURLCreate,
     ShareablePermissions,
     SimulationCreate,

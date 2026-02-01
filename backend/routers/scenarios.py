@@ -2,12 +2,16 @@
 What-If Scenario Analysis endpoints (Generic Construction feature)
 """
 
+import logging
 from fastapi import APIRouter, HTTPException, Depends, Query
 from uuid import UUID
 from typing import List, Optional
 from datetime import datetime
 
 from auth.rbac import require_permission, Permission
+
+logger = logging.getLogger(__name__)
+GENERIC_500 = "An unexpected error occurred. Please try again later."
 from auth.dependencies import get_current_user
 from config.database import supabase
 from services.generic_construction_services import ScenarioAnalyzer
@@ -47,9 +51,9 @@ async def create_scenario(
         
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        print(f"Create scenario error: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to create scenario: {str(e)}")
+    except Exception:
+        logger.exception("Failed to create scenario")
+        raise HTTPException(status_code=500, detail=GENERIC_500)
 
 @router.put("/{scenario_id}", response_model=ScenarioAnalysis)
 async def update_scenario(
@@ -70,7 +74,7 @@ async def update_scenario(
         # Use real-time update method
         result = await scenario_analyzer.update_scenario_realtime(
             scenario_id=scenario_id,
-            parameter_changes=scenario_config.parameter_changes.dict(exclude_none=True),
+            parameter_changes=scenario_config.parameter_changes.model_dump(exclude_none=True),
             user_id=UUID(current_user["user_id"])
         )
         
@@ -80,9 +84,9 @@ async def update_scenario(
         raise HTTPException(status_code=400, detail=str(e))
     except HTTPException:
         raise
-    except Exception as e:
-        print(f"Update scenario error: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to update scenario: {str(e)}")
+    except Exception:
+        logger.exception("Failed to update scenario")
+        raise HTTPException(status_code=500, detail=GENERIC_500)
 
 @router.get("/{scenario_id}", response_model=ScenarioAnalysis)
 async def get_scenario(
@@ -103,9 +107,9 @@ async def get_scenario(
         
     except HTTPException:
         raise
-    except Exception as e:
-        print(f"Get scenario error: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to get scenario: {str(e)}")
+    except Exception:
+        logger.exception("Failed to get scenario")
+        raise HTTPException(status_code=500, detail=GENERIC_500)
 
 @router.get("/{scenario_id}/compare", response_model=ScenarioComparison)
 async def compare_scenario_with_baseline(
@@ -149,9 +153,9 @@ async def compare_scenario_with_baseline(
         
     except HTTPException:
         raise
-    except Exception as e:
-        print(f"Compare scenario error: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to compare scenarios: {str(e)}")
+    except Exception:
+        logger.exception("Failed to compare scenarios")
+        raise HTTPException(status_code=500, detail=GENERIC_500)
 
 @router.post("/compare", response_model=ScenarioComparison)
 async def compare_multiple_scenarios(
@@ -180,9 +184,9 @@ async def compare_multiple_scenarios(
         
     except HTTPException:
         raise
-    except Exception as e:
-        print(f"Compare scenarios error: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to compare scenarios: {str(e)}")
+    except Exception:
+        logger.exception("Failed to compare scenarios")
+        raise HTTPException(status_code=500, detail=GENERIC_500)
 
 @router.get("/projects/{project_id}/scenarios")
 async def list_project_scenarios(
@@ -227,9 +231,9 @@ async def list_project_scenarios(
             "offset": offset
         }
         
-    except Exception as e:
-        print(f"List project scenarios error: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to list scenarios: {str(e)}")
+    except Exception:
+        logger.exception("Failed to list scenarios")
+        raise HTTPException(status_code=500, detail=GENERIC_500)
 
 @router.delete("/{scenario_id}", status_code=204)
 async def delete_scenario(
@@ -263,9 +267,9 @@ async def delete_scenario(
         
     except HTTPException:
         raise
-    except Exception as e:
-        print(f"Delete scenario error: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to delete scenario: {str(e)}")
+    except Exception:
+        logger.exception("Failed to delete scenario")
+        raise HTTPException(status_code=500, detail=GENERIC_500)
 
 @router.post("/{scenario_id}/clone", response_model=ScenarioAnalysis, status_code=201)
 async def clone_scenario(
@@ -310,9 +314,9 @@ async def clone_scenario(
         
     except HTTPException:
         raise
-    except Exception as e:
-        print(f"Clone scenario error: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to clone scenario: {str(e)}")
+    except Exception:
+        logger.exception("Failed to clone scenario")
+        raise HTTPException(status_code=500, detail=GENERIC_500)
 
 @router.post("/{scenario_id}/set-baseline", response_model=ScenarioAnalysis)
 async def set_as_baseline(
@@ -355,6 +359,6 @@ async def set_as_baseline(
         
     except HTTPException:
         raise
-    except Exception as e:
-        print(f"Set baseline error: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to set baseline: {str(e)}")
+    except Exception:
+        logger.exception("Failed to set baseline")
+        raise HTTPException(status_code=500, detail=GENERIC_500)

@@ -1,7 +1,7 @@
 """
 Property-based tests for Feature Flags and Deployment Safety
 
-Feature: roche-construction-ppm-features
+Feature: generic-construction-ppm-features
 Property 15: Feature Flag and Deployment Safety
 Validates: Requirements 10.5, 10.6
 
@@ -78,7 +78,7 @@ def feature_flag_create_strategy(draw):
         rollout_percentage=rollout_percentage,
         allowed_user_ids=allowed_user_ids,
         allowed_roles=allowed_roles,
-        metadata={"version": "1.0.0", "owner": "roche-construction"}
+        metadata={"version": "1.0.0", "owner": "generic-construction"}
     )
 
 
@@ -267,7 +267,7 @@ class TestFeatureFlagDeploymentSafety:
         """
         Test that feature flags can be created for all new features
         
-        Feature: roche-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
+        Feature: generic-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
         """
         # Create fresh mock Supabase client for each example
         mock_supabase = MockSupabaseClient()
@@ -304,7 +304,7 @@ class TestFeatureFlagDeploymentSafety:
         """
         Test that feature flag access control is properly enforced
         
-        Feature: roche-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
+        Feature: generic-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
         """
         # Create mock Supabase client
         mock_supabase = MockSupabaseClient()
@@ -363,7 +363,7 @@ class TestFeatureFlagDeploymentSafety:
         """
         Test that feature flags can be updated to support gradual rollout
         
-        Feature: roche-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
+        Feature: generic-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
         """
         # Skip if update has no changes
         assume(
@@ -410,7 +410,7 @@ class TestFeatureFlagDeploymentSafety:
         """
         Test that percentage-based rollout is consistent for the same user
         
-        Feature: roche-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
+        Feature: generic-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
         """
         # Create mock Supabase client
         mock_supabase = MockSupabaseClient()
@@ -444,13 +444,13 @@ class TestFeatureFlagDeploymentSafety:
         assert all(r == results[0] for r in results), \
             "Percentage rollout should be consistent for the same user"
     
-    def test_all_roche_construction_features_have_feature_flags(self):
+    def test_all_generic_construction_features_have_feature_flags(self):
         """
-        Test that all Roche Construction features have corresponding feature flags
+        Test that all Generic Construction features have corresponding feature flags
         
-        Feature: roche-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
+        Feature: generic-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
         """
-        # Expected feature flags for all Roche Construction features
+        # Expected feature flags for all Generic Construction features
         expected_features = [
             "shareable_project_urls",
             "monte_carlo_simulations",
@@ -471,7 +471,7 @@ class TestFeatureFlagDeploymentSafety:
                 description=f"Feature flag for {feature_name}",
                 status=FeatureFlagStatus.DISABLED,
                 rollout_strategy=RolloutStrategy.ALL_USERS,
-                metadata={"feature_group": "roche-construction"}
+                metadata={"feature_group": "generic-construction"}
             )
             
             created_by = uuid4()
@@ -491,7 +491,7 @@ class TestFeatureFlagDeploymentSafety:
         """
         Test that feature flags support beta status for testing phases
         
-        Feature: roche-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
+        Feature: generic-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
         """
         mock_supabase = MockSupabaseClient()
         service = FeatureFlagService(mock_supabase)
@@ -534,11 +534,11 @@ class TestAPIDocumentationCompleteness:
     
     def test_api_documentation_includes_all_roche_construction_endpoints(self):
         """
-        Test that API documentation includes all Roche Construction endpoints
+        Test that API documentation includes all Generic Construction endpoints
         
-        Feature: roche-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
+        Feature: generic-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
         """
-        # Expected endpoint patterns for Roche Construction features
+        # Expected endpoint patterns for Generic Construction features
         expected_endpoint_patterns = [
             "/projects/{id}/share",  # Shareable URLs
             "/shared/{token}",  # Shareable URL access
@@ -566,9 +566,9 @@ class TestAPIDocumentationCompleteness:
         """
         Test that API documentation includes authentication requirements
         
-        Feature: roche-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
+        Feature: generic-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
         """
-        # All Roche Construction endpoints require authentication
+        # All Generic Construction endpoints require authentication
         authentication_schemes = ["BearerAuth", "ApiKeyAuth"]
         
         # Verify authentication schemes are defined
@@ -580,7 +580,7 @@ class TestAPIDocumentationCompleteness:
         """
         Test that API documentation includes rate limiting information
         
-        Feature: roche-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
+        Feature: generic-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
         """
         # Expected rate limits for different endpoint types
         rate_limits = {
@@ -603,9 +603,9 @@ class TestAPIDocumentationCompleteness:
         """
         Test that API documentation includes error codes and descriptions
         
-        Feature: roche-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
+        Feature: generic-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
         """
-        # Expected error codes for Roche Construction features
+        # Expected error codes for Generic Construction features
         expected_error_codes = [
             "VALIDATION_ERROR",
             "AUTHENTICATION_ERROR",
@@ -628,7 +628,7 @@ class TestAPIDocumentationCompleteness:
         """
         Test that API documentation includes request/response examples
         
-        Feature: roche-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
+        Feature: generic-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
         """
         # Example request/response structures for key endpoints
         example_structures = {
@@ -657,7 +657,7 @@ class TestAPIDocumentationCompleteness:
         """
         Test that API documentation includes versioning information
         
-        Feature: roche-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
+        Feature: generic-construction-ppm-features, Property 15: Feature Flag and Deployment Safety
         """
         # API versioning information
         supported_versions = ["v1", "v2"]

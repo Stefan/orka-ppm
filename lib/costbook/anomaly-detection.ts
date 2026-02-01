@@ -1,4 +1,4 @@
-// Costbook 4.0 Anomaly Detection
+// Costbook Anomaly Detection
 // Statistical analysis for detecting spending pattern anomalies
 
 import { ProjectWithFinancials } from '@/types/costbook'

@@ -307,7 +307,7 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
     - **Property 23: Filter State Preservation**
     - **Validates: Requirements 9.5**
 
-- [ ] 17. Costbook 4.0 Integration
+- [ ] 17. Costbook Integration
   - [ ] 17.1 Erstelle Costbook View mit Projects Grid
     - RegisterGrid Integration für Projects
     - Nested Grid Configuration für Commitments/Actuals
@@ -322,7 +322,7 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
     - _Requirements: 10.4_
   
   - [ ] 17.3 Write property test for Costbook integration completeness
-    - **Property 25: Costbook 4.0 Integration Completeness**
+    - **Property 25: Costbook Integration Completeness**
     - **Validates: Requirements 10.4**
 
 - [ ] 18. Error Handling & Edge Cases
@@ -392,7 +392,7 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
 - [ ] 21. Final Checkpoint - Complete Feature
   - Ensure all tests pass, ask the user if questions arise.
   - Verify all 10x features are implemented and working
-  - Verify Costbook 4.0 integration is complete
+  - Verify Costbook integration is complete
   - Verify all requirements are met
 
 ## Notes

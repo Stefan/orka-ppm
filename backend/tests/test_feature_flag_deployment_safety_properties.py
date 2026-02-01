@@ -1,7 +1,7 @@
 """
 Property-based tests for Feature Flag and Deployment Safety (Property 15)
 
-Feature: roche-construction-ppm-features
+Feature: generic-construction-ppm-features
 Property 15: Feature Flag and Deployment Safety
 
 Validates: Requirements 10.5, 10.6
@@ -621,9 +621,9 @@ class TestAPIDocumentationAvailability:
                 assert len(endpoint.__doc__.strip()) > 20, \
                     f"Endpoint {endpoint.__name__} should have meaningful documentation"
     
-    def test_roche_construction_endpoints_documented(self):
+    def test_generic_construction_endpoints_documented(self):
         """
-        Verify that all Roche Construction feature endpoints are documented.
+        Verify that all Generic Construction feature endpoints are documented.
         
         Validates: Requirement 10.5
         """

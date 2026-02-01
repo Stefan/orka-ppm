@@ -46,14 +46,15 @@ export function calculateVendorScore(metrics: VendorMetrics): number {
   // Response time score (faster is better, max 48 hours expected)
   const responseScore = Math.max(0, 100 - (metrics.avg_response_time_hours / 48) * 100)
   
-  // Calculate weighted average
+  // Calculate weighted average (guard against NaN from invalid inputs)
   const overallScore = 
     onTimeScore * SCORE_WEIGHTS.on_time_delivery +
     costScore * SCORE_WEIGHTS.cost_variance +
     qualityScore * SCORE_WEIGHTS.quality +
     responseScore * SCORE_WEIGHTS.response_time
-  
-  return Math.round(Math.max(0, Math.min(100, overallScore)) * 10) / 10
+
+  const clamped = Number.isFinite(overallScore) ? Math.max(0, Math.min(100, overallScore)) : 0
+  return Math.round(clamped * 10) / 10
 }
 
 /**

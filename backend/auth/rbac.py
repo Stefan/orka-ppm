@@ -151,7 +151,7 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.pmr_create, Permission.pmr_read, Permission.pmr_update, Permission.pmr_delete,
         Permission.pmr_approve, Permission.pmr_export, Permission.pmr_collaborate, Permission.pmr_ai_insights,
         Permission.pmr_template_manage, Permission.pmr_audit_read,
-        # Roche Construction/Engineering PPM features
+        # Generic Construction/Engineering PPM features
         Permission.shareable_url_create, Permission.shareable_url_read, Permission.shareable_url_revoke, Permission.shareable_url_manage,
         Permission.simulation_run, Permission.simulation_read, Permission.simulation_delete, Permission.simulation_manage,
         Permission.scenario_create, Permission.scenario_read, Permission.scenario_update, Permission.scenario_delete, Permission.scenario_compare,
@@ -177,7 +177,7 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.ai_rag_query, Permission.ai_resource_optimize, Permission.ai_risk_forecast, Permission.ai_metrics_read,
         Permission.pmr_create, Permission.pmr_read, Permission.pmr_update, Permission.pmr_approve,
         Permission.pmr_export, Permission.pmr_collaborate, Permission.pmr_ai_insights, Permission.pmr_audit_read,
-        # Roche Construction/Engineering PPM features
+        # Generic Construction/Engineering PPM features
         Permission.shareable_url_create, Permission.shareable_url_read, Permission.shareable_url_revoke,
         Permission.simulation_run, Permission.simulation_read, Permission.simulation_delete,
         Permission.scenario_create, Permission.scenario_read, Permission.scenario_update, Permission.scenario_delete, Permission.scenario_compare,
@@ -200,7 +200,7 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.ai_rag_query, Permission.ai_resource_optimize, Permission.ai_risk_forecast,
         Permission.pmr_create, Permission.pmr_read, Permission.pmr_update,
         Permission.pmr_export, Permission.pmr_collaborate, Permission.pmr_ai_insights,
-        # Roche Construction/Engineering PPM features
+        # Generic Construction/Engineering PPM features
         Permission.shareable_url_create, Permission.shareable_url_read,
         Permission.simulation_run, Permission.simulation_read,
         Permission.scenario_create, Permission.scenario_read, Permission.scenario_update, Permission.scenario_compare,
@@ -220,7 +220,7 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.risk_read,
         Permission.issue_read,
         Permission.ai_rag_query, Permission.ai_resource_optimize,
-        # Roche Construction/Engineering PPM features
+        # Generic Construction/Engineering PPM features
         Permission.simulation_read,
         Permission.scenario_read,
         Permission.change_read,
@@ -237,7 +237,7 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.risk_read, Permission.risk_create,
         Permission.issue_read, Permission.issue_create, Permission.issue_update,
         Permission.ai_rag_query,
-        # Roche Construction/Engineering PPM features
+        # Generic Construction/Engineering PPM features
         Permission.simulation_read,
         Permission.scenario_read,
         Permission.change_create, Permission.change_read,
@@ -256,7 +256,7 @@ DEFAULT_ROLE_PERMISSIONS = {
         Permission.issue_read,
         Permission.ai_rag_query,
         Permission.pmr_read,
-        # Roche Construction/Engineering PPM features
+        # Generic Construction/Engineering PPM features
         Permission.simulation_read,
         Permission.scenario_read,
         Permission.change_read,

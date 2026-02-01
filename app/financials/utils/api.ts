@@ -14,7 +14,10 @@ export async function fetchProjects(accessToken: string): Promise<Project[]> {
     console.log('Fetching projects from:', url)
 
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+    const timeoutId = setTimeout(
+      () => controller.abort(new DOMException('Request timeout', 'AbortError')),
+      10000
+    )
 
     const response = await fetch(url, {
       headers: {
@@ -42,38 +45,17 @@ export async function fetchProjects(accessToken: string): Promise<Project[]> {
     }
     return []
   } catch (error) {
-    console.error('Failed to fetch projects:', error)
-    if (error instanceof Error) {
-      console.error('Error name:', error.name)
-      console.error('Error message:', error.message)
-
-      // Check if it's an abort error (timeout)
-      if (error.name === 'AbortError') {
-        console.warn('⏰ REQUEST TIMEOUT: Projects request timed out after 10 seconds')
-        console.warn('💡 This might indicate:')
-        console.warn('   - Backend server is slow to respond')
-        console.warn('   - Network connectivity issues')
-        console.warn('   - Heavy database load')
-        console.warn('')
-        console.warn('Using mock data for development...')
-        // Return mock data for development
-        return getMockProjects()
-      }
-
-      // Check if it's a network error
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        console.warn('🚨 NETWORK ERROR: Backend server is not running!')
-        console.warn('💡 To fix this:')
-        console.warn('   1. Open a new terminal')
-        console.warn('   2. Run: cd backend && bash start_server.sh')
-        console.warn('   3. Or run: npm run dev:backend')
-        console.warn('   4. Refresh this page')
-        console.warn('')
-        console.warn('Using mock data for development...')
-        // Return mock data for development
-        return getMockProjects()
-      }
+    const err = error instanceof Error ? error : new Error(error != null && typeof error === 'object' && 'message' in error ? String((error as Error).message) : String(error))
+    const msg = err.message.toLowerCase()
+    if (err.name === 'AbortError' || msg.includes('aborted')) {
+      console.warn('⏰ REQUEST TIMEOUT: Projects request timed out. Using mock data.')
+      return getMockProjects()
     }
+    if ((err.name === 'TypeError' && msg.includes('fetch')) || msg === 'failed to fetch') {
+      console.warn('🚨 NETWORK ERROR: Backend not reachable. Using mock data.')
+      return getMockProjects()
+    }
+    console.error('Failed to fetch projects:', err)
     return []
   }
 }
@@ -88,7 +70,10 @@ export async function fetchBudgetVariance(
     console.log('Fetching budget variance from:', url)
 
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+    const timeoutId = setTimeout(
+      () => controller.abort(new DOMException('Request timeout', 'AbortError')),
+      10000
+    )
 
     const response = await fetch(url, {
       headers: {
@@ -115,22 +100,12 @@ export async function fetchBudgetVariance(
     console.error('Budget variance request failed:', response.status, response.statusText)
     return null
   } catch (error) {
-    console.error('Failed to fetch budget variance:', error)
-    if (error instanceof Error) {
-      console.error('Error name:', error.name)
-      console.error('Error message:', error.message)
-
-      // Check if it's an abort error (timeout)
-      if (error.name === 'AbortError') {
-        console.warn('⏰ REQUEST TIMEOUT: Budget variance request timed out after 10 seconds')
-        console.warn('Using null for budget variance (graceful degradation)')
-      }
-
-      // Check if it's a network error
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        console.warn('Network error: Backend server is not running. Skipping budget variance.')
-      }
+    const err = error instanceof Error ? error : new Error(error != null && typeof error === 'object' && 'message' in error ? String((error as Error).message) : String(error))
+    const msg = err.message.toLowerCase()
+    if (err.name === 'AbortError' || msg.includes('aborted') || (err.name === 'TypeError' && msg.includes('fetch')) || msg === 'failed to fetch') {
+      return null
     }
+    console.error('Failed to fetch budget variance:', err)
     return null
   }
 }
@@ -141,7 +116,10 @@ export async function fetchFinancialAlerts(accessToken: string): Promise<Financi
     console.log('Fetching financial alerts from:', url)
 
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+    const timeoutId = setTimeout(
+      () => controller.abort(new DOMException('Request timeout', 'AbortError')),
+      10000
+    )
 
     const response = await fetch(url, {
       headers: {
@@ -175,38 +153,17 @@ export async function fetchFinancialAlerts(accessToken: string): Promise<Financi
     }
     return []
   } catch (error) {
-    console.error('Failed to fetch financial alerts:', error)
-    if (error instanceof Error) {
-      console.error('Error name:', error.name)
-      console.error('Error message:', error.message)
-
-      // Check if it's an abort error (timeout)
-      if (error.name === 'AbortError') {
-        console.warn('⏰ REQUEST TIMEOUT: Financial alerts request timed out after 10 seconds')
-        console.warn('💡 This might indicate:')
-        console.warn('   - Backend server is slow to respond')
-        console.warn('   - Network connectivity issues')
-        console.warn('   - Heavy database load')
-        console.warn('')
-        console.warn('Using mock data for development...')
-        // Return mock data for development
-        return getMockFinancialAlerts()
-      }
-
-      // Check if it's a network error
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        console.warn('🚨 NETWORK ERROR: Backend server is not running!')
-        console.warn('💡 To fix this:')
-        console.warn('   1. Open a new terminal')
-        console.warn('   2. Run: cd backend && bash start_server.sh')
-        console.warn('   3. Or run: npm run dev:backend')
-        console.warn('   4. Refresh this page')
-        console.warn('')
-        console.warn('Using mock data for development...')
-        // Return mock data for development
-        return getMockFinancialAlerts()
-      }
+    const err = error instanceof Error ? error : new Error(error != null && typeof error === 'object' && 'message' in error ? String((error as Error).message) : String(error))
+    const msg = err.message.toLowerCase()
+    if (err.name === 'AbortError' || msg.includes('aborted')) {
+      console.warn('⏰ REQUEST TIMEOUT: Financial alerts timed out. Using mock data.')
+      return getMockFinancialAlerts()
     }
+    if ((err.name === 'TypeError' && msg.includes('fetch')) || msg === 'failed to fetch') {
+      console.warn('🚨 NETWORK ERROR: Backend not reachable. Using mock data.')
+      return getMockFinancialAlerts()
+    }
+    console.error('Failed to fetch financial alerts:', err)
     return []
   }
 }

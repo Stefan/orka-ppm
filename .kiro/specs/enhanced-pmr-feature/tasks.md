@@ -2,7 +2,7 @@
 
 ## Overview
 
-This task list implements the Enhanced Project Monthly Report (PMR) feature that's "3x better than Cora" through AI-powered insights, interactive editing, and multi-format exports. Each task builds incrementally on the existing codebase.
+This task list implements the Enhanced Project Monthly Report (PMR) feature with enterprise-grade capabilities through AI-powered insights, interactive editing, and multi-format exports. Each task builds incrementally on the existing codebase.
 
 ## Tasks
 

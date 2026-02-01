@@ -1,8 +1,8 @@
-# Requirements Document: Costbook 4.0
+# Requirements Document: Costbook
 
 ## Introduction
 
-Costbook 4.0 is a sophisticated financial management dashboard for project management applications that provides real-time visibility into project budgets, commitments, actuals, and variances. The system integrates with Supabase to aggregate financial data across projects and presents it through an interactive, no-scroll dashboard with KPI metrics, project cards, and visual analytics. The feature will be delivered in three phases: Phase 1 (Basis) establishes core financial tracking, Phase 2 (AI) adds intelligent anomaly detection and natural language capabilities, and Phase 3 (Extended) introduces earned value management and collaborative features.
+Costbook is a sophisticated financial management dashboard for project management applications that provides real-time visibility into project budgets, commitments, actuals, and variances. The system integrates with Supabase to aggregate financial data across projects and presents it through an interactive, no-scroll dashboard with KPI metrics, project cards, and visual analytics. The feature will be delivered in three phases: Phase 1 (Basis) establishes core financial tracking, Phase 2 (AI) adds intelligent anomaly detection and natural language capabilities, and Phase 3 (Extended) introduces earned value management and collaborative features.
 
 ## Glossary
 
@@ -692,3 +692,37 @@ Costbook 4.0 is a sophisticated financial management dashboard for project manag
 4. WHEN a phase is not yet implemented, THE Costbook_System SHALL disable corresponding UI elements
 5. THE Costbook_System SHALL clearly document which features belong to which phase
 6. THE Costbook_System SHALL ensure each phase is fully functional and testable before moving to the next
+
+### Requirement 53: Distribution Settings for Cash Out Forecast (Phase 2)
+
+**User Story:** Als Finanzmanager möchte ich Distribution Settings für die Planung von Cash Out Forecasts konfigurieren, damit ich verschiedene Budget-Verteilungsszenarien analysieren kann.
+
+#### Acceptance Criteria
+
+1. THE Costbook_System SHALL provide a Distribution Settings modal dialog for configuring forecast distributions
+2. WHEN configuring distribution settings, THE Costbook_System SHALL support three profile types: Linear, Custom, and AI-generated
+3. THE Costbook_System SHALL allow users to specify duration (start date and end date) for distributions
+4. THE Costbook_System SHALL support two granularity options: Weekly and Monthly
+5. WHEN Linear profile is selected, THE Costbook_System SHALL distribute budget evenly across the duration
+6. WHEN Custom profile is selected, THE Costbook_System SHALL allow manual adjustment of distribution percentages
+7. WHEN AI-generated profile is selected, THE Costbook_System SHALL use historical patterns to suggest optimal distributions
+8. THE Costbook_System SHALL validate that distribution percentages sum to 100%
+9. THE Costbook_System SHALL persist distribution settings to the database
+10. THE Costbook_System SHALL display a preview of the calculated distribution before applying
+
+### Requirement 54: Distribution Rules Engine (Phase 3)
+
+**User Story:** Als Finanzmanager möchte ich einen Distribution Rules Engine verwenden, der automatisch Budget-Verteilungen basierend auf Regeln und AI anpasst, damit ich proaktiv Forecasts optimieren kann.
+
+#### Acceptance Criteria
+
+1. THE Costbook_System SHALL implement a Distribution Rules Engine with three rule types: Automatic, Reprofiling, and AI Generator
+2. WHEN Automatic rule type is selected, THE Costbook_System SHALL distribute budget linearly based on project duration
+3. WHEN Reprofiling rule type is selected, THE Costbook_System SHALL adjust planned distributions based on actual commitments and actuals
+4. WHEN AI Generator rule type is selected, THE Costbook_System SHALL use machine learning to predict optimal distribution patterns
+5. THE Costbook_System SHALL allow users to create, save, and apply distribution rules to projects
+6. THE Costbook_System SHALL support rule-based automation triggers when financial data changes
+7. WHEN a distribution rule is applied, THE Costbook_System SHALL update the Cash Out Forecast automatically
+8. THE Costbook_System SHALL provide a rule management interface for viewing, editing, and deleting rules
+9. THE Costbook_System SHALL log all rule applications for audit purposes
+10. THE Costbook_System SHALL allow users to preview rule impact before applying

@@ -19,7 +19,7 @@ from config.database import supabase
 
 
 class AuditEventType(str, Enum):
-    """Types of audit events for Roche Construction PPM features"""
+    """Types of audit events for Generic Construction PPM features"""
     
     # Shareable URL events
     SHAREABLE_URL_CREATED = "shareable_url_created"
@@ -77,9 +77,9 @@ class AuditSeverity(str, Enum):
     CRITICAL = "critical"
 
 
-class RocheAuditService:
+class GenericAuditService:
     """
-    Comprehensive audit logging service for Roche Construction PPM features.
+    Comprehensive audit logging service for Generic Construction PPM features.
     
     This service logs all operations across new features with detailed context,
     user information, and performance metrics for compliance and monitoring.
@@ -471,4 +471,4 @@ class RocheAuditService:
 
 
 # Global audit service instance
-audit_service = RocheAuditService()
+audit_service = GenericAuditService()

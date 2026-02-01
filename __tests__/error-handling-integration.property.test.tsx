@@ -1,6 +1,6 @@
 /**
  * Property 14: Error Handling Integration
- * Feature: roche-construction-ppm-features
+ * Feature: generic-construction-ppm-features
  * 
  * For any error condition across new features, error messages must be clear and actionable,
  * and errors must integrate with existing logging infrastructure

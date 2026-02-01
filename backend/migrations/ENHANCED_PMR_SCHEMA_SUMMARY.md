@@ -284,7 +284,7 @@ python migrations/verify_enhanced_pmr_migration.py
 
 ## Conclusion
 
-The Enhanced PMR schema migration is complete and production-ready. It provides a robust foundation for the "3x better than Cora" PMR feature with:
+The Enhanced PMR schema migration is complete and production-ready. It provides a robust foundation for the enterprise-grade PMR feature with:
 
 - Comprehensive data model
 - Performance optimizations

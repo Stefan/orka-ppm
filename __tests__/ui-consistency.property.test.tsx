@@ -1,6 +1,6 @@
 /**
  * Property 12: User Interface Consistency
- * Feature: roche-construction-ppm-features
+ * Feature: generic-construction-ppm-features
  * 
  * For any new feature interface, UI/UX patterns must be consistent with existing 
  * dashboard layouts and all required interactive elements must be present and functional

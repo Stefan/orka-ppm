@@ -274,6 +274,6 @@ import#!/usr/bin/env python3
 """
 Property-Based Tests for Google Suite Report Generation System
 
-Feature: roche-construction-ppm-features
+Feature: generic-construction-ppm-features
 Property 8: Report Generation Completeness
 

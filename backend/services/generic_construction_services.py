@@ -239,13 +239,13 @@ class MonteCarloEngine:
             'simulation_type': 'monte_carlo',
             'name': name,
             'description': description,
-            'config': simulation_config.dict(),
-            'input_parameters': {'risks': [risk.dict() for risk in risks]},
+            'config': simulation_config.model_dump(),
+            'input_parameters': {'risks': [risk.model_dump() for risk in risks]},
             'results': {
                 'cost_distribution': cost_results.tolist() if simulation_config.include_cost_analysis else [],
                 'schedule_distribution': schedule_results.tolist() if simulation_config.include_schedule_analysis else []
             },
-            'statistics': statistics.dict() if statistics else {},
+            'statistics': statistics.model_dump() if statistics else {},
             'percentiles': percentiles,
             'execution_time_ms': execution_time,
             'iterations_completed': simulation_config.iterations,
@@ -617,15 +617,15 @@ class ScenarioAnalyzer:
             'name': scenario_config.name,
             'description': scenario_config.description,
             'base_scenario_id': str(base_scenario_id) if base_scenario_id else None,
-            'parameter_changes': scenario_config.parameter_changes.dict(exclude_none=True),
+            'parameter_changes': scenario_config.parameter_changes.model_dump(exclude_none=True),
             'impact_results': {
-                'timeline': timeline_impact.dict() if timeline_impact else {},
-                'cost': cost_impact.dict() if cost_impact else {},
-                'resource': resource_impact.dict() if resource_impact else {}
+                'timeline': timeline_impact.model_dump() if timeline_impact else {},
+                'cost': cost_impact.model_dump() if cost_impact else {},
+                'resource': resource_impact.model_dump() if resource_impact else {}
             },
-            'timeline_impact': timeline_impact.dict() if timeline_impact else None,
-            'cost_impact': cost_impact.dict() if cost_impact else None,
-            'resource_impact': resource_impact.dict() if resource_impact else None,
+            'timeline_impact': timeline_impact.model_dump() if timeline_impact else None,
+            'cost_impact': cost_impact.model_dump() if cost_impact else None,
+            'resource_impact': resource_impact.model_dump() if resource_impact else None,
             'created_by': str(user_id),
             'is_active': True,
             'is_baseline': False
@@ -684,9 +684,9 @@ class ScenarioAnalyzer:
         # Update scenario in database
         update_data = {
             'parameter_changes': updated_changes,
-            'timeline_impact': timeline_impact.dict() if timeline_impact else None,
-            'cost_impact': cost_impact.dict() if cost_impact else None,
-            'resource_impact': resource_impact.dict() if resource_impact else None,
+            'timeline_impact': timeline_impact.model_dump() if timeline_impact else None,
+            'cost_impact': cost_impact.model_dump() if cost_impact else None,
+            'resource_impact': resource_impact.model_dump() if resource_impact else None,
             'updated_at': datetime.now().isoformat()
         }
         
@@ -750,10 +750,10 @@ class ScenarioAnalyzer:
             comparison_matrix[scenario_key] = {
                 'name': scenario.name,
                 'description': scenario.description,
-                'cost_impact': scenario.cost_impact.dict() if scenario.cost_impact else {},
-                'timeline_impact': scenario.timeline_impact.dict() if scenario.timeline_impact else {},
-                'resource_impact': scenario.resource_impact.dict() if scenario.resource_impact else {},
-                'parameter_changes': scenario.parameter_changes.dict() if hasattr(scenario.parameter_changes, 'dict') else scenario.parameter_changes
+                'cost_impact': scenario.cost_impact.model_dump() if scenario.cost_impact else {},
+                'timeline_impact': scenario.timeline_impact.model_dump() if scenario.timeline_impact else {},
+                'resource_impact': scenario.resource_impact.model_dump() if scenario.resource_impact else {},
+                'parameter_changes': scenario.parameter_changes.model_dump() if hasattr(scenario.parameter_changes, 'model_dump') else scenario.parameter_changes
             }
         
         # Generate recommendations based on comparison

@@ -241,7 +241,7 @@ class HelpRAGAgent(RAGReporterAgent):
 **Validation Rules**:
 - PPM feature focus only
 - No external tool recommendations
-- No Cora methodology references
+- No external proprietary methodology references
 - No general business advice
 - Platform-specific guidance only
 

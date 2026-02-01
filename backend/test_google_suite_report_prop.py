@@ -2,7 +2,7 @@
 """
 Property-Based Tests for Google Suite Report Generation System
 
-Feature: roche-construction-ppm-features
+Feature: generic-construction-ppm-features
 Property 8: Report Generation Completeness
 Validates: Requirements 6.1, 6.2, 6.3
 """

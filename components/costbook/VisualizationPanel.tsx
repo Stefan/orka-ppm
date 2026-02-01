@@ -1,11 +1,13 @@
 'use client'
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { ProjectWithFinancials, Currency, KPIMetrics } from '@/types/costbook'
 import { VarianceWaterfall } from './VarianceWaterfall'
 import { HealthBubbleChart } from './HealthBubbleChart'
 import { TrendSparkline } from './TrendSparkline'
-import { BarChart3, PieChart, TrendingUp } from 'lucide-react'
+import { EVMTrendChart } from './EVMTrendChart'
+import { generateMockEVMHistory } from '@/lib/evm-calculations'
+import { BarChart3, PieChart, TrendingUp, Activity } from 'lucide-react'
 
 export interface VisualizationPanelProps {
   /** Array of projects with financial data */
@@ -96,6 +98,9 @@ export function VisualizationPanel({
         <ChartContainer title="Spending Trend" icon={<TrendingUp className="w-4 h-4" />}>
           <ChartSkeleton height={140} />
         </ChartContainer>
+        <ChartContainer title="EVM Performance Trends" icon={<Activity className="w-4 h-4" />}>
+          <ChartSkeleton height={140} />
+        </ChartContainer>
       </div>
     )
   }
@@ -149,7 +154,53 @@ export function VisualizationPanel({
           data-testid={`${testId}-trend`}
         />
       </ChartContainer>
+
+      {/* EVM Performance Trends (Phase 3) */}
+      {projects.length > 0 && (
+        <ChartContainer
+          title="EVM Performance Trends"
+          icon={<Activity className="w-4 h-4" />}
+        >
+          <EVMTrendChartSection projects={projects} testId={testId} />
+        </ChartContainer>
+      )}
     </div>
+  )
+}
+
+/**
+ * EVM trend chart section - uses first project's mock history for aggregate view
+ */
+function EVMTrendChartSection({
+  projects,
+  testId
+}: {
+  projects: ProjectWithFinancials[]
+  testId: string
+}) {
+  const evmHistory = useMemo(() => {
+    if (projects.length === 0) return []
+    // Use first project to generate representative EVM history for the panel
+    return generateMockEVMHistory(projects[0], 6)
+  }, [projects])
+
+  if (evmHistory.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-[140px] text-gray-500 text-sm">
+        No EVM history available
+      </div>
+    )
+  }
+
+  return (
+    <EVMTrendChart
+      history={evmHistory}
+      title="CPI / SPI Over Time"
+      showCPI={true}
+      showSPI={true}
+      height={140}
+      data-testid={`${testId}-evm-trend`}
+    />
   )
 }
 

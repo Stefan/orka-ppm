@@ -1,8 +1,8 @@
-# Design Document: Costbook 4.0
+# Design Document: Costbook
 
 ## Overview
 
-Costbook 4.0 is a React-based financial management dashboard that provides real-time visibility into project budgets, commitments, and actuals. The system integrates with Supabase for data persistence and uses Recharts for data visualization. The architecture follows a component-based design with clear separation between data fetching, business logic, and presentation layers.
+Costbook is a React-based financial management dashboard that provides real-time visibility into project budgets, commitments, and actuals. The system integrates with Supabase for data persistence and uses Recharts for data visualization. The architecture follows a component-based design with clear separation between data fetching, business logic, and presentation layers.
 
 The implementation uses Next.js with TypeScript, Tailwind CSS for styling, and follows React best practices including hooks for state management. The dashboard is designed as a no-scroll interface that fits all key information on a single screen, with scrolling only within the projects grid when necessary.
 
@@ -1053,7 +1053,7 @@ function LoadingOverlay({ message = 'Loading...' }: { message?: string }) {
 
 ### Testing Approach
 
-The Costbook 4.0 feature will use a dual testing approach combining unit tests for specific examples and edge cases with property-based tests for universal correctness properties. This comprehensive strategy ensures both concrete functionality and general correctness across all inputs.
+The Costbook feature will use a dual testing approach combining unit tests for specific examples and edge cases with property-based tests for universal correctness properties. This comprehensive strategy ensures both concrete functionality and general correctness across all inputs.
 
 ### Unit Testing
 
@@ -1585,7 +1585,7 @@ Die Contingency Rundown Profiles Erweiterung ersetzt das externe Generic-Script 
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Costbook 4.0 Frontend                    │
+│                    Costbook Frontend                    │
 │  ┌───────────────────────────────────────────────────────┐  │
 │  │  ProjectCard                                          │  │
 │  │  ┌─────────────────────────────────────────────────┐  │  │
@@ -2682,14 +2682,232 @@ interface Comment {
 
 ---
 
+## Distribution Settings & Rules (Phase 2 & 3)
+
+### Distribution Settings Component (Phase 2)
+
+**Purpose**: Configure how forecasted cash outflows are distributed over time.
+
+**Props**:
+```typescript
+interface DistributionSettingsProps {
+  projectId: string
+  currentSettings?: DistributionSettings
+  onSave: (settings: DistributionSettings) => void
+  onCancel: () => void
+}
+
+interface DistributionSettings {
+  profile: 'linear' | 'custom' | 'ai_generated'
+  duration_start: string
+  duration_end: string
+  granularity: 'week' | 'month'
+  customDistribution?: number[] // For custom profile
+}
+```
+
+**Features**:
+- **Linear Profile**: Even distribution across time periods
+- **Custom Profile**: Manual percentage entry with validation
+- **AI-Generated Profile**: ML-powered optimal distribution based on historical patterns
+- **Duration Selection**: Date range picker with project constraints
+- **Granularity Toggle**: Switch between weekly/monthly buckets
+- **Live Preview**: Chart showing distribution before applying
+
+**Layout**: Modal dialog with tabs for each profile type, preview chart, and action buttons
+
+### Distribution Rules Engine (Phase 3)
+
+**Component**: DistributionRulesManager
+
+**Purpose**: Automate forecast distribution adjustments using rules and AI.
+
+**Props**:
+```typescript
+interface DistributionRulesManagerProps {
+  projectId?: string // If null, manage global rules
+  rules: DistributionRule[]
+  onCreateRule: (rule: DistributionRule) => void
+  onUpdateRule: (ruleId: string, updates: Partial<DistributionRule>) => void
+  onDeleteRule: (ruleId: string) => void
+  onApplyRule: (ruleId: string, projectIds: string[]) => void
+}
+
+interface DistributionRule {
+  id: string
+  name: string
+  type: 'automatic' | 'reprofiling' | 'ai_generator'
+  profile: 'linear' | 'custom' | 'ai_generated'
+  settings: DistributionSettings
+  trigger_conditions?: RuleTrigger[]
+  created_at: string
+  last_applied: string
+  application_count: number
+}
+
+interface RuleTrigger {
+  event: 'commitment_added' | 'actual_posted' | 'budget_changed' | 'schedule'
+  condition?: string // Optional filter condition
+  schedule?: string // Cron expression for scheduled rules
+}
+```
+
+**Rule Types**:
+
+1. **Automatic**: Simple linear distribution
+   - Evenly distributes budget from start to end date
+   - No manual intervention required
+   - Best for stable, predictable projects
+
+2. **Reprofiling**: Adaptive distribution
+   - Analyzes actual commitments and actuals
+   - Adjusts remaining distribution based on consumption patterns
+   - Redistributes unspent budget to future periods
+   - Maintains total budget constraint
+
+3. **AI Generator**: Intelligent distribution
+   - Uses historical project data for training
+   - Predicts optimal distribution based on:
+     - Project type and size
+     - Vendor patterns
+     - Seasonal trends
+     - Risk factors
+   - Provides confidence scores
+   - Learns from actual vs planned deviations
+
+**Backend Service**: DistributionRulesEngine
+
+```python
+# backend/services/distribution_rules_engine.py
+class DistributionRulesEngine:
+    def __init__(self, supabase_client):
+        self.supabase = supabase_client
+        self.ml_model = load_distribution_model()
+    
+    async def apply_rule(
+        self,
+        rule: DistributionRule,
+        project_id: str
+    ) -> DistributionResult:
+        """Apply a distribution rule to a project."""
+        project = await self.fetch_project(project_id)
+        
+        if rule.type == 'automatic':
+            return self.apply_linear_distribution(project, rule.settings)
+        elif rule.type == 'reprofiling':
+            return self.apply_reprofiling(project, rule.settings)
+        elif rule.type == 'ai_generator':
+            return self.apply_ai_distribution(project, rule.settings)
+    
+    def apply_linear_distribution(
+        self,
+        project: Project,
+        settings: DistributionSettings
+    ) -> DistributionResult:
+        """Distribute budget evenly over duration."""
+        periods = calculate_periods(
+            settings.duration_start,
+            settings.duration_end,
+            settings.granularity
+        )
+        amount_per_period = project.budget / len(periods)
+        return create_distribution(periods, amount_per_period)
+    
+    def apply_reprofiling(
+        self,
+        project: Project,
+        settings: DistributionSettings
+    ) -> DistributionResult:
+        """Adjust distribution based on actual consumption."""
+        current_spend = calculate_total_spend(project)
+        remaining_budget = project.budget - current_spend
+        
+        # Get remaining periods
+        today = datetime.now()
+        remaining_periods = [
+            p for p in calculate_periods(
+                settings.duration_start,
+                settings.duration_end,
+                settings.granularity
+            )
+            if p.start_date >= today
+        ]
+        
+        # Redistribute remaining budget
+        if len(remaining_periods) > 0:
+            amount_per_period = remaining_budget / len(remaining_periods)
+            return create_distribution(remaining_periods, amount_per_period)
+        
+        return DistributionResult(periods=[], error="No remaining periods")
+    
+    def apply_ai_distribution(
+        self,
+        project: Project,
+        settings: DistributionSettings
+    ) -> DistributionResult:
+        """Use ML model to predict optimal distribution."""
+        features = extract_project_features(project)
+        predictions = self.ml_model.predict(features)
+        
+        periods = calculate_periods(
+            settings.duration_start,
+            settings.duration_end,
+            settings.granularity
+        )
+        
+        # Normalize predictions to sum to project budget
+        total_predicted = sum(predictions)
+        scaled_predictions = [
+            (p / total_predicted) * project.budget
+            for p in predictions
+        ]
+        
+        return create_distribution(
+            periods,
+            scaled_predictions,
+            confidence=calculate_confidence(predictions, features)
+        )
+```
+
+**UI Components**:
+
+- **RulesList**: Table showing all rules with status, last applied, and actions
+- **RuleEditor**: Form for creating/editing rules with profile selection and trigger configuration
+- **RulePreview**: Visualization of rule impact on selected projects
+- **RuleApplicationLog**: Audit trail of rule executions
+
+**Integration with Cash Out Forecast**:
+
+```typescript
+// When user opens Distribution Settings from Cash Out Forecast
+function handleConfigureDistribution(projectId: string) {
+  // Open modal with current settings
+  setDistributionModalOpen(true)
+  setSelectedProject(projectId)
+}
+
+// When user applies a distribution rule
+async function handleApplyRule(ruleId: string, projectId: string) {
+  const result = await applyDistributionRule({ ruleId, projectId })
+  
+  // Refresh Cash Out Forecast with new distribution
+  invalidateQuery(['cash-out-forecast', projectId])
+  
+  // Show success notification
+  toast.success(`Distribution rule applied to ${result.periods.length} periods`)
+}
+```
+
+---
+
 ## Summary
 
-The Costbook 4.0 design provides a comprehensive, three-phase approach to building a sophisticated financial management dashboard. The architecture emphasizes:
+The Costbook design provides a comprehensive, three-phase approach to building a sophisticated financial management dashboard. The architecture emphasizes:
 
 1. **Performance**: Efficient Supabase queries, react-query caching, virtualization
 2. **User Experience**: No-scroll layout, collapsible panels, natural language search
-3. **Intelligence**: AI-powered anomaly detection, predictions, recommendations
+3. **Intelligence**: AI-powered anomaly detection, predictions, recommendations, distribution optimization
 4. **Collaboration**: Inline comments, template sharing, gamification
-5. **Extensibility**: Clear phase boundaries, modular components, plugin architecture
+5. **Extensibility**: Clear phase boundaries, modular components, plugin architecture, rule-based automation
 
-The design supports iterative delivery with each phase providing complete, testable functionality while building toward the full vision of an intelligent, interactive financial management system.
+The design supports iterative delivery with each phase providing complete, testable functionality while building toward the full vision of an intelligent, interactive financial management system with advanced forecast planning capabilities.

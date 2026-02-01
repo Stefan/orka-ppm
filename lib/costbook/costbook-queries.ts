@@ -19,20 +19,9 @@ import { fetchTransactionsWithPOJoin, getMockTransactions, TransactionFilters } 
 import { ProjectWithFinancials, Commitment, Actual, Transaction, Currency } from '@/types/costbook'
 import { calculateKPIs } from '@/lib/costbook-calculations'
 import { convertCurrency } from '@/lib/currency-utils'
+import { costbookKeys } from './costbook-keys'
 
-// Query Keys
-export const costbookKeys = {
-  all: ['costbook'] as const,
-  projects: () => [...costbookKeys.all, 'projects'] as const,
-  projectsWithFinancials: () => [...costbookKeys.projects(), 'financials'] as const,
-  project: (id: string) => [...costbookKeys.projects(), id] as const,
-  commitments: () => [...costbookKeys.all, 'commitments'] as const,
-  commitmentsByProject: (projectId: string) => [...costbookKeys.commitments(), projectId] as const,
-  actuals: () => [...costbookKeys.all, 'actuals'] as const,
-  actualsByProject: (projectId: string) => [...costbookKeys.actuals(), projectId] as const,
-  transactions: (filters?: TransactionFilters) => [...costbookKeys.all, 'transactions', filters] as const,
-  kpis: (currency: Currency) => [...costbookKeys.all, 'kpis', currency] as const,
-}
+export { costbookKeys }
 
 // Default options
 const DEFAULT_STALE_TIME = 5 * 60 * 1000 // 5 minutes

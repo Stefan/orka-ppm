@@ -27,9 +27,9 @@ From `data/Combined_Commitments_DIA_UATNEW_short.csv`:
 22. Value in document currency ❌
 23. Document currency code ❌
 24. Investment Profile ❌
-25. Account Group (Cora Level 1) ❌
-26. Account Sub Group (Cora Level 2) ❌
-27. Account (Cora Level 3) ❌
+25. Account Group Level 1 ❌
+26. Account Sub Group Level 2 ❌
+27. Account Level 3 ❌
 28. Change Date ❌
 29. Purchase requisition ❌
 30. Procurement Plant ❌
@@ -123,9 +123,9 @@ These CSV columns are not mapped and will be ignored during import:
 - Value in document currency
 - Document currency code
 - Investment Profile
-- Account Group (Cora Level 1)
-- Account Sub Group (Cora Level 2)
-- Account (Cora Level 3)
+- Account Group Level 1
+- Account Sub Group Level 2
+- Account Level 3
 - Change Date
 - Purchase requisition
 - Procurement Plant

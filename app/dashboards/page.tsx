@@ -1,6 +1,6 @@
 'use client'
 
-// Next.js 16 Dashboard - Ultra-Compact Grid Layout (Cora PPM Style)
+// Next.js 16 Dashboard - Ultra-Compact Grid Layout (Enterprise PPM Style)
 // Stack: Next.js 16, Tailwind CSS, Recharts, lucide-react
 // Design: Grid-based, Mobile-first, Hover details, Minimal scrolling
 // Note: AppLayout has TopBar, so available height is less than 100vh

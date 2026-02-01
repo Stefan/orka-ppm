@@ -439,5 +439,115 @@ describe('Vendor Scoring', () => {
         { numRuns: 10 }
       )
     })
+
+    // Property 40: Vendor Trend Consistency (Validates: Requirements 42.6)
+    it('Property 40: analyzeVendorTrend returns improving when last avg > first avg by >5', () => {
+      fc.assert(
+        fc.property(
+          fc.array(
+            fc.record({
+              overall_score: fc.double(50, 70),
+              on_time_delivery_rate: fc.double(70, 95),
+              quality_score: fc.double(70, 95)
+            }),
+            { minLength: 4 }
+          ),
+          (historyPoints) => {
+            const history: VendorHistoryPoint[] = historyPoints.map((p, i) => ({
+              date: new Date(Date.now() - (historyPoints.length - i) * 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+              overall_score: p.overall_score,
+              on_time_delivery_rate: p.on_time_delivery_rate,
+              cost_variance_percentage: 0,
+              quality_score: p.quality_score
+            }))
+            const firstAvg = history.slice(0, 3).reduce((s, h) => s + h.overall_score, 0) / Math.min(3, history.length)
+            const lastAvg = history.slice(-3).reduce((s, h) => s + h.overall_score, 0) / Math.min(3, history.length)
+            const trend = analyzeVendorTrend(history)
+            if (lastAvg - firstAvg > 5) expect(trend).toBe('improving')
+            if (firstAvg - lastAvg > 5) expect(trend).toBe('declining')
+            expect(['improving', 'stable', 'declining']).toContain(trend)
+          }
+        ),
+        { numRuns: 20 }
+      )
+    })
+
+    // P3.3.6 Property 20: Vendor Score Calculation Consistency (Validates: Requirements 15.1)
+    it('Property 20: same metrics produce same vendor score', () => {
+      fc.assert(
+        fc.property(
+          fc.record({
+            avg_delivery_days: fc.integer({ min: 1, max: 90 }),
+            delivery_std_dev: fc.integer({ min: 0, max: 30 }),
+            avg_cost_variance: fc.double(-50, 50),
+            late_deliveries: fc.integer({ min: 0, max: 20 }),
+            total_deliveries: fc.integer({ min: 1, max: 50 }),
+            avg_quality_rating: fc.double(0, 5),
+            quality_issues: fc.integer({ min: 0, max: 20 }),
+            avg_response_time_hours: fc.double(0, 72)
+          }).filter(
+            (r) =>
+              Number.isFinite(r.avg_cost_variance) &&
+              Number.isFinite(r.avg_quality_rating) &&
+              Number.isFinite(r.avg_response_time_hours)
+          ),
+          (r) => {
+            const m: VendorMetrics = {
+              vendor_id: 'v',
+              ...r,
+              total_deliveries: Math.max(1, r.total_deliveries),
+              late_deliveries: Math.min(r.late_deliveries, r.total_deliveries)
+            }
+            const s1 = calculateVendorScore(m)
+            const s2 = calculateVendorScore({ ...m })
+            expect(s1).toBe(s2)
+            expect(s1).toBeGreaterThanOrEqual(0)
+            expect(s1).toBeLessThanOrEqual(100)
+          }
+        ),
+        { numRuns: 30 }
+      )
+    })
+
+    // Property 21: Vendor Metrics Completeness (Validates: Requirements 15.3)
+    it('Property 21: filterVendors preserves metric completeness', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            search: fc.option(fc.string({ maxLength: 20 }), { nil: undefined }),
+            min_score: fc.option(fc.double(0, 100), { nil: undefined })
+          }),
+          async (filter) => {
+            const vendors = await fetchVendors(undefined, { field: 'name', direction: 'asc' })
+            const filtered = filterVendors(vendors, filter)
+            for (const v of filtered) {
+              expect(v).toHaveProperty('score')
+              expect(v.score).toHaveProperty('overall_score')
+              expect(v.score).toHaveProperty('on_time_delivery_rate')
+              expect(v.score).toHaveProperty('cost_variance_percentage')
+            }
+          }
+        ),
+        { numRuns: 10 }
+      )
+    })
+
+    // Property 22: Vendor Filtering Correctness (Validates: Requirements 15.5)
+    it('Property 22: filtered list is subset and respects filter', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.integer({ min: 0, max: 100 }).filter(n => n >= 0 && n <= 100),
+          async (minScore) => {
+            const vendors = await fetchVendors()
+            const filtered = filterVendors(vendors, { min_score: minScore })
+            expect(filtered.length).toBeLessThanOrEqual(vendors.length)
+            for (const v of filtered) {
+              expect(v.score.overall_score).toBeGreaterThanOrEqual(minScore)
+            }
+          }
+        ),
+        { numRuns: 10 }
+      )
+    })
   })
 })

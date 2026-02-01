@@ -20,26 +20,26 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 );
 
 -- Create indexes for efficient querying
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_event_type ON roche_audit_logs(event_type);
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_user_id ON roche_audit_logs(user_id);
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_entity_type ON roche_audit_logs(entity_type);
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_entity_id ON roche_audit_logs(entity_id);
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_project_id ON roche_audit_logs(project_id);
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_timestamp ON roche_audit_logs(timestamp DESC);
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_severity ON roche_audit_logs(severity);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_event_type ON audit_logs(event_type);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_entity_type ON audit_logs(entity_type);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_entity_id ON audit_logs(entity_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_project_id ON audit_logs(project_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON audit_logs(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_severity ON audit_logs(severity);
 
 -- Create composite index for common query patterns
-CREATE INDEX IF NOT EXISTS idx_roche_audit_logs_entity_timestamp 
-    ON roche_audit_logs(entity_type, entity_id, timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_entity_timestamp 
+    ON audit_logs(entity_type, entity_id, timestamp DESC);
 
 -- Add comment to table
 COMMENT ON TABLE audit_logs IS 'Comprehensive audit trail for Generic Construction PPM features including shareable URLs, simulations, scenarios, change management, PO breakdowns, and report generation';
 
 -- Add comments to columns
-COMMENT ON COLUMN roche_audit_logs.event_type IS 'Type of audit event (e.g., shareable_url_created, simulation_completed)';
-COMMENT ON COLUMN roche_audit_logs.user_id IS 'User who performed the action (NULL for system events)';
-COMMENT ON COLUMN roche_audit_logs.entity_type IS 'Type of entity being acted upon (e.g., shareable_url, simulation, change_request)';
-COMMENT ON COLUMN roche_audit_logs.entity_id IS 'ID of the specific entity';
-COMMENT ON COLUMN roche_audit_logs.action_details IS 'Detailed JSON information about the action';
-COMMENT ON COLUMN roche_audit_logs.severity IS 'Severity level: info, warning, error, critical';
-COMMENT ON COLUMN roche_audit_logs.performance_metrics IS 'Performance data including execution time, resource usage, etc.';
+COMMENT ON COLUMN audit_logs.event_type IS 'Type of audit event (e.g., shareable_url_created, simulation_completed)';
+COMMENT ON COLUMN audit_logs.user_id IS 'User who performed the action (NULL for system events)';
+COMMENT ON COLUMN audit_logs.entity_type IS 'Type of entity being acted upon (e.g., shareable_url, simulation, change_request)';
+COMMENT ON COLUMN audit_logs.entity_id IS 'ID of the specific entity';
+COMMENT ON COLUMN audit_logs.action_details IS 'Detailed JSON information about the action';
+COMMENT ON COLUMN audit_logs.severity IS 'Severity level: info, warning, error, critical';
+COMMENT ON COLUMN audit_logs.performance_metrics IS 'Performance data including execution time, resource usage, etc.';

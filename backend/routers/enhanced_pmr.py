@@ -79,10 +79,7 @@ if performance_available:
         performance_monitor = PerformanceMonitor()
         
         pmr_performance_optimizer = PMRPerformanceOptimizer(cache_manager, performance_monitor)
-        websocket_optimizer = WebSocketOptimizer(
-            max_connections=1000,
-            max_connections_per_session=10
-        )
+        websocket_optimizer = WebSocketOptimizer()
         pmr_performance_monitor = PMRPerformanceMonitor()
         
         logger.info("PMR performance components initialized")

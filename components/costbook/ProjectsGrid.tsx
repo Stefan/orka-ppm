@@ -25,6 +25,10 @@ export interface ProjectsGridProps {
   anomalies?: AnomalyResult[]
   /** Handler for anomaly clicks */
   onAnomalyClick?: (anomaly: AnomalyResult) => void
+  /** Comment count per project ID (Phase 3) */
+  commentCounts?: Map<string, number>
+  /** Handler for comment indicator click */
+  onCommentsClick?: (projectId: string) => void
   /** Additional CSS classes */
   className?: string
   /** Test ID for testing */
@@ -167,6 +171,8 @@ export function ProjectsGrid({
   isLoading = false,
   anomalies = [],
   onAnomalyClick,
+  commentCounts,
+  onCommentsClick,
   className = '',
   'data-testid': testId = 'projects-grid'
 }: ProjectsGridProps) {
@@ -251,6 +257,8 @@ export function ProjectsGrid({
           selected={selectedProjectId === project.id}
           anomalies={getAnomaliesForProject(project.id, anomalies)}
           onAnomalyClick={onAnomalyClick}
+          commentCount={commentCounts?.get(project.id) ?? 0}
+          onCommentsClick={onCommentsClick ? () => onCommentsClick(project.id) : undefined}
           data-testid={`${testId}-card-${project.id}`}
         />
       ))}

@@ -131,7 +131,7 @@ An AI-powered In-App Help Chat system that provides contextual assistance to use
 #### Acceptance Criteria
 
 1. WHEN users ask about competitors or external tools, THE Scope_Validator SHALL politely redirect to PPM platform features
-2. WHEN generating responses, THE Context_Aware_Assistant SHALL not reference or discuss Cora project management methodologies
+2. WHEN generating responses, THE Context_Aware_Assistant SHALL not reference or discuss external proprietary project management methodologies
 3. WHEN users request general business advice, THE Scope_Validator SHALL limit responses to PPM platform capabilities
 4. THE Scope_Validator SHALL use prompt engineering techniques to maintain response boundaries
 5. WHEN detecting scope violations, THE Scope_Validator SHALL log incidents for system improvement without exposing sensitive information

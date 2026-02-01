@@ -677,7 +677,7 @@ Nach der Reflection bleiben folgende einzigartige, nicht-redundante Properties �
 - Inline Editing mit Validation und Error Handling
 - Drag & Drop Reordering mit Error Handling
 - Filter Application und State Preservation
-- Costbook 4.0 Integration
+- Costbook Integration
 
 ### Correctness Properties
 
@@ -873,9 +873,9 @@ Nach der Reflection bleiben folgende einzigartige, nicht-redundante Properties �
 
 ---
 
-**Property 25: Costbook 4.0 Integration Completeness**
+**Property 25: Costbook Integration Completeness**
 
-*F체r die* Costbook 4.0 View, sollen alle konfigurierten Nested Grid Features (Inline-Editing, Filters, Drag&Drop, Multi-Level Nesting) vollst채ndig unterst체tzt werden.
+*F체r die* Costbook View, sollen alle konfigurierten Nested Grid Features (Inline-Editing, Filters, Drag&Drop, Multi-Level Nesting) vollst채ndig unterst체tzt werden.
 
 **Validates: Requirements 10.4**
 
@@ -1043,7 +1043,7 @@ Dieses Feature erfordert sowohl Unit Tests als auch Property-Based Tests f체r um
 - Spezifische Beispiele (z.B. Tasks Columns werden bei Item Type "Tasks" angezeigt)
 - Edge Cases (z.B. leere Nested Grids, maximale Nesting-Tiefe)
 - Error Conditions (z.B. Permission Denied, Save Failures)
-- Integration Points (z.B. Costbook 4.0 Integration)
+- Integration Points (z.B. Costbook Integration)
 
 **Property-Based Tests** fokussieren auf:
 - Universelle Properties 체ber alle Inputs (z.B. Filter-Anwendung funktioniert f체r beliebige Filter-Kombinationen)
@@ -1141,7 +1141,7 @@ describe('Property 6: Expand/Collapse Idempotence', () => {
 
 - **Unit Testing:** Jest + React Testing Library
 - **Property-Based Testing:** fast-check
-- **E2E Testing:** Playwright (f체r Costbook 4.0 Integration)
+- **E2E Testing:** Playwright (f체r Costbook Integration)
 - **Component Testing:** Storybook (f체r isolierte Component Tests)
 - **API Mocking:** MSW (Mock Service Worker)
 

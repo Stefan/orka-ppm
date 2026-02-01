@@ -15,9 +15,9 @@ Added 17 new columns to the `commitments` table:
 - `document_currency_code` - Original document currency
 - `value_in_document_currency` - Value in original currency
 - `investment_profile` - Investment classification (capex/opex)
-- `account_group_level1` - Account group (Cora Level 1)
-- `account_subgroup_level2` - Account subgroup (Cora Level 2)
-- `account_level3` - Account (Cora Level 3)
+- `account_group_level1` - Account group (Cost Element Level 1)
+- `account_subgroup_level2` - Account subgroup (Cost Element Level 2)
+- `account_level3` - Account (Cost Element Level 3)
 - `change_date` - Last change date
 - `purchase_requisition` - Purchase requisition number
 - `procurement_plant` - Procurement plant identifier
@@ -55,9 +55,9 @@ Added mappings for all new CSV columns:
 - Value in document currency → value_in_document_currency
 - Document currency code → document_currency_code
 - Investment Profile → investment_profile
-- Account Group (Cora Level 1) → account_group_level1
-- Account Sub Group (Cora Level 2) → account_subgroup_level2
-- Account (Cora Level 3) → account_level3
+- Account Group Level 1 → account_group_level1
+- Account Sub Group Level 2 → account_subgroup_level2
+- Account Level 3 → account_level3
 - Change Date → change_date
 - Purchase requisition → purchase_requisition
 - Procurement Plant → procurement_plant

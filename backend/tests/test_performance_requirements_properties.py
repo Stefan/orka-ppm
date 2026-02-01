@@ -4,7 +4,7 @@ Property-Based Tests for Performance Requirements (Task 10.3)
 Tests Property 4: Simulation Performance and Caching
 Tests Property 10: Performance Under Load
 
-Feature: roche-construction-ppm-features
+Feature: generic-construction-ppm-features
 Validates: Requirements 8.1, 8.3, 8.4, 8.6
 """
 

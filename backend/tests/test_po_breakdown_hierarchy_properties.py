@@ -4,7 +4,7 @@ Property-Based Tests for PO Breakdown Hierarchy Integrity
 This module contains property-based tests using Hypothesis to validate
 universal correctness properties of the PO breakdown management system.
 
-Feature: roche-construction-ppm-features
+Feature: generic-construction-ppm-features
 Property 7: PO Breakdown Hierarchy Integrity
 """
 
@@ -127,7 +127,7 @@ def test_property7_parent_child_relationships_maintained(breakdowns):
     3. All parent IDs must exist in the structure
     4. No circular references exist
     
-    Feature: roche-construction-ppm-features, Property 7: PO Breakdown Hierarchy Integrity
+    Feature: generic-construction-ppm-features, Property 7: PO Breakdown Hierarchy Integrity
     Validates: Requirements 5.1, 5.2, 5.3, 5.6
     """
     # Skip if no breakdowns
@@ -196,7 +196,7 @@ def test_property7_cost_rollups_mathematically_consistent(breakdowns):
     4. Committed amount must not exceed planned amount
     5. Actual amount must not exceed committed amount
     
-    Feature: roche-construction-ppm-features, Property 7: PO Breakdown Hierarchy Integrity
+    Feature: generic-construction-ppm-features, Property 7: PO Breakdown Hierarchy Integrity
     Validates: Requirements 5.2, 5.6
     """
     # Skip if no breakdowns
@@ -264,7 +264,7 @@ def test_property7_csv_hierarchy_detection_consistent(csv_rows):
     3. Hierarchy levels must be sequential (no gaps)
     4. Parsing must be deterministic (same input = same output)
     
-    Feature: roche-construction-ppm-features, Property 7: PO Breakdown Hierarchy Integrity
+    Feature: generic-construction-ppm-features, Property 7: PO Breakdown Hierarchy Integrity
     Validates: Requirements 5.1, 5.2
     """
     # Setup
@@ -328,7 +328,7 @@ def test_property7_hierarchy_validation_detects_errors(breakdowns):
     2. Invalid parent references must be detected
     3. Validation must be comprehensive
     
-    Feature: roche-construction-ppm-features, Property 7: PO Breakdown Hierarchy Integrity
+    Feature: generic-construction-ppm-features, Property 7: PO Breakdown Hierarchy Integrity
     Validates: Requirements 5.1, 5.2, 5.3
     """
     # Skip if no breakdowns
@@ -382,7 +382,7 @@ def test_property7_version_control_maintained(breakdowns):
     2. Updates must increment version
     3. Version must be tracked per breakdown
     
-    Feature: roche-construction-ppm-features, Property 7: PO Breakdown Hierarchy Integrity
+    Feature: generic-construction-ppm-features, Property 7: PO Breakdown Hierarchy Integrity
     Validates: Requirements 5.3, 5.6
     """
     # Skip if no breakdowns
@@ -416,7 +416,7 @@ def test_property7_currency_consistency_in_hierarchy(breakdowns):
     2. Currency must be a valid code
     3. Rollup calculations should handle currency consistently
     
-    Feature: roche-construction-ppm-features, Property 7: PO Breakdown Hierarchy Integrity
+    Feature: generic-construction-ppm-features, Property 7: PO Breakdown Hierarchy Integrity
     Validates: Requirements 5.2, 5.6
     """
     # Skip if no breakdowns

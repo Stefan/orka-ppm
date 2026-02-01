@@ -170,7 +170,12 @@ const nextConfig: NextConfig = {
           source: '/api/optimized/:path*',
           destination: '/api/optimized/:path*',
         },
-        // Rewrite all other /api calls to local backend
+        // Monte Carlo and other /api/v1 routes: backend expects /api/v1/... (prefix in FastAPI)
+        {
+          source: '/api/v1/:path*',
+          destination: `http://localhost:8000/api/v1/:path*`,
+        },
+        // Rewrite all other /api calls to local backend (no /api prefix on backend)
         {
           source: '/api/:path*',
           destination: `http://localhost:8000/:path*`,
@@ -183,7 +188,12 @@ const nextConfig: NextConfig = {
         source: '/api/optimized/:path*',
         destination: '/api/optimized/:path*',
       },
-      // Rewrite all other /api calls to backend
+      // Monte Carlo and other /api/v1 routes: backend expects /api/v1/... (prefix in FastAPI)
+      {
+        source: '/api/v1/:path*',
+        destination: `${backendUrl}/api/v1/:path*`,
+      },
+      // Rewrite all other /api calls to backend (no /api prefix on backend)
       {
         source: '/api/:path*',
         destination: `${backendUrl}/:path*`,

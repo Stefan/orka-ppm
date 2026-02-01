@@ -3,7 +3,7 @@
 import { useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { LogOut, Activity, MessageSquare, X, Users, BarChart3, FileText } from 'lucide-react'
+import { LogOut, Activity, MessageSquare, X, Users, BarChart3, FileText, Layers } from 'lucide-react'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
 import { GlobalLanguageSelector } from './GlobalLanguageSelector'
 import { usePermissions } from '@/hooks/usePermissions'
@@ -193,6 +193,17 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
               >
                 <MessageSquare className="mr-2 h-4 w-4" />
                 Feedback & Ideas
+              </Link>
+            </li>
+            <li>
+              <Link 
+                href="/features" 
+                prefetch={true}
+                className="flex items-center py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px]"
+                onClick={handleLinkClick}
+              >
+                <Layers className="mr-2 h-4 w-4" />
+                Features
               </Link>
             </li>
             <PermissionGuard permission="admin_read">

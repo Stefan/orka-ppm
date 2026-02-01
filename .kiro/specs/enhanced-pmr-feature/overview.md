@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-The Enhanced PMR feature transforms traditional project reporting into an AI-powered, interactive, and collaborative experience that's "3x better than Cora" by leveraging advanced AI insights, real-time collaboration, and multi-format export capabilities.
+The Enhanced PMR feature transforms traditional project reporting into an AI-powered, interactive, and collaborative experience with enterprise-grade capabilities, leveraging advanced AI insights, real-time collaboration, and multi-format export.
 
 ## Current State Analysis
 
@@ -21,7 +21,7 @@ Based on codebase analysis, the existing system includes:
 
 ## Enhanced PMR Vision
 
-### Core Differentiators from Cora
+### Core Enterprise Differentiators
 1. **AI-Powered Natural Language Summaries**: Automatic generation of executive summaries
 2. **Interactive Chat-Editable Reports**: Real-time collaborative editing via AI chat
 3. **Predictive Insights**: Monte Carlo simulations and predictive analytics

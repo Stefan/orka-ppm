@@ -3,6 +3,8 @@
 
 // Main component
 export { Costbook, default } from './Costbook'
+// Costbook Roadmap: unified wireframe (3 phases, Financial Tracking columns, Distribution Settings)
+export { CostbookRoadmap } from './CostbookRoadmap'
 
 // Core components
 export { CurrencySelector, CurrencyBadge } from './CurrencySelector'
@@ -55,6 +57,11 @@ export { CSVImportDialog } from './CSVImportDialog'
 export { PerformanceDialog } from './PerformanceDialog'
 export { HelpDialog } from './HelpDialog'
 
+// Distribution Settings & Rules (Phase 2 & 3)
+export { DistributionPreview } from './DistributionPreview'
+export { DistributionSettingsDialog } from './DistributionSettingsDialog'
+export { DistributionRulesPanel } from './DistributionRulesPanel'
+
 // Re-export types for convenience
 export type { CurrencySelectorProps } from './CurrencySelector'
 export type { KPIBadgesProps } from './KPIBadges'
@@ -98,3 +105,8 @@ export type { MobileAccordionProps, AccordionSection, AccordionItemProps } from 
 export type { CSVImportDialogProps, ImportType } from './CSVImportDialog'
 export type { PerformanceDialogProps, PerformanceMetrics } from './PerformanceDialog'
 export type { HelpDialogProps } from './HelpDialog'
+
+// Distribution Settings & Rules types (Phase 2 & 3)
+export type { DistributionPreviewProps } from './DistributionPreview'
+export type { DistributionSettingsDialogProps } from './DistributionSettingsDialog'
+export type { DistributionRulesPanelProps } from './DistributionRulesPanel'

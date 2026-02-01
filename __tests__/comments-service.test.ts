@@ -330,5 +330,60 @@ describe('Comments Service', () => {
         { numRuns: 10 }
       )
     })
+
+    // Property 18: Comment Data Completeness (Validates: Requirements 14.2)
+    it('Property 18: every comment has required fields and valid types', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            project_id: fc.option(fc.string(), { nil: undefined }),
+            sort_by: fc.option(fc.constantFrom('newest', 'oldest'), { nil: undefined }),
+            limit: fc.option(fc.nat({ max: 50 }), { nil: undefined })
+          }),
+          async (filter) => {
+            const comments = await fetchComments(filter)
+            for (const c of comments) {
+              expect(typeof c.id).toBe('string')
+              expect(typeof c.project_id).toBe('string')
+              expect(typeof c.user_id).toBe('string')
+              expect(typeof c.content).toBe('string')
+              expect(Array.isArray(c.mentions)).toBe(true)
+              expect(typeof c.created_at).toBe('string')
+              expect(typeof c.updated_at).toBe('string')
+              expect(typeof c.author_name).toBe('string')
+              expect(typeof c.reply_count).toBe('number')
+              expect(c.reply_count).toBeGreaterThanOrEqual(0)
+              expect(typeof c.is_edited).toBe('boolean')
+            }
+          }
+        ),
+        { numRuns: 15 }
+      )
+    })
+
+    // Property 19: Comment Chronological Ordering (Validates: Requirements 14.5)
+    it('Property 19: sort_by newest returns non-ascending created_at; sort_by oldest returns non-descending', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            project_id: fc.option(fc.string(), { nil: undefined }),
+            sort_by: fc.constantFrom('newest', 'oldest')
+          }),
+          async (filter) => {
+            const comments = await fetchComments({ ...filter, limit: 50 })
+            for (let i = 1; i < comments.length; i++) {
+              const prev = new Date(comments[i - 1].created_at).getTime()
+              const curr = new Date(comments[i].created_at).getTime()
+              if (filter.sort_by === 'newest') {
+                expect(prev).toBeGreaterThanOrEqual(curr)
+              } else {
+                expect(prev).toBeLessThanOrEqual(curr)
+              }
+            }
+          }
+        ),
+        { numRuns: 15 }
+      )
+    })
   })
 })

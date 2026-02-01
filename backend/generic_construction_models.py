@@ -2,7 +2,7 @@
 Pydantic models for Generic Construction/Engineering PPM Features
 """
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 from typing import List, Dict, Any, Optional, Union
 from datetime import datetime, date
 from decimal import Decimal
@@ -99,14 +99,17 @@ class ShareableURLCreate(BaseModel):
     expires_at: datetime
     description: Optional[str] = None
     
-    @validator('expires_at')
-    def validate_expiration(cls, v):
+    @field_validator('expires_at')
+    @classmethod
+    def validate_expiration(cls, v: datetime) -> datetime:
         if v <= datetime.now():
             raise ValueError('Expiration time must be in the future')
         return v
 
 
 class ShareableURLResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     project_id: UUID
     token: str
@@ -117,9 +120,6 @@ class ShareableURLResponse(BaseModel):
     last_accessed: Optional[datetime]
     is_revoked: bool
     created_at: datetime
-    
-    class Config:
-        from_attributes = True
 
 
 class ShareableURLValidation(BaseModel):
@@ -137,8 +137,9 @@ class SimulationConfig(BaseModel):
     include_schedule_analysis: bool = True
     risk_correlation_matrix: Optional[Dict[str, Dict[str, float]]] = None
     
-    @validator('confidence_levels')
-    def validate_confidence_levels(cls, v):
+    @field_validator('confidence_levels')
+    @classmethod
+    def validate_confidence_levels(cls, v: List[float]) -> List[float]:
         for level in v:
             if not 0 < level < 1:
                 raise ValueError('Confidence levels must be between 0 and 1')
@@ -162,6 +163,8 @@ class SimulationCreate(BaseModel):
 
 
 class SimulationResult(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     project_id: UUID
     simulation_type: SimulationType
@@ -175,9 +178,6 @@ class SimulationResult(BaseModel):
     iterations_completed: Optional[int]
     created_by: UUID
     created_at: datetime
-    
-    class Config:
-        from_attributes = True
 
 
 # Scenario Analysis Models
@@ -227,6 +227,8 @@ class ScenarioCreate(BaseModel):
 
 
 class ScenarioAnalysis(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     project_id: UUID
     name: str
@@ -241,9 +243,6 @@ class ScenarioAnalysis(BaseModel):
     updated_at: datetime
     is_active: bool
     is_baseline: bool
-    
-    class Config:
-        from_attributes = True
 
 
 class ScenarioComparison(BaseModel):
@@ -289,6 +288,8 @@ class ChangeRequestUpdate(BaseModel):
 
 
 class ChangeRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     project_id: UUID
     change_number: str
@@ -311,9 +312,6 @@ class ChangeRequest(BaseModel):
     approved_by: Optional[UUID]
     created_at: datetime
     updated_at: datetime
-    
-    class Config:
-        from_attributes = True
 
 
 class ApprovalDecision(BaseModel):
@@ -372,6 +370,8 @@ class POBreakdownUpdate(BaseModel):
 
 
 class POBreakdown(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     project_id: UUID
     name: str
@@ -399,9 +399,6 @@ class POBreakdown(BaseModel):
     is_active: bool
     created_at: datetime
     updated_at: datetime
-    
-    class Config:
-        from_attributes = True
 
 
 class ImportConfig(BaseModel):
@@ -460,6 +457,8 @@ class ReportTemplateCreate(BaseModel):
 
 
 class ReportTemplate(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     name: str
     description: Optional[str]
@@ -478,9 +477,6 @@ class ReportTemplate(BaseModel):
     created_by: UUID
     created_at: datetime
     updated_at: datetime
-    
-    class Config:
-        from_attributes = True
 
 
 class ReportConfig(BaseModel):
@@ -501,6 +497,8 @@ class ReportGenerationRequest(BaseModel):
 
 
 class GeneratedReport(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     project_id: UUID
     template_id: UUID
@@ -516,9 +514,6 @@ class GeneratedReport(BaseModel):
     generated_by: UUID
     created_at: datetime
     completed_at: Optional[datetime]
-    
-    class Config:
-        from_attributes = True
 
 
 # Statistics and Analytics Models
@@ -553,6 +548,8 @@ class POBreakdownSummary(BaseModel):
 
 # Access Log Models
 class ShareableURLAccessLog(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     shareable_url_id: UUID
     accessed_at: datetime
@@ -563,6 +560,3 @@ class ShareableURLAccessLog(BaseModel):
     denial_reason: Optional[str]
     sections_accessed: List[str]
     session_duration_seconds: Optional[int]
-    
-    class Config:
-        from_attributes = True

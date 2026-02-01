@@ -83,7 +83,14 @@ export default function MonteCarloVisualization({
             : null
 
         if (response.status === 404) {
-          setError('Simulation results not found. Run a simulation first to generate charts.')
+          const msg = typeof errorData.detail === 'string' ? errorData.detail : 'Simulation results not found. Run a simulation first to generate charts.'
+          setError(msg)
+          setLoading(false)
+          return
+        }
+        if (response.status === 503) {
+          const msg = typeof errorData.detail === 'string' ? errorData.detail : 'Visualization service unavailable. Start the backend (e.g. port 8000) and try again.'
+          setError(msg)
           setLoading(false)
           return
         }

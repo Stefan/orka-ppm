@@ -629,4 +629,45 @@ export function updateRecommendationStatus(
   )
 }
 
+// Task 43.5: Recommendation learning - track user feedback for algorithm adjustment
+export interface RecommendationFeedbackRecord {
+  recommendationId: string
+  category: EnhancedRecommendation['category']
+  status: EnhancedRecommendation['status']
+  timestamp: string
+}
+
+const feedbackStore: RecommendationFeedbackRecord[] = []
+
+/**
+ * Record user feedback on a recommendation (accept/reject/defer).
+ * Used to adjust recommendation algorithm over time (Phase 3).
+ */
+export function recordRecommendationFeedback(
+  recommendationId: string,
+  category: EnhancedRecommendation['category'],
+  status: EnhancedRecommendation['status']
+): void {
+  feedbackStore.push({
+    recommendationId,
+    category,
+    status,
+    timestamp: new Date().toISOString()
+  })
+}
+
+/**
+ * Get feedback stats per category (for learning / tuning).
+ */
+export function getRecommendationFeedbackStats(): Record<string, { accepted: number; rejected: number; deferred: number }> {
+  const stats: Record<string, { accepted: number; rejected: number; deferred: number }> = {}
+  for (const f of feedbackStore) {
+    if (!stats[f.category]) stats[f.category] = { accepted: 0, rejected: 0, deferred: 0 }
+    if (f.status === 'accepted') stats[f.category].accepted++
+    else if (f.status === 'rejected') stats[f.category].rejected++
+    else if (f.status === 'deferred') stats[f.category].deferred++
+  }
+  return stats
+}
+
 export default generateRecommendations

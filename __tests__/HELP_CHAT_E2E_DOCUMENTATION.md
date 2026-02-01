@@ -73,7 +73,7 @@ The end-to-end tests cover all requirements from the Help Chat specification:
 
 ### Scope Control and IP Protection (Requirements 10.1-10.5)
 - ✅ **10.1**: Competitor/external tool redirection to PPM features
-- ✅ **10.2**: No Cora project management methodology references
+- ✅ **10.2**: No external proprietary methodology references
 - ✅ **10.3**: General business advice limitation to PPM capabilities
 - ✅ **10.4**: Prompt engineering for response boundary maintenance
 - ✅ **10.5**: Scope violation logging for system improvement
@@ -249,7 +249,7 @@ npm test -- lib/__tests__/help-chat-api.test.ts
 #### Scope Validation
 - Competitor tool questions (Microsoft Project, Jira)
 - Off-topic questions (weather, news, general advice)
-- Cora methodology references
+- External proprietary methodology references
 - External system integration questions
 
 #### Performance Edge Cases

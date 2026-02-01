@@ -241,20 +241,7 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
     }
   }, [performanceState.memoryInfo])
 
-  // Performance budget alerts
-  useEffect(() => {
-    const exceededBudgets = performanceState.budgetStatus.filter(
-      budget => budget.status === 'exceeded'
-    )
-
-    if (exceededBudgets.length > 0 && process.env.NODE_ENV === 'development') {
-      console.group('🚨 Performance Budget Violations')
-      exceededBudgets.forEach(budget => {
-        console.warn(`${budget.metric}: ${budget.current.toFixed(2)} > ${budget.budget}`)
-      })
-      console.groupEnd()
-    }
-  }, [performanceState.budgetStatus])
+  // Budget status is shown in the Performance Debug Panel (no console logging)
 
   // Lazy loading intersection observer
   useEffect(() => {

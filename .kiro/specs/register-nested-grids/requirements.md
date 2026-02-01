@@ -128,13 +128,13 @@ Dieses Feature ermöglicht Expand-Rows in Registers (Kostenbuch-Projekten), um v
 5. THE Nested_Grid SHALL Filter-State beim Navigation Return erhalten
 6. THE Nested_Grid SHALL AI-Vorschläge für häufig verwendete Filter-Kombinationen anzeigen
 
-### Requirement 10: Integration mit Costbook 4.0
+### Requirement 10: Integration mit Costbook
 
-**User Story:** Als Benutzer möchte ich im Costbook 4.0-Tab Projects-Grid als Nested-Register sehen, so dass ich zu Commitments/Actuals expandieren kann.
+**User Story:** Als Benutzer möchte ich im Costbook-Tab Projects-Grid als Nested-Register sehen, so dass ich zu Commitments/Actuals expandieren kann.
 
 #### Acceptance Criteria
 
-1. WHEN ein Benutzer den Costbook 4.0-Tab öffnet, THE Costbook_View SHALL das Projects-Grid mit Nested Grid Funktionalität anzeigen
+1. WHEN ein Benutzer den Costbook-Tab öffnet, THE Costbook_View SHALL das Projects-Grid mit Nested Grid Funktionalität anzeigen
 2. WHEN ein Benutzer eine Project-Row expandiert, THE Projects_Grid SHALL Nested Grids für Commitments und Actuals anzeigen
 3. WHEN ein Benutzer ein Commitment oder Actual expandiert, THE Nested_Grid SHALL weitere Details in einem zweiten Nesting-Level anzeigen
 4. THE Costbook_View SHALL alle konfigurierten Nested Grid Features (Inline-Editing, Filters, Drag&Drop) unterstützen

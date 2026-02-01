@@ -322,3 +322,71 @@ export interface ImportTemplate {
   usage_count: number
   last_used: string
 }
+
+// Extended Commitment interface with additional financial tracking fields
+export interface ExtendedCommitment extends Commitment {
+  total_amount?: number
+  po_date?: string
+  po_line_nr?: string
+  po_line_text?: string
+  vendor_description?: string
+  requester?: string
+  cost_center?: string
+  wbs_element?: string
+  account_group_level1?: string
+  account_subgroup_level2?: string
+  account_level3?: string
+  custom_fields?: Record<string, unknown>
+}
+
+// Extended Actual interface with additional financial tracking fields
+export interface ExtendedActual extends Actual {
+  po_no?: string
+  posting_date?: string
+  gl_account?: string
+  cost_center?: string
+  wbs_element?: string
+  item_text?: string
+  quantity?: number
+  net_due_date?: string
+  custom_fields?: Record<string, unknown>
+}
+
+// Cost Breakdown Structure - financial tracking columns
+export interface CostBreakdownRow {
+  approved_budget: number
+  eac: number
+  variance: number
+  open_committed: number
+  invoice_value: number
+  actual_cost: number
+}
+
+// Cash Out Forecast: time bucket + distribution
+export interface CashOutForecastBucket {
+  period_start: string
+  period_end: string
+  planned: number
+  commitments: number
+  actuals: number
+}
+
+// Distribution Settings for forecast planning (Phase 2)
+export type DistributionProfile = 'linear' | 'custom' | 'ai_generated'
+
+export interface DistributionSettings {
+  profile: DistributionProfile
+  duration_start: string
+  duration_end: string
+  granularity: 'week' | 'month'
+}
+
+// Distribution Rules Engine (Phase 3)
+export type DistributionRuleType = 'automatic' | 'reprofiling' | 'ai_generator'
+
+export interface DistributionRule {
+  id: string
+  type: DistributionRuleType
+  profile: DistributionProfile
+  settings: DistributionSettings
+}

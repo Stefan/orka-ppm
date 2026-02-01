@@ -98,20 +98,9 @@ class PerformanceMonitor {
 
   private observeResourceTiming() {
     const resourceObserver = new PerformanceObserver((list) => {
-      const entries = list.getEntries()
-      entries.forEach((entry: any) => {
-        const resource: ResourceTiming = {
-          name: entry.name,
-          duration: entry.duration,
-          size: entry.transferSize,
-          type: this.getResourceType(entry.name)
-        }
-
-        // Log slow resources
-        if (resource.duration > 1000) {
-          logger.warn('Slow resource detected', resource)
-        }
-      })
+      // Resource timings available via getEntriesByType('resource') / analyzeResourceSizes
+      // No per-resource console logging to avoid noise
+      list.getEntries()
     })
 
     try {
@@ -124,19 +113,8 @@ class PerformanceMonitor {
 
   private observeLongTasks() {
     const longTaskObserver = new PerformanceObserver((list) => {
-      const entries = list.getEntries()
-      entries.forEach((entry) => {
-        // Only log tasks significantly over the 50ms threshold (150ms+)
-        // Tasks 50-150ms are common during initial load with charts and not concerning
-        // This reduces console noise while still catching truly problematic tasks
-        if (entry.duration >= 150) {
-          logger.warn('Long task detected', {
-            duration: entry.duration,
-            startTime: entry.startTime,
-            name: entry.name
-          })
-        }
-      })
+      // Long tasks observed for API availability; no console logging to avoid noise
+      list.getEntries()
     })
 
     try {
@@ -164,10 +142,7 @@ class PerformanceMonitor {
 
     logger.debug(`Performance metric: ${name}`, metric)
 
-    // Alert on poor performance
-    if (rating === 'poor') {
-      logger.warn(`Poor performance detected: ${name}`, metric)
-    }
+    // Poor ratings are tracked in metrics; no console alert to avoid noise
   }
 
   private getLCPRating(value: number): 'good' | 'needs-improvement' | 'poor' {
