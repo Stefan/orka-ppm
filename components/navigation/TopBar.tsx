@@ -168,7 +168,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             <button
               onClick={() => setMoreMenuOpen(!moreMenuOpen)}
               className={`flex items-center space-x-1 ${navLinkBase} ${
-                moreMenuOpen || ['/scenarios', '/monte-carlo', '/changes', '/audit', '/feedback', '/admin/performance', '/admin/users'].includes(pathname)
+                moreMenuOpen || ['/scenarios', '/monte-carlo', '/changes', '/audit', '/feedback', '/features', '/admin/performance', '/admin/users'].includes(pathname)
                   ? navLinkActive
                   : navLinkInactive
               }`}
@@ -240,7 +240,19 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   <MessageSquare className="h-4 w-4 mr-3 flex-shrink-0" />
                   Feedback & Ideas
                 </Link>
-                
+                <Link
+                  href="/features"
+                  className={`flex items-center px-3 py-2 mx-2 rounded-md text-sm transition-all ${
+                    pathname === '/features'
+                      ? 'bg-blue-600 text-white font-medium'
+                      : 'text-gray-900 hover:bg-blue-50 hover:text-blue-700'
+                  }`}
+                  onClick={() => setMoreMenuOpen(false)}
+                >
+                  <Layers className="h-4 w-4 mr-3 flex-shrink-0" />
+                  Features Overview
+                </Link>
+
                 <div className="border-t border-gray-200 my-2 mx-2"></div>
                 
                 <Link

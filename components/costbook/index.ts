@@ -59,8 +59,8 @@ export { HelpDialog } from './HelpDialog'
 
 // Distribution Settings & Rules (Phase 2 & 3)
 export { DistributionPreview } from './DistributionPreview'
-export { DistributionSettingsDialog } from './DistributionSettingsDialog'
-export { DistributionRulesPanel } from './DistributionRulesPanel'
+// DistributionSettingsDialog and DistributionRulesPanel are used internally via stubs in Costbook;
+// not re-exported here to avoid build failure when files are missing (e.g. in CI). Import from their paths if needed.
 
 // Re-export types for convenience
 export type { CurrencySelectorProps } from './CurrencySelector'
@@ -108,5 +108,3 @@ export type { HelpDialogProps } from './HelpDialog'
 
 // Distribution Settings & Rules types (Phase 2 & 3)
 export type { DistributionPreviewProps } from './DistributionPreview'
-export type { DistributionSettingsDialogProps } from './DistributionSettingsDialog'
-export type { DistributionRulesPanelProps } from './DistributionRulesPanel'

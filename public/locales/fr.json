@@ -484,6 +484,7 @@
   },
   "risks": {
     "title": "Gestion des risques",
+    "addRisk": "Ajouter un risque",
     "total": "Total",
     "highRisk": "Risque élevé",
     "avg": "Moy",

@@ -492,6 +492,7 @@
   },
   "risks": {
     "title": "Risikomanagement",
+    "addRisk": "Risiko hinzufügen",
     "total": "Gesamt",
     "highRisk": "Hohes Risiko",
     "avg": "Durchschn",

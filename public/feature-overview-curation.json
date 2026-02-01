@@ -1,0 +1,28 @@
+{
+  "excludeRouteIds": [
+    "route:/changes/[id]",
+    "route:/projects/[id]",
+    "route:/projects/[id]/share/[token]",
+    "route:/admin",
+    "route:/admin/feature-toggles",
+    "route:/admin/features",
+    "route:/features",
+    "route:/chrome-scroll-test",
+    "route:/design-system",
+    "route:/admin/navigation-stats",
+    "route:/offline",
+    "route:/admin/performance",
+    "route:/admin/users"
+  ],
+  "nameOverrides": {
+    "route:/audit": "Audit logs",
+    "route:/dashboards": "Dashboards",
+    "route:/financials": "Financials",
+    "route:/import": "Import data",
+    "route:/projects/import": "Import projects",
+    "route:/reports": "Reports",
+    "route:/reports/pmr": "PMR Reports",
+    "route:/resources": "Resources",
+    "route:/risks": "Risk management"
+  }
+}

@@ -1,41 +1,10 @@
 /**
- * Feature search: Fuse.js fuzzy search over name, description, link
- * Optional: use simple string match if Fuse not available
+ * Feature search: simple string match (case-insensitive) across name, description, link.
+ * No external dependency; fuzzy search (e.g. fuse.js) can be added later if needed.
  */
 import type { Feature, FeatureSearchResult } from '@/types/features'
 
-let FuseClass: typeof import('fuse.js').default | null = null
-try {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  FuseClass = require('fuse.js').default
-} catch {
-  FuseClass = null
-}
-
-const DEFAULT_OPTIONS = {
-  keys: ['name', 'description', 'link'] as const,
-  threshold: 0.4,
-  includeScore: true,
-}
-
-export function searchFeatures(
-  features: Feature[],
-  query: string
-): FeatureSearchResult[] {
-  const q = query.trim().toLowerCase()
-  if (!q) return features.map((f) => ({ feature: f }))
-
-  if (FuseClass) {
-    const fuse = new FuseClass(features, DEFAULT_OPTIONS)
-    const results = fuse.search(q)
-    return results.map((r) => ({
-      feature: r.item,
-      score: r.score,
-      matches: r.matches?.map((m) => m.value).filter(Boolean) as string[] | undefined,
-    }))
-  }
-
-  // Fallback: simple substring match
+function searchFeaturesFallback(features: Feature[], q: string): FeatureSearchResult[] {
   return features
     .filter(
       (f) =>
@@ -44,6 +13,29 @@ export function searchFeatures(
         (f.link && f.link.toLowerCase().includes(q))
     )
     .map((f) => ({ feature: f }))
+}
+
+/** Sync search. */
+export function searchFeaturesSync(
+  features: Feature[],
+  query: string
+): FeatureSearchResult[] {
+  const q = query.trim().toLowerCase()
+  if (!q) return features.map((f) => ({ feature: f }))
+  return searchFeaturesFallback(features, q)
+}
+
+/**
+ * Async search: uses string match. Does not depend on fuse.js at build time.
+ * Use this when you can handle a Promise (e.g. in useEffect).
+ */
+export async function searchFeatures(
+  features: Feature[],
+  query: string
+): Promise<FeatureSearchResult[]> {
+  const q = query.trim().toLowerCase()
+  if (!q) return features.map((f) => ({ feature: f }))
+  return Promise.resolve(searchFeaturesFallback(features, q))
 }
 
 export function getFeatureIdsFromSearchResults(

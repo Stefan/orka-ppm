@@ -480,6 +480,7 @@
   },
   "risks": {
     "title": "Zarządzanie Ryzykiem",
+    "addRisk": "Dodaj ryzyko",
     "total": "Wszystkie",
     "highRisk": "Wysokie Ryzyko",
     "avg": "Śr",

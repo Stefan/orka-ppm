@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import AppLayout from '../../components/shared/AppLayout'
-import { Users, Activity, Settings, Layers } from 'lucide-react'
+import { Users, Activity, Settings, Layers, ToggleLeft } from 'lucide-react'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -51,6 +51,15 @@ export default function AdminPage() {
             <Layers className="h-8 w-8 text-blue-600 mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Feature catalog</h2>
             <p className="text-gray-600">Manage features overview and screenshots</p>
+          </button>
+
+          <button
+            onClick={() => router.push('/admin/feature-toggles')}
+            className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow text-left"
+          >
+            <ToggleLeft className="h-8 w-8 text-amber-600 mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Feature toggles</h2>
+            <p className="text-gray-600">Enable or disable features globally or per organization</p>
           </button>
         </div>
       </div>

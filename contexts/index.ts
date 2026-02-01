@@ -1,6 +1,6 @@
 /**
  * Contexts Index
- * 
+ *
  * Central export point for all React contexts
  */
 
@@ -10,3 +10,9 @@ export type {
   PMRContextActions,
   PMRContextType
 } from './PMRContext'
+
+export {
+  FeatureFlagProvider,
+  useFeatureFlags,
+  useFeatureFlag
+} from './FeatureFlagContext'

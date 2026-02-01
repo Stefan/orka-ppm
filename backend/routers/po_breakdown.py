@@ -352,26 +352,29 @@ async def list_project_breakdowns(
         if not project_result.data:
             raise HTTPException(status_code=404, detail="Project not found")
         
-        # Use optimized paginated query if no filters and flag is set
+        # Use optimized paginated RPC when available and no filters; else use service
         if use_optimized_query and not search and not breakdown_type and not cost_center:
-            # Call optimized database function
-            result = supabase.rpc(
-                'get_po_breakdown_hierarchy_paginated',
-                {
-                    'proj_id': str(project_id),
-                    'parent_id': str(parent_id) if parent_id else None,
-                    'page_size': limit,
-                    'page_offset': offset
-                }
-            ).execute()
-            
-            breakdowns = []
-            for row in result.data:
-                breakdowns.append(POBreakdown(**row))
-            
-            return breakdowns
-        
-        # Fall back to service method for filtered queries
+            try:
+                result = supabase.rpc(
+                    'get_po_breakdown_hierarchy_paginated',
+                    {
+                        'proj_id': str(project_id),
+                        'parent_id': str(parent_id) if parent_id else None,
+                        'page_size': limit,
+                        'page_offset': offset
+                    }
+                ).execute()
+                if result.data is not None:
+                    breakdowns = []
+                    for row in result.data:
+                        row['remaining_amount'] = float(row.get('planned_amount', 0)) - float(row.get('actual_amount', 0))
+                        breakdowns.append(POBreakdown(**row))
+                    return breakdowns
+            except Exception:
+                # RPC may not exist or return incompatible shape; fall back to service
+                pass
+
+        # Service path: filtered queries or when RPC is unavailable
         if search or breakdown_type or cost_center:
             results = await po_breakdown_service.search_breakdowns(
                 project_id=project_id,
