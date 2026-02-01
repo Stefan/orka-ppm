@@ -36,9 +36,19 @@ backend/*.log
 # IDE and editor files
 .vscode/
 .idea/
+.cursor/
 *.swp
 *.swo
 *~
+
+# Accidental / noise directories (do not commit)
+#/
+Use/
+if/
+installed/
+it/
+you/
+python3.12/
 
 # OS generated files
 .DS_Store
