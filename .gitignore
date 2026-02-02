@@ -177,3 +177,5 @@ SECURITY_INCIDENT_RESPONSE.md
 SUPABASE_REDIRECT_SETUP.md
 deploy-password-reset.sh
 remove-credentials-from-history.sh
+# Python virtual environment
+#/

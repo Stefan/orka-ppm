@@ -603,6 +603,123 @@ class ResourceAssignmentService:
         except Exception as e:
             logger.error(f"Error getting schedule resource summary: {e}")
             raise RuntimeError(f"Failed to get schedule resource summary: {str(e)}")
+
+    async def get_schedule_resource_availability(
+        self,
+        schedule_id: UUID
+    ) -> Dict[str, Any]:
+        """
+        Get resource availability for the schedule: capacity, assigned hours, remaining capacity.
+        Requirements: 8.3 - resource availability checking.
+        """
+        try:
+            summary = await self.get_schedule_resource_summary(schedule_id)
+            availability_list = []
+            for r in summary.get("resource_utilization", []):
+                capacity = 40  # default
+                # Recompute from assignments if we had raw capacity
+                utilization_pct = r.get("utilization_percentage", 0)
+                total_planned = r.get("total_planned_hours", 0) or 0
+                # Assume capacity from utilization: capacity = planned / (util_pct/100)
+                capacity_hours = (total_planned / (utilization_pct / 100)) if utilization_pct > 0 else 40
+                remaining_hours = max(0, capacity_hours - total_planned)
+                availability_list.append({
+                    "resource_id": r["resource_id"],
+                    "resource_name": r["resource_name"],
+                    "capacity_hours": round(capacity_hours, 2),
+                    "assigned_hours": round(total_planned, 2),
+                    "remaining_hours": round(remaining_hours, 2),
+                    "utilization_percentage": r.get("utilization_percentage", 0),
+                    "is_available": r.get("is_overallocated", False) is False,
+                })
+            return {
+                "schedule_id": str(schedule_id),
+                "resources": availability_list,
+                "conflicts": summary.get("conflicts", []),
+            }
+        except Exception as e:
+            logger.error(f"Error getting schedule resource availability: {e}")
+            raise RuntimeError(f"Failed to get schedule resource availability: {str(e)}")
+
+    async def sync_schedule_assignments_to_project(
+        self,
+        schedule_id: UUID
+    ) -> Dict[str, Any]:
+        """
+        Synchronize task_resource_assignments for this schedule to project_resources
+        so the rest of the PPM platform sees which resources are on the project.
+        Requirements: 8.3, 8.5 - resource assignment synchronization.
+        """
+        try:
+            # Get schedule -> project_id
+            schedule_result = self.db.table("schedules").select("id, project_id").eq("id", str(schedule_id)).execute()
+            if not schedule_result.data:
+                raise ValueError(f"Schedule {schedule_id} not found")
+            project_id = schedule_result.data[0]["project_id"]
+
+            # All task_resource_assignments for tasks in this schedule
+            assignments_result = self.db.table("task_resource_assignments").select(
+                "resource_id, allocation_percentage, assignment_start_date, assignment_end_date"
+            ).eq("tasks.schedule_id", str(schedule_id))
+            # Supabase join: we need to query via tasks
+            task_ids_result = self.db.table("tasks").select("id").eq("schedule_id", str(schedule_id)).execute()
+            if not task_ids_result.data:
+                return {"schedule_id": str(schedule_id), "project_id": str(project_id), "synced": 0, "message": "No tasks in schedule"}
+            task_ids = [str(t["id"]) for t in task_ids_result.data]
+
+            assignments_result = self.db.table("task_resource_assignments").select(
+                "resource_id, allocation_percentage, assignment_start_date, assignment_end_date"
+            ).in_("task_id", task_ids).execute()
+            assignments = assignments_result.data or []
+
+            # Group by resource_id: min start, max end, max allocation
+            by_resource: Dict[str, Dict[str, Any]] = {}
+            for a in assignments:
+                rid = a["resource_id"]
+                if rid not in by_resource:
+                    by_resource[rid] = {
+                        "resource_id": rid,
+                        "allocation_percentage": a["allocation_percentage"],
+                        "start_date": a["assignment_start_date"],
+                        "end_date": a["assignment_end_date"],
+                    }
+                else:
+                    by_resource[rid]["allocation_percentage"] = max(
+                        by_resource[rid]["allocation_percentage"], a["allocation_percentage"]
+                    )
+                    if a["assignment_start_date"] and (not by_resource[rid]["start_date"] or a["assignment_start_date"] < by_resource[rid]["start_date"]):
+                        by_resource[rid]["start_date"] = a["assignment_start_date"]
+                    if a["assignment_end_date"] and (not by_resource[rid]["end_date"] or a["assignment_end_date"] > by_resource[rid]["end_date"]):
+                        by_resource[rid]["end_date"] = a["assignment_end_date"]
+
+            synced = 0
+            for rid, info in by_resource.items():
+                existing = self.db.table("project_resources").select("id").eq("project_id", str(project_id)).eq("resource_id", str(rid)).execute()
+                row = {
+                    "project_id": str(project_id),
+                    "resource_id": str(rid),
+                    "allocation_percentage": info["allocation_percentage"],
+                    "start_date": info["start_date"],
+                    "end_date": info["end_date"],
+                    "updated_at": datetime.utcnow().isoformat(),
+                }
+                if existing.data:
+                    self.db.table("project_resources").update(row).eq("project_id", str(project_id)).eq("resource_id", str(rid)).execute()
+                else:
+                    self.db.table("project_resources").insert(row).execute()
+                synced += 1
+
+            return {
+                "schedule_id": str(schedule_id),
+                "project_id": str(project_id),
+                "synced": synced,
+                "message": f"Synchronized {synced} resource(s) to project",
+            }
+        except ValueError:
+            raise
+        except Exception as e:
+            logger.error(f"Error syncing schedule assignments to project: {e}")
+            raise RuntimeError(f"Failed to sync schedule assignments to project: {str(e)}")
     
     # Private helper methods
     

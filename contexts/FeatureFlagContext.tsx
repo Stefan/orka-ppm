@@ -26,24 +26,19 @@ export function FeatureFlagProvider({ children }: { children: React.ReactNode })
   const [error, setError] = useState<Error | null>(null)
 
   const fetchFlags = useCallback(async () => {
-    if (!session?.access_token) {
-      setFlags(new Map())
-      setLoading(false)
-      return
-    }
-
     setLoading(true)
     setError(null)
     let lastErr: Error | null = null
 
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
-        const url = getApiUrl('/api/features')
-        const response = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        })
+        // Use relative URL to go through Next.js API route (not getApiUrl which might point to backend)
+        const url = '/api/features'
+        const headers: HeadersInit = {}
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`
+        }
+        const response = await fetch(url, { headers })
 
         if (!response.ok) {
           if (response.status === 401) {

@@ -162,7 +162,11 @@
     "commitmentsVsActualsSummary": "Verpflichtungen vs. Ist-Werte Zusammenfassung",
     "totalCommitments": "Gesamtverpflichtungen",
     "totalActuals": "Gesamt-Ist-Werte",
-    "netVariance": "Netto-Varianz"
+    "netVariance": "Netto-Varianz",
+    "noData": "Keine Varianzdaten vorhanden.",
+    "importCsvToSee": "CSV-Dateien importieren, um die Varianzanalyse zu sehen.",
+    "dataUnavailable": "Varianzdaten nicht verfügbar: {error}",
+    "importCsv": "CSV importieren"
   },
   "financials": {
     "title": "Finanzmanagement",

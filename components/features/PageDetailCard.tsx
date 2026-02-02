@@ -11,9 +11,10 @@ export interface PageDetailCardProps {
 }
 
 export function PageDetailCard({ node, className = '' }: PageDetailCardProps) {
-  // #region agent log
-  if (node && typeof fetch !== 'undefined') {
-    fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', {
+  // #region agent log (only when NEXT_PUBLIC_AGENT_INGEST_URL is set to avoid ERR_CONNECTION_REFUSED in Lighthouse)
+  const ingestUrl = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_AGENT_INGEST_URL : undefined
+  if (ingestUrl && node && typeof fetch !== 'undefined') {
+    fetch(ingestUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

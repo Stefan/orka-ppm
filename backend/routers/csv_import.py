@@ -2,11 +2,12 @@
 CSV import functionality endpoints
 """
 
-from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Query
+from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Query, Request
 from uuid import UUID
 from typing import Optional, Dict, Any, List
 import csv
 import io
+import json
 from datetime import datetime
 
 from auth.dependencies import get_current_user
@@ -14,6 +15,7 @@ from auth.rbac import require_permission, Permission
 from config.database import supabase, service_supabase
 from utils.converters import convert_uuids
 from services.actuals_commitments_import import ActualsCommitmentsImportService
+from services.enterprise_audit_service import EnterpriseAuditService
 
 router = APIRouter(prefix="/csv-import", tags=["csv-import"])
 
@@ -275,9 +277,10 @@ def map_csv_columns(rows: List[Dict[str, Any]], import_type: str) -> List[Dict[s
 
 @router.post("/upload")
 async def upload_csv_file(
+    request: Request,
     file: UploadFile = File(...),
     import_type: str = Query(...),  # "actuals" or "commitments"
-    current_user = Depends(require_permission(Permission.data_import))
+    current_user = Depends(require_permission(Permission.data_import)),
 ):
     """
     Upload and process CSV file for actuals or commitments import.
@@ -339,7 +342,25 @@ async def upload_csv_file(
             result = await import_service.import_actuals(rows, anonymize=True)
         else:  # commitments
             result = await import_service.import_commitments(rows, anonymize=True)
-        
+
+        # Phase 1: SOX audit log
+        try:
+            ip = request.client.host if request.client else None
+            EnterpriseAuditService().log(
+                user_id=str(user_id),
+                action="CREATE",
+                entity=f"csv_import_{import_type}",
+                new_value=json.dumps({
+                    "import_id": result.import_id,
+                    "total_records": result.total_records,
+                    "success_count": result.success_count,
+                    "error_count": len(result.errors),
+                }, default=str),
+                ip=ip,
+            )
+        except Exception as e:
+            print(f"Enterprise audit log failed: {e}")
+
         # Return result in format expected by frontend
         return {
             "success": result.success,
@@ -545,11 +566,11 @@ async def get_financial_variances(
     limit: int = 100,
     current_user = Depends(get_current_user)
 ):
-    """Get financial variances calculated from commitments vs actuals"""
+    """Get financial variances calculated from commitments vs actuals (DB tables: commitments, actuals)."""
     try:
         if supabase is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        
+
         # Get commitments grouped by project_nr and wbs_element
         try:
             commitments_response = supabase.table("commitments").select(
@@ -558,62 +579,55 @@ async def get_financial_variances(
             commitments = commitments_response.data or []
         except Exception as db_error:
             print(f"Database query error: {db_error}")
-            # Return empty result instead of failing
             return {
                 "variances": [],
-                "summary": {
-                    "total_variances": 0,
-                    "over_budget": 0,
-                    "under_budget": 0,
-                    "on_budget": 0
-                },
-                "filters": {
-                    "organization_id": organization_id,
-                    "project_id": project_id,
-                    "status": status,
-                    "limit": limit
-                }
+                "summary": {"total_variances": 0, "over_budget": 0, "under_budget": 0, "on_budget": 0},
+                "filters": {"organization_id": organization_id, "project_id": project_id, "status": status, "limit": limit},
             }
-        
-        # Get actuals grouped by project_nr and wbs
+
+        # Actuals table: project_nr, wbs, invoice_amount (not wbs_element/amount)
         try:
             actuals_response = supabase.table("actuals").select(
-                "project_nr, wbs_element, amount"
+                "project_nr, wbs, invoice_amount"
             ).execute()
             actuals = actuals_response.data or []
         except Exception as db_error:
             print(f"Database query error: {db_error}")
             actuals = []
-        
+
+        def _actual_wbs(row):
+            return row.get("wbs") or row.get("wbs_element") or ""
+
+        def _actual_amount(row):
+            return float(row.get("invoice_amount") or row.get("amount") or 0)
+
         # Group commitments by (project_nr, wbs_element)
         commitment_groups = {}
         for commitment in commitments:
-            key = (commitment.get('project_nr'), commitment.get('wbs_element'))
+            key = (commitment.get("project_nr") or "", commitment.get("wbs_element") or "")
             if key not in commitment_groups:
                 commitment_groups[key] = {
-                    'project_nr': commitment.get('project_nr'),
-                    'wbs_element': commitment.get('wbs_element'),
-                    'project_description': commitment.get('project_description'),
-                    'total_commitment': 0
+                    "project_nr": commitment.get("project_nr"),
+                    "wbs_element": commitment.get("wbs_element"),
+                    "project_description": commitment.get("project_description"),
+                    "total_commitment": 0,
                 }
             try:
-                amount = float(commitment.get('total_amount', 0))
-                commitment_groups[key]['total_commitment'] += amount
+                commitment_groups[key]["total_commitment"] += float(commitment.get("total_amount", 0))
             except (ValueError, TypeError):
                 pass
-        
-        # Group actuals by (project_nr, wbs_element)
+
+        # Group actuals by (project_nr, wbs) – wbs matches commitments wbs_element
         actual_groups = {}
         for actual in actuals:
-            key = (actual.get('project_nr'), actual.get('wbs_element'))
+            key = (actual.get("project_nr") or "", _actual_wbs(actual))
             if key not in actual_groups:
                 actual_groups[key] = 0
             try:
-                amount = float(actual.get('amount', 0))
-                actual_groups[key] += amount
+                actual_groups[key] += _actual_amount(actual)
             except (ValueError, TypeError):
                 pass
-        
+
         # Calculate variances
         variances = []
         for key, commitment_data in commitment_groups.items():

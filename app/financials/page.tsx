@@ -1,6 +1,7 @@
 'use client'
 
 import React, { lazy, Suspense, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import { AlertTriangle } from 'lucide-react'
 import AppLayout from '../../components/shared/AppLayout'
@@ -31,16 +32,32 @@ import { ViewMode } from './types'
 const CommitmentsActualsView = lazy(() => import('./components/CommitmentsActualsView'))
 const Costbook = lazy(() => import('../../components/costbook/Costbook'))
 
+const TAB_PARAM_VALID: ViewMode[] = ['overview', 'detailed', 'trends', 'analysis', 'po-breakdown', 'csv-import', 'commitments-actuals', 'costbook']
+
+function getInitialViewMode(searchParams: ReturnType<typeof useSearchParams>): ViewMode {
+  const tab = searchParams.get('tab')
+  return (tab && TAB_PARAM_VALID.includes(tab as ViewMode)) ? (tab as ViewMode) : 'overview'
+}
+
 export default function Financials() {
   const { session } = useAuth()
+  const searchParams = useSearchParams()
   const { t } = useTranslations()
   const [selectedCurrency, setSelectedCurrency] = React.useState('USD')
   const [dateRange, setDateRange] = React.useState('all')
   const [showFilters, setShowFilters] = React.useState(false)
-  const [viewMode, setViewMode] = React.useState<ViewMode>('overview')
+  const [viewMode, setViewMode] = React.useState<ViewMode>(() => getInitialViewMode(searchParams))
 
   // Feature flag checks
   const { enabled: costbookEnabled } = useFeatureFlag('costbook_phase1')
+
+  // Sync view mode when URL tab param changes (e.g. back/forward)
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab && TAB_PARAM_VALID.includes(tab as ViewMode)) {
+      setViewMode(tab as ViewMode)
+    }
+  }, [searchParams])
 
   // Redirect from costbook view if feature is disabled
   useEffect(() => {

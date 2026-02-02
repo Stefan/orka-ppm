@@ -162,7 +162,11 @@
     "commitmentsVsActualsSummary": "Resumen de Compromisos vs Reales",
     "totalCommitments": "Compromisos Totales",
     "totalActuals": "Reales Totales",
-    "netVariance": "Variación Neta"
+    "netVariance": "Variación Neta",
+    "noData": "No hay datos de variación.",
+    "importCsvToSee": "Importe archivos CSV para ver el análisis de variación.",
+    "dataUnavailable": "Datos de variación no disponibles: {error}",
+    "importCsv": "Importar CSV"
   },
   "financials": {
     "title": "Gestión Financiera",

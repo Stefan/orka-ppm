@@ -43,6 +43,10 @@ const WorkflowDashboard = dynamic(() => import('@/components/workflow/WorkflowDa
   ssr: false,
   loading: () => <div className="h-48 bg-gray-100 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
 })
+const ScheduleDashboardWidgets = dynamic(() => import('./components/ScheduleDashboardWidgets'), {
+  ssr: false,
+  loading: () => <div className="h-32 bg-gray-100 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
+})
 
 // KPI Card Component - balanced sizing with design tokens
 function KPICard({ label, value, change, icon: Icon, color, testId }: any) {
@@ -402,6 +406,13 @@ export default function CompactDashboard() {
             </Suspense>
           </div>
         </div>
+
+        {/* Schedule widgets (Task 15) */}
+        {session?.access_token && (
+          <Suspense fallback={<div className="h-32 bg-gray-100 rounded-lg animate-pulse" />}>
+            <ScheduleDashboardWidgets accessToken={session.access_token} />
+          </Suspense>
+        )}
 
         {/* Health Summary - Full Width */}
         <div data-testid="dashboard-health-section" className="space-y-2 md:space-y-3">

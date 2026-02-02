@@ -1,4 +1,3 @@
-import { getApiUrl } from '../../../lib/api'
 import { 
   Project, 
   BudgetVariance, 
@@ -10,7 +9,7 @@ import {
 
 export async function fetchProjects(accessToken: string): Promise<Project[]> {
   try {
-    const url = getApiUrl('/projects/')
+    const url = '/api/projects'
     console.log('Fetching projects from:', url)
 
     const controller = new AbortController()
@@ -66,7 +65,7 @@ export async function fetchBudgetVariance(
   accessToken: string
 ): Promise<BudgetVariance | null> {
   try {
-    const url = getApiUrl(`/projects/${projectId}/budget-variance?currency=${currency}`)
+    const url = `/api/projects/${projectId}/budget-variance?currency=${currency}`
     console.log('Fetching budget variance from:', url)
 
     const controller = new AbortController()
@@ -112,7 +111,7 @@ export async function fetchBudgetVariance(
 
 export async function fetchFinancialAlerts(accessToken: string): Promise<FinancialAlert[]> {
   try {
-    const url = getApiUrl('/financial-tracking/budget-alerts?threshold_percentage=80')
+    const url = '/api/financial-tracking/budget-alerts?threshold_percentage=80'
     console.log('Fetching financial alerts from:', url)
 
     const controller = new AbortController()
@@ -242,7 +241,7 @@ export async function fetchComprehensiveReport(
 ): Promise<ComprehensiveFinancialReport | null> {
   try {
     const response = await fetch(
-      getApiUrl(`/financial-tracking/comprehensive-report?currency=${currency}&include_trends=true`), 
+      `/api/financial-tracking/comprehensive-report?currency=${currency}&include_trends=true`, 
       {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -269,7 +268,7 @@ export async function fetchComprehensiveReport(
 
 export async function fetchCSVImportHistory(accessToken: string): Promise<CSVImportHistory[]> {
   try {
-    const response = await fetch(getApiUrl('/csv-import/history'), {
+    const response = await fetch('/api/csv-import/history', {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
@@ -296,7 +295,7 @@ export async function uploadCSVFile(
   formData.append('file', file)
   
   const response = await fetch(
-    getApiUrl(`/csv-import/upload?import_type=${importType}`), 
+    `/api/csv-import/upload?import_type=${importType}`, 
     {
       method: 'POST',
       headers: {
@@ -325,7 +324,7 @@ export async function downloadCSVTemplate(
   importType: 'commitments' | 'actuals', 
   accessToken: string
 ): Promise<void> {
-  const response = await fetch(getApiUrl(`/csv-import/template/${importType}`), {
+  const response = await fetch(`/api/csv-import/template/${importType}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     }

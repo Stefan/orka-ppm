@@ -179,28 +179,31 @@ export async function GET() {
     const curation = await curateRoutesWithGrok(result.routes)
     const curatedRoutes = applyCuration(result.routes, curation)
 
-    // #region agent log
+    // #region agent log (only when NEXT_PUBLIC_AGENT_INGEST_URL is set to avoid ERR_CONNECTION_REFUSED in Lighthouse)
+    const ingestUrl = process.env.NEXT_PUBLIC_AGENT_INGEST_URL
     const hasApiKey = Boolean(process.env.OPENAI_API_KEY)
     const descCount = Object.keys(curation.descriptions || {}).length
     const firstCurated = curatedRoutes[0]
-    fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: 'app/api/features/docs/route.ts:GET',
-        message: 'Docs API after curation',
-        data: {
-          hasApiKey,
-          descCount,
-          firstRouteId: firstCurated?.id,
-          firstRouteDescLen: firstCurated?.description?.length ?? 0,
-          responseHasFeatureDescriptions: false,
-        },
-        timestamp: Date.now(),
-        sessionId: 'debug-session',
-        hypothesisId: 'H1,H2,H4',
-      }),
-    }).catch(() => {})
+    if (ingestUrl) {
+      fetch(ingestUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'app/api/features/docs/route.ts:GET',
+          message: 'Docs API after curation',
+          data: {
+            hasApiKey,
+            descCount,
+            firstRouteId: firstCurated?.id,
+            firstRouteDescLen: firstCurated?.description?.length ?? 0,
+            responseHasFeatureDescriptions: false,
+          },
+          timestamp: Date.now(),
+          sessionId: 'debug-session',
+          hypothesisId: 'H1,H2,H4',
+        }),
+      }).catch(() => {})
+    }
     // #endregion
 
     // Process specs with enrichments

@@ -11,6 +11,9 @@ export * from './help-chat'
 // Re-export RBAC types
 export * from './rbac'
 
+// Enterprise Readiness (Phase 1–3)
+export * from './enterprise'
+
 // Base Types
 export interface BaseEntity {
   id: string

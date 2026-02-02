@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, memo } from 'react'
-import { TrendingUp, TrendingDown, AlertTriangle, Target } from 'lucide-react'
+import Link from 'next/link'
+import { TrendingUp, TrendingDown, AlertTriangle, Target, Upload } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
 import { useTranslations } from '../../../lib/i18n/context'
 import { resilientFetch } from '@/lib/api/resilient-fetch'
@@ -181,12 +182,23 @@ function VarianceKPIs({ session, selectedCurrency = 'USD', showDetailedMetrics, 
     return (
       <div data-testid="variance-kpis-error" className="bg-white rounded-lg border border-gray-200 p-4 h-full flex flex-col" style={{ minHeight: '240px' }}>
         <h3 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">{t('variance.kpis')}</h3>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center">
-            <Target className="h-5 w-5 text-blue-600 mr-3 flex-shrink-0" />
-            <span className="text-sm text-blue-800">
-              {error ? `Variance data unavailable: ${error}` : 'No variance data available. Import CSV files to see variance analysis.'}
-            </span>
+        <div className="flex-1 flex flex-col items-center justify-center gap-3">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3 w-full">
+            <Target className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" aria-hidden />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-blue-800">
+                {error
+                  ? t('variance.dataUnavailable', { error })
+                  : `${t('variance.noData')} ${t('variance.importCsvToSee')}`}
+              </p>
+              <Link
+                href="/financials?tab=csv-import"
+                className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-blue-700 hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded"
+              >
+                <Upload className="h-4 w-4" aria-hidden />
+                {t('variance.importCsv')}
+              </Link>
+            </div>
           </div>
         </div>
       </div>

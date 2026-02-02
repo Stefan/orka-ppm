@@ -36,10 +36,11 @@ function featureTreeNodeToPageOrFeature(node: FeatureTreeNode): PageOrFeatureNod
 export function buildPageTree(routes: DocItem[], features: Feature[]): PageOrFeatureNode[] {
   const routeItems = routes.filter((r) => r.source === 'route' && r.id.startsWith('route:'))
   const sorted = routeItems.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
-  // #region agent log
+  // #region agent log (only when NEXT_PUBLIC_AGENT_INGEST_URL is set to avoid ERR_CONNECTION_REFUSED in Lighthouse)
+  const ingestUrl = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_AGENT_INGEST_URL : undefined
   const firstRoute = sorted[0]
-  if (typeof fetch !== 'undefined' && firstRoute) {
-    fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', {
+  if (ingestUrl && typeof fetch !== 'undefined' && firstRoute) {
+    fetch(ingestUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

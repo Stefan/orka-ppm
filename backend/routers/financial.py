@@ -2,12 +2,13 @@
 Financial tracking and budget management endpoints
 """
 
-from fastapi import APIRouter, HTTPException, Depends, status, Query
+from fastapi import APIRouter, HTTPException, Depends, status, Query, Request
 from uuid import UUID
 from typing import Optional, List
 from datetime import datetime, date
 from decimal import Decimal
 import logging
+import json
 
 from auth.rbac import require_permission, Permission
 from auth.dependencies import get_current_user
@@ -19,6 +20,7 @@ from models.financial import (
 )
 from utils.converters import convert_uuids
 from services.workflow_ppm_integration import WorkflowPPMIntegration
+from services.enterprise_audit_service import EnterpriseAuditService
 
 router = APIRouter(prefix="/financial-tracking", tags=["financial"])
 budget_alerts_router = APIRouter(prefix="/budget-alerts", tags=["budget-alerts"])
@@ -41,7 +43,11 @@ def get_ppm_integration() -> Optional[WorkflowPPMIntegration]:
 
 # Financial Tracking Endpoints
 @router.post("/", response_model=FinancialTrackingResponse, status_code=status.HTTP_201_CREATED)
-async def create_financial_entry(entry: FinancialTrackingCreate, current_user = Depends(get_current_user)):
+async def create_financial_entry(
+    entry: FinancialTrackingCreate,
+    request: Request,
+    current_user=Depends(get_current_user),
+):
     """
     Create a new financial tracking entry.
     
@@ -124,7 +130,21 @@ async def create_financial_entry(entry: FinancialTrackingCreate, current_user = 
                 except Exception as e:
                     logger.error(f"Error triggering budget workflow: {e}")
                     # Don't fail the financial entry creation if workflow fails
-        
+
+        # Phase 1: SOX audit log
+        try:
+            ip = request.client.host if request.client else None
+            EnterpriseAuditService().log(
+                user_id=str(user_id),
+                action="CREATE",
+                entity="financial_tracking",
+                entity_id=str(created_entry.get("id")),
+                new_value=json.dumps({"project_id": str(entry.project_id), "amount": getattr(entry, "amount", None)}, default=str),
+                ip=ip,
+            )
+        except Exception as e:
+            logger.warning("Enterprise audit log failed: %s", e)
+
         return convert_uuids(created_entry)
         
     except HTTPException:

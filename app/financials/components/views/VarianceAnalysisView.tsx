@@ -502,7 +502,8 @@ const VarianceAnalysisView = forwardRef<{ refresh: () => void }, VarianceAnalysi
                 <tr>
                   <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
                     <FileText className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                    No variance data found. Import CSV files to see analysis.
+                    <p>Variance is calculated from Commitments and Actuals.</p>
+                    <p className="mt-1 text-sm">Import CSV files (Commitments and Actuals) to see variance analysis.</p>
                   </td>
                 </tr>
               ) : (

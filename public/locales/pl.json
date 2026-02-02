@@ -158,7 +158,11 @@
     "commitmentsVsActualsSummary": "Podsumowanie Zobowiązań vs Rzeczywistych",
     "totalCommitments": "Całkowite Zobowiązania",
     "totalActuals": "Całkowite Rzeczywiste",
-    "netVariance": "Wariancja Netto"
+    "netVariance": "Wariancja Netto",
+    "noData": "Brak danych wariancji.",
+    "importCsvToSee": "Zaimportuj pliki CSV, aby zobaczyć analizę wariancji.",
+    "dataUnavailable": "Dane wariancji niedostępne: {error}",
+    "importCsv": "Importuj CSV"
   },
   "financials": {
     "title": "Zarządzanie Finansami",

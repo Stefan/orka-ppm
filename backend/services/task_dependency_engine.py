@@ -171,6 +171,35 @@ class TaskDependencyEngine:
         except Exception as e:
             logger.error(f"Error deleting dependency {dependency_id}: {e}")
             raise RuntimeError(f"Failed to delete dependency: {str(e)}")
+
+    async def get_dependencies_for_task(self, task_id: UUID) -> List[TaskDependencyResponse]:
+        """Get all dependencies where the task is predecessor or successor."""
+        try:
+            pred = self.db.table("task_dependencies").select("*").eq(
+                "predecessor_task_id", str(task_id)
+            ).execute()
+            succ = self.db.table("task_dependencies").select("*").eq(
+                "successor_task_id", str(task_id)
+            ).execute()
+            seen = set()
+            out = []
+            for row in (pred.data or []) + (succ.data or []):
+                if row["id"] in seen:
+                    continue
+                seen.add(row["id"])
+                out.append(TaskDependencyResponse(
+                    id=row["id"],
+                    predecessor_task_id=row["predecessor_task_id"],
+                    successor_task_id=row["successor_task_id"],
+                    dependency_type=row["dependency_type"],
+                    lag_days=row["lag_days"],
+                    created_by=str(row.get("created_by") or ""),
+                    created_at=datetime.fromisoformat(row["created_at"].replace("Z", "+00:00")),
+                ))
+            return out
+        except Exception as e:
+            logger.error(f"Error getting dependencies for task {task_id}: {e}")
+            raise RuntimeError(f"Failed to get dependencies: {str(e)}")
     
     async def detect_circular_dependencies(
         self,

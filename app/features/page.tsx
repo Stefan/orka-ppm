@@ -121,26 +121,29 @@ function FeaturesContent() {
     fetch('/api/features/docs')
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('Failed to load docs'))))
       .then((json) => {
-        // #region agent log
+        // #region agent log (only when NEXT_PUBLIC_AGENT_INGEST_URL is set to avoid ERR_CONNECTION_REFUSED in Lighthouse)
+        const ingestUrl = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_AGENT_INGEST_URL : undefined
         const firstRoute = Array.isArray(json.routes) ? json.routes[0] : null
-        fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            location: 'app/features/page.tsx:docs fetch',
-            message: 'Client received docs response',
-            data: {
-              routesLen: json.routes?.length ?? 0,
-              firstRouteId: firstRoute?.id,
-              firstRouteDescLen: firstRoute?.description?.length ?? 0,
-              hasFeatureDescriptionsKey: 'featureDescriptions' in json,
-              featureDescriptionsCount: json.featureDescriptions ? Object.keys(json.featureDescriptions).length : 0,
-            },
-            timestamp: Date.now(),
-            sessionId: 'debug-session',
-            hypothesisId: 'H3,H4,H5',
-          }),
-        }).catch(() => {})
+        if (ingestUrl && typeof fetch !== 'undefined') {
+          fetch(ingestUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              location: 'app/features/page.tsx:docs fetch',
+              message: 'Client received docs response',
+              data: {
+                routesLen: json.routes?.length ?? 0,
+                firstRouteId: firstRoute?.id,
+                firstRouteDescLen: firstRoute?.description?.length ?? 0,
+                hasFeatureDescriptionsKey: 'featureDescriptions' in json,
+                featureDescriptionsCount: json.featureDescriptions ? Object.keys(json.featureDescriptions).length : 0,
+              },
+              timestamp: Date.now(),
+              sessionId: 'debug-session',
+              hypothesisId: 'H3,H4,H5',
+            }),
+          }).catch(() => {})
+        }
         // #endregion
         if (!cancelled && Array.isArray(json.routes)) setRoutes(json.routes)
       })

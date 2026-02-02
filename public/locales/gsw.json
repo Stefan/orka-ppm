@@ -158,7 +158,11 @@
     "commitmentsVsActualsSummary": "Verpflichtige vs Effektivi Zämmefassig",
     "totalCommitments": "Totali Verpflichtige",
     "totalActuals": "Totali Effektivi",
-    "netVariance": "Netto-Abwyychig"
+    "netVariance": "Netto-Abwyychig",
+    "noData": "Kei Abwyychigs-Date verfüegbar.",
+    "importCsvToSee": "CSV-Dateie importiere zum Abwyychigs-Analyse gseh.",
+    "dataUnavailable": "Abwyychigs-Date nöd verfüegbar: {error}",
+    "importCsv": "CSV importiere"
   },
   "financials": {
     "title": "Finanz-Verwaltung",

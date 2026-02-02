@@ -322,16 +322,16 @@ describe('Property 4: Environment Security', () => {
 
   test('No hardcoded secrets in codebase', () => {
     const mockCodebase = [
-      'const API_KEY = "sk-1234567890abcdef"', // Bad
+      'const API_KEY = "sk-xxxxxxxx"', // Bad – example pattern only
       'process.env.OPENAI_API_KEY', // Good
       'SUPABASE_URL: https://project.supabase.co', // Good (public)
-      'const TOKEN = "vercel_token_123"', // Bad
+      'const TOKEN = "x-invalid-token-placeholder"', // Bad – example pattern only
       'secrets.VERCEL_TOKEN', // Good
     ]
 
     const hardcodedSecrets = mockCodebase.filter(line =>
       line.includes('"sk-') ||
-      line.includes('"vercel_token_') ||
+      line.includes('"x-invalid-token-') ||
       line.includes('"eyJ') // JWT tokens
     )
 

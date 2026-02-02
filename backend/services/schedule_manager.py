@@ -22,7 +22,7 @@ from config.database import supabase
 from models.schedule import (
     ScheduleCreate, ScheduleUpdate, ScheduleResponse,
     TaskCreate, TaskUpdate, TaskResponse, TaskProgressUpdate,
-    TaskStatus, ScheduleWithTasksResponse, TaskHierarchyResponse
+    TaskStatus, ScheduleWithTasksResponse, TaskHierarchyResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -110,6 +110,104 @@ class ScheduleManager:
         except Exception as e:
             logger.error(f"Error creating schedule: {e}")
             raise RuntimeError(f"Failed to create schedule: {str(e)}")
+
+    async def list_schedules(
+        self,
+        project_id: Optional[UUID] = None,
+        status: Optional[str] = None,
+        page: int = 1,
+        page_size: int = 50,
+        sort_by: Optional[str] = "created_at",
+        sort_order: str = "desc",
+    ) -> Tuple[List[ScheduleResponse], int]:
+        """
+        List schedules with optional filtering and pagination.
+        Returns (list of schedules, total count).
+        """
+        try:
+            query = self.db.table("schedules").select("*", count="exact")
+            if project_id:
+                query = query.eq("project_id", str(project_id))
+            if status:
+                query = query.eq("status", status)
+            if sort_by:
+                query = query.order(sort_by, desc=(sort_order == "desc"))
+            offset = (page - 1) * page_size
+            query = query.range(offset, offset + page_size - 1)
+            result = query.execute()
+            total = result.count if hasattr(result, "count") and result.count is not None else len(result.data or [])
+            items = result.data or []
+            schedules = [
+                ScheduleResponse(
+                    id=s["id"],
+                    project_id=s["project_id"],
+                    name=s["name"],
+                    description=s.get("description"),
+                    start_date=date.fromisoformat(s["start_date"]),
+                    end_date=date.fromisoformat(s["end_date"]),
+                    baseline_start_date=date.fromisoformat(s["baseline_start_date"]) if s.get("baseline_start_date") else None,
+                    baseline_end_date=date.fromisoformat(s["baseline_end_date"]) if s.get("baseline_end_date") else None,
+                    status=s["status"],
+                    schedule_performance_index=s.get("schedule_performance_index"),
+                    schedule_variance_days=s.get("schedule_variance_days"),
+                    created_by=s["created_by"],
+                    created_at=datetime.fromisoformat(s["created_at"].replace("Z", "+00:00")),
+                    updated_at=datetime.fromisoformat(s["updated_at"].replace("Z", "+00:00")),
+                )
+                for s in items
+            ]
+            return schedules, total
+        except Exception as e:
+            logger.error(f"Error listing schedules: {e}")
+            raise RuntimeError(f"Failed to list schedules: {str(e)}")
+
+    async def update_schedule(
+        self,
+        schedule_id: UUID,
+        updates: ScheduleUpdate,
+        updated_by: UUID,
+    ) -> ScheduleResponse:
+        """Update an existing schedule."""
+        try:
+            existing = self.db.table("schedules").select("*").eq("id", str(schedule_id)).execute()
+            if not existing.data:
+                raise ValueError(f"Schedule {schedule_id} not found")
+            update_data = {"updated_at": datetime.utcnow().isoformat()}
+            if updates.name is not None:
+                update_data["name"] = updates.name
+            if updates.description is not None:
+                update_data["description"] = updates.description
+            if updates.start_date is not None:
+                update_data["start_date"] = updates.start_date.isoformat()
+            if updates.end_date is not None:
+                update_data["end_date"] = updates.end_date.isoformat()
+            if updates.status is not None:
+                update_data["status"] = updates.status
+            result = self.db.table("schedules").update(update_data).eq("id", str(schedule_id)).execute()
+            if not result.data:
+                raise RuntimeError("Failed to update schedule")
+            s = result.data[0]
+            return ScheduleResponse(
+                id=s["id"],
+                project_id=s["project_id"],
+                name=s["name"],
+                description=s.get("description"),
+                start_date=date.fromisoformat(s["start_date"]),
+                end_date=date.fromisoformat(s["end_date"]),
+                baseline_start_date=date.fromisoformat(s["baseline_start_date"]) if s.get("baseline_start_date") else None,
+                baseline_end_date=date.fromisoformat(s["baseline_end_date"]) if s.get("baseline_end_date") else None,
+                status=s["status"],
+                schedule_performance_index=s.get("schedule_performance_index"),
+                schedule_variance_days=s.get("schedule_variance_days"),
+                created_by=s["created_by"],
+                created_at=datetime.fromisoformat(s["created_at"].replace("Z", "+00:00")),
+                updated_at=datetime.fromisoformat(s["updated_at"].replace("Z", "+00:00")),
+            )
+        except ValueError:
+            raise
+        except Exception as e:
+            logger.error(f"Error updating schedule: {e}")
+            raise RuntimeError(f"Failed to update schedule: {str(e)}")
     
     async def create_task(
         self,
