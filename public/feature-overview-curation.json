@@ -6,9 +6,13 @@
     "route:/admin",
     "route:/admin/feature-toggles",
     "route:/admin/features",
-    "route:/features",
+    "route:/audit",
     "route:/chrome-scroll-test",
     "route:/design-system",
+    "route:/features",
+    "route:/feedback",
+    "route:/import",
+    "route:/projects/import",
     "route:/admin/navigation-stats",
     "route:/offline",
     "route:/admin/performance",
@@ -22,6 +26,11 @@
     "route:/projects/import": "Import projects",
     "route:/reports": "Reports",
     "route:/reports/pmr": "PMR Reports",
-    "route:/resources": "Resources"
+    "route:/projects": "Projects",
+    "route:/resources": "Resources",
+    "route:/risks": "Risks",
+    "route:/scenarios": "Scenarios",
+    "route:/changes": "Changes",
+    "route:/monte-carlo": "Monte Carlo Simulations"
   }
 }

@@ -69,7 +69,7 @@ DROP TRIGGER IF EXISTS trigger_feature_toggles_updated_at ON feature_toggles;
 CREATE TRIGGER trigger_feature_toggles_updated_at
 BEFORE UPDATE ON feature_toggles
 FOR EACH ROW
-EXECUTE PROCEDURE update_feature_toggles_updated_at();
+EXECUTE FUNCTION update_feature_toggles_updated_at();
 
 -- Seed: initial global flags (organization_id NULL)
 INSERT INTO feature_toggles (name, enabled, organization_id, description)
