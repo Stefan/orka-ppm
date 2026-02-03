@@ -105,7 +105,6 @@ const customJestConfig = {
     '<rootDir>/__tests__/admin-skeleton-dimensions.property.test.ts',
     '<rootDir>/__tests__/admin-total-blocking-time.property.test.ts',
     '<rootDir>/__tests__/ai-result-visualizations.test.tsx',
-    '<rootDir>/__tests__/api-routes/projects-import.route.test.ts',
     '<rootDir>/__tests__/audit-ui-components.test.tsx',
     '<rootDir>/__tests__/authentication-state-handling.property.test.tsx',
     '<rootDir>/__tests__/bundle-size-limit.property.test.ts',
@@ -231,9 +230,11 @@ const customJestConfig = {
       lines: 16,
       statements: 15
     },
-    // Path-based 80% (uncomment as each area reaches 80%):
-    // './lib/feature-flags/**/*.ts': { branches: 80, functions: 80, lines: 80, statements: 80 },
-    // './lib/i18n/**/*.{ts,tsx}': { branches: 80, functions: 80, lines: 80, statements: 80 },
+    // Path-based 80% for Phase 1 (lib) – add paths as they reach 80%
+    './lib/currency-utils.ts': { branches: 80, functions: 80, lines: 80, statements: 80 },
+    './lib/design-system.ts': { branches: 80, functions: 80, lines: 80, statements: 80 },
+    './lib/utils/formatting.ts': { branches: 70, functions: 80, lines: 80, statements: 80 },
+    './lib/utils/env.ts': { branches: 75, functions: 80, lines: 80, statements: 80 },
   },
   
   // Test categorization - simplified for now

@@ -1,10 +1,24 @@
 /**
  * Unit Tests for Design System Utilities
- * Tests the cn function for class name composition
+ * Tests cn, getResponsiveClasses, getVariantClasses, darkMode, motionSafe, motionReduce
  */
 
 import { describe, it, expect } from '@jest/globals'
-import { cn } from '../design-system'
+import {
+  cn,
+  colors,
+  spacing,
+  typography,
+  breakpoints,
+  shadows,
+  borderRadius,
+  variants,
+  getResponsiveClasses,
+  getVariantClasses,
+  darkMode,
+  motionSafe,
+  motionReduce
+} from '../design-system'
 
 describe('cn function', () => {
   it('should combine multiple classes correctly', () => {
@@ -132,5 +146,87 @@ describe('cn function', () => {
     const result = cn('md:px-2', 'md:px-4')
     expect(result).toBe('md:px-4')
     expect(result).not.toContain('md:px-2')
+  })
+})
+
+describe('design system constants', () => {
+  it('colors has primary, secondary, success, warning, error', () => {
+    expect(colors.primary[500]).toBe('#3b82f6')
+    expect(colors.secondary[500]).toBe('#64748b')
+    expect(colors.success[500]).toBe('#22c55e')
+    expect(colors.warning[500]).toBe('#f59e0b')
+    expect(colors.error[500]).toBe('#ef4444')
+  })
+  it('spacing has numeric keys', () => {
+    expect(spacing[0]).toBe('0px')
+    expect(spacing[4]).toBe('1rem')
+  })
+  it('typography has fontSize and fontWeight', () => {
+    expect(typography.fontSize.sm).toEqual(['0.875rem', { lineHeight: '1.25rem' }])
+    expect(typography.fontWeight.medium).toBe('500')
+  })
+  it('breakpoints has sm, md, lg', () => {
+    expect(breakpoints.sm).toBe('640px')
+    expect(breakpoints.lg).toBe('1024px')
+  })
+  it('shadows and borderRadius are defined', () => {
+    expect(shadows.sm).toContain('rgb')
+    expect(borderRadius.lg).toBe('0.5rem')
+  })
+  it('variants has button, input, badge', () => {
+    expect(variants.button.primary).toContain('bg-primary')
+    expect(variants.input.error).toContain('border-error')
+    expect(variants.badge.success).toContain('bg-success')
+  })
+})
+
+describe('getResponsiveClasses', () => {
+  it('returns base when no breakpoints', () => {
+    expect(getResponsiveClasses('p-4')).toBe('p-4')
+  })
+  it('appends sm/md/lg prefixed classes', () => {
+    const r = getResponsiveClasses('p-2', 'p-4', 'p-6', 'p-8')
+    expect(r).toContain('p-2')
+    expect(r).toContain('sm:p-4')
+    expect(r).toContain('md:p-6')
+    expect(r).toContain('lg:p-8')
+  })
+  it('handles 2xl', () => {
+    const r = getResponsiveClasses('text-sm', undefined, undefined, undefined, undefined, 'text-2xl')
+    expect(r).toContain('2xl:text-2xl')
+  })
+})
+
+describe('getVariantClasses', () => {
+  it('returns variant class for button', () => {
+    const r = getVariantClasses('button', 'primary')
+    expect(r).toContain('bg-primary')
+  })
+  it('adds size and state when provided', () => {
+    const r = getVariantClasses('button', 'secondary', 'lg', 'disabled')
+    expect(r).toContain('button-lg')
+    expect(r).toContain('button-disabled')
+  })
+  it('returns empty for unknown variant', () => {
+    const r = getVariantClasses('button', 'unknown')
+    expect(r).toBe('')
+  })
+})
+
+describe('darkMode', () => {
+  it('returns light and dark class', () => {
+    expect(darkMode('bg-white', 'bg-black')).toBe('bg-white dark:bg-black')
+  })
+})
+
+describe('motionSafe', () => {
+  it('prefixes with motion-safe', () => {
+    expect(motionSafe('animate-spin')).toBe('motion-safe:animate-spin')
+  })
+})
+
+describe('motionReduce', () => {
+  it('prefixes with motion-reduce', () => {
+    expect(motionReduce('transition-none')).toBe('motion-reduce:transition-none')
   })
 })

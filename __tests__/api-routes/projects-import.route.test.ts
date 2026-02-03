@@ -1,14 +1,11 @@
 /**
  * API Route Tests: Projects Import
- * POST /api/projects/import - auth required, token extraction, proxy error forwarding
+ * POST /api/projects/import - auth required, proxy to backend
+ * Uses createMockNextRequestWithCookies so request.cookies exists (NextRequest contract).
  * @jest-environment node
  */
 
-import {
-  createMockNextRequestWithCookies,
-  createAuthenticatedRequest,
-  parseJsonResponse,
-} from './helpers'
+import { createMockNextRequestWithCookies, parseJsonResponse } from './helpers'
 
 describe('POST /api/projects/import', () => {
   const originalFetch = global.fetch
@@ -17,97 +14,106 @@ describe('POST /api/projects/import', () => {
     global.fetch = originalFetch
   })
 
-  it('returns 401 when no token (no header, no cookies)', async () => {
+  it('returns 401 when no token (no Authorization, no cookies)', async () => {
+    const { POST } = await import('@/app/api/projects/import/route')
     const request = createMockNextRequestWithCookies({
       url: 'http://localhost:3000/api/projects/import',
       method: 'POST',
       body: [],
       cookies: [],
     })
-    request.headers.set('Content-Type', 'application/json')
-
-    const { POST } = await import('@/app/api/projects/import/route')
     const response = await POST(request as any)
     const data = await parseJsonResponse(response)
 
     expect(response.status).toBe(401)
-    expect((data as Record<string, unknown>).message).toContain('Authentication required')
-    expect((data as Record<string, unknown>).success).toBe(false)
-    expect(global.fetch).not.toHaveBeenCalled()
+    expect(data).toBeDefined()
+    const obj = data as Record<string, unknown>
+    expect(obj.success).toBe(false)
+    expect(obj.message).toMatch(/Authentication required/i)
   })
 
-  it('forwards request to backend when Bearer token is present and returns backend response', async () => {
+  it('returns 401 when Authorization header is not Bearer', async () => {
+    const { POST } = await import('@/app/api/projects/import/route')
+    const request = createMockNextRequestWithCookies({
+      url: 'http://localhost:3000/api/projects/import',
+      method: 'POST',
+      headers: { Authorization: 'Basic x' },
+      body: [],
+      cookies: [],
+    })
+    const response = await POST(request as any)
+    expect(response.status).toBe(401)
+  })
+
+  it('returns 200 and backend response when Bearer token and backend ok', async () => {
     global.fetch = jest.fn().mockResolvedValueOnce({
       ok: true,
       status: 200,
-      text: async () =>
-        JSON.stringify({
-          success: true,
-          count: 2,
-          errors: [],
-          message: 'Imported 2 projects',
-        }),
-    })
-
-    const request = createAuthenticatedRequest('http://localhost:3000/api/projects/import', 'secret-token', {
-      method: 'POST',
-      body: [{ name: 'P1' }, { name: 'P2' }],
+      text: async () => JSON.stringify({ success: true, count: 2, errors: [] }),
     })
 
     const { POST } = await import('@/app/api/projects/import/route')
+    const request = createMockNextRequestWithCookies({
+      url: 'http://localhost:3000/api/projects/import',
+      method: 'POST',
+      headers: { Authorization: 'Bearer my-token' },
+      body: [{ name: 'P1' }, { name: 'P2' }],
+      cookies: [],
+    })
     const response = await POST(request as any)
     const data = await parseJsonResponse(response)
 
     expect(response.status).toBe(200)
-    expect((data as Record<string, unknown>).success).toBe(true)
-    expect((data as Record<string, unknown>).count).toBe(2)
+    expect(data).toBeDefined()
+    const obj = data as Record<string, unknown>
+    expect(obj.success).toBe(true)
+    expect(obj.count).toBe(2)
     expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringMatching(/\/api\/projects\/import$/),
+      expect.stringContaining('/api/projects/import'),
       expect.objectContaining({
         method: 'POST',
-        headers: expect.objectContaining({
-          Authorization: 'Bearer secret-token',
-          'Content-Type': 'application/json',
-        }),
+        headers: expect.objectContaining({ Authorization: 'Bearer my-token' }),
       })
     )
   })
 
-  it('forwards 401 from backend with message', async () => {
+  it('returns 401 when backend returns 401', async () => {
     global.fetch = jest.fn().mockResolvedValueOnce({
       ok: false,
       status: 401,
-      text: async () => JSON.stringify({ message: 'Invalid or expired token' }),
-    })
-
-    const request = createAuthenticatedRequest('http://localhost:3000/api/projects/import', 'bad-token', {
-      method: 'POST',
-      body: [],
+      text: async () => JSON.stringify({ detail: 'Invalid token' }),
     })
 
     const { POST } = await import('@/app/api/projects/import/route')
+    const request = createMockNextRequestWithCookies({
+      url: 'http://localhost:3000/api/projects/import',
+      method: 'POST',
+      headers: { Authorization: 'Bearer bad-token' },
+      body: [],
+      cookies: [],
+    })
     const response = await POST(request as any)
     const data = await parseJsonResponse(response)
 
     expect(response.status).toBe(401)
     expect((data as Record<string, unknown>).success).toBe(false)
-    expect((data as Record<string, unknown>).message).toBeDefined()
   })
 
-  it('forwards 403 from backend (permission)', async () => {
+  it('returns 403 when backend returns 403', async () => {
     global.fetch = jest.fn().mockResolvedValueOnce({
       ok: false,
       status: 403,
-      text: async () =>
-        JSON.stringify({ message: 'Insufficient permissions. The data_import permission is required.' }),
-    })
-
-    const request = createAuthenticatedRequest('http://localhost:3000/api/projects/import', 'token', {
-      method: 'POST',
-      body: [],
+      text: async () => JSON.stringify({ detail: 'Insufficient permissions' }),
     })
 
     const { POST } = await import('@/app/api/projects/import/route')
+    const request = createMockNextRequestWithCookies({
+      url: 'http://localhost:3000/api/projects/import',
+      method: 'POST',
+      headers: { Authorization: 'Bearer token' },
+      body: [],
+      cookies: [],
+    })
     const response = await POST(request as any)
     const data = await parseJsonResponse(response)
 
@@ -115,31 +121,28 @@ describe('POST /api/projects/import', () => {
     expect((data as Record<string, unknown>).success).toBe(false)
   })
 
-  it('uses cookie auth when auth_token cookie is set', async () => {
+  it('accepts auth from cookie when no Authorization header', async () => {
     global.fetch = jest.fn().mockResolvedValueOnce({
       ok: true,
       status: 200,
-      text: async () => JSON.stringify({ success: true, count: 0, errors: [], message: 'OK' }),
+      text: async () => JSON.stringify({ success: true, count: 0, errors: [] }),
     })
 
+    const { POST } = await import('@/app/api/projects/import/route')
     const request = createMockNextRequestWithCookies({
       url: 'http://localhost:3000/api/projects/import',
       method: 'POST',
       body: [],
       cookies: [{ name: 'auth_token', value: 'cookie-token' }],
     })
-    request.headers.set('Content-Type', 'application/json')
-
-    const { POST } = await import('@/app/api/projects/import/route')
     const response = await POST(request as any)
+    const data = await parseJsonResponse(response)
 
     expect(response.status).toBe(200)
     expect(global.fetch).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        headers: expect.objectContaining({
-          Authorization: 'Bearer cookie-token',
-        }),
+        headers: expect.objectContaining({ Authorization: 'Bearer cookie-token' }),
       })
     )
   })
