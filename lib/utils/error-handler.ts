@@ -4,6 +4,17 @@
 
 import { logger } from '../monitoring/logger'
 
+async function captureWithSentry(error: Error, extra?: Record<string, unknown>) {
+  try {
+    if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SENTRY_DSN) {
+      const Sentry = await import('@sentry/nextjs').catch(() => null)
+      if (Sentry) Sentry.captureException(error, { extra })
+    }
+  } catch {
+    // Sentry not available or not configured
+  }
+}
+
 export interface AppError extends Error {
   code?: string
   statusCode?: number
@@ -142,7 +153,6 @@ export class ErrorHandler {
 
   private async sendToErrorService(error: AppError) {
     try {
-      // TODO: Integrate with error reporting service (e.g., Sentry, Bugsnag)
       logger.error('Application Error', {
         message: error.message,
         code: error.code,
@@ -151,9 +161,15 @@ export class ErrorHandler {
         stack: error.stack,
         timestamp: error.timestamp
       })
+
+      await captureWithSentry(error, {
+        code: error.code,
+        statusCode: error.statusCode,
+        context: error.context,
+        timestamp: error.timestamp
+      })
       
-      // For now, just log to console in production
-      if (process.env.NODE_ENV === 'production') {
+      if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_SENTRY_DSN) {
         console.error('Production error:', {
           message: error.message,
           code: error.code,
@@ -161,14 +177,6 @@ export class ErrorHandler {
           stack: error.stack
         })
       }
-
-      // Mock API call
-      // await fetch('/api/errors', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(error)
-      // })
-
     } catch (e) {
       console.warn('Failed to send error to service:', e)
     }

@@ -33,8 +33,8 @@ const validCommitmentRowArbitrary = fc.record({
   amount: fc.float({ min: 100, max: 1000000, noNaN: true }).map(Math.fround),
   currency: fc.constantFrom('USD', 'EUR', 'GBP', 'CHF', 'JPY'),
   status: fc.constantFrom('draft', 'approved', 'issued', 'received', 'cancelled'),
-  issue_date: fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }).map(d => d.toISOString().split('T')[0]),
-  delivery_date: fc.option(fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }).map(d => d.toISOString().split('T')[0]))
+  issue_date: fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }).map(d => (Number.isNaN(d.getTime()) ? '2020-01-01' : d.toISOString().split('T')[0])),
+  delivery_date: fc.option(fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }).map(d => (Number.isNaN(d.getTime()) ? '2020-01-01' : d.toISOString().split('T')[0])))
 })
 
 // Generate valid actual CSV row
@@ -48,8 +48,8 @@ const validActualRowArbitrary = fc.record({
   amount: fc.float({ min: 100, max: 1000000, noNaN: true }).map(Math.fround),
   currency: fc.constantFrom('USD', 'EUR', 'GBP', 'CHF', 'JPY'),
   status: fc.constantFrom('pending', 'approved', 'rejected', 'cancelled'),
-  invoice_date: fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }).map(d => d.toISOString().split('T')[0]),
-  payment_date: fc.option(fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }).map(d => d.toISOString().split('T')[0]))
+  invoice_date: fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }).map(d => (Number.isNaN(d.getTime()) ? '2020-01-01' : d.toISOString().split('T')[0])),
+  payment_date: fc.option(fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }).map(d => (Number.isNaN(d.getTime()) ? '2020-01-01' : d.toISOString().split('T')[0])))
 })
 
 // Convert row object to CSV line

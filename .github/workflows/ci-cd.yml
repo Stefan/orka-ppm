@@ -117,6 +117,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Health check (syntax, optional deps, type-check)
+        run: npm run health-check
+
       - name: Run ESLint
         run: npm run lint
 

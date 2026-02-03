@@ -31,9 +31,9 @@ describe('DistributionSettingsDialog', () => {
 
   it('should display all three profile tabs', () => {
     render(<DistributionSettingsDialog {...mockProps} />)
-    expect(screen.getByText('Linear')).toBeInTheDocument()
-    expect(screen.getByText('Custom')).toBeInTheDocument()
-    expect(screen.getByText('AI Generated')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Linear' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Custom' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'AI Generated' })).toBeInTheDocument()
   })
 
   it('should show linear distribution by default', () => {
@@ -43,20 +43,20 @@ describe('DistributionSettingsDialog', () => {
 
   it('should switch to custom tab when clicked', () => {
     render(<DistributionSettingsDialog {...mockProps} />)
-    
-    const customTab = screen.getByText('Custom')
+
+    const customTab = screen.getByRole('button', { name: 'Custom' })
     fireEvent.click(customTab)
-    
+
     expect(screen.getByText(/Custom Distribution:/)).toBeInTheDocument()
     expect(screen.getByText('Auto Balance to 100%')).toBeInTheDocument()
   })
 
   it('should switch to AI tab when clicked', () => {
     render(<DistributionSettingsDialog {...mockProps} />)
-    
-    const aiTab = screen.getByText('AI Generated')
+
+    const aiTab = screen.getByRole('button', { name: 'AI Generated' })
     fireEvent.click(aiTab)
-    
+
     expect(screen.getByText(/AI Generated Distribution:/)).toBeInTheDocument()
   })
 
@@ -110,62 +110,69 @@ describe('DistributionSettingsDialog', () => {
 
   it('should change start date', () => {
     render(<DistributionSettingsDialog {...mockProps} />)
-    
-    const startDateInput = screen.getByLabelText('Start Date')
+    const durationSelect = screen.getByLabelText('Duration')
+    fireEvent.change(durationSelect, { target: { value: 'custom' } })
+
+    const startDateInput = screen.getByLabelText('From Date')
     fireEvent.change(startDateInput, { target: { value: '2024-02-01' } })
-    
+
     expect(startDateInput).toHaveValue('2024-02-01')
   })
 
   it('should change end date', () => {
     render(<DistributionSettingsDialog {...mockProps} />)
-    
-    const endDateInput = screen.getByLabelText('End Date')
+    const durationSelect = screen.getByLabelText('Duration')
+    fireEvent.change(durationSelect, { target: { value: 'custom' } })
+
+    const endDateInput = screen.getByLabelText('To Date')
     fireEvent.change(endDateInput, { target: { value: '2024-11-30' } })
-    
+
     expect(endDateInput).toHaveValue('2024-11-30')
   })
 
   describe('Custom Distribution', () => {
-    it('should show custom percentage inputs', () => {
+    it('should show custom percentage inputs', async () => {
       render(<DistributionSettingsDialog {...mockProps} />)
-      
-      const customTab = screen.getByText('Custom')
+
+      const customTab = screen.getByRole('button', { name: 'Custom' })
       fireEvent.click(customTab)
-      
-      // Should show percentage inputs for each period
-      const percentageInputs = screen.getAllByRole('spinbutton')
-      expect(percentageInputs.length).toBeGreaterThan(0)
+
+      // Wait for useEffect to populate equal distribution and render spinbuttons
+      await waitFor(() => {
+        const percentageInputs = screen.getAllByRole('spinbutton')
+        expect(percentageInputs.length).toBeGreaterThan(0)
+      })
     })
 
     it('should show validation error for invalid percentages', async () => {
       render(<DistributionSettingsDialog {...mockProps} />)
-      
-      const customTab = screen.getByText('Custom')
+
+      const customTab = screen.getByRole('button', { name: 'Custom' })
       fireEvent.click(customTab)
-      
-      // Try to apply without balancing percentages
-      const applyButton = screen.getByText('Apply Distribution')
-      fireEvent.click(applyButton)
-      
-      // Should show error (percentages don't sum to 100)
+
+      await waitFor(() => expect(screen.getAllByRole('spinbutton').length).toBeGreaterThan(0))
+      const inputs = screen.getAllByRole('spinbutton')
+      fireEvent.change(inputs[0], { target: { value: '100' } })
+
+      // When percentages do not sum to 100%, Apply is disabled and inline hint is shown
       await waitFor(() => {
-        expect(screen.getByText(/Validation Error/)).toBeInTheDocument()
+        expect(screen.getByText(/Must equal 100%/)).toBeInTheDocument()
       })
+      const applyButton = screen.getByText('Apply Distribution')
+      expect(applyButton).toBeDisabled()
     })
 
     it('should balance percentages when auto-balance clicked', async () => {
       render(<DistributionSettingsDialog {...mockProps} />)
-      
-      const customTab = screen.getByText('Custom')
+
+      const customTab = screen.getByRole('button', { name: 'Custom' })
       fireEvent.click(customTab)
-      
-      await waitFor(() => {
-        const autoBalanceButton = screen.getByText('Auto Balance to 100%')
-        fireEvent.click(autoBalanceButton)
-      })
-      
-      // Total percentage should be displayed as 100%
+
+      await waitFor(() => expect(screen.getAllByRole('spinbutton').length).toBeGreaterThan(0))
+
+      const autoBalanceButton = screen.getByText('Auto Balance to 100%')
+      fireEvent.click(autoBalanceButton)
+
       await waitFor(() => {
         expect(screen.getByText(/Total: 100\.00%/)).toBeInTheDocument()
       })
@@ -178,7 +185,8 @@ describe('DistributionSettingsDialog', () => {
         profile: 'linear' as const,
         duration_start: '2024-03-01',
         duration_end: '2024-09-30',
-        granularity: 'week' as const
+        granularity: 'week' as const,
+        duration_type: 'custom' as const
       }
 
       render(
@@ -187,9 +195,9 @@ describe('DistributionSettingsDialog', () => {
           initialSettings={initialSettings}
         />
       )
-      
-      expect(screen.getByLabelText('Start Date')).toHaveValue('2024-03-01')
-      expect(screen.getByLabelText('End Date')).toHaveValue('2024-09-30')
+
+      expect(screen.getByLabelText('From Date')).toHaveValue('2024-03-01')
+      expect(screen.getByLabelText('To Date')).toHaveValue('2024-09-30')
       expect(screen.getByLabelText('Granularity')).toHaveValue('week')
     })
   })
@@ -197,22 +205,22 @@ describe('DistributionSettingsDialog', () => {
   describe('Accessibility', () => {
     it('should have proper ARIA labels', () => {
       render(<DistributionSettingsDialog {...mockProps} />)
-      
+
       expect(screen.getByLabelText('Close dialog')).toBeInTheDocument()
-      expect(screen.getByLabelText('Start Date')).toBeInTheDocument()
-      expect(screen.getByLabelText('End Date')).toBeInTheDocument()
+      expect(screen.getByLabelText('From Date')).toBeInTheDocument()
+      expect(screen.getByLabelText('To Date')).toBeInTheDocument()
       expect(screen.getByLabelText('Granularity')).toBeInTheDocument()
     })
 
     it('should disable apply button when invalid', async () => {
       render(<DistributionSettingsDialog {...mockProps} />)
-      
-      const customTab = screen.getByText('Custom')
+
+      const customTab = screen.getByRole('button', { name: 'Custom' })
       fireEvent.click(customTab)
-      
+
+      // Wait for Custom tab to initialize with equal distribution, then Apply should be enabled
       await waitFor(() => {
         const applyButton = screen.getByText('Apply Distribution')
-        // Button should be enabled by default (equal distribution)
         expect(applyButton).not.toBeDisabled()
       })
     })

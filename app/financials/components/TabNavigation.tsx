@@ -34,13 +34,13 @@ const TabButton = React.memo(({ tab, isActive, onClick }: {
         ${isActive 
           ? 'bg-blue-600 text-white shadow-md' 
           : tab.highlight 
-            ? 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-200' 
-            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+            ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/50 border border-green-200 dark:border-green-800' 
+            : 'text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-slate-700'
         }
       `}
       title={tab.description}
     >
-      <Icon className={`h-4 w-4 mr-2 ${isActive ? 'text-white' : tab.highlight ? 'text-green-600' : 'text-gray-500'}`} />
+      <Icon className={`h-4 w-4 mr-2 ${isActive ? 'text-white' : tab.highlight ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-slate-400'}`} />
       <span className="whitespace-nowrap">{tab.label}</span>
       
       {/* Tooltip */}
@@ -97,7 +97,7 @@ export default function TabNavigation({ viewMode, onViewModeChange }: TabNavigat
   }, [viewMode, t])
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1">
+    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-1">
       <div className="flex flex-wrap gap-1">
         {tabConfig.map((tab) => (
           <TabButton
@@ -110,14 +110,14 @@ export default function TabNavigation({ viewMode, onViewModeChange }: TabNavigat
       </div>
       
       {/* Quick Actions Bar */}
-      <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-        <div className="flex items-center space-x-2 text-sm text-gray-600">
+      <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-slate-700">
+        <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-slate-300">
           <div className="flex items-center">
             <div className="w-2 h-2 bg-blue-600 rounded-full mr-2"></div>
             {t('financials.currentView')}: <span className="font-medium ml-1">{currentViewLabel}</span>
           </div>
           {viewMode === 'csv-import' && (
-            <div className="flex items-center text-green-600">
+            <div className="flex items-center text-green-600 dark:text-green-400">
               <Upload className="h-3 w-3 mr-1" />
               <span className="text-xs">{t('financials.dragDropCSV')}</span>
             </div>
@@ -126,12 +126,12 @@ export default function TabNavigation({ viewMode, onViewModeChange }: TabNavigat
         
         <div className="flex items-center space-x-2">
           {viewMode === 'csv-import' && (
-            <div className="flex items-center space-x-1 text-xs text-gray-500">
+            <div className="flex items-center space-x-1 text-xs text-gray-500 dark:text-slate-400">
               <CheckCircle className="h-3 w-3 text-green-500" />
               <span>{t('financials.supportedFormats')}</span>
             </div>
           )}
-          <div className="text-xs text-gray-400">
+          <div className="text-xs text-gray-400 dark:text-slate-500">
             {t('financials.lastUpdated')}: {new Date().toLocaleTimeString('de-DE')}
           </div>
         </div>

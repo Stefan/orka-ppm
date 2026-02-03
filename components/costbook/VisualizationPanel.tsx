@@ -32,10 +32,10 @@ export interface VisualizationPanelProps {
 function ChartSkeleton({ height = 200 }: { height?: number }) {
   return (
     <div 
-      className={`bg-gray-100 rounded-lg animate-pulse flex items-center justify-center`}
+      className={`bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse flex items-center justify-center`}
       style={{ height }}
     >
-      <BarChart3 className="w-8 h-8 text-gray-300" />
+      <BarChart3 className="w-8 h-8 text-gray-300 dark:text-slate-500" />
     </div>
   )
 }
@@ -55,10 +55,10 @@ function ChartContainer({
   className?: string
 }) {
   return (
-    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-4 ${className}`}>
+    <div className={`bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4 ${className}`}>
       <div className="flex items-center gap-2 mb-3">
-        <span className="text-gray-400">{icon}</span>
-        <h3 className="text-sm font-medium text-gray-700">{title}</h3>
+        <span className="text-gray-400 dark:text-slate-500">{icon}</span>
+        <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300">{title}</h3>
       </div>
       {children}
     </div>

@@ -15,6 +15,8 @@ export interface DocItem {
   sourcePath: string
   parentId: string | null
   icon: string | null
+  /** Optional screenshot URL (e.g. from public/feature-screenshots/). Set by build-feature-overview. */
+  screenshot_url?: string | null
 }
 
 /** Tree node for documentation (sections as roots, items as children) */

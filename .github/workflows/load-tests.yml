@@ -1,0 +1,50 @@
+# k6 load tests - Enterprise Test Strategy Section 2 (Phase 3)
+# Run smoke and dashboard scripts; BASE_URL required (e.g. staging or start app locally).
+name: Load Tests
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'BASE_URL (e.g. https://staging.example.com or http://localhost:3000)'
+        required: true
+        default: 'http://localhost:3000'
+  push:
+    tags:
+      - 'load'
+
+jobs:
+  k6-smoke:
+    name: k6 smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install k6
+        uses: grafana/setup-k6-action@v0.5
+        with:
+          version: v0.54.0
+
+      - name: Run k6 smoke
+        run: k6 run scripts/load/smoke.js
+        env:
+          BASE_URL: ${{ vars.BASE_URL || github.event.inputs.base_url || 'http://localhost:3000' }}
+
+  k6-dashboard:
+    name: k6 dashboard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install k6
+        uses: grafana/setup-k6-action@v0.5
+        with:
+          version: v0.54.0
+
+      - name: Run k6 dashboard
+        run: k6 run scripts/load/dashboard.js
+        env:
+          BASE_URL: ${{ vars.BASE_URL || github.event.inputs.base_url || 'http://localhost:3000' }}
+          AUTH_TOKEN: ${{ secrets.LOAD_TEST_AUTH_TOKEN }}

@@ -673,7 +673,7 @@ curl -X POST "https://api.yourplatform.com/api/audit/gdpr-export" \
 
 ## Rollback Plan
 
-In case of issues, follow this rollback procedure:
+In case of issues, follow this rollback procedure. For other incident scenarios (API down, high 5xx, DB issues, white screen), see [docs/runbooks/README.md](runbooks/README.md).
 
 ### 1. Identify Issue
 

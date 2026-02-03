@@ -813,10 +813,7 @@ describe('usePermissions', () => {
   })
 
   describe('API URL Configuration', () => {
-    it('should use NEXT_PUBLIC_API_URL environment variable when available', async () => {
-      const originalEnv = process.env.NEXT_PUBLIC_API_URL
-      process.env.NEXT_PUBLIC_API_URL = 'https://api.example.com'
-
+    it('should call user-permissions API with relative path', async () => {
       mockUseAuth.mockReturnValue({
         session: mockSession,
         user: mockSession.user,
@@ -833,40 +830,16 @@ describe('usePermissions', () => {
 
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledWith(
-          expect.stringContaining('https://api.example.com'),
-          expect.any(Object)
+          '/api/rbac/user-permissions',
+          expect.objectContaining({
+            method: 'GET',
+            headers: expect.objectContaining({
+              'Authorization': `Bearer ${mockSession.access_token}`,
+              'Content-Type': 'application/json'
+            })
+          })
         )
       })
-
-      process.env.NEXT_PUBLIC_API_URL = originalEnv
-    })
-
-    it('should fallback to localhost when NEXT_PUBLIC_API_URL is not set', async () => {
-      const originalEnv = process.env.NEXT_PUBLIC_API_URL
-      delete process.env.NEXT_PUBLIC_API_URL
-
-      mockUseAuth.mockReturnValue({
-        session: mockSession,
-        user: mockSession.user,
-        loading: false,
-        error: null
-      })
-
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
-
-      renderHook(() => usePermissions())
-
-      await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith(
-          expect.stringContaining('http://localhost:8000'),
-          expect.any(Object)
-        )
-      })
-
-      process.env.NEXT_PUBLIC_API_URL = originalEnv
     })
   })
 })

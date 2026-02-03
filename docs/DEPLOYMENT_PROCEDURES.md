@@ -14,6 +14,8 @@ This document outlines the deployment procedures for the PPM SaaS application wi
 - [Rollback Procedures](#rollback-procedures)
 - [Environment-Specific Instructions](#environment-specific-instructions)
 
+**Incident response:** For step-by-step actions during incidents (API down, high error rate, DB issues, frontend white screen), see [docs/runbooks/README.md](runbooks/README.md).
+
 ## Pre-Deployment Checklist
 
 ### 1. Environment Preparation
@@ -34,6 +36,11 @@ JWT_SECRET=your-jwt-secret
 # Optional: Pre-startup testing
 SKIP_PRE_STARTUP_TESTS=false
 PRE_STARTUP_TEST_TIMEOUT=30
+
+# Optional: Production error reporting (Sentry)
+# Set NEXT_PUBLIC_SENTRY_DSN for client/server error reporting. Get DSN from sentry.io.
+# If not set, errors are only logged locally. For full setup run: npx @sentry/wizard@latest -i nextjs
+NEXT_PUBLIC_SENTRY_DSN=
 ```
 
 ### 2. Database Backup

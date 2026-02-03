@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Card snapshot matches snapshot for dashboard card with header and content 1`] = `
+<div
+  class="bg-white dark:bg-slate-800 rounded-xl text-gray-900 dark:text-slate-100 shadow-sm border border-gray-200 dark:border-slate-700 p-6 transition-shadow duration-200"
+>
+  <div
+    class="pb-4 mb-4 border-b border-gray-200 dark:border-slate-700"
+  >
+    <h3
+      class="text-lg font-semibold text-gray-900 dark:text-slate-100"
+    >
+      Project Overview
+    </h3>
+    <p
+      class="text-sm text-gray-500 dark:text-slate-400 mt-1"
+    >
+      Active projects and health summary
+    </p>
+  </div>
+  <div
+    class=""
+  >
+    <p
+      class="text-sm text-gray-600"
+    >
+      3 active, 2 at risk
+    </p>
+  </div>
+</div>
+`;
+
+exports[`Card snapshot matches snapshot with padding and border 1`] = `
+<div
+  class="bg-white dark:bg-slate-800 rounded-xl text-gray-900 dark:text-slate-100 shadow-md border border-gray-200 dark:border-slate-700 p-8 transition-shadow duration-200"
+>
+  <div
+    class=""
+  >
+    Content only
+  </div>
+</div>
+`;

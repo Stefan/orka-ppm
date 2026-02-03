@@ -61,12 +61,179 @@ button {
 }
 
 /* ========================================
-   CSS CUSTOM PROPERTIES
+   CSS CUSTOM PROPERTIES - THEME SYSTEM
    ======================================== */
 
-:root {
+/* Light Theme (Default) */
+:root,
+[data-theme="light"] {
+  /* Background colors */
   --background: #ffffff;
-  --foreground: #171717;
+  --background-secondary: #f9fafb;
+  --background-tertiary: #f3f4f6;
+  --background-elevated: #ffffff;
+  
+  /* Foreground/Text colors */
+  --foreground: #111827;
+  --foreground-secondary: #4b5563;
+  --foreground-muted: #9ca3af;
+  
+  /* Border colors */
+  --border: #e5e7eb;
+  --border-hover: #d1d5db;
+  --border-focus: #3b82f6;
+  
+  /* Primary brand colors */
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-foreground: #ffffff;
+  
+  /* Semantic colors */
+  --success: #10b981;
+  --success-background: #ecfdf5;
+  --warning: #f59e0b;
+  --warning-background: #fffbeb;
+  --error: #ef4444;
+  --error-background: #fef2f2;
+  --info: #3b82f6;
+  --info-background: #eff6ff;
+  
+  /* Card/Surface colors */
+  --card: #ffffff;
+  --card-hover: #f9fafb;
+  
+  /* Input colors */
+  --input-background: #ffffff;
+  --input-border: #d1d5db;
+  --input-focus: #3b82f6;
+  
+  /* Sidebar colors */
+  --sidebar-background: #ffffff;
+  --sidebar-foreground: #374151;
+  --sidebar-hover: #f3f4f6;
+  --sidebar-active: #eff6ff;
+  
+  /* Shadow colors */
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shadow-color-lg: rgba(0, 0, 0, 0.15);
+}
+
+/* Dark Theme (data-theme for ThemeProvider, .dark for Tailwind dark: variant) */
+[data-theme="dark"],
+.dark {
+  /* Background colors */
+  --background: #0f172a;
+  --background-secondary: #1e293b;
+  --background-tertiary: #334155;
+  --background-elevated: #1e293b;
+  
+  /* Foreground/Text colors */
+  --foreground: #f1f5f9;
+  --foreground-secondary: #cbd5e1;
+  --foreground-muted: #64748b;
+  
+  /* Border colors */
+  --border: #334155;
+  --border-hover: #475569;
+  --border-focus: #60a5fa;
+  
+  /* Primary brand colors */
+  --primary: #60a5fa;
+  --primary-hover: #3b82f6;
+  --primary-foreground: #0f172a;
+  
+  /* Semantic colors */
+  --success: #34d399;
+  --success-background: #064e3b;
+  --warning: #fbbf24;
+  --warning-background: #78350f;
+  --error: #f87171;
+  --error-background: #7f1d1d;
+  --info: #60a5fa;
+  --info-background: #1e3a8a;
+  
+  /* Card/Surface colors */
+  --card: #1e293b;
+  --card-hover: #334155;
+
+  /* Quick Actions bar - ensure dark background (works even if Tailwind dark: is delayed) */
+  --quick-actions-bg: #1e293b;
+  
+  /* Input colors */
+  --input-background: #1e293b;
+  --input-border: #475569;
+  --input-focus: #60a5fa;
+  
+  /* Sidebar colors */
+  --sidebar-background: #0f172a;
+  --sidebar-foreground: #e2e8f0;
+  --sidebar-hover: #1e293b;
+  --sidebar-active: #1e3a8a;
+  
+  /* Shadow colors */
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --shadow-color-lg: rgba(0, 0, 0, 0.5);
+}
+
+/* Quick Actions bar: dark background in dark mode (independent of Tailwind dark:) */
+[data-theme="dark"] [data-testid="dashboard-quick-actions"],
+.dark [data-testid="dashboard-quick-actions"] {
+  background-color: #1e293b;
+}
+
+/* System preference (used when data-theme="system" or not set) */
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] {
+    /* Background colors */
+    --background: #0f172a;
+    --background-secondary: #1e293b;
+    --background-tertiary: #334155;
+    --background-elevated: #1e293b;
+    
+    /* Foreground/Text colors */
+    --foreground: #f1f5f9;
+    --foreground-secondary: #cbd5e1;
+    --foreground-muted: #64748b;
+    
+    /* Border colors */
+    --border: #334155;
+    --border-hover: #475569;
+    --border-focus: #60a5fa;
+    
+    /* Primary brand colors */
+    --primary: #60a5fa;
+    --primary-hover: #3b82f6;
+    --primary-foreground: #0f172a;
+    
+    /* Semantic colors */
+    --success: #34d399;
+    --success-background: #064e3b;
+    --warning: #fbbf24;
+    --warning-background: #78350f;
+    --error: #f87171;
+    --error-background: #7f1d1d;
+    --info: #60a5fa;
+    --info-background: #1e3a8a;
+    
+    /* Card/Surface colors */
+    --card: #1e293b;
+    --card-hover: #334155;
+    
+    /* Input colors */
+    --input-background: #1e293b;
+    --input-border: #475569;
+    --input-focus: #60a5fa;
+    
+    /* Sidebar colors */
+    --sidebar-background: #0f172a;
+    --sidebar-foreground: #e2e8f0;
+    --sidebar-hover: #1e293b;
+    --sidebar-active: #1e3a8a;
+    
+    /* Shadow colors */
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --shadow-color-lg: rgba(0, 0, 0, 0.5);
+  }
 }
 
 @theme inline {
@@ -76,18 +243,301 @@ button {
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, monospace;
 }
 
-/* Dark mode is disabled for now - will be implemented with proper theme switcher */
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-} */
-
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
   font-family: var(--font-sans);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Dark mode using .dark class (set by ThemeProvider) */
+html.dark {
+  --background: #0f172a !important;
+  --background-secondary: #1e293b !important;
+  --background-tertiary: #334155 !important;
+  --foreground: #f1f5f9 !important;
+  --foreground-secondary: #cbd5e1 !important;
+  --foreground-muted: #64748b !important;
+  --border: #334155 !important;
+  --card: #1e293b !important;
+}
+
+html.dark body {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+}
+
+/* ========================================
+   DARK MODE OVERRIDES
+   Comprehensive overrides for Tailwind v4
+   ======================================== */
+
+/* Background colors */
+html.dark .bg-white,
+html.dark .bg-background {
+  background-color: #1e293b !important;
+}
+
+html.dark .bg-gray-50 {
+  background-color: #1e293b !important;
+}
+
+html.dark .bg-gray-100 {
+  background-color: #334155 !important;
+}
+
+html.dark .bg-gray-200 {
+  background-color: #475569 !important;
+}
+
+/* Text colors */
+html.dark .text-gray-900,
+html.dark .text-gray-800 {
+  color: #f1f5f9 !important;
+}
+
+html.dark .text-gray-700,
+html.dark .text-gray-600 {
+  color: #e2e8f0 !important;
+}
+
+html.dark .text-gray-500,
+html.dark .text-gray-400 {
+  color: #94a3b8 !important;
+}
+
+html.dark .text-foreground {
+  color: #f1f5f9 !important;
+}
+
+html.dark .text-foreground-secondary {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-foreground-muted {
+  color: #64748b !important;
+}
+
+/* Border colors */
+html.dark .border-gray-100,
+html.dark .border-gray-200,
+html.dark .border-gray-300 {
+  border-color: #475569 !important;
+}
+
+html.dark .border-border {
+  border-color: #475569 !important;
+}
+
+html.dark .divide-gray-200 > * + * {
+  border-color: #475569 !important;
+}
+
+/* Form elements */
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border-color: #475569 !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus {
+  border-color: #60a5fa !important;
+  outline-color: #60a5fa !important;
+}
+
+/* Dropdown/Select options */
+html.dark option {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+}
+
+/* Cards and elevated surfaces */
+html.dark .bg-card,
+html.dark [class*="rounded-lg"][class*="shadow"],
+html.dark [class*="rounded-xl"][class*="shadow"] {
+  background-color: #1e293b !important;
+}
+
+/* Hover states */
+html.dark .hover\:bg-gray-50:hover,
+html.dark .hover\:bg-gray-100:hover {
+  background-color: #334155 !important;
+}
+
+/* Ring/Focus colors */
+html.dark .ring-gray-200,
+html.dark .ring-gray-300 {
+  --tw-ring-color: #475569 !important;
+}
+
+/* Skeleton loaders */
+html.dark .animate-pulse {
+  background-color: #334155 !important;
+}
+
+/* Tables */
+html.dark table,
+html.dark th,
+html.dark td {
+  border-color: #475569 !important;
+}
+
+html.dark thead {
+  background-color: #1e293b !important;
+}
+
+html.dark tbody tr:nth-child(even) {
+  background-color: #1e293b !important;
+}
+
+html.dark tbody tr:nth-child(odd) {
+  background-color: #0f172a !important;
+}
+
+/* Modals and dialogs */
+html.dark [role="dialog"],
+html.dark [role="menu"],
+html.dark [role="listbox"] {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+}
+
+/* Popovers and dropdowns */
+html.dark [data-radix-popper-content-wrapper] > div,
+html.dark [data-state="open"] {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+}
+
+/* Tab backgrounds */
+html.dark .bg-background-tertiary {
+  background-color: #334155 !important;
+}
+
+/* Links */
+html.dark a:not([class*="text-blue"]):not([class*="text-primary"]) {
+  color: #cbd5e1 !important;
+}
+
+html.dark a:hover:not([class*="text-blue"]):not([class*="text-primary"]) {
+  color: #f1f5f9 !important;
+}
+
+/* Page titles and headers */
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6 {
+  color: #f1f5f9 !important;
+}
+
+/* Labels */
+html.dark label {
+  color: #e2e8f0 !important;
+}
+
+/* Paragraphs with gray text */
+html.dark p.text-gray-600,
+html.dark p.text-gray-500,
+html.dark span.text-gray-600,
+html.dark span.text-gray-500,
+html.dark div.text-gray-600,
+html.dark div.text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+/* All stat cards and analytics */
+html.dark .text-gray-700 {
+  color: #cbd5e1 !important;
+}
+
+/* Placeholder text */
+html.dark ::placeholder {
+  color: #64748b !important;
+}
+
+/* ========================================
+   DARK MODE BLUE COLOR HARMONIZATION
+   Make blues softer and more harmonious
+   ======================================== */
+
+/* Primary blue backgrounds - softer in dark mode */
+html.dark .bg-blue-600 {
+  background-color: #3b82f6 !important;
+}
+
+html.dark .bg-blue-700 {
+  background-color: #2563eb !important;
+}
+
+/* Blue text - brighter for better contrast */
+html.dark .text-blue-600 {
+  color: #60a5fa !important;
+}
+
+html.dark .text-blue-700 {
+  color: #3b82f6 !important;
+}
+
+/* Blue badges and pills */
+html.dark .bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+html.dark .bg-blue-50 {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+html.dark .text-blue-800 {
+  color: #93c5fd !important;
+}
+
+/* Hover states for blue */
+html.dark .hover\:bg-blue-50:hover {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+}
+
+html.dark .hover\:bg-blue-100:hover {
+  background-color: rgba(59, 130, 246, 0.25) !important;
+}
+
+/* Focus rings */
+html.dark .focus\:ring-blue-500:focus {
+  --tw-ring-color: rgba(96, 165, 250, 0.5) !important;
+}
+
+/* Gradient adjustments for dark mode */
+html.dark .from-blue-600 {
+  --tw-gradient-from: #3b82f6 !important;
+}
+
+html.dark .to-blue-700 {
+  --tw-gradient-to: #2563eb !important;
+}
+
+html.dark .from-blue-50 {
+  --tw-gradient-from: rgba(59, 130, 246, 0.1) !important;
+}
+
+html.dark .to-indigo-50 {
+  --tw-gradient-to: rgba(99, 102, 241, 0.1) !important;
+}
+
+/* Theme transition for smooth switching */
+[data-theme] * {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
 }
 
 /* ========================================

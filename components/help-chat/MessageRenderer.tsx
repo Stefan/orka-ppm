@@ -229,8 +229,8 @@ export function MessageRenderer({
 
           {(message.confidence || ragData?.confidence) && (
             <div className="flex items-center space-x-2 mt-2">
-              <Star className="h-3 w-3 text-gray-600" />
-              <span className="text-xs font-semibold text-gray-700">Confidence:</span>
+              <Star className="h-3 w-3 text-gray-600 dark:text-slate-400" />
+              <span className="text-xs font-semibold text-gray-700 dark:text-slate-300">Confidence:</span>
               <div className={cn(
                 'px-2 py-1 rounded-full text-xs font-medium border',
                 getConfidenceColor(message.confidence || ragData?.confidence || 0)
@@ -238,7 +238,7 @@ export function MessageRenderer({
                 {Math.round((message.confidence || ragData?.confidence || 0) * 100)}%
               </div>
               {(message.confidence || ragData?.confidence) && (message.confidence || ragData?.confidence)! < 0.6 && (
-                <div className="flex items-center space-x-1 text-xs text-gray-600">
+                <div className="flex items-center space-x-1 text-xs text-gray-600 dark:text-slate-400">
                   <AlertCircle className="h-3 w-3" />
                   <span>Low confidence - please verify</span>
                 </div>

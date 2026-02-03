@@ -101,6 +101,18 @@ export interface ProjectWithFinancials {
   spend_percentage: number
   health_score: number // 0-100 scale
   eac?: number // Phase 2: Estimate at Completion
+
+  // Cost Book columns (when loaded from costbook API or enriched)
+  pending_budget?: number
+  approved_budget?: number
+  control_estimate?: number
+  open_committed?: number
+  invoice_value?: number
+  remaining_commitment?: number
+  vowd?: number
+  accruals?: number
+  etc?: number
+  delta_eac?: number
 }
 
 export interface KPIMetrics {
@@ -352,7 +364,7 @@ export interface ExtendedActual extends Actual {
   custom_fields?: Record<string, unknown>
 }
 
-// Cost Breakdown Structure - financial tracking columns
+// Cost Breakdown Structure - financial tracking columns (legacy)
 export interface CostBreakdownRow {
   approved_budget: number
   eac: number
@@ -360,6 +372,27 @@ export interface CostBreakdownRow {
   open_committed: number
   invoice_value: number
   actual_cost: number
+}
+
+// Costbook row – full Cost Book columns (API / grid)
+export interface CostbookRow {
+  project_id: string
+  project_name: string
+  start_date?: string
+  end_date?: string
+  pending_budget: number
+  approved_budget: number
+  control_estimate: number
+  open_committed: number
+  invoice_value: number
+  remaining_commitment: number
+  vowd: number
+  accruals: number
+  etc: number
+  eac: number
+  delta_eac: number
+  variance: number
+  currency?: string
 }
 
 // Cash Out Forecast: time bucket + distribution
@@ -374,19 +407,36 @@ export interface CashOutForecastBucket {
 // Distribution Settings for forecast planning (Phase 2)
 export type DistributionProfile = 'linear' | 'custom' | 'ai_generated'
 
+export type DurationType = 'project' | 'task' | 'custom'
+
 export interface DistributionSettings {
   profile: DistributionProfile
   duration_start: string
   duration_end: string
   granularity: 'week' | 'month'
+  /** Custom percentage per period (when profile === 'custom') */
+  customDistribution?: number[]
+  /** Duration scope: project dates, task dates, or custom from/to */
+  duration_type?: DurationType
 }
 
 // Distribution Rules Engine (Phase 3)
 export type DistributionRuleType = 'automatic' | 'reprofiling' | 'ai_generator'
+
+/** Scope of a distribution rule: project-level or line-level (WBS) */
+export type DistributionRuleScope = 'project' | 'line'
 
 export interface DistributionRule {
   id: string
   type: DistributionRuleType
   profile: DistributionProfile
   settings: DistributionSettings
+  /** Optional: scope for line-level distribution (Phase 3) */
+  scope?: DistributionRuleScope
+  /** Optional: WBS element or line ID when scope === 'line' */
+  wbs_element?: string
+  line_id?: string
+  created_at?: string
+  last_applied?: string
+  application_count?: number
 }

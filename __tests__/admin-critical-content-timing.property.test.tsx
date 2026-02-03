@@ -8,6 +8,7 @@
  * renders in the DOM before non-critical JavaScript (charts, tables) begins loading.
  */
 
+import React from 'react'
 import fc from 'fast-check'
 import { render, waitFor, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
@@ -98,8 +99,6 @@ function MockLazyChart({ onLoad }: { onLoad?: () => void }) {
 
   return <div data-testid="chart-section">Chart</div>
 }
-
-import React from 'react'
 
 describe('Admin Performance Optimization - Critical Content Timing', () => {
   beforeEach(() => {

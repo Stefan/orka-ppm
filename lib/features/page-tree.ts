@@ -6,14 +6,17 @@ import type { DocItem } from '@/types/features'
 import type { Feature, FeatureTreeNode, PageOrFeatureNode } from '@/types/features'
 import { buildFeatureTree } from './tree'
 
+/**
+ * Check if a feature belongs as a CHILD of a page.
+ * Features with the exact same link as the page are NOT children (redundant).
+ * Only sub-pages (like /financials?tab=x or /financials/sub) are children.
+ */
 function linkBelongsToPage(featureLink: string | null, pageLink: string): boolean {
   if (!featureLink) return false
-  if (pageLink === '/') return featureLink === '/'
-  return (
-    featureLink === pageLink ||
-    featureLink.startsWith(pageLink + '?') ||
-    featureLink.startsWith(pageLink + '/')
-  )
+  if (pageLink === '/') return false // Root page has no feature children by link
+  // Do NOT match exact link (that's the page itself, not a child)
+  // Only match sub-paths or query params
+  return featureLink.startsWith(pageLink + '?') || featureLink.startsWith(pageLink + '/')
 }
 
 function featureTreeNodeToPageOrFeature(node: FeatureTreeNode): PageOrFeatureNode {
@@ -31,49 +34,52 @@ function featureTreeNodeToPageOrFeature(node: FeatureTreeNode): PageOrFeatureNod
 
 /**
  * Build one tree: roots = app pages (from routes), under each page = sub-features from catalog.
+ * Respects parentId hierarchy so sub-routes (like /financials?tab=costbook) appear under their parent.
  * Features are assigned to a page when feature.link matches the page path (or starts with page? or page/).
  */
 export function buildPageTree(routes: DocItem[], features: Feature[]): PageOrFeatureNode[] {
   const routeItems = routes.filter((r) => r.source === 'route' && r.id.startsWith('route:'))
-  const sorted = routeItems.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
-  // #region agent log (only when NEXT_PUBLIC_AGENT_INGEST_URL is set to avoid ERR_CONNECTION_REFUSED in Lighthouse)
-  const ingestUrl = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_AGENT_INGEST_URL : undefined
-  const firstRoute = sorted[0]
-  if (ingestUrl && typeof fetch !== 'undefined' && firstRoute) {
-    fetch(ingestUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: 'lib/features/page-tree.ts:buildPageTree',
-        message: 'buildPageTree route.description preserved',
-        data: {
-          firstRouteId: firstRoute.id,
-          routeDescLen: firstRoute.description?.length ?? 0,
-          nodeDescLen: firstRoute.description?.length ?? 0,
-          runId: 'post-fix',
-        },
-        timestamp: Date.now(),
-        sessionId: 'debug-session',
-        hypothesisId: 'H3',
-      }),
-    }).catch(() => {})
-  }
-  // #endregion
-  return sorted.map((route) => {
+
+  // Build a map of route ID -> route for quick lookup
+  const routeMap = new Map<string, DocItem>()
+  routeItems.forEach((r) => routeMap.set(r.id, r))
+
+  // Find top-level routes (parentId is section:routes or not a route)
+  const topLevelRoutes = routeItems.filter(
+    (r) => !r.parentId || r.parentId === 'section:routes' || !r.parentId.startsWith('route:')
+  )
+
+  // Find child routes for a given parent
+  const getChildRoutes = (parentId: string): DocItem[] =>
+    routeItems.filter((r) => r.parentId === parentId)
+
+  // Convert a route to a PageOrFeatureNode, recursively including child routes
+  const routeToNode = (route: DocItem): PageOrFeatureNode => {
     const pageFeatures = features.filter((f) => linkBelongsToPage(f.link, route.link || ''))
-    const childTree = buildFeatureTree(pageFeatures)
-    const children = childTree.map(featureTreeNodeToPageOrFeature)
+    const featureTree = buildFeatureTree(pageFeatures)
+    const featureChildren = featureTree.map(featureTreeNodeToPageOrFeature)
+
+    // Get child routes (sub-pages like tabs)
+    const childRoutes = getChildRoutes(route.id)
+    const routeChildren = childRoutes.map(routeToNode)
+
+    // Combine feature children and route children
+    const allChildren = [...routeChildren, ...featureChildren]
+
     return {
       id: route.id,
       name: route.name,
       link: route.link,
       description: route.description ?? null,
-      screenshot_url: null,
+      screenshot_url: route.screenshot_url ?? null,
       icon: route.icon,
-      children,
+      children: allChildren,
       feature: null,
     } as PageOrFeatureNode
-  })
+  }
+
+  const sorted = topLevelRoutes.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+  return sorted.map(routeToNode)
 }
 
 export function findPageOrFeatureNode(

@@ -1,19 +1,39 @@
 #!/bin/bash
 #
-# Git Pre-Push Hook for Property-Based Testing
+# Git Pre-Push Hook: Health Check + Property-Based Testing
 #
-# This hook runs property-based tests before pushing to remote repository.
-# It helps catch issues early and ensures code quality.
+# 1. Health check (syntax, optional deps, type-check) – catches e.g. "Module not found" early.
+# 2. Property-based tests on changed files.
 #
 # To install this hook:
 #   cp scripts/git-hooks/pre-push .git/hooks/pre-push
 #   chmod +x .git/hooks/pre-push
+#
+# With Husky (prepare script runs "husky install"):
+#   Husky will use .husky/pre-push if present; otherwise copy from scripts/git-hooks/pre-push.
 #
 # To bypass this hook (not recommended):
 #   git push --no-verify
 #
 # Task: 13.2 Add CI/CD integration and automation
 # Feature: property-based-testing
+
+set -e
+cd "$(git rev-parse --show-toplevel)"
+
+echo "Running pre-push checks..."
+echo ""
+
+# 1. Health check (syntax, optional-deps, type-check)
+echo "▶ Health check (syntax, optional deps, type-check)"
+if ! npm run health-check; then
+    echo ""
+    echo "❌ Health check failed (syntax / optional deps / type-check)."
+    echo "   Fix the errors above before pushing."
+    echo "   Bypass: git push --no-verify"
+    exit 1
+fi
+echo ""
 
 # Get the remote and branch being pushed to
 remote="$1"

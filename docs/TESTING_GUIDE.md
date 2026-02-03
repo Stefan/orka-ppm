@@ -255,6 +255,66 @@ Tests run automatically on:
 - Transaction handling
 - Data persistence
 
+## SLO / SLA Monitoring
+
+Explicit latency and error thresholds are enforced in CI. When exceeded, tests or load runs fail.
+
+### Where SLOs are enforced
+
+| SLO | Where enforced | Threshold |
+|-----|----------------|-----------|
+| Health API latency | Jest `__tests__/slo/api-latency.test.ts` | Response < 2000 ms |
+| Load: p95 duration | k6 `scripts/load/smoke.js`, `scripts/load/dashboard.js` | `http_req_duration p(95)<2000` |
+| Load: error rate | k6 smoke/dashboard | `http_req_failed rate<0.05` |
+| Import flow (optional) | k6 `scripts/load/import.js` | p95 < 3000 ms, error rate < 10% |
+
+### Updating SLOs
+
+- **Jest:** Change the constant (e.g. `SLO_HEALTH_MS`) and assertion in `__tests__/slo/api-latency.test.ts`.
+- **k6:** Edit the `thresholds` object in `scripts/load/smoke.js` or `scripts/load/dashboard.js` (e.g. `p(95)<2000` or `rate<0.05`). Re-run with `k6 run scripts/load/smoke.js`.
+
+### Running load tests locally
+
+```bash
+# Install k6 (e.g. brew install k6), then:
+BASE_URL=http://localhost:3000 k6 run scripts/load/smoke.js
+BASE_URL=https://staging.example.com k6 run scripts/load/dashboard.js
+```
+
+### Running load tests in CI
+
+- **BASE_URL:** Scheduled runs and tag `load` use the repository variable `vars.BASE_URL` if set (e.g. your staging URL). For manual runs use the workflow_dispatch input. If neither is set, `http://localhost:3000` is used (smoke may fail unless you add a job that starts the app).
+- **When they run:** Schedule (daily), on push to tag `load`, or via workflow_dispatch. See [.github/workflows/load-tests.yml](.github/workflows/load-tests.yml).
+- **Setting staging:** In GitHub repo Settings → Secrets and variables → Actions, add a variable `BASE_URL` = your staging or production URL so scheduled load tests hit a live target.
+
+## Contract tests and OpenAPI
+
+Contract tests in `__tests__/contract/` validate consumer expectations for Health, Projects, and Help-Chat. They also support OpenAPI-driven checks: `openapi-contract.test.ts` loads `__tests__/contract/openapi.json` (committed or generated) and asserts path/schema structure. To regenerate the schema from the backend, run:
+
+```bash
+BACKEND_URL=http://localhost:8000 ./scripts/export-openapi.sh
+```
+
+This overwrites `__tests__/contract/openapi.json`. Commit the file after backend API changes so CI keeps contract tests in sync.
+
+## Accessibility
+
+Automated a11y checks use `jest-axe` in `__tests__/a11y/`. Key components (e.g. ErrorMessage, EmptyState) are rendered and checked for axe violations. Run with:
+
+```bash
+npm test -- __tests__/a11y
+```
+
+Target level: WCAG 2.1 (AA where applicable). To add checks for more pages or components, add tests that render the component and call `expect(await axe(container)).toHaveNoViolations()`.
+
+## API rate limiting
+
+Rate limiting is enforced at the **backend** (FastAPI). When the performance optimization module is loaded, `SlowAPIMiddleware` and a limiter are applied (see `backend/main.py`). The backend also provides `backend/middleware/rate_limit_middleware.py`, which sets `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` on responses.
+
+- **Where enforced:** Backend API (not in Next.js API routes). Limits are documented in `backend/api_documentation.py`: standard endpoints 60/min, dashboard/KPI 30/min, bulk 5–10/min.
+- **Client behavior:** Frontend and API clients should respect `X-RateLimit-*` response headers and honour 429 (Retry-After) when present.
+- **Next.js layer:** No per-IP or per-route rate limiting is applied in Next.js; protection is backend-only unless you add middleware or route-level limiting.
+
 ## Adding New Tests
 
 ### When to Add Tests:

@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/210</span>
+                <span class='fraction'>0/204</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/108</span>
+                <span class='fraction'>0/100</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/181</span>
+                <span class='fraction'>0/175</span>
             </div>
         
             
@@ -582,19 +582,7 @@
 <a name='L517'></a><a href='#L517'>517</a>
 <a name='L518'></a><a href='#L518'>518</a>
 <a name='L519'></a><a href='#L519'>519</a>
-<a name='L520'></a><a href='#L520'>520</a>
-<a name='L521'></a><a href='#L521'>521</a>
-<a name='L522'></a><a href='#L522'>522</a>
-<a name='L523'></a><a href='#L523'>523</a>
-<a name='L524'></a><a href='#L524'>524</a>
-<a name='L525'></a><a href='#L525'>525</a>
-<a name='L526'></a><a href='#L526'>526</a>
-<a name='L527'></a><a href='#L527'>527</a>
-<a name='L528'></a><a href='#L528'>528</a>
-<a name='L529'></a><a href='#L529'>529</a>
-<a name='L530'></a><a href='#L530'>530</a>
-<a name='L531'></a><a href='#L531'>531</a>
-<a name='L532'></a><a href='#L532'>532</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L520'></a><a href='#L520'>520</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -725,14 +713,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -745,12 +728,10 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -830,20 +811,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1254,11 +1230,6 @@ class PerformanceMonitor {
 <span class="cstat-no" title="statement not covered" >    this.metrics.push(metric)</span>
 <span class="cstat-no" title="statement not covered" >    this.checkBudget(name, value)</span>
 &nbsp;
-    // Log in development
-<span class="cstat-no" title="statement not covered" >    if (process.env.NODE_ENV === 'development') {</span>
-<span class="cstat-no" title="statement not covered" >      console.log(`🎯 Core Web Vital: ${name} = ${value.toFixed(2)}${name === 'CLS' ? '' : 'ms'} (${rating})`, metadata)</span>
-    }
-&nbsp;
     // Send to analytics
 <span class="cstat-no" title="statement not covered" >    this.sendToAnalytics(metric)</span>
   }
@@ -1277,10 +1248,8 @@ class PerformanceMonitor {
 <span class="cstat-no" title="statement not covered" >    if (!budget) <span class="cstat-no" title="statement not covered" >return</span></span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (value &gt; budget.budget) {</span>
-<span class="cstat-no" title="statement not covered" >      console.warn(`🚨 Performance Budget Exceeded: ${metricName} = ${value} (budget: ${budget.budget})`)</span>
 <span class="cstat-no" title="statement not covered" >      this.recordMetric(`budget_exceeded_${metricName}`, value, 'custom', { budget: budget.budget })</span>
     } else <span class="cstat-no" title="statement not covered" >if (value &gt; budget.warning) {</span>
-<span class="cstat-no" title="statement not covered" >      console.warn(`⚠️ Performance Budget Warning: ${metricName} = ${value} (warning: ${budget.warning})`)</span>
 <span class="cstat-no" title="statement not covered" >      this.recordMetric(`budget_warning_${metricName}`, value, 'custom', { warning: budget.warning })</span>
     }
   }
@@ -1374,11 +1343,6 @@ class PerformanceMonitor {
     // Check budget for custom metrics too
 <span class="cstat-no" title="statement not covered" >    if (type === 'custom') {</span>
 <span class="cstat-no" title="statement not covered" >      this.checkBudget(name, value)</span>
-    }
-&nbsp;
-    // Log in development
-<span class="cstat-no" title="statement not covered" >    if (process.env.NODE_ENV === 'development') {</span>
-<span class="cstat-no" title="statement not covered" >      console.log(`📊 Performance: ${name} = ${value.toFixed(2)}ms${rating ? ` (${rating})` : ''}`, metadata)</span>
     }
 &nbsp;
     // Send to analytics in production
@@ -1663,7 +1627,7 @@ export const <span class="cstat-no" title="statement not covered" >getMemoryInfo
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-23T20:41:45.322Z
+                at 2026-02-03T20:46:02.366Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

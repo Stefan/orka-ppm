@@ -133,7 +133,7 @@ describe('Property 37: Frontend Data Formatting Consistency', () => {
     fc.assert(
       fc.property(
         fc.record({
-          date: fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }),
+          date: fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }).filter(d => !isNaN(d.getTime())),
           amount: fc.float({ min: 0, max: 1000000, noNaN: true }),
           percentage: fc.float({ min: 0, max: 100, noNaN: true }),
           count: fc.integer({ min: 0, max: 10000000 })

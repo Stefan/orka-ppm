@@ -109,23 +109,33 @@ function AlertChip({ alert, onDismiss }: { alert: any, onDismiss: (id: string) =
   const [showTooltip, setShowTooltip] = useState(false)
   
   const severityConfig = {
-    critical: { 
-      bg: 'bg-red-100', 
-      border: 'border-red-300', 
-      text: 'text-red-800',
-      dot: 'bg-red-600'
+    critical: {
+      bg: 'bg-red-100 dark:bg-red-950/60',
+      border: 'border-red-300 dark:border-red-800',
+      text: 'text-red-900 dark:text-red-100',
+      textMuted: 'text-red-800 dark:text-red-100',
+      dot: 'bg-red-600 dark:bg-red-400'
     },
-    warning: { 
-      bg: 'bg-orange-100', 
-      border: 'border-orange-300', 
-      text: 'text-orange-800',
-      dot: 'bg-orange-600'
+    high: {
+      bg: 'bg-red-100 dark:bg-red-950/60',
+      border: 'border-red-300 dark:border-red-800',
+      text: 'text-red-900 dark:text-red-100',
+      textMuted: 'text-red-800 dark:text-red-100',
+      dot: 'bg-red-600 dark:bg-red-400'
     },
-    info: { 
-      bg: 'bg-blue-100', 
-      border: 'border-blue-300', 
-      text: 'text-blue-800',
-      dot: 'bg-blue-600'
+    warning: {
+      bg: 'bg-orange-100 dark:bg-orange-950/60',
+      border: 'border-orange-300 dark:border-orange-800',
+      text: 'text-orange-900 dark:text-orange-100',
+      textMuted: 'text-orange-800 dark:text-orange-100',
+      dot: 'bg-orange-600 dark:bg-orange-400'
+    },
+    info: {
+      bg: 'bg-blue-100 dark:bg-blue-950/60',
+      border: 'border-blue-300 dark:border-blue-800',
+      text: 'text-blue-900 dark:text-blue-100',
+      textMuted: 'text-blue-800 dark:text-blue-100',
+      dot: 'bg-blue-600 dark:bg-blue-400'
     }
   }
   
@@ -139,23 +149,24 @@ function AlertChip({ alert, onDismiss }: { alert: any, onDismiss: (id: string) =
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
     >
-      <div className={`w-2 h-2 rounded-full ${config.dot} flex-shrink-0`}></div>
-      <div className="flex flex-col min-w-0">
+      <div className={`w-2 h-2 rounded-full ${config.dot} flex-shrink-0`} aria-hidden></div>
+      <div className="flex flex-col min-w-0 flex-1">
         <span className={`text-sm font-semibold ${config.text}`}>{alert.title}</span>
-        <span className={`text-xs ${config.text} opacity-70 truncate`}>{alert.description}</span>
+        <span className={`text-xs sm:text-sm ${(config as any).textMuted || config.text} truncate leading-snug`}>{alert.description}</span>
       </div>
       <button
         onClick={() => onDismiss(alert.id)}
-        className={`p-0.5 rounded hover:bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ${config.text}`}
+        className={`p-0.5 rounded hover:bg-black/10 dark:hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ${config.text}`}
+        aria-label="Dismiss alert"
       >
-        <X size={14} />
+        <X size={14} aria-hidden />
       </button>
       
       {/* Tooltip on hover */}
       {showTooltip && (
-        <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-lg z-20 whitespace-nowrap">
+        <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 dark:bg-slate-800 text-white dark:text-slate-100 text-sm rounded-lg shadow-lg z-20 whitespace-nowrap">
           {alert.description}
-          <div className="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+          <div className="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-slate-800"></div>
         </div>
       )}
     </div>
@@ -171,15 +182,15 @@ function FilterDropdown({ value, onChange }: { value: string, onChange: (val: st
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-xs"
+        className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors text-xs text-gray-900 dark:text-slate-100"
       >
-        <Filter size={14} />
+        <Filter size={14} aria-hidden />
         <span className="hidden sm:inline">{value}</span>
-        <ChevronDown size={14} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown size={14} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} aria-hidden />
       </button>
       
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg z-10">
           {options.map((option) => (
             <button
               key={option}
@@ -187,8 +198,8 @@ function FilterDropdown({ value, onChange }: { value: string, onChange: (val: st
                 onChange(option)
                 setIsOpen(false)
               }}
-              className={`w-full text-left px-4 py-2 text-xs hover:bg-gray-50 transition-colors first:rounded-t-lg last:rounded-b-lg ${
-                value === option ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'
+              className={`w-full text-left px-4 py-2 text-xs hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors first:rounded-t-lg last:rounded-b-lg ${
+                value === option ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 font-medium' : 'text-gray-700 dark:text-slate-200'
               }`}
             >
               {option}
@@ -213,7 +224,8 @@ export default function CompactDashboard() {
   const [timeFilter, setTimeFilter] = useState('Last 30 days')
   const [alerts, setAlerts] = useState<any[]>([
     { id: '1', title: 'Budget Overrun', description: 'Project Alpha exceeded budget by 15%', severity: 'critical' },
-    { id: '2', title: 'Timeline Delay', description: 'Project Beta is 2 weeks behind schedule', severity: 'warning' },
+    { id: '2', title: 'Schedule Delay Risk', description: 'Critical path activities delayed by 3 days', severity: 'high' },
+    { id: '4', title: 'Timeline Delay', description: 'Project Beta is 2 weeks behind schedule', severity: 'warning' },
     { id: '3', title: 'Resource Conflict', description: 'Team member assigned to multiple projects', severity: 'warning' },
   ])
   const [showImportModal, setShowImportModal] = useState(false)
@@ -462,36 +474,40 @@ export default function CompactDashboard() {
       </div>
 
       {/* BOTTOM: Quick Actions - Fixed at bottom of viewport with higher z-index */}
-      <div data-testid="dashboard-quick-actions" className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-white/95 border-t-2 border-gray-300 py-2 px-3 shadow-2xl z-50">
-        <div className="max-w-[1600px] mx-auto">
+      <div data-testid="dashboard-quick-actions" className="fixed bottom-0 left-0 right-0 border-t-2 border-gray-300 dark:border-slate-700 py-2 px-3 shadow-2xl z-50">
+        {/* Light: gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-t from-white via-white to-white/95 dark:hidden" aria-hidden />
+        {/* Dark: solid background (separate layer so it always applies) */}
+        <div className="absolute inset-0 hidden dark:block bg-slate-800" aria-hidden />
+        <div className="relative z-10 max-w-[1600px] mx-auto">
           <div className="flex items-center gap-2 overflow-x-auto pb-1">
-            <span className="text-xs font-bold text-gray-700 uppercase tracking-wide whitespace-nowrap mr-1">{t('actions.quickActions')}:</span>
-            <button data-testid="action-scenarios" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all whitespace-nowrap shadow-md hover:shadow-lg">
-              <BarChart3 size={18} />
+            <span className="text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap mr-1">{t('actions.quickActions')}:</span>
+            <button data-testid="action-scenarios" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-blue-500 dark:bg-blue-700 dark:border dark:border-blue-600 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-600 transition-all whitespace-nowrap shadow-md hover:shadow-lg text-white [&_svg]:text-white [&_span]:text-white">
+              <BarChart3 size={18} className="shrink-0" aria-hidden />
               <span className="text-sm font-medium">{t('actions.scenarios')}</span>
             </button>
-            <button data-testid="action-resources" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
-              <Users size={18} className="text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">{t('actions.resources')}</span>
+            <button data-testid="action-resources" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-700 border-2 border-gray-300 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-700 dark:text-white [&_svg]:text-inherit">
+              <Users size={18} className="shrink-0" aria-hidden />
+              <span className="text-sm font-medium">{t('actions.resources')}</span>
             </button>
-            <button data-testid="action-financials" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
-              <DollarSign size={18} className="text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">{t('actions.financials')}</span>
+            <button data-testid="action-financials" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-700 border-2 border-gray-300 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-700 dark:text-white [&_svg]:text-inherit">
+              <DollarSign size={18} className="shrink-0" aria-hidden />
+              <span className="text-sm font-medium">{t('actions.financials')}</span>
             </button>
-            <button data-testid="action-reports" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
-              <FileText size={18} className="text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">{t('actions.reports')}</span>
+            <button data-testid="action-reports" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-700 border-2 border-gray-300 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-700 dark:text-white [&_svg]:text-inherit">
+              <FileText size={18} className="shrink-0" aria-hidden />
+              <span className="text-sm font-medium">{t('actions.reports')}</span>
             </button>
-            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
-              <Clock size={18} className="text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">Timeline</span>
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-700 border-2 border-gray-300 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-700 dark:text-white [&_svg]:text-inherit">
+              <Clock size={18} className="shrink-0" aria-hidden />
+              <span className="text-sm font-medium">Timeline</span>
             </button>
-            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all whitespace-nowrap shadow-sm">
-              <TrendingUp size={18} className="text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">Analytics</span>
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-700 border-2 border-gray-300 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-700 dark:text-white [&_svg]:text-inherit">
+              <TrendingUp size={18} className="shrink-0" aria-hidden />
+              <span className="text-sm font-medium">Analytics</span>
             </button>
-            <button data-testid="action-import" onClick={() => setShowImportModal(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all whitespace-nowrap shadow-md hover:shadow-lg">
-              <Upload size={18} />
+            <button data-testid="action-import" onClick={() => setShowImportModal(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-700 dark:border dark:border-blue-600 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-all whitespace-nowrap shadow-md hover:shadow-lg text-white [&_svg]:text-white [&_span]:text-white">
+              <Upload size={18} className="shrink-0" aria-hidden />
               <span className="text-sm font-medium">Import Projects</span>
             </button>
           </div>

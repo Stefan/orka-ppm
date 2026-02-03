@@ -385,24 +385,24 @@ interface ResourceCardProps {
 &nbsp;
 function <span class="fstat-no" title="function not covered" >ResourceCard({</span> resource }: ResourceCardProps) {
   return (
-    &lt;div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow touch-manipulation"&gt;
+    &lt;div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4 sm:p-6 hover:shadow-md transition-shadow touch-manipulation"&gt;
       &lt;div className="flex items-start justify-between"&gt;
         &lt;div className="flex-1 min-w-0"&gt;
-          &lt;h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate"&gt;{resource.name}&lt;/h3&gt;
-          &lt;p className="text-sm text-gray-700 truncate"&gt;{resource.role || 'No role specified'}&lt;/p&gt;
-          &lt;p className="text-sm text-gray-500 truncate"&gt;{resource.email}&lt;/p&gt;
+          &lt;h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-slate-100 truncate"&gt;{resource.name}&lt;/h3&gt;
+          &lt;p className="text-sm text-gray-700 dark:text-slate-300 truncate"&gt;{resource.role || 'No role specified'}&lt;/p&gt;
+          &lt;p className="text-sm text-gray-500 dark:text-slate-400 truncate"&gt;{resource.email}&lt;/p&gt;
           {<span class="branch-0 cbranch-no" title="branch not covered" >resource.location </span>&amp;&amp; (
-            &lt;div className="flex items-center mt-1 text-sm text-gray-500"&gt;
+            &lt;div className="flex items-center mt-1 text-sm text-gray-500 dark:text-slate-400"&gt;
               &lt;MapPin className="h-3 w-3 mr-1 flex-shrink-0" /&gt;
               &lt;span className="truncate"&gt;{resource.location}&lt;/span&gt;
             &lt;/div&gt;
           )}
         &lt;/div&gt;
         &lt;div className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ml-2 ${
-          resource.availability_status === 'available' ? 'bg-green-100 text-green-800' :
-          resource.availability_status === 'partially_allocated' ? 'bg-yellow-100 text-yellow-800' :
-          resource.availability_status === 'mostly_allocated' ? 'bg-orange-100 text-orange-800' :
-          'bg-red-100 text-red-800'
+          resource.availability_status === 'available' ? 'bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300' :
+          resource.availability_status === 'partially_allocated' ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300' :
+          resource.availability_status === 'mostly_allocated' ? 'bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-300' :
+          'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300'
         }`}
         &gt;
           {resource.availability_status.replace('_', ' ')}
@@ -410,11 +410,11 @@ function <span class="fstat-no" title="function not covered" >ResourceCard({</sp
       &lt;/div&gt;
       
       &lt;div className="mt-4"&gt;
-        &lt;div className="flex justify-between text-sm text-gray-700 mb-2"&gt;
+        &lt;div className="flex justify-between text-sm text-gray-700 dark:text-slate-300 mb-2"&gt;
           &lt;span&gt;Utilization&lt;/span&gt;
           &lt;span className="font-medium"&gt;{resource.utilization_percentage.toFixed(1)}%&lt;/span&gt;
         &lt;/div&gt;
-        &lt;div className="w-full bg-gray-200 rounded-full h-3 touch-manipulation"&gt;
+        &lt;div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-3 touch-manipulation"&gt;
           &lt;div 
             className={`h-3 rounded-full transition-all duration-300 ${
               resource.utilization_percentage &lt;= 70 ? 'bg-green-500' :
@@ -429,32 +429,32 @@ function <span class="fstat-no" title="function not covered" >ResourceCard({</sp
 &nbsp;
       &lt;div className="mt-4 space-y-2"&gt;
         &lt;div className="flex justify-between text-sm"&gt;
-          &lt;span className="text-gray-700"&gt;Available Hours:&lt;/span&gt;
-          &lt;span className="font-medium text-gray-900"&gt;{resource.available_hours.toFixed(1)}h/week&lt;/span&gt;
+          &lt;span className="text-gray-700 dark:text-slate-300"&gt;Available Hours:&lt;/span&gt;
+          &lt;span className="font-medium text-gray-900 dark:text-slate-100"&gt;{resource.available_hours.toFixed(1)}h/week&lt;/span&gt;
         &lt;/div&gt;
         &lt;div className="flex justify-between text-sm"&gt;
-          &lt;span className="text-gray-700"&gt;Current Projects:&lt;/span&gt;
-          &lt;span className="font-medium text-gray-900"&gt;{resource.current_projects.length}&lt;/span&gt;
+          &lt;span className="text-gray-700 dark:text-slate-300"&gt;Current Projects:&lt;/span&gt;
+          &lt;span className="font-medium text-gray-900 dark:text-slate-100"&gt;{resource.current_projects.length}&lt;/span&gt;
         &lt;/div&gt;
         {<span class="branch-0 cbranch-no" title="branch not covered" >resource.hourly_rate </span>&amp;&amp; (
           &lt;div className="flex justify-between text-sm"&gt;
-            &lt;span className="text-gray-700"&gt;Hourly Rate:&lt;/span&gt;
-            &lt;span className="font-medium text-gray-900"&gt;${resource.hourly_rate}/hr&lt;/span&gt;
+            &lt;span className="text-gray-700 dark:text-slate-300"&gt;Hourly Rate:&lt;/span&gt;
+            &lt;span className="font-medium text-gray-900 dark:text-slate-100"&gt;${resource.hourly_rate}/hr&lt;/span&gt;
           &lt;/div&gt;
         )}
       &lt;/div&gt;
 &nbsp;
       {<span class="branch-0 cbranch-no" title="branch not covered" >resource.skills.length &gt; 0 &amp;&amp; (</span>
         &lt;div className="mt-4"&gt;
-          &lt;p className="text-sm text-gray-700 mb-2"&gt;Skills:&lt;/p&gt;
+          &lt;p className="text-sm text-gray-700 dark:text-slate-300 mb-2"&gt;Skills:&lt;/p&gt;
           &lt;div className="flex flex-wrap gap-1"&gt;
             {resource.skills.slice(0, 3).map(<span class="fstat-no" title="function not covered" >(s</span>kill, index) =&gt; (
-<span class="cstat-no" title="statement not covered" >              &lt;span key={index} c</span>lassName="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded touch-manipulation"&gt;
+<span class="cstat-no" title="statement not covered" >              &lt;span key={index} c</span>lassName="px-2 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 text-xs rounded touch-manipulation"&gt;
                 {skill}
               &lt;/span&gt;
             ))}
             {<span class="branch-0 cbranch-no" title="branch not covered" >resource.skills.length &gt; 3 &amp;&amp; (</span>
-              &lt;span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded"&gt;
+              &lt;span className="px-2 py-1 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 text-xs rounded"&gt;
                 +{resource.skills.length - 3} more
               &lt;/span&gt;
             )}
@@ -462,11 +462,11 @@ function <span class="fstat-no" title="function not covered" >ResourceCard({</sp
         &lt;/div&gt;
       )}
 &nbsp;
-      &lt;div className="mt-4 pt-4 border-t border-gray-100 flex justify-between"&gt;
-        &lt;button className="text-sm text-blue-600 hover:text-blue-800 active:text-blue-900 min-h-[44px] px-3 py-2 -mx-3 -my-2 rounded touch-manipulation"&gt;
+      &lt;div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700 flex justify-between"&gt;
+        &lt;button className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 active:text-blue-900 min-h-[44px] px-3 py-2 -mx-3 -my-2 rounded touch-manipulation"&gt;
           View Details
         &lt;/button&gt;
-        &lt;button className="text-sm text-gray-600 hover:text-gray-800 active:text-gray-900 min-h-[44px] px-3 py-2 -mx-3 -my-2 rounded touch-manipulation"&gt;
+        &lt;button className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-200 active:text-gray-900 min-h-[44px] px-3 py-2 -mx-3 -my-2 rounded touch-manipulation"&gt;
           Edit
         &lt;/button&gt;
       &lt;/div&gt;
@@ -505,7 +505,7 @@ const arePropsEqual = <span class="cstat-no" title="statement not covered" ><spa
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-23T20:41:45.322Z
+                at 2026-02-03T20:46:02.366Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

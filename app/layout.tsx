@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google'
 import { SupabaseAuthProvider } from './providers/SupabaseAuthProvider'
 import { FeatureFlagProvider } from '@/contexts/FeatureFlagContext'
 import { EnhancedAuthProvider } from './providers/EnhancedAuthProvider'
+import { ThemeProvider, ThemeScript } from './providers/ThemeProvider'
 import { ErrorBoundary } from '../components/shared/ErrorBoundary'
 import { ToastProvider } from '../components/shared/Toast'
 import PerformanceOptimizer from '../components/performance/PerformanceOptimizer'
@@ -68,6 +69,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="de" className={`${inter.variable} chrome-optimized`} suppressHydrationWarning>
       <head>
+        {/* Theme script to prevent flash of incorrect theme */}
+        <ThemeScript />
+        
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -100,13 +104,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         */}
       </head>
       <body 
-        className="font-sans antialiased bg-white min-h-screen chrome-optimized chrome-background-coverage" 
+        className="font-sans antialiased min-h-screen chrome-optimized chrome-background-coverage" 
         suppressHydrationWarning={true}
         style={{
           WebkitOverflowScrolling: 'touch',
           overscrollBehavior: 'contain',
-          backgroundAttachment: 'local',
-          backgroundColor: '#f9fafb'
+          backgroundAttachment: 'local'
         } as React.CSSProperties}
       >
         {/* Visible fallback before React hydrates or if JS fails - prevents white page */}
@@ -115,24 +118,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             Orka PPM – Please enable JavaScript to use this app.
           </div>
         </noscript>
-        <div id="root-loading" style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f9fafb', color: '#4b5563', fontFamily: 'system-ui, sans-serif', fontSize: 16, zIndex: 0 }} aria-hidden="true">
-          Loading…
-        </div>
+        {/* Root loading removed - was causing dark mode issues */}
         <FirefoxSidebarFix />
         <ResourcePreloader />
         <PredictivePrefetcher enabled={true} />
         <PerformanceOptimizer>
           <ErrorBoundary>
             <SupabaseAuthProvider>
-              <EnhancedAuthProvider>
-                <FeatureFlagProvider>
-                  <I18nProvider>
-                    <ToastProvider>
-                      {children}
-                    </ToastProvider>
-                  </I18nProvider>
-                </FeatureFlagProvider>
-              </EnhancedAuthProvider>
+              <ThemeProvider>
+                <EnhancedAuthProvider>
+                  <FeatureFlagProvider>
+                    <I18nProvider>
+                      <ToastProvider>
+                        {children}
+                      </ToastProvider>
+                    </I18nProvider>
+                  </FeatureFlagProvider>
+                </EnhancedAuthProvider>
+              </ThemeProvider>
             </SupabaseAuthProvider>
           </ErrorBoundary>
         </PerformanceOptimizer>

@@ -73,9 +73,9 @@ function IconButton({
       className={`
         p-2
         rounded-md
-        text-gray-500
-        hover:text-gray-700
-        hover:bg-gray-100
+        text-gray-500 dark:text-slate-400
+        hover:text-gray-700 dark:hover:text-slate-200
+        hover:bg-gray-100 dark:hover:bg-slate-700
         disabled:opacity-50
         disabled:cursor-not-allowed
         transition-colors
@@ -101,7 +101,7 @@ function SearchInput({
 }) {
   return (
     <div className="relative">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500" />
       <input
         type="text"
         value={value}
@@ -111,13 +111,15 @@ function SearchInput({
           w-48
           pl-9 pr-3 py-2
           text-sm
-          border border-gray-300
+          border border-gray-300 dark:border-slate-600
           rounded-md
+          bg-white dark:bg-slate-800
+          text-gray-900 dark:text-slate-100
           focus:outline-none
           focus:ring-2
           focus:ring-blue-500
           focus:border-blue-500
-          placeholder:text-gray-400
+          placeholder:text-gray-400 dark:placeholder:text-slate-500
         "
       />
     </div>
@@ -146,23 +148,23 @@ export function CostbookHeader({
 }: CostbookHeaderProps) {
   return (
     <header
-      className={`bg-white rounded-lg shadow-sm border border-gray-200 p-3 ${className}`}
+      className={`bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-3 ${className}`}
       data-testid={testId}
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
         {/* Left Section: Title and Currency */}
         <div className="flex items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Costbook</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Costbook</h1>
             {lastRefreshTime && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-slate-400">
                 Last updated: {lastRefreshTime.toLocaleTimeString()}
               </p>
             )}
           </div>
           
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Currency:</span>
+            <span className="text-sm text-gray-500 dark:text-slate-400">Currency:</span>
             <CurrencySelector
               value={selectedCurrency}
               onChange={onCurrencyChange}
@@ -250,9 +252,9 @@ export function CompactCostbookHeader({
   className?: string
 }) {
   return (
-    <header className={`bg-white rounded-lg shadow-sm border border-gray-200 p-3 ${className}`}>
+    <header className={`bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-3 ${className}`}>
       <div className="flex items-center justify-between mb-3">
-        <h1 className="text-xl font-bold text-gray-900">Costbook</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-slate-100">Costbook</h1>
         
         <div className="flex items-center gap-2">
           <CurrencySelector
@@ -265,7 +267,7 @@ export function CompactCostbookHeader({
           <button
             onClick={onRefresh}
             disabled={isLoading}
-            className="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+            className="p-2 rounded-md text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700"
           >
             <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
           </button>

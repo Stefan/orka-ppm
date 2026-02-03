@@ -67,14 +67,14 @@ export function Card({
   return (
     <div
       className={cn(
-        // Base styles
-        'bg-white rounded-xl',
+        // Base styles - theme-aware
+        'bg-white dark:bg-slate-800 rounded-xl',
         // Text color
-        'text-gray-900',
+        'text-gray-900 dark:text-slate-100',
         // Shadow
         cardShadow[shadow],
         // Border
-        border && 'border border-gray-200',
+        border && 'border border-gray-200 dark:border-slate-700',
         // Padding
         cardPadding[padding],
         // Transition for hover effects
@@ -95,7 +95,7 @@ export function CardHeader({ className, children, ...props }: CardHeaderProps) {
   return (
     <div 
       className={cn(
-        'pb-4 mb-4 border-b border-gray-100',
+        'pb-4 mb-4 border-b border-gray-200 dark:border-slate-700',
         className
       )} 
       {...props}
@@ -123,7 +123,7 @@ export function CardFooter({ className, children, ...props }: CardFooterProps) {
   return (
     <div 
       className={cn(
-        'pt-4 mt-4 border-t border-gray-100',
+        'pt-4 mt-4 border-t border-gray-100 dark:border-slate-700',
         className
       )} 
       {...props}
@@ -140,7 +140,7 @@ export function CardTitle({ className, children, ...props }: CardTitleProps) {
   return (
     <h3 
       className={cn(
-        'text-lg font-semibold text-gray-900',
+        'text-lg font-semibold text-gray-900 dark:text-slate-100',
         className
       )} 
       {...props}
@@ -157,7 +157,7 @@ export function CardDescription({ className, children, ...props }: CardDescripti
   return (
     <p 
       className={cn(
-        'text-sm text-gray-500 mt-1',
+        'text-sm text-gray-500 dark:text-slate-400 mt-1',
         className
       )} 
       {...props}

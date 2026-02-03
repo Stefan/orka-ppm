@@ -22,8 +22,8 @@ describe('HelpChatAPIService', () => {
 
   beforeEach(() => {
     apiService = new HelpChatAPIService()
-    mockFetch.mockClear()
-    apiService.clearCache()
+    mockFetch.mockReset()
+    apiService.clearLocalCache()
     apiService.resetRateLimits()
   })
 
@@ -329,7 +329,7 @@ describe('HelpChatAPIService', () => {
       await apiService.submitQuery(mockRequest)
       expect(apiService.getCacheStats().size).toBeGreaterThan(0)
 
-      apiService.clearCache()
+      apiService.clearLocalCache()
       expect(apiService.getCacheStats().size).toBe(0)
     })
   })
@@ -693,7 +693,7 @@ describe('API Calls with Various Contexts', () => {
 
   beforeEach(() => {
     apiService = new HelpChatAPIService()
-    mockFetch.mockClear()
+    mockFetch.mockReset()
     apiService.clearLocalCache()
     apiService.resetRateLimits()
   })
@@ -954,15 +954,18 @@ describe('API Calls with Various Contexts', () => {
         headers: new Headers()
       } as Response)
 
-      const result = await apiService.getProactiveTips('/projects')
+      // Pass page_route as query string; API uses page_route for path context
+      const result = await apiService.getProactiveTips(new URLSearchParams({ page_route: '/projects' }))
 
       expect(result).toEqual(mockTips)
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/ai/help/tips?context=%2Fprojects'),
+        expect.stringContaining('/ai/help/tips'),
         expect.objectContaining({
           method: 'GET'
         })
       )
+      const callUrl = mockFetch.mock.calls[0][0] as string
+      expect(callUrl).toContain('page_route=%2Fprojects')
     })
   })
 })
@@ -973,7 +976,7 @@ describe('Enhanced Error Handling and Retry Logic', () => {
 
   beforeEach(() => {
     apiService = new HelpChatAPIService()
-    mockFetch.mockClear()
+    mockFetch.mockReset()
     apiService.clearLocalCache()
     apiService.resetRateLimits()
   })

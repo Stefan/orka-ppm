@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/116</span>
+                <span class='fraction'>0/120</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/92</span>
+                <span class='fraction'>0/96</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/24</span>
+                <span class='fraction'>0/25</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/107</span>
+                <span class='fraction'>0/111</span>
             </div>
         
             
@@ -654,7 +654,18 @@
 <a name='L589'></a><a href='#L589'>589</a>
 <a name='L590'></a><a href='#L590'>590</a>
 <a name='L591'></a><a href='#L591'>591</a>
-<a name='L592'></a><a href='#L592'>592</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L592'></a><a href='#L592'>592</a>
+<a name='L593'></a><a href='#L593'>593</a>
+<a name='L594'></a><a href='#L594'>594</a>
+<a name='L595'></a><a href='#L595'>595</a>
+<a name='L596'></a><a href='#L596'>596</a>
+<a name='L597'></a><a href='#L597'>597</a>
+<a name='L598'></a><a href='#L598'>598</a>
+<a name='L599'></a><a href='#L599'>599</a>
+<a name='L600'></a><a href='#L600'>600</a>
+<a name='L601'></a><a href='#L601'>601</a>
+<a name='L602'></a><a href='#L602'>602</a>
+<a name='L603'></a><a href='#L603'>603</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -761,12 +772,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1350,19 +1372,30 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 <span class="cstat-no" title="statement not covered" >        headers['Authorization'] = `Bearer ${session.access_token}`</span>
       }
       
-      const response = <span class="cstat-no" title="statement not covered" >await fetch(getApiUrl('/projects'), {</span>
+      const url = <span class="cstat-no" title="statement not covered" >getApiUrl('/projects')</span>
+      
+      const response = <span class="cstat-no" title="statement not covered" >await fetch(url, {</span>
         headers
       })
       
-<span class="cstat-no" title="statement not covered" >      if (!response.ok) <span class="cstat-no" title="statement not covered" >throw new Error('Failed to fetch projects')</span></span>
+<span class="cstat-no" title="statement not covered" >      if (!response.ok) {</span>
+<span class="cstat-no" title="statement not covered" >        console.error('Failed to fetch projects:', response.statusText)</span>
+<span class="cstat-no" title="statement not covered" >        throw new Error('Failed to fetch projects')</span>
+      }
       
       const projectsData = <span class="cstat-no" title="statement not covered" >await response.json()</span>
-      const projectsArray = <span class="cstat-no" title="statement not covered" >projectsData.projects || projectsData || []</span>
-<span class="cstat-no" title="statement not covered" >      setProjects(projectsArray)</span>
+      
+      // Backend returns array directly, not wrapped in {projects: [...]}
+      const projectsArray = <span class="cstat-no" title="statement not covered" >Array.isArray(projectsData) ? projectsData : (projectsData.projects || [])</span>
+      
+      // Filter out invalid projects (must have id and name)
+      const validProjects = <span class="cstat-no" title="statement not covered" >projectsArray.filter(<span class="fstat-no" title="function not covered" >(p</span>: any) =&gt; <span class="cstat-no" title="statement not covered" >p &amp;&amp; p.id &amp;&amp; p.name)</span></span>
+      
+<span class="cstat-no" title="statement not covered" >      setProjects(validProjects)</span>
       
       // Auto-select first project if available
-<span class="cstat-no" title="statement not covered" >      if (projectsArray.length &gt; 0 &amp;&amp; !selectedProject) {</span>
-<span class="cstat-no" title="statement not covered" >        setSelectedProject(projectsArray[0])</span>
+<span class="cstat-no" title="statement not covered" >      if (validProjects.length &gt; 0 &amp;&amp; !selectedProject) {</span>
+<span class="cstat-no" title="statement not covered" >        setSelectedProject(validProjects[0])</span>
       }
       
     } catch (err) {
@@ -1511,7 +1544,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
         {/* Header */}
         &lt;div data-testid="scenarios-header" className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-2 sm:space-y-0"&gt;
           &lt;div&gt;
-            &lt;h1 className="text-xl sm:text-2xl font-bold text-gray-900"&gt;{t('scenarios.title')}&lt;/h1&gt;
+            &lt;h1 data-testid="scenarios-title" className="text-xl sm:text-2xl font-bold text-gray-900"&gt;{t('scenarios.title')}&lt;/h1&gt;
             &lt;p className="mt-1 text-sm text-gray-600"&gt;
               {t('scenarios.subtitle')}
             &lt;/p&gt;
@@ -1624,7 +1657,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                   &lt;/button&gt;
                 &lt;/div&gt;
               ) : (
-                &lt;div className="space-y-2"&gt;
+                &lt;div data-testid="scenarios-list" className="space-y-2"&gt;
                   {scenarios.map(<span class="fstat-no" title="function not covered" >(s</span>cenario) =&gt; (
 <span class="cstat-no" title="statement not covered" >                    &lt;div</span>
                       key={scenario.id}
@@ -1843,7 +1876,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-23T20:41:45.322Z
+                at 2026-02-03T20:46:02.366Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

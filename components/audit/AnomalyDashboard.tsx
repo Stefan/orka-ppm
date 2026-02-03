@@ -262,16 +262,16 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
 
   if (anomalies.length === 0) {
     return (
-      <div className={`bg-white rounded-lg border border-gray-200 ${className}`} data-testid="anomaly-dashboard">
+      <div className={`bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 ${className}`} data-testid="anomaly-dashboard">
         {/* Header with connection status */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-gray-200 dark:border-slate-700">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <TriangleAlert className="h-6 w-6 text-red-600 mr-2" />
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100 flex items-center">
+                <TriangleAlert className="h-6 w-6 text-red-600 dark:text-red-400 mr-2" />
                 Anomaly Detection
               </h2>
-              <p className="text-sm text-gray-600 mt-1">0 anomalies detected</p>
+              <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">0 anomalies detected</p>
             </div>
             
             {/* WebSocket Connection Status */}
@@ -324,7 +324,7 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
         }
       `}</style>
 
-      <div className={`bg-white rounded-lg border border-gray-200 ${className}`} data-testid="anomaly-dashboard">
+      <div className={`bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 ${className}`} data-testid="anomaly-dashboard">
       {/* Real-time Toast Notifications */}
       {notifications.length > 0 && (
         <div className="fixed top-4 right-4 z-50 space-y-2" style={{ maxWidth: '400px' }}>
@@ -374,14 +374,14 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
       )}
 
       {/* Header with Stats */}
-      <div className="p-6 border-b border-gray-200">
+      <div className="p-6 border-b border-gray-200 dark:border-slate-700">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-              <AlertTriangle className="h-6 w-6 text-red-600 mr-2" />
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100 flex items-center">
+              <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400 mr-2" />
               Anomaly Detection
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
               {anomalies.length} anomal{anomalies.length !== 1 ? 'ies' : 'y'} detected
             </p>
           </div>
@@ -406,43 +406,45 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div
+            className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
+          >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-red-600 font-medium">Critical</p>
-                <p className="text-2xl font-bold text-red-700">{anomalyStats.critical}</p>
+                <p className="text-xs text-red-600 dark:text-red-400 font-medium">Critical</p>
+                <p className="text-2xl font-bold text-red-700 dark:text-red-300">{anomalyStats.critical}</p>
               </div>
-              <div className="w-3 h-3 rounded-full bg-red-600"></div>
+              <div className="w-3 h-3 rounded-full bg-red-600 dark:bg-red-400"></div>
             </div>
           </div>
 
-          <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+          <div className="p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-orange-600 font-medium">High</p>
-                <p className="text-2xl font-bold text-orange-700">{anomalyStats.high}</p>
+                <p className="text-xs text-orange-600 dark:text-orange-400 font-medium">High</p>
+                <p className="text-2xl font-bold text-orange-700 dark:text-orange-300">{anomalyStats.high}</p>
               </div>
-              <div className="w-3 h-3 rounded-full bg-orange-600"></div>
+              <div className="w-3 h-3 rounded-full bg-orange-600 dark:bg-orange-400"></div>
             </div>
           </div>
 
-          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-yellow-600 font-medium">Medium</p>
-                <p className="text-2xl font-bold text-yellow-700">{anomalyStats.medium}</p>
+                <p className="text-xs text-yellow-600 dark:text-yellow-400 font-medium">Medium</p>
+                <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">{anomalyStats.medium}</p>
               </div>
-              <div className="w-3 h-3 rounded-full bg-yellow-600"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-600 dark:bg-yellow-400"></div>
             </div>
           </div>
 
-          <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+          <div className="p-4 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-600 font-medium">False Positives</p>
-                <p className="text-2xl font-bold text-gray-700">{anomalyStats.falsePositives}</p>
+                <p className="text-xs text-gray-600 dark:text-slate-400 font-medium">False Positives</p>
+                <p className="text-2xl font-bold text-gray-700 dark:text-slate-300">{anomalyStats.falsePositives}</p>
               </div>
-              <CheckCircle className="h-5 w-5 text-gray-400" />
+              <CheckCircle className="h-5 w-5 text-gray-400 dark:text-slate-500" />
             </div>
           </div>
         </div>

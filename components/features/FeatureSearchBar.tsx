@@ -52,17 +52,17 @@ export function FeatureSearchBar({
 
   return (
     <div
-      className={`flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 ${className}`}
+      className={`flex items-center gap-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 ${className}`}
       data-testid="feature-search-bar"
     >
-      <Search className="h-5 w-5 text-gray-400 flex-shrink-0" />
+      <Search className="h-5 w-5 text-gray-400 dark:text-slate-500 flex-shrink-0" />
       <input
         type="search"
         value={localValue}
         onChange={handleChange}
         placeholder={placeholder}
         disabled={disabled}
-        className="flex-1 min-w-0 bg-transparent text-gray-900 placeholder-gray-500 outline-none text-sm"
+        className="flex-1 min-w-0 bg-transparent text-gray-900 dark:text-slate-100 placeholder-gray-500 dark:placeholder-slate-400 outline-none text-sm"
         aria-label="Search features"
       />
       {onAISuggest && (
@@ -70,7 +70,7 @@ export function FeatureSearchBar({
           type="button"
           onClick={handleAIClick}
           disabled={disabled || !localValue.trim()}
-          className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/40 disabled:opacity-50 disabled:cursor-not-allowed"
           title="AI suggestions"
           data-testid="feature-search-ai-suggest"
         >

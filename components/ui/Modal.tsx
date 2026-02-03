@@ -67,7 +67,7 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         ref={modalRef}
         className={cn(
-          'relative bg-white rounded-lg shadow-xl w-full',
+          'relative bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full',
           sizeClasses[size],
           'transform transition-all',
           className
@@ -75,18 +75,18 @@ export const Modal: React.FC<ModalProps> = ({
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-slate-700">
             {title && (
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                 {title}
               </h2>
             )}
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors"
+                className="p-2 text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-200 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5" aria-hidden />
               </button>
             )}
           </div>
@@ -110,7 +110,7 @@ export const ModalFooter: React.FC<{
   children: React.ReactNode
   className?: string
 }> = ({ children, className }) => (
-  <div className={cn('flex justify-end space-x-3 pt-4 border-t border-gray-200 mt-6', className)}>
+  <div className={cn('flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-slate-700 mt-6', className)}>
     {children}
   </div>
 )

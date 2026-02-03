@@ -158,17 +158,17 @@ export function NLSearchInput({
       <div
         className={`
           flex items-center gap-2
-          bg-white border rounded-lg
+          bg-white dark:bg-slate-800 border rounded-lg
           transition-all duration-200
           ${isFocused 
-            ? 'border-blue-500 ring-2 ring-blue-100 shadow-sm' 
-            : 'border-gray-300 hover:border-gray-400'
+            ? 'border-blue-500 ring-2 ring-blue-100 dark:ring-blue-900 shadow-sm' 
+            : 'border-gray-300 dark:border-slate-600 hover:border-gray-400 dark:hover:border-slate-500'
           }
-          ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''}
+          ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-slate-700' : ''}
         `}
       >
         {/* Search icon */}
-        <div className="pl-3 text-gray-400">
+        <div className="pl-3 text-gray-400 dark:text-slate-500">
           <Search className="w-4 h-4" />
         </div>
         
@@ -186,8 +186,8 @@ export function NLSearchInput({
           autoFocus={autoFocus}
           className={`
             flex-1 py-2 pr-2
-            text-sm text-gray-900
-            placeholder-gray-400
+            text-sm text-gray-900 dark:text-slate-100
+            placeholder-gray-400 dark:placeholder-slate-500
             bg-transparent
             outline-none
             ${disabled ? 'cursor-not-allowed' : ''}
@@ -200,7 +200,7 @@ export function NLSearchInput({
         
         {/* AI Badge */}
         {showAiBadge && !hasValue && (
-          <div className="flex items-center gap-1 px-2 py-1 mr-1 text-xs font-medium text-purple-600 bg-purple-50 rounded-full">
+          <div className="flex items-center gap-1 px-2 py-1 mr-1 text-xs font-medium text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 rounded-full">
             <Sparkles className="w-3 h-3" />
             <span>AI</span>
           </div>
@@ -210,7 +210,7 @@ export function NLSearchInput({
         {hasValue && (
           <button
             onClick={handleClear}
-            className="p-1 mr-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+            className="p-1 mr-2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
             aria-label="Clear search"
             type="button"
           >
@@ -225,13 +225,13 @@ export function NLSearchInput({
           {parseResult.patterns.map((pattern, index) => (
             <span
               key={index}
-              className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-blue-700 bg-blue-100 rounded-full"
+              className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/50 rounded-full"
             >
               {pattern}
             </span>
           ))}
           {parseResult.confidence < 0.5 && (
-            <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-amber-700 bg-amber-100 rounded-full">
+            <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/50 rounded-full">
               Low confidence
             </span>
           )}
@@ -270,8 +270,8 @@ export function CompactNLSearchInput({
       <button
         onClick={() => setIsExpanded(true)}
         className={`
-          p-2 text-gray-500 hover:text-gray-700
-          hover:bg-gray-100 rounded-lg
+          p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200
+          hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg
           transition-colors
           ${className}
         `}
@@ -301,7 +301,7 @@ export function CompactNLSearchInput({
           setIsExpanded(false)
           onChange('')
         }}
-        className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+        className="p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
         aria-label="Close search"
       >
         <X className="w-4 h-4" />

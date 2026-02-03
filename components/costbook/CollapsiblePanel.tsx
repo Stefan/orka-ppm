@@ -105,9 +105,9 @@ export function CollapsiblePanel({
   return (
     <div
       className={`
-        bg-gray-50
+        bg-gray-50 dark:bg-slate-800
         rounded-lg
-        border border-gray-200
+        border border-gray-200 dark:border-slate-700
         overflow-hidden
         transition-all duration-300
         ${className}
@@ -121,8 +121,8 @@ export function CollapsiblePanel({
           w-full
           flex items-center justify-between
           px-4 py-3
-          bg-white
-          hover:bg-gray-50
+          bg-white dark:bg-slate-700
+          hover:bg-gray-50 dark:hover:bg-slate-600
           transition-colors
           cursor-pointer
           focus:outline-none
@@ -134,17 +134,17 @@ export function CollapsiblePanel({
       >
         <div className="flex items-center gap-2">
           {icon && (
-            <span className="text-gray-500">{icon}</span>
+            <span className="text-gray-500 dark:text-slate-400">{icon}</span>
           )}
-          <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100">{title}</h3>
         </div>
         
         <div className="flex items-center gap-2">
           {headerContent}
           {isOpen ? (
-            <ChevronUp className="w-5 h-5 text-gray-500" />
+            <ChevronUp className="w-5 h-5 text-gray-500 dark:text-slate-400" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-gray-500" />
+            <ChevronDown className="w-5 h-5 text-gray-500 dark:text-slate-400" />
           )}
         </div>
       </button>
@@ -256,9 +256,9 @@ export function ExpandableCard({
       {/* Normal view */}
       <div
         className={`
-          bg-white
+          bg-white dark:bg-slate-800
           rounded-lg
-          border border-gray-200
+          border border-gray-200 dark:border-slate-700
           shadow-sm
           ${isExpanded ? 'hidden' : ''}
           ${className}
@@ -266,14 +266,14 @@ export function ExpandableCard({
         data-testid={testId}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-slate-700">
           <div className="flex items-center gap-2">
-            {icon && <span className="text-gray-500">{icon}</span>}
-            <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+            {icon && <span className="text-gray-500 dark:text-slate-400">{icon}</span>}
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100">{title}</h3>
           </div>
           <button
             onClick={() => setIsExpanded(true)}
-            className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded"
+            className="p-1 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
             title="Expand"
           >
             <Maximize2 className="w-4 h-4" />
@@ -288,16 +288,16 @@ export function ExpandableCard({
 
       {/* Expanded (full-screen) view */}
       {isExpanded && (
-        <div className="fixed inset-0 bg-white z-50 flex flex-col">
+        <div className="fixed inset-0 bg-white dark:bg-slate-900 z-50 flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-slate-700">
             <div className="flex items-center gap-2">
-              {icon && <span className="text-gray-500">{icon}</span>}
-              <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+              {icon && <span className="text-gray-500 dark:text-slate-400">{icon}</span>}
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{title}</h2>
             </div>
             <button
               onClick={() => setIsExpanded(false)}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded"
+              className="p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
               title="Minimize"
             >
               <Minimize2 className="w-5 h-5" />

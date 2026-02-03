@@ -63,19 +63,19 @@ export function CurrencySelector({
           appearance-none
           ${sizeClasses[size]}
           pr-8
-          bg-white
-          border border-gray-300
+          bg-white dark:bg-slate-800
+          border border-gray-300 dark:border-slate-600
           rounded-md
           shadow-sm
           font-medium
-          text-gray-700
-          hover:border-gray-400
+          text-gray-700 dark:text-slate-200
+          hover:border-gray-400 dark:hover:border-slate-500
           focus:outline-none
           focus:ring-2
           focus:ring-blue-500
           focus:border-blue-500
-          disabled:bg-gray-100
-          disabled:text-gray-500
+          disabled:bg-gray-100 dark:disabled:bg-slate-700
+          disabled:text-gray-500 dark:disabled:text-slate-400
           disabled:cursor-not-allowed
           cursor-pointer
           transition-colors
@@ -101,7 +101,7 @@ export function CurrencySelector({
         <ChevronDown 
           className={`
             w-4 h-4 
-            ${disabled ? 'text-gray-400' : 'text-gray-600'}
+            ${disabled ? 'text-gray-400 dark:text-slate-500' : 'text-gray-600 dark:text-slate-400'}
           `} 
         />
       </div>
@@ -125,8 +125,8 @@ export function CurrencyBadge({
         inline-flex items-center
         px-2 py-1
         text-xs font-semibold
-        text-gray-700
-        bg-gray-100
+        text-gray-700 dark:text-slate-200
+        bg-gray-100 dark:bg-slate-700
         rounded-full
         ${className}
       `}

@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">12.21% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/131</span>
+                <span class='fraction'>16/131</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">22.95% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/61</span>
+                <span class='fraction'>14/61</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">6.45% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/31</span>
+                <span class='fraction'>2/31</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">11.71% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/128</span>
+                <span class='fraction'>15/128</span>
             </div>
         
             
@@ -484,23 +484,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -810,16 +810,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">36x</span>
+<span class="cline-any cline-yes">36x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">36x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use client'
+<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">'use client'
 &nbsp;
 /**
  * WebSocket Service for Real-time Chart Data Streaming
@@ -862,23 +862,23 @@ export type WebSocketEventHandler = (message: WebSocketMessage) =&gt; void
 export type ConnectionStatusHandler = (status: ConnectionStatus) =&gt; void
 &nbsp;
 class WebSocketService {
-  private <span class="cstat-no" title="statement not covered" >ws: WebSocket | null = null</span>
+  private ws: WebSocket | null = null
   private config: WebSocketConfig
-  private <span class="cstat-no" title="statement not covered" >eventHandlers: Map&lt;string, WebSocketEventHandler[]&gt; = new Map()</span>
-  private <span class="cstat-no" title="statement not covered" >statusHandlers: ConnectionStatusHandler[] = []</span>
-  private <span class="cstat-no" title="statement not covered" >reconnectTimer: NodeJS.Timeout | null = null</span>
-  private <span class="cstat-no" title="statement not covered" >heartbeatTimer: NodeJS.Timeout | null = null</span>
-  private <span class="cstat-no" title="statement not covered" >messageBuffer: WebSocketMessage[] = []</span>
-  private <span class="cstat-no" title="statement not covered" >status: ConnectionStatus = {</span>
+  private eventHandlers: Map&lt;string, WebSocketEventHandler[]&gt; = new Map()
+  private statusHandlers: ConnectionStatusHandler[] = []
+  private reconnectTimer: NodeJS.Timeout | null = null
+  private heartbeatTimer: NodeJS.Timeout | null = null
+  private messageBuffer: WebSocketMessage[] = []
+  private status: ConnectionStatus = {
     connected: false,
     reconnecting: false,
     reconnectAttempts: 0,
     latency: 0
   }
-  private <span class="cstat-no" title="statement not covered" >lastPingTime: number = 0</span>
+  private lastPingTime: number = 0
 &nbsp;
-<span class="fstat-no" title="function not covered" >  constructor(c</span>onfig: Partial&lt;WebSocketConfig&gt; = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
-<span class="cstat-no" title="statement not covered" >    this.config = {</span>
+  constructor(config: Partial&lt;WebSocketConfig&gt; = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
+    this.config = {
       url: config.url || 'ws://localhost:8080/ws',
       reconnectInterval: config.reconnectInterval || 3000,
       maxReconnectAttempts: config.maxReconnectAttempts || 10,
@@ -1188,23 +1188,23 @@ class WebSocketService {
 }
 &nbsp;
 // Singleton instance for global use
-let globalWebSocketService: WebSocketService | null = <span class="cstat-no" title="statement not covered" >null</span>
+let globalWebSocketService: WebSocketService | null = null
 &nbsp;
-export const <span class="cstat-no" title="statement not covered" >getWebSocketService = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(</span>c</span>onfig?: Partial&lt;WebSocketConfig&gt;): WebSocketService =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >  if (!globalWebSocketService) {</span>
-<span class="cstat-no" title="statement not covered" >    globalWebSocketService = new WebSocketService(config)</span>
+export const getWebSocketService = (config?: Partial&lt;WebSocketConfig&gt;): WebSocketService =&gt; {
+  if (!globalWebSocketService) {
+    globalWebSocketService = new WebSocketService(config)
   }
-<span class="cstat-no" title="statement not covered" >  return globalWebSocketService</span>
+  return globalWebSocketService
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >export default <span class="cstat-no" title="statement not covered" >W</span>ebSocketService</span></pre></td></tr></table></pre>
+<span class="cstat-no" title="statement not covered" >export default W</span>ebSocketService</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-23T20:41:45.322Z
+                at 2026-02-03T20:46:02.366Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
@@ -234,13 +234,23 @@
 <a name='L169'></a><a href='#L169'>169</a>
 <a name='L170'></a><a href='#L170'>170</a>
 <a name='L171'></a><a href='#L171'>171</a>
-<a name='L172'></a><a href='#L172'>172</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -283,10 +293,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -298,6 +304,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -407,8 +415,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use client'
 &nbsp;
-&nbsp;
 import { Project, BudgetVariance, AnalyticsData } from '../../types'
+import { useTranslations } from <span class="cstat-no" title="statement not covered" >'../../../../lib/i18n/context'</span>
 &nbsp;
 interface BudgetVarianceTableProps {
   budgetVariances: BudgetVariance[]
@@ -423,19 +431,21 @@ export default function <span class="cstat-no" title="statement not covered" ><s
   selectedCurrency, 
   analyticsData 
 }: BudgetVarianceTableProps) {
+  const { t } = <span class="cstat-no" title="statement not covered" >useTranslations()</span>
+  
   return (
     &lt;div className="bg-white rounded-lg shadow-sm border border-gray-200"&gt;
       &lt;div className="px-6 py-4 border-b border-gray-200"&gt;
         &lt;div className="flex items-center justify-between"&gt;
           &lt;h3 className="text-lg font-semibold text-gray-900"&gt;
-            Budget-Abweichungsanalyse ({budgetVariances.length} Projekte)
+            {t('financials.varianceAnalysis')} ({budgetVariances.length} {t('financials.projects')})
           &lt;/h3&gt;
           &lt;div className="flex items-center space-x-4 text-sm text-gray-600"&gt;
-            &lt;span&gt;Alle Beträge in {selectedCurrency}&lt;/span&gt;
+            &lt;span&gt;{t('financials.allAmountsIn')} {selectedCurrency}&lt;/span&gt;
             {<span class="branch-0 cbranch-no" title="branch not covered" >analyticsData &amp;&amp; (</span>
               &lt;&gt;
                 &lt;span&gt;•&lt;/span&gt;
-                &lt;span&gt;Ø Effizienz: {analyticsData.avgEfficiency.toFixed(1)}%&lt;/span&gt;
+                &lt;span&gt;{t('financials.avgEfficiency')}: {analyticsData.avgEfficiency.toFixed(1)}%&lt;/span&gt;
               &lt;/&gt;
             )}
           &lt;/div&gt;
@@ -446,14 +456,14 @@ export default function <span class="cstat-no" title="statement not covered" ><s
         &lt;table className="min-w-full divide-y divide-gray-200"&gt;
           &lt;thead className="bg-gray-50"&gt;
             &lt;tr&gt;
-              &lt;th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Projekt&lt;/th&gt;
-              &lt;th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Budget&lt;/th&gt;
-              &lt;th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Ist&lt;/th&gt;
-              &lt;th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Abweichung&lt;/th&gt;
-              &lt;th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Abweichung %&lt;/th&gt;
-              &lt;th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Effizienz&lt;/th&gt;
-              &lt;th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Status&lt;/th&gt;
-              &lt;th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Gesundheit&lt;/th&gt;
+              &lt;th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;{t('financials.project')}&lt;/th&gt;
+              &lt;th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;{t('financials.budget')}&lt;/th&gt;
+              &lt;th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;{t('financials.actual')}&lt;/th&gt;
+              &lt;th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;{t('financials.variance')}&lt;/th&gt;
+              &lt;th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;{t('financials.variancePercent')}&lt;/th&gt;
+              &lt;th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;{t('financials.efficiency')}&lt;/th&gt;
+              &lt;th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;{t('financials.status')}&lt;/th&gt;
+              &lt;th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;{t('financials.health')}&lt;/th&gt;
             &lt;/tr&gt;
           &lt;/thead&gt;
           &lt;tbody className="bg-white divide-y divide-gray-200"&gt;
@@ -472,7 +482,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                   &lt;tr key={variance.project_id} className="hover:bg-gray-50"&gt;
                     &lt;td className="px-6 py-4 whitespace-nowrap"&gt;
                       &lt;div className="text-sm font-medium text-gray-900"&gt;
-                        {project?.name || 'Unbekanntes Projekt'}
+                        {project?.name || t('financials.unknownProject')}
                       &lt;/div&gt;
                     &lt;/td&gt;
                     &lt;td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"&gt;
@@ -519,8 +529,9 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                         'bg-blue-100 text-blue-800'
                       }`}
                       &gt;
-                        {variance.status === 'over_budget' ? 'Über Budget' :
-                         variance.status === 'under_budget' ? 'Unter Budget' : 'Im Budget'}
+                        {variance.status === 'over_budget' ? t('financials.overBudgetStatus') :
+                         variance.status === 'under_budget' ? t('financials.underBudgetStatus') : 
+                         t('financials.onBudgetStatus')}
                       &lt;/span&gt;
                     &lt;/td&gt;
                     &lt;td className="px-6 py-4 whitespace-nowrap"&gt;
@@ -531,9 +542,10 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                         'bg-gray-100 text-gray-800'
                       }`}
                       &gt;
-                        {project?.health === 'green' ? 'Gut' :
-                         project?.health === 'yellow' ? 'Warnung' :
-                         project?.health === 'red' ? 'Kritisch' : 'Unbekannt'}
+                        {project?.health === 'green' ? t('financials.good') :
+                         project?.health === 'yellow' ? t('financials.warningStatus') :
+                         project?.health === 'red' ? t('financials.critical') : 
+                         t('financials.unknown')}
                       &lt;/span&gt;
                     &lt;/td&gt;
                   &lt;/tr&gt;
@@ -548,25 +560,25 @@ export default function <span class="cstat-no" title="statement not covered" ><s
         &lt;div className="px-6 py-4 bg-gray-50 border-t border-gray-200"&gt;
           &lt;div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm"&gt;
             &lt;div&gt;
-              &lt;span className="text-gray-600"&gt;Gesamteinsparungen:&lt;/span&gt;
+              &lt;span className="text-gray-600"&gt;{t('financials.totalSavings')}:&lt;/span&gt;
               &lt;div className="font-semibold text-green-600"&gt;
                 {analyticsData.totalSavings.toLocaleString()} {selectedCurrency}
               &lt;/div&gt;
             &lt;/div&gt;
             &lt;div&gt;
-              &lt;span className="text-gray-600"&gt;Gesamtüberschreitungen:&lt;/span&gt;
+              &lt;span className="text-gray-600"&gt;{t('financials.totalOverruns')}:&lt;/span&gt;
               &lt;div className="font-semibold text-red-600"&gt;
                 {analyticsData.totalOverruns.toLocaleString()} {selectedCurrency}
               &lt;/div&gt;
             &lt;/div&gt;
             &lt;div&gt;
-              &lt;span className="text-gray-600"&gt;Netto-Abweichung:&lt;/span&gt;
+              &lt;span className="text-gray-600"&gt;{t('financials.netVariance')}:&lt;/span&gt;
               &lt;div className={`font-semibold ${analyticsData.netVariance &gt;= 0 ? 'text-red-600' : 'text-green-600'}`}&gt;
                 {analyticsData.netVariance &gt;= 0 ? '+' : ''}{analyticsData.netVariance.toLocaleString()} {selectedCurrency}
               &lt;/div&gt;
             &lt;/div&gt;
             &lt;div&gt;
-              &lt;span className="text-gray-600"&gt;Portfolio-Effizienz:&lt;/span&gt;
+              &lt;span className="text-gray-600"&gt;{t('financials.portfolioEfficiency')}:&lt;/span&gt;
               &lt;div className="font-semibold text-blue-600"&gt;
                 {analyticsData.avgEfficiency.toFixed(1)}%
               &lt;/div&gt;
@@ -583,7 +595,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-23T20:41:45.322Z
+                at 2026-02-03T20:46:02.366Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

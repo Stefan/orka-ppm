@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">90% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>9/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -171,8 +171,8 @@
 <a name='L106'></a><a href='#L106'>106</a>
 <a name='L107'></a><a href='#L107'>107</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -249,36 +249,36 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use client'
 &nbsp;
-import React, { ReactNode } from <span class="cstat-no" title="statement not covered" >'react'</span>
-import { useEnhancedAuth } from <span class="cstat-no" title="statement not covered" >'@/app/providers/EnhancedAuthProvider'</span>
+import React, { ReactNode } from 'react'
+import { useEnhancedAuth } from '@/app/providers/EnhancedAuthProvider'
 import type { Permission, PermissionContext } from '@/types/rbac'
 &nbsp;
 /**
@@ -355,32 +355,32 @@ export interface PermissionGuardProps {
  *   &lt;EditProjectForm /&gt;
  * &lt;/PermissionGuard&gt;
  */
-export const <span class="cstat-no" title="statement not covered" >PermissionGuard: React.FC&lt;PermissionGuardProps&gt; = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(</span>{</span></span>
+export const PermissionGuard: React.FC&lt;PermissionGuardProps&gt; = ({
   permission,
   context,
-  fallback = <span class="branch-0 cbranch-no" title="branch not covered" >null,</span>
+  fallback = null,
   children,
-  loadingFallback = <span class="branch-0 cbranch-no" title="branch not covered" >null</span>
+  loadingFallback = null
 }) =&gt; {
-  const { hasPermission, loading } = <span class="cstat-no" title="statement not covered" >useEnhancedAuth()</span>
+  const { hasPermission, loading } = useEnhancedAuth()
 &nbsp;
   // Show loading state while checking permissions
-<span class="cstat-no" title="statement not covered" >  if (loading) {</span>
+  if (loading) {
     return &lt;&gt;{loadingFallback}&lt;/&gt;
   }
 &nbsp;
   // Check permission using the enhanced auth provider
-  const granted = <span class="cstat-no" title="statement not covered" >hasPermission(permission, context)</span>
+  const granted = hasPermission(permission, context)
 &nbsp;
   // Render children if user has permission, otherwise render fallback
-<span class="cstat-no" title="statement not covered" >  if (granted) {</span>
+  if (granted) {
     return &lt;&gt;{children}&lt;/&gt;
   }
 &nbsp;
   return &lt;&gt;{fallback}&lt;/&gt;
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >export default <span class="cstat-no" title="statement not covered" >P</span>ermissionGuard</span>
+<span class="cstat-no" title="statement not covered" >export default P</span>ermissionGuard
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -388,7 +388,7 @@ export const <span class="cstat-no" title="statement not covered" >PermissionGua
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-23T20:41:45.322Z
+                at 2026-02-03T20:46:02.366Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

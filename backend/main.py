@@ -51,6 +51,7 @@ from routers.rundown import router as rundown_router
 from routers.features import router as features_router
 from routers.feature_toggles import router as feature_toggles_router
 from routers.erp import router as erp_router
+from routers.costbook import router as costbook_router
 
 # Import performance tracking middleware
 from middleware.performance_tracker import PerformanceMiddleware, performance_tracker
@@ -222,6 +223,7 @@ app.include_router(rundown_router)
 app.include_router(feature_toggles_router)
 app.include_router(features_router)
 app.include_router(erp_router)
+app.include_router(costbook_router)
 
 # Add performance tracking middleware
 app.add_middleware(PerformanceMiddleware, tracker=performance_tracker)

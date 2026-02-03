@@ -1,0 +1,4 @@
+#!/bin/sh
+# Pre-push: health-check + PBT. Full logic in scripts/git-hooks/pre-push (single source of truth).
+ROOT="$(cd "$(dirname -- "$0")/.." && pwd)"
+exec "$ROOT/scripts/git-hooks/pre-push" "$@"

@@ -87,13 +87,14 @@ function LoadingSkeleton({ viewMode }: { viewMode: 'grid' | 'list' }) {
 /**
  * List view header
  */
-function ListHeader() {
+function ListHeader({ showEac = false }: { showEac?: boolean }) {
   return (
     <div className="flex items-center justify-between px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-medium text-gray-500 uppercase tracking-wider">
       <div className="flex-1">Project</div>
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4">
         <span className="w-24 text-right">Budget</span>
         <span className="w-24 text-right">Spend</span>
+        {showEac && <span className="w-24 text-right">EAC</span>}
         <span className="w-24 text-right">Variance</span>
         <span className="w-16 text-right">%</span>
       </div>
@@ -202,6 +203,7 @@ export function ProjectsGrid({
   }
 
   if (viewMode === 'list') {
+    const showEac = filteredProjects.some(p => p.eac != null)
     return (
       <div
         className={`
@@ -213,7 +215,7 @@ export function ProjectsGrid({
         `}
         data-testid={testId}
       >
-        <ListHeader />
+        <ListHeader showEac={showEac} />
         <div className="overflow-y-auto">
           {filteredProjects.map((project) => (
             <ProjectRow
@@ -223,6 +225,7 @@ export function ProjectsGrid({
               onClick={onProjectSelect}
               anomalies={getAnomaliesForProject(project.id, anomalies)}
               onAnomalyClick={onAnomalyClick}
+              showEacColumn={showEac}
             />
           ))}
         </div>

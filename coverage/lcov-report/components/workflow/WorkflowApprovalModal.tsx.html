@@ -1052,12 +1052,12 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  if (loading) {</span>
     return (
-      &lt;div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"&gt;
-        &lt;div className="bg-white rounded-lg p-8 max-w-2xl w-full mx-4"&gt;
+      &lt;div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"&gt;
+        &lt;div className="bg-white dark:bg-slate-800 rounded-lg p-8 max-w-2xl w-full mx-4 border border-gray-200 dark:border-slate-700"&gt;
           &lt;div className="animate-pulse space-y-4"&gt;
-            &lt;div className="h-6 bg-gray-200 rounded w-1/3"&gt;&lt;/div&gt;
-            &lt;div className="h-4 bg-gray-200 rounded w-2/3"&gt;&lt;/div&gt;
-            &lt;div className="h-32 bg-gray-200 rounded"&gt;&lt;/div&gt;
+            &lt;div className="h-6 bg-gray-200 dark:bg-slate-600 rounded w-1/3"&gt;&lt;/div&gt;
+            &lt;div className="h-4 bg-gray-200 dark:bg-slate-600 rounded w-2/3"&gt;&lt;/div&gt;
+            &lt;div className="h-32 bg-gray-200 dark:bg-slate-600 rounded"&gt;&lt;/div&gt;
           &lt;/div&gt;
         &lt;/div&gt;
       &lt;/div&gt;
@@ -1066,19 +1066,19 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  if (error &amp;&amp; !workflow) {</span>
     return (
-      &lt;div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"&gt;
-        &lt;div className="bg-white rounded-lg p-8 max-w-2xl w-full mx-4"&gt;
+      &lt;div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"&gt;
+        &lt;div className="bg-white dark:bg-slate-800 rounded-lg p-8 max-w-2xl w-full mx-4 border border-gray-200 dark:border-slate-700"&gt;
           &lt;div className="flex justify-between items-start mb-4"&gt;
-            &lt;h2 className="text-xl font-bold text-gray-900"&gt;Error&lt;/h2&gt;
+            &lt;h2 className="text-xl font-bold text-gray-900 dark:text-slate-100"&gt;Error&lt;/h2&gt;
             &lt;button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-200"
             &gt;
-              &lt;X size={24} /&gt;
+              &lt;X size={24} aria-hidden /&gt;
             &lt;/button&gt;
           &lt;/div&gt;
-          &lt;div className="bg-red-50 border border-red-200 rounded p-4"&gt;
-            &lt;p className="text-red-800"&gt;{error}&lt;/p&gt;
+          &lt;div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-4"&gt;
+            &lt;p className="text-red-800 dark:text-red-300"&gt;{error}&lt;/p&gt;
           &lt;/div&gt;
         &lt;/div&gt;
       &lt;/div&gt;
@@ -1098,55 +1098,55 @@ export default function <span class="cstat-no" title="statement not covered" ><s
   const StatusIcon = <span class="cstat-no" title="statement not covered" >config.icon</span>
 &nbsp;
   return (
-    &lt;div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"&gt;
-      &lt;div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col"&gt;
+    &lt;div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"&gt;
+      &lt;div className="bg-white dark:bg-slate-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-gray-200 dark:border-slate-700"&gt;
         {/* Header */}
-        &lt;div className="flex justify-between items-start p-6 border-b"&gt;
+        &lt;div className="flex justify-between items-start p-6 border-b border-gray-200 dark:border-slate-700"&gt;
           &lt;div&gt;
-            &lt;h2 className="text-2xl font-bold text-gray-900 mb-2"&gt;
+            &lt;h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2"&gt;
               {workflow.workflow_name}
             &lt;/h2&gt;
             &lt;div className="flex items-center gap-2"&gt;
-              &lt;StatusIcon className={`text-${config.color}-600`} size={20} /&gt;
+              &lt;StatusIcon className={`text-${config.color}-600`} size={20} aria-hidden /&gt;
               &lt;span className={`text-${config.color}-800 font-medium`}&gt;
                 {config.label}
               &lt;/span&gt;
-              &lt;span className="text-gray-500"&gt;•&lt;/span&gt;
-              &lt;span className="text-gray-600"&gt;Step {workflow.current_step + 1}&lt;/span&gt;
+              &lt;span className="text-gray-500 dark:text-slate-400"&gt;•&lt;/span&gt;
+              &lt;span className="text-gray-600 dark:text-slate-300"&gt;Step {workflow.current_step + 1}&lt;/span&gt;
             &lt;/div&gt;
           &lt;/div&gt;
           &lt;button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-200 transition-colors"
           &gt;
-            &lt;X size={24} /&gt;
+            &lt;X size={24} aria-hidden /&gt;
           &lt;/button&gt;
         &lt;/div&gt;
 &nbsp;
         {/* Content */}
         &lt;div className="flex-1 overflow-y-auto p-6 space-y-6"&gt;
           {/* Entity Info */}
-          &lt;div className="bg-gray-50 rounded-lg p-4"&gt;
-            &lt;h3 className="font-semibold text-gray-900 mb-2"&gt;Workflow Details&lt;/h3&gt;
+          &lt;div className="bg-gray-50 dark:bg-slate-700/50 rounded-lg p-4"&gt;
+            &lt;h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-2"&gt;Workflow Details&lt;/h3&gt;
             &lt;div className="grid grid-cols-2 gap-4 text-sm"&gt;
               &lt;div&gt;
-                &lt;span className="text-gray-600"&gt;Entity Type:&lt;/span&gt;
-                &lt;span className="ml-2 font-medium"&gt;{workflow.entity_type}&lt;/span&gt;
+                &lt;span className="text-gray-600 dark:text-slate-400"&gt;Entity Type:&lt;/span&gt;
+                &lt;span className="ml-2 font-medium dark:text-slate-200"&gt;{workflow.entity_type}&lt;/span&gt;
               &lt;/div&gt;
               &lt;div&gt;
-                &lt;span className="text-gray-600"&gt;Entity ID:&lt;/span&gt;
-                &lt;span className="ml-2 font-mono text-xs"&gt;{workflow.entity_id}&lt;/span&gt;
+                &lt;span className="text-gray-600 dark:text-slate-400"&gt;Entity ID:&lt;/span&gt;
+                &lt;span className="ml-2 font-mono text-xs dark:text-slate-300"&gt;{workflow.entity_id}&lt;/span&gt;
               &lt;/div&gt;
               &lt;div&gt;
-                &lt;span className="text-gray-600"&gt;Started:&lt;/span&gt;
-                &lt;span className="ml-2 font-medium"&gt;
+                &lt;span className="text-gray-600 dark:text-slate-400"&gt;Started:&lt;/span&gt;
+                &lt;span className="ml-2 font-medium dark:text-slate-200"&gt;
                   {new Date(workflow.started_at).toLocaleString()}
                 &lt;/span&gt;
               &lt;/div&gt;
               {<span class="branch-0 cbranch-no" title="branch not covered" >workflow.completed_at </span>&amp;&amp; (
                 &lt;div&gt;
-                  &lt;span className="text-gray-600"&gt;Completed:&lt;/span&gt;
-                  &lt;span className="ml-2 font-medium"&gt;
+                  &lt;span className="text-gray-600 dark:text-slate-400"&gt;Completed:&lt;/span&gt;
+                  &lt;span className="ml-2 font-medium dark:text-slate-200"&gt;
                     {new Date(workflow.completed_at).toLocaleString()}
                   &lt;/span&gt;
                 &lt;/div&gt;
@@ -1156,27 +1156,27 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
           {/* Current Step Approvals */}
           &lt;div&gt;
-            &lt;h3 className="font-semibold text-gray-900 mb-3"&gt;Current Step Approvals&lt;/h3&gt;
+            &lt;h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-3"&gt;Current Step Approvals&lt;/h3&gt;
             &lt;div className="space-y-2"&gt;
               {getCurrentStepApprovals().map(<span class="fstat-no" title="function not covered" >(a</span>pproval) =&gt; (
 <span class="cstat-no" title="statement not covered" >                &lt;div</span>
                   key={approval.id}
                   className={`border rounded-lg p-4 ${
-                    approval.status === 'approved' ? 'border-green-200 bg-green-50' :
-                    approval.status === 'rejected' ? 'border-red-200 bg-red-50' :
-                    'border-gray-200 bg-white'
+                    approval.status === 'approved' ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20' :
+                    approval.status === 'rejected' ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20' :
+                    'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700/50'
                   }`}
                 &gt;
                   &lt;div className="flex items-start justify-between"&gt;
                     &lt;div className="flex items-center gap-3"&gt;
-                      &lt;User className="text-gray-400" size={20} /&gt;
+                      &lt;User className="text-gray-400 dark:text-slate-500" size={20} aria-hidden /&gt;
                       &lt;div&gt;
-                        &lt;div className="font-medium text-gray-900"&gt;
+                        &lt;div className="font-medium text-gray-900 dark:text-slate-100"&gt;
                           Approver {approval.approver_id.slice(0, 8)}
                         &lt;/div&gt;
                         {<span class="branch-0 cbranch-no" title="branch not covered" >approval.approved_at </span>&amp;&amp; (
-                          &lt;div className="text-xs text-gray-500 flex items-center gap-1 mt-1"&gt;
-                            &lt;Calendar size={12} /&gt;
+                          &lt;div className="text-xs text-gray-500 dark:text-slate-400 flex items-center gap-1 mt-1"&gt;
+                            &lt;Calendar size={12} aria-hidden /&gt;
                             {new Date(approval.approved_at).toLocaleString()}
                           &lt;/div&gt;
                         )}
@@ -1184,28 +1184,28 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                     &lt;/div&gt;
                     &lt;div&gt;
                       {<span class="branch-0 cbranch-no" title="branch not covered" >approval.status === 'approved' &amp;&amp; (</span>
-                        &lt;span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded"&gt;
-                          &lt;CheckCircle size={14} /&gt;
+                        &lt;span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300 text-xs font-medium rounded"&gt;
+                          &lt;CheckCircle size={14} aria-hidden /&gt;
                           Approved
                         &lt;/span&gt;
                       )}
                       {<span class="branch-0 cbranch-no" title="branch not covered" >approval.status === 'rejected' &amp;&amp; (</span>
-                        &lt;span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded"&gt;
-                          &lt;XCircle size={14} /&gt;
+                        &lt;span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300 text-xs font-medium rounded"&gt;
+                          &lt;XCircle size={14} aria-hidden /&gt;
                           Rejected
                         &lt;/span&gt;
                       )}
                       {<span class="branch-0 cbranch-no" title="branch not covered" >approval.status === 'pending' &amp;&amp; (</span>
-                        &lt;span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded"&gt;
-                          &lt;Clock size={14} /&gt;
+                        &lt;span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300 text-xs font-medium rounded"&gt;
+                          &lt;Clock size={14} aria-hidden /&gt;
                           Pending
                         &lt;/span&gt;
                       )}
                     &lt;/div&gt;
                   &lt;/div&gt;
                   {<span class="branch-0 cbranch-no" title="branch not covered" >approval.comments </span>&amp;&amp; (
-                    &lt;div className="mt-3 pt-3 border-t border-current/10"&gt;
-                      &lt;p className="text-sm text-gray-700"&gt;{approval.comments}&lt;/p&gt;
+                    &lt;div className="mt-3 pt-3 border-t border-gray-200 dark:border-slate-600"&gt;
+                      &lt;p className="text-sm text-gray-700 dark:text-slate-300"&gt;{approval.comments}&lt;/p&gt;
                     &lt;/div&gt;
                   )}
                 &lt;/div&gt;
@@ -1215,17 +1215,17 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
           {/* Approval Actions */}
           {<span class="branch-0 cbranch-no" title="branch not covered" >canApprove() &amp;&amp; (</span>
-            &lt;div className="bg-blue-50 border border-blue-200 rounded-lg p-4"&gt;
-              &lt;h3 className="font-semibold text-gray-900 mb-3"&gt;Your Approval&lt;/h3&gt;
+            &lt;div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4"&gt;
+              &lt;h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-3"&gt;Your Approval&lt;/h3&gt;
               
               &lt;div className="mb-4"&gt;
-                &lt;label className="block text-sm font-medium text-gray-700 mb-2"&gt;
+                &lt;label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2"&gt;
                   Comments (optional)
                 &lt;/label&gt;
                 &lt;textarea
                   value={comments}
                   onChange={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >setComments(e.target.value)}</span>
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-700 dark:text-slate-100"
                   rows={3}
                   placeholder="Add your comments here..."
                   disabled={submitting}
@@ -1233,8 +1233,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
               &lt;/div&gt;
 &nbsp;
               {<span class="branch-0 cbranch-no" title="branch not covered" >error &amp;&amp; (</span>
-                &lt;div className="mb-4 bg-red-50 border border-red-200 rounded p-3"&gt;
-                  &lt;p className="text-sm text-red-800"&gt;{error}&lt;/p&gt;
+                &lt;div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-3"&gt;
+                  &lt;p className="text-sm text-red-800 dark:text-red-300"&gt;{error}&lt;/p&gt;
                 &lt;/div&gt;
               )}
 &nbsp;
@@ -1273,7 +1273,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-23T20:41:45.322Z
+                at 2026-02-03T20:46:02.366Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

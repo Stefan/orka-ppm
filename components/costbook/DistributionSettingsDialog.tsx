@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
-import { X, Calendar, TrendingUp, Sparkles, AlertCircle } from 'lucide-react'
-import { DistributionSettings, DistributionProfile, Currency } from '@/types/costbook'
-import { calculateDistribution, validateCustomDistribution } from '@/lib/costbook/distribution-engine'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import { X, Calendar, TrendingUp, Sparkles, AlertCircle, Mic, MicOff } from 'lucide-react'
+import { DistributionSettings, DistributionProfile, Currency, DurationType } from '@/types/costbook'
+import { calculateDistribution, calculatePeriods, validateCustomDistribution } from '@/lib/costbook/distribution-engine'
 import { DistributionPreview } from './DistributionPreview'
 
 export interface DistributionSettingsDialogProps {
@@ -36,24 +36,102 @@ export function DistributionSettingsDialog({
 }: DistributionSettingsDialogProps) {
   // State
   const [activeTab, setActiveTab] = useState<DistributionProfile>('linear')
+  const [durationType, setDurationType] = useState<DurationType>(initialSettings?.duration_type ?? 'project')
   const [durationStart, setDurationStart] = useState(projectStartDate)
   const [durationEnd, setDurationEnd] = useState(projectEndDate)
   const [granularity, setGranularity] = useState<'week' | 'month'>('month')
   const [customPercentages, setCustomPercentages] = useState<number[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [voiceField, setVoiceField] = useState<'from' | 'to' | null>(null)
+  const [voiceError, setVoiceError] = useState<string | null>(null)
+
+  // Parse spoken date (e.g. "March 15 2025", "15.3.2025", "2025-03-15") to YYYY-MM-DD
+  const parseSpokenDate = useCallback((text: string): string | null => {
+    const t = text.trim().toLowerCase()
+    const months: Record<string, number> = {
+      january: 1, february: 2, march: 3, april: 4, may: 5, june: 6,
+      july: 7, august: 8, september: 9, october: 10, november: 11, december: 12,
+      jan: 1, feb: 2, mar: 3, apr: 4, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
+    }
+    // ISO already
+    if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return t
+    // DD.MM.YYYY or DD/MM/YYYY
+    const dmy = t.match(/(\d{1,2})[./](\d{1,2})[./](\d{4})/)
+    if (dmy) {
+      const [, d, m, y] = dmy
+      return `${y}-${m!.padStart(2, '0')}-${d!.padStart(2, '0')}`
+    }
+    // Month name DD YYYY
+    for (const [name, month] of Object.entries(months)) {
+      const re = new RegExp(`${name}\\s+(\\d{1,2})\\s+(\\d{4})`, 'i')
+      const m = t.match(re)
+      if (m) {
+        const [, d, y] = m
+        return `${y}-${String(month).padStart(2, '0')}-${d!.padStart(2, '0')}`
+      }
+    }
+    return null
+  }, [])
+
+  const startVoiceInput = useCallback((field: 'from' | 'to') => {
+    setVoiceError(null)
+    setVoiceField(field)
+    const win = typeof window !== 'undefined' ? window : null
+    const SpeechRecognition = win
+      ? ((win as unknown as { SpeechRecognition?: new () => { start: () => void; stop: () => void; onresult: (e: { results: { 0: { 0: { transcript: string } } } }) => void; onerror: (e: { error: string }) => void; onend: () => void } }).SpeechRecognition
+          ?? (win as unknown as { webkitSpeechRecognition?: new () => unknown }).webkitSpeechRecognition)
+      : undefined
+    if (!SpeechRecognition) {
+      setVoiceError('Voice input not supported in this browser')
+      setVoiceField(null)
+      return
+    }
+    const rec = new SpeechRecognition() as { start: () => void; stop: () => void; onresult: (e: { results: { 0: { 0: { transcript: string } } } }) => void; onerror: (e: { error: string }) => void; onend: () => void }
+    rec.onresult = (e: { results: { 0: { 0: { transcript: string } } } }) => {
+      const transcript = e.results?.[0]?.[0]?.transcript ?? ''
+      const parsed = parseSpokenDate(transcript)
+      if (parsed) {
+        if (field === 'from') setDurationStart(parsed)
+        else setDurationEnd(parsed)
+      } else {
+        setVoiceError(`Could not parse date: "${transcript}"`)
+      }
+      setVoiceField(null)
+    }
+    rec.onerror = (e: { error: string }) => {
+      setVoiceError(e.error === 'not-allowed' ? 'Microphone access denied' : e.error)
+      setVoiceField(null)
+    }
+    rec.onend = () => setVoiceField(null)
+    try {
+      rec.start()
+    } catch {
+      setVoiceError('Could not start voice recognition')
+      setVoiceField(null)
+    }
+  }, [parseSpokenDate])
+
+  // Sync From/To when duration type is project (use project dates)
+  useEffect(() => {
+    if (durationType === 'project' && (projectStartDate || projectEndDate)) {
+      if (projectStartDate) setDurationStart(projectStartDate.slice(0, 10))
+      if (projectEndDate) setDurationEnd(projectEndDate.slice(0, 10))
+    }
+  }, [durationType, projectStartDate, projectEndDate])
 
   // Initialize from initial settings if provided
   useEffect(() => {
     if (initialSettings) {
       setActiveTab(initialSettings.profile)
-      setDurationStart(initialSettings.duration_start)
-      setDurationEnd(initialSettings.duration_end)
+      setDurationType(initialSettings.duration_type ?? 'project')
+      setDurationStart(initialSettings.duration_start?.slice(0, 10) ?? projectStartDate?.slice(0, 10) ?? '')
+      setDurationEnd(initialSettings.duration_end?.slice(0, 10) ?? projectEndDate?.slice(0, 10) ?? '')
       setGranularity(initialSettings.granularity)
       if (initialSettings.customDistribution) {
         setCustomPercentages(initialSettings.customDistribution)
       }
     }
-  }, [initialSettings])
+  }, [initialSettings, projectStartDate, projectEndDate])
 
   // Calculate distribution preview
   const distribution = useMemo(() => {
@@ -68,14 +146,18 @@ export function DistributionSettingsDialog({
     return calculateDistribution(projectBudget, settings, currentSpend)
   }, [activeTab, durationStart, durationEnd, granularity, customPercentages, projectBudget, currentSpend])
 
-  // Initialize custom percentages when switching to custom tab
+  // Initialize custom percentages when switching to custom tab (use date range so we get period count even when customDistribution is empty)
+  const periodCount = useMemo(() => {
+    const periods = calculatePeriods(durationStart, durationEnd, granularity)
+    return periods.length
+  }, [durationStart, durationEnd, granularity])
+
   useEffect(() => {
-    if (activeTab === 'custom' && distribution.periods.length > 0 && customPercentages.length !== distribution.periods.length) {
-      // Initialize with equal distribution
-      const equal = 100 / distribution.periods.length
-      setCustomPercentages(Array(distribution.periods.length).fill(equal))
+    if (activeTab === 'custom' && periodCount > 0 && customPercentages.length !== periodCount) {
+      const equal = 100 / periodCount
+      setCustomPercentages(Array(periodCount).fill(equal))
     }
-  }, [activeTab, distribution.periods.length, customPercentages.length])
+  }, [activeTab, periodCount, customPercentages.length])
 
   const handleApply = () => {
     // Validate
@@ -97,6 +179,7 @@ export function DistributionSettingsDialog({
       duration_start: durationStart,
       duration_end: durationEnd,
       granularity,
+      duration_type: durationType,
       customDistribution: activeTab === 'custom' ? customPercentages : undefined
     }
 
@@ -146,39 +229,29 @@ export function DistributionSettingsDialog({
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {/* Duration and Granularity */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Duration Type: Project / Task / Custom */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Start Date
+              <label htmlFor="duration-type" className="block text-sm font-medium text-gray-700 mb-2">
+                Duration
               </label>
-              <input
-                type="date"
-                value={durationStart}
-                onChange={(e) => setDurationStart(e.target.value)}
-                min={projectStartDate}
-                max={projectEndDate}
+              <select
+                id="duration-type"
+                value={durationType}
+                onChange={(e) => setDurationType(e.target.value as DurationType)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+              >
+                <option value="project">Project (use project start/end)</option>
+                <option value="task">Task</option>
+                <option value="custom">Custom (choose From/To)</option>
+              </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                End Date
-              </label>
-              <input
-                type="date"
-                value={durationEnd}
-                onChange={(e) => setDurationEnd(e.target.value)}
-                min={durationStart}
-                max={projectEndDate}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="granularity" className="block text-sm font-medium text-gray-700 mb-2">
                 Granularity
               </label>
               <select
+                id="granularity"
                 value={granularity}
                 onChange={(e) => setGranularity(e.target.value as 'week' | 'month')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -189,7 +262,120 @@ export function DistributionSettingsDialog({
             </div>
           </div>
 
-          {/* Profile Tabs */}
+          {/* From / To Dates + Voice input */}
+          {voiceError && (
+            <div className="text-sm text-amber-700 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-200 rounded p-2 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              {voiceError}
+            </div>
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="from-date" className="block text-sm font-medium text-gray-700 mb-2">
+                From Date
+              </label>
+              <div className="flex gap-2">
+                <input
+                  id="from-date"
+                  type="date"
+                  aria-label="From Date"
+                  value={durationStart.slice(0, 10)}
+                  onChange={(e) => setDurationStart(e.target.value)}
+                  min={durationType === 'project' ? projectStartDate?.slice(0, 10) : undefined}
+                  max={durationEnd?.slice(0, 10)}
+                  disabled={durationType === 'project'}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                />
+                <button
+                  type="button"
+                  onClick={() => startVoiceInput('from')}
+                  disabled={durationType === 'project' || voiceField !== null}
+                  title="Voice input for From date (e.g. March 15 2025)"
+                  className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Voice input From date"
+                >
+                  {voiceField === 'from' ? <MicOff className="w-5 h-5 text-red-500" /> : <Mic className="w-5 h-5 text-gray-600" />}
+                </button>
+              </div>
+            </div>
+            <div>
+              <label htmlFor="to-date" className="block text-sm font-medium text-gray-700 mb-2">
+                To Date
+              </label>
+              <div className="flex gap-2">
+                <input
+                  id="to-date"
+                  type="date"
+                  aria-label="To Date"
+                  value={durationEnd.slice(0, 10)}
+                  onChange={(e) => setDurationEnd(e.target.value)}
+                  min={durationStart?.slice(0, 10)}
+                  max={durationType === 'project' ? projectEndDate?.slice(0, 10) : undefined}
+                  disabled={durationType === 'project'}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                />
+                <button
+                  type="button"
+                  onClick={() => startVoiceInput('to')}
+                  disabled={durationType === 'project' || voiceField !== null}
+                  title="Voice input for To date (e.g. March 15 2025)"
+                  className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Voice input To date"
+                >
+                  {voiceField === 'to' ? <MicOff className="w-5 h-5 text-red-500" /> : <Mic className="w-5 h-5 text-gray-600" />}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Profile dropdown */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Profile
+            </label>
+            <select
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value as DistributionProfile)}
+              className="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="linear">Manual (Linear)</option>
+              <option value="custom">Custom</option>
+              <option value="ai_generated">AI Generated</option>
+            </select>
+          </div>
+
+          {/* AI Suggestion buttons */}
+          <div className="rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800 p-4">
+            <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">AI suggestions</p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('linear')
+                  setDurationType('project')
+                  setError(null)
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-blue-800 bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-700 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+              >
+                <Sparkles className="w-4 h-4" />
+                Basierend auf Historie: Linear empfohlen
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('ai_generated')
+                  setDurationType('project')
+                  setError(null)
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-blue-800 bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-700 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+              >
+                <TrendingUp className="w-4 h-4" />
+                S-Curve (typisch für Projekte)
+              </button>
+            </div>
+          </div>
+
+          {/* Profile Tabs (visual alternative) */}
           <div className="border-b border-gray-200">
             <div className="flex space-x-4">
               <button

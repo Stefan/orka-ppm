@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/74</span>
+                <span class='fraction'>0/76</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/74</span>
+                <span class='fraction'>0/76</span>
             </div>
         
             
@@ -466,7 +466,10 @@
 <a name='L401'></a><a href='#L401'>401</a>
 <a name='L402'></a><a href='#L402'>402</a>
 <a name='L403'></a><a href='#L403'>403</a>
-<a name='L404'></a><a href='#L404'>404</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -539,6 +542,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -550,6 +554,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -941,7 +947,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
       }
 &nbsp;
       // Fetch workflows where user is involved (as initiator or approver)
-      const response = <span class="cstat-no" title="statement not covered" >await fetch('/api/workflows/instances/my-workflows', {</span>
+      const apiUrl = <span class="cstat-no" title="statement not covered" >process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'</span>
+      const response = <span class="cstat-no" title="statement not covered" >await fetch(`${apiUrl}/api/workflows/instances/my-workflows`, {</span>
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json'
@@ -955,8 +962,10 @@ export default function <span class="cstat-no" title="statement not covered" ><s
       const data = <span class="cstat-no" title="statement not covered" >await response.json()</span>
 <span class="cstat-no" title="statement not covered" >      setWorkflows(data.workflows || [])</span>
     } catch (err) {
-<span class="cstat-no" title="statement not covered" >      console.error('Failed to fetch workflows:', err)</span>
-<span class="cstat-no" title="statement not covered" >      setError(err instanceof Error ? err.message : 'An error occurred')</span>
+<span class="cstat-no" title="statement not covered" >      console.warn('Could not fetch workflows (backend may not be running):', err)</span>
+      // Set empty workflows instead of showing error
+<span class="cstat-no" title="statement not covered" >      setWorkflows([])</span>
+<span class="cstat-no" title="statement not covered" >      setError(null) /</span>/ Don't show error to user
     } finally {
 <span class="cstat-no" title="statement not covered" >      setLoading(false)</span>
     }
@@ -1029,10 +1038,10 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 <span class="cstat-no" title="statement not covered" >  if (compact) {</span>
 <span class="cstat-no" title="statement not covered" >    if (loading) {</span>
       return (
-        &lt;div className="bg-white rounded-lg border border-gray-200 p-4"&gt;
+        &lt;div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4"&gt;
           &lt;div className="animate-pulse space-y-3"&gt;
-            &lt;div className="h-4 bg-gray-200 rounded w-1/3"&gt;&lt;/div&gt;
-            &lt;div className="h-20 bg-gray-200 rounded"&gt;&lt;/div&gt;
+            &lt;div className="h-4 bg-gray-200 dark:bg-slate-600 rounded w-1/3"&gt;&lt;/div&gt;
+            &lt;div className="h-20 bg-gray-200 dark:bg-slate-600 rounded"&gt;&lt;/div&gt;
           &lt;/div&gt;
         &lt;/div&gt;
       )
@@ -1040,9 +1049,9 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (error) {</span>
       return (
-        &lt;div className="bg-white rounded-lg border border-gray-200 p-4"&gt;
-          &lt;div className="flex items-center gap-2 text-red-600"&gt;
-            &lt;AlertCircle size={16} /&gt;
+        &lt;div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4"&gt;
+          &lt;div className="flex items-center gap-2 text-red-600 dark:text-red-400"&gt;
+            &lt;AlertCircle size={16} aria-hidden /&gt;
             &lt;span className="text-sm"&gt;{error}&lt;/span&gt;
           &lt;/div&gt;
         &lt;/div&gt;
@@ -1054,13 +1063,13 @@ export default function <span class="cstat-no" title="statement not covered" ><s
     }
 &nbsp;
     return (
-      &lt;div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200 p-4"&gt;
+      &lt;div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border-2 border-blue-200 dark:border-blue-800 p-4"&gt;
         &lt;div className="flex items-center justify-between mb-3"&gt;
           &lt;div className="flex items-center gap-2"&gt;
-            &lt;AlertCircle className="text-blue-600" size={20} /&gt;
-            &lt;h3 className="font-semibold text-gray-900"&gt;Pending Approvals&lt;/h3&gt;
+            &lt;AlertCircle className="text-blue-600 dark:text-blue-400" size={20} aria-hidden /&gt;
+            &lt;h3 className="font-semibold text-gray-900 dark:text-slate-100"&gt;Pending Approvals&lt;/h3&gt;
           &lt;/div&gt;
-          &lt;span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full"&gt;
+          &lt;span className="bg-blue-600 dark:bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full"&gt;
             {pendingCount}
           &lt;/span&gt;
         &lt;/div&gt;
@@ -1073,18 +1082,18 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 <span class="cstat-no" title="statement not covered" >              &lt;button</span>
                 key={workflow.id}
                 onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >h</span>andleWorkflowClick(workflow.id)}</span>
-                className="w-full bg-white rounded-lg border border-gray-200 p-3 hover:border-blue-400 hover:shadow-md transition-all text-left"
+                className="w-full bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-600 p-3 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition-all text-left"
               &gt;
                 &lt;div className="flex items-center justify-between"&gt;
                   &lt;div className="flex-1 min-w-0"&gt;
-                    &lt;div className="font-medium text-sm text-gray-900 truncate"&gt;
+                    &lt;div className="font-medium text-sm text-gray-900 dark:text-slate-100 truncate"&gt;
                       {workflow.workflow_name}
                     &lt;/div&gt;
-                    &lt;div className="text-xs text-gray-500 mt-1"&gt;
+                    &lt;div className="text-xs text-gray-500 dark:text-slate-400 mt-1"&gt;
                       Step {workflow.current_step + 1} • {workflow.entity_type}
                     &lt;/div&gt;
                   &lt;/div&gt;
-                  &lt;ChevronRight className="text-gray-400 flex-shrink-0 ml-2" size={16} /&gt;
+                  &lt;ChevronRight className="text-gray-400 dark:text-slate-400 flex-shrink-0 ml-2" size={16} aria-hidden /&gt;
                 &lt;/div&gt;
               &lt;/button&gt;
             ))}
@@ -1093,7 +1102,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
         {<span class="branch-0 cbranch-no" title="branch not covered" >pendingCount &gt; 3 &amp;&amp; (</span>
           &lt;button
             onClick={<span class="fstat-no" title="function not covered" >() =&gt; {/* Navigate to full workflow page */}</span>}
-            className="w-full mt-3 text-sm text-blue-600 hover:text-blue-700 font-medium"
+            className="w-full mt-3 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
           &gt;
             View all {pendingCount} pending approvals →
           &lt;/button&gt;
@@ -1115,17 +1124,17 @@ export default function <span class="cstat-no" title="statement not covered" ><s
       {/* Header */}
       &lt;div className="flex items-center justify-between"&gt;
         &lt;div&gt;
-          &lt;h2 className="text-2xl font-bold text-gray-900"&gt;Workflow Approvals&lt;/h2&gt;
-          &lt;p className="text-sm text-gray-600 mt-1"&gt;
+          &lt;h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100"&gt;Workflow Approvals&lt;/h2&gt;
+          &lt;p className="text-sm text-gray-600 dark:text-slate-400 mt-1"&gt;
             Manage and track approval workflows
           &lt;/p&gt;
         &lt;/div&gt;
         
         {<span class="branch-0 cbranch-no" title="branch not covered" >pendingCount &gt; 0 &amp;&amp; (</span>
-          &lt;div className="bg-yellow-100 border border-yellow-300 rounded-lg px-4 py-2"&gt;
+          &lt;div className="bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded-lg px-4 py-2"&gt;
             &lt;div className="flex items-center gap-2"&gt;
-              &lt;AlertCircle className="text-yellow-600" size={20} /&gt;
-              &lt;span className="font-semibold text-yellow-800"&gt;
+              &lt;AlertCircle className="text-yellow-600 dark:text-yellow-400" size={20} aria-hidden /&gt;
+              &lt;span className="font-semibold text-yellow-800 dark:text-yellow-200"&gt;
                 {pendingCount} pending approval{pendingCount !== 1 ? 's' : ''}
               &lt;/span&gt;
             &lt;/div&gt;
@@ -1134,13 +1143,13 @@ export default function <span class="cstat-no" title="statement not covered" ><s
       &lt;/div&gt;
 &nbsp;
       {/* Filter Tabs */}
-      &lt;div className="flex gap-2 border-b border-gray-200"&gt;
+      &lt;div className="flex gap-2 border-b border-gray-200 dark:border-slate-700"&gt;
         &lt;button
           onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etFilter('all')}</span>
           className={`px-4 py-2 font-medium text-sm transition-colors ${
             filter === 'all'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
+              : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100'
           }`}
         &gt;
           All Workflows ({workflows.length})
@@ -1149,8 +1158,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
           onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etFilter('pending')}</span>
           className={`px-4 py-2 font-medium text-sm transition-colors ${
             filter === 'pending'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
+              : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100'
           }`}
         &gt;
           Pending ({workflows.filter(<span class="fstat-no" title="function not covered" >w =&gt; <span class="cstat-no" title="statement not covered" >w</span>.status === 'pending' || w.status === 'in_progress').l</span>ength})
@@ -1159,8 +1168,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
           onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etFilter('completed')}</span>
           className={`px-4 py-2 font-medium text-sm transition-colors ${
             filter === 'completed'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
+              : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100'
           }`}
         &gt;
           Completed ({workflows.filter(<span class="fstat-no" title="function not covered" >w =&gt; <span class="cstat-no" title="statement not covered" >w</span>.status === 'completed' || w.status === 'rejected').l</span>ength})
@@ -1171,16 +1180,16 @@ export default function <span class="cstat-no" title="statement not covered" ><s
       {<span class="branch-0 cbranch-no" title="branch not covered" >loading &amp;&amp; (</span>
         &lt;div className="space-y-3"&gt;
           {[...Array(3)].map(<span class="fstat-no" title="function not covered" >(_</span>, i) =&gt; (
-<span class="cstat-no" title="statement not covered" >            &lt;div key={i} c</span>lassName="animate-pulse bg-gray-100 rounded-lg h-24"&gt;&lt;/div&gt;
+<span class="cstat-no" title="statement not covered" >            &lt;div key={i} c</span>lassName="animate-pulse bg-gray-100 dark:bg-slate-700 rounded-lg h-24"&gt;&lt;/div&gt;
           ))}
         &lt;/div&gt;
       )}
 &nbsp;
       {/* Error State */}
       {error &amp;&amp; !loading &amp;&amp; (
-        &lt;div className="bg-red-50 border border-red-200 rounded-lg p-4"&gt;
-          &lt;div className="flex items-center gap-2 text-red-800"&gt;
-            &lt;AlertCircle size={20} /&gt;
+        &lt;div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4"&gt;
+          &lt;div className="flex items-center gap-2 text-red-800 dark:text-red-300"&gt;
+            &lt;AlertCircle size={20} aria-hidden /&gt;
             &lt;span&gt;{error}&lt;/span&gt;
           &lt;/div&gt;
         &lt;/div&gt;
@@ -1190,9 +1199,9 @@ export default function <span class="cstat-no" title="statement not covered" ><s
       {!loading &amp;&amp; !error &amp;&amp; (
         &lt;div className="space-y-3"&gt;
           {filteredWorkflows.length === 0 ? (
-            &lt;div className="text-center py-12 bg-gray-50 rounded-lg"&gt;
-              &lt;AlertCircle className="mx-auto text-gray-400 mb-3" size={48} /&gt;
-              &lt;p className="text-gray-600"&gt;No workflows found&lt;/p&gt;
+            &lt;div className="text-center py-12 bg-gray-50 dark:bg-slate-800 rounded-lg"&gt;
+              &lt;AlertCircle className="mx-auto text-gray-400 dark:text-slate-500 mb-3" size={48} aria-hidden /&gt;
+              &lt;p className="text-gray-600 dark:text-slate-400"&gt;No workflows found&lt;/p&gt;
             &lt;/div&gt;
           ) : (
             filteredWorkflows.map(<span class="fstat-no" title="function not covered" >workflow =&gt; {</span>
@@ -1201,36 +1210,36 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 <span class="cstat-no" title="statement not covered" >              return (</span>
                 &lt;div
                   key={workflow.id}
-                  className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all"
+                  className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4 hover:shadow-md transition-all"
                 &gt;
                   &lt;div className="flex items-start justify-between gap-4"&gt;
                     &lt;div className="flex-1 min-w-0"&gt;
                       &lt;div className="flex items-center gap-3 mb-2"&gt;
                         {getStatusIcon(workflow.status)}
-                        &lt;h3 className="font-semibold text-gray-900 truncate"&gt;
+                        &lt;h3 className="font-semibold text-gray-900 dark:text-slate-100 truncate"&gt;
                           {workflow.workflow_name}
                         &lt;/h3&gt;
                       &lt;/div&gt;
                       
-                      &lt;div className="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-3"&gt;
+                      &lt;div className="grid grid-cols-2 gap-2 text-sm text-gray-600 dark:text-slate-300 mb-3"&gt;
                         &lt;div&gt;
-                          &lt;span className="text-gray-500"&gt;Entity:&lt;/span&gt;{' '}
+                          &lt;span className="text-gray-500 dark:text-slate-400"&gt;Entity:&lt;/span&gt;{' '}
                           &lt;span className="font-medium"&gt;{workflow.entity_type}&lt;/span&gt;
                         &lt;/div&gt;
                         &lt;div&gt;
-                          &lt;span className="text-gray-500"&gt;Step:&lt;/span&gt;{' '}
-                          &lt;span className="font-medium"&gt;{workflow.current_step + 1}&lt;/span&gt;
+                          &lt;span className="text-gray-500 dark:text-slate-400"&gt;Step:&lt;/span&gt;{' '}
+                          &lt;span className="font-medium dark:text-slate-200"&gt;{workflow.current_step + 1}&lt;/span&gt;
                         &lt;/div&gt;
                         &lt;div&gt;
-                          &lt;span className="text-gray-500"&gt;Started:&lt;/span&gt;{' '}
-                          &lt;span className="font-medium"&gt;
+                          &lt;span className="text-gray-500 dark:text-slate-400"&gt;Started:&lt;/span&gt;{' '}
+                          &lt;span className="font-medium dark:text-slate-200"&gt;
                             {new Date(workflow.started_at).toLocaleDateString()}
                           &lt;/span&gt;
                         &lt;/div&gt;
                         {<span class="branch-0 cbranch-no" title="branch not covered" >workflow.completed_at </span>&amp;&amp; (
                           &lt;div&gt;
-                            &lt;span className="text-gray-500"&gt;Completed:&lt;/span&gt;{' '}
-                            &lt;span className="font-medium"&gt;
+                            &lt;span className="text-gray-500 dark:text-slate-400"&gt;Completed:&lt;/span&gt;{' '}
+                            &lt;span className="font-medium dark:text-slate-200"&gt;
                               {new Date(workflow.completed_at).toLocaleDateString()}
                             &lt;/span&gt;
                           &lt;/div&gt;
@@ -1238,9 +1247,9 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                       &lt;/div&gt;
 &nbsp;
                       {<span class="branch-0 cbranch-no" title="branch not covered" >pendingApprovals &gt; 0 &amp;&amp; (</span>
-                        &lt;div className="bg-yellow-50 border border-yellow-200 rounded px-3 py-2 inline-flex items-center gap-2"&gt;
-                          &lt;AlertCircle className="text-yellow-600" size={16} /&gt;
-                          &lt;span className="text-sm font-medium text-yellow-800"&gt;
+                        &lt;div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded px-3 py-2 inline-flex items-center gap-2"&gt;
+                          &lt;AlertCircle className="text-yellow-600 dark:text-yellow-400" size={16} aria-hidden /&gt;
+                          &lt;span className="text-sm font-medium text-yellow-800 dark:text-yellow-200"&gt;
                             {pendingApprovals} pending approval{pendingApprovals !== 1 ? 's' : ''} from you
                           &lt;/span&gt;
                         &lt;/div&gt;
@@ -1249,7 +1258,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
                     &lt;button
                       onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >h</span>andleWorkflowClick(workflow.id)}</span>
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 whitespace-nowrap"
+                      className="px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors flex items-center gap-2 whitespace-nowrap"
                     &gt;
                       View Details
                       &lt;ChevronRight size={16} /&gt;
@@ -1279,7 +1288,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-23T20:41:45.322Z
+                at 2026-02-03T20:46:02.366Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

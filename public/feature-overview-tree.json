@@ -1,0 +1,3110 @@
+{
+  "sections": [
+    {
+      "id": "section:routes",
+      "name": "App routes",
+      "description": "Pages discovered from app/",
+      "link": null,
+      "source": "route",
+      "sourcePath": "",
+      "parentId": null,
+      "icon": "Layout"
+    },
+    {
+      "id": "section:specs",
+      "name": "Specs (.kiro/specs)",
+      "description": "Feature specs and requirements",
+      "link": null,
+      "source": "spec",
+      "sourcePath": "",
+      "parentId": null,
+      "icon": "FileText"
+    },
+    {
+      "id": "section:docs",
+      "name": "Documentation (docs/)",
+      "description": "Project documentation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "",
+      "parentId": null,
+      "icon": "BookOpen"
+    }
+  ],
+  "routes": [
+    {
+      "id": "route:/audit",
+      "name": "Audit Trail",
+      "description": "The Audit page provides a complete trail of all changes made across your PPM workspace. Track who modified projects, schedules, budgets, or risks, with timestamps and before/after values. Use it for compliance requirements, debugging issues, or understanding decision-making history. Filter by user, date range, or entity type to quickly find relevant changes. Export audit logs for external reporting. This helps PPM teams maintain transparency and accountability in portfolio decisions.",
+      "link": "/audit",
+      "source": "route",
+      "sourcePath": "app/audit/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/audit.png"
+    },
+    {
+      "id": "route:/financials?tab=budget",
+      "name": "Budget Tracking",
+      "description": "Budget Tracking helps you monitor planned vs actual spending across your project portfolio. Set baseline budgets, track commitments and expenditures, and view variance reports. Get alerts for over-budget projects and drill down into cost categories like labor, materials, or vendors. Use it during quarterly reviews to justify funding requests or reallocate resources. Real-time dashboards show portfolio-level budget health, helping PMOs maintain financial discipline.",
+      "link": "/financials?tab=budget",
+      "source": "route",
+      "sourcePath": "app/financials/page.tsx#budget-tracking",
+      "parentId": "route:/financials",
+      "icon": "Layout",
+      "screenshot_url": null
+    },
+    {
+      "id": "route:/changes",
+      "name": "Changes",
+      "description": "Changes tracks all change requests, scope modifications, and approval workflows across your projects. Submit new change requests with impact assessments on schedule, cost, and risk. Review pending changes in a centralized queue with automated routing to approvers. Track change history and analyze trends to improve change management processes. Use it to maintain control over scope creep while ensuring legitimate changes are processed efficiently in your PPM environment.",
+      "link": "/changes",
+      "source": "route",
+      "sourcePath": "app/changes/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/changes.png"
+    },
+    {
+      "id": "route:/financials?tab=costbook",
+      "name": "Costbook",
+      "description": "The Costbook is your centralized library of cost rates, resources, and pricing templates. Define hourly rates for team members, contractors, and equipment, then apply them consistently across projects. Create cost templates for common work packages to speed up planning. Use it to ensure accurate financial forecasting and standardize costing methodology across your PPM workflows. Perfect for organizations needing defensible cost models for stakeholder reviews.",
+      "link": "/financials?tab=costbook",
+      "source": "route",
+      "sourcePath": "app/financials/page.tsx#costbook",
+      "parentId": "route:/financials",
+      "icon": "Layout",
+      "screenshot_url": null
+    },
+    {
+      "id": "route:/dashboards",
+      "name": "Dashboards",
+      "description": "Dashboards let you create personalized views of your PPM data with drag-and-drop widgets. Monitor portfolio health through KPIs like schedule variance, budget status, and resource utilization. Build executive dashboards with traffic light indicators and drill-down capabilities. Save multiple dashboard layouts for different stakeholders—from project managers to C-suite executives. Use it daily to get instant visibility into portfolio performance and spot issues before they escalate.",
+      "link": "/dashboards",
+      "source": "route",
+      "sourcePath": "app/dashboards/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/dashboards.png"
+    },
+    {
+      "id": "route:/financials?tab=eac",
+      "name": "EAC Calculations",
+      "description": "EAC (Estimate at Completion) Calculation forecasts final project costs based on current performance. Choose from methods like Bottom-Up, Top-Down, or Earned Value formulas. Input actuals to date, remaining work estimates, and performance indices for accurate predictions. Compare EAC against original budgets to identify at-risk projects early. Use during monthly portfolio reviews to communicate realistic completion costs to executives and adjust resource allocations proactively.",
+      "link": "/financials?tab=eac",
+      "source": "route",
+      "sourcePath": "app/financials/page.tsx#eac-calculation",
+      "parentId": "route:/financials",
+      "icon": "Layout",
+      "screenshot_url": null
+    },
+    {
+      "id": "route:/feedback",
+      "name": "Feedback & Support",
+      "description": "Feedback captures user suggestions, bug reports, and feature requests directly within Orka PPM. Submit detailed feedback with screenshots and affected project context. Vote on existing feedback to prioritize improvements. Track resolution status and see how your input shapes the product roadmap. Use it to help make Orka PPM work better for your specific PPM workflows and team needs.",
+      "link": "/feedback",
+      "source": "route",
+      "sourcePath": "app/feedback/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/feedback.png"
+    },
+    {
+      "id": "route:/financials?tab=forecast",
+      "name": "Financial Forecasts",
+      "description": "Financial Forecast provides rolling 12-18 month cash flow projections across your entire portfolio. Aggregate project forecasts, factoring in planned spending, revenue milestones, and contingency reserves. Scenario planning lets you test 'what-if' impacts of delays or scope changes. Use it for executive cash flow reporting and capital planning. Interactive charts show monthly burn rates and cumulative spend, helping PPM leaders align projects with corporate financial goals.",
+      "link": "/financials?tab=forecast",
+      "source": "route",
+      "sourcePath": "app/financials/page.tsx#financial-forecast",
+      "parentId": "route:/financials",
+      "icon": "Layout",
+      "screenshot_url": null
+    },
+    {
+      "id": "route:/financials",
+      "name": "Financials",
+      "description": "The Financials hub gives you a 360° view of portfolio financial health through configurable tabs. Switch between Budget Tracking, Costbook, EAC calculations, and forecasting tools. Create custom dashboards showing KPIs like cost variance, ROI projections, and funding utilization. Use it as your primary financial command center for portfolio analysis and decision-making. Perfect for PMOs needing to answer executive questions about project spending and financial performance instantly.",
+      "link": "/financials",
+      "source": "route",
+      "sourcePath": "app/financials/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/financials.png"
+    },
+    {
+      "id": "route:/import",
+      "name": "Import",
+      "description": "Import provides bulk data loading for projects, resources, schedules, and financials from CSV, Excel, or external systems. Map columns to Orka fields with preview validation before committing. Schedule recurring imports for ongoing data synchronization. Use it during initial PPM implementation or monthly actuals updates. Comprehensive error reporting and rollback capabilities ensure data integrity across your portfolio.",
+      "link": "/import",
+      "source": "route",
+      "sourcePath": "app/import/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/import.png"
+    },
+    {
+      "id": "route:/monte-carlo",
+      "name": "Monte Carlo",
+      "description": "Monte Carlo simulation runs thousands of schedule and cost scenarios using probabilistic modeling. Define uncertainty ranges for task durations, costs, and dependencies. Get probability distributions for completion dates and total costs, not just single-point estimates. Use it for high-stakes projects where executives need confidence intervals (80% likely to complete by X date). Essential for portfolio-level risk analysis and contingency planning.",
+      "link": "/monte-carlo",
+      "source": "route",
+      "sourcePath": "app/monte-carlo/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/monte-carlo.png"
+    },
+    {
+      "id": "route:/reports/pmr",
+      "name": "PMR Reports",
+      "description": "PMR Reports (Project Management Review) deliver standardized executive portfolio summaries. Generate slide-ready reports showing health scores, milestone status, and financial summaries. Customize templates with your organization's KPIs and branding. Schedule automated distribution to stakeholders. Use monthly for Portfolio Management Review meetings to communicate portfolio status concisely to executives and governance boards.",
+      "link": "/reports/pmr",
+      "source": "route",
+      "sourcePath": "app/reports/pmr/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/reports-pmr.png"
+    },
+    {
+      "id": "route:/projects/import",
+      "name": "Project Import",
+      "description": "Project Import streamlines onboarding multiple projects from spreadsheets or legacy systems. Map project fields, phases, resources, and costs with data validation previews. Import hierarchical work breakdown structures and relationships between projects. Use it for PPM implementation, quarterly portfolio refresh, or merging acquired project data. Maintains data relationships and history while accelerating portfolio setup.",
+      "link": "/projects/import",
+      "source": "route",
+      "sourcePath": "app/projects/import/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/projects-import.png"
+    },
+    {
+      "id": "route:/projects",
+      "name": "Projects",
+      "description": "Projects is the heart of Orka PPM, showing your complete project portfolio with health indicators. Filter and sort by status, owner, phase, or custom criteria. Drill into individual projects for detailed schedules, financials, and risks. Use portfolio-level actions to bulk update, prioritize, or reallocate resources across projects. Perfect for PMOs managing 10-1000+ projects needing portfolio visibility and governance.",
+      "link": "/projects",
+      "source": "route",
+      "sourcePath": "app/projects/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/projects.png"
+    },
+    {
+      "id": "route:/reports",
+      "name": "Reports",
+      "description": "Reports is your one-stop shop for 50+ pre-built PPM reports plus custom report builder. Access portfolio summaries, project health scorecards, resource capacity plans, and financial variance analysis. Export to PDF, Excel, or PowerPoint with your branding. Schedule automated delivery and create saved report sets for recurring business reviews. Use it to eliminate manual reporting and deliver professional insights to stakeholders instantly.",
+      "link": "/reports",
+      "source": "route",
+      "sourcePath": "app/reports/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/reports.png"
+    },
+    {
+      "id": "route:/resources",
+      "name": "Resources",
+      "description": "Resources manages your team's capacity, allocation, and forecasting across all projects. View utilization heatmaps, skill matrices, and availability calendars. Assign resources to projects with automated conflict detection. Forecast hiring needs based on portfolio demand. Use it for resource leveling, capacity planning, and answering 'Do we have bandwidth for this new project?' questions confidently.",
+      "link": "/resources",
+      "source": "route",
+      "sourcePath": "app/resources/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/resources.png"
+    },
+    {
+      "id": "route:/risks",
+      "name": "Risks",
+      "description": "Risks provides enterprise risk management across your portfolio. Register risks with probability/impact scoring, mitigation plans, and ownership assignment. View portfolio heat maps and risk-adjusted schedules. Automated escalation when risks materialize. Use it for quarterly risk reviews, executive reporting, and integrating risk considerations into portfolio prioritization and resource allocation.",
+      "link": "/risks",
+      "source": "route",
+      "sourcePath": "app/risks/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/risks.png"
+    },
+    {
+      "id": "route:/scenarios",
+      "name": "Scenarios",
+      "description": "Scenarios lets you test 'what-if' portfolio decisions without affecting live data. Create alternate resource plans, reprioritize projects, or simulate budget cuts. Compare scenarios side-by-side with quantitative scoring (NPV, ROI, strategic alignment). Present multiple options to executives with clear trade-off analysis. Essential for strategic portfolio planning and rebalancing during market shifts or organizational changes.",
+      "link": "/scenarios",
+      "source": "route",
+      "sourcePath": "app/scenarios/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/scenarios.png"
+    },
+    {
+      "id": "route:/schedules",
+      "name": "Schedules",
+      "description": "Schedules provides portfolio-level visibility into all project timelines and dependencies. Use Critical Path analysis, resource leveling, and baseline comparisons. Visualize with Gantt charts, timeline views, or milestone trackers. Bulk update dates across projects and forecast completion probability. Perfect for PMOs needing to answer 'What's slipping and why?' across their entire portfolio.",
+      "link": "/schedules",
+      "source": "route",
+      "sourcePath": "app/schedules/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/schedules.png"
+    }
+  ],
+  "specs": [
+    {
+      "id": "spec:ai-empowered-audit-trail",
+      "name": "Ai Empowered Audit Trail",
+      "description": "Design Document: AI-Empowered Audit Trail",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/ai-empowered-audit-trail",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:ai-empowered-ppm-features",
+      "name": "Ai Empowered Ppm Features",
+      "description": "Design Document: AI-Empowered PPM Features",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/ai-empowered-ppm-features",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:ai-help-chat",
+      "name": "Ai Help Chat",
+      "description": "Design Document",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/ai-help-chat",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:ai-help-chat-knowledge-base",
+      "name": "Ai Help Chat Knowledge Base",
+      "description": "Design Document: AI Help Chat Knowledge Base",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/ai-help-chat-knowledge-base",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:change-orders",
+      "name": "Change Orders",
+      "description": "Design Document",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/change-orders",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:complete-i18n-system",
+      "name": "Complete I18n System",
+      "description": "Design Document: Complete I18n System",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/complete-i18n-system",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:costbook-4-0",
+      "name": "Costbook 4 0",
+      "description": "Design Document: Costbook",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/costbook-4-0",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:enhanced-pmr",
+      "name": "Enhanced Pmr",
+      "description": "Enhanced Project Monthly Report (PMR) - Design Document",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/enhanced-pmr",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:enhanced-pmr-feature",
+      "name": "Enhanced Pmr Feature",
+      "description": null,
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/enhanced-pmr-feature",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:feature-toggle-system",
+      "name": "Feature Toggle System",
+      "description": "Design Document: Feature Toggle System",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/feature-toggle-system",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:features-overview",
+      "name": "Features Overview",
+      "description": "Design Document: Features Overview Page",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/features-overview",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:generic-construction-ppm-features",
+      "name": "Generic Construction Ppm Features",
+      "description": "Design Document: Generic Construction/Engineering PPM Features",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/generic-construction-ppm-features",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:import-actuals-commitments",
+      "name": "Import Actuals Commitments",
+      "description": "Design Document: Import Actuals and Commitments",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/import-actuals-commitments",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:integrated-change-management",
+      "name": "Integrated Change Management",
+      "description": "Design Document: Integrated Change Management System",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/integrated-change-management",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:integrated-master-schedule",
+      "name": "Integrated Master Schedule",
+      "description": "Design Document: Integrated Master Schedule System",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/integrated-master-schedule",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:mobile-first-ui-enhancements",
+      "name": "Mobile First Ui Enhancements",
+      "description": "Design Document: Mobile-First UI Enhancements",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/mobile-first-ui-enhancements",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:monte-carlo-risk-simulations",
+      "name": "Monte Carlo Risk Simulations",
+      "description": "Design Document: Monte Carlo Risk Simulations",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/monte-carlo-risk-simulations",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:project-controls-etc-eac",
+      "name": "Project Controls Etc Eac",
+      "description": "Design Document",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/project-controls-etc-eac",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:project-import-mvp",
+      "name": "Project Import Mvp",
+      "description": "Design Document: Project Import MVP",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/project-import-mvp",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:rbac-enhancement",
+      "name": "Rbac Enhancement",
+      "description": "Design Document: RBAC Enhancement",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/rbac-enhancement",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:register-nested-grids",
+      "name": "Register Nested Grids",
+      "description": "Design Document: Register Nested Grids",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/register-nested-grids",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:sap-po-breakdown-management",
+      "name": "Sap Po Breakdown Management",
+      "description": "Design Document",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/sap-po-breakdown-management",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:shareable-project-urls",
+      "name": "Shareable Project Urls",
+      "description": "Design Document: Shareable Project URLs",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/shareable-project-urls",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:user-synchronization",
+      "name": "User Synchronization",
+      "description": "Design Document: User Synchronization System",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/user-synchronization",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:workflow-engine",
+      "name": "Workflow Engine",
+      "description": "Design Document: Workflow Engine",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/workflow-engine",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    }
+  ],
+  "docs": [
+    {
+      "id": "doc:archive/DOCKER_FIX_DEPLOYED.md",
+      "name": "✅ Docker Fix Deployed - Nächste Schritte",
+      "description": "✅ Docker Fix Deployed - Nächste Schritte",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/DOCKER_FIX_DEPLOYED.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/FRONTEND_API_PREFIX_FIX.md",
+      "name": "✅ Frontend API Prefix Fix - GELÖST!",
+      "description": "✅ Frontend API Prefix Fix - GELÖST!",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/FRONTEND_API_PREFIX_FIX.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/RENDER_FIX_CHECKLIST.md",
+      "name": "✅ Render Backend Fix - Schritt-für-Schritt Checklist",
+      "description": "✅ Render Backend Fix - Schritt-für-Schritt Checklist",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/RENDER_FIX_CHECKLIST.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:CLEANUP_SUMMARY.md",
+      "name": "🧹 ORKA-PPM Codebase Aufräum-Zusammenfassung",
+      "description": "🧹 ORKA-PPM Codebase Aufräum-Zusammenfassung",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/CLEANUP_SUMMARY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/STATUS_JETZT.md",
+      "name": "🚀 STATUS UPDATE - 18:40 Uhr",
+      "description": "🚀 STATUS UPDATE - 18:40 Uhr",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/STATUS_JETZT.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/RENDER_FIX_JETZT.md",
+      "name": "🚨 RENDER BACKEND FIX - SOFORT DURCHFÜHREN",
+      "description": "🚨 RENDER BACKEND FIX - SOFORT DURCHFÜHREN",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/RENDER_FIX_JETZT.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:user-acceptance-testing/accessibility-testing-guide.md",
+      "name": "Accessibility Testing Guide",
+      "description": "Accessibility Testing Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/user-acceptance-testing/accessibility-testing-guide.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:ADMIN_SETUP.md",
+      "name": "Admin Setup & User Management Documentation",
+      "description": "Admin Setup & User Management Documentation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/ADMIN_SETUP.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:audit-admin-guide.md",
+      "name": "AI-Empowered Audit Trail Administrator Guide",
+      "description": "AI-Empowered Audit Trail Administrator Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/audit-admin-guide.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:audit-api-documentation.md",
+      "name": "AI-Empowered Audit Trail API Documentation",
+      "description": "AI-Empowered Audit Trail API Documentation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/audit-api-documentation.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:audit-deployment-checklist.md",
+      "name": "AI-Empowered Audit Trail Deployment Checklist",
+      "description": "AI-Empowered Audit Trail Deployment Checklist",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/audit-deployment-checklist.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:audit-monitoring-guide.md",
+      "name": "AI-Empowered Audit Trail Monitoring and Alerting Guide",
+      "description": "AI-Empowered Audit Trail Monitoring and Alerting Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/audit-monitoring-guide.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:audit-user-guide.md",
+      "name": "AI-Empowered Audit Trail User Guide",
+      "description": "AI-Empowered Audit Trail User Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/audit-user-guide.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/API_ENDPOINT_ISSUES_SUMMARY.md",
+      "name": "API Endpoint Issues Summary",
+      "description": "API Endpoint Issues Summary",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/API_ENDPOINT_ISSUES_SUMMARY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/API_PREFIX_AUDIT.md",
+      "name": "API Prefix Audit - Frontend vs Backend",
+      "description": "API Prefix Audit - Frontend vs Backend",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/API_PREFIX_AUDIT.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:baseline-management.md",
+      "name": "Baseline Management Guide",
+      "description": "Baseline Management Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/baseline-management.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:frontend/BOOTSTRAP_ADMIN.md",
+      "name": "Bootstrapping Admin User - Solving the \"No Users\" Problem",
+      "description": "Bootstrapping Admin User - Solving the \"No Users\" Problem",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/frontend/BOOTSTRAP_ADMIN.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/financials?tab=budget.md",
+      "name": "Budget Tracking helps you monitor planned vs actual spending across your project portfolio. Set baseline budgets, track ",
+      "description": "Budget Tracking helps you monitor planned vs actual spending across your project portfolio. Set baseline budgets, track commitments and expenditures, and view variance reports. Get alerts for over-budget projects and drill down into cost categories like labor, materials, or vendo",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/financials?tab=budget.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/changes.md",
+      "name": "Changes tracks all change requests, scope modifications, and approval workflows across your projects. Submit new change ",
+      "description": "Changes tracks all change requests, scope modifications, and approval workflows across your projects. Submit new change requests with impact assessments on schedule, cost, and risk. Review pending changes in a centralized queue with automated routing to approvers. Track change hi",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/changes.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:CI_CD_INTEGRATION.md",
+      "name": "CI/CD Integration for User Synchronization",
+      "description": "CI/CD Integration for User Synchronization",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/CI_CD_INTEGRATION.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:testing/CI_CD_PIPELINES.md",
+      "name": "CI/CD Pipeline Documentation",
+      "description": "CI/CD Pipeline Documentation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/testing/CI_CD_PIPELINES.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:testing/CI_CD_SETUP_CHECKLIST.md",
+      "name": "CI/CD setup checklist",
+      "description": "CI/CD setup checklist",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/testing/CI_CD_SETUP_CHECKLIST.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:CLS_PREVENTION_GUIDE.md",
+      "name": "CLS Prevention Developer Guide",
+      "description": "CLS Prevention Developer Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/CLS_PREVENTION_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:CODE_REVIEW_CHECKLIST.md",
+      "name": "Code Review Checklist (Roche→Generic + Costbook/CICD)",
+      "description": "Code Review Checklist (Roche→Generic + Costbook/CICD)",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/CODE_REVIEW_CHECKLIST.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:CODE_REVIEW_RESULTS.md",
+      "name": "Code Review Results",
+      "description": "Code Review Results",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/CODE_REVIEW_RESULTS.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:CLEANUP_INVESTIGATION.md",
+      "name": "Codebase Cleanup Investigation",
+      "description": "Codebase Cleanup Investigation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/CLEANUP_INVESTIGATION.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:CLEANUP_TODO.md",
+      "name": "Codebase Cleanup TODO",
+      "description": "Codebase Cleanup TODO",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/CLEANUP_TODO.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:dashboard-optimization-flow.md",
+      "name": "Dashboard Data Loading Optimization Flow",
+      "description": "Dashboard Data Loading Optimization Flow",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/dashboard-optimization-flow.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/dashboards.md",
+      "name": "Dashboards let you create personalized views of your PPM data with drag-and-drop widgets. Monitor portfolio health throu",
+      "description": "Dashboards let you create personalized views of your PPM data with drag-and-drop widgets. Monitor portfolio health through KPIs like schedule variance, budget status, and resource utilization. Build executive dashboards with traffic light indicators and drill-down capabilities. S",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/dashboards.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/DEBUG_LANGUAGE_SWITCH.md",
+      "name": "Debug: Sprachwechsel Englisch → Deutsch funktioniert nicht",
+      "description": "Debug: Sprachwechsel Englisch → Deutsch funktioniert nicht",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/DEBUG_LANGUAGE_SWITCH.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/DEPLOYMENT_OPTIMIZATION_ANALYSIS.md",
+      "name": "Deployment Optimization Analysis",
+      "description": "Deployment Optimization Analysis",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/DEPLOYMENT_OPTIMIZATION_ANALYSIS.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:DEPLOYMENT_PROCEDURES.md",
+      "name": "Deployment Procedures with User Synchronization",
+      "description": "Deployment Procedures with User Synchronization",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/DEPLOYMENT_PROCEDURES.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/DEPLOYMENT_SUMMARY.md",
+      "name": "Deployment Summary - Help Chat Multilingual & Performance Optimization",
+      "description": "Deployment Summary - Help Chat Multilingual & Performance Optimization",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/DEPLOYMENT_SUMMARY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:testing/DEVELOPER_TESTING_GUIDE.md",
+      "name": "Developer Testing Guidelines",
+      "description": "Developer Testing Guidelines",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/testing/DEVELOPER_TESTING_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:README.md",
+      "name": "Documentation",
+      "description": "Documentation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/README.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/DOCUMENTATION_GAPS_AND_RECOMMENDATIONS.md",
+      "name": "Documentation Gaps & Recommendations",
+      "description": "Documentation Gaps & Recommendations",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/DOCUMENTATION_GAPS_AND_RECOMMENDATIONS.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/DOCUMENTATION_UPDATE_SUMMARY.md",
+      "name": "Documentation Update Summary",
+      "description": "Documentation Update Summary",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/DOCUMENTATION_UPDATE_SUMMARY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:DOCUMENTATION_WORKFLOW.md",
+      "name": "Documentation Workflow Guide",
+      "description": "Documentation Workflow Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/DOCUMENTATION_WORKFLOW.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/financials?tab=eac.md",
+      "name": "EAC (Estimate at Completion) Calculation forecasts final project costs based on current performance. Choose from methods",
+      "description": "EAC (Estimate at Completion) Calculation forecasts final project costs based on current performance. Choose from methods like Bottom-Up, Top-Down, or Earned Value formulas. Input actuals to date, remaining work estimates, and performance indices for accurate predictions. Compare ",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/financials?tab=eac.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:ENHANCED_AI_CHAT_INTEGRATION.md",
+      "name": "Enhanced AI Chat Integration for PMR",
+      "description": "Enhanced AI Chat Integration for PMR",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/ENHANCED_AI_CHAT_INTEGRATION.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:PMR_HELP_IMPLEMENTATION_SUMMARY.md",
+      "name": "Enhanced PMR Help Integration - Implementation Summary",
+      "description": "Enhanced PMR Help Integration - Implementation Summary",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/PMR_HELP_IMPLEMENTATION_SUMMARY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:PMR_QUICK_REFERENCE.md",
+      "name": "Enhanced PMR Quick Reference Guide",
+      "description": "Enhanced PMR Quick Reference Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/PMR_QUICK_REFERENCE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:ENHANCED_PMR_USER_GUIDE.md",
+      "name": "Enhanced PMR User Guide",
+      "description": "Enhanced PMR User Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/ENHANCED_PMR_USER_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:PMR_VIDEO_TUTORIALS.md",
+      "name": "Enhanced PMR Video Tutorials",
+      "description": "Enhanced PMR Video Tutorials",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/PMR_VIDEO_TUTORIALS.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:enterprise/CHECKLIST.md",
+      "name": "Enterprise Readiness – Phasen-Checkliste",
+      "description": "Enterprise Readiness – Phasen-Checkliste",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/enterprise/CHECKLIST.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:testing/TEST_STRATEGY.md",
+      "name": "Enterprise Test Strategy",
+      "description": "Enterprise Test Strategy",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/testing/TEST_STRATEGY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features-overview-ideas.md",
+      "name": "Feature Overview: Ideas for More Comprehensive and Automated",
+      "description": "Feature Overview: Ideas for More Comprehensive and Automated",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features-overview-ideas.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:feature-toggles-api.md",
+      "name": "Feature Toggles API",
+      "description": "Feature Toggles API",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/feature-toggles-api.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features-webhook-and-screenshots.md",
+      "name": "Features Overview: Webhook, Screenshots, and AI Enrichment",
+      "description": "Features Overview: Webhook, Screenshots, and AI Enrichment",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features-webhook-and-screenshots.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/feedback.md",
+      "name": "Feedback captures user suggestions, bug reports, and feature requests directly within Orka PPM. Submit detailed feedback",
+      "description": "Feedback captures user suggestions, bug reports, and feature requests directly within Orka PPM. Submit detailed feedback with screenshots and affected project context. Vote on existing feedback to prioritize improvements. Track resolution status and see how your input shapes the ",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/feedback.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/financials?tab=forecast.md",
+      "name": "Financial Forecast provides rolling 12-18 month cash flow projections across your entire portfolio. Aggregate project fo",
+      "description": "Financial Forecast provides rolling 12-18 month cash flow projections across your entire portfolio. Aggregate project forecasts, factoring in planned spending, revenue milestones, and contingency reserves. Scenario planning lets you test 'what-if' impacts of delays or scope chang",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/financials?tab=forecast.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/FIXES_SUMMARY_SESSION_2.md",
+      "name": "Fixes Summary - Session 2",
+      "description": "Fixes Summary - Session 2",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/FIXES_SUMMARY_SESSION_2.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/HELP_CHAT_FIX_VISUAL_GUIDE.md",
+      "name": "Help Chat Fix - Visual Guide",
+      "description": "Help Chat Fix - Visual Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/HELP_CHAT_FIX_VISUAL_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/TEST_HELP_CHAT_LANGUAGE_SWITCHING.md",
+      "name": "Help Chat Language Switching - Manual Test Plan",
+      "description": "Help Chat Language Switching - Manual Test Plan",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/TEST_HELP_CHAT_LANGUAGE_SWITCHING.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/HELP_CHAT_LANGUAGE_SWITCHING_TEST.md",
+      "name": "Help Chat Language Switching - Testing Guide",
+      "description": "Help Chat Language Switching - Testing Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/HELP_CHAT_LANGUAGE_SWITCHING_TEST.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/HELP_CHAT_LANGUAGE_SYNC_FIX.md",
+      "name": "Help Chat Language Sync Error Fix",
+      "description": "Help Chat Language Sync Error Fix",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/HELP_CHAT_LANGUAGE_SYNC_FIX.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:help-chat-multilingual.md",
+      "name": "Help Chat Multilingual System",
+      "description": "Help Chat Multilingual System",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/help-chat-multilingual.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:I18N_DEVELOPER_GUIDE.md",
+      "name": "i18n Developer Guide",
+      "description": "i18n Developer Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/I18N_DEVELOPER_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:IMAGE_OPTIMIZATION_GUIDE.md",
+      "name": "Image Optimization Guide",
+      "description": "Image Optimization Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/IMAGE_OPTIMIZATION_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/import.md",
+      "name": "Import provides bulk data loading for projects, resources, schedules, and financials from CSV, Excel, or external system",
+      "description": "Import provides bulk data loading for projects, resources, schedules, and financials from CSV, Excel, or external systems. Map columns to Orka fields with preview validation before committing. Schedule recurring imports for ongoing data synchronization. Use it during initial PPM ",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/import.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:LIGHTHOUSE_PERFORMANCE.md",
+      "name": "Lighthouse & Performance",
+      "description": "Lighthouse & Performance",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/LIGHTHOUSE_PERFORMANCE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:user-acceptance-testing/mobile-device-scenarios.md",
+      "name": "Mobile Device Testing Scenarios",
+      "description": "Mobile Device Testing Scenarios",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/user-acceptance-testing/mobile-device-scenarios.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:user-acceptance-testing/feature-documentation.md",
+      "name": "Mobile-First UI Enhancements - Feature Documentation",
+      "description": "Mobile-First UI Enhancements - Feature Documentation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/user-acceptance-testing/feature-documentation.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/monte-carlo.md",
+      "name": "Monte Carlo simulation runs thousands of schedule and cost scenarios using probabilistic modeling. Define uncertainty ra",
+      "description": "Monte Carlo simulation runs thousands of schedule and cost scenarios using probabilistic modeling. Define uncertainty ranges for task durations, costs, and dependencies. Get probability distributions for completion dates and total costs, not just single-point estimates. Use it fo",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/monte-carlo.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:DESIGN_SYSTEM_GUIDE.md",
+      "name": "ORKA PPM Design System Guide",
+      "description": "ORKA PPM Design System Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/DESIGN_SYSTEM_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:frontend/REFACTORING_SUMMARY.md",
+      "name": "ORKA-PPM Codebase Refactoring Summary",
+      "description": "ORKA-PPM Codebase Refactoring Summary",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/frontend/REFACTORING_SUMMARY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/FEATURE_INVENTORY.md",
+      "name": "ORKA-PPM Complete Feature Inventory",
+      "description": "ORKA-PPM Complete Feature Inventory",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/FEATURE_INVENTORY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:PROJECT_STRUCTURE.md",
+      "name": "ORKA-PPM Projektstruktur",
+      "description": "ORKA-PPM Projektstruktur",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/PROJECT_STRUCTURE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:enterprise/PHASE_1_SECURITY_SCALABILITY.md",
+      "name": "Phase 1 – Security & Scalability",
+      "description": "Phase 1 – Security & Scalability",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/enterprise/PHASE_1_SECURITY_SCALABILITY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:enterprise/PHASE_2_INTEGRATION_CUSTOMIZABILITY.md",
+      "name": "Phase 2 – Integration & Customizability",
+      "description": "Phase 2 – Integration & Customizability",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/enterprise/PHASE_2_INTEGRATION_CUSTOMIZABILITY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:enterprise/PHASE_3_AI_ANALYTICS_RELIABILITY.md",
+      "name": "Phase 3 – AI, Analytics & Reliability",
+      "description": "Phase 3 – AI, Analytics & Reliability",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/enterprise/PHASE_3_AI_ANALYTICS_RELIABILITY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/reports-pmr.md",
+      "name": "PMR Reports (Project Management Review) deliver standardized executive portfolio summaries. Generate slide-ready reports",
+      "description": "PMR Reports (Project Management Review) deliver standardized executive portfolio summaries. Generate slide-ready reports showing health scores, milestone status, and financial summaries. Customize templates with your organization's KPIs and branding. Schedule automated distributi",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/reports-pmr.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:frontend/PROJECT_OVERVIEW.md",
+      "name": "PPM-SaaS Project Knowledge Base",
+      "description": "PPM-SaaS Project Knowledge Base",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/frontend/PROJECT_OVERVIEW.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:SECURITY_CHECKLIST.md",
+      "name": "Production Security Checklist",
+      "description": "Production Security Checklist",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/SECURITY_CHECKLIST.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/projects-import.md",
+      "name": "Project Import streamlines onboarding multiple projects from spreadsheets or legacy systems. Map project fields, phases,",
+      "description": "Project Import streamlines onboarding multiple projects from spreadsheets or legacy systems. Map project fields, phases, resources, and costs with data validation previews. Import hierarchical work breakdown structures and relationships between projects. Use it for PPM implementa",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/projects-import.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/projects.md",
+      "name": "Projects is the heart of Orka PPM, showing your complete project portfolio with health indicators. Filter and sort by st",
+      "description": "Projects is the heart of Orka PPM, showing your complete project portfolio with health indicators. Filter and sort by status, owner, phase, or custom criteria. Drill into individual projects for detailed schedules, financials, and risks. Use portfolio-level actions to bulk update",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/projects.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:RAG_IMPLEMENTATION_STATUS.md",
+      "name": "RAG Implementation Status",
+      "description": "RAG Implementation Status",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/RAG_IMPLEMENTATION_STATUS.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:RAG_SYSTEM_README.md",
+      "name": "RAG Knowledge Base System",
+      "description": "RAG Knowledge Base System",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/RAG_SYSTEM_README.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:real-time-updates.md",
+      "name": "Real-Time Updates Guide",
+      "description": "Real-Time Updates Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/real-time-updates.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/RENDER_SETUP_GUIDE.md",
+      "name": "Render Backend Setup Guide",
+      "description": "Render Backend Setup Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/RENDER_SETUP_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/RENDER_DEPLOYMENT_TROUBLESHOOTING.md",
+      "name": "Render Deployment Troubleshooting",
+      "description": "Render Deployment Troubleshooting",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/RENDER_DEPLOYMENT_TROUBLESHOOTING.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/reports.md",
+      "name": "Reports is your one-stop shop for 50+ pre-built PPM reports plus custom report builder. Access portfolio summaries, proj",
+      "description": "Reports is your one-stop shop for 50+ pre-built PPM reports plus custom report builder. Access portfolio summaries, project health scorecards, resource capacity plans, and financial variance analysis. Export to PDF, Excel, or PowerPoint with your branding. Schedule automated deli",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/reports.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:RESOURCE_PRELOADING_GUIDE.md",
+      "name": "Resource Preloading Guide",
+      "description": "Resource Preloading Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/RESOURCE_PRELOADING_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/resources.md",
+      "name": "Resources manages your team's capacity, allocation, and forecasting across all projects. View utilization heatmaps, skil",
+      "description": "Resources manages your team's capacity, allocation, and forecasting across all projects. View utilization heatmaps, skill matrices, and availability calendars. Assign resources to projects with automated conflict detection. Forecast hiring needs based on portfolio demand. Use it ",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/resources.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/risks.md",
+      "name": "Risks provides enterprise risk management across your portfolio. Register risks with probability/impact scoring, mitigat",
+      "description": "Risks provides enterprise risk management across your portfolio. Register risks with probability/impact scoring, mitigation plans, and ownership assignment. View portfolio heat maps and risk-adjusted schedules. Automated escalation when risks materialize. Use it for quarterly ris",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/risks.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:sap-po-breakdown.md",
+      "name": "SAP PO Breakdown Guide",
+      "description": "SAP PO Breakdown Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/sap-po-breakdown.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:scenario-analysis.md",
+      "name": "Scenario Analysis Guide",
+      "description": "Scenario Analysis Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/scenario-analysis.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/scenarios.md",
+      "name": "Scenarios lets you test 'what-if' portfolio decisions without affecting live data. Create alternate resource plans, repr",
+      "description": "Scenarios lets you test 'what-if' portfolio decisions without affecting live data. Create alternate resource plans, reprioritize projects, or simulate budget cuts. Compare scenarios side-by-side with quantitative scoring (NPV, ROI, strategic alignment). Present multiple options t",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/scenarios.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:schedule-management.md",
+      "name": "Schedule Management Guide",
+      "description": "Schedule Management Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/schedule-management.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/schedules.md",
+      "name": "Schedules provides portfolio-level visibility into all project timelines and dependencies. Use Critical Path analysis, r",
+      "description": "Schedules provides portfolio-level visibility into all project timelines and dependencies. Use Critical Path analysis, resource leveling, and baseline comparisons. Visualize with Gantt charts, timeline views, or milestone trackers. Bulk update dates across projects and forecast c",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/schedules.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:SERVICE_WORKER_CACHING.md",
+      "name": "Service Worker Caching Implementation",
+      "description": "Service Worker Caching Implementation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/SERVICE_WORKER_CACHING.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:TESTING_GUIDE.md",
+      "name": "Testing Guide - Catching API Errors Early",
+      "description": "Testing Guide - Catching API Errors Early",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/TESTING_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/audit.md",
+      "name": "The Audit page provides a complete trail of all changes made across your PPM workspace. Track who modified projects, sch",
+      "description": "The Audit page provides a complete trail of all changes made across your PPM workspace. Track who modified projects, schedules, budgets, or risks, with timestamps and before/after values. Use it for compliance requirements, debugging issues, or understanding decision-making histo",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/audit.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/financials?tab=costbook.md",
+      "name": "The Costbook is your centralized library of cost rates, resources, and pricing templates. Define hourly rates for team m",
+      "description": "The Costbook is your centralized library of cost rates, resources, and pricing templates. Define hourly rates for team members, contractors, and equipment, then apply them consistently across projects. Create cost templates for common work packages to speed up planning. Use it to",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/financials?tab=costbook.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/financials.md",
+      "name": "The Financials hub gives you a 360° view of portfolio financial health through configurable tabs. Switch between Budget ",
+      "description": "The Financials hub gives you a 360° view of portfolio financial health through configurable tabs. Switch between Budget Tracking, Costbook, EAC calculations, and forecasting tools. Create custom dashboards showing KPIs like cost variance, ROI projections, and funding utilization.",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/financials.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:frontend/UI_UX_ENHANCEMENT_SPECIFICATION.md",
+      "name": "UI/UX Enhancement Specification für PPM-SaaS",
+      "description": "UI/UX Enhancement Specification für PPM-SaaS",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/frontend/UI_UX_ENHANCEMENT_SPECIFICATION.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:user-acceptance-testing/user-guide-template.md",
+      "name": "User Guide Template - Mobile-First UI Enhancements",
+      "description": "User Guide Template - Mobile-First UI Enhancements",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/user-acceptance-testing/user-guide-template.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:USER_SYNC_QUICK_REFERENCE.md",
+      "name": "User Synchronization Quick Reference",
+      "description": "User Synchronization Quick Reference",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/USER_SYNC_QUICK_REFERENCE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:USER_SYNCHRONIZATION.md",
+      "name": "User Synchronization System Documentation",
+      "description": "User Synchronization System Documentation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/USER_SYNCHRONIZATION.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:variance-tracking.md",
+      "name": "Variance Tracking Guide",
+      "description": "Variance Tracking Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/variance-tracking.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/VERCEL_AUTO_DEPLOY_QUICK_GUIDE.md",
+      "name": "Vercel Auto-Deploy - Schnellanleitung",
+      "description": "Vercel Auto-Deploy - Schnellanleitung",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/VERCEL_AUTO_DEPLOY_QUICK_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/VERCEL_AUTO_DEPLOY_SETUP.md",
+      "name": "Vercel Auto-Deployment Setup",
+      "description": "Vercel Auto-Deployment Setup",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/VERCEL_AUTO_DEPLOY_SETUP.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:frontend/FRONTEND_INTEGRATION_SUMMARY.md",
+      "name": "What-If Scenarios Frontend Integration Summary",
+      "description": "What-If Scenarios Frontend Integration Summary",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/frontend/FRONTEND_INTEGRATION_SUMMARY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:workflow-api-routes-implementation.md",
+      "name": "Workflow Engine API Routes Implementation",
+      "description": "Workflow Engine API Routes Implementation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/workflow-api-routes-implementation.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:workflow-integration-testing.md",
+      "name": "Workflow Engine Frontend-Backend Integration Testing Guide",
+      "description": "Workflow Engine Frontend-Backend Integration Testing Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/workflow-integration-testing.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/README_XAI_SETUP.md",
+      "name": "XAI/Grok Help Chat Setup - Complete Guide",
+      "description": "XAI/Grok Help Chat Setup - Complete Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/README_XAI_SETUP.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    }
+  ],
+  "all": [
+    {
+      "id": "section:routes",
+      "name": "App routes",
+      "description": "Pages discovered from app/",
+      "link": null,
+      "source": "route",
+      "sourcePath": "",
+      "parentId": null,
+      "icon": "Layout"
+    },
+    {
+      "id": "section:specs",
+      "name": "Specs (.kiro/specs)",
+      "description": "Feature specs and requirements",
+      "link": null,
+      "source": "spec",
+      "sourcePath": "",
+      "parentId": null,
+      "icon": "FileText"
+    },
+    {
+      "id": "section:docs",
+      "name": "Documentation (docs/)",
+      "description": "Project documentation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "",
+      "parentId": null,
+      "icon": "BookOpen"
+    },
+    {
+      "id": "route:/audit",
+      "name": "Audit Trail",
+      "description": "The Audit page provides a complete trail of all changes made across your PPM workspace. Track who modified projects, schedules, budgets, or risks, with timestamps and before/after values. Use it for compliance requirements, debugging issues, or understanding decision-making history. Filter by user, date range, or entity type to quickly find relevant changes. Export audit logs for external reporting. This helps PPM teams maintain transparency and accountability in portfolio decisions.",
+      "link": "/audit",
+      "source": "route",
+      "sourcePath": "app/audit/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/audit.png"
+    },
+    {
+      "id": "route:/financials?tab=budget",
+      "name": "Budget Tracking",
+      "description": "Budget Tracking helps you monitor planned vs actual spending across your project portfolio. Set baseline budgets, track commitments and expenditures, and view variance reports. Get alerts for over-budget projects and drill down into cost categories like labor, materials, or vendors. Use it during quarterly reviews to justify funding requests or reallocate resources. Real-time dashboards show portfolio-level budget health, helping PMOs maintain financial discipline.",
+      "link": "/financials?tab=budget",
+      "source": "route",
+      "sourcePath": "app/financials/page.tsx#budget-tracking",
+      "parentId": "route:/financials",
+      "icon": "Layout",
+      "screenshot_url": null
+    },
+    {
+      "id": "route:/changes",
+      "name": "Changes",
+      "description": "Changes tracks all change requests, scope modifications, and approval workflows across your projects. Submit new change requests with impact assessments on schedule, cost, and risk. Review pending changes in a centralized queue with automated routing to approvers. Track change history and analyze trends to improve change management processes. Use it to maintain control over scope creep while ensuring legitimate changes are processed efficiently in your PPM environment.",
+      "link": "/changes",
+      "source": "route",
+      "sourcePath": "app/changes/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/changes.png"
+    },
+    {
+      "id": "route:/financials?tab=costbook",
+      "name": "Costbook",
+      "description": "The Costbook is your centralized library of cost rates, resources, and pricing templates. Define hourly rates for team members, contractors, and equipment, then apply them consistently across projects. Create cost templates for common work packages to speed up planning. Use it to ensure accurate financial forecasting and standardize costing methodology across your PPM workflows. Perfect for organizations needing defensible cost models for stakeholder reviews.",
+      "link": "/financials?tab=costbook",
+      "source": "route",
+      "sourcePath": "app/financials/page.tsx#costbook",
+      "parentId": "route:/financials",
+      "icon": "Layout",
+      "screenshot_url": null
+    },
+    {
+      "id": "route:/dashboards",
+      "name": "Dashboards",
+      "description": "Dashboards let you create personalized views of your PPM data with drag-and-drop widgets. Monitor portfolio health through KPIs like schedule variance, budget status, and resource utilization. Build executive dashboards with traffic light indicators and drill-down capabilities. Save multiple dashboard layouts for different stakeholders—from project managers to C-suite executives. Use it daily to get instant visibility into portfolio performance and spot issues before they escalate.",
+      "link": "/dashboards",
+      "source": "route",
+      "sourcePath": "app/dashboards/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/dashboards.png"
+    },
+    {
+      "id": "route:/financials?tab=eac",
+      "name": "EAC Calculations",
+      "description": "EAC (Estimate at Completion) Calculation forecasts final project costs based on current performance. Choose from methods like Bottom-Up, Top-Down, or Earned Value formulas. Input actuals to date, remaining work estimates, and performance indices for accurate predictions. Compare EAC against original budgets to identify at-risk projects early. Use during monthly portfolio reviews to communicate realistic completion costs to executives and adjust resource allocations proactively.",
+      "link": "/financials?tab=eac",
+      "source": "route",
+      "sourcePath": "app/financials/page.tsx#eac-calculation",
+      "parentId": "route:/financials",
+      "icon": "Layout",
+      "screenshot_url": null
+    },
+    {
+      "id": "route:/feedback",
+      "name": "Feedback & Support",
+      "description": "Feedback captures user suggestions, bug reports, and feature requests directly within Orka PPM. Submit detailed feedback with screenshots and affected project context. Vote on existing feedback to prioritize improvements. Track resolution status and see how your input shapes the product roadmap. Use it to help make Orka PPM work better for your specific PPM workflows and team needs.",
+      "link": "/feedback",
+      "source": "route",
+      "sourcePath": "app/feedback/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/feedback.png"
+    },
+    {
+      "id": "route:/financials?tab=forecast",
+      "name": "Financial Forecasts",
+      "description": "Financial Forecast provides rolling 12-18 month cash flow projections across your entire portfolio. Aggregate project forecasts, factoring in planned spending, revenue milestones, and contingency reserves. Scenario planning lets you test 'what-if' impacts of delays or scope changes. Use it for executive cash flow reporting and capital planning. Interactive charts show monthly burn rates and cumulative spend, helping PPM leaders align projects with corporate financial goals.",
+      "link": "/financials?tab=forecast",
+      "source": "route",
+      "sourcePath": "app/financials/page.tsx#financial-forecast",
+      "parentId": "route:/financials",
+      "icon": "Layout",
+      "screenshot_url": null
+    },
+    {
+      "id": "route:/financials",
+      "name": "Financials",
+      "description": "The Financials hub gives you a 360° view of portfolio financial health through configurable tabs. Switch between Budget Tracking, Costbook, EAC calculations, and forecasting tools. Create custom dashboards showing KPIs like cost variance, ROI projections, and funding utilization. Use it as your primary financial command center for portfolio analysis and decision-making. Perfect for PMOs needing to answer executive questions about project spending and financial performance instantly.",
+      "link": "/financials",
+      "source": "route",
+      "sourcePath": "app/financials/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/financials.png"
+    },
+    {
+      "id": "route:/import",
+      "name": "Import",
+      "description": "Import provides bulk data loading for projects, resources, schedules, and financials from CSV, Excel, or external systems. Map columns to Orka fields with preview validation before committing. Schedule recurring imports for ongoing data synchronization. Use it during initial PPM implementation or monthly actuals updates. Comprehensive error reporting and rollback capabilities ensure data integrity across your portfolio.",
+      "link": "/import",
+      "source": "route",
+      "sourcePath": "app/import/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/import.png"
+    },
+    {
+      "id": "route:/monte-carlo",
+      "name": "Monte Carlo",
+      "description": "Monte Carlo simulation runs thousands of schedule and cost scenarios using probabilistic modeling. Define uncertainty ranges for task durations, costs, and dependencies. Get probability distributions for completion dates and total costs, not just single-point estimates. Use it for high-stakes projects where executives need confidence intervals (80% likely to complete by X date). Essential for portfolio-level risk analysis and contingency planning.",
+      "link": "/monte-carlo",
+      "source": "route",
+      "sourcePath": "app/monte-carlo/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/monte-carlo.png"
+    },
+    {
+      "id": "route:/reports/pmr",
+      "name": "PMR Reports",
+      "description": "PMR Reports (Project Management Review) deliver standardized executive portfolio summaries. Generate slide-ready reports showing health scores, milestone status, and financial summaries. Customize templates with your organization's KPIs and branding. Schedule automated distribution to stakeholders. Use monthly for Portfolio Management Review meetings to communicate portfolio status concisely to executives and governance boards.",
+      "link": "/reports/pmr",
+      "source": "route",
+      "sourcePath": "app/reports/pmr/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/reports-pmr.png"
+    },
+    {
+      "id": "route:/projects/import",
+      "name": "Project Import",
+      "description": "Project Import streamlines onboarding multiple projects from spreadsheets or legacy systems. Map project fields, phases, resources, and costs with data validation previews. Import hierarchical work breakdown structures and relationships between projects. Use it for PPM implementation, quarterly portfolio refresh, or merging acquired project data. Maintains data relationships and history while accelerating portfolio setup.",
+      "link": "/projects/import",
+      "source": "route",
+      "sourcePath": "app/projects/import/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/projects-import.png"
+    },
+    {
+      "id": "route:/projects",
+      "name": "Projects",
+      "description": "Projects is the heart of Orka PPM, showing your complete project portfolio with health indicators. Filter and sort by status, owner, phase, or custom criteria. Drill into individual projects for detailed schedules, financials, and risks. Use portfolio-level actions to bulk update, prioritize, or reallocate resources across projects. Perfect for PMOs managing 10-1000+ projects needing portfolio visibility and governance.",
+      "link": "/projects",
+      "source": "route",
+      "sourcePath": "app/projects/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/projects.png"
+    },
+    {
+      "id": "route:/reports",
+      "name": "Reports",
+      "description": "Reports is your one-stop shop for 50+ pre-built PPM reports plus custom report builder. Access portfolio summaries, project health scorecards, resource capacity plans, and financial variance analysis. Export to PDF, Excel, or PowerPoint with your branding. Schedule automated delivery and create saved report sets for recurring business reviews. Use it to eliminate manual reporting and deliver professional insights to stakeholders instantly.",
+      "link": "/reports",
+      "source": "route",
+      "sourcePath": "app/reports/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/reports.png"
+    },
+    {
+      "id": "route:/resources",
+      "name": "Resources",
+      "description": "Resources manages your team's capacity, allocation, and forecasting across all projects. View utilization heatmaps, skill matrices, and availability calendars. Assign resources to projects with automated conflict detection. Forecast hiring needs based on portfolio demand. Use it for resource leveling, capacity planning, and answering 'Do we have bandwidth for this new project?' questions confidently.",
+      "link": "/resources",
+      "source": "route",
+      "sourcePath": "app/resources/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/resources.png"
+    },
+    {
+      "id": "route:/risks",
+      "name": "Risks",
+      "description": "Risks provides enterprise risk management across your portfolio. Register risks with probability/impact scoring, mitigation plans, and ownership assignment. View portfolio heat maps and risk-adjusted schedules. Automated escalation when risks materialize. Use it for quarterly risk reviews, executive reporting, and integrating risk considerations into portfolio prioritization and resource allocation.",
+      "link": "/risks",
+      "source": "route",
+      "sourcePath": "app/risks/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/risks.png"
+    },
+    {
+      "id": "route:/scenarios",
+      "name": "Scenarios",
+      "description": "Scenarios lets you test 'what-if' portfolio decisions without affecting live data. Create alternate resource plans, reprioritize projects, or simulate budget cuts. Compare scenarios side-by-side with quantitative scoring (NPV, ROI, strategic alignment). Present multiple options to executives with clear trade-off analysis. Essential for strategic portfolio planning and rebalancing during market shifts or organizational changes.",
+      "link": "/scenarios",
+      "source": "route",
+      "sourcePath": "app/scenarios/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/scenarios.png"
+    },
+    {
+      "id": "route:/schedules",
+      "name": "Schedules",
+      "description": "Schedules provides portfolio-level visibility into all project timelines and dependencies. Use Critical Path analysis, resource leveling, and baseline comparisons. Visualize with Gantt charts, timeline views, or milestone trackers. Bulk update dates across projects and forecast completion probability. Perfect for PMOs needing to answer 'What's slipping and why?' across their entire portfolio.",
+      "link": "/schedules",
+      "source": "route",
+      "sourcePath": "app/schedules/page.tsx",
+      "parentId": "section:routes",
+      "icon": "Layout",
+      "screenshot_url": "/feature-screenshots/schedules.png"
+    },
+    {
+      "id": "spec:ai-empowered-audit-trail",
+      "name": "Ai Empowered Audit Trail",
+      "description": "Design Document: AI-Empowered Audit Trail",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/ai-empowered-audit-trail",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:ai-empowered-ppm-features",
+      "name": "Ai Empowered Ppm Features",
+      "description": "Design Document: AI-Empowered PPM Features",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/ai-empowered-ppm-features",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:ai-help-chat",
+      "name": "Ai Help Chat",
+      "description": "Design Document",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/ai-help-chat",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:ai-help-chat-knowledge-base",
+      "name": "Ai Help Chat Knowledge Base",
+      "description": "Design Document: AI Help Chat Knowledge Base",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/ai-help-chat-knowledge-base",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:change-orders",
+      "name": "Change Orders",
+      "description": "Design Document",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/change-orders",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:complete-i18n-system",
+      "name": "Complete I18n System",
+      "description": "Design Document: Complete I18n System",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/complete-i18n-system",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:costbook-4-0",
+      "name": "Costbook 4 0",
+      "description": "Design Document: Costbook",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/costbook-4-0",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:enhanced-pmr",
+      "name": "Enhanced Pmr",
+      "description": "Enhanced Project Monthly Report (PMR) - Design Document",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/enhanced-pmr",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:enhanced-pmr-feature",
+      "name": "Enhanced Pmr Feature",
+      "description": null,
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/enhanced-pmr-feature",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:feature-toggle-system",
+      "name": "Feature Toggle System",
+      "description": "Design Document: Feature Toggle System",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/feature-toggle-system",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:features-overview",
+      "name": "Features Overview",
+      "description": "Design Document: Features Overview Page",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/features-overview",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:generic-construction-ppm-features",
+      "name": "Generic Construction Ppm Features",
+      "description": "Design Document: Generic Construction/Engineering PPM Features",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/generic-construction-ppm-features",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:import-actuals-commitments",
+      "name": "Import Actuals Commitments",
+      "description": "Design Document: Import Actuals and Commitments",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/import-actuals-commitments",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:integrated-change-management",
+      "name": "Integrated Change Management",
+      "description": "Design Document: Integrated Change Management System",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/integrated-change-management",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:integrated-master-schedule",
+      "name": "Integrated Master Schedule",
+      "description": "Design Document: Integrated Master Schedule System",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/integrated-master-schedule",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:mobile-first-ui-enhancements",
+      "name": "Mobile First Ui Enhancements",
+      "description": "Design Document: Mobile-First UI Enhancements",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/mobile-first-ui-enhancements",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:monte-carlo-risk-simulations",
+      "name": "Monte Carlo Risk Simulations",
+      "description": "Design Document: Monte Carlo Risk Simulations",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/monte-carlo-risk-simulations",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:project-controls-etc-eac",
+      "name": "Project Controls Etc Eac",
+      "description": "Design Document",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/project-controls-etc-eac",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:project-import-mvp",
+      "name": "Project Import Mvp",
+      "description": "Design Document: Project Import MVP",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/project-import-mvp",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:rbac-enhancement",
+      "name": "Rbac Enhancement",
+      "description": "Design Document: RBAC Enhancement",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/rbac-enhancement",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:register-nested-grids",
+      "name": "Register Nested Grids",
+      "description": "Design Document: Register Nested Grids",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/register-nested-grids",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:sap-po-breakdown-management",
+      "name": "Sap Po Breakdown Management",
+      "description": "Design Document",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/sap-po-breakdown-management",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:shareable-project-urls",
+      "name": "Shareable Project Urls",
+      "description": "Design Document: Shareable Project URLs",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/shareable-project-urls",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:user-synchronization",
+      "name": "User Synchronization",
+      "description": "Design Document: User Synchronization System",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/user-synchronization",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "spec:workflow-engine",
+      "name": "Workflow Engine",
+      "description": "Design Document: Workflow Engine",
+      "link": null,
+      "source": "spec",
+      "sourcePath": ".kiro/specs/workflow-engine",
+      "parentId": "section:specs",
+      "icon": "FileText"
+    },
+    {
+      "id": "doc:archive/DOCKER_FIX_DEPLOYED.md",
+      "name": "✅ Docker Fix Deployed - Nächste Schritte",
+      "description": "✅ Docker Fix Deployed - Nächste Schritte",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/DOCKER_FIX_DEPLOYED.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/FRONTEND_API_PREFIX_FIX.md",
+      "name": "✅ Frontend API Prefix Fix - GELÖST!",
+      "description": "✅ Frontend API Prefix Fix - GELÖST!",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/FRONTEND_API_PREFIX_FIX.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/RENDER_FIX_CHECKLIST.md",
+      "name": "✅ Render Backend Fix - Schritt-für-Schritt Checklist",
+      "description": "✅ Render Backend Fix - Schritt-für-Schritt Checklist",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/RENDER_FIX_CHECKLIST.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:CLEANUP_SUMMARY.md",
+      "name": "🧹 ORKA-PPM Codebase Aufräum-Zusammenfassung",
+      "description": "🧹 ORKA-PPM Codebase Aufräum-Zusammenfassung",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/CLEANUP_SUMMARY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/STATUS_JETZT.md",
+      "name": "🚀 STATUS UPDATE - 18:40 Uhr",
+      "description": "🚀 STATUS UPDATE - 18:40 Uhr",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/STATUS_JETZT.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/RENDER_FIX_JETZT.md",
+      "name": "🚨 RENDER BACKEND FIX - SOFORT DURCHFÜHREN",
+      "description": "🚨 RENDER BACKEND FIX - SOFORT DURCHFÜHREN",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/RENDER_FIX_JETZT.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:user-acceptance-testing/accessibility-testing-guide.md",
+      "name": "Accessibility Testing Guide",
+      "description": "Accessibility Testing Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/user-acceptance-testing/accessibility-testing-guide.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:ADMIN_SETUP.md",
+      "name": "Admin Setup & User Management Documentation",
+      "description": "Admin Setup & User Management Documentation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/ADMIN_SETUP.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:audit-admin-guide.md",
+      "name": "AI-Empowered Audit Trail Administrator Guide",
+      "description": "AI-Empowered Audit Trail Administrator Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/audit-admin-guide.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:audit-api-documentation.md",
+      "name": "AI-Empowered Audit Trail API Documentation",
+      "description": "AI-Empowered Audit Trail API Documentation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/audit-api-documentation.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:audit-deployment-checklist.md",
+      "name": "AI-Empowered Audit Trail Deployment Checklist",
+      "description": "AI-Empowered Audit Trail Deployment Checklist",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/audit-deployment-checklist.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:audit-monitoring-guide.md",
+      "name": "AI-Empowered Audit Trail Monitoring and Alerting Guide",
+      "description": "AI-Empowered Audit Trail Monitoring and Alerting Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/audit-monitoring-guide.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:audit-user-guide.md",
+      "name": "AI-Empowered Audit Trail User Guide",
+      "description": "AI-Empowered Audit Trail User Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/audit-user-guide.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/API_ENDPOINT_ISSUES_SUMMARY.md",
+      "name": "API Endpoint Issues Summary",
+      "description": "API Endpoint Issues Summary",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/API_ENDPOINT_ISSUES_SUMMARY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/API_PREFIX_AUDIT.md",
+      "name": "API Prefix Audit - Frontend vs Backend",
+      "description": "API Prefix Audit - Frontend vs Backend",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/API_PREFIX_AUDIT.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:baseline-management.md",
+      "name": "Baseline Management Guide",
+      "description": "Baseline Management Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/baseline-management.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:frontend/BOOTSTRAP_ADMIN.md",
+      "name": "Bootstrapping Admin User - Solving the \"No Users\" Problem",
+      "description": "Bootstrapping Admin User - Solving the \"No Users\" Problem",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/frontend/BOOTSTRAP_ADMIN.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/financials?tab=budget.md",
+      "name": "Budget Tracking helps you monitor planned vs actual spending across your project portfolio. Set baseline budgets, track ",
+      "description": "Budget Tracking helps you monitor planned vs actual spending across your project portfolio. Set baseline budgets, track commitments and expenditures, and view variance reports. Get alerts for over-budget projects and drill down into cost categories like labor, materials, or vendo",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/financials?tab=budget.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/changes.md",
+      "name": "Changes tracks all change requests, scope modifications, and approval workflows across your projects. Submit new change ",
+      "description": "Changes tracks all change requests, scope modifications, and approval workflows across your projects. Submit new change requests with impact assessments on schedule, cost, and risk. Review pending changes in a centralized queue with automated routing to approvers. Track change hi",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/changes.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:CI_CD_INTEGRATION.md",
+      "name": "CI/CD Integration for User Synchronization",
+      "description": "CI/CD Integration for User Synchronization",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/CI_CD_INTEGRATION.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:testing/CI_CD_PIPELINES.md",
+      "name": "CI/CD Pipeline Documentation",
+      "description": "CI/CD Pipeline Documentation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/testing/CI_CD_PIPELINES.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:testing/CI_CD_SETUP_CHECKLIST.md",
+      "name": "CI/CD setup checklist",
+      "description": "CI/CD setup checklist",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/testing/CI_CD_SETUP_CHECKLIST.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:CLS_PREVENTION_GUIDE.md",
+      "name": "CLS Prevention Developer Guide",
+      "description": "CLS Prevention Developer Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/CLS_PREVENTION_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:CODE_REVIEW_CHECKLIST.md",
+      "name": "Code Review Checklist (Roche→Generic + Costbook/CICD)",
+      "description": "Code Review Checklist (Roche→Generic + Costbook/CICD)",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/CODE_REVIEW_CHECKLIST.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:CODE_REVIEW_RESULTS.md",
+      "name": "Code Review Results",
+      "description": "Code Review Results",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/CODE_REVIEW_RESULTS.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:CLEANUP_INVESTIGATION.md",
+      "name": "Codebase Cleanup Investigation",
+      "description": "Codebase Cleanup Investigation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/CLEANUP_INVESTIGATION.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:CLEANUP_TODO.md",
+      "name": "Codebase Cleanup TODO",
+      "description": "Codebase Cleanup TODO",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/CLEANUP_TODO.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:dashboard-optimization-flow.md",
+      "name": "Dashboard Data Loading Optimization Flow",
+      "description": "Dashboard Data Loading Optimization Flow",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/dashboard-optimization-flow.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/dashboards.md",
+      "name": "Dashboards let you create personalized views of your PPM data with drag-and-drop widgets. Monitor portfolio health throu",
+      "description": "Dashboards let you create personalized views of your PPM data with drag-and-drop widgets. Monitor portfolio health through KPIs like schedule variance, budget status, and resource utilization. Build executive dashboards with traffic light indicators and drill-down capabilities. S",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/dashboards.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/DEBUG_LANGUAGE_SWITCH.md",
+      "name": "Debug: Sprachwechsel Englisch → Deutsch funktioniert nicht",
+      "description": "Debug: Sprachwechsel Englisch → Deutsch funktioniert nicht",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/DEBUG_LANGUAGE_SWITCH.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/DEPLOYMENT_OPTIMIZATION_ANALYSIS.md",
+      "name": "Deployment Optimization Analysis",
+      "description": "Deployment Optimization Analysis",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/DEPLOYMENT_OPTIMIZATION_ANALYSIS.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:DEPLOYMENT_PROCEDURES.md",
+      "name": "Deployment Procedures with User Synchronization",
+      "description": "Deployment Procedures with User Synchronization",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/DEPLOYMENT_PROCEDURES.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/DEPLOYMENT_SUMMARY.md",
+      "name": "Deployment Summary - Help Chat Multilingual & Performance Optimization",
+      "description": "Deployment Summary - Help Chat Multilingual & Performance Optimization",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/DEPLOYMENT_SUMMARY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:testing/DEVELOPER_TESTING_GUIDE.md",
+      "name": "Developer Testing Guidelines",
+      "description": "Developer Testing Guidelines",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/testing/DEVELOPER_TESTING_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:README.md",
+      "name": "Documentation",
+      "description": "Documentation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/README.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/DOCUMENTATION_GAPS_AND_RECOMMENDATIONS.md",
+      "name": "Documentation Gaps & Recommendations",
+      "description": "Documentation Gaps & Recommendations",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/DOCUMENTATION_GAPS_AND_RECOMMENDATIONS.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/DOCUMENTATION_UPDATE_SUMMARY.md",
+      "name": "Documentation Update Summary",
+      "description": "Documentation Update Summary",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/DOCUMENTATION_UPDATE_SUMMARY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:DOCUMENTATION_WORKFLOW.md",
+      "name": "Documentation Workflow Guide",
+      "description": "Documentation Workflow Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/DOCUMENTATION_WORKFLOW.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/financials?tab=eac.md",
+      "name": "EAC (Estimate at Completion) Calculation forecasts final project costs based on current performance. Choose from methods",
+      "description": "EAC (Estimate at Completion) Calculation forecasts final project costs based on current performance. Choose from methods like Bottom-Up, Top-Down, or Earned Value formulas. Input actuals to date, remaining work estimates, and performance indices for accurate predictions. Compare ",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/financials?tab=eac.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:ENHANCED_AI_CHAT_INTEGRATION.md",
+      "name": "Enhanced AI Chat Integration for PMR",
+      "description": "Enhanced AI Chat Integration for PMR",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/ENHANCED_AI_CHAT_INTEGRATION.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:PMR_HELP_IMPLEMENTATION_SUMMARY.md",
+      "name": "Enhanced PMR Help Integration - Implementation Summary",
+      "description": "Enhanced PMR Help Integration - Implementation Summary",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/PMR_HELP_IMPLEMENTATION_SUMMARY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:PMR_QUICK_REFERENCE.md",
+      "name": "Enhanced PMR Quick Reference Guide",
+      "description": "Enhanced PMR Quick Reference Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/PMR_QUICK_REFERENCE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:ENHANCED_PMR_USER_GUIDE.md",
+      "name": "Enhanced PMR User Guide",
+      "description": "Enhanced PMR User Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/ENHANCED_PMR_USER_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:PMR_VIDEO_TUTORIALS.md",
+      "name": "Enhanced PMR Video Tutorials",
+      "description": "Enhanced PMR Video Tutorials",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/PMR_VIDEO_TUTORIALS.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:enterprise/CHECKLIST.md",
+      "name": "Enterprise Readiness – Phasen-Checkliste",
+      "description": "Enterprise Readiness – Phasen-Checkliste",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/enterprise/CHECKLIST.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:testing/TEST_STRATEGY.md",
+      "name": "Enterprise Test Strategy",
+      "description": "Enterprise Test Strategy",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/testing/TEST_STRATEGY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features-overview-ideas.md",
+      "name": "Feature Overview: Ideas for More Comprehensive and Automated",
+      "description": "Feature Overview: Ideas for More Comprehensive and Automated",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features-overview-ideas.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:feature-toggles-api.md",
+      "name": "Feature Toggles API",
+      "description": "Feature Toggles API",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/feature-toggles-api.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features-webhook-and-screenshots.md",
+      "name": "Features Overview: Webhook, Screenshots, and AI Enrichment",
+      "description": "Features Overview: Webhook, Screenshots, and AI Enrichment",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features-webhook-and-screenshots.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/feedback.md",
+      "name": "Feedback captures user suggestions, bug reports, and feature requests directly within Orka PPM. Submit detailed feedback",
+      "description": "Feedback captures user suggestions, bug reports, and feature requests directly within Orka PPM. Submit detailed feedback with screenshots and affected project context. Vote on existing feedback to prioritize improvements. Track resolution status and see how your input shapes the ",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/feedback.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/financials?tab=forecast.md",
+      "name": "Financial Forecast provides rolling 12-18 month cash flow projections across your entire portfolio. Aggregate project fo",
+      "description": "Financial Forecast provides rolling 12-18 month cash flow projections across your entire portfolio. Aggregate project forecasts, factoring in planned spending, revenue milestones, and contingency reserves. Scenario planning lets you test 'what-if' impacts of delays or scope chang",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/financials?tab=forecast.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/FIXES_SUMMARY_SESSION_2.md",
+      "name": "Fixes Summary - Session 2",
+      "description": "Fixes Summary - Session 2",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/FIXES_SUMMARY_SESSION_2.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/HELP_CHAT_FIX_VISUAL_GUIDE.md",
+      "name": "Help Chat Fix - Visual Guide",
+      "description": "Help Chat Fix - Visual Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/HELP_CHAT_FIX_VISUAL_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/TEST_HELP_CHAT_LANGUAGE_SWITCHING.md",
+      "name": "Help Chat Language Switching - Manual Test Plan",
+      "description": "Help Chat Language Switching - Manual Test Plan",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/TEST_HELP_CHAT_LANGUAGE_SWITCHING.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/HELP_CHAT_LANGUAGE_SWITCHING_TEST.md",
+      "name": "Help Chat Language Switching - Testing Guide",
+      "description": "Help Chat Language Switching - Testing Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/HELP_CHAT_LANGUAGE_SWITCHING_TEST.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/HELP_CHAT_LANGUAGE_SYNC_FIX.md",
+      "name": "Help Chat Language Sync Error Fix",
+      "description": "Help Chat Language Sync Error Fix",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/HELP_CHAT_LANGUAGE_SYNC_FIX.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:help-chat-multilingual.md",
+      "name": "Help Chat Multilingual System",
+      "description": "Help Chat Multilingual System",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/help-chat-multilingual.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:I18N_DEVELOPER_GUIDE.md",
+      "name": "i18n Developer Guide",
+      "description": "i18n Developer Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/I18N_DEVELOPER_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:IMAGE_OPTIMIZATION_GUIDE.md",
+      "name": "Image Optimization Guide",
+      "description": "Image Optimization Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/IMAGE_OPTIMIZATION_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/import.md",
+      "name": "Import provides bulk data loading for projects, resources, schedules, and financials from CSV, Excel, or external system",
+      "description": "Import provides bulk data loading for projects, resources, schedules, and financials from CSV, Excel, or external systems. Map columns to Orka fields with preview validation before committing. Schedule recurring imports for ongoing data synchronization. Use it during initial PPM ",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/import.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:LIGHTHOUSE_PERFORMANCE.md",
+      "name": "Lighthouse & Performance",
+      "description": "Lighthouse & Performance",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/LIGHTHOUSE_PERFORMANCE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:user-acceptance-testing/mobile-device-scenarios.md",
+      "name": "Mobile Device Testing Scenarios",
+      "description": "Mobile Device Testing Scenarios",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/user-acceptance-testing/mobile-device-scenarios.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:user-acceptance-testing/feature-documentation.md",
+      "name": "Mobile-First UI Enhancements - Feature Documentation",
+      "description": "Mobile-First UI Enhancements - Feature Documentation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/user-acceptance-testing/feature-documentation.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/monte-carlo.md",
+      "name": "Monte Carlo simulation runs thousands of schedule and cost scenarios using probabilistic modeling. Define uncertainty ra",
+      "description": "Monte Carlo simulation runs thousands of schedule and cost scenarios using probabilistic modeling. Define uncertainty ranges for task durations, costs, and dependencies. Get probability distributions for completion dates and total costs, not just single-point estimates. Use it fo",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/monte-carlo.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:DESIGN_SYSTEM_GUIDE.md",
+      "name": "ORKA PPM Design System Guide",
+      "description": "ORKA PPM Design System Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/DESIGN_SYSTEM_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:frontend/REFACTORING_SUMMARY.md",
+      "name": "ORKA-PPM Codebase Refactoring Summary",
+      "description": "ORKA-PPM Codebase Refactoring Summary",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/frontend/REFACTORING_SUMMARY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/FEATURE_INVENTORY.md",
+      "name": "ORKA-PPM Complete Feature Inventory",
+      "description": "ORKA-PPM Complete Feature Inventory",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/FEATURE_INVENTORY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:PROJECT_STRUCTURE.md",
+      "name": "ORKA-PPM Projektstruktur",
+      "description": "ORKA-PPM Projektstruktur",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/PROJECT_STRUCTURE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:enterprise/PHASE_1_SECURITY_SCALABILITY.md",
+      "name": "Phase 1 – Security & Scalability",
+      "description": "Phase 1 – Security & Scalability",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/enterprise/PHASE_1_SECURITY_SCALABILITY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:enterprise/PHASE_2_INTEGRATION_CUSTOMIZABILITY.md",
+      "name": "Phase 2 – Integration & Customizability",
+      "description": "Phase 2 – Integration & Customizability",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/enterprise/PHASE_2_INTEGRATION_CUSTOMIZABILITY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:enterprise/PHASE_3_AI_ANALYTICS_RELIABILITY.md",
+      "name": "Phase 3 – AI, Analytics & Reliability",
+      "description": "Phase 3 – AI, Analytics & Reliability",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/enterprise/PHASE_3_AI_ANALYTICS_RELIABILITY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/reports-pmr.md",
+      "name": "PMR Reports (Project Management Review) deliver standardized executive portfolio summaries. Generate slide-ready reports",
+      "description": "PMR Reports (Project Management Review) deliver standardized executive portfolio summaries. Generate slide-ready reports showing health scores, milestone status, and financial summaries. Customize templates with your organization's KPIs and branding. Schedule automated distributi",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/reports-pmr.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:frontend/PROJECT_OVERVIEW.md",
+      "name": "PPM-SaaS Project Knowledge Base",
+      "description": "PPM-SaaS Project Knowledge Base",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/frontend/PROJECT_OVERVIEW.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:SECURITY_CHECKLIST.md",
+      "name": "Production Security Checklist",
+      "description": "Production Security Checklist",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/SECURITY_CHECKLIST.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/projects-import.md",
+      "name": "Project Import streamlines onboarding multiple projects from spreadsheets or legacy systems. Map project fields, phases,",
+      "description": "Project Import streamlines onboarding multiple projects from spreadsheets or legacy systems. Map project fields, phases, resources, and costs with data validation previews. Import hierarchical work breakdown structures and relationships between projects. Use it for PPM implementa",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/projects-import.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/projects.md",
+      "name": "Projects is the heart of Orka PPM, showing your complete project portfolio with health indicators. Filter and sort by st",
+      "description": "Projects is the heart of Orka PPM, showing your complete project portfolio with health indicators. Filter and sort by status, owner, phase, or custom criteria. Drill into individual projects for detailed schedules, financials, and risks. Use portfolio-level actions to bulk update",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/projects.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:RAG_IMPLEMENTATION_STATUS.md",
+      "name": "RAG Implementation Status",
+      "description": "RAG Implementation Status",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/RAG_IMPLEMENTATION_STATUS.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:RAG_SYSTEM_README.md",
+      "name": "RAG Knowledge Base System",
+      "description": "RAG Knowledge Base System",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/RAG_SYSTEM_README.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:real-time-updates.md",
+      "name": "Real-Time Updates Guide",
+      "description": "Real-Time Updates Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/real-time-updates.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/RENDER_SETUP_GUIDE.md",
+      "name": "Render Backend Setup Guide",
+      "description": "Render Backend Setup Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/RENDER_SETUP_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/RENDER_DEPLOYMENT_TROUBLESHOOTING.md",
+      "name": "Render Deployment Troubleshooting",
+      "description": "Render Deployment Troubleshooting",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/RENDER_DEPLOYMENT_TROUBLESHOOTING.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/reports.md",
+      "name": "Reports is your one-stop shop for 50+ pre-built PPM reports plus custom report builder. Access portfolio summaries, proj",
+      "description": "Reports is your one-stop shop for 50+ pre-built PPM reports plus custom report builder. Access portfolio summaries, project health scorecards, resource capacity plans, and financial variance analysis. Export to PDF, Excel, or PowerPoint with your branding. Schedule automated deli",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/reports.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:RESOURCE_PRELOADING_GUIDE.md",
+      "name": "Resource Preloading Guide",
+      "description": "Resource Preloading Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/RESOURCE_PRELOADING_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/resources.md",
+      "name": "Resources manages your team's capacity, allocation, and forecasting across all projects. View utilization heatmaps, skil",
+      "description": "Resources manages your team's capacity, allocation, and forecasting across all projects. View utilization heatmaps, skill matrices, and availability calendars. Assign resources to projects with automated conflict detection. Forecast hiring needs based on portfolio demand. Use it ",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/resources.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/risks.md",
+      "name": "Risks provides enterprise risk management across your portfolio. Register risks with probability/impact scoring, mitigat",
+      "description": "Risks provides enterprise risk management across your portfolio. Register risks with probability/impact scoring, mitigation plans, and ownership assignment. View portfolio heat maps and risk-adjusted schedules. Automated escalation when risks materialize. Use it for quarterly ris",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/risks.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:sap-po-breakdown.md",
+      "name": "SAP PO Breakdown Guide",
+      "description": "SAP PO Breakdown Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/sap-po-breakdown.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:scenario-analysis.md",
+      "name": "Scenario Analysis Guide",
+      "description": "Scenario Analysis Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/scenario-analysis.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/scenarios.md",
+      "name": "Scenarios lets you test 'what-if' portfolio decisions without affecting live data. Create alternate resource plans, repr",
+      "description": "Scenarios lets you test 'what-if' portfolio decisions without affecting live data. Create alternate resource plans, reprioritize projects, or simulate budget cuts. Compare scenarios side-by-side with quantitative scoring (NPV, ROI, strategic alignment). Present multiple options t",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/scenarios.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:schedule-management.md",
+      "name": "Schedule Management Guide",
+      "description": "Schedule Management Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/schedule-management.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/schedules.md",
+      "name": "Schedules provides portfolio-level visibility into all project timelines and dependencies. Use Critical Path analysis, r",
+      "description": "Schedules provides portfolio-level visibility into all project timelines and dependencies. Use Critical Path analysis, resource leveling, and baseline comparisons. Visualize with Gantt charts, timeline views, or milestone trackers. Bulk update dates across projects and forecast c",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/schedules.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:SERVICE_WORKER_CACHING.md",
+      "name": "Service Worker Caching Implementation",
+      "description": "Service Worker Caching Implementation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/SERVICE_WORKER_CACHING.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:TESTING_GUIDE.md",
+      "name": "Testing Guide - Catching API Errors Early",
+      "description": "Testing Guide - Catching API Errors Early",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/TESTING_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/audit.md",
+      "name": "The Audit page provides a complete trail of all changes made across your PPM workspace. Track who modified projects, sch",
+      "description": "The Audit page provides a complete trail of all changes made across your PPM workspace. Track who modified projects, schedules, budgets, or risks, with timestamps and before/after values. Use it for compliance requirements, debugging issues, or understanding decision-making histo",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/audit.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/financials?tab=costbook.md",
+      "name": "The Costbook is your centralized library of cost rates, resources, and pricing templates. Define hourly rates for team m",
+      "description": "The Costbook is your centralized library of cost rates, resources, and pricing templates. Define hourly rates for team members, contractors, and equipment, then apply them consistently across projects. Create cost templates for common work packages to speed up planning. Use it to",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/financials?tab=costbook.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:features/financials.md",
+      "name": "The Financials hub gives you a 360° view of portfolio financial health through configurable tabs. Switch between Budget ",
+      "description": "The Financials hub gives you a 360° view of portfolio financial health through configurable tabs. Switch between Budget Tracking, Costbook, EAC calculations, and forecasting tools. Create custom dashboards showing KPIs like cost variance, ROI projections, and funding utilization.",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/features/financials.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:frontend/UI_UX_ENHANCEMENT_SPECIFICATION.md",
+      "name": "UI/UX Enhancement Specification für PPM-SaaS",
+      "description": "UI/UX Enhancement Specification für PPM-SaaS",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/frontend/UI_UX_ENHANCEMENT_SPECIFICATION.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:user-acceptance-testing/user-guide-template.md",
+      "name": "User Guide Template - Mobile-First UI Enhancements",
+      "description": "User Guide Template - Mobile-First UI Enhancements",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/user-acceptance-testing/user-guide-template.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:USER_SYNC_QUICK_REFERENCE.md",
+      "name": "User Synchronization Quick Reference",
+      "description": "User Synchronization Quick Reference",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/USER_SYNC_QUICK_REFERENCE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:USER_SYNCHRONIZATION.md",
+      "name": "User Synchronization System Documentation",
+      "description": "User Synchronization System Documentation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/USER_SYNCHRONIZATION.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:variance-tracking.md",
+      "name": "Variance Tracking Guide",
+      "description": "Variance Tracking Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/variance-tracking.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/VERCEL_AUTO_DEPLOY_QUICK_GUIDE.md",
+      "name": "Vercel Auto-Deploy - Schnellanleitung",
+      "description": "Vercel Auto-Deploy - Schnellanleitung",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/VERCEL_AUTO_DEPLOY_QUICK_GUIDE.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/VERCEL_AUTO_DEPLOY_SETUP.md",
+      "name": "Vercel Auto-Deployment Setup",
+      "description": "Vercel Auto-Deployment Setup",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/VERCEL_AUTO_DEPLOY_SETUP.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:frontend/FRONTEND_INTEGRATION_SUMMARY.md",
+      "name": "What-If Scenarios Frontend Integration Summary",
+      "description": "What-If Scenarios Frontend Integration Summary",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/frontend/FRONTEND_INTEGRATION_SUMMARY.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:workflow-api-routes-implementation.md",
+      "name": "Workflow Engine API Routes Implementation",
+      "description": "Workflow Engine API Routes Implementation",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/workflow-api-routes-implementation.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:workflow-integration-testing.md",
+      "name": "Workflow Engine Frontend-Backend Integration Testing Guide",
+      "description": "Workflow Engine Frontend-Backend Integration Testing Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/workflow-integration-testing.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    },
+    {
+      "id": "doc:archive/README_XAI_SETUP.md",
+      "name": "XAI/Grok Help Chat Setup - Complete Guide",
+      "description": "XAI/Grok Help Chat Setup - Complete Guide",
+      "link": null,
+      "source": "doc",
+      "sourcePath": "docs/archive/README_XAI_SETUP.md",
+      "parentId": "section:docs",
+      "icon": "BookOpen"
+    }
+  ]
+}

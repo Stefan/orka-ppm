@@ -51,11 +51,13 @@ import { MobileAccordion, AccordionSection } from './MobileAccordion'
 import { HierarchyTreeView, ViewType as HierarchyViewType } from './HierarchyTreeView'
 import { VirtualizedTransactionTable } from './VirtualizedTransactionTable'
 import { CollapsiblePanel } from './CollapsiblePanel'
+import { CashOutGantt } from './CashOutGantt'
 import { buildCESHierarchy, buildWBSHierarchy } from '@/lib/costbook/hierarchy-builders'
 
 import { getMockTransactions, TransactionFilters as TxFilters, filterTransactions, sortTransactions, TransactionSortField, SortDirection } from '@/lib/costbook/transaction-queries'
 import { fetchCommentsCountBatch } from '@/lib/comments-service'
-import { CSVImportResult, Commitment, Actual, HierarchyNode, Transaction, DistributionSettings, DistributionRule } from '@/types/costbook'
+import { CSVImportResult, Commitment, Actual, HierarchyNode, Transaction, DistributionSettings, DistributionRule, CostbookRow } from '@/types/costbook'
+import { getApiUrl } from '@/lib/api'
 
 export interface CostbookProps {
   /** Use mock data instead of fetching from Supabase */
@@ -70,18 +72,7 @@ export interface CostbookProps {
   'data-testid'?: string
 }
 
-// Stub components when DistributionSettingsDialog/DistributionRulesPanel files are missing (e.g. in CI)
-const DistributionSettingsDialogStub: React.FC<{
-  isOpen: boolean
-  onClose: () => void
-  onApply: (settings: DistributionSettings) => void
-  projectBudget: number
-  projectStartDate: string
-  projectEndDate: string
-  currentSpend?: number
-  currency: Currency
-  initialSettings?: DistributionSettings
-}> = () => null
+import { DistributionSettingsDialog } from './DistributionSettingsDialog'
 const DistributionRulesPanelStub: React.FC<{
   rules: DistributionRule[]
   onCreateRule: (rule: Omit<DistributionRule, 'id' | 'created_at' | 'last_applied' | 'application_count'>) => void
@@ -193,6 +184,36 @@ function CostbookInner({
         data = getMockProjectsWithFinancials()
       } else {
         data = await fetchProjectsWithFinancials()
+        // Enrich with costbook rows (Cost Book columns) when API is available
+        try {
+          const res = await fetch(getApiUrl('/v1/costbook/rows'), { credentials: 'include' })
+          if (res.ok) {
+            const json = await res.json() as { rows?: CostbookRow[] }
+            const rows = json.rows ?? []
+            const byId = new Map(rows.map(r => [r.project_id, r]))
+            data = data.map(p => {
+              const row = byId.get(p.id)
+              if (!row) return p
+              return {
+                ...p,
+                pending_budget: row.pending_budget,
+                approved_budget: row.approved_budget,
+                control_estimate: row.control_estimate,
+                open_committed: row.open_committed,
+                invoice_value: row.invoice_value,
+                remaining_commitment: row.remaining_commitment,
+                vowd: row.vowd,
+                accruals: row.accruals,
+                etc: row.etc,
+                eac: row.eac,
+                delta_eac: row.delta_eac,
+                variance: row.variance
+              }
+            })
+          }
+        } catch (_) {
+          // Costbook API optional; continue with projects only
+        }
       }
 
       setProjects(data)
@@ -554,7 +575,7 @@ function CostbookInner({
   if (isMobile) {
     return (
       <div
-        className={`flex flex-col bg-gray-50 min-h-[600px] p-2 ${className}`}
+        className={`flex flex-col bg-gray-50 dark:bg-slate-900 min-h-[600px] p-2 ${className}`}
         data-testid={testId}
       >
         {/* Mobile Header */}
@@ -580,7 +601,7 @@ function CostbookInner({
           {/* Projects Section - First on mobile */}
           <section className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold text-gray-900">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100">
                 Projects ({filteredProjects.length})
               </h2>
             </div>
@@ -626,87 +647,75 @@ function CostbookInner({
     )
   }
 
-  // Render desktop layout
+  // Render desktop layout: Unified No-Scroll View (grid-rows-[auto_1fr_auto])
   return (
     <div
-      className={`flex flex-col bg-gray-50 min-h-[800px] p-4 ${className}`}
+      className={`grid grid-rows-[auto_1fr_auto] bg-gray-50 dark:bg-slate-900 min-h-[800px] p-4 gap-0 ${className}`}
       data-testid={testId}
+      style={{ minHeight: 'calc(100vh - 8rem)' }}
     >
-      {/* Header */}
-      <CostbookHeader
-        kpis={kpis}
-        selectedCurrency={selectedCurrency}
-        onCurrencyChange={handleCurrencyChange}
-        onRefresh={handleRefresh}
-        onPerformance={handlePerformance}
-        onHelp={handleHelp}
-        onSearch={handleSearch}
-        searchTerm={searchTerm}
-        isLoading={isLoading}
-        lastRefreshTime={lastRefreshTime || undefined}
-        className="flex-shrink-0 mb-4"
-      />
-
-      {/* Error Display */}
-      {error && (
-        <ErrorDisplay
-          error={error}
-          onRetry={handleRefresh}
-          onDismiss={() => setError(null)}
+      {/* Row 1: Header (auto) */}
+      <div className="flex-shrink-0">
+        <CostbookHeader
+          kpis={kpis}
+          selectedCurrency={selectedCurrency}
+          onCurrencyChange={handleCurrencyChange}
+          onRefresh={handleRefresh}
+          onPerformance={handlePerformance}
+          onHelp={handleHelp}
+          onSearch={handleSearch}
+          searchTerm={searchTerm}
+          isLoading={isLoading}
+          lastRefreshTime={lastRefreshTime || undefined}
           className="mb-4"
         />
-      )}
+        {error && (
+          <ErrorDisplay
+            error={error}
+            onRetry={handleRefresh}
+            onDismiss={() => setError(null)}
+            className="mb-4"
+          />
+        )}
+      </div>
 
-        {/* Main Content */}
-        <main className="flex flex-col gap-6 flex-1 min-h-[500px]">
-          {/* NL Search Section */}
-          <section className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <NLSearchInput
-              value={searchTerm}
-              onChange={handleSearch}
-              placeholder="Search projects... (e.g., 'over budget', 'high variance', 'vendor Acme')"
-              className="max-w-2xl"
-            />
-            {parseResult && searchTerm && (
-              <p className="mt-2 text-sm text-gray-500">
-                {parseResult.interpretation}
-                {filteredProjects.length !== convertedProjects.length && (
-                  <span className="ml-2 text-blue-600">
-                    ({filteredProjects.length} of {convertedProjects.length} projects)
-                  </span>
-                )}
-              </p>
-            )}
-          </section>
+      {/* Row 2: Main content – Overview / Forecast / List (1fr, scroll inside only) */}
+      <main className="min-h-0 overflow-auto flex flex-col gap-4">
+        {/* NL Search */}
+        <section className="flex-shrink-0 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
+          <NLSearchInput
+            value={searchTerm}
+            onChange={handleSearch}
+            placeholder="Search projects... (e.g., 'over budget', 'high variance', 'vendor Acme')"
+            className="max-w-2xl"
+          />
+          {parseResult && searchTerm && (
+            <p className="mt-2 text-sm text-gray-500 dark:text-slate-400">
+              {parseResult.interpretation}
+              {filteredProjects.length !== convertedProjects.length && (
+                <span className="ml-2 text-blue-600">
+                  ({filteredProjects.length} of {convertedProjects.length} projects)
+                </span>
+              )}
+            </p>
+          )}
+        </section>
 
-          {/* Projects Section (takes most space) */}
-          <section className="flex flex-col">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 p-2 bg-white rounded-lg shadow-sm border border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900 whitespace-nowrap">
-                Projects ({filteredProjects.length})
-              </h2>
-              <div className="flex-shrink-0">
-                <ViewModeToggle
-                  viewMode={viewMode}
-                  onViewModeChange={setViewMode}
-                />
-              </div>
+        {/* Panel: Overview (Projects Grid) + Forecast (Gantt/Rules) side by side on large screens */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
+          {/* Overview: Projects Grid (left, 2 cols on lg) */}
+          <section className="lg:col-span-2 flex flex-col min-h-0">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-2 p-2 bg-white rounded-lg shadow-sm border border-gray-200">
+              <h2 className="text-lg font-bold text-gray-900 whitespace-nowrap">Overview – Projects ({filteredProjects.length})</h2>
+              <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
             </div>
-
-            {/* Projects Grid/List */}
-            <div className="flex-1 overflow-auto min-h-[400px] bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className="flex-1 min-h-[280px] overflow-auto bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
               {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
-                  {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <CardSkeleton key={i} />
-                  ))}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {[1, 2, 3, 4, 5, 6].map((i) => <CardSkeleton key={i} />)}
                 </div>
               ) : filteredProjects.length === 0 && searchTerm ? (
-                <NoResults
-                  query={searchTerm}
-                  onSuggestionSelect={handleSearch}
-                />
+                <NoResults query={searchTerm} onSuggestionSelect={handleSearch} />
               ) : (
                 <ProjectsGrid
                   projects={filteredProjects}
@@ -724,10 +733,25 @@ function CostbookInner({
             </div>
           </section>
 
-          {/* Visualization and Recommendations Section */}
-          <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Visualizations (2/3 width on large screens) */}
-            <div className="lg:col-span-2">
+          {/* Forecast: Gantt + Distribution Rules (right, 1 col on lg) */}
+          <section className="lg:col-span-1 flex flex-col min-h-0">
+            <div className="flex justify-between items-center mb-2 p-2 bg-white rounded-lg shadow-sm border border-gray-200">
+              <h2 className="text-lg font-bold text-gray-900">Forecast</h2>
+              <button
+                type="button"
+                onClick={() => setShowDistributionRules(true)}
+                className="text-sm text-blue-600 hover:underline"
+              >
+                Distribution Rules
+              </button>
+            </div>
+            <div className="flex-1 min-h-[280px] overflow-auto bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4 space-y-4">
+              <CashOutGantt
+                projects={filteredProjects}
+                currency={selectedCurrency}
+                distributionSettingsByProject={distributionSettings}
+                onOpenDistributionSettings={costbookPhase2Enabled ? handleDistributionSettings : undefined}
+              />
               <VisualizationPanel
                 projects={filteredProjects}
                 kpis={kpis}
@@ -735,10 +759,6 @@ function CostbookInner({
                 onProjectClick={handleProjectClick}
                 isLoading={isLoading}
               />
-            </div>
-            
-            {/* Recommendations Panel (1/3 width on large screens) */}
-            <div className="lg:col-span-1">
               <RecommendationsPanel
                 recommendations={recommendations}
                 onView={handleRecommendationView}
@@ -746,96 +766,65 @@ function CostbookInner({
                 onReject={handleRecommendationReject}
                 onDefer={handleRecommendationDefer}
                 collapsible={true}
-                defaultCollapsed={false}
-                initialLimit={3}
+                defaultCollapsed={true}
+                initialLimit={2}
               />
             </div>
           </section>
+        </div>
 
-          {/* Hierarchy Section */}
-          <section className="mt-6">
-            <CollapsiblePanel
-              title="Cost Structure Breakdown"
-              icon={<Layers className="w-5 h-5 text-blue-600" />}
-              defaultOpen={false}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
-            >
-              <div className="p-4">
-                {/* View Type Toggle */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      View Type:
-                    </span>
-                    <div className="flex bg-gray-100 dark:bg-gray-700 rounded-md p-1">
-                      <button
-                        onClick={() => setHierarchyViewType('ces')}
-                        className={`px-3 py-1 text-xs font-medium rounded ${
-                          hierarchyViewType === 'ces'
-                            ? 'bg-blue-600 text-white'
-                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-                        }`}
-                      >
-                        CES
-                      </button>
-                      <button
-                        onClick={() => setHierarchyViewType('wbs')}
-                        className={`px-3 py-1 text-xs font-medium rounded ${
-                          hierarchyViewType === 'wbs'
-                            ? 'bg-blue-600 text-white'
-                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-                        }`}
-                      >
-                        WBS
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span>Committed</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                      <span>Actual</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                      <span>Variance</span>
-                    </div>
+        {/* Panel: List (CES/WBS Tree) */}
+        <section className="flex-shrink-0">
+          <CollapsiblePanel
+            title="List – Cost Structure (CES/WBS)"
+            icon={<Layers className="w-5 h-5 text-blue-600" />}
+            defaultOpen={false}
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+          >
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">View:</span>
+                  <div className="flex bg-gray-100 dark:bg-gray-700 rounded-md p-1">
+                    <button
+                      onClick={() => setHierarchyViewType('ces')}
+                      className={`px-3 py-1 text-xs font-medium rounded ${hierarchyViewType === 'ces' ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-400'}`}
+                    >
+                      CES
+                    </button>
+                    <button
+                      onClick={() => setHierarchyViewType('wbs')}
+                      className={`px-3 py-1 text-xs font-medium rounded ${hierarchyViewType === 'wbs' ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-400'}`}
+                    >
+                      WBS
+                    </button>
                   </div>
                 </div>
-
-                {/* Hierarchy Tree */}
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                  <HierarchyTreeView
-                    data={hierarchyData}
-                    viewType={hierarchyViewType}
-                    currency={selectedCurrency}
-                    onNodeSelect={handleHierarchyNodeSelect}
-                    selectedNodeId={selectedHierarchyNode?.id}
-                    showBudget={true}
-                    showSpend={true}
-                    showVariance={true}
-                    className="max-h-96"
-                  />
-                </div>
-
-                {hierarchyData.length === 0 && (
-                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                    <Layers className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                    <p className="text-sm">
-                      No {hierarchyViewType === 'ces' ? 'CES' : 'WBS'} data available for current filters
-                    </p>
-                  </div>
-                )}
               </div>
-            </CollapsiblePanel>
-          </section>
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                <HierarchyTreeView
+                  data={hierarchyData}
+                  viewType={hierarchyViewType}
+                  currency={selectedCurrency}
+                  onNodeSelect={handleHierarchyNodeSelect}
+                  selectedNodeId={selectedHierarchyNode?.id}
+                  showBudget={true}
+                  showSpend={true}
+                  showVariance={true}
+                  className="max-h-96"
+                />
+              </div>
+              {hierarchyData.length === 0 && (
+                <div className="text-center py-6 text-gray-500 dark:text-slate-400 text-sm">
+                  No {hierarchyViewType === 'ces' ? 'CES' : 'WBS'} data for current filters
+                </div>
+              )}
+            </div>
+          </CollapsiblePanel>
+        </section>
       </main>
 
-      {/* Footer */}
+      {/* Row 3: Footer (auto) */}
       <CostbookFooter
         onScenarios={() => console.log('Scenarios - Phase 2')}
         onResources={handleResources}
@@ -923,7 +912,7 @@ function CostbookInner({
         if (!project) return null
         
         return (
-          <DistributionSettingsDialogStub
+          <DistributionSettingsDialog
             isOpen={showDistributionDialog}
             onClose={() => {
               setShowDistributionDialog(false)

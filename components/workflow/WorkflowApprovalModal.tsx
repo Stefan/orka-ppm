@@ -185,12 +185,12 @@ export default function WorkflowApprovalModal({
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-8 max-w-2xl w-full mx-4">
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white dark:bg-slate-800 rounded-lg p-8 max-w-2xl w-full mx-4 border border-gray-200 dark:border-slate-700">
           <div className="animate-pulse space-y-4">
-            <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-            <div className="h-32 bg-gray-200 rounded"></div>
+            <div className="h-6 bg-gray-200 dark:bg-slate-600 rounded w-1/3"></div>
+            <div className="h-4 bg-gray-200 dark:bg-slate-600 rounded w-2/3"></div>
+            <div className="h-32 bg-gray-200 dark:bg-slate-600 rounded"></div>
           </div>
         </div>
       </div>
@@ -199,19 +199,19 @@ export default function WorkflowApprovalModal({
 
   if (error && !workflow) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-8 max-w-2xl w-full mx-4">
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white dark:bg-slate-800 rounded-lg p-8 max-w-2xl w-full mx-4 border border-gray-200 dark:border-slate-700">
           <div className="flex justify-between items-start mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Error</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100">Error</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-200"
             >
-              <X size={24} />
+              <X size={24} aria-hidden />
             </button>
           </div>
-          <div className="bg-red-50 border border-red-200 rounded p-4">
-            <p className="text-red-800">{error}</p>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-4">
+            <p className="text-red-800 dark:text-red-300">{error}</p>
           </div>
         </div>
       </div>
@@ -231,55 +231,55 @@ export default function WorkflowApprovalModal({
   const StatusIcon = config.icon
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-gray-200 dark:border-slate-700">
         {/* Header */}
-        <div className="flex justify-between items-start p-6 border-b">
+        <div className="flex justify-between items-start p-6 border-b border-gray-200 dark:border-slate-700">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2">
               {workflow.workflow_name}
             </h2>
             <div className="flex items-center gap-2">
-              <StatusIcon className={`text-${config.color}-600`} size={20} />
+              <StatusIcon className={`text-${config.color}-600`} size={20} aria-hidden />
               <span className={`text-${config.color}-800 font-medium`}>
                 {config.label}
               </span>
-              <span className="text-gray-500">•</span>
-              <span className="text-gray-600">Step {workflow.current_step + 1}</span>
+              <span className="text-gray-500 dark:text-slate-400">•</span>
+              <span className="text-gray-600 dark:text-slate-300">Step {workflow.current_step + 1}</span>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-200 transition-colors"
           >
-            <X size={24} />
+            <X size={24} aria-hidden />
           </button>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Entity Info */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="font-semibold text-gray-900 mb-2">Workflow Details</h3>
+          <div className="bg-gray-50 dark:bg-slate-700/50 rounded-lg p-4">
+            <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-2">Workflow Details</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-600">Entity Type:</span>
-                <span className="ml-2 font-medium">{workflow.entity_type}</span>
+                <span className="text-gray-600 dark:text-slate-400">Entity Type:</span>
+                <span className="ml-2 font-medium dark:text-slate-200">{workflow.entity_type}</span>
               </div>
               <div>
-                <span className="text-gray-600">Entity ID:</span>
-                <span className="ml-2 font-mono text-xs">{workflow.entity_id}</span>
+                <span className="text-gray-600 dark:text-slate-400">Entity ID:</span>
+                <span className="ml-2 font-mono text-xs dark:text-slate-300">{workflow.entity_id}</span>
               </div>
               <div>
-                <span className="text-gray-600">Started:</span>
-                <span className="ml-2 font-medium">
+                <span className="text-gray-600 dark:text-slate-400">Started:</span>
+                <span className="ml-2 font-medium dark:text-slate-200">
                   {new Date(workflow.started_at).toLocaleString()}
                 </span>
               </div>
               {workflow.completed_at && (
                 <div>
-                  <span className="text-gray-600">Completed:</span>
-                  <span className="ml-2 font-medium">
+                  <span className="text-gray-600 dark:text-slate-400">Completed:</span>
+                  <span className="ml-2 font-medium dark:text-slate-200">
                     {new Date(workflow.completed_at).toLocaleString()}
                   </span>
                 </div>
@@ -289,27 +289,27 @@ export default function WorkflowApprovalModal({
 
           {/* Current Step Approvals */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-3">Current Step Approvals</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-3">Current Step Approvals</h3>
             <div className="space-y-2">
               {getCurrentStepApprovals().map((approval) => (
                 <div
                   key={approval.id}
                   className={`border rounded-lg p-4 ${
-                    approval.status === 'approved' ? 'border-green-200 bg-green-50' :
-                    approval.status === 'rejected' ? 'border-red-200 bg-red-50' :
-                    'border-gray-200 bg-white'
+                    approval.status === 'approved' ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20' :
+                    approval.status === 'rejected' ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20' :
+                    'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700/50'
                   }`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <User className="text-gray-400" size={20} />
+                      <User className="text-gray-400 dark:text-slate-500" size={20} aria-hidden />
                       <div>
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-gray-900 dark:text-slate-100">
                           Approver {approval.approver_id.slice(0, 8)}
                         </div>
                         {approval.approved_at && (
-                          <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                            <Calendar size={12} />
+                          <div className="text-xs text-gray-500 dark:text-slate-400 flex items-center gap-1 mt-1">
+                            <Calendar size={12} aria-hidden />
                             {new Date(approval.approved_at).toLocaleString()}
                           </div>
                         )}
@@ -317,28 +317,28 @@ export default function WorkflowApprovalModal({
                     </div>
                     <div>
                       {approval.status === 'approved' && (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
-                          <CheckCircle size={14} />
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300 text-xs font-medium rounded">
+                          <CheckCircle size={14} aria-hidden />
                           Approved
                         </span>
                       )}
                       {approval.status === 'rejected' && (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded">
-                          <XCircle size={14} />
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300 text-xs font-medium rounded">
+                          <XCircle size={14} aria-hidden />
                           Rejected
                         </span>
                       )}
                       {approval.status === 'pending' && (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded">
-                          <Clock size={14} />
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300 text-xs font-medium rounded">
+                          <Clock size={14} aria-hidden />
                           Pending
                         </span>
                       )}
                     </div>
                   </div>
                   {approval.comments && (
-                    <div className="mt-3 pt-3 border-t border-current/10">
-                      <p className="text-sm text-gray-700">{approval.comments}</p>
+                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-slate-600">
+                      <p className="text-sm text-gray-700 dark:text-slate-300">{approval.comments}</p>
                     </div>
                   )}
                 </div>
@@ -348,17 +348,17 @@ export default function WorkflowApprovalModal({
 
           {/* Approval Actions */}
           {canApprove() && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Your Approval</h3>
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-3">Your Approval</h3>
               
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   Comments (optional)
                 </label>
                 <textarea
                   value={comments}
                   onChange={(e) => setComments(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-700 dark:text-slate-100"
                   rows={3}
                   placeholder="Add your comments here..."
                   disabled={submitting}
@@ -366,8 +366,8 @@ export default function WorkflowApprovalModal({
               </div>
 
               {error && (
-                <div className="mb-4 bg-red-50 border border-red-200 rounded p-3">
-                  <p className="text-sm text-red-800">{error}</p>
+                <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-3">
+                  <p className="text-sm text-red-800 dark:text-red-300">{error}</p>
                 </div>
               )}
 

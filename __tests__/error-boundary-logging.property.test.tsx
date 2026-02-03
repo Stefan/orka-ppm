@@ -112,12 +112,21 @@ describe('Error Boundary Logging Completeness Property Tests', () => {
     
     console.error = (...args) => {
       capturedErrors.push(args)
-      originalConsoleError.apply(console, args)
+      try {
+        originalConsoleError.apply(console, args)
+      } catch {
+        // Some environments throw when logging non-serializable args (e.g. React error objects)
+        originalConsoleError.apply(console, args.map(a => (typeof a === 'string' ? a : String(a))))
+      }
     }
-    
+
     console.warn = (...args) => {
       capturedWarnings.push(args)
-      originalConsoleWarn.apply(console, args)
+      try {
+        originalConsoleWarn.apply(console, args)
+      } catch {
+        originalConsoleWarn.apply(console, args.map(a => (typeof a === 'string' ? a : String(a))))
+      }
     }
 
     // Reset error interceptor

@@ -21,9 +21,14 @@ import {
   Shield,
   GitBranch,
   DollarSign,
-  AlertTriangle
+  AlertTriangle,
+  Settings,
+  Sun,
+  Moon,
+  Monitor
 } from 'lucide-react'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
+import { useTheme } from '@/app/providers/ThemeProvider'
 import { GlobalLanguageSelector } from './GlobalLanguageSelector'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useTranslations } from '@/lib/i18n/context'
@@ -116,25 +121,34 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
 
   const userEmail = session?.user?.email || 'User'
   const userName = session?.user?.user_metadata?.full_name || userEmail.split('@')[0]
+  const { theme, setTheme } = useTheme()
 
-  // Navigation link styles
+  const cycleTheme = () => {
+    const next = theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light'
+    setTheme(next)
+  }
+
+  const themeIcon = theme === 'dark' ? Moon : theme === 'system' ? Monitor : Sun
+  const ThemeIcon = themeIcon
+
+  // Navigation link styles (first-level menu items)
   const navLinkBase = 'px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200'
-  const navLinkActive = 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-200'
-  const navLinkInactive = 'text-gray-700 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50'
+  const navLinkActive = 'bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/50'
+  const navLinkInactive = 'text-gray-700 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-700'
 
   return (
-    <header data-testid="top-bar" className="bg-white border-b border-gray-100 w-full" style={{ position: 'sticky', top: 0, zIndex: 9999, flexShrink: 0, minHeight: '64px', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)' }}>
+    <header data-testid="top-bar" className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 w-full" style={{ position: 'sticky', top: 0, zIndex: 9999, flexShrink: 0, minHeight: '64px', boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06)' }}>
       <div className="flex items-center justify-between h-16 px-6 lg:px-8 w-full">
         {/* Left Section: Logo + Menu Button */}
         <div data-testid="top-bar-logo" className="flex items-center space-x-5 flex-shrink-0">
           <button
             data-testid="top-bar-menu-toggle"
             onClick={onMenuToggle}
-            className="p-2.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200"
+            className="p-2.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-200"
             style={{ display: showNav ? 'none' : 'block' }}
             aria-label="Toggle menu"
           >
-            <Menu className="h-5 w-5 text-gray-700" />
+            <Menu className="h-5 w-5 text-gray-700 dark:text-slate-300" />
           </button>
           
           <Link href="/dashboards" className="flex items-center space-x-3 group">
@@ -144,7 +158,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
               </div>
               <div className="hidden sm:block">
                 <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">ORKA PPM</span>
-                <div className="text-[10px] font-medium text-gray-500 -mt-1">Portfolio Management</div>
+                <div className="text-[10px] font-medium text-gray-500 dark:text-slate-400 -mt-1">Portfolio Management</div>
               </div>
             </div>
           </Link>
@@ -176,23 +190,25 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   : navLinkInactive
               }`}
             >
-              <span>Projects</span>
+              <span className="text-inherit">Projects</span>
               <ChevronDown className="h-4 w-4" />
             </button>
 
             {/* Projects Dropdown Menu */}
             {projectsMenuOpen && (
-              <div className="absolute left-0 mt-3 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
-                   style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
-                <div className="px-3 pb-2 mb-2 border-b border-gray-100">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Projects</h3>
+              <div
+                className="absolute left-0 mt-3 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+                style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+              >
+                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Projects</h3>
                 </div>
                 <Link
                   href="/projects"
                   className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
                     pathname === '/projects' || pathname.startsWith('/projects/')
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-600 hover:text-blue-700 dark:hover:text-blue-300'
                   }`}
                   onClick={() => setProjectsMenuOpen(false)}
                 >
@@ -204,7 +220,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
                     pathname === '/resources'
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
                   }`}
                   onClick={() => setProjectsMenuOpen(false)}
                 >
@@ -225,23 +241,23 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   : navLinkInactive
               }`}
             >
-              <span>Financials</span>
+              <span className="text-inherit">Financials</span>
               <ChevronDown className="h-4 w-4" />
             </button>
 
             {/* Financials Dropdown Menu */}
             {financialsMenuOpen && (
-              <div className="absolute left-0 mt-3 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+              <div className="absolute left-0 mt-3 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
                    style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
-                <div className="px-3 pb-2 mb-2 border-b border-gray-100">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Financial Management</h3>
+                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Financial Management</h3>
                 </div>
                 <Link
                   href="/financials"
                   className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
                     pathname === '/financials' || pathname.startsWith('/financials/')
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700'
+                      : 'text-gray-700 dark:text-slate-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-700 dark:hover:to-slate-600 hover:text-blue-700 dark:hover:text-blue-400'
                   }`}
                   onClick={() => setFinancialsMenuOpen(false)}
                 >
@@ -253,7 +269,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
                     pathname === '/reports' || pathname.startsWith('/reports/')
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
                   }`}
                   onClick={() => setFinancialsMenuOpen(false)}
                 >
@@ -274,23 +290,23 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   : navLinkInactive
               }`}
             >
-              <span>Analysis</span>
+              <span className="text-inherit">Analysis</span>
               <ChevronDown className="h-4 w-4" />
             </button>
 
             {/* Analysis Dropdown Menu */}
             {analysisMenuOpen && (
-              <div className="absolute left-0 mt-3 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+              <div className="absolute left-0 mt-3 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
                    style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
-                <div className="px-3 pb-2 mb-2 border-b border-gray-100">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Risk & Analysis</h3>
+                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Risk & Analysis</h3>
                 </div>
                 <Link
                   href="/risks"
                   className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
                     pathname === '/risks'
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
                   }`}
                   onClick={() => setAnalysisMenuOpen(false)}
                 >
@@ -302,7 +318,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
                     pathname === '/scenarios'
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
                   }`}
                   onClick={() => setAnalysisMenuOpen(false)}
                 >
@@ -314,7 +330,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
                     pathname === '/monte-carlo'
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
                   }`}
                   onClick={() => setAnalysisMenuOpen(false)}
                 >
@@ -326,7 +342,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
                     pathname === '/audit'
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
                   }`}
                   onClick={() => setAnalysisMenuOpen(false)}
                 >
@@ -347,23 +363,23 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   : navLinkInactive
               }`}
             >
-              <span>Management</span>
+              <span className="text-inherit">Management</span>
               <ChevronDown className="h-4 w-4" />
             </button>
 
             {/* Management Dropdown Menu */}
             {managementMenuOpen && (
-              <div className="absolute left-0 mt-3 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+              <div className="absolute left-0 mt-3 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
                    style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
-                <div className="px-3 pb-2 mb-2 border-b border-gray-100">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Change & Feedback</h3>
+                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Change & Feedback</h3>
                 </div>
                 <Link
                   href="/changes"
                   className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
                     pathname === '/changes'
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
                   }`}
                   onClick={() => setManagementMenuOpen(false)}
                 >
@@ -375,7 +391,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
                     pathname === '/feedback'
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
                   }`}
                   onClick={() => setManagementMenuOpen(false)}
                 >
@@ -387,7 +403,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
                     pathname === '/features'
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
                   }`}
                   onClick={() => setManagementMenuOpen(false)}
                 >
@@ -409,23 +425,23 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
               }`}
             >
               <Shield className="h-4 w-4" />
-              <span>Admin</span>
+              <span className="text-inherit">Admin</span>
               <ChevronDown className="h-4 w-4" />
             </button>
 
             {/* Admin Dropdown Menu */}
             {adminMenuOpen && (
-              <div className="absolute left-0 mt-3 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+              <div className="absolute left-0 mt-3 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
                    style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
-                <div className="px-3 pb-2 mb-2 border-b border-gray-100">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Administration</h3>
+                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Administration</h3>
                 </div>
                 <Link
                   href="/admin"
                   className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
                     pathname === '/admin'
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
                   }`}
                   onClick={() => setAdminMenuOpen(false)}
                 >
@@ -437,7 +453,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
                     pathname === '/admin/performance'
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
                   }`}
                   onClick={() => setAdminMenuOpen(false)}
                 >
@@ -449,7 +465,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
                     pathname === '/admin/users'
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
                   }`}
                   onClick={() => setAdminMenuOpen(false)}
                 >
@@ -461,18 +477,29 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           </div>
         </nav>
 
-        {/* Right Section: Language, Notifications, User Menu */}
+        {/* Right Section: Theme, Language, Notifications, User Menu */}
         <div data-testid="top-bar-actions" className="flex items-center space-x-3 flex-shrink-0">
+          {/* Theme Toggle (Light / Dark / System) */}
+          <button
+            data-testid="top-bar-theme-toggle"
+            onClick={cycleTheme}
+            className="p-2.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-200 group"
+            aria-label={theme === 'dark' ? 'Dark mode' : theme === 'system' ? 'System theme' : 'Light mode'}
+            title={theme === 'dark' ? 'Switch to system theme' : theme === 'system' ? 'Switch to light' : 'Switch to dark'}
+          >
+            <ThemeIcon className="h-5 w-5 text-gray-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+          </button>
+
           {/* Language Selector */}
           <GlobalLanguageSelector variant="topbar" />
 
           {/* Notifications */}
           <button
             data-testid="top-bar-notifications"
-            className="p-2.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 relative group"
+            className="p-2.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-200 relative group"
             aria-label="Notifications"
           >
-            <Bell className="h-5 w-5 text-gray-600 group-hover:text-blue-600 transition-colors" />
+            <Bell className="h-5 w-5 text-gray-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
             <span className="absolute top-2 right-2 w-2 h-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full shadow-sm animate-pulse"></span>
           </button>
 
@@ -481,22 +508,22 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             <button
               data-testid="top-bar-user-menu"
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 group"
+              className="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-200 group"
               aria-label="User menu"
             >
-              <div className="w-9 h-9 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 rounded-lg flex items-center justify-center shadow-md shadow-blue-200 group-hover:shadow-lg group-hover:shadow-blue-300 transition-all duration-200 group-hover:scale-105">
+              <div className="w-9 h-9 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 rounded-lg flex items-center justify-center shadow-md shadow-blue-200 dark:shadow-blue-900/30 group-hover:shadow-lg group-hover:shadow-blue-300 dark:group-hover:shadow-blue-900/50 transition-all duration-200 group-hover:scale-105">
                 <span className="text-white text-sm font-semibold">
                   {userName.charAt(0).toUpperCase()}
                 </span>
               </div>
-              <ChevronDown className="h-4 w-4 text-gray-600 group-hover:text-blue-600 hidden sm:block transition-colors" />
+              <ChevronDown className="h-4 w-4 text-gray-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 hidden sm:block transition-colors" />
             </button>
 
             {/* User Dropdown Menu */}
             {userMenuOpen && (
-              <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+              <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
                    style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
-                <div className="px-4 py-3 border-b border-gray-100">
+                <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-700">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 rounded-lg flex items-center justify-center shadow-md">
                       <span className="text-white text-sm font-semibold">
@@ -504,8 +531,8 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 truncate">{userName}</p>
-                      <p className="text-xs text-gray-500 truncate">{userEmail}</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-slate-100 truncate">{userName}</p>
+                      <p className="text-xs text-gray-500 dark:text-slate-400 truncate">{userEmail}</p>
                     </div>
                   </div>
                 </div>
@@ -513,23 +540,32 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 <div className="py-2">
                   <Link
                     href="/admin/users"
-                    className="flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 transition-all duration-200"
+                    className="flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-200"
                     onClick={() => setUserMenuOpen(false)}
                   >
                     <User className="h-5 w-5 mr-3 flex-shrink-0" />
                     <span className="font-medium">Profile Settings</span>
+                  </Link>
+                  
+                  <Link
+                    href="/settings"
+                    className="flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-200"
+                    onClick={() => setUserMenuOpen(false)}
+                  >
+                    <Settings className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <span className="font-medium">Settings</span>
                   </Link>
 
                   <div className="sm:hidden px-2 py-2">
                     <GlobalLanguageSelector variant="dropdown" />
                   </div>
 
-                  <div className="border-t border-gray-100 my-2"></div>
+                  <div className="border-t border-gray-100 dark:border-slate-700 my-2"></div>
 
                   <button
                     data-testid="top-bar-logout"
                     onClick={handleLogout}
-                    className="flex items-center w-full px-4 py-2.5 mx-2 rounded-lg text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-all duration-200"
+                    className="flex items-center w-full px-4 py-2.5 mx-2 rounded-lg text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-700 dark:hover:text-red-300 transition-all duration-200"
                   >
                     <LogOut className="h-5 w-5 mr-3 flex-shrink-0" />
                     <span className="font-medium">Logout</span>

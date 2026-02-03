@@ -361,13 +361,13 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
       )}
 
       {/* Import History */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">Import-Verlauf</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Import-Verlauf</h3>
             <button
               onClick={fetchCSVImportHistory}
-              className="flex items-center px-3 py-1 text-sm bg-gray-100 text-gray-900 rounded hover:bg-gray-200"
+              className="flex items-center px-3 py-1 text-sm bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-slate-200 rounded hover:bg-gray-200 dark:hover:bg-slate-600"
             >
               <RefreshCw className="h-4 w-4 mr-1" />
               Aktualisieren
@@ -376,39 +376,39 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
         </div>
         
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+            <thead className="bg-gray-50 dark:bg-slate-700">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Typ</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datei</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datensätze</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Größe</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Typ</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Datei</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Datensätze</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Datum</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Größe</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
               {csvImportHistory.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                    <History className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500 dark:text-slate-400">
+                    <History className="h-8 w-8 mx-auto mb-2 text-gray-400 dark:text-slate-500" />
                     Noch keine Imports durchgeführt
                   </td>
                 </tr>
               ) : (
                 csvImportHistory.map((importRecord) => (
-                  <tr key={importRecord.id} className="hover:bg-gray-50">
+                  <tr key={importRecord.id} className="hover:bg-gray-50 dark:hover:bg-slate-700">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                         importRecord.import_type === 'commitments' 
-                          ? 'bg-blue-100 text-blue-800' 
-                          : 'bg-green-100 text-green-800'
+                          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' 
+                          : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
                       }`}
                       >
                         {importRecord.import_type === 'commitments' ? 'Commitments' : 'Actuals'}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-100">
                       {importRecord.file_name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -421,8 +421,8 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
                           <Clock className="h-4 w-4 text-yellow-500 mr-1" />
                         )}
                         <span className={`text-sm ${
-                          importRecord.import_status === 'completed' ? 'text-green-800' :
-                          importRecord.import_status === 'failed' ? 'text-red-800' : 'text-yellow-800'
+                          importRecord.import_status === 'completed' ? 'text-green-800 dark:text-green-300' :
+                          importRecord.import_status === 'failed' ? 'text-red-800 dark:text-red-300' : 'text-yellow-800 dark:text-yellow-300'
                         }`}
                         >
                           {importRecord.import_status === 'completed' ? 'Abgeschlossen' :
@@ -430,23 +430,23 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-100">
                       <div className="flex items-center space-x-2">
-                        <span className="text-green-600">{importRecord.records_imported}</span>
-                        <span className="text-gray-400">/</span>
+                        <span className="text-green-600 dark:text-green-400">{importRecord.records_imported}</span>
+                        <span className="text-gray-400 dark:text-slate-500">/</span>
                         <span>{importRecord.records_processed}</span>
                         {importRecord.records_failed > 0 && (
                           <>
-                            <span className="text-gray-400">•</span>
-                            <span className="text-red-600">{importRecord.records_failed} Fehler</span>
+                            <span className="text-gray-400 dark:text-slate-500">•</span>
+                            <span className="text-red-600 dark:text-red-400">{importRecord.records_failed} Fehler</span>
                           </>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                       {new Date(importRecord.started_at).toLocaleString('de-DE')}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                       {(importRecord.file_size / 1024).toFixed(1)} KB
                     </td>
                   </tr>

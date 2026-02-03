@@ -767,6 +767,7 @@ describe('Preference Persistence Edge Cases', () => {
         userRole="user"
         layout="grid"
         widgets={[]}
+        enableAI={false}
       />
     )
     

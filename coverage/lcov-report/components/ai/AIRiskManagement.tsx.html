@@ -883,7 +883,9 @@
 <a name='L818'></a><a href='#L818'>818</a>
 <a name='L819'></a><a href='#L819'>819</a>
 <a name='L820'></a><a href='#L820'>820</a>
-<a name='L821'></a><a href='#L821'>821</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L821'></a><a href='#L821'>821</a>
+<a name='L822'></a><a href='#L822'>822</a>
+<a name='L823'></a><a href='#L823'>823</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1361,6 +1363,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1866,41 +1870,41 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
   const getSeverityColor = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(s</span>everity: string) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    switch (severity) {</span>
-      case 'critical': <span class="cstat-no" title="statement not covered" >return 'text-red-600 bg-red-100'</span>
-      case 'high': <span class="cstat-no" title="statement not covered" >return 'text-red-500 bg-red-50'</span>
-      case 'medium': <span class="cstat-no" title="statement not covered" >return 'text-yellow-600 bg-yellow-100'</span>
-      case 'low': <span class="cstat-no" title="statement not covered" >return 'text-green-600 bg-green-100'</span>
-      default: <span class="cstat-no" title="statement not covered" >return 'text-gray-600 bg-gray-100'</span>
+      case 'critical': <span class="cstat-no" title="statement not covered" >return 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/50'</span>
+      case 'high': <span class="cstat-no" title="statement not covered" >return 'text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/30'</span>
+      case 'medium': <span class="cstat-no" title="statement not covered" >return 'text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/50'</span>
+      case 'low': <span class="cstat-no" title="statement not covered" >return 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/50'</span>
+      default: <span class="cstat-no" title="statement not covered" >return 'text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-700'</span>
     }
   }
 &nbsp;
   const getUrgencyIcon = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(u</span>rgency: string) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    switch (urgency) {</span>
-      case 'immediate': return &lt;AlertTriangle className="h-4 w-4 text-red-600" /&gt;
-      case 'within_24h': return &lt;Clock className="h-4 w-4 text-orange-600" /&gt;
-      case 'within_week': return &lt;Eye className="h-4 w-4 text-yellow-600" /&gt;
-      case 'monitor': return &lt;Info className="h-4 w-4 text-blue-600" /&gt;
-      default: return &lt;Info className="h-4 w-4 text-gray-600" /&gt;
+      case 'immediate': return &lt;AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" /&gt;
+      case 'within_24h': return &lt;Clock className="h-4 w-4 text-orange-600 dark:text-orange-400" /&gt;
+      case 'within_week': return &lt;Eye className="h-4 w-4 text-yellow-600 dark:text-yellow-400" /&gt;
+      case 'monitor': return &lt;Info className="h-4 w-4 text-blue-600 dark:text-blue-400" /&gt;
+      default: return &lt;Info className="h-4 w-4 text-gray-600 dark:text-slate-400" /&gt;
     }
   }
 &nbsp;
   const getPatternTypeIcon = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(t</span>ype: string) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    switch (type) {</span>
-      case 'recurring': return &lt;RefreshCw className="h-4 w-4" /&gt;
-      case 'cascading': return &lt;TrendingUp className="h-4 w-4" /&gt;
-      case 'seasonal': return &lt;Clock className="h-4 w-4" /&gt;
-      case 'project_phase': return &lt;Target className="h-4 w-4" /&gt;
-      case 'resource_dependent': return &lt;Shield className="h-4 w-4" /&gt;
-      default: return &lt;Brain className="h-4 w-4" /&gt;
+      case 'recurring': return &lt;RefreshCw className="h-4 w-4 dark:text-slate-400" /&gt;
+      case 'cascading': return &lt;TrendingUp className="h-4 w-4 dark:text-slate-400" /&gt;
+      case 'seasonal': return &lt;Clock className="h-4 w-4 dark:text-slate-400" /&gt;
+      case 'project_phase': return &lt;Target className="h-4 w-4 dark:text-slate-400" /&gt;
+      case 'resource_dependent': return &lt;Shield className="h-4 w-4 dark:text-slate-400" /&gt;
+      default: return &lt;Brain className="h-4 w-4 dark:text-slate-400" /&gt;
     }
   }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  if (loading &amp;&amp; !patterns.length &amp;&amp; !alerts.length) {</span>
     return (
-      &lt;div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"&gt;
+      &lt;div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6"&gt;
         &lt;div className="flex items-center justify-center space-x-3"&gt;
           &lt;div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"&gt;&lt;/div&gt;
-          &lt;span className="text-gray-600"&gt;Analyzing risks with AI...&lt;/span&gt;
+          &lt;span className="text-gray-600 dark:text-slate-400"&gt;Analyzing risks with AI...&lt;/span&gt;
         &lt;/div&gt;
       &lt;/div&gt;
     )
@@ -1908,8 +1912,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  if (error) {</span>
     return (
-      &lt;div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"&gt;
-        &lt;div className="flex items-center space-x-3 text-red-600"&gt;
+      &lt;div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6"&gt;
+        &lt;div className="flex items-center space-x-3 text-red-600 dark:text-red-400"&gt;
           &lt;XCircle className="h-5 w-5" /&gt;
           &lt;span&gt;AI Risk Analysis Error: {error}&lt;/span&gt;
         &lt;/div&gt;
@@ -1975,62 +1979,62 @@ export default function <span class="cstat-no" title="statement not covered" ><s
       {/* AI Insights Summary */}
       {<span class="branch-0 cbranch-no" title="branch not covered" >dashboardData &amp;&amp; (</span>
         &lt;div className="grid grid-cols-1 md:grid-cols-4 gap-4"&gt;
-          &lt;div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"&gt;
+          &lt;div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700"&gt;
             &lt;div className="flex items-center justify-between"&gt;
               &lt;div&gt;
-                &lt;p className="text-sm font-medium text-gray-700"&gt;Active Patterns&lt;/p&gt;
-                &lt;p className="text-2xl font-bold text-blue-600"&gt;
+                &lt;p className="text-sm font-medium text-gray-700 dark:text-slate-300"&gt;Active Patterns&lt;/p&gt;
+                &lt;p className="text-2xl font-bold text-blue-600 dark:text-blue-400"&gt;
                   {patterns.length}
                 &lt;/p&gt;
               &lt;/div&gt;
-              &lt;Brain className="h-8 w-8 text-blue-600" /&gt;
+              &lt;Brain className="h-8 w-8 text-blue-600 dark:text-blue-400" /&gt;
             &lt;/div&gt;
           &lt;/div&gt;
           
-          &lt;div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"&gt;
+          &lt;div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700"&gt;
             &lt;div className="flex items-center justify-between"&gt;
               &lt;div&gt;
-                &lt;p className="text-sm font-medium text-gray-700"&gt;Escalation Alerts&lt;/p&gt;
-                &lt;p className="text-2xl font-bold text-orange-600"&gt;
+                &lt;p className="text-sm font-medium text-gray-700 dark:text-slate-300"&gt;Escalation Alerts&lt;/p&gt;
+                &lt;p className="text-2xl font-bold text-orange-600 dark:text-orange-400"&gt;
                   {alerts.filter(<span class="fstat-no" title="function not covered" >a =&gt; <span class="cstat-no" title="statement not covered" >!</span>a.acknowledged)</span>.length}
                 &lt;/p&gt;
               &lt;/div&gt;
-              &lt;Bell className="h-8 w-8 text-orange-600" /&gt;
+              &lt;Bell className="h-8 w-8 text-orange-600 dark:text-orange-400" /&gt;
             &lt;/div&gt;
           &lt;/div&gt;
           
-          &lt;div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"&gt;
+          &lt;div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700"&gt;
             &lt;div className="flex items-center justify-between"&gt;
               &lt;div&gt;
-                &lt;p className="text-sm font-medium text-gray-700"&gt;Critical Risks&lt;/p&gt;
-                &lt;p className="text-2xl font-bold text-red-600"&gt;
+                &lt;p className="text-sm font-medium text-gray-700 dark:text-slate-300"&gt;Critical Risks&lt;/p&gt;
+                &lt;p className="text-2xl font-bold text-red-600 dark:text-red-400"&gt;
                   {alerts.filter(<span class="fstat-no" title="function not covered" >a =&gt; <span class="cstat-no" title="statement not covered" >a</span>.severity === 'critical').l</span>ength}
                 &lt;/p&gt;
               &lt;/div&gt;
-              &lt;AlertTriangle className="h-8 w-8 text-red-600" /&gt;
+              &lt;AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" /&gt;
             &lt;/div&gt;
           &lt;/div&gt;
           
-          &lt;div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"&gt;
+          &lt;div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700"&gt;
             &lt;div className="flex items-center justify-between"&gt;
               &lt;div&gt;
-                &lt;p className="text-sm font-medium text-gray-700"&gt;Prediction Confidence&lt;/p&gt;
-                &lt;p className="text-2xl font-bold text-green-600"&gt;
+                &lt;p className="text-sm font-medium text-gray-700 dark:text-slate-300"&gt;Prediction Confidence&lt;/p&gt;
+                &lt;p className="text-2xl font-bold text-green-600 dark:text-green-400"&gt;
                   {dashboardData.ai_insights?.prediction_confidence 
                     ? `${(dashboardData.ai_insights.prediction_confidence * 100).toFixed(0)}%`
                     : '78%'
                   }
                 &lt;/p&gt;
               &lt;/div&gt;
-              &lt;Target className="h-8 w-8 text-green-600" /&gt;
+              &lt;Target className="h-8 w-8 text-green-600 dark:text-green-400" /&gt;
             &lt;/div&gt;
           &lt;/div&gt;
         &lt;/div&gt;
       )}
 &nbsp;
       {/* Tab Navigation */}
-      &lt;div className="bg-white rounded-lg shadow-sm border border-gray-200"&gt;
-        &lt;div className="border-b border-gray-200"&gt;
+      &lt;div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700"&gt;
+        &lt;div className="border-b border-gray-200 dark:border-slate-700"&gt;
           &lt;nav className="flex space-x-8 px-6"&gt;
             {[
               { id: 'patterns', label: 'Risk Patterns', icon: Brain, count: patterns.length },
@@ -2043,14 +2047,14 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                 onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etActiveTab(tab.id as any)}</span>
                 className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 hover:border-gray-300 dark:hover:border-slate-600'
                 }`}
               &gt;
                 &lt;tab.icon className="h-4 w-4" /&gt;
                 &lt;span&gt;{tab.label}&lt;/span&gt;
                 {<span class="branch-0 cbranch-no" title="branch not covered" >tab.count &gt; 0 &amp;&amp; (</span>
-                  &lt;span className="bg-blue-100 text-blue-800 text-xs rounded-full px-2 py-1"&gt;
+                  &lt;span className="bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 text-xs rounded-full px-2 py-1"&gt;
                     {tab.count}
                   &lt;/span&gt;
                 )}
@@ -2064,70 +2068,70 @@ export default function <span class="cstat-no" title="statement not covered" ><s
           {<span class="branch-0 cbranch-no" title="branch not covered" >activeTab === 'patterns' &amp;&amp; (</span>
             &lt;div className="space-y-4"&gt;
               &lt;div className="flex items-center justify-between"&gt;
-                &lt;h3 className="text-lg font-semibold text-gray-900"&gt;
+                &lt;h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100"&gt;
                   Identified Risk Patterns
                 &lt;/h3&gt;
-                &lt;div className="text-sm text-gray-600"&gt;
+                &lt;div className="text-sm text-gray-600 dark:text-slate-400"&gt;
                   {patterns.filter(<span class="fstat-no" title="function not covered" >p =&gt; <span class="cstat-no" title="statement not covered" >p</span>.confidence_score &gt; 0.8).l</span>ength} high-confidence patterns
                 &lt;/div&gt;
               &lt;/div&gt;
               
               {patterns.length === 0 ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >                &lt;div className="text-center py-8 text-gray-500"&gt;</span>
-                  &lt;Brain className="h-12 w-12 mx-auto mb-4 text-gray-300" /&gt;
+<span class="branch-0 cbranch-no" title="branch not covered" >                &lt;div className="text-center py-8 text-gray-500 dark:text-slate-400"&gt;</span>
+                  &lt;Brain className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-slate-600" /&gt;
                   &lt;p&gt;No risk patterns detected yet.&lt;/p&gt;
                   &lt;p className="text-sm"&gt;AI needs more historical data to identify patterns.&lt;/p&gt;
                 &lt;/div&gt;
               ) : (
                 &lt;div className="grid grid-cols-1 lg:grid-cols-2 gap-4"&gt;
                   {patterns.map(<span class="fstat-no" title="function not covered" >(p</span>attern) =&gt; (
-<span class="cstat-no" title="statement not covered" >                    &lt;div key={pattern.pattern_id} c</span>lassName="border border-gray-200 rounded-lg p-4"&gt;
+<span class="cstat-no" title="statement not covered" >                    &lt;div key={pattern.pattern_id} c</span>lassName="border border-gray-200 dark:border-slate-700 rounded-lg p-4 dark:bg-slate-700/50"&gt;
                       &lt;div className="flex items-start justify-between mb-3"&gt;
-                        &lt;div className="flex items-center space-x-2"&gt;
+                        &lt;div className="flex items-center space-x-2 dark:text-slate-300"&gt;
                           {getPatternTypeIcon(pattern.pattern_type)}
-                          &lt;h4 className="font-medium text-gray-900"&gt;{pattern.pattern_name}&lt;/h4&gt;
+                          &lt;h4 className="font-medium text-gray-900 dark:text-slate-100"&gt;{pattern.pattern_name}&lt;/h4&gt;
                         &lt;/div&gt;
                         &lt;div className="flex items-center space-x-2"&gt;
                           &lt;span className={`px-2 py-1 text-xs rounded-full ${
-                            pattern.confidence_score &gt; 0.8 ? 'bg-green-100 text-green-800' :
-                            pattern.confidence_score &gt; 0.6 ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-gray-100 text-gray-800'
+                            pattern.confidence_score &gt; 0.8 ? 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300' :
+                            pattern.confidence_score &gt; 0.6 ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300' :
+                            'bg-gray-100 dark:bg-slate-600 text-gray-800 dark:text-slate-300'
                           }`}&gt;
                             {(pattern.confidence_score * 100).toFixed(0)}% confidence
                           &lt;/span&gt;
                         &lt;/div&gt;
                       &lt;/div&gt;
                       
-                      &lt;p className="text-sm text-gray-600 mb-3"&gt;{pattern.description}&lt;/p&gt;
+                      &lt;p className="text-sm text-gray-600 dark:text-slate-400 mb-3"&gt;{pattern.description}&lt;/p&gt;
                       
                       &lt;div className="grid grid-cols-2 gap-4 text-sm"&gt;
                         &lt;div&gt;
-                          &lt;span className="font-medium text-gray-700"&gt;Frequency:&lt;/span&gt;
-                          &lt;span className="ml-1 capitalize"&gt;{pattern.frequency}&lt;/span&gt;
+                          &lt;span className="font-medium text-gray-700 dark:text-slate-300"&gt;Frequency:&lt;/span&gt;
+                          &lt;span className="ml-1 capitalize dark:text-slate-400"&gt;{pattern.frequency}&lt;/span&gt;
                         &lt;/div&gt;
                         &lt;div&gt;
-                          &lt;span className="font-medium text-gray-700"&gt;Occurrences:&lt;/span&gt;
-                          &lt;span className="ml-1"&gt;{pattern.occurrences_count}&lt;/span&gt;
+                          &lt;span className="font-medium text-gray-700 dark:text-slate-300"&gt;Occurrences:&lt;/span&gt;
+                          &lt;span className="ml-1 dark:text-slate-400"&gt;{pattern.occurrences_count}&lt;/span&gt;
                         &lt;/div&gt;
                         &lt;div&gt;
-                          &lt;span className="font-medium text-gray-700"&gt;Avg Impact:&lt;/span&gt;
-                          &lt;span className="ml-1"&gt;{(pattern.average_impact_score * 100).toFixed(0)}%&lt;/span&gt;
+                          &lt;span className="font-medium text-gray-700 dark:text-slate-300"&gt;Avg Impact:&lt;/span&gt;
+                          &lt;span className="ml-1 dark:text-slate-400"&gt;{(pattern.average_impact_score * 100).toFixed(0)}%&lt;/span&gt;
                         &lt;/div&gt;
                         &lt;div&gt;
-                          &lt;span className="font-medium text-gray-700"&gt;Escalation Risk:&lt;/span&gt;
-                          &lt;span className="ml-1"&gt;{(pattern.escalation_probability * 100).toFixed(0)}%&lt;/span&gt;
+                          &lt;span className="font-medium text-gray-700 dark:text-slate-300"&gt;Escalation Risk:&lt;/span&gt;
+                          &lt;span className="ml-1 dark:text-slate-400"&gt;{(pattern.escalation_probability * 100).toFixed(0)}%&lt;/span&gt;
                         &lt;/div&gt;
                       &lt;/div&gt;
                       
                       {<span class="branch-0 cbranch-no" title="branch not covered" >pattern.next_likely_occurrence </span>&amp;&amp; (
-                        &lt;div className="mt-3 p-3 bg-blue-50 rounded-md"&gt;
+                        &lt;div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-md"&gt;
                           &lt;div className="flex items-center space-x-2 text-sm"&gt;
-                            &lt;Clock className="h-4 w-4 text-blue-600" /&gt;
-                            &lt;span className="font-medium text-blue-900"&gt;Next Occurrence:&lt;/span&gt;
-                            &lt;span className="text-blue-700"&gt;
+                            &lt;Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" /&gt;
+                            &lt;span className="font-medium text-blue-900 dark:text-blue-300"&gt;Next Occurrence:&lt;/span&gt;
+                            &lt;span className="text-blue-700 dark:text-blue-400"&gt;
                               {new Date(pattern.next_likely_occurrence.predicted_date).toLocaleDateString()}
                             &lt;/span&gt;
-                            &lt;span className="text-blue-600"&gt;
+                            &lt;span className="text-blue-600 dark:text-blue-400"&gt;
                               ({(pattern.next_likely_occurrence.confidence * 100).toFixed(0)}% confidence)
                             &lt;/span&gt;
                           &lt;/div&gt;
@@ -2136,15 +2140,15 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                       
                       {<span class="branch-0 cbranch-no" title="branch not covered" >pattern.successful_mitigations.length &gt; 0 &amp;&amp; (</span>
                         &lt;div className="mt-3"&gt;
-                          &lt;div className="text-sm font-medium text-gray-700 mb-1"&gt;
+                          &lt;div className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"&gt;
                             Successful Mitigations:
                           &lt;/div&gt;
                           &lt;div className="space-y-1"&gt;
                             {pattern.successful_mitigations.slice(0, 2).map(<span class="fstat-no" title="function not covered" >(m</span>itigation, index) =&gt; (
-<span class="cstat-no" title="statement not covered" >                              &lt;div key={index} c</span>lassName="text-xs text-gray-600 flex items-center space-x-2"&gt;
+<span class="cstat-no" title="statement not covered" >                              &lt;div key={index} c</span>lassName="text-xs text-gray-600 dark:text-slate-400 flex items-center space-x-2"&gt;
                                 &lt;CheckCircle className="h-3 w-3 text-green-500" /&gt;
                                 &lt;span&gt;{mitigation.strategy}&lt;/span&gt;
-                                &lt;span className="text-green-600"&gt;
+                                &lt;span className="text-green-600 dark:text-green-400"&gt;
                                   ({(mitigation.success_rate * 100).toFixed(0)}% success)
                                 &lt;/span&gt;
                               &lt;/div&gt;
@@ -2163,17 +2167,17 @@ export default function <span class="cstat-no" title="statement not covered" ><s
           {<span class="branch-0 cbranch-no" title="branch not covered" >activeTab === 'alerts' &amp;&amp; (</span>
             &lt;div className="space-y-4"&gt;
               &lt;div className="flex items-center justify-between"&gt;
-                &lt;h3 className="text-lg font-semibold text-gray-900"&gt;
+                &lt;h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100"&gt;
                   Escalation Alerts
                 &lt;/h3&gt;
-                &lt;div className="text-sm text-gray-600"&gt;
+                &lt;div className="text-sm text-gray-600 dark:text-slate-400"&gt;
                   {alerts.filter(<span class="fstat-no" title="function not covered" >a =&gt; <span class="cstat-no" title="statement not covered" >a</span>.severity === 'critical' || a.severity === 'high').l</span>ength} high-priority alerts
                 &lt;/div&gt;
               &lt;/div&gt;
               
               {alerts.length === 0 ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >                &lt;div className="text-center py-8 text-gray-500"&gt;</span>
-                  &lt;Bell className="h-12 w-12 mx-auto mb-4 text-gray-300" /&gt;
+<span class="branch-0 cbranch-no" title="branch not covered" >                &lt;div className="text-center py-8 text-gray-500 dark:text-slate-400"&gt;</span>
+                  &lt;Bell className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-slate-600" /&gt;
                   &lt;p&gt;No escalation alerts at this time.&lt;/p&gt;
                   &lt;p className="text-sm"&gt;AI monitoring is active and will alert you to potential escalations.&lt;/p&gt;
                 &lt;/div&gt;
@@ -2183,15 +2187,17 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 <span class="cstat-no" title="statement not covered" >                    &lt;div </span>
                       key={alert.alert_id} 
                       className={`border rounded-lg p-4 ${
-                        alert.acknowledged ? 'border-gray-200 bg-gray-50' : 'border-orange-200 bg-orange-50'
+                        alert.acknowledged 
+                          ? 'border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50' 
+                          : 'border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/20'
                       }`}
                     &gt;
                       &lt;div className="flex items-start justify-between mb-3"&gt;
                         &lt;div className="flex items-start space-x-3"&gt;
                           {getUrgencyIcon(alert.urgency)}
                           &lt;div&gt;
-                            &lt;h4 className="font-medium text-gray-900"&gt;{alert.risk_title}&lt;/h4&gt;
-                            &lt;p className="text-sm text-gray-600"&gt;{alert.project_name}&lt;/p&gt;
+                            &lt;h4 className="font-medium text-gray-900 dark:text-slate-100"&gt;{alert.risk_title}&lt;/h4&gt;
+                            &lt;p className="text-sm text-gray-600 dark:text-slate-400"&gt;{alert.project_name}&lt;/p&gt;
                           &lt;/div&gt;
                         &lt;/div&gt;
                         
@@ -2212,32 +2218,32 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                       
                       &lt;div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3 text-sm"&gt;
                         &lt;div&gt;
-                          &lt;span className="font-medium text-gray-700"&gt;Current Score:&lt;/span&gt;
-                          &lt;span className="ml-1"&gt;{(alert.current_risk_score * 100).toFixed(0)}%&lt;/span&gt;
+                          &lt;span className="font-medium text-gray-700 dark:text-slate-300"&gt;Current Score:&lt;/span&gt;
+                          &lt;span className="ml-1 dark:text-slate-400"&gt;{(alert.current_risk_score * 100).toFixed(0)}%&lt;/span&gt;
                         &lt;/div&gt;
                         &lt;div&gt;
-                          &lt;span className="font-medium text-gray-700"&gt;Predicted Score:&lt;/span&gt;
-                          &lt;span className="ml-1 text-orange-600"&gt;
+                          &lt;span className="font-medium text-gray-700 dark:text-slate-300"&gt;Predicted Score:&lt;/span&gt;
+                          &lt;span className="ml-1 text-orange-600 dark:text-orange-400"&gt;
                             {(alert.predicted_risk_score * 100).toFixed(0)}%
                           &lt;/span&gt;
                         &lt;/div&gt;
                         &lt;div&gt;
-                          &lt;span className="font-medium text-gray-700"&gt;Time to Escalation:&lt;/span&gt;
-                          &lt;span className="ml-1"&gt;{alert.time_to_escalation}&lt;/span&gt;
+                          &lt;span className="font-medium text-gray-700 dark:text-slate-300"&gt;Time to Escalation:&lt;/span&gt;
+                          &lt;span className="ml-1 dark:text-slate-400"&gt;{alert.time_to_escalation}&lt;/span&gt;
                         &lt;/div&gt;
                       &lt;/div&gt;
                       
                       {<span class="branch-0 cbranch-no" title="branch not covered" >alert.triggering_factors.length &gt; 0 &amp;&amp; (</span>
                         &lt;div className="mb-3"&gt;
-                          &lt;div className="text-sm font-medium text-gray-700 mb-1"&gt;
+                          &lt;div className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"&gt;
                             Triggering Factors:
                           &lt;/div&gt;
                           &lt;div className="space-y-1"&gt;
                             {alert.triggering_factors.slice(0, 3).map(<span class="fstat-no" title="function not covered" >(f</span>actor, index) =&gt; (
-<span class="cstat-no" title="statement not covered" >                              &lt;div key={index} c</span>lassName="text-xs text-gray-600 flex items-center space-x-2"&gt;
+<span class="cstat-no" title="statement not covered" >                              &lt;div key={index} c</span>lassName="text-xs text-gray-600 dark:text-slate-400 flex items-center space-x-2"&gt;
                                 &lt;div className="w-2 h-2 bg-orange-400 rounded-full"&gt;&lt;/div&gt;
                                 &lt;span&gt;{factor.factor}&lt;/span&gt;
-                                &lt;span className="text-orange-600"&gt;
+                                &lt;span className="text-orange-600 dark:text-orange-400"&gt;
                                   ({factor.current_value} vs {factor.threshold} threshold)
                                 &lt;/span&gt;
                               &lt;/div&gt;
@@ -2247,16 +2253,16 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                       )}
                       
                       {<span class="branch-0 cbranch-no" title="branch not covered" >alert.immediate_actions.length &gt; 0 &amp;&amp; (</span>
-                        &lt;div className="mt-3 p-3 bg-blue-50 rounded-md"&gt;
-                          &lt;div className="text-sm font-medium text-blue-900 mb-2"&gt;
+                        &lt;div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-md"&gt;
+                          &lt;div className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2"&gt;
                             Recommended Actions:
                           &lt;/div&gt;
                           &lt;div className="space-y-1"&gt;
                             {alert.immediate_actions.slice(0, 2).map(<span class="fstat-no" title="function not covered" >(a</span>ction, index) =&gt; (
-<span class="cstat-no" title="statement not covered" >                              &lt;div key={index} c</span>lassName="text-sm text-blue-800 flex items-center space-x-2"&gt;
+<span class="cstat-no" title="statement not covered" >                              &lt;div key={index} c</span>lassName="text-sm text-blue-800 dark:text-blue-300 flex items-center space-x-2"&gt;
                                 &lt;Target className="h-3 w-3" /&gt;
                                 &lt;span&gt;{action.action}&lt;/span&gt;
-                                &lt;span className="text-blue-600"&gt;
+                                &lt;span className="text-blue-600 dark:text-blue-400"&gt;
                                   (Priority: {action.priority})
                                 &lt;/span&gt;
                               &lt;/div&gt;
@@ -2266,7 +2272,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                       )}
                       
                       {<span class="branch-0 cbranch-no" title="branch not covered" >alert.acknowledged </span>&amp;&amp; (
-                        &lt;div className="mt-3 text-xs text-gray-500 flex items-center space-x-2"&gt;
+                        &lt;div className="mt-3 text-xs text-gray-500 dark:text-slate-500 flex items-center space-x-2"&gt;
                           &lt;CheckCircle className="h-3 w-3 text-green-500" /&gt;
                           &lt;span&gt;
                             Acknowledged {alert.acknowledged_at ? new Date(alert.acknowledged_at).toLocaleString() : ''}
@@ -2284,13 +2290,13 @@ export default function <span class="cstat-no" title="statement not covered" ><s
           {<span class="branch-0 cbranch-no" title="branch not covered" >activeTab === 'strategies' &amp;&amp; (</span>
             &lt;div className="space-y-4"&gt;
               &lt;div className="flex items-center justify-between"&gt;
-                &lt;h3 className="text-lg font-semibold text-gray-900"&gt;
+                &lt;h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100"&gt;
                   AI-Recommended Mitigation Strategies
                 &lt;/h3&gt;
                 &lt;select
                   value={selectedRisk || ''}
                   onChange={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >setSelectedRisk(e.target.value || null)}</span>
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500"
                 &gt;
                   &lt;option value=""&gt;Select a risk to analyze&lt;/option&gt;
                   {risks.map(<span class="fstat-no" title="function not covered" >(r</span>isk) =&gt; (
@@ -2302,29 +2308,29 @@ export default function <span class="cstat-no" title="statement not covered" ><s
               &lt;/div&gt;
               
               {!selectedRisk ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >                &lt;div className="text-center py-8 text-gray-500"&gt;</span>
-                  &lt;Shield className="h-12 w-12 mx-auto mb-4 text-gray-300" /&gt;
+<span class="branch-0 cbranch-no" title="branch not covered" >                &lt;div className="text-center py-8 text-gray-500 dark:text-slate-400"&gt;</span>
+                  &lt;Shield className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-slate-600" /&gt;
                   &lt;p&gt;Select a risk to view AI-recommended mitigation strategies.&lt;/p&gt;
                 &lt;/div&gt;
               ) : strategies.length === 0 ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >                &lt;div className="text-center py-8 text-gray-500"&gt;</span>
+<span class="branch-0 cbranch-no" title="branch not covered" >                &lt;div className="text-center py-8 text-gray-500 dark:text-slate-400"&gt;</span>
                   &lt;div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"&gt;&lt;/div&gt;
                   &lt;p&gt;Analyzing mitigation strategies...&lt;/p&gt;
                 &lt;/div&gt;
               ) : (
                 &lt;div className="space-y-4"&gt;
                   {strategies.map(<span class="fstat-no" title="function not covered" >(s</span>trategy) =&gt; (
-<span class="cstat-no" title="statement not covered" >                    &lt;div key={strategy.strategy_id} c</span>lassName="border border-gray-200 rounded-lg p-4"&gt;
+<span class="cstat-no" title="statement not covered" >                    &lt;div key={strategy.strategy_id} c</span>lassName="border border-gray-200 dark:border-slate-700 rounded-lg p-4 dark:bg-slate-700/50"&gt;
                       &lt;div className="flex items-start justify-between mb-3"&gt;
                         &lt;div&gt;
-                          &lt;h4 className="font-medium text-gray-900"&gt;{strategy.strategy_name}&lt;/h4&gt;
-                          &lt;p className="text-sm text-gray-600 mt-1"&gt;{strategy.description}&lt;/p&gt;
+                          &lt;h4 className="font-medium text-gray-900 dark:text-slate-100"&gt;{strategy.strategy_name}&lt;/h4&gt;
+                          &lt;p className="text-sm text-gray-600 dark:text-slate-400 mt-1"&gt;{strategy.description}&lt;/p&gt;
                         &lt;/div&gt;
                         &lt;div className="flex items-center space-x-2"&gt;
                           &lt;span className={`px-2 py-1 text-xs rounded-full ${
-                            strategy.historical_success_rate &gt; 0.8 ? 'bg-green-100 text-green-800' :
-                            strategy.historical_success_rate &gt; 0.6 ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-gray-100 text-gray-800'
+                            strategy.historical_success_rate &gt; 0.8 ? 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300' :
+                            strategy.historical_success_rate &gt; 0.6 ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300' :
+                            'bg-gray-100 dark:bg-slate-600 text-gray-800 dark:text-slate-300'
                           }`}&gt;
                             {(strategy.historical_success_rate * 100).toFixed(0)}% success rate
                           &lt;/span&gt;
@@ -2333,48 +2339,48 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                       
                       &lt;div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3 text-sm"&gt;
                         &lt;div&gt;
-                          &lt;span className="font-medium text-gray-700"&gt;Risk Reduction:&lt;/span&gt;
-                          &lt;span className="ml-1 text-green-600"&gt;
+                          &lt;span className="font-medium text-gray-700 dark:text-slate-300"&gt;Risk Reduction:&lt;/span&gt;
+                          &lt;span className="ml-1 text-green-600 dark:text-green-400"&gt;
                             {(strategy.average_risk_reduction * 100).toFixed(0)}%
                           &lt;/span&gt;
                         &lt;/div&gt;
                         &lt;div&gt;
-                          &lt;span className="font-medium text-gray-700"&gt;Complexity:&lt;/span&gt;
+                          &lt;span className="font-medium text-gray-700 dark:text-slate-300"&gt;Complexity:&lt;/span&gt;
                           &lt;span className={`ml-1 capitalize ${
-                            strategy.implementation_complexity === 'low' ? 'text-green-600' :
-                            strategy.implementation_complexity === 'medium' ? 'text-yellow-600' :
-                            'text-red-600'
+                            strategy.implementation_complexity === 'low' ? 'text-green-600 dark:text-green-400' :
+                            strategy.implementation_complexity === 'medium' ? 'text-yellow-600 dark:text-yellow-400' :
+                            'text-red-600 dark:text-red-400'
                           }`}&gt;
                             {strategy.implementation_complexity}
                           &lt;/span&gt;
                         &lt;/div&gt;
                         &lt;div&gt;
-                          &lt;span className="font-medium text-gray-700"&gt;Timeline:&lt;/span&gt;
-                          &lt;span className="ml-1"&gt;{strategy.typical_implementation_time}&lt;/span&gt;
+                          &lt;span className="font-medium text-gray-700 dark:text-slate-300"&gt;Timeline:&lt;/span&gt;
+                          &lt;span className="ml-1 dark:text-slate-400"&gt;{strategy.typical_implementation_time}&lt;/span&gt;
                         &lt;/div&gt;
                       &lt;/div&gt;
                       
                       {<span class="branch-0 cbranch-no" title="branch not covered" >strategy.implementation_steps.length &gt; 0 &amp;&amp; (</span>
                         &lt;div className="mt-3"&gt;
-                          &lt;div className="text-sm font-medium text-gray-700 mb-2"&gt;
+                          &lt;div className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2"&gt;
                             Implementation Steps:
                           &lt;/div&gt;
                           &lt;div className="space-y-2"&gt;
                             {strategy.implementation_steps.slice(0, 3).map(<span class="fstat-no" title="function not covered" >(s</span>tep) =&gt; (
 <span class="cstat-no" title="statement not covered" >                              &lt;div key={step.step_number} c</span>lassName="flex items-start space-x-2 text-sm"&gt;
-                                &lt;span className="flex-shrink-0 w-5 h-5 bg-blue-100 text-blue-800 rounded-full text-xs flex items-center justify-center"&gt;
+                                &lt;span className="flex-shrink-0 w-5 h-5 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 rounded-full text-xs flex items-center justify-center"&gt;
                                   {step.step_number}
                                 &lt;/span&gt;
                                 &lt;div&gt;
-                                  &lt;span className="text-gray-900"&gt;{step.description}&lt;/span&gt;
-                                  &lt;div className="text-xs text-gray-500 mt-1"&gt;
+                                  &lt;span className="text-gray-900 dark:text-slate-100"&gt;{step.description}&lt;/span&gt;
+                                  &lt;div className="text-xs text-gray-500 dark:text-slate-500 mt-1"&gt;
                                     Duration: {step.estimated_duration}
                                   &lt;/div&gt;
                                 &lt;/div&gt;
                               &lt;/div&gt;
                             ))}
                             {<span class="branch-0 cbranch-no" title="branch not covered" >strategy.implementation_steps.length &gt; 3 &amp;&amp; (</span>
-                              &lt;div className="text-xs text-gray-500 ml-7"&gt;
+                              &lt;div className="text-xs text-gray-500 dark:text-slate-500 ml-7"&gt;
                                 ... and {strategy.implementation_steps.length - 3} more steps
                               &lt;/div&gt;
                             )}
@@ -2383,11 +2389,11 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                       )}
                       
                       {<span class="branch-0 cbranch-no" title="branch not covered" >strategy.similar_cases.length &gt; 0 &amp;&amp; (</span>
-                        &lt;div className="mt-3 p-3 bg-green-50 rounded-md"&gt;
-                          &lt;div className="text-sm font-medium text-green-900 mb-1"&gt;
+                        &lt;div className="mt-3 p-3 bg-green-50 dark:bg-green-900/30 rounded-md"&gt;
+                          &lt;div className="text-sm font-medium text-green-900 dark:text-green-300 mb-1"&gt;
                             Historical Success Cases:
                           &lt;/div&gt;
-                          &lt;div className="text-xs text-green-800"&gt;
+                          &lt;div className="text-xs text-green-800 dark:text-green-400"&gt;
                             {strategy.similar_cases.filter(<span class="fstat-no" title="function not covered" >c =&gt; <span class="cstat-no" title="statement not covered" >c</span>.outcome === 'successful').l</span>ength} successful implementations
                             in similar scenarios
                           &lt;/div&gt;
@@ -2403,12 +2409,12 @@ export default function <span class="cstat-no" title="statement not covered" ><s
           {/* AI Insights Tab */}
           {<span class="branch-0 cbranch-no" title="branch not covered" >activeTab === 'insights' &amp;&amp; (</span>
             &lt;div className="space-y-6"&gt;
-              &lt;h3 className="text-lg font-semibold text-gray-900"&gt;AI-Generated Insights&lt;/h3&gt;
+              &lt;h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100"&gt;AI-Generated Insights&lt;/h3&gt;
               
               {/* Risk Insights */}
-              &lt;div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6"&gt;
-                &lt;h4 className="font-medium text-gray-900 mb-4 flex items-center"&gt;
-                  &lt;Zap className="h-5 w-5 mr-2 text-blue-600" /&gt;
+              &lt;div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 rounded-lg p-6"&gt;
+                &lt;h4 className="font-medium text-gray-900 dark:text-slate-100 mb-4 flex items-center"&gt;
+                  &lt;Zap className="h-5 w-5 mr-2 text-blue-600 dark:text-blue-400" /&gt;
                   Key Risk Insights
                 &lt;/h4&gt;
                 
@@ -2421,11 +2427,11 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                         'bg-blue-500'
                       }`}&gt;&lt;/div&gt;
                       &lt;div&gt;
-                        &lt;p className="text-sm text-gray-900"&gt;{insight.insight}&lt;/p&gt;
-                        &lt;div className="flex items-center space-x-4 mt-1 text-xs text-gray-600"&gt;
+                        &lt;p className="text-sm text-gray-900 dark:text-slate-100"&gt;{insight.insight}&lt;/p&gt;
+                        &lt;div className="flex items-center space-x-4 mt-1 text-xs text-gray-600 dark:text-slate-400"&gt;
                           &lt;span&gt;Confidence: {(insight.confidence * 100).toFixed(0)}%&lt;/span&gt;
                           {<span class="branch-0 cbranch-no" title="branch not covered" >insight.actionable </span>&amp;&amp; (
-                            &lt;span className="text-green-600"&gt;Actionable&lt;/span&gt;
+                            &lt;span className="text-green-600 dark:text-green-400"&gt;Actionable&lt;/span&gt;
                           )}
                         &lt;/div&gt;
                       &lt;/div&gt;
@@ -2436,45 +2442,45 @@ export default function <span class="cstat-no" title="statement not covered" ><s
               
               {/* Model Performance */}
               {<span class="branch-0 cbranch-no" title="branch not covered" >dashboardData?.ai_insights &amp;&amp; (</span>
-                &lt;div className="bg-white border border-gray-200 rounded-lg p-6"&gt;
-                  &lt;h4 className="font-medium text-gray-900 mb-4 flex items-center"&gt;
-                    &lt;Target className="h-5 w-5 mr-2 text-green-600" /&gt;
+                &lt;div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6"&gt;
+                  &lt;h4 className="font-medium text-gray-900 dark:text-slate-100 mb-4 flex items-center"&gt;
+                    &lt;Target className="h-5 w-5 mr-2 text-green-600 dark:text-green-400" /&gt;
                     AI Model Performance
                   &lt;/h4&gt;
                   
                   &lt;div className="grid grid-cols-1 md:grid-cols-2 gap-6"&gt;
                     &lt;div&gt;
-                      &lt;div className="text-sm text-gray-700 mb-2"&gt;Overall Accuracy&lt;/div&gt;
+                      &lt;div className="text-sm text-gray-700 dark:text-slate-300 mb-2"&gt;Overall Accuracy&lt;/div&gt;
                       &lt;div className="flex items-center space-x-2"&gt;
-                        &lt;div className="flex-1 bg-gray-200 rounded-full h-2"&gt;
+                        &lt;div className="flex-1 bg-gray-200 dark:bg-slate-700 rounded-full h-2"&gt;
                           &lt;div 
                             className="bg-green-600 h-2 rounded-full" 
                             style={{ width: `${(dashboardData.ai_insights.model_accuracy || 0.85) * 100}%` }}
                           &gt;&lt;/div&gt;
                         &lt;/div&gt;
-                        &lt;span className="text-sm font-medium"&gt;
+                        &lt;span className="text-sm font-medium dark:text-slate-100"&gt;
                           {((dashboardData.ai_insights.model_accuracy || 0.85) * 100).toFixed(1)}%
                         &lt;/span&gt;
                       &lt;/div&gt;
                     &lt;/div&gt;
                     
                     &lt;div&gt;
-                      &lt;div className="text-sm text-gray-700 mb-2"&gt;Prediction Confidence&lt;/div&gt;
+                      &lt;div className="text-sm text-gray-700 dark:text-slate-300 mb-2"&gt;Prediction Confidence&lt;/div&gt;
                       &lt;div className="flex items-center space-x-2"&gt;
-                        &lt;div className="flex-1 bg-gray-200 rounded-full h-2"&gt;
+                        &lt;div className="flex-1 bg-gray-200 dark:bg-slate-700 rounded-full h-2"&gt;
                           &lt;div 
                             className="bg-blue-600 h-2 rounded-full" 
                             style={{ width: `${(dashboardData.ai_insights.prediction_confidence || 0.78) * 100}%` }}
                           &gt;&lt;/div&gt;
                         &lt;/div&gt;
-                        &lt;span className="text-sm font-medium"&gt;
+                        &lt;span className="text-sm font-medium dark:text-slate-100"&gt;
                           {((dashboardData.ai_insights.prediction_confidence || 0.78) * 100).toFixed(1)}%
                         &lt;/span&gt;
                       &lt;/div&gt;
                     &lt;/div&gt;
                   &lt;/div&gt;
                   
-                  &lt;div className="mt-4 text-xs text-gray-500"&gt;
+                  &lt;div className="mt-4 text-xs text-gray-500 dark:text-slate-500"&gt;
                     Last model update: {dashboardData.ai_insights.last_model_update 
                       ? new Date(dashboardData.ai_insights.last_model_update).toLocaleDateString()
                       : 'Recently'
@@ -2485,30 +2491,30 @@ export default function <span class="cstat-no" title="statement not covered" ><s
               
               {/* Recommendations */}
               {<span class="branch-0 cbranch-no" title="branch not covered" >dashboardData?.recommendations &amp;&amp; (</span>
-                &lt;div className="bg-white border border-gray-200 rounded-lg p-6"&gt;
-                  &lt;h4 className="font-medium text-gray-900 mb-4 flex items-center"&gt;
-                    &lt;Brain className="h-5 w-5 mr-2 text-purple-600" /&gt;
+                &lt;div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6"&gt;
+                  &lt;h4 className="font-medium text-gray-900 dark:text-slate-100 mb-4 flex items-center"&gt;
+                    &lt;Brain className="h-5 w-5 mr-2 text-purple-600 dark:text-purple-400" /&gt;
                     AI Recommendations
                   &lt;/h4&gt;
                   
                   &lt;div className="space-y-3"&gt;
                     {dashboardData.recommendations.slice(0, 5).map(<span class="fstat-no" title="function not covered" >(r</span>ec: any, index: number) =&gt; (
-<span class="cstat-no" title="statement not covered" >                      &lt;div key={index} c</span>lassName="flex items-start space-x-3 p-3 bg-gray-50 rounded-md"&gt;
+<span class="cstat-no" title="statement not covered" >                      &lt;div key={index} c</span>lassName="flex items-start space-x-3 p-3 bg-gray-50 dark:bg-slate-700 rounded-md"&gt;
                         &lt;div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                          rec.priority === 1 ? 'bg-red-100 text-red-800' :
-                          rec.priority === 2 ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-blue-100 text-blue-800'
+                          rec.priority === 1 ? 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300' :
+                          rec.priority === 2 ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300' :
+                          'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300'
                         }`}&gt;
                           {rec.priority}
                         &lt;/div&gt;
                         &lt;div className="flex-1"&gt;
-                          &lt;h5 className="font-medium text-gray-900"&gt;{rec.title}&lt;/h5&gt;
-                          &lt;p className="text-sm text-gray-600 mt-1"&gt;{rec.description}&lt;/p&gt;
-                          &lt;div className="flex items-center space-x-4 mt-2 text-xs text-gray-500"&gt;
+                          &lt;h5 className="font-medium text-gray-900 dark:text-slate-100"&gt;{rec.title}&lt;/h5&gt;
+                          &lt;p className="text-sm text-gray-600 dark:text-slate-400 mt-1"&gt;{rec.description}&lt;/p&gt;
+                          &lt;div className="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-slate-500"&gt;
                             &lt;span className="capitalize"&gt;Type: {rec.type}&lt;/span&gt;
                             &lt;span&gt;Impact: {rec.estimated_impact}&lt;/span&gt;
                             {<span class="branch-0 cbranch-no" title="branch not covered" >rec.action_required </span>&amp;&amp; (
-                              &lt;span className="text-orange-600"&gt;Action Required&lt;/span&gt;
+                              &lt;span className="text-orange-600 dark:text-orange-400"&gt;Action Required&lt;/span&gt;
                             )}
                           &lt;/div&gt;
                         &lt;/div&gt;
@@ -2530,7 +2536,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-23T20:41:45.322Z
+                at 2026-02-03T20:46:02.366Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

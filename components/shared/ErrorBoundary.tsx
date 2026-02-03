@@ -75,17 +75,14 @@ class ErrorBoundaryComponent extends Component<Props, State> {
       this.props.onError(error, errorInfo)
     }
 
-    // Log to error reporting service in production
-    if (process.env.NODE_ENV === 'production') {
-      // Integrate with error reporting service (e.g., Sentry)
-      logger.error('Production error caught by ErrorBoundary', { 
-        message: error.message,
-        name: error.name,
-        stack: error.stack,
-        componentStack: errorInfo.componentStack,
-        errorId: this.state.errorId
-      })
-    }
+    logger.error('Production error caught by ErrorBoundary', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+      errorId: this.state.errorId
+    })
+    // Optional: when @sentry/nextjs is installed, call Sentry.captureException(error, { extra: { componentStack, errorId } })
   }
 
   private handleRetry = () => {
@@ -227,27 +224,27 @@ class ErrorBoundaryComponent extends Component<Props, State> {
 
       // Default error UI
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-          <div className="max-w-lg w-full bg-white rounded-lg shadow-lg p-6 text-center">
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900 px-4">
+          <div className="max-w-lg w-full bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 text-center border border-gray-200 dark:border-slate-700">
             <div className="flex justify-center mb-4">
-              <AlertTriangle className="h-12 w-12 text-red-500" />
+              <AlertTriangle className="h-12 w-12 text-red-500 dark:text-red-400" aria-hidden />
             </div>
             
-            <h1 className="text-xl font-semibold text-gray-900 mb-2">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-2">
               {this.t('errors.boundary.title', { context: contextualInfo })}
             </h1>
             
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 dark:text-slate-300 mb-4">
               {errorTypeMessage}
             </p>
 
             {/* Error ID for support */}
             {this.state.errorId && (
-              <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-md">
-                <p className="text-sm text-gray-600">
+              <div className="mb-4 p-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-md">
+                <p className="text-sm text-gray-600 dark:text-slate-300">
                   <strong>{this.t('errors.boundary.errorId')}</strong> {this.state.errorId}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                   {this.t('errors.boundary.includeIdInSupport')}
                 </p>
               </div>
@@ -255,27 +252,27 @@ class ErrorBoundaryComponent extends Component<Props, State> {
 
             {/* Development error details */}
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md text-left">
-                <h3 className="text-sm font-medium text-red-800 mb-2">{this.t('errors.boundary.devDetails')}</h3>
+              <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md text-left">
+                <h3 className="text-sm font-medium text-red-800 dark:text-red-300 mb-2">{this.t('errors.boundary.devDetails')}</h3>
                 <div className="space-y-2">
                   <div>
-                    <strong className="text-xs text-red-700">{this.t('errors.boundary.message')}</strong>
-                    <pre className="text-xs text-red-700 overflow-auto mt-1 bg-red-100 p-2 rounded">
+                    <strong className="text-xs text-red-700 dark:text-red-400">{this.t('errors.boundary.message')}</strong>
+                    <pre className="text-xs text-red-700 dark:text-red-300 overflow-auto mt-1 bg-red-100 dark:bg-red-900/30 p-2 rounded">
                       {this.state.error.message}
                     </pre>
                   </div>
                   {this.state.error.stack && (
                     <div>
-                      <strong className="text-xs text-red-700">{this.t('errors.boundary.stackTrace')}</strong>
-                      <pre className="text-xs text-red-700 overflow-auto mt-1 bg-red-100 p-2 rounded max-h-32">
+                      <strong className="text-xs text-red-700 dark:text-red-400">{this.t('errors.boundary.stackTrace')}</strong>
+                      <pre className="text-xs text-red-700 dark:text-red-300 overflow-auto mt-1 bg-red-100 dark:bg-red-900/30 p-2 rounded max-h-32">
                         {this.state.error.stack}
                       </pre>
                     </div>
                   )}
                   {this.state.errorInfo?.componentStack && (
                     <div>
-                      <strong className="text-xs text-red-700">{this.t('errors.boundary.componentStack')}</strong>
-                      <pre className="text-xs text-red-700 overflow-auto mt-1 bg-red-100 p-2 rounded max-h-32">
+                      <strong className="text-xs text-red-700 dark:text-red-400">{this.t('errors.boundary.componentStack')}</strong>
+                      <pre className="text-xs text-red-700 dark:text-red-300 overflow-auto mt-1 bg-red-100 dark:bg-red-900/30 p-2 rounded max-h-32">
                         {this.state.errorInfo.componentStack}
                       </pre>
                     </div>
@@ -288,17 +285,17 @@ class ErrorBoundaryComponent extends Component<Props, State> {
             <div className="flex flex-col sm:flex-row gap-3 justify-center mb-4">
               <button
                 onClick={this.handleRetry}
-                className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                className="flex items-center justify-center px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
               >
-                <RefreshCw className="h-4 w-4 mr-2" />
+                <RefreshCw className="h-4 w-4 mr-2" aria-hidden />
                 {this.t('errors.boundary.tryAgain')}
               </button>
               
               <button
                 onClick={() => window.location.reload()}
-                className="flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+                className="flex items-center justify-center px-4 py-2 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
               >
-                <RefreshCw className="h-4 w-4 mr-2" />
+                <RefreshCw className="h-4 w-4 mr-2" aria-hidden />
                 {this.t('errors.boundary.refreshPage')}
               </button>
             </div>
@@ -306,54 +303,54 @@ class ErrorBoundaryComponent extends Component<Props, State> {
             {/* Navigation options */}
             {showNavigation && (
               <>
-                <div className="border-t border-gray-200 pt-4 mb-4">
-                  <p className="text-sm text-gray-600 mb-3">
+                <div className="border-t border-gray-200 dark:border-slate-700 pt-4 mb-4">
+                  <p className="text-sm text-gray-600 dark:text-slate-300 mb-3">
                     {this.t('errors.boundary.navigateSection')}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2 justify-center">
                     <button
                       onClick={this.handleGoHome}
-                      className="flex items-center justify-center px-3 py-2 bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors"
+                      className="flex items-center justify-center px-3 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-md hover:bg-green-200 dark:hover:bg-green-800/40 transition-colors"
                     >
-                      <Home className="h-4 w-4 mr-2" />
+                      <Home className="h-4 w-4 mr-2" aria-hidden />
                       {this.t('errors.boundary.dashboardHome')}
                     </button>
                     
                     <button
                       onClick={this.handleGoBack}
-                      className="flex items-center justify-center px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+                      className="flex items-center justify-center px-3 py-2 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
                     >
-                      <ArrowLeft className="h-4 w-4 mr-2" />
+                      <ArrowLeft className="h-4 w-4 mr-2" aria-hidden />
                       {this.t('errors.boundary.goBack')}
                     </button>
                   </div>
                 </div>
 
                 {/* Quick navigation links */}
-                <div className="border-t border-gray-200 pt-4">
-                  <p className="text-xs text-gray-500 mb-2">{this.t('errors.boundary.quickNavigation')}</p>
+                <div className="border-t border-gray-200 dark:border-slate-700 pt-4">
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">{this.t('errors.boundary.quickNavigation')}</p>
                   <div className="flex flex-wrap gap-2 justify-center text-xs">
                     <a 
                       href="/reports" 
-                      className="px-2 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
+                      className="px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded hover:bg-blue-100 dark:hover:bg-blue-800/40 transition-colors"
                     >
                       {this.t('nav.reports')}
                     </a>
                     <a 
                       href="/risks" 
-                      className="px-2 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
+                      className="px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded hover:bg-blue-100 dark:hover:bg-blue-800/40 transition-colors"
                     >
                       {this.t('nav.risks')}
                     </a>
                     <a 
                       href="/scenarios" 
-                      className="px-2 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
+                      className="px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded hover:bg-blue-100 dark:hover:bg-blue-800/40 transition-colors"
                     >
                       {this.t('nav.scenarios')}
                     </a>
                     <a 
                       href="/feedback" 
-                      className="px-2 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
+                      className="px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded hover:bg-blue-100 dark:hover:bg-blue-800/40 transition-colors"
                     >
                       <HelpCircle className="h-3 w-3 inline mr-1" />
                       {this.t('errors.boundary.help')}

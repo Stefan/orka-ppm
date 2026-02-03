@@ -1,15 +1,162 @@
 /**
  * Dashboard Quick Stats API Endpoint
  * Fetches real data from backend and computes dashboard statistics
+ * Applies user KPI preferences from settings
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+import { jwtDecode } from 'jwt-decode'
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8001'
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
+// Create Supabase client for fetching user preferences
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: { autoRefreshToken: false, persistSession: false }
+})
+
+interface DashboardKPIs {
+  successRateMethod: 'health' | 'completion'
+  budgetMethod: 'spent' | 'remaining'
+  resourceMethod: 'auto' | 'fixed'
+  resourceFixedValue: number
+}
+
+const DEFAULT_KPI_SETTINGS: DashboardKPIs = {
+  successRateMethod: 'health',
+  budgetMethod: 'spent',
+  resourceMethod: 'auto',
+  resourceFixedValue: 85
+}
+
+/**
+ * Extract user ID from JWT token
+ */
+function getUserIdFromAuth(authHeader: string | null): string | null {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null
+  }
+  
+  try {
+    const token = authHeader.substring(7)
+    const decoded = jwtDecode<{ sub?: string }>(token)
+    return decoded.sub || null
+  } catch (error) {
+    console.error('Failed to decode JWT:', error)
+    return null
+  }
+}
+
+/**
+ * Fetch user's KPI preferences
+ */
+async function getUserKPISettings(userId: string | null): Promise<DashboardKPIs> {
+  if (!userId || !supabaseUrl) {
+    return DEFAULT_KPI_SETTINGS
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('preferences')
+      .eq('user_id', userId)
+      .single()
+
+    if (error || !data?.preferences?.dashboardKPIs) {
+      return DEFAULT_KPI_SETTINGS
+    }
+
+    return {
+      ...DEFAULT_KPI_SETTINGS,
+      ...data.preferences.dashboardKPIs
+    }
+  } catch (error) {
+    console.error('Failed to fetch user KPI settings:', error)
+    return DEFAULT_KPI_SETTINGS
+  }
+}
+
+/**
+ * Calculate KPIs based on user preferences
+ */
+function calculateKPIs(
+  settings: DashboardKPIs,
+  totalProjects: number,
+  activeProjects: number,
+  completedProjects: number,
+  healthDistribution: { green: number; yellow: number; red: number },
+  totalBudget: number,
+  spentBudget: number
+) {
+  // Success Rate: based on user preference
+  let project_success_rate = 0
+  if (totalProjects > 0) {
+    if (settings.successRateMethod === 'health') {
+      // Health-based: % of green projects + completed
+      project_success_rate = Math.round(((healthDistribution.green + completedProjects) / totalProjects) * 100)
+    } else {
+      // Completion-based: % of completed projects
+      project_success_rate = Math.round((completedProjects / totalProjects) * 100)
+    }
+  }
+
+  // Budget Performance: based on user preference
+  let budget_performance = 0
+  if (totalBudget > 0) {
+    if (settings.budgetMethod === 'spent') {
+      // Spent: % of budget utilized
+      budget_performance = Math.round((spentBudget / totalBudget) * 100)
+    } else {
+      // Remaining: % of budget available
+      budget_performance = Math.round(((totalBudget - spentBudget) / totalBudget) * 100)
+    }
+  }
+
+  // Timeline Performance: % of active projects
+  const timeline_performance = totalProjects > 0 
+    ? Math.round((activeProjects / totalProjects) * 100) 
+    : 0
+
+  // Average Health Score
+  const average_health_score = totalProjects > 0 
+    ? Math.round(((healthDistribution.green * 100 + healthDistribution.yellow * 50) / totalProjects) / 10) / 10 
+    : 0
+
+  // Resource Efficiency: based on user preference
+  let resource_efficiency = 0
+  if (settings.resourceMethod === 'fixed') {
+    resource_efficiency = settings.resourceFixedValue
+  } else {
+    // Auto-calculate based on active projects ratio
+    resource_efficiency = totalProjects > 0 
+      ? Math.min(100, Math.round((activeProjects / totalProjects) * 100 + 20)) 
+      : 0
+  }
+
+  // Active Projects Ratio
+  const active_projects_ratio = totalProjects > 0 
+    ? Math.round((activeProjects / totalProjects) * 100) 
+    : 0
+
+  return {
+    project_success_rate,
+    budget_performance,
+    timeline_performance,
+    average_health_score,
+    resource_efficiency,
+    active_projects_ratio
+  }
+}
 
 export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization')
+    
+    // Get user ID and their KPI preferences
+    const userId = getUserIdFromAuth(authHeader)
+    const kpiSettings = await getUserKPISettings(userId)
     
     // Fetch projects from backend
     const response = await fetch(`${BACKEND_URL}/projects`, {
@@ -23,7 +170,7 @@ export async function GET(request: NextRequest) {
     if (!response.ok) {
       console.error('Backend API error:', response.status)
       // Return fallback mock data if backend is unavailable
-      return NextResponse.json(getMockDashboardData(), { 
+      return NextResponse.json(getMockDashboardData(kpiSettings), { 
         status: 200,
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -49,6 +196,17 @@ export async function GET(request: NextRequest) {
     const totalBudget = projects.reduce((sum: number, p: any) => sum + (p?.budget || 0), 0)
     const spentBudget = projects.reduce((sum: number, p: any) => sum + (p?.actual || p?.budget * 0.7 || 0), 0)
     
+    // Calculate KPIs with user preferences
+    const kpis = calculateKPIs(
+      kpiSettings,
+      totalProjects,
+      activeProjects,
+      completedProjects,
+      healthDistribution,
+      totalBudget,
+      spentBudget
+    )
+    
     const dashboardData = {
       quick_stats: {
         total_projects: totalProjects,
@@ -59,18 +217,12 @@ export async function GET(request: NextRequest) {
         at_risk_projects: healthDistribution.yellow || 0,
         total_budget: totalBudget,
         spent_budget: spentBudget,
-        team_members: Math.max(totalProjects * 3, 1), // Estimate
-        pending_tasks: activeProjects * 15, // Estimate
-        overdue_tasks: healthDistribution.red * 6 // Estimate
+        team_members: Math.max(totalProjects * 3, 1),
+        pending_tasks: activeProjects * 15,
+        overdue_tasks: healthDistribution.red * 6
       },
-      kpis: {
-        project_success_rate: totalProjects > 0 ? Math.round((completedProjects / totalProjects) * 100) : 0,
-        budget_utilization: totalBudget > 0 ? Math.round((spentBudget / totalBudget) * 100) : 0,
-        team_productivity: 78, // Would need time tracking data
-        risk_score: (healthDistribution.red * 10 + healthDistribution.yellow * 5),
-        schedule_performance: 91, // Would need schedule data
-        cost_performance: totalBudget > 0 ? Math.round(((totalBudget - spentBudget) / totalBudget) * 100) : 100
-      },
+      kpis,
+      kpi_settings: kpiSettings, // Include settings so frontend knows what was applied
       recent_activity: projects.slice(0, 3).map((p: any, i: number) => ({
         id: i + 1,
         type: 'project_update',
@@ -94,7 +246,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Dashboard API error:', error)
     // Return fallback mock data on error
-    return NextResponse.json(getMockDashboardData(), { 
+    return NextResponse.json(getMockDashboardData(DEFAULT_KPI_SETTINGS), { 
       status: 200,
       headers: {
         'X-Data-Source': 'fallback-mock'
@@ -116,7 +268,7 @@ function generateBudgetData(projects: any[]) {
   const categories = ['Development', 'Design', 'Testing', 'Infrastructure']
   const totalBudget = projects.reduce((sum: number, p: any) => sum + (p?.budget || 0), 0)
   
-  return categories.map((category, i) => {
+  return categories.map((category) => {
     const budget = totalBudget / categories.length
     return {
       category,
@@ -126,33 +278,41 @@ function generateBudgetData(projects: any[]) {
   })
 }
 
-function getMockDashboardData() {
+function getMockDashboardData(kpiSettings: DashboardKPIs) {
+  // Mock data with configurable KPIs
+  const totalProjects = 12
+  const activeProjects = 8
+  const completedProjects = 4
+  const healthDistribution = { green: 6, yellow: 4, red: 2 }
+  const totalBudget = 2500000
+  const spentBudget = 1800000
+
+  const kpis = calculateKPIs(
+    kpiSettings,
+    totalProjects,
+    activeProjects,
+    completedProjects,
+    healthDistribution,
+    totalBudget,
+    spentBudget
+  )
+
   return {
     quick_stats: {
-      total_projects: 12,
-      active_projects: 8,
-      completed_projects: 4,
-      health_distribution: {
-        green: 6,
-        yellow: 4,
-        red: 2
-      },
+      total_projects: totalProjects,
+      active_projects: activeProjects,
+      completed_projects: completedProjects,
+      health_distribution: healthDistribution,
       critical_alerts: 2,
       at_risk_projects: 4,
-      total_budget: 2500000,
-      spent_budget: 1800000,
+      total_budget: totalBudget,
+      spent_budget: spentBudget,
       team_members: 24,
       pending_tasks: 156,
       overdue_tasks: 12
     },
-    kpis: {
-      project_success_rate: 85,
-      budget_utilization: 72,
-      team_productivity: 78,
-      risk_score: 23,
-      schedule_performance: 91,
-      cost_performance: 88
-    },
+    kpis,
+    kpi_settings: kpiSettings,
     recent_activity: [
       {
         id: 1,

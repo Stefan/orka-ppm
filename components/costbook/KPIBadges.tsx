@@ -75,21 +75,37 @@ function KPIBadge({
 
   const classes = sizeClasses[size]
 
+  // Map light mode bg classes to dark mode equivalents
+  const getDarkBgClass = (lightBg: string) => {
+    const darkBgMap: Record<string, string> = {
+      'bg-blue-50': 'dark:bg-blue-900/30',
+      'bg-orange-50': 'dark:bg-orange-900/30',
+      'bg-purple-50': 'dark:bg-purple-900/30',
+      'bg-gray-50': 'dark:bg-slate-700',
+      'bg-gray-100': 'dark:bg-slate-700',
+      'bg-green-50': 'dark:bg-green-900/30',
+      'bg-green-100': 'dark:bg-green-900/30',
+      'bg-red-50': 'dark:bg-red-900/30'
+    }
+    return darkBgMap[lightBg] || 'dark:bg-slate-700'
+  }
+
   return (
     <div 
       className={`
         flex flex-col items-center
         ${classes.container}
         ${bgColorClass}
+        ${getDarkBgClass(bgColorClass)}
         rounded-lg
-        border border-gray-200
+        border border-gray-200 dark:border-slate-600
         shadow-sm
         min-w-[80px]
         transition-transform hover:scale-105
       `}
       data-testid={testId}
     >
-      <div className={`flex items-center gap-1 mb-1 text-gray-500`}>
+      <div className={`flex items-center gap-1 mb-1 text-gray-500 dark:text-slate-400`}>
         <span className={classes.icon}>{icon}</span>
         <span className={`${classes.label} font-medium uppercase tracking-wide`}>
           {label}

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useCallback, useMemo, useRef } from 'react'
-import { ProjectWithFinancials, Currency } from '@/types/costbook'
+import { ProjectWithFinancials, Currency, DistributionSettings } from '@/types/costbook'
 import { formatCurrency } from '@/lib/currency-utils'
 import { ForecastScenario, ScenarioSelector, createBaselineScenario, duplicateScenario } from './ScenarioSelector'
 import {
@@ -40,6 +40,10 @@ export interface CashOutGanttProps {
   startDate?: Date
   /** End date for the timeline */
   endDate?: Date
+  /** Distribution settings per project (Duration/Profile) – shown as columns/badges */
+  distributionSettingsByProject?: Map<string, DistributionSettings>
+  /** Open distribution settings modal for a project */
+  onOpenDistributionSettings?: (projectId: string) => void
   /** Additional CSS classes */
   className?: string
   /** Test ID */
@@ -220,6 +224,8 @@ export function CashOutGantt({
   onForecastChange,
   startDate: propStartDate,
   endDate: propEndDate,
+  distributionSettingsByProject,
+  onOpenDistributionSettings,
   className = '',
   'data-testid': testId = 'cash-out-gantt'
 }: CashOutGanttProps) {
@@ -346,6 +352,31 @@ export function CashOutGantt({
       className={`bg-white rounded-lg border border-gray-200 overflow-hidden ${className}`}
       data-testid={testId}
     >
+      {/* Duration/Profile summary when distribution settings are provided */}
+      {distributionSettingsByProject && distributionSettingsByProject.size > 0 && (
+        <div className="px-4 py-2 border-b border-gray-100 bg-gray-50 text-xs">
+          <span className="font-medium text-gray-600">Duration / Profile:</span>
+          <div className="flex flex-wrap gap-2 mt-1">
+            {Array.from(distributionSettingsByProject.entries()).slice(0, 5).map(([projectId, settings]) => {
+              const project = projects.find(p => p.id === projectId)
+              const label = project?.name ?? projectId.slice(0, 8)
+              return (
+                <button
+                  key={projectId}
+                  type="button"
+                  onClick={() => onOpenDistributionSettings?.(projectId)}
+                  className="px-2 py-1 rounded bg-white border border-gray-200 hover:border-blue-300 hover:bg-blue-50 text-gray-700 truncate max-w-[140px]"
+                  title={`${label}: ${settings.profile}, ${settings.duration_start?.slice(0, 10)} – ${settings.duration_end?.slice(0, 10)}`}
+                >
+                  <span className="truncate block">{label}</span>
+                  <span className="text-gray-500">{settings.profile}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <div className="flex items-center gap-3">

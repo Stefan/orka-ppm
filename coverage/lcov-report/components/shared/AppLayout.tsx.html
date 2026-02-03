@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/26</span>
+                <span class='fraction'>0/27</span>
             </div>
         
             
@@ -151,7 +151,10 @@
 <a name='L86'></a><a href='#L86'>86</a>
 <a name='L87'></a><a href='#L87'>87</a>
 <a name='L88'></a><a href='#L88'>88</a>
-<a name='L89'></a><a href='#L89'>89</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -165,6 +168,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -176,7 +180,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -218,7 +221,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -241,7 +247,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use client'
 &nbsp;
-import React, { useEffect, useRef, useState, lazy, Suspense } from <span class="cstat-no" title="statement not covered" >'react'</span>
+import React, { useEffect, useRef, useState } from <span class="cstat-no" title="statement not covered" >'react'</span>
 import { useAuth } from <span class="cstat-no" title="statement not covered" >'../../app/providers/SupabaseAuthProvider'</span>
 import { HelpChatProvider } from <span class="cstat-no" title="statement not covered" >'../../app/providers/HelpChatProvider'</span>
 import { useRouter } from <span class="cstat-no" title="statement not covered" >'next/navigation'</span>
@@ -251,8 +257,9 @@ import HelpChatToggle from <span class="cstat-no" title="statement not covered" 
 import { useIsMobile } from <span class="cstat-no" title="statement not covered" >'@/hooks/useMediaQuery'</span>
 import { useTranslations } from <span class="cstat-no" title="statement not covered" >'@/lib/i18n/context'</span>
 &nbsp;
-// Lazy load HelpChat for better performance
-const HelpChat = <span class="cstat-no" title="statement not covered" >lazy(<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >i</span>mport('</span>../HelpChat'))</span></span>
+// Import HelpChat directly to prevent CLS (layout shift)
+import HelpChat from <span class="cstat-no" title="statement not covered" >'../HelpChat'</span>
+import { DarkModeForcer } from <span class="cstat-no" title="statement not covered" >'./DarkModeForcer'</span>
 &nbsp;
 export interface AppLayoutProps {
   children: React.ReactNode
@@ -263,7 +270,6 @@ export default function <span class="cstat-no" title="statement not covered" ><s
   const router = <span class="cstat-no" title="statement not covered" >useRouter()</span>
   const mainContentRef = <span class="cstat-no" title="statement not covered" >useRef&lt;HTMLElement&gt;(null)</span>
   const { t } = <span class="cstat-no" title="statement not covered" >useTranslations()</span>
-  
   // Mobile navigation state management
   const isMobile = <span class="cstat-no" title="statement not covered" >useIsMobile()</span>
   const [mobileNavOpen, setMobileNavOpen] = <span class="cstat-no" title="statement not covered" >useState(false)</span>
@@ -282,7 +288,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  if (loading) {</span>
     return (
-      &lt;div className="flex items-center justify-center h-screen"&gt;
+      &lt;div className="flex items-center justify-center h-screen bg-white dark:bg-slate-900"&gt;
         &lt;div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"&gt;&lt;/div&gt;
       &lt;/div&gt;
     )
@@ -290,9 +296,9 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  if (!session) {</span>
     return (
-      &lt;div className="flex items-center justify-center h-screen"&gt;
+      &lt;div className="flex items-center justify-center h-screen bg-white dark:bg-slate-900"&gt;
         &lt;div className="text-center"&gt;
-          &lt;p className="text-gray-600 mb-4"&gt;{t('layout.redirecting')}&lt;/p&gt;
+          &lt;p className="text-gray-600 dark:text-gray-300 mb-4"&gt;{t('layout.redirecting')}&lt;/p&gt;
           &lt;div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"&gt;&lt;/div&gt;
         &lt;/div&gt;
       &lt;/div&gt;
@@ -301,7 +307,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
 &nbsp;
   return (
     &lt;HelpChatProvider&gt;
-      &lt;div data-testid="app-layout" className="min-h-screen bg-gray-50 flex flex-col"&gt;
+      &lt;DarkModeForcer /&gt;
+      &lt;div data-testid="app-layout" className="min-h-screen bg-white dark:bg-slate-900 flex flex-col"&gt;
         {/* Top Bar Navigation */}
         &lt;TopBar onMenuToggle={toggleMobileNav} /&gt;
         
@@ -309,10 +316,14 @@ export default function <span class="cstat-no" title="statement not covered" ><s
         &lt;MobileNav isOpen={mobileNavOpen} onClose={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etMobileNavOpen(false)} /&gt;</span>
         
         {/* Main Content Area */}
-        &lt;main 
+        &lt;main
           data-testid="app-layout-main"
           ref={mainContentRef}
           className="flex-1"
+          style={{
+            // CSS containment for better performance isolation and CLS prevention
+            contain: 'layout style paint'
+          }}
         &gt;
           {children}
         &lt;/main&gt;
@@ -320,10 +331,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
         {/* Help Chat Toggle - Floating at bottom-right */}
         &lt;HelpChatToggle /&gt;
 &nbsp;
-        {/* Help Chat Integration - Lazy loaded */}
-        &lt;Suspense fallback={null}&gt;
-          &lt;HelpChat /&gt;
-        &lt;/Suspense&gt;
+        {/* Help Chat Integration - Always rendered to prevent CLS */}
+        &lt;HelpChat /&gt;
       &lt;/div&gt;
     &lt;/HelpChatProvider&gt;
   )
@@ -334,7 +343,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-23T20:41:45.322Z
+                at 2026-02-03T20:46:02.366Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

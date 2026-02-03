@@ -928,7 +928,9 @@
 <a name='L863'></a><a href='#L863'>863</a>
 <a name='L864'></a><a href='#L864'>864</a>
 <a name='L865'></a><a href='#L865'>865</a>
-<a name='L866'></a><a href='#L866'>866</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L866'></a><a href='#L866'>866</a>
+<a name='L867'></a><a href='#L867'>867</a>
+<a name='L868'></a><a href='#L868'>868</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1293,6 +1295,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2057,16 +2061,16 @@ const AnomalyDashboard: React.FC&lt;AnomalyDashboardProps&gt; = <span class="cst
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  if (anomalies.length === 0) {</span>
     return (
-      &lt;div className={`bg-white rounded-lg border border-gray-200 ${className}`} data-testid="anomaly-dashboard"&gt;
+      &lt;div className={`bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 ${className}`} data-testid="anomaly-dashboard"&gt;
         {/* Header with connection status */}
-        &lt;div className="p-6 border-b border-gray-200"&gt;
+        &lt;div className="p-6 border-b border-gray-200 dark:border-slate-700"&gt;
           &lt;div className="flex items-center justify-between mb-4"&gt;
             &lt;div&gt;
-              &lt;h2 className="text-2xl font-bold text-gray-900 flex items-center"&gt;
-                &lt;TriangleAlert className="h-6 w-6 text-red-600 mr-2" /&gt;
+              &lt;h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100 flex items-center"&gt;
+                &lt;TriangleAlert className="h-6 w-6 text-red-600 dark:text-red-400 mr-2" /&gt;
                 Anomaly Detection
               &lt;/h2&gt;
-              &lt;p className="text-sm text-gray-600 mt-1"&gt;0 anomalies detected&lt;/p&gt;
+              &lt;p className="text-sm text-gray-600 dark:text-slate-400 mt-1"&gt;0 anomalies detected&lt;/p&gt;
             &lt;/div&gt;
             
             {/* WebSocket Connection Status */}
@@ -2119,7 +2123,7 @@ const AnomalyDashboard: React.FC&lt;AnomalyDashboardProps&gt; = <span class="cst
         }
       `}&lt;/style&gt;
 &nbsp;
-      &lt;div className={`bg-white rounded-lg border border-gray-200 ${className}`} data-testid="anomaly-dashboard"&gt;
+      &lt;div className={`bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 ${className}`} data-testid="anomaly-dashboard"&gt;
       {/* Real-time Toast Notifications */}
       {<span class="branch-0 cbranch-no" title="branch not covered" >notifications.length &gt; 0 &amp;&amp; (</span>
         &lt;div className="fixed top-4 right-4 z-50 space-y-2" style={{ maxWidth: '400px' }}&gt;
@@ -2169,14 +2173,14 @@ const AnomalyDashboard: React.FC&lt;AnomalyDashboardProps&gt; = <span class="cst
       )}
 &nbsp;
       {/* Header with Stats */}
-      &lt;div className="p-6 border-b border-gray-200"&gt;
+      &lt;div className="p-6 border-b border-gray-200 dark:border-slate-700"&gt;
         &lt;div className="flex items-center justify-between mb-4"&gt;
           &lt;div&gt;
-            &lt;h2 className="text-2xl font-bold text-gray-900 flex items-center"&gt;
-              &lt;AlertTriangle className="h-6 w-6 text-red-600 mr-2" /&gt;
+            &lt;h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100 flex items-center"&gt;
+              &lt;AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400 mr-2" /&gt;
               Anomaly Detection
             &lt;/h2&gt;
-            &lt;p className="text-sm text-gray-600 mt-1"&gt;
+            &lt;p className="text-sm text-gray-600 dark:text-slate-400 mt-1"&gt;
               {anomalies.length} anomal{anomalies.length !== 1 ? 'ies' : 'y'} detected
             &lt;/p&gt;
           &lt;/div&gt;
@@ -2201,43 +2205,45 @@ const AnomalyDashboard: React.FC&lt;AnomalyDashboardProps&gt; = <span class="cst
 &nbsp;
         {/* Stats Cards */}
         &lt;div className="grid grid-cols-2 md:grid-cols-4 gap-4"&gt;
-          &lt;div className="p-4 bg-red-50 border border-red-200 rounded-lg"&gt;
+          &lt;div
+            className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
+          &gt;
             &lt;div className="flex items-center justify-between"&gt;
               &lt;div&gt;
-                &lt;p className="text-xs text-red-600 font-medium"&gt;Critical&lt;/p&gt;
-                &lt;p className="text-2xl font-bold text-red-700"&gt;{anomalyStats.critical}&lt;/p&gt;
+                &lt;p className="text-xs text-red-600 dark:text-red-400 font-medium"&gt;Critical&lt;/p&gt;
+                &lt;p className="text-2xl font-bold text-red-700 dark:text-red-300"&gt;{anomalyStats.critical}&lt;/p&gt;
               &lt;/div&gt;
-              &lt;div className="w-3 h-3 rounded-full bg-red-600"&gt;&lt;/div&gt;
+              &lt;div className="w-3 h-3 rounded-full bg-red-600 dark:bg-red-400"&gt;&lt;/div&gt;
             &lt;/div&gt;
           &lt;/div&gt;
 &nbsp;
-          &lt;div className="p-4 bg-orange-50 border border-orange-200 rounded-lg"&gt;
+          &lt;div className="p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg"&gt;
             &lt;div className="flex items-center justify-between"&gt;
               &lt;div&gt;
-                &lt;p className="text-xs text-orange-600 font-medium"&gt;High&lt;/p&gt;
-                &lt;p className="text-2xl font-bold text-orange-700"&gt;{anomalyStats.high}&lt;/p&gt;
+                &lt;p className="text-xs text-orange-600 dark:text-orange-400 font-medium"&gt;High&lt;/p&gt;
+                &lt;p className="text-2xl font-bold text-orange-700 dark:text-orange-300"&gt;{anomalyStats.high}&lt;/p&gt;
               &lt;/div&gt;
-              &lt;div className="w-3 h-3 rounded-full bg-orange-600"&gt;&lt;/div&gt;
+              &lt;div className="w-3 h-3 rounded-full bg-orange-600 dark:bg-orange-400"&gt;&lt;/div&gt;
             &lt;/div&gt;
           &lt;/div&gt;
 &nbsp;
-          &lt;div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg"&gt;
+          &lt;div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg"&gt;
             &lt;div className="flex items-center justify-between"&gt;
               &lt;div&gt;
-                &lt;p className="text-xs text-yellow-600 font-medium"&gt;Medium&lt;/p&gt;
-                &lt;p className="text-2xl font-bold text-yellow-700"&gt;{anomalyStats.medium}&lt;/p&gt;
+                &lt;p className="text-xs text-yellow-600 dark:text-yellow-400 font-medium"&gt;Medium&lt;/p&gt;
+                &lt;p className="text-2xl font-bold text-yellow-700 dark:text-yellow-300"&gt;{anomalyStats.medium}&lt;/p&gt;
               &lt;/div&gt;
-              &lt;div className="w-3 h-3 rounded-full bg-yellow-600"&gt;&lt;/div&gt;
+              &lt;div className="w-3 h-3 rounded-full bg-yellow-600 dark:bg-yellow-400"&gt;&lt;/div&gt;
             &lt;/div&gt;
           &lt;/div&gt;
 &nbsp;
-          &lt;div className="p-4 bg-gray-50 border border-gray-200 rounded-lg"&gt;
+          &lt;div className="p-4 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg"&gt;
             &lt;div className="flex items-center justify-between"&gt;
               &lt;div&gt;
-                &lt;p className="text-xs text-gray-600 font-medium"&gt;False Positives&lt;/p&gt;
-                &lt;p className="text-2xl font-bold text-gray-700"&gt;{anomalyStats.falsePositives}&lt;/p&gt;
+                &lt;p className="text-xs text-gray-600 dark:text-slate-400 font-medium"&gt;False Positives&lt;/p&gt;
+                &lt;p className="text-2xl font-bold text-gray-700 dark:text-slate-300"&gt;{anomalyStats.falsePositives}&lt;/p&gt;
               &lt;/div&gt;
-              &lt;CheckCircle className="h-5 w-5 text-gray-400" /&gt;
+              &lt;CheckCircle className="h-5 w-5 text-gray-400 dark:text-slate-500" /&gt;
             &lt;/div&gt;
           &lt;/div&gt;
         &lt;/div&gt;
@@ -2665,7 +2671,7 @@ const AnomalyDashboard: React.FC&lt;AnomalyDashboardProps&gt; = <span class="cst
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-23T20:41:45.322Z
+                at 2026-02-03T20:46:02.366Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

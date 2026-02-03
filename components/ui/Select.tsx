@@ -4,7 +4,7 @@
  * A professional select/dropdown component with custom styling.
  */
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ChevronDown, Check } from 'lucide-react'
 import { cn } from '@/lib/design-system'
 import { useClickOutside } from '@/hooks'
@@ -33,12 +33,12 @@ const selectBaseStyles = [
   'text-sm',
   'min-h-[40px]',
   'rounded-lg',
-  'border border-gray-300',
-  'bg-white',
-  'text-gray-900',
+  'border border-gray-300 dark:border-slate-600',
+  'bg-white dark:bg-slate-800',
+  'text-gray-900 dark:text-slate-100',
   'transition-all duration-150 ease-in-out',
   'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
-  'disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed',
+  'disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed dark:disabled:bg-slate-700 dark:disabled:text-slate-400',
 ].join(' ')
 
 export const Select: React.FC<SelectProps> = ({
@@ -56,6 +56,12 @@ export const Select: React.FC<SelectProps> = ({
   const [selectedValues, setSelectedValues] = useState<string[]>(
     multiple ? (value ? value.split(',') : []) : (value ? [value] : [])
   )
+
+  // Sync selectedValues when value prop changes
+  useEffect(() => {
+    const newValues = multiple ? (value ? value.split(',') : []) : (value ? [value] : [])
+    setSelectedValues(newValues)
+  }, [value, multiple])
 
   const selectRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false))
 
@@ -112,9 +118,8 @@ export const Select: React.FC<SelectProps> = ({
   }
 
   return (
-    <div className="relative w-full">
+    <div ref={selectRef} className="relative w-full">
       <div
-        ref={selectRef}
         className={cn(
           selectBaseStyles,
           'relative cursor-pointer flex items-center',
@@ -126,22 +131,23 @@ export const Select: React.FC<SelectProps> = ({
       >
         <span className={cn(
           'block truncate flex-1',
-          selectedValues.length === 0 && 'text-gray-400'
+          selectedValues.length === 0 && 'text-gray-400 dark:text-slate-500'
         )}>
           {getDisplayValue()}
         </span>
         <ChevronDown
           className={cn(
-            'h-4 w-4 text-gray-400 transition-transform duration-200',
+            'h-4 w-4 text-gray-400 dark:text-slate-400 transition-transform duration-200 shrink-0',
             isOpen && 'rotate-180'
           )}
+          aria-hidden
         />
       </div>
 
       {isOpen && !disabled && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg shadow-lg max-h-60 overflow-auto">
           {options.length === 0 ? (
-            <div className="px-4 py-3 text-sm text-gray-500">No options available</div>
+            <div className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400">No options available</div>
           ) : (
             options.map((option) => (
               <div
@@ -150,15 +156,15 @@ export const Select: React.FC<SelectProps> = ({
                   'px-4 py-2.5 text-sm cursor-pointer flex items-center justify-between',
                   'transition-colors duration-100',
                   option.disabled
-                    ? 'text-gray-400 cursor-not-allowed'
-                    : 'text-gray-900 hover:bg-gray-50',
-                  selectedValues.includes(option.value) && 'bg-blue-50 text-blue-700'
+                    ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed'
+                    : 'text-gray-900 dark:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-700',
+                  selectedValues.includes(option.value) && 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
                 )}
                 onClick={() => !option.disabled && handleSelect(option.value)}
               >
                 <span className="truncate">{option.label}</span>
                 {selectedValues.includes(option.value) && (
-                  <Check className="h-4 w-4 text-blue-600 flex-shrink-0 ml-2" />
+                  <Check className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0 ml-2" />
                 )}
               </div>
             ))

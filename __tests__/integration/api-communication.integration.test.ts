@@ -8,6 +8,12 @@
 // const server = setupServer(...handlers); beforeAll(() => server.listen()); afterEach(() => server.resetHandlers()); afterAll(() => server.close());
 
 describe('API communication (integration)', () => {
+  const originalFetch = global.fetch
+
+  afterEach(() => {
+    global.fetch = originalFetch
+  })
+
   it('health endpoint returns ok when mocked', async () => {
     const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
     const res = await fetch(`${base}/health`).catch(() => null);
@@ -17,6 +23,11 @@ describe('API communication (integration)', () => {
   });
 
   it('projects list returns array when mocked', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ projects: [] }),
+    } as Response)
     const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
     const res = await fetch(`${base}/projects/`, {
       headers: { Authorization: 'Bearer test-token' },

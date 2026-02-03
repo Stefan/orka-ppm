@@ -159,6 +159,10 @@ class RateLimiter {
     const recentRequests = this.requests.filter(timestamp => now - timestamp < this.windowMs)
     return Math.max(0, this.maxRequests - recentRequests.length)
   }
+
+  reset(): void {
+    this.requests = []
+  }
 }
 
 // Error handling utilities
@@ -441,9 +445,12 @@ export class HelpChatAPIService {
         
         return data
       } catch (error) {
-        if (error instanceof Error && error.name === 'TypeError') {
+        if (error && typeof error === 'object' && 'code' in error) {
+          throw error
+        }
+        if (error instanceof Error) {
           throw createHelpChatError(
-            'Network error - please check your connection',
+            error.message || 'Network error - please check your connection',
             'NETWORK_ERROR',
             { originalError: error.message }
           )
@@ -612,9 +619,10 @@ export class HelpChatAPIService {
         
         return data
       } catch (error) {
-        if (error instanceof Error && error.name === 'TypeError') {
+        if (error && typeof error === 'object' && 'code' in error) throw error
+        if (error instanceof Error) {
           throw createHelpChatError(
-            'Network error - please check your connection',
+            error.message || 'Network error - please check your connection',
             'NETWORK_ERROR',
             { originalError: error.message }
           )
@@ -672,9 +680,10 @@ export class HelpChatAPIService {
 
         return await response.json()
       } catch (error) {
-        if (error instanceof Error && error.name === 'TypeError') {
+        if (error && typeof error === 'object' && 'code' in error) throw error
+        if (error instanceof Error) {
           throw createHelpChatError(
-            'Network error - please check your connection',
+            error.message || 'Network error - please check your connection',
             'NETWORK_ERROR',
             { originalError: error.message }
           )
@@ -731,9 +740,17 @@ export class HelpChatAPIService {
       throw error
     }
   }
-  async getProactiveTips(params: URLSearchParams): Promise<ProactiveTipsResponse> {
+  async getProactiveTips(params: URLSearchParams | string | Record<string, string>): Promise<ProactiveTipsResponse> {
+    const searchParams =
+      params instanceof URLSearchParams
+        ? params
+        : typeof params === 'string'
+          ? (params.includes('=') ? new URLSearchParams(params) : new URLSearchParams({ page_route: params }))
+          : new URLSearchParams(
+              Object.entries(params).reduce((acc, [k, v]) => ({ ...acc, [k]: String(v) }), {} as Record<string, string>)
+            )
     // Check cache first
-    const cacheKey = params.toString()
+    const cacheKey = searchParams.toString()
     const cachedResponse = this.cache.get('tips', { params: cacheKey })
     if (cachedResponse) {
       return cachedResponse
@@ -741,7 +758,7 @@ export class HelpChatAPIService {
 
     const operation = async (): Promise<ProactiveTipsResponse> => {
       try {
-        const url = `${getApiUrl(HELP_CHAT_CONFIG.endpoints.tips)}?${params.toString()}`
+        const url = `${getApiUrl(HELP_CHAT_CONFIG.endpoints.tips)}?${searchParams.toString()}`
         const response = await fetch(url, {
           method: 'GET',
           headers: this.getAuthHeaders()
@@ -758,13 +775,14 @@ export class HelpChatAPIService {
         const data: ProactiveTipsResponse = await response.json()
         
         // Cache successful response
-        this.cache.set('tips', { params: cacheKey }, data, 15 * 60 * 1000) // 15 minutes cache
+        this.cache.set('tips', { params: cacheKey }, data, 15 * 60 * 1000) // 15 min cache
         
         return data
       } catch (error) {
-        if (error instanceof Error && error.name === 'TypeError') {
+        if (error && typeof error === 'object' && 'code' in error) throw error
+        if (error instanceof Error) {
           throw createHelpChatError(
-            'Network error - please check your connection',
+            error.message || 'Network error - please check your connection',
             'NETWORK_ERROR',
             { originalError: error.message }
           )
@@ -782,10 +800,23 @@ export class HelpChatAPIService {
   }
 
   /**
-   * Clear local cache
+   * Reset rate limit counters (for testing or manual reset).
+   */
+  resetRateLimits(): void {
+    this.rateLimiterMinute.reset()
+    this.rateLimiterHour.reset()
+  }
+
+  /**
+   * Clear local cache (alias: clearCache for backward compatibility)
    */
   clearLocalCache(): void {
     this.cache.clear()
+  }
+
+  /** @deprecated Use clearLocalCache. Alias for tests and backward compatibility. */
+  clearCache(): void {
+    this.clearLocalCache()
   }
 
   /**

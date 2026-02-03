@@ -11,7 +11,6 @@ import { useTranslations } from '../../lib/i18n/context'
 // Import modular components
 import FinancialHeader from './components/FinancialHeader'
 import TabNavigation from './components/TabNavigation'
-import FinancialMetrics from './components/FinancialMetrics'
 import OverviewView from './components/views/OverviewView'
 import AnalysisView from './components/views/AnalysisView'
 import DetailedView from './components/views/DetailedView'
@@ -161,12 +160,15 @@ export default function Financials() {
           />
         </div>
 
-        {/* Financial Metrics Dashboard – only on Overview to avoid redundancy on other tabs */}
-        {viewMode === 'overview' && metrics && (
-          <div data-testid="financials-metrics">
-            <FinancialMetrics
-              metrics={metrics}
+        {/* Overview: KPI card, then Financial Metrics (Gesamtbudget etc.), then charts */}
+        {viewMode === 'overview' && (
+          <div data-testid="financials-overview-view">
+            <OverviewView
+              analyticsData={analyticsData}
               selectedCurrency={selectedCurrency}
+              accessToken={session?.access_token}
+              totalProjectBudget={metrics?.total_budget}
+              metrics={metrics ?? undefined}
             />
           </div>
         )}
@@ -251,17 +253,6 @@ export default function Financials() {
         )}
 
         {/* View-specific Content */}
-        {viewMode === 'overview' && (
-          <div data-testid="financials-overview-view">
-            <OverviewView
-              analyticsData={analyticsData}
-              selectedCurrency={selectedCurrency}
-              accessToken={session?.access_token}
-              totalProjectBudget={metrics?.total_budget}
-            />
-          </div>
-        )}
-
         {viewMode === 'analysis' && (
           <div data-testid="financials-analysis-view">
             <AnalysisView

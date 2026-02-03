@@ -76,8 +76,8 @@ function FooterButton({
         rounded-lg
         transition-all
         ${disabled 
-          ? 'text-gray-400 cursor-not-allowed' 
-          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+          ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed' 
+          : 'text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700'
         }
       `}
     >
@@ -91,7 +91,7 @@ function FooterButton({
  * Divider between button groups
  */
 function FooterDivider() {
-  return <div className="h-8 w-px bg-gray-200 mx-1" />
+  return <div className="h-8 w-px bg-gray-200 dark:bg-slate-600 mx-1" />
 }
 
 /**
@@ -126,7 +126,7 @@ export function CostbookFooter({
 
   return (
     <footer 
-      className={`bg-white rounded-lg shadow-sm border border-gray-200 p-2 ${className}`}
+      className={`bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-2 ${className}`}
       data-testid={testId}
     >
       <div className="flex items-center justify-center gap-1 flex-wrap">
@@ -227,7 +227,7 @@ export function CompactCostbookFooter({
   className?: string
 }) {
   return (
-    <footer className={`bg-white rounded-lg shadow-sm border border-gray-200 p-2 ${className}`}>
+    <footer className={`bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-2 ${className}`}>
       <div className="flex items-center justify-around">
         <FooterButton
           icon={<FileText className="w-5 h-5" />}

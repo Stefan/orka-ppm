@@ -12,8 +12,8 @@ exports[`GlobalLanguageSelector Rendering should render dropdown variant correct
     </div>
     <button
       class="
-              flex items-center w-full px-2 py-1.5 text-sm text-left transition-colors rounded
-              bg-blue-50 text-blue-700 font-medium
+              flex items-center w-full px-2 py-1.5 text-sm text-left transition-all duration-200 rounded
+              bg-blue-50 text-blue-700
               
             "
     >
@@ -28,10 +28,11 @@ exports[`GlobalLanguageSelector Rendering should render dropdown variant correct
     </button>
     <button
       class="
-              flex items-center w-full px-2 py-1.5 text-sm text-left transition-colors rounded
-              text-gray-900 hover:bg-gray-50
+              flex items-center w-full px-2 py-1.5 text-sm text-left transition-all duration-200 rounded
+              text-gray-900
               
             "
+      style="background-color: transparent;"
     >
       <span
         class="mr-2"
@@ -44,10 +45,11 @@ exports[`GlobalLanguageSelector Rendering should render dropdown variant correct
     </button>
     <button
       class="
-              flex items-center w-full px-2 py-1.5 text-sm text-left transition-colors rounded
-              text-gray-900 hover:bg-gray-50
+              flex items-center w-full px-2 py-1.5 text-sm text-left transition-all duration-200 rounded
+              text-gray-900
               
             "
+      style="background-color: transparent;"
     >
       <span
         class="mr-2"
@@ -60,10 +62,11 @@ exports[`GlobalLanguageSelector Rendering should render dropdown variant correct
     </button>
     <button
       class="
-              flex items-center w-full px-2 py-1.5 text-sm text-left transition-colors rounded
-              text-gray-900 hover:bg-gray-50
+              flex items-center w-full px-2 py-1.5 text-sm text-left transition-all duration-200 rounded
+              text-gray-900
               
             "
+      style="background-color: transparent;"
     >
       <span
         class="mr-2"
@@ -76,10 +79,11 @@ exports[`GlobalLanguageSelector Rendering should render dropdown variant correct
     </button>
     <button
       class="
-              flex items-center w-full px-2 py-1.5 text-sm text-left transition-colors rounded
-              text-gray-900 hover:bg-gray-50
+              flex items-center w-full px-2 py-1.5 text-sm text-left transition-all duration-200 rounded
+              text-gray-900
               
             "
+      style="background-color: transparent;"
     >
       <span
         class="mr-2"
@@ -92,10 +96,11 @@ exports[`GlobalLanguageSelector Rendering should render dropdown variant correct
     </button>
     <button
       class="
-              flex items-center w-full px-2 py-1.5 text-sm text-left transition-colors rounded
-              text-gray-900 hover:bg-gray-50
+              flex items-center w-full px-2 py-1.5 text-sm text-left transition-all duration-200 rounded
+              text-gray-900
               
             "
+      style="background-color: transparent;"
     >
       <span
         class="mr-2"
@@ -157,8 +162,8 @@ exports[`GlobalLanguageSelector Rendering should render sidebar variant correctl
     >
       <button
         class="
-              flex items-center w-full px-4 py-2 text-sm text-left transition-colors first:rounded-t-lg last:rounded-b-lg
-              bg-blue-600 text-white
+              flex items-center w-full px-4 py-2 text-sm text-left transition-all duration-200 first:rounded-t-lg last:rounded-b-lg
+              bg-blue-600 text-white shadow-md
               
             "
       >
@@ -173,8 +178,8 @@ exports[`GlobalLanguageSelector Rendering should render sidebar variant correctl
       </button>
       <button
         class="
-              flex items-center w-full px-4 py-2 text-sm text-left transition-colors first:rounded-t-lg last:rounded-b-lg
-              text-gray-300 hover:bg-gray-600 hover:text-white
+              flex items-center w-full px-4 py-2 text-sm text-left transition-all duration-200 first:rounded-t-lg last:rounded-b-lg
+              text-gray-300 hover:bg-blue-600 hover:text-white hover:shadow-md
               
             "
       >
@@ -189,8 +194,8 @@ exports[`GlobalLanguageSelector Rendering should render sidebar variant correctl
       </button>
       <button
         class="
-              flex items-center w-full px-4 py-2 text-sm text-left transition-colors first:rounded-t-lg last:rounded-b-lg
-              text-gray-300 hover:bg-gray-600 hover:text-white
+              flex items-center w-full px-4 py-2 text-sm text-left transition-all duration-200 first:rounded-t-lg last:rounded-b-lg
+              text-gray-300 hover:bg-blue-600 hover:text-white hover:shadow-md
               
             "
       >
@@ -205,8 +210,8 @@ exports[`GlobalLanguageSelector Rendering should render sidebar variant correctl
       </button>
       <button
         class="
-              flex items-center w-full px-4 py-2 text-sm text-left transition-colors first:rounded-t-lg last:rounded-b-lg
-              text-gray-300 hover:bg-gray-600 hover:text-white
+              flex items-center w-full px-4 py-2 text-sm text-left transition-all duration-200 first:rounded-t-lg last:rounded-b-lg
+              text-gray-300 hover:bg-blue-600 hover:text-white hover:shadow-md
               
             "
       >
@@ -221,8 +226,8 @@ exports[`GlobalLanguageSelector Rendering should render sidebar variant correctl
       </button>
       <button
         class="
-              flex items-center w-full px-4 py-2 text-sm text-left transition-colors first:rounded-t-lg last:rounded-b-lg
-              text-gray-300 hover:bg-gray-600 hover:text-white
+              flex items-center w-full px-4 py-2 text-sm text-left transition-all duration-200 first:rounded-t-lg last:rounded-b-lg
+              text-gray-300 hover:bg-blue-600 hover:text-white hover:shadow-md
               
             "
       >
@@ -237,8 +242,8 @@ exports[`GlobalLanguageSelector Rendering should render sidebar variant correctl
       </button>
       <button
         class="
-              flex items-center w-full px-4 py-2 text-sm text-left transition-colors first:rounded-t-lg last:rounded-b-lg
-              text-gray-300 hover:bg-gray-600 hover:text-white
+              flex items-center w-full px-4 py-2 text-sm text-left transition-all duration-200 first:rounded-t-lg last:rounded-b-lg
+              text-gray-300 hover:bg-blue-600 hover:text-white hover:shadow-md
               
             "
       >
@@ -284,9 +289,9 @@ exports[`GlobalLanguageSelector Rendering should render topbar variant correctly
         />
       </svg>
       <span
-        class="text-sm font-medium text-gray-700 hidden md:inline"
+        class="text-sm font-medium text-gray-700"
       >
-        🇬🇧
+        EN
       </span>
     </button>
   </div>

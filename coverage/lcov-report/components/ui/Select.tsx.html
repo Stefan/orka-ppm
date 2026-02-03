@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/39</span>
+                <span class='fraction'>0/42</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/50</span>
+                <span class='fraction'>0/56</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/11</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/33</span>
+                <span class='fraction'>0/36</span>
             </div>
         
             
@@ -244,7 +244,13 @@
 <a name='L179'></a><a href='#L179'>179</a>
 <a name='L180'></a><a href='#L180'>180</a>
 <a name='L181'></a><a href='#L181'>181</a>
-<a name='L182'></a><a href='#L182'>182</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -303,6 +309,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -367,8 +379,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -431,7 +443,7 @@
  * A professional select/dropdown component with custom styling.
  */
 &nbsp;
-import React, { useState } from <span class="cstat-no" title="statement not covered" >'react'</span>
+import React, { useState, useEffect } from <span class="cstat-no" title="statement not covered" >'react'</span>
 import { ChevronDown, Check } from <span class="cstat-no" title="statement not covered" >'lucide-react'</span>
 import { cn } from <span class="cstat-no" title="statement not covered" >'@/lib/design-system'</span>
 import { useClickOutside } from <span class="cstat-no" title="statement not covered" >'@/hooks'</span>
@@ -460,12 +472,12 @@ const selectBaseStyles = <span class="cstat-no" title="statement not covered" >[
   'text-sm',
   'min-h-[40px]',
   'rounded-lg',
-  'border border-gray-300',
-  'bg-white',
-  'text-gray-900',
+  'border border-gray-300 dark:border-slate-600',
+  'bg-white dark:bg-slate-800',
+  'text-gray-900 dark:text-slate-100',
   'transition-all duration-150 ease-in-out',
   'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
-  'disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed',
+  'disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed dark:disabled:bg-slate-700 dark:disabled:text-slate-400',
 ].join(' ')
 &nbsp;
 export const <span class="cstat-no" title="statement not covered" >Select: React.FC&lt;SelectProps&gt; = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(</span>{</span></span>
@@ -483,6 +495,12 @@ export const <span class="cstat-no" title="statement not covered" >Select: React
   const [selectedValues, setSelectedValues] = <span class="cstat-no" title="statement not covered" >useState&lt;string[]&gt;(</span>
     multiple ? (value ? value.split(',') : []) : (value ? [value] : [])
   )
+&nbsp;
+  // Sync selectedValues when value prop changes
+<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+    const newValues = <span class="cstat-no" title="statement not covered" >multiple ? (value ? value.split(',') : []) : (value ? [value] : [])</span>
+<span class="cstat-no" title="statement not covered" >    setSelectedValues(newValues)</span>
+  }, [value, multiple])
 &nbsp;
   const selectRef = <span class="cstat-no" title="statement not covered" >useClickOutside&lt;HTMLDivElement&gt;(<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etIsOpen(false))</span></span>
 &nbsp;
@@ -539,9 +557,8 @@ export const <span class="cstat-no" title="statement not covered" >Select: React
   }
 &nbsp;
   return (
-    &lt;div className="relative w-full"&gt;
+    &lt;div ref={selectRef} className="relative w-full"&gt;
       &lt;div
-        ref={selectRef}
         className={cn(
           selectBaseStyles,
           'relative cursor-pointer flex items-center',
@@ -553,22 +570,23 @@ export const <span class="cstat-no" title="statement not covered" >Select: React
       &gt;
         &lt;span className={cn(
           'block truncate flex-1',
-          selectedValues.length === 0 &amp;&amp; 'text-gray-400'
+          selectedValues.length === 0 &amp;&amp; 'text-gray-400 dark:text-slate-500'
         )}&gt;
           {getDisplayValue()}
         &lt;/span&gt;
         &lt;ChevronDown
           className={cn(
-            'h-4 w-4 text-gray-400 transition-transform duration-200',
+            'h-4 w-4 text-gray-400 dark:text-slate-400 transition-transform duration-200 shrink-0',
             isOpen &amp;&amp; 'rotate-180'
           )}
+          aria-hidden
         /&gt;
       &lt;/div&gt;
 &nbsp;
       {isOpen &amp;&amp; !disabled &amp;&amp; (
-        &lt;div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto"&gt;
+        &lt;div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg shadow-lg max-h-60 overflow-auto"&gt;
           {options.length === 0 ? (
-            &lt;div className="px-4 py-3 text-sm text-gray-500"&gt;No options available&lt;/div&gt;
+            &lt;div className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400"&gt;No options available&lt;/div&gt;
           ) : (
             options.map(<span class="fstat-no" title="function not covered" >(o</span>ption) =&gt; (
 <span class="cstat-no" title="statement not covered" >              &lt;div</span>
@@ -577,15 +595,15 @@ export const <span class="cstat-no" title="statement not covered" >Select: React
                   'px-4 py-2.5 text-sm cursor-pointer flex items-center justify-between',
                   'transition-colors duration-100',
                   option.disabled
-                    ? 'text-gray-400 cursor-not-allowed'
-                    : 'text-gray-900 hover:bg-gray-50',
-                  selectedValues.includes(option.value) &amp;&amp; 'bg-blue-50 text-blue-700'
+                    ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed'
+                    : 'text-gray-900 dark:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-700',
+                  selectedValues.includes(option.value) &amp;&amp; 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
                 )}
                 onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >!</span>option.disabled &amp;&amp; handleSelect(option.value)}</span>
               &gt;
                 &lt;span className="truncate"&gt;{option.label}&lt;/span&gt;
                 {<span class="branch-0 cbranch-no" title="branch not covered" >selectedValues.includes(option.value) &amp;&amp; (</span>
-                  &lt;Check className="h-4 w-4 text-blue-600 flex-shrink-0 ml-2" /&gt;
+                  &lt;Check className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0 ml-2" /&gt;
                 )}
               &lt;/div&gt;
             ))
@@ -613,7 +631,7 @@ export const <span class="cstat-no" title="statement not covered" >Select: React
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-23T20:41:45.322Z
+                at 2026-02-03T20:46:02.366Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

@@ -111,7 +111,7 @@ export function CacheManagement() {
           <li>• Images: Cache-first with 30-day expiration</li>
           <li>• Fonts: Cache-first with 1-year expiration</li>
         </ul>
-      </div>
+      </Card>
     </div>
   );
 }

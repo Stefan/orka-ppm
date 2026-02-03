@@ -1,0 +1,3 @@
+# Screenshots for Features Overview (one per route, e.g. dashboards.png).
+# Add images manually or run: npm run feature-screenshots
+# build-feature-overview sets screenshot_url to /feature-screenshots/{slug}.png

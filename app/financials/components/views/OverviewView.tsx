@@ -1,11 +1,14 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell, ComposedChart
 } from 'recharts'
 import { AnalyticsData } from '../../types'
+import type { FinancialMetrics as FinancialMetricsType } from '../../types'
 import CommitmentsActualsSummaryCard from '../CommitmentsActualsSummaryCard'
+import FinancialMetrics from '../FinancialMetrics'
 import { useCommitmentsActualsData } from '../../hooks/useCommitmentsActualsData'
 
 interface OverviewViewProps {
@@ -13,14 +16,30 @@ interface OverviewViewProps {
   selectedCurrency: string
   accessToken?: string
   totalProjectBudget?: number
+  metrics?: FinancialMetricsType | null
 }
 
 export default function OverviewView({ 
   analyticsData, 
   selectedCurrency,
   accessToken,
-  totalProjectBudget 
+  totalProjectBudget,
+  metrics 
 }: OverviewViewProps) {
+  // Dark mode detection for Recharts tooltips
+  const [isDark, setIsDark] = useState(false)
+  useEffect(() => {
+    const checkDarkMode = () => setIsDark(document.documentElement.classList.contains('dark'))
+    checkDarkMode()
+    const observer = new MutationObserver(checkDarkMode)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => observer.disconnect()
+  }, [])
+
+  const tooltipStyle = isDark 
+    ? { backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f1f5f9' }
+    : { backgroundColor: '#ffffff', border: '1px solid #e5e7eb', color: '#111827' }
+
   // Fetch commitments & actuals data
   const { summary, analytics, loading: commitmentsLoading } = useCommitmentsActualsData({
     accessToken,
@@ -87,28 +106,38 @@ export default function OverviewView({
   return (
     <div className="space-y-6">
       {/* Quick Summary Bar - Compact */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200">
+      <div
+        data-financials-kpi-card
+        className="rounded-lg p-4 border border-gray-200 dark:border-slate-700 bg-[linear-gradient(to_right,#eff6ff,#faf5ff)]"
+        ref={(el) => {
+          // Apply dark mode styles via JS (Tailwind v4 gradient/border classes can be overridden)
+          if (el && typeof window !== 'undefined' && document.documentElement.classList.contains('dark')) {
+            el.style.setProperty('background', '#1e293b', 'important');
+            el.style.setProperty('border-color', '#334155', 'important'); // slate-700
+          }
+        }}
+      >
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-xs text-gray-600 mb-1">Projects</div>
-            <div className="text-2xl font-bold text-gray-900">{summary?.projectCount || 0}</div>
+            <div className="text-xs text-gray-600 dark:text-slate-300 mb-1">Projects</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">{summary?.projectCount || 0}</div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-gray-600 mb-1">Commitments</div>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-xs text-gray-600 dark:text-slate-300 mb-1">Commitments</div>
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-300">
               {summary ? (summary.totalCommitments / 1000000).toFixed(1) : '0'}M
             </div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-gray-600 mb-1">Actuals</div>
-            <div className="text-2xl font-bold text-red-600">
+            <div className="text-xs text-gray-600 dark:text-slate-300 mb-1">Actuals</div>
+            <div className="text-2xl font-bold text-red-600 dark:text-red-300">
               {summary ? (summary.totalActuals / 1000000).toFixed(1) : '0'}M
             </div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-gray-600 mb-1">Spend Rate</div>
-            <div className="text-2xl font-bold text-purple-600">
-              {summary && summary.totalCommitments > 0 
+            <div className="text-xs text-gray-600 dark:text-slate-300 mb-1">Spend Rate</div>
+            <div className="text-2xl font-bold text-purple-600 dark:text-purple-300">
+              {summary && summary.totalCommitments > 0
                 ? ((summary.totalActuals / summary.totalCommitments) * 100).toFixed(0)
                 : '0'}%
             </div>
@@ -116,13 +145,23 @@ export default function OverviewView({
         </div>
       </div>
 
+      {/* Financial Metrics – Gesamtbudget, Gesamt ausgegeben, Varianz, etc. (directly under KPI card) */}
+      {metrics && (
+        <div data-testid="financials-metrics">
+          <FinancialMetrics metrics={metrics} selectedCurrency={selectedCurrency} />
+        </div>
+      )}
+
       {/* Existing Charts */}
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Enhanced Budget Status Distribution - 1/3 width */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 lg:w-1/3" style={{ contain: 'layout style paint' }}>
+        <div
+          className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 lg:w-1/3"
+          style={{ contain: 'layout style paint' }}
+        >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Budget Status Distribution</h3>
-            <span className="text-sm text-gray-500">{summary?.projectCount || analyticsData.totalProjects} projects</span>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Budget Status Distribution</h3>
+            <span className="text-sm text-gray-500 dark:text-slate-400">{summary?.projectCount || analyticsData.totalProjects} projects</span>
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -140,16 +179,16 @@ export default function OverviewView({
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip contentStyle={tooltipStyle} />
             </PieChart>
           </ResponsiveContainer>
         </div>
 
         {/* Enhanced Category Spending Analysis - 2/3 width */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 lg:w-2/3">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 lg:w-2/3">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Category Spending</h3>
-            <span className="text-sm text-gray-500">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Category Spending</h3>
+            <span className="text-sm text-gray-500 dark:text-slate-400">
               {analytics ? 'Commitments vs Actuals' : 'Planned vs Actual'}
             </span>
           </div>
@@ -164,7 +203,7 @@ export default function OverviewView({
                 tick={{ fontSize: 11 }}
               />
               <YAxis tick={{ fontSize: 11 }} />
-              <Tooltip formatter={(value: number | undefined) => `${(value || 0).toLocaleString()} ${selectedCurrency}`} />
+              <Tooltip contentStyle={tooltipStyle} formatter={(value: number | undefined) => `${(value || 0).toLocaleString()} ${selectedCurrency}`} />
               <Legend />
               <Bar dataKey="planned" fill="#3B82F6" name={analytics ? "Commitments" : "Planned"} />
               <Bar dataKey="actual" fill="#EF4444" name="Actuals" />
@@ -174,10 +213,10 @@ export default function OverviewView({
       </div>
 
       {/* Project Performance - Full Width */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Project Performance Overview</h3>
-          <div className="flex items-center space-x-4 text-sm text-gray-600">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Project Performance Overview</h3>
+          <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-slate-400">
             <span>Top {displayProjectData.length} Projects</span>
             {analytics && (
               <>
@@ -193,6 +232,7 @@ export default function OverviewView({
             <YAxis yAxisId="left" />
             <YAxis yAxisId="right" orientation="right" />
             <Tooltip 
+              contentStyle={tooltipStyle}
               formatter={(value: number | undefined, name: string | undefined) => {
                 const safeValue = value || 0
                 const safeName = name || ''

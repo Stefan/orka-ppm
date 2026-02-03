@@ -203,12 +203,12 @@ export default function WorkflowStatus({
       </div>
 
       {/* Progress Visualization */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
-        <h4 className="font-semibold text-gray-900 mb-4">Approval Progress</h4>
+      <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4">
+        <h4 className="font-semibold text-gray-900 dark:text-slate-100 mb-4">Approval Progress</h4>
         
         <div className="relative">
           {/* Progress line */}
-          <div className="absolute left-[20px] top-[30px] bottom-[30px] w-0.5 bg-gray-200"></div>
+          <div className="absolute left-[20px] top-[30px] bottom-[30px] w-0.5 bg-gray-200 dark:bg-slate-600"></div>
           
           {/* Steps */}
           <div className="space-y-4">
@@ -220,8 +220,8 @@ export default function WorkflowStatus({
               return (
                 <div key={stepNumber} className="relative pl-12">
                   {/* Step icon */}
-                  <div className={`absolute left-0 top-1 bg-white p-1 rounded-full border-2 ${
-                    isCurrent ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200'
+                  <div className={`absolute left-0 top-1 bg-white dark:bg-slate-800 p-1 rounded-full border-2 ${
+                    isCurrent ? 'border-blue-500 dark:border-blue-400 ring-2 ring-blue-200 dark:ring-blue-900/50' : 'border-gray-200 dark:border-slate-600'
                   }`}>
                     {getStepIcon(stepNumber)}
                   </div>
@@ -229,7 +229,7 @@ export default function WorkflowStatus({
                   {/* Step card */}
                   <div className={`border rounded-lg p-3 ${getStepColor(stepNumber)}`}>
                     <div className="flex items-center justify-between mb-2">
-                      <h5 className="font-semibold text-gray-900">
+                      <h5 className="font-semibold text-gray-900 dark:text-slate-100">
                         Step {stepNumber + 1}
                         {isCurrent && (
                           <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">

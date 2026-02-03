@@ -215,13 +215,15 @@ function FeaturesContent() {
 
   return (
     <div className="flex h-full flex-col" data-testid="features-page">
-      <header className="flex-shrink-0 border-b border-gray-200 bg-white px-4 py-3">
+      <header
+        className="flex-shrink-0 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3"
+      >
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <Layers className="h-6 w-6 text-blue-600" />
+            <Layers className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             <div>
-              <h1 className="text-lg font-semibold text-gray-900">Features</h1>
-              <p className="text-xs text-gray-500">By page · descriptions and screenshots</p>
+              <h1 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Features</h1>
+              <p className="text-xs text-gray-500 dark:text-slate-400">By page · descriptions and screenshots</p>
             </div>
           </div>
           <div className="flex-1 min-w-0 max-w-xl">
@@ -234,7 +236,7 @@ function FeaturesContent() {
           </div>
           <button
             type="button"
-            className="lg:hidden rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="lg:hidden rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-600"
             onClick={() => setTreeOpen((o) => !o)}
             aria-expanded={treeOpen}
           >
@@ -246,7 +248,7 @@ function FeaturesContent() {
       <div className="flex flex-1 min-h-0">
         <aside
           className={`
-            flex-shrink-0 w-80 border-r border-gray-200 bg-gray-50 overflow-y-auto
+            flex-shrink-0 w-80 border-r border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 overflow-y-auto
             lg:block
             ${treeOpen ? 'block' : 'hidden'}
           `}
@@ -262,7 +264,10 @@ function FeaturesContent() {
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0 overflow-y-auto p-4 lg:p-6" data-testid="features-detail-main">
+        <main
+          className="flex-1 min-w-0 overflow-y-auto p-4 lg:p-6 bg-white dark:bg-slate-900"
+          data-testid="features-detail-main"
+        >
           {selectedNode?.feature ? (
             <FeatureDetailCard feature={selectedFeature!} onExplain={handleExplain} />
           ) : (

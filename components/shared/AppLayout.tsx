@@ -12,6 +12,7 @@ import { useTranslations } from '@/lib/i18n/context'
 
 // Import HelpChat directly to prevent CLS (layout shift)
 import HelpChat from '../HelpChat'
+import { DarkModeForcer } from './DarkModeForcer'
 
 export interface AppLayoutProps {
   children: React.ReactNode
@@ -40,7 +41,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-screen bg-white dark:bg-slate-900">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     )
@@ -48,9 +49,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   if (!session) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-screen bg-white dark:bg-slate-900">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">{t('layout.redirecting')}</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">{t('layout.redirecting')}</p>
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
         </div>
       </div>
@@ -59,7 +60,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <HelpChatProvider>
-      <div data-testid="app-layout" className="min-h-screen bg-gray-50 flex flex-col">
+      <DarkModeForcer />
+      <div data-testid="app-layout" className="min-h-screen bg-white dark:bg-slate-900 flex flex-col">
         {/* Top Bar Navigation */}
         <TopBar onMenuToggle={toggleMobileNav} />
         

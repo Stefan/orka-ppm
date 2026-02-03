@@ -499,24 +499,24 @@ export default function Risks() {
   }
 
   const getRiskLevelColor = (score: number) => {
-    if (score >= 0.5) return 'text-red-600'
-    if (score >= 0.3) return 'text-yellow-600'
-    return 'text-green-600'
+    if (score >= 0.5) return 'text-red-600 dark:text-red-400'
+    if (score >= 0.3) return 'text-yellow-600 dark:text-yellow-400'
+    return 'text-green-600 dark:text-green-400'
   }
 
   const getRiskLevelBg = (score: number) => {
-    if (score >= 0.5) return 'bg-red-100 text-red-800'
-    if (score >= 0.3) return 'bg-yellow-100 text-yellow-800'
-    return 'bg-green-100 text-green-800'
+    if (score >= 0.5) return 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300'
+    if (score >= 0.3) return 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300'
+    return 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300'
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'identified': return 'bg-blue-100 text-blue-800'
-      case 'analyzing': return 'bg-purple-100 text-purple-800'
-      case 'mitigating': return 'bg-orange-100 text-orange-800'
-      case 'closed': return 'bg-gray-100 text-gray-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'identified': return 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300'
+      case 'analyzing': return 'bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300'
+      case 'mitigating': return 'bg-orange-100 dark:bg-orange-900/50 text-orange-800 dark:text-orange-300'
+      case 'closed': return 'bg-gray-100 dark:bg-slate-600 text-gray-800 dark:text-slate-300'
+      default: return 'bg-gray-100 dark:bg-slate-600 text-gray-800 dark:text-slate-300'
     }
   }
 
@@ -635,17 +635,17 @@ export default function Risks() {
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
             <div className="min-w-0 flex-1">
               <div className="flex flex-col space-y-2">
-                <h1 data-testid="risks-title" className="text-2xl sm:text-3xl font-bold text-gray-900">{t('risks.title')}</h1>
+                <h1 data-testid="risks-title" className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-slate-100">{t('risks.title')}</h1>
                 <div className="flex flex-wrap items-center gap-2">
                   {alerts.length > 0 && (
-                    <div className="flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
-                      <AlertTriangle className="h-4 w-4 mr-1 flex-shrink-0" />
+                    <div className="flex items-center px-3 py-1 bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200 rounded-full text-sm font-medium ring-1 ring-red-200 dark:ring-red-800/60">
+                      <AlertTriangle className="h-4 w-4 mr-1 flex-shrink-0" aria-hidden />
                       <span>{alerts.length} {t('risks.alert')}{alerts.length !== 1 ? 's' : ''}</span>
                     </div>
                   )}
                 </div>
               </div>
-              <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-sm text-gray-600">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-sm text-gray-600 dark:text-slate-400">
                 {metrics && (
                   <>
                     <span>{t('risks.total')}: {metrics.total_risks}</span>
@@ -669,13 +669,13 @@ export default function Risks() {
               </button>
               
               {/* Secondary Actions */}
-              <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-lg">
+              <div className="flex items-center gap-1 p-1 bg-gray-100 dark:bg-slate-700 rounded-lg">
                 <button
                   onClick={() => setViewMode('overview')}
                   className={`inline-flex items-center justify-center h-8 px-3 rounded-md text-sm font-medium transition-colors ${
                     viewMode === 'overview' 
-                      ? 'bg-white text-gray-900 shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-slate-100 shadow-sm' 
+                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-600'
                   }`}
                 >
                   <BarChart3 className="h-4 w-4" />
@@ -685,8 +685,8 @@ export default function Risks() {
                   onClick={() => setViewMode('matrix')}
                   className={`inline-flex items-center justify-center h-8 px-3 rounded-md text-sm font-medium transition-colors ${
                     viewMode === 'matrix' 
-                      ? 'bg-white text-gray-900 shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-slate-100 shadow-sm' 
+                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-600'
                   }`}
                 >
                   <Target className="h-4 w-4" />
@@ -696,8 +696,8 @@ export default function Risks() {
                   onClick={() => setViewMode('trends')}
                   className={`inline-flex items-center justify-center h-8 px-3 rounded-md text-sm font-medium transition-colors ${
                     viewMode === 'trends' 
-                      ? 'bg-white text-gray-900 shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-slate-100 shadow-sm' 
+                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-600'
                   }`}
                 >
                   <TrendingUp className="h-4 w-4" />
@@ -707,8 +707,8 @@ export default function Risks() {
                   onClick={() => setViewMode('detailed')}
                   className={`inline-flex items-center justify-center h-8 px-3 rounded-md text-sm font-medium transition-colors ${
                     viewMode === 'detailed' 
-                      ? 'bg-white text-gray-900 shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-slate-100 shadow-sm' 
+                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-600'
                   }`}
                 >
                   <Activity className="h-4 w-4" />
@@ -717,13 +717,13 @@ export default function Risks() {
               </div>
               
               {/* Tool Buttons */}
-              <div className="hidden sm:flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+              <div className="hidden sm:flex items-center gap-1 border-l border-gray-200 dark:border-slate-600 pl-2 ml-1">
                 <button
                   onClick={() => setShowAIAnalysis(!showAIAnalysis)}
                   className={`inline-flex items-center justify-center h-10 px-3 rounded-lg text-sm font-medium transition-colors ${
                     showAIAnalysis 
                       ? 'bg-purple-600 text-white hover:bg-purple-700' 
-                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                      : 'bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-600'
                   }`}
                   title="KI-Analyse"
                 >
@@ -734,7 +734,7 @@ export default function Risks() {
                 <button
                   onClick={() => setShowMonteCarloModal(true)}
                   disabled={filteredRisks.length === 0}
-                  className="inline-flex items-center justify-center h-10 px-3 bg-white text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+                  className="inline-flex items-center justify-center h-10 px-3 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
                   title="Monte Carlo Simulation"
                 >
                   <Activity className="h-4 w-4" />
@@ -743,13 +743,13 @@ export default function Risks() {
               </div>
               
               {/* Utility Buttons */}
-              <div className="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+              <div className="flex items-center gap-1 border-l border-gray-200 dark:border-slate-600 pl-2 ml-1">
                 <button
                   onClick={() => setShowFilters(!showFilters)}
                   className={`inline-flex items-center justify-center h-10 w-10 rounded-lg transition-colors ${
                     showFilters 
                       ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-slate-100 hover:bg-gray-200 dark:hover:bg-slate-600'
                   }`}
                   title="Filter"
                 >
@@ -758,7 +758,7 @@ export default function Risks() {
                 
                 <button
                   onClick={exportRiskData}
-                  className="inline-flex items-center justify-center h-10 w-10 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="inline-flex items-center justify-center h-10 w-10 bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-slate-100 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
                   title="Exportieren"
                 >
                   <Download className="h-5 w-5" />
@@ -766,7 +766,7 @@ export default function Risks() {
                 
                 <button
                   onClick={fetchRisks}
-                  className="inline-flex items-center justify-center h-10 w-10 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="inline-flex items-center justify-center h-10 w-10 bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-slate-100 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
                   title="Aktualisieren"
                 >
                   <RefreshCw className="h-5 w-5" />
@@ -778,27 +778,32 @@ export default function Risks() {
 
         {/* Risk Alerts */}
         {alerts.length > 0 && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <div
+            className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6"
+          >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-red-900">{t('risks.riskAlerts')}</h3>
-              <span className="text-sm text-red-700">{alerts.length} {t('risks.alert')}{alerts.length !== 1 ? 's' : ''}</span>
+              <h3 className="text-lg font-semibold text-red-900 dark:text-red-300">{t('risks.riskAlerts')}</h3>
+              <span className="text-sm text-red-700 dark:text-red-400">{alerts.length} {t('risks.alert')}{alerts.length !== 1 ? 's' : ''}</span>
             </div>
             <div className="space-y-3">
               {alerts.map((alert, index) => (
-                <div key={index} className="bg-white p-4 rounded-lg border border-red-200">
+                <div
+                  key={index}
+                  className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-red-200 dark:border-red-800"
+                >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{alert.risk_title}</h4>
-                      <p className="text-sm text-gray-600 mt-1">{alert.message}</p>
-                      <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                      <h4 className="font-medium text-gray-900 dark:text-slate-100">{alert.risk_title}</h4>
+                      <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">{alert.message}</p>
+                      <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-slate-500">
                         <span>{t('risks.project')}: {alert.project_name}</span>
                         <span>{t('risks.date')}: {new Date(alert.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
                     <div className={`px-2 py-1 rounded text-xs font-medium ${
-                      alert.alert_type === 'new_high_risk' ? 'bg-red-100 text-red-800' : 
-                      alert.alert_type === 'escalated' ? 'bg-orange-100 text-orange-800' :
-                      'bg-yellow-100 text-yellow-800'
+                      alert.alert_type === 'new_high_risk' ? 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300' :
+                      alert.alert_type === 'escalated' ? 'bg-orange-100 dark:bg-orange-900/50 text-orange-800 dark:text-orange-300' :
+                      'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300'
                     }`}
                     >
                       {alert.alert_type.replace('_', ' ')}
@@ -812,28 +817,28 @@ export default function Risks() {
 
         {/* Enhanced Mobile-First Filter Panel */}
         {showFilters && (
-          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               <div className="sm:col-span-2 lg:col-span-1">
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('risks.search')}</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('risks.search')}</label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
                   <input
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder={t('risks.search') + '...'}
-                    className="input-field w-full min-h-[44px] pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    className="input-field w-full min-h-[44px] pl-10 pr-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   />
                 </div>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('risks.category')}</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('risks.category')}</label>
                 <select
                   value={filterCategory}
                   onChange={(e) => dispatchFilterSort({ type: 'SET_FILTER_CATEGORY', value: e.target.value })}
-                  className="w-full min-h-[44px] p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                  className="w-full min-h-[44px] p-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                 >
                   <option value="all">{t('risks.allCategories')}</option>
                   <option value="technical">{t('risks.technical')}</option>
@@ -845,11 +850,11 @@ export default function Risks() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('risks.status')}</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('risks.status')}</label>
                 <select
                   value={filterStatus}
                   onChange={(e) => dispatchFilterSort({ type: 'SET_FILTER_STATUS', value: e.target.value })}
-                  className="w-full min-h-[44px] p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                  className="w-full min-h-[44px] p-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                 >
                   <option value="all">{t('risks.allStatus')}</option>
                   <option value="identified">{t('risks.identified')}</option>
@@ -860,12 +865,12 @@ export default function Risks() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('risks.sortBy')}</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('risks.sortBy')}</label>
                 <div className="flex space-x-2">
                   <select
                     value={sortBy}
                     onChange={(e) => dispatchFilterSort({ type: 'SET_SORT_BY', value: e.target.value as any })}
-                    className="flex-1 min-h-[44px] p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    className="flex-1 min-h-[44px] p-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   >
                     <option value="risk_score">{t('risks.riskScore')}</option>
                     <option value="created_at">{t('risks.createdDate')}</option>
@@ -873,7 +878,7 @@ export default function Risks() {
                   </select>
                   <button
                     onClick={() => dispatchFilterSort({ type: 'TOGGLE_SORT_ORDER' })}
-                    className="min-h-[44px] px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 active:bg-gray-100"
+                    className="min-h-[44px] px-3 py-2 border border-gray-300 dark:border-slate-600 dark:text-slate-300 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 active:bg-gray-100"
                   >
                     {sortOrder === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
                   </button>
@@ -886,7 +891,7 @@ export default function Risks() {
                     dispatchFilterSort({ type: 'RESET_FILTERS' })
                     setSearchTerm('')
                   }}
-                  className="w-full min-h-[44px] px-4 py-2 bg-gray-100 text-gray-900 rounded-md hover:bg-gray-200 active:bg-gray-300 font-medium"
+                  className="w-full min-h-[44px] px-4 py-2 bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-slate-100 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 active:bg-gray-300 font-medium"
                 >
                   {t('risks.clearFilters')}
                 </button>
@@ -897,63 +902,65 @@ export default function Risks() {
 
         {/* Mobile-First Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
+          <div
+            className="bg-white dark:bg-slate-800 p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-600"
+          >
+            <div className="flex items-center justify-between bg-transparent">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-700 truncate">Total Risks</p>
-                <p className="text-lg sm:text-2xl font-bold text-blue-600">
+                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 truncate">Total Risks</p>
+                <p className="text-lg sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {metrics?.total_risks || 0}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                   {filteredRisks.length} filtered
                 </p>
               </div>
-              <Shield className="h-5 w-5 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
+              <Shield className="h-5 w-5 sm:h-8 sm:w-8 text-blue-600 dark:text-blue-400 flex-shrink-0" />
             </div>
           </div>
           
-          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
+          <div className="bg-white dark:bg-slate-800 p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-600">
+            <div className="flex items-center justify-between bg-transparent">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-700 truncate">High Risk</p>
-                <p className="text-lg sm:text-2xl font-bold text-red-600">
+                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 truncate">High Risk</p>
+                <p className="text-lg sm:text-2xl font-bold text-red-600 dark:text-red-400">
                   {metrics?.high_risk_count || 0}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                   {metrics?.total_risks ? ((metrics.high_risk_count / metrics.total_risks) * 100).toFixed(1) : 0}% of total
                 </p>
               </div>
-              <AlertTriangle className="h-5 w-5 sm:h-8 sm:w-8 text-red-600 flex-shrink-0" />
+              <AlertTriangle className="h-5 w-5 sm:h-8 sm:w-8 text-red-600 dark:text-red-400 flex-shrink-0" />
             </div>
           </div>
           
-          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
+          <div className="bg-white dark:bg-slate-800 p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-600">
+            <div className="flex items-center justify-between bg-transparent">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-700 truncate">Medium Risk</p>
-                <p className="text-lg sm:text-2xl font-bold text-yellow-600">
+                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 truncate">Medium Risk</p>
+                <p className="text-lg sm:text-2xl font-bold text-yellow-600 dark:text-yellow-400">
                   {metrics?.medium_risk_count || 0}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                   Active mitigation
                 </p>
               </div>
-              <Activity className="h-5 w-5 sm:h-8 sm:w-8 text-yellow-600 flex-shrink-0" />
+              <Activity className="h-5 w-5 sm:h-8 sm:w-8 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
             </div>
           </div>
           
-          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
+          <div className="bg-white dark:bg-slate-800 p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-600">
+            <div className="flex items-center justify-between bg-transparent">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-700 truncate">Avg Risk Score</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 truncate">Avg Risk Score</p>
                 <p className={`text-lg sm:text-2xl font-bold ${getRiskLevelColor(metrics?.average_risk_score || 0)}`}>
                   {((metrics?.average_risk_score || 0) * 100).toFixed(0)}%
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                   Portfolio average
                 </p>
               </div>
-              <Target className="h-5 w-5 sm:h-8 sm:w-8 text-purple-600 flex-shrink-0" />
+              <Target className="h-5 w-5 sm:h-8 sm:w-8 text-purple-600 dark:text-purple-400 flex-shrink-0" aria-hidden />
             </div>
           </div>
         </div>
@@ -987,8 +994,8 @@ export default function Risks() {
         {viewMode === 'overview' && (
           <div data-testid="risks-dashboard" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Enhanced Risk by Category */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Risks by Category</h3>
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Risks by Category</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={categoryData}>
                   <XAxis dataKey="category" />
@@ -1003,8 +1010,8 @@ export default function Risks() {
             </div>
 
             {/* Risk Status Distribution */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Risk Status Distribution</h3>
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Risk Status Distribution</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -1029,8 +1036,8 @@ export default function Risks() {
         )}
 
         {viewMode === 'matrix' && (
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Risk Matrix (Probability vs Impact)</h3>
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Risk Matrix (Probability vs Impact)</h3>
             <ResponsiveContainer width="100%" height={500}>
               <ScatterChart data={riskScatterData}>
                 <XAxis 
@@ -1070,8 +1077,8 @@ export default function Risks() {
         )}
 
         {viewMode === 'trends' && metrics?.trend_data && (
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Risk Trends Over Time</h3>
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Risk Trends Over Time</h3>
             <ResponsiveContainer width="100%" height={400}>
               <AreaChart data={metrics.trend_data}>
                 <XAxis dataKey="date" />
@@ -1088,24 +1095,24 @@ export default function Risks() {
 
         {/* Top Risks Summary */}
         {analyticsData?.topRisks && (
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Top 5 Risks by Score</h3>
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Top 5 Risks by Score</h3>
             <div className="space-y-3">
               {analyticsData.topRisks.map((risk, index) => (
-                <div key={risk.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div key={risk.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
                   <div className="flex items-center space-x-4">
-                    <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                    <div className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 rounded-full text-sm font-medium">
                       {index + 1}
                     </div>
                     <div>
-                      <h4 className="font-medium text-gray-900">{risk.title}</h4>
-                      <p className="text-sm text-gray-600">{risk.project_name}</p>
+                      <h4 className="font-medium text-gray-900 dark:text-slate-100">{risk.title}</h4>
+                      <p className="text-sm text-gray-600 dark:text-slate-400">{risk.project_name}</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 text-gray-600 dark:text-slate-400">
                       {getCategoryIcon(risk.category)}
-                      <span className="text-sm text-gray-600 capitalize">{risk.category}</span>
+                      <span className="text-sm capitalize">{risk.category}</span>
                     </div>
                     <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getRiskLevelBg(risk.risk_score)}`}>
                       {(risk.risk_score * 100).toFixed(0)}%
@@ -1118,9 +1125,9 @@ export default function Risks() {
         )}
 
         {/* Enhanced Mobile-First Risk Details Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
-            <h3 className="text-lg font-semibold text-gray-900">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-slate-700 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
               Risk Register ({filteredRisks.length} risks)
             </h3>
             <button 
@@ -1134,59 +1141,59 @@ export default function Risks() {
           
           {/* Mobile-optimized table with horizontal scroll */}
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+              <thead className="bg-gray-50 dark:bg-slate-700">
                 <tr>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     Risk
                   </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     Project
                   </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     Category
                   </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     Risk Score
                   </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     Probability
                   </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     Impact
                   </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     Owner
                   </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     Due Date
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                 {filteredRisks.map((risk) => (
-                  <tr key={risk.id} className="hover:bg-gray-50">
+                  <tr key={risk.id} className="hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors">
                     <td className="px-4 sm:px-6 py-4">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{risk.title}</div>
-                        <div className="text-sm text-gray-500 mt-1 max-w-xs truncate">{risk.description}</div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-slate-100">{risk.title}</div>
+                        <div className="text-sm text-gray-500 dark:text-slate-400 mt-1 max-w-xs truncate">{risk.description}</div>
                         {risk.mitigation && (
-                          <div className="text-xs text-blue-600 mt-1 max-w-xs truncate">
+                          <div className="text-xs text-blue-600 dark:text-blue-400 mt-1 max-w-xs truncate">
                             Mitigation: {risk.mitigation}
                           </div>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-100">
                       {risk.project_name}
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
+                      <div className="flex items-center text-gray-600 dark:text-slate-400">
                         {getCategoryIcon(risk.category)}
-                        <span className="ml-2 text-sm text-gray-900 capitalize">
+                        <span className="ml-2 text-sm text-gray-900 dark:text-slate-100 capitalize">
                           {risk.category}
                         </span>
                       </div>
@@ -1196,10 +1203,10 @@ export default function Risks() {
                         {(risk.risk_score * 100).toFixed(0)}%
                       </span>
                     </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-100">
                       {(risk.probability * 100).toFixed(0)}%
                     </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-100">
                       {(risk.impact * 100).toFixed(0)}%
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
@@ -1207,12 +1214,12 @@ export default function Risks() {
                         {risk.status.replace('_', ' ')}
                       </span>
                     </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-100">
                       {risk.owner}
                     </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-100">
                       <div className="flex items-center">
-                        <Calendar className="h-4 w-4 text-gray-400 mr-1 flex-shrink-0" />
+                        <Calendar className="h-4 w-4 text-gray-400 dark:text-slate-500 mr-1 flex-shrink-0" />
                         <span className="truncate">{new Date(risk.due_date).toLocaleDateString()}</span>
                       </div>
                     </td>

@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`EmptyState snapshot matches snapshot with action button 1`] = `
+<div
+  class="text-center py-12"
+>
+  <h3
+    class="text-lg font-medium text-gray-900 mb-2"
+  >
+    No results
+  </h3>
+  <p
+    class="text-sm text-gray-600 mb-6 max-w-md mx-auto"
+  >
+    Try adjusting your filters or search term.
+  </p>
+  <button
+    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+  >
+    Clear filters
+  </button>
+</div>
+`;
+
+exports[`EmptyState snapshot matches snapshot without action 1`] = `
+<div
+  class="text-center py-12"
+>
+  <h3
+    class="text-lg font-medium text-gray-900 mb-2"
+  >
+    No projects yet
+  </h3>
+  <p
+    class="text-sm text-gray-600 mb-6 max-w-md mx-auto"
+  >
+    Create your first project to get started.
+  </p>
+</div>
+`;

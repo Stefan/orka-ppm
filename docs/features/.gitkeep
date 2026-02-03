@@ -1,0 +1,4 @@
+# Feature descriptions for the Features Overview tree.
+# One .md file per route (slug from path, e.g. dashboards.md, reports-pmr.md).
+# Created by: npm run build-feature-overview
+# Edit these files; re-run the script to regenerate public/feature-overview-tree.json (your edits are preserved).

@@ -55,25 +55,36 @@ export interface DeviceInfo {
   isActive: boolean
 }
 
+export interface DashboardKPIs {
+  successRateMethod: 'health' | 'completion'
+  budgetMethod: 'spent' | 'remaining'
+  resourceMethod: 'auto' | 'fixed'
+  resourceFixedValue: number // 0-100, used if method is 'fixed'
+}
+
+export interface AISettings {
+  enableSuggestions: boolean
+  enablePredictiveText: boolean
+  enableAutoOptimization: boolean
+}
+
 export interface UserPreferences {
   userId: string
   theme: 'light' | 'dark' | 'auto'
   language: string
   timezone: string
+  currency: 'USD' | 'EUR' | 'CHF' | 'GBP'
   dashboardLayout: {
     widgets: any[]
     layout: 'grid' | 'masonry' | 'list'
   }
+  dashboardKPIs: DashboardKPIs
   navigationPreferences: {
     collapsedSections: string[]
     pinnedItems: string[]
     recentItems: string[]
   }
-  aiSettings: {
-    enableSuggestions: boolean
-    enablePredictiveText: boolean
-    enableAutoOptimization: boolean
-  }
+  aiSettings: AISettings
   devicePreferences: {
     [deviceId: string]: {
       lastUsed: Date
@@ -361,9 +372,16 @@ export class CrossDeviceSyncService {
       theme: 'auto',
       language: 'en',
       timezone,
+      currency: 'USD',
       dashboardLayout: {
         widgets: [],
         layout: 'grid'
+      },
+      dashboardKPIs: {
+        successRateMethod: 'health',
+        budgetMethod: 'spent',
+        resourceMethod: 'auto',
+        resourceFixedValue: 85
       },
       navigationPreferences: {
         collapsedSections: [],
@@ -373,7 +391,7 @@ export class CrossDeviceSyncService {
       aiSettings: {
         enableSuggestions: true,
         enablePredictiveText: true,
-        enableAutoOptimization: true
+        enableAutoOptimization: false
       },
       devicePreferences: {},
       version: 1,

@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`LoadingSpinner snapshot matches snapshot default (md, primary) 1`] = `
+<div
+  class="animate-spin rounded-full border-2 border-current border-t-transparent h-6 w-6 text-blue-600"
+/>
+`;
+
+exports[`LoadingSpinner snapshot matches snapshot for lg size 1`] = `
+<div
+  class="animate-spin rounded-full border-2 border-current border-t-transparent h-8 w-8 text-blue-600"
+/>
+`;
+
+exports[`LoadingSpinner snapshot matches snapshot for secondary color 1`] = `
+<div
+  class="animate-spin rounded-full border-2 border-current border-t-transparent h-6 w-6 text-gray-600"
+/>
+`;

@@ -115,6 +115,14 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
     description: 'Submit feedback and improvement ideas'
   },
   {
+    id: 'settings',
+    label: 'Settings',
+    icon: Settings,
+    href: '/settings',
+    category: 'secondary',
+    description: 'Application settings and preferences'
+  },
+  {
     id: 'admin',
     label: 'Admin',
     icon: Shield,
@@ -260,20 +268,20 @@ export default function SmartSidebar({
     if (aiSuggestions.length === 0) return null
 
     return (
-      <div className="p-4 bg-gradient-to-r from-blue-900 to-blue-800 bg-opacity-50 border-b border-gray-700">
+      <div className="p-4 bg-gradient-to-r from-slate-700 to-slate-600 border-b border-slate-500">
         <div className="flex items-center mb-2">
           <Zap className="h-4 w-4 text-blue-300 mr-2" />
-          <h3 className="text-sm font-medium text-blue-200">
-            AI Suggestions
+          <h3 className="text-sm font-medium text-slate-100">
+            Predicted Next Routes
           </h3>
         </div>
         <div className="space-y-1">
           {aiSuggestions.slice(0, 2).map((suggestion, index) => {
             const item = NAVIGATION_ITEMS.find(item => item.id === suggestion.itemId)
             if (!item) return null
-            
+
             return (
-              <div key={index} className="text-xs text-blue-100 flex items-center">
+              <div key={index} className="text-xs text-slate-200 flex items-center">
                 <div className="w-2 h-2 bg-blue-400 rounded-full mr-2 flex-shrink-0" />
                 <span className="truncate">{suggestion.message}</span>
               </div>

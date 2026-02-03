@@ -839,21 +839,21 @@ export default function Reports() {
                     
                     {/* Sources and Confidence for Assistant Messages */}
                     {message.type === 'assistant' && (message.sources || message.confidence !== undefined) && (
-                      <div className="mt-3 pt-3 border-t border-gray-100">
+                      <div className="mt-3 pt-3 border-t border-gray-100 dark:border-slate-700">
                         {message.confidence !== undefined && (
                           <div className="flex items-center space-x-2 text-xs mb-2">
-                            <span className="text-gray-700">Confidence:</span>
+                            <span className="text-gray-700 dark:text-slate-300">Confidence:</span>
                             <ConfidenceBadge confidence={message.confidence} />
                           </div>
                         )}
                         {message.sources && message.sources.length > 0 && (
                           <div className="mt-2">
-                            <span className="text-xs text-gray-700">Sources:</span>
+                            <span className="text-xs text-gray-700 dark:text-slate-300">Sources:</span>
                             <div className="flex flex-wrap gap-1 mt-1">
                               {message.sources.map((source, index) => (
                                 <span
                                   key={index}
-                                  className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded"
+                                  className="px-2 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 text-xs rounded"
                                 >
                                   {source.type} {source.count && `(${source.count})`}
                                 </span>

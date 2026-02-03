@@ -57,9 +57,9 @@ function CustomTooltip({
   if (active && payload && payload.length) {
     const data = payload[0].payload as WaterfallDataPoint
     return (
-      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-        <p className="font-medium text-gray-900 mb-1">{data.name}</p>
-        <p className={`text-sm font-bold ${data.isPositive ? 'text-green-600' : data.value < 0 ? 'text-red-600' : 'text-gray-700'}`}>
+      <div className="bg-white dark:bg-slate-800 p-3 border border-gray-200 dark:border-slate-600 rounded-lg shadow-lg">
+        <p className="font-medium text-gray-900 dark:text-slate-100 mb-1">{data.name}</p>
+        <p className={`text-sm font-bold ${data.isPositive ? 'text-green-600 dark:text-green-400' : data.value < 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-slate-200'}`}>
           {formatCurrency(data.displayValue, currency)}
         </p>
       </div>

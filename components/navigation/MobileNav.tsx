@@ -17,7 +17,8 @@ import {
   Activity,
   UserCog,
   Layers,
-  Shield
+  Shield,
+  Settings
 } from 'lucide-react'
 
 export interface MobileNavProps {
@@ -47,6 +48,7 @@ const NAV_ITEMS = [
   { href: '/changes', label: 'Change Management', icon: GitPullRequest, group: 'Management' },
   { href: '/feedback', label: 'Feedback & Ideas', icon: MessageSquare, group: 'Management' },
   { href: '/features', label: 'Features Overview', icon: Layers, group: 'Management' },
+  { href: '/settings', label: 'Settings', icon: Settings, group: 'Management' },
 
   // Administration
   { href: '/admin', label: 'System Admin', icon: Shield, group: 'Admin' },
@@ -97,29 +99,29 @@ export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
       <div 
         data-testid="mobile-nav"
         ref={navRef}
-        className="fixed left-0 top-0 h-full w-80 max-w-[85vw] bg-white z-50 xl:hidden transform transition-transform duration-300 ease-in-out overflow-y-auto"
+        className="fixed left-0 top-0 h-full w-80 max-w-[85vw] bg-white dark:bg-slate-900 z-50 xl:hidden transform transition-transform duration-300 ease-in-out overflow-y-auto"
         style={{
           transform: isOpen ? 'translateX(0)' : 'translateX(-100%)'
         }}
       >
         {/* Header */}
-        <div data-testid="mobile-nav-header" className="flex items-center justify-between p-4 border-b border-gray-200">
+        <div data-testid="mobile-nav-header" className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-lg">O</span>
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">ORKA PPM</h2>
-              <p className="text-xs text-gray-500">Portfolio Management</p>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">ORKA PPM</h2>
+              <p className="text-xs text-gray-500 dark:text-slate-400">Portfolio Management</p>
             </div>
           </div>
           <button
             data-testid="mobile-nav-close"
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
             aria-label="Close menu"
           >
-            <X className="h-5 w-5 text-gray-600" />
+            <X className="h-5 w-5 text-gray-600 dark:text-slate-300" />
           </button>
         </div>
 
@@ -136,7 +138,7 @@ export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
 
             return Object.entries(groups).map(([groupName, items]) => (
               <div key={groupName} className="mb-6">
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-2">
+                <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider px-3 mb-2">
                   {groupName}
                 </h3>
                 <ul className="space-y-1">
@@ -152,8 +154,8 @@ export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
                           className={`
                             flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all
                             ${isActive
-                              ? 'bg-blue-50 text-blue-700 font-medium'
-                              : 'text-gray-900 hover:bg-gray-50'
+                              ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium'
+                              : 'text-gray-900 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700'
                             }
                           `}
                         >

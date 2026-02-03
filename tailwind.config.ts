@@ -1,8 +1,35 @@
 import type { Config } from 'tailwindcss'
 
+// Theme-aware colors using CSS variables
+const themeColors = {
+  background: 'var(--background)',
+  'background-secondary': 'var(--background-secondary)',
+  'background-tertiary': 'var(--background-tertiary)',
+  'background-elevated': 'var(--background-elevated)',
+  foreground: 'var(--foreground)',
+  'foreground-secondary': 'var(--foreground-secondary)',
+  'foreground-muted': 'var(--foreground-muted)',
+  border: 'var(--border)',
+  'border-hover': 'var(--border-hover)',
+  'border-focus': 'var(--border-focus)',
+  'theme-primary': 'var(--primary)',
+  'theme-primary-hover': 'var(--primary-hover)',
+  'theme-primary-foreground': 'var(--primary-foreground)',
+  card: 'var(--card)',
+  'card-hover': 'var(--card-hover)',
+  'input-background': 'var(--input-background)',
+  'input-border': 'var(--input-border)',
+  sidebar: 'var(--sidebar-background)',
+  'sidebar-foreground': 'var(--sidebar-foreground)',
+  'sidebar-hover': 'var(--sidebar-hover)',
+  'sidebar-active': 'var(--sidebar-active)',
+}
+
 // Design System Tokens
 const designTokens = {
   colors: {
+    // Theme colors
+    ...themeColors,
     primary: {
       50: '#eff6ff',
       100: '#dbeafe',
@@ -162,6 +189,7 @@ const designTokens = {
 }
 
 const config: Config = {
+  darkMode: 'class',
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',

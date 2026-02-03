@@ -43,19 +43,29 @@ const mockSession = {
   },
 };
 
-const mockVarianceData = {
-  variances: [
+// Mock data matching what the API actually returns
+const mockCommitmentsData = {
+  commitments: [
     {
-      project_id: 'proj-1',
-      total_commitment: 100000,
-      total_actual: 110000,
-      status: 'over',
+      project_nr: 'proj-1',
+      total_amount: 100000,
     },
     {
-      project_id: 'proj-2',
-      total_commitment: 50000,
-      total_actual: 45000,
-      status: 'under',
+      project_nr: 'proj-2',
+      total_amount: 50000,
+    },
+  ],
+};
+
+const mockActualsData = {
+  actuals: [
+    {
+      project_nr: 'proj-1',
+      invoice_amount: 110000,
+    },
+    {
+      project_nr: 'proj-2',
+      invoice_amount: 45000,
     },
   ],
 };
@@ -70,9 +80,15 @@ describe('VarianceKPIs Component Structure', () => {
   describe('Normal State with Valid Data', () => {
     it('renders all required elements with valid data', async () => {
       const { resilientFetch } = require('@/lib/api/resilient-fetch');
-      resilientFetch.mockResolvedValue({
-        data: mockVarianceData,
-        error: null,
+      // Mock returns different data based on URL
+      resilientFetch.mockImplementation((url: string) => {
+        if (url.includes('commitments')) {
+          return Promise.resolve({ data: mockCommitmentsData, error: null });
+        }
+        if (url.includes('actuals')) {
+          return Promise.resolve({ data: mockActualsData, error: null });
+        }
+        return Promise.resolve({ data: null, error: 'Unknown endpoint' });
       });
 
       const result = render(
@@ -103,9 +119,14 @@ describe('VarianceKPIs Component Structure', () => {
 
     it('displays correct variance calculations', async () => {
       const { resilientFetch } = require('@/lib/api/resilient-fetch');
-      resilientFetch.mockResolvedValue({
-        data: mockVarianceData,
-        error: null,
+      resilientFetch.mockImplementation((url: string) => {
+        if (url.includes('commitments')) {
+          return Promise.resolve({ data: mockCommitmentsData, error: null });
+        }
+        if (url.includes('actuals')) {
+          return Promise.resolve({ data: mockActualsData, error: null });
+        }
+        return Promise.resolve({ data: null, error: 'Unknown endpoint' });
       });
 
       render(<VarianceKPIs session={mockSession} selectedCurrency="USD" />);
@@ -153,9 +174,10 @@ describe('VarianceKPIs Component Structure', () => {
   describe('Error State', () => {
     it('renders error message when data fetch fails', async () => {
       const { resilientFetch } = require('@/lib/api/resilient-fetch');
+      // Both endpoints return empty data (fallback behavior with silentFail)
       resilientFetch.mockResolvedValue({
-        data: null,
-        error: 'Network error',
+        data: { commitments: [], actuals: [] },
+        error: null,
       });
 
       const result = render(
@@ -177,9 +199,15 @@ describe('VarianceKPIs Component Structure', () => {
   describe('Empty State', () => {
     it('renders empty state when no variance data available', async () => {
       const { resilientFetch } = require('@/lib/api/resilient-fetch');
-      resilientFetch.mockResolvedValue({
-        data: { variances: [] },
-        error: null,
+      // Both endpoints return empty arrays
+      resilientFetch.mockImplementation((url: string) => {
+        if (url.includes('commitments')) {
+          return Promise.resolve({ data: { commitments: [] }, error: null });
+        }
+        if (url.includes('actuals')) {
+          return Promise.resolve({ data: { actuals: [] }, error: null });
+        }
+        return Promise.resolve({ data: null, error: 'Unknown endpoint' });
       });
 
       const result = render(
@@ -201,9 +229,14 @@ describe('VarianceKPIs Component Structure', () => {
   describe('Conditional Rendering', () => {
     it('hides financial details when permissions are restricted', async () => {
       const { resilientFetch } = require('@/lib/api/resilient-fetch');
-      resilientFetch.mockResolvedValue({
-        data: mockVarianceData,
-        error: null,
+      resilientFetch.mockImplementation((url: string) => {
+        if (url.includes('commitments')) {
+          return Promise.resolve({ data: mockCommitmentsData, error: null });
+        }
+        if (url.includes('actuals')) {
+          return Promise.resolve({ data: mockActualsData, error: null });
+        }
+        return Promise.resolve({ data: null, error: 'Unknown endpoint' });
       });
 
       render(
@@ -225,9 +258,14 @@ describe('VarianceKPIs Component Structure', () => {
 
     it('shows alert badge when projects are over budget', async () => {
       const { resilientFetch } = require('@/lib/api/resilient-fetch');
-      resilientFetch.mockResolvedValue({
-        data: mockVarianceData,
-        error: null,
+      resilientFetch.mockImplementation((url: string) => {
+        if (url.includes('commitments')) {
+          return Promise.resolve({ data: mockCommitmentsData, error: null });
+        }
+        if (url.includes('actuals')) {
+          return Promise.resolve({ data: mockActualsData, error: null });
+        }
+        return Promise.resolve({ data: null, error: 'Unknown endpoint' });
       });
 
       render(<VarianceKPIs session={mockSession} selectedCurrency="USD" />);

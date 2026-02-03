@@ -425,9 +425,9 @@ export default function ChangeRequestForm({
   ];
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-900">
+    <div className="max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-lg shadow-lg">
+      <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100">
           {changeId ? t('requestForm.editTitle') : t('requestForm.title')}
         </h2>
       </div>
@@ -739,22 +739,22 @@ export default function ChangeRequestForm({
         )}
 
         {/* File Attachments */}
-        <div className="border-t pt-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">{t('requestForm.attachments')}</h3>
+        <div className="border-t dark:border-slate-700 pt-6">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">{t('requestForm.attachments')}</h3>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 {t('requestForm.uploadDocuments')}
               </label>
               <div className="flex items-center justify-center w-full">
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 dark:border-slate-600 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Upload className="w-8 h-8 mb-4 text-gray-500" />
-                    <p className="mb-2 text-sm text-gray-500">
+                    <Upload className="w-8 h-8 mb-4 text-gray-500 dark:text-slate-400" />
+                    <p className="mb-2 text-sm text-gray-500 dark:text-slate-400">
                       <span className="font-semibold">{t('requestForm.clickToUpload')}</span> {t('requestForm.dragAndDrop')}
                     </p>
-                    <p className="text-xs text-gray-500">{t('requestForm.fileTypes')}</p>
+                    <p className="text-xs text-gray-500 dark:text-slate-500">{t('requestForm.fileTypes')}</p>
                   </div>
                   <input
                     type="file"
@@ -770,20 +770,20 @@ export default function ChangeRequestForm({
 
             {attachments.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">{t('requestForm.attachedFiles')}</h4>
+                <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('requestForm.attachedFiles')}</h4>
                 {attachments.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-slate-700 rounded-lg">
                     <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm text-gray-700">{file.name}</span>
-                      <span className="text-xs text-gray-500">
+                      <FileText className="h-4 w-4 text-gray-500 dark:text-slate-400" />
+                      <span className="text-sm text-gray-700 dark:text-slate-300">{file.name}</span>
+                      <span className="text-xs text-gray-500 dark:text-slate-500">
                         ({(file.size / 1024 / 1024).toFixed(2)} MB)
                       </span>
                     </div>
                     <button
                       type="button"
                       onClick={() => removeAttachment(index)}
-                      className="text-red-600 hover:text-red-800"
+                      className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -795,8 +795,8 @@ export default function ChangeRequestForm({
         </div>
 
         {/* Form Actions */}
-        <div className="flex items-center justify-between pt-6 border-t">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+        <div className="flex items-center justify-between pt-6 border-t dark:border-slate-700">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
             <Info className="h-4 w-4" />
             <span>{t('requestForm.fieldsRequired')}</span>
           </div>
@@ -805,7 +805,7 @@ export default function ChangeRequestForm({
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
             >
               {t('requestForm.cancel')}
             </button>

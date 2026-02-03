@@ -1,4 +1,21 @@
 import '@testing-library/jest-dom'
+import 'jest-axe/extend-expect'
+
+// Ensure Request/Response/Headers exist for Next.js API route tests (workers may not inherit from jest.env.js)
+if (typeof global.Request === 'undefined') {
+  try {
+    const { Request, Response, Headers } = require('undici')
+    global.Request = Request
+    global.Response = Response
+    global.Headers = Headers
+  } catch {
+    if (typeof globalThis.Request !== 'undefined') {
+      global.Request = globalThis.Request
+      global.Response = globalThis.Response
+      global.Headers = globalThis.Headers
+    }
+  }
+}
 
 // Import custom testing utilities
 import { toMeetTouchTargetRequirements, toHaveResponsiveLayout } from './__tests__/utils/responsive-testing'
@@ -9,7 +26,16 @@ expect.extend({
   toHaveResponsiveLayout
 })
 
-// Add polyfills for Node.js environment
+// Add polyfills for Node.js environment (Next.js route handlers need Request/Response)
+try {
+  const { Request, Response, Headers } = require('undici')
+  if (typeof global.Request === 'undefined') global.Request = Request
+  if (typeof global.Response === 'undefined') global.Response = Response
+  if (typeof global.Headers === 'undefined') global.Headers = Headers
+} catch {
+  // Node 18+ has these globally; no-op if already defined
+}
+
 if (typeof TextEncoder === 'undefined') {
   global.TextEncoder = require('util').TextEncoder
 }

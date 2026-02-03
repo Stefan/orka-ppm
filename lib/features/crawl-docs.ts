@@ -18,6 +18,22 @@ const SKIP_APP_SEGMENTS = new Set([
   '_next',
 ])
 
+/** Known sub-pages/routes that exist as tabs within main pages */
+const KNOWN_SUB_ROUTES: Record<string, Array<{path: string, name: string}>> = {
+  '/financials': [
+    { path: '/financials?tab=costbook', name: 'Costbook' },
+    { path: '/financials?tab=eac', name: 'EAC Calculation' },
+    { path: '/financials?tab=forecast', name: 'Financial Forecast' },
+    { path: '/financials?tab=budget', name: 'Budget Tracking' },
+  ],
+}
+
+/** Custom name overrides for routes that need better display names */
+const ROUTE_NAME_OVERRIDES: Record<string, string> = {
+  '/projects/import': 'Project Import',
+  '/reports/pmr': 'PMR Reports',
+}
+
 /** Derive route path from app dir path (e.g. "dashboards" -> "/dashboards", "projects/[id]" -> "/projects/[id]") */
 function appDirToRoute(relativeDir: string): string {
   const segments = relativeDir.replace(/\\/g, '/').split('/').filter(Boolean)
@@ -52,6 +68,8 @@ function crawlAppRoutes(rootDir: string): DocItem[] {
   if (!fs.existsSync(appDir)) return []
 
   const items: DocItem[] = []
+  const seenIds = new Set<string>()
+
   function walk(dir: string, relativeDir: string) {
     const entries = fs.readdirSync(dir, { withFileTypes: true })
     for (const e of entries) {
@@ -63,9 +81,21 @@ function crawlAppRoutes(rootDir: string): DocItem[] {
       } else if (e.name === 'page.tsx' || e.name === 'page.js') {
         const routePath = appDirToRoute(relativeDir)
         const segment = path.basename(relativeDir)
-        const name = segment ? segmentToName(segment) : 'Home'
+        // Use custom name override if available, otherwise derive from segment
+        const name = ROUTE_NAME_OVERRIDES[routePath] ?? (segment ? segmentToName(segment) : 'Home')
+
+        // Skip home route if it duplicates dashboards
+        if (routePath === '/' && segment === '') continue
+
+        const id = `route:${routePath}`
+        if (seenIds.has(id)) {
+          console.warn(`[crawl] Skipping duplicate route: ${id} (${full})`)
+          continue // Skip duplicates
+        }
+        seenIds.add(id)
+
         items.push({
-          id: `route:${routePath}`,
+          id,
           name: name || routePath || 'Home',
           description: null,
           link: routePath,
@@ -74,6 +104,27 @@ function crawlAppRoutes(rootDir: string): DocItem[] {
           parentId: 'section:routes',
           icon: 'Layout',
         })
+
+        // Add known sub-routes for this main route
+        const subRoutes = KNOWN_SUB_ROUTES[routePath]
+        if (subRoutes) {
+          for (const sub of subRoutes) {
+            const subId = `route:${sub.path}`
+            if (!seenIds.has(subId)) {
+              seenIds.add(subId)
+              items.push({
+                id: subId,
+                name: sub.name,
+                description: null,
+                link: sub.path,
+                source: 'route',
+                sourcePath: `app/${relativeDir}/page.tsx#${sub.name.toLowerCase().replace(/\s+/g, '-')}`,
+                parentId: `route:${routePath}`,
+                icon: 'Layout',
+              })
+            }
+          }
+        }
       }
     }
   }

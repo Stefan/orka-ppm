@@ -478,10 +478,10 @@ export default function AdminUsers() {
 
   const getRoleColor = (role: string) => {
     switch (role.toLowerCase()) {
-      case 'admin': return 'bg-red-100 text-red-800'
-      case 'manager': return 'bg-blue-100 text-blue-800'
-      case 'user': return 'bg-gray-100 text-gray-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'admin': return 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300'
+      case 'manager': return 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300'
+      case 'user': return 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-300'
+      default: return 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-300'
     }
   }
 
@@ -537,10 +537,10 @@ export default function AdminUsers() {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Manage Roles</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Manage Roles</h2>
               <button
                 onClick={closeRoleModal}
                 className="text-gray-400 hover:text-gray-600"
@@ -549,24 +549,24 @@ export default function AdminUsers() {
               </button>
             </div>
 
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+            <div className="mb-6 p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
               <div className="flex items-center space-x-3">
-                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                  <span className="text-lg font-medium text-blue-600">
+                <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+                  <span className="text-lg font-medium text-blue-600 dark:text-blue-300">
                     {selectedUserForRole.email.charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <div>
-                  <div className="text-lg font-medium text-gray-900">
+                  <div className="text-lg font-medium text-gray-900 dark:text-slate-100">
                     {selectedUserForRole.full_name || selectedUserForRole.email}
                   </div>
-                  <div className="text-sm text-gray-500">{selectedUserForRole.email}</div>
+                  <div className="text-sm text-gray-500 dark:text-slate-400">{selectedUserForRole.email}</div>
                 </div>
               </div>
             </div>
 
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Current Roles</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Current Roles</h3>
               {selectedUserForRole.roles && selectedUserForRole.roles.length > 0 ? (
                 <div className="space-y-2">
                   {selectedUserForRole.roles.map((role) => (
@@ -642,7 +642,7 @@ export default function AdminUsers() {
             <div className="mt-6 flex justify-end">
               <button
                 onClick={closeRoleModal}
-                className="px-4 py-2 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200"
+                className="px-4 py-2 bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-slate-100 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600"
               >
                 Close
               </button>
@@ -659,10 +659,10 @@ export default function AdminUsers() {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4">
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">{t('inviteUser')}</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">{t('inviteUser')}</h2>
               <button
                 onClick={closeInviteModal}
                 className="text-gray-400 hover:text-gray-600"
@@ -673,7 +673,7 @@ export default function AdminUsers() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   {t('email')}
                 </label>
                 <input
@@ -683,19 +683,19 @@ export default function AdminUsers() {
                   placeholder={t('enterEmail')}
                   maxLength={254}
                   autoFocus
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-900"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-900 dark:text-slate-100 bg-white dark:bg-slate-700"
                   disabled={inviteLoading}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   {t('role')}
                 </label>
                 <select
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-900"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-900 dark:text-slate-100 bg-white dark:bg-slate-700"
                   disabled={inviteLoading}
                 >
                   <option value="team_member">{t('teamMember')}</option>
@@ -707,8 +707,8 @@ export default function AdminUsers() {
                 </select>
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-sm text-blue-800">
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                <p className="text-sm text-blue-800 dark:text-blue-300">
                   {t('inviteNote')}
                 </p>
               </div>
@@ -718,14 +718,14 @@ export default function AdminUsers() {
               <button
                 onClick={closeInviteModal}
                 disabled={inviteLoading}
-                className="px-4 py-2 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 disabled:opacity-50"
+                className="px-4 py-2 bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-slate-100 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 disabled:opacity-50"
               >
                 {t('cancel')}
               </button>
               <button
                 onClick={handleInviteUser}
                 disabled={inviteLoading || !inviteEmail.trim()}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+                className="px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-400 disabled:opacity-50 flex items-center space-x-2"
               >
                 {inviteLoading ? (
                   <>
@@ -795,32 +795,32 @@ export default function AdminUsers() {
 
         {/* Filters */}
         {showFilters && (
-          <div className="bg-gray-50 p-4 rounded-lg border">
+          <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg border border-gray-200 dark:border-slate-600">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   {t('searchByEmail')}
                 </label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
                   <input
                     type="text"
                     value={filters.search}
                     onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
                     placeholder={t('enterEmail')}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="pl-10 w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
                   />
                 </div>
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   {t('status')}
                 </label>
                 <select
                   value={filters.status}
                   onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
                 >
                   <option value="">{t('allStatuses')}</option>
                   <option value="active">{t('active')}</option>
@@ -830,13 +830,13 @@ export default function AdminUsers() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   {t('role')}
                 </label>
                 <select
                   value={filters.role}
                   onChange={(e) => setFilters(prev => ({ ...prev, role: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
                 >
                   <option value="">{t('allRoles')}</option>
                   <option value="admin">{t('admin')}</option>
@@ -851,36 +851,36 @@ export default function AdminUsers() {
 
         {/* Bulk Actions */}
         {selectedUsers.length > 0 && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-blue-900">
+              <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
                 {selectedUsers.length} {t('usersSelected')}
               </span>
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => handleBulkAction('activate')}
                   disabled={actionLoading === 'bulk'}
-                  className="px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 disabled:opacity-50 text-sm"
+                  className="px-3 py-1 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-800 disabled:opacity-50 text-sm"
                 >
                   {t('activate')}
                 </button>
                 <button
                   onClick={() => handleBulkAction('deactivate')}
                   disabled={actionLoading === 'bulk'}
-                  className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 disabled:opacity-50 text-sm"
+                  className="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 rounded hover:bg-yellow-200 dark:hover:bg-yellow-800 disabled:opacity-50 text-sm"
                 >
                   {t('deactivate')}
                 </button>
                 <button
                   onClick={() => handleBulkAction('delete')}
                   disabled={actionLoading === 'bulk'}
-                  className="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50 text-sm"
+                  className="px-3 py-1 bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 rounded hover:bg-red-200 dark:hover:bg-red-800 disabled:opacity-50 text-sm"
                 >
                   {t('delete')}
                 </button>
                 <button
                   onClick={() => setSelectedUsers([])}
-                  className="px-3 py-1 bg-gray-100 text-gray-900 rounded hover:bg-gray-200 text-sm"
+                  className="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-slate-100 rounded hover:bg-gray-200 dark:hover:bg-slate-600 text-sm"
                 >
                   {t('clear')}
                 </button>
@@ -922,10 +922,10 @@ export default function AdminUsers() {
         )}
 
         {/* Users Table */}
-        <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow border border-gray-200 dark:border-slate-700 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+              <thead className="bg-gray-50 dark:bg-slate-700">
                 <tr>
                   <th className="px-6 py-3 text-left">
                     <input
@@ -941,29 +941,29 @@ export default function AdminUsers() {
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     {t('tableHeaders.user')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     {t('tableHeaders.role')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     {t('tableHeaders.status')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     {t('tableHeaders.lastLogin')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     {t('tableHeaders.created')}
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     {t('tableHeaders.actions')}
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                 {users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
+                  <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-slate-700">
                     <td className="px-6 py-4">
                       <input
                         type="checkbox"
@@ -981,16 +981,16 @@ export default function AdminUsers() {
                     <td className="px-6 py-4">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-8 w-8">
-                          <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-sm font-medium text-gray-600">
+                          <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-slate-600 flex items-center justify-center">
+                            <span className="text-sm font-medium text-gray-600 dark:text-slate-300">
                               {user.email.charAt(0).toUpperCase()}
                             </span>
                           </div>
                         </div>
                         <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">{user.email}</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-slate-100">{user.email}</div>
                           {user.sso_provider && (
-                            <div className="text-xs text-gray-500">{t('sso')}: {user.sso_provider}</div>
+                            <div className="text-xs text-gray-500 dark:text-slate-400">{t('sso')}: {user.sso_provider}</div>
                           )}
                         </div>
                       </div>
@@ -1018,18 +1018,18 @@ export default function AdminUsers() {
                     <td className="px-6 py-4">
                       <div className="flex items-center">
                         {getStatusIcon(user)}
-                        <span className="ml-2 text-sm text-gray-900">{getStatusText(user)}</span>
+                        <span className="ml-2 text-sm text-gray-900 dark:text-slate-100">{getStatusText(user)}</span>
                       </div>
                       {user.deactivated_at && (
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                           {t('deactivatedAt')}: {formatDate(user.deactivated_at)}
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm text-gray-900 dark:text-slate-100">
                       {formatDate(user.last_login)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm text-gray-900 dark:text-slate-100">
                       {formatDate(user.created_at)}
                     </td>
                     <td className="px-6 py-4 text-right text-sm font-medium">
@@ -1084,10 +1084,10 @@ export default function AdminUsers() {
           
           {users.length === 0 && !loading && (
             <div className="text-center py-12">
-              <Users className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">{t('noUsersFound')}</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                {filters.search || filters.status || filters.role 
+              <Users className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-slate-100">{t('noUsersFound')}</h3>
+              <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
+                {filters.search || filters.status || filters.role
                   ? t('tryAdjustingFilters')
                   : t('getStartedInvite')
                 }
@@ -1099,29 +1099,29 @@ export default function AdminUsers() {
         {/* Pagination */}
         {pagination.total_pages > 1 && (
           <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-700">
+            <div className="text-sm text-gray-700 dark:text-slate-300">
               {t('showing')} {((pagination.page - 1) * pagination.per_page) + 1} {t('to')}{' '}
               {Math.min(pagination.page * pagination.per_page, pagination.total_count)} {t('of')}{' '}
               {pagination.total_count} {t('users')}
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
                 disabled={pagination.page === 1}
-                className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 dark:text-slate-100"
               >
                 {t('previous')}
               </button>
-              
-              <span className="px-3 py-2 text-sm text-gray-700">
+
+              <span className="px-3 py-2 text-sm text-gray-700 dark:text-slate-300">
                 {t('page')} {pagination.page} {t('of')} {pagination.total_pages}
               </span>
-              
+
               <button
                 onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
                 disabled={pagination.page === pagination.total_pages}
-                className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 dark:text-slate-100"
               >
                 {t('next')}
               </button>

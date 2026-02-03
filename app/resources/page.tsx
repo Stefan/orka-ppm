@@ -751,10 +751,10 @@ export default function Resources() {
 
           {/* Enhanced Touch-Optimized Heatmap */}
           {viewMode === 'heatmap' && (
-            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-2 sm:space-y-0">
-              <h3 className="text-lg font-semibold text-gray-900">Resource Utilization Heatmap</h3>
-              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Resource Utilization Heatmap</h3>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-700 dark:text-slate-300">
                 <span>Total: {filteredResources.length}</span>
                 <span>Avg: {analyticsData.averageUtilization.toFixed(1)}%</span>
               </div>
@@ -856,68 +856,70 @@ export default function Resources() {
             {/* Enhanced mobile-friendly legend */}
             <div className="mt-6 space-y-4">
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 text-sm">
-                <div className="flex items-center p-2 rounded-lg bg-green-50">
-                  <div className="w-4 h-4 bg-green-100 border border-green-300 rounded mr-2 flex-shrink-0"></div>
+                <div
+                  className="flex items-center p-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
+                >
+                  <div className="w-4 h-4 bg-green-100 dark:bg-green-800 border border-green-300 dark:border-green-600 rounded mr-2 flex-shrink-0"></div>
                   <div className="min-w-0">
-                    <div className="font-medium text-green-800">Under-utilized</div>
-                    <div className="text-xs text-green-600">≤50% - {analyticsData.utilizationDistribution[0]?.value || 0}</div>
+                    <div className="font-medium text-green-800 dark:text-green-300">Under-utilized</div>
+                    <div className="text-xs text-green-600 dark:text-green-400">≤50% - {analyticsData.utilizationDistribution[0]?.value || 0}</div>
                   </div>
                 </div>
-                <div className="flex items-center p-2 rounded-lg bg-blue-50">
-                  <div className="w-4 h-4 bg-blue-100 border border-blue-300 rounded mr-2 flex-shrink-0"></div>
+                <div className="flex items-center p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                  <div className="w-4 h-4 bg-blue-100 dark:bg-blue-800 border border-blue-300 dark:border-blue-600 rounded mr-2 flex-shrink-0"></div>
                   <div className="min-w-0">
-                    <div className="font-medium text-blue-800">Well-utilized</div>
-                    <div className="text-xs text-blue-600">51-80% - {analyticsData.utilizationDistribution[1]?.value || 0}</div>
+                    <div className="font-medium text-blue-800 dark:text-blue-300">Well-utilized</div>
+                    <div className="text-xs text-blue-600 dark:text-blue-400">51-80% - {analyticsData.utilizationDistribution[1]?.value || 0}</div>
                   </div>
                 </div>
-                <div className="flex items-center p-2 rounded-lg bg-yellow-50">
-                  <div className="w-4 h-4 bg-yellow-100 border border-yellow-300 rounded mr-2 flex-shrink-0"></div>
+                <div className="flex items-center p-2 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+                  <div className="w-4 h-4 bg-yellow-100 dark:bg-yellow-800 border border-yellow-300 dark:border-yellow-600 rounded mr-2 flex-shrink-0"></div>
                   <div className="min-w-0">
-                    <div className="font-medium text-yellow-800">Highly-utilized</div>
-                    <div className="text-xs text-yellow-600">81-100% - {analyticsData.utilizationDistribution[2]?.value || 0}</div>
+                    <div className="font-medium text-yellow-800 dark:text-yellow-300">Highly-utilized</div>
+                    <div className="text-xs text-yellow-600 dark:text-yellow-400">81-100% - {analyticsData.utilizationDistribution[2]?.value || 0}</div>
                   </div>
                 </div>
-                <div className="flex items-center p-2 rounded-lg bg-red-50">
-                  <div className="w-4 h-4 bg-red-100 border border-red-300 rounded mr-2 flex-shrink-0"></div>
+                <div className="flex items-center p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                  <div className="w-4 h-4 bg-red-100 dark:bg-red-800 border border-red-300 dark:border-red-600 rounded mr-2 flex-shrink-0"></div>
                   <div className="min-w-0">
-                    <div className="font-medium text-red-800">Over-utilized</div>
-                    <div className="text-xs text-red-600">{">"}100% - {analyticsData.utilizationDistribution[3]?.value || 0}</div>
+                    <div className="font-medium text-red-800 dark:text-red-300">Over-utilized</div>
+                    <div className="text-xs text-red-600 dark:text-red-400">{">"}100% - {analyticsData.utilizationDistribution[3]?.value || 0}</div>
                   </div>
                 </div>
               </div>
               
               {/* Touch interaction hints */}
-              <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+              <div className="bg-gray-50 dark:bg-slate-700 p-3 sm:p-4 rounded-lg border border-gray-200 dark:border-slate-600">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-gray-900">Utilization Insights</h4>
-                  <div className="text-xs text-gray-500 bg-white px-2 py-1 rounded">
+                  <h4 className="font-medium text-gray-900 dark:text-slate-100">Utilization Insights</h4>
+                  <div className="text-xs text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-600 px-2 py-1 rounded border border-gray-200 dark:border-slate-500">
                     Tap cards for details
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-sm">
                   <div>
-                    <span className="text-gray-600">Most Utilized:</span>
-                    <div className="font-medium text-gray-900 truncate">
-                      {filteredResources.reduce((max, resource) => 
-                        resource.utilization_percentage > max.utilization_percentage ? resource : max, 
+                    <span className="text-gray-600 dark:text-slate-400">Most Utilized:</span>
+                    <div className="font-medium text-gray-900 dark:text-slate-100 truncate">
+                      {filteredResources.reduce((max, resource) =>
+                        resource.utilization_percentage > max.utilization_percentage ? resource : max,
                         filteredResources[0] || { name: 'N/A', utilization_percentage: 0 }
-                      ).name} ({filteredResources.length > 0 ? 
+                      ).name} ({filteredResources.length > 0 ?
                         Math.max(...filteredResources.map(r => r.utilization_percentage)).toFixed(1) : 0}%)
                     </div>
                   </div>
                   <div>
-                    <span className="text-gray-600">Least Utilized:</span>
-                    <div className="font-medium text-gray-900 truncate">
-                      {filteredResources.reduce((min, resource) => 
-                        resource.utilization_percentage < min.utilization_percentage ? resource : min, 
+                    <span className="text-gray-600 dark:text-slate-400">Least Utilized:</span>
+                    <div className="font-medium text-gray-900 dark:text-slate-100 truncate">
+                      {filteredResources.reduce((min, resource) =>
+                        resource.utilization_percentage < min.utilization_percentage ? resource : min,
                         filteredResources[0] || { name: 'N/A', utilization_percentage: 100 }
-                      ).name} ({filteredResources.length > 0 ? 
+                      ).name} ({filteredResources.length > 0 ?
                         Math.min(...filteredResources.map(r => r.utilization_percentage)).toFixed(1) : 0}%)
                     </div>
                   </div>
                   <div>
-                    <span className="text-gray-600">Available Capacity:</span>
-                    <div className="font-medium text-gray-900">
+                    <span className="text-gray-600 dark:text-slate-400">Available Capacity:</span>
+                    <div className="font-medium text-gray-900 dark:text-slate-100">
                       {filteredResources.reduce((sum, r) => sum + r.available_hours, 0).toFixed(1)}h total
                     </div>
                   </div>

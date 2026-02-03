@@ -188,15 +188,15 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
       : 0
     
     return (
-      <div key={node.id} className="border-b border-gray-100 last:border-b-0">
+      <div key={node.id} className="border-b border-gray-100 dark:border-slate-700 last:border-b-0">
         <div 
-          className="flex items-center py-3 px-4 hover:bg-gray-50 cursor-pointer"
+          className="flex items-center py-3 px-4 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer"
           style={{ paddingLeft: `${indent + 16}px` }}
         >
           {/* Expand/Collapse Button */}
           <button
             onClick={() => toggleNode(node.id)}
-            className="mr-2 text-gray-400 hover:text-gray-600"
+            className="mr-2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300"
             disabled={!hasChildren}
           >
             {hasChildren ? (
@@ -209,20 +209,20 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
           {/* Name and Code */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center space-x-2">
-              <span className="font-medium text-gray-900 truncate">{node.name}</span>
+              <span className="font-medium text-gray-900 dark:text-slate-100 truncate">{node.name}</span>
               {node.code && (
-                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                <span className="text-xs text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded">
                   {node.code}
                 </span>
               )}
               {node.sap_po_number && (
-                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+                <span className="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded">
                   {node.sap_po_number}
                 </span>
               )}
             </div>
             {node.cost_center && (
-              <div className="text-xs text-gray-500 mt-0.5">
+              <div className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                 Cost Center: {node.cost_center}
               </div>
             )}
@@ -231,40 +231,40 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
           {/* Amounts */}
           <div className="flex items-center space-x-6 text-sm">
             <div className="text-right">
-              <div className="text-gray-600">Planned</div>
-              <div className="font-medium text-gray-900">
+              <div className="text-gray-600 dark:text-slate-400">Planned</div>
+              <div className="font-medium text-gray-900 dark:text-slate-100">
                 {node.planned_amount.toLocaleString()} {node.currency}
               </div>
             </div>
             
             <div className="text-right">
-              <div className="text-gray-600">Committed</div>
-              <div className="font-medium text-blue-600">
+              <div className="text-gray-600 dark:text-slate-400">Committed</div>
+              <div className="font-medium text-blue-600 dark:text-blue-400">
                 {node.committed_amount.toLocaleString()} {node.currency}
               </div>
             </div>
             
             <div className="text-right">
-              <div className="text-gray-600">Actual</div>
-              <div className="font-medium text-green-600">
+              <div className="text-gray-600 dark:text-slate-400">Actual</div>
+              <div className="font-medium text-green-600 dark:text-green-400">
                 {node.actual_amount.toLocaleString()} {node.currency}
               </div>
             </div>
             
             <div className="text-right">
-              <div className="text-gray-600">Remaining</div>
-              <div className="font-medium text-gray-900">
+              <div className="text-gray-600 dark:text-slate-400">Remaining</div>
+              <div className="font-medium text-gray-900 dark:text-slate-100">
                 {node.remaining_amount.toLocaleString()} {node.currency}
               </div>
             </div>
             
             {/* Utilization Bar */}
             <div className="w-24">
-              <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+              <div className="flex items-center justify-between text-xs text-gray-600 dark:text-slate-400 mb-1">
                 <span>Utilization</span>
                 <span>{utilizationPercent.toFixed(0)}%</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-gray-200 dark:bg-slate-600 rounded-full h-2">
                 <div 
                   className={`h-2 rounded-full ${
                     utilizationPercent > 90 ? 'bg-red-500' : 
@@ -279,10 +279,10 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
           
           {/* Actions */}
           <div className="flex items-center space-x-2 ml-4">
-            <button className="p-1 text-gray-400 hover:text-blue-600">
+            <button className="p-1 text-gray-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400">
               <Edit2 className="h-4 w-4" />
             </button>
-            <button className="p-1 text-gray-400 hover:text-red-600">
+            <button className="p-1 text-gray-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400">
               <Trash2 className="h-4 w-4" />
             </button>
           </div>
@@ -300,12 +300,12 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
 
   if (!projectId) {
     return (
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+      <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-lg p-6">
         <div className="flex items-center">
-          <AlertCircle className="h-5 w-5 text-yellow-600 mr-3" />
+          <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mr-3" />
           <div>
-            <h3 className="font-medium text-yellow-900">No Project Selected</h3>
-            <p className="text-sm text-yellow-700 mt-1">
+            <h3 className="font-medium text-yellow-900 dark:text-yellow-300">No Project Selected</h3>
+            <p className="text-sm text-yellow-700 dark:text-yellow-400 mt-1">
               Please select a project to view PO breakdowns
             </p>
           </div>
@@ -319,33 +319,33 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
       {/* Summary Cards */}
       {summary && (
         <div className="summary-cards-grid gap-4">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="text-sm text-gray-600 mb-1">Total Planned</div>
-            <div className="text-2xl font-bold text-gray-900">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+            <div className="text-sm text-gray-600 dark:text-slate-400 mb-1">Total Planned</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-slate-100">
               {summary.total_planned.toLocaleString()} {summary.currency}
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="text-sm text-gray-600 mb-1">Total Committed</div>
-            <div className="text-2xl font-bold text-blue-600">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+            <div className="text-sm text-gray-600 dark:text-slate-400 mb-1">Total Committed</div>
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
               {summary.total_committed.toLocaleString()} {summary.currency}
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="text-sm text-gray-600 mb-1">Total Actual</div>
-            <div className="text-2xl font-bold text-green-600">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+            <div className="text-sm text-gray-600 dark:text-slate-400 mb-1">Total Actual</div>
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {summary.total_actual.toLocaleString()} {summary.currency}
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="text-sm text-gray-600 mb-1">Remaining</div>
-            <div className="text-2xl font-bold text-gray-900">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+            <div className="text-sm text-gray-600 dark:text-slate-400 mb-1">Remaining</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-slate-100">
               {summary.total_remaining.toLocaleString()} {summary.currency}
             </div>
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="text-xs text-gray-500 dark:text-slate-500 mt-1">
               {summary.breakdown_count} items, {summary.hierarchy_levels} levels
             </div>
           </div>
@@ -353,21 +353,21 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
       )}
       
       {/* Toolbar */}
-      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
               <input
                 type="text"
                 placeholder="Search breakdowns..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="pl-10 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500"
               />
             </div>
             
-            <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center space-x-2">
+            <button className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center space-x-2 text-gray-700 dark:text-slate-300">
               <Filter className="h-4 w-4" />
               <span>Filter</span>
             </button>
@@ -376,13 +376,13 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
           <div className="flex items-center space-x-2">
             <button 
               onClick={fetchBreakdowns}
-              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center space-x-2"
+              className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center space-x-2 text-gray-700 dark:text-slate-300"
             >
               <RefreshCw className="h-4 w-4" />
               <span>Refresh</span>
             </button>
             
-            <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center space-x-2">
+            <button className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center space-x-2 text-gray-700 dark:text-slate-300">
               <Download className="h-4 w-4" />
               <span>Export</span>
             </button>
@@ -405,21 +405,21 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
       
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg p-4">
           <div className="flex items-center">
-            <AlertCircle className="h-5 w-5 text-red-600 mr-3" />
+            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mr-3" />
             <div>
-              <h3 className="font-medium text-red-900">Error</h3>
-              <p className="text-sm text-red-700 mt-1">{error}</p>
+              <h3 className="font-medium text-red-900 dark:text-red-300">Error</h3>
+              <p className="text-sm text-red-700 dark:text-red-400 mt-1">{error}</p>
             </div>
           </div>
         </div>
       )}
       
       {/* Breakdown Tree */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
-          <div className="flex items-center justify-between text-sm font-medium text-gray-700">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
+        <div className="bg-gray-50 dark:bg-slate-700 px-4 py-3 border-b border-gray-200 dark:border-slate-600">
+          <div className="flex items-center justify-between text-sm font-medium text-gray-700 dark:text-slate-300">
             <div className="flex-1">PO Breakdown Structure</div>
             <div className="flex items-center space-x-6">
               <div>Planned</div>
@@ -438,11 +438,11 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
           </div>
         ) : breakdowns.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-gray-500 mb-4">
+            <div className="text-gray-500 dark:text-slate-400 mb-4">
               <p className="text-lg font-medium">No PO breakdowns found</p>
               <p className="text-sm mt-2">This feature requires SAP Purchase Order data</p>
             </div>
-            <div className="mt-6 space-y-2 text-sm text-gray-600">
+            <div className="mt-6 space-y-2 text-sm text-gray-600 dark:text-slate-400">
               <p>To get started:</p>
               <ul className="list-disc list-inside space-y-1">
                 <li>Import a CSV file with PO breakdown structure</li>
@@ -469,14 +469,14 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
       {/* Upload Modal */}
       {showUploadModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold mb-4">Import SAP PO Breakdown CSV</h3>
+          <div className="bg-white dark:bg-slate-800 rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-slate-100">Import SAP PO Breakdown CSV</h3>
             
             {!importResult ? (
               <div>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                  <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-sm text-gray-600 mb-4">
+                <div className="border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-lg p-8 text-center">
+                  <Upload className="h-12 w-12 text-gray-400 dark:text-slate-500 mx-auto mb-4" />
+                  <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">
                     Drag and drop your CSV file here, or click to browse
                   </p>
                   <input
@@ -499,11 +499,11 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
                 
                 {uploadProgress > 0 && uploadProgress < 100 && (
                   <div className="mt-4">
-                    <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                    <div className="flex items-center justify-between text-sm text-gray-600 dark:text-slate-400 mb-2">
                       <span>Uploading...</span>
                       <span>{uploadProgress}%</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-gray-200 dark:bg-slate-600 rounded-full h-2">
                       <div 
                         className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                         style={{ width: `${uploadProgress}%` }}
@@ -517,14 +517,14 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
                 {importResult.success ? (
                   <div className="text-center">
                     <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                    <h4 className="text-lg font-medium text-gray-900 mb-2">Import Successful!</h4>
-                    <p className="text-sm text-gray-600 mb-4">
+                    <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-2">Import Successful!</h4>
+                    <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">
                       {importResult.successful_imports} of {importResult.total_rows} records imported
                     </p>
                     {importResult.warnings.length > 0 && (
-                      <div className="text-left bg-yellow-50 border border-yellow-200 rounded p-3 mb-4">
-                        <p className="text-sm font-medium text-yellow-900 mb-1">Warnings:</p>
-                        <ul className="text-xs text-yellow-700 space-y-1">
+                      <div className="text-left bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded p-3 mb-4">
+                        <p className="text-sm font-medium text-yellow-900 dark:text-yellow-300 mb-1">Warnings:</p>
+                        <ul className="text-xs text-yellow-700 dark:text-yellow-400 space-y-1">
                           {importResult.warnings.slice(0, 3).map((warning, i) => (
                             <li key={i}>{warning}</li>
                           ))}
@@ -535,10 +535,10 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
                 ) : (
                   <div className="text-center">
                     <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-                    <h4 className="text-lg font-medium text-gray-900 mb-2">Import Failed</h4>
-                    <div className="text-left bg-red-50 border border-red-200 rounded p-3 mb-4">
-                      <p className="text-sm font-medium text-red-900 mb-1">Errors:</p>
-                      <ul className="text-xs text-red-700 space-y-1">
+                    <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-2">Import Failed</h4>
+                    <div className="text-left bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded p-3 mb-4">
+                      <p className="text-sm font-medium text-red-900 dark:text-red-300 mb-1">Errors:</p>
+                      <ul className="text-xs text-red-700 dark:text-red-400 space-y-1">
                         {importResult.errors.slice(0, 5).map((error, i) => (
                           <li key={i}>{error}</li>
                         ))}
@@ -556,7 +556,7 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
                   setImportResult(null)
                   setUploadProgress(0)
                 }}
-                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300"
               >
                 Close
               </button>

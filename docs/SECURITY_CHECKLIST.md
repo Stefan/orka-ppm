@@ -35,7 +35,8 @@
 
 ### ✅ Network Security
 - [ ] HTTPS is enforced (no HTTP traffic allowed)
-- [ ] Security headers are configured (HSTS, CSP, etc.)
+- [ ] Security headers are configured (HSTS, CSP, etc.)  
+  **Implemented in Next.js:** `next.config.ts` `headers()` sets X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy; in production also Strict-Transport-Security and Content-Security-Policy-Report-Only. To change or add domains (e.g. for CSP), edit `next.config.ts`.
 - [ ] API endpoints are behind a firewall/WAF
 - [ ] Internal services are not exposed to public internet
 - [ ] VPN or private networking is used for admin access
@@ -67,6 +68,39 @@
 - [ ] Bootstrap/setup endpoints are disabled
 - [ ] Admin documentation is not exposed in the application
 - [ ] Privileged operations require additional confirmation
+
+## Secrets and rotation
+
+### Where production secrets are stored
+
+- **Frontend (Vercel):** Environment variables in Vercel project (Settings → Environment Variables). Used at build and runtime for `NEXT_PUBLIC_*` and server-side vars.
+- **Backend (Render or host):** Environment variables in the service dashboard.
+- **Database / Auth:** Supabase dashboard (Project Settings → API, Database).
+- **CI/CD:** GitHub repository Secrets and variables (Actions). Used for deploy keys, `LOAD_TEST_AUTH_TOKEN`, etc.
+
+Do not commit secrets to the repo; use `.env.local` locally and never commit it.
+
+### Critical secrets (no values here)
+
+- Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and (backend) service role or DB URL if used.
+- Sentry: `NEXT_PUBLIC_SENTRY_DSN` (optional).
+- Backend: `OPENAI_API_KEY`, Redis URL, any API keys for integrations.
+- GitHub: secrets used by workflows (e.g. deploy tokens, `LOAD_TEST_AUTH_TOKEN`).
+
+### Who can change them and how
+
+- **Vercel:** Project admins; change in dashboard then redeploy or wait for next deploy.
+- **Render / backend host:** Team with access; change in service env, then restart/redeploy.
+- **Supabase:** Project owners; rotate in dashboard and update all consumers (frontend env, backend env).
+- **GitHub:** Repo admins; change in Settings → Secrets and variables → Actions.
+
+### Recommended rotation cadence and procedure
+
+- **Database credentials / Supabase keys:** At least every 90 days, or immediately on compromise.
+- **API keys (OpenAI, etc.):** Annually or on compromise.
+- **Deploy tokens and CI secrets:** On personnel change or compromise.
+
+**Procedure (generic):** (1) Generate new secret in the provider (Supabase, OpenAI, etc.). (2) Update the secret in every consumer (Vercel, Render, GitHub). (3) Redeploy or restart services so they use the new value. (4) Revoke or delete the old secret after confirming the app works. (5) Document the rotation date and next due date.
 
 ## Post-Deployment Security Monitoring
 
