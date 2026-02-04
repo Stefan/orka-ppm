@@ -29,10 +29,10 @@ export default function ImportPage() {
   const router = useRouter()
   const { enabled: importEnabled } = useFeatureFlag('import_builder_ai')
 
-  // Redirect if feature is disabled
+  // When AI import builder is disabled, redirect to project import page instead of dashboard
   useEffect(() => {
     if (!importEnabled) {
-      router.push('/')
+      router.replace('/projects/import')
     }
   }, [importEnabled, router])
 

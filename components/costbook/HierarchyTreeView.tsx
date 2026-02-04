@@ -185,9 +185,9 @@ function TreeNode({
             style={{ marginLeft: indentPx + 18 }}
           />
           
-          {node.children.map(child => (
+          {node.children.map((child, index) => (
             <TreeNode
-              key={child.id}
+              key={`${child.id}-${index}`}
               node={child}
               level={level + 1}
               currency={currency}

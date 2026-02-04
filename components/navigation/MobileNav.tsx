@@ -38,7 +38,7 @@ const NAV_ITEMS = [
   // Projects & Resources
   { href: '/projects', label: 'All Projects', icon: GitBranch, group: 'Projects' },
   { href: '/resources', label: 'Resource Management', icon: Users, group: 'Projects' },
-  { href: '/import', label: 'Import', icon: Upload, group: 'Projects' },
+  { href: '/projects/import', label: 'Import', icon: Upload, group: 'Projects' },
 
   // Financial Management
   { href: '/financials', label: 'Budget & Cost Tracking', icon: DollarSign, group: 'Financials' },

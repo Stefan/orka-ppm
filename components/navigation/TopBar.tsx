@@ -233,9 +233,9 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   <span className="font-medium">Resource Management</span>
                 </Link>
                 <Link
-                  href="/import"
+                  href="/projects/import"
                   className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
-                    pathname === '/import'
+                    pathname === '/projects/import'
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
                       : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
                   }`}
