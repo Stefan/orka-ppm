@@ -5,17 +5,20 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { jwtDecode } from 'jwt-decode'
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
-// Create Supabase client for fetching user preferences
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: { autoRefreshToken: false, persistSession: false }
-})
+/** Lazy Supabase client so build (no env) does not throw "supabaseUrl is required" at module load */
+function getSupabase(): SupabaseClient | null {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  if (!supabaseUrl || !supabaseKey) return null
+  return createClient(supabaseUrl, supabaseKey, {
+    auth: { autoRefreshToken: false, persistSession: false }
+  })
+}
 
 interface DashboardKPIs {
   successRateMethod: 'health' | 'completion'
@@ -53,7 +56,8 @@ function getUserIdFromAuth(authHeader: string | null): string | null {
  * Fetch user's KPI preferences
  */
 async function getUserKPISettings(userId: string | null): Promise<DashboardKPIs> {
-  if (!userId || !supabaseUrl) {
+  const supabase = getSupabase()
+  if (!userId || !supabase) {
     return DEFAULT_KPI_SETTINGS
   }
 

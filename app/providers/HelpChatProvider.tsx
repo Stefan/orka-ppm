@@ -166,44 +166,57 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
     let currentPortfolio: string | undefined
     let relevantData: Record<string, any> = {}
 
-    // Determine page title and context based on route
+    // Determine page title and context based on route; fill relevantData for AI context
     switch (pathSegments[0]) {
       case 'dashboards':
         pageTitle = t('nav.dashboards')
+        relevantData = { page: 'dashboards', hint: 'User is on dashboards – KPIs and variance alerts are relevant.' }
         break
       case 'projects':
         pageTitle = 'Projects'
         if (pathSegments[1]) {
           currentProject = pathSegments[1]
           pageTitle = `Project: ${pathSegments[1]}`
+          relevantData = { page: 'project', projectId: pathSegments[1], hint: 'User is viewing a specific project.' }
+        } else {
+          relevantData = { page: 'projects', hint: 'User is on project list.' }
         }
         break
       case 'resources':
         pageTitle = t('resources.title')
+        relevantData = { page: 'resources', hint: 'User is on resource planning – utilization and allocation are relevant.' }
         break
       case 'risks':
         pageTitle = t('risks.title')
+        relevantData = { page: 'risks', hint: 'User is on risk management.' }
         break
       case 'financials':
         pageTitle = t('financials.title')
+        relevantData = { page: 'financials', hint: 'User is on financials – EAC, variance, budget, and costbook are relevant. Prefer answers about columns and variance.' }
         break
       case 'reports':
         pageTitle = t('reports.title')
+        relevantData = { page: 'reports', hint: 'User is on reports.' }
         break
       case 'scenarios':
         pageTitle = t('scenarios.title')
+        relevantData = { page: 'scenarios', hint: 'User is on scenarios – what-if and comparisons are relevant.' }
         break
       case 'monte-carlo':
         pageTitle = t('monteCarlo.title')
+        relevantData = { page: 'monte-carlo', hint: 'User is on Monte Carlo simulations – risk and forecasts are relevant.' }
         break
       case 'changes':
         pageTitle = t('nav.changes')
+        relevantData = { page: 'changes', hint: 'User is on change management.' }
         break
       case 'admin':
         pageTitle = 'Administration'
+        relevantData = { page: 'admin', hint: 'User is in admin area.' }
         break
       default:
         pageTitle = t('dashboard.title')
+        relevantData = { page: 'dashboard', hint: 'User is on main dashboard.' }
     }
 
     // Add user role context

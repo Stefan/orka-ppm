@@ -63,7 +63,8 @@ jobs:
       - name: Run unit structure tests
         id: unit-tests
         run: |
-          npm run test:structure:unit -- --ci --coverage --json --outputFile=test-results/unit-structure-results.json
+          mkdir -p test-results
+          npm run test:structure:unit -- --ci --json --outputFile=test-results/unit-structure-results.json
           TEST_EXIT_CODE=$?
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit $TEST_EXIT_CODE

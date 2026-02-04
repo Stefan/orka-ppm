@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { Layers } from 'lucide-react'
+import { Layers, Zap, X } from 'lucide-react'
 import { ProjectWithFinancials, Currency, KPIMetrics } from '@/types/costbook'
 import { calculateKPIs } from '@/lib/costbook-calculations'
 import { convertCurrency } from '@/lib/currency-utils'
@@ -130,6 +130,11 @@ function CostbookInner({
   const [showRecommendationDetail, setShowRecommendationDetail] = useState(false)
   const [selectedRecommendation, setSelectedRecommendation] = useState<EnhancedRecommendation | null>(null)
 
+  // AI Optimize Costbook state
+  const [showOptimizeModal, setShowOptimizeModal] = useState(false)
+  const [optimizeSuggestions, setOptimizeSuggestions] = useState<Array<{ id: string; description: string; metric: string; change: number; unit: string; impact: string }>>([])
+  const [optimizeLoading, setOptimizeLoading] = useState(false)
+
   // Comments state (Phase 3)
   const [commentsPanelProjectId, setCommentsPanelProjectId] = useState<string | null>(null)
   const [commentCounts, setCommentCounts] = useState<Map<string, number>>(new Map())
@@ -222,8 +227,11 @@ function CostbookInner({
       const detectedAnomalies = detectAnomalies(data)
       setAnomalies(detectedAnomalies)
       
-      // Generate recommendations
-      const generatedRecommendations = generateRecommendations(data, detectedAnomalies)
+      // Generate recommendations (with optional user/tenant context for personalization)
+      const userContext = typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_TENANT_NAME
+        ? { tenantName: process.env.NEXT_PUBLIC_TENANT_NAME }
+        : undefined
+      const generatedRecommendations = generateRecommendations(data, detectedAnomalies, { userContext })
       setRecommendations(generatedRecommendations)
 
       setLastRefreshTime(new Date())
@@ -262,7 +270,10 @@ function CostbookInner({
           setAnomalies(detectedAnomalies)
           
           // Generate recommendations for mock data
-          const generatedRecommendations = generateRecommendations(mockData, detectedAnomalies)
+          const userContext = typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_TENANT_NAME
+            ? { tenantName: process.env.NEXT_PUBLIC_TENANT_NAME }
+            : undefined
+          const generatedRecommendations = generateRecommendations(mockData, detectedAnomalies, { userContext })
           setRecommendations(generatedRecommendations)
 
           setLastRefreshTime(new Date())
@@ -449,6 +460,25 @@ function CostbookInner({
 
   const handleHelp = useCallback(() => {
     setShowHelpDialog(true)
+  }, [])
+
+  const handleOptimizeCostbook = useCallback(async () => {
+    setShowOptimizeModal(true)
+    setOptimizeLoading(true)
+    setOptimizeSuggestions([])
+    try {
+      const res = await fetch('/api/costbook/optimize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectIds: filteredProjects.map(p => p.id) }),
+      })
+      const data = await res.json().catch(() => ({}))
+      setOptimizeSuggestions(data.suggestions || [])
+    } catch {
+      setOptimizeSuggestions([])
+    } finally {
+      setOptimizeLoading(false)
+    }
   }, [])
 
   const handleAnomalyClick = useCallback((anomaly: AnomalyResult) => {
@@ -707,7 +737,18 @@ function CostbookInner({
           <section className="lg:col-span-2 flex flex-col min-h-0">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-2 p-2 bg-white rounded-lg shadow-sm border border-gray-200">
               <h2 className="text-lg font-bold text-gray-900 whitespace-nowrap">Overview – Projects ({filteredProjects.length})</h2>
-              <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleOptimizeCostbook}
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors"
+                  aria-label="AI Optimize Costbook"
+                >
+                  <Zap className="w-4 h-4" />
+                  AI Optimize Costbook
+                </button>
+                <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+              </div>
             </div>
             <div className="flex-1 min-h-[280px] overflow-auto bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
               {isLoading ? (
@@ -905,6 +946,43 @@ function CostbookInner({
         onDefer={handleRecommendationDefer}
         data-testid="recommendation-detail-dialog"
       />
+
+      {/* AI Optimize Costbook Modal */}
+      {showOptimizeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" role="dialog" aria-modal="true" aria-labelledby="optimize-title">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
+              <h2 id="optimize-title" className="font-semibold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+                <Zap className="h-4 w-4 text-amber-500" />
+                Optimize Costbook
+              </h2>
+              <button type="button" onClick={() => setShowOptimizeModal(false)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-slate-700" aria-label="Close">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto flex-1">
+              {optimizeLoading ? (
+                <p className="text-sm text-gray-500">Loading suggestions…</p>
+              ) : optimizeSuggestions.length === 0 ? (
+                <p className="text-sm text-gray-500">No optimization suggestions right now.</p>
+              ) : (
+                <ul className="space-y-3">
+                  {optimizeSuggestions.map((s) => (
+                    <li key={s.id} className="p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-100 dark:border-slate-600">
+                      <p className="text-sm font-medium text-gray-900 dark:text-slate-100">{s.description}</p>
+                      <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">{s.impact}</p>
+                      <div className="mt-2 flex gap-2">
+                        <button type="button" className="text-xs text-blue-600 hover:text-blue-800 font-medium">Simulate</button>
+                        <button type="button" className="text-xs text-green-600 hover:text-green-800 font-medium">Apply</button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Distribution Settings Dialog (Phase 2) */}
       {costbookPhase2Enabled && showDistributionDialog && selectedProjectId && (() => {

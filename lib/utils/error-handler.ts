@@ -4,15 +4,10 @@
 
 import { logger } from '../monitoring/logger'
 
-async function captureWithSentry(error: Error, extra?: Record<string, unknown>) {
-  try {
-    if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SENTRY_DSN) {
-      const Sentry = await import('@sentry/nextjs').catch(() => null)
-      if (Sentry) Sentry.captureException(error, { extra })
-    }
-  } catch {
-    // Sentry not available or not configured
-  }
+async function captureWithSentry(_error: Error, _extra?: Record<string, unknown>) {
+  // Sentry disabled: @sentry/nextjs peer is next@^13|^14|^15; re-enable when it supports Next 16.
+  void _error
+  void _extra
 }
 
 export interface AppError extends Error {

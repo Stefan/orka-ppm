@@ -502,6 +502,12 @@ Give clear steps. Use bullet points."""
         prompt = f"Question: {query}\n"
         prompt += f"Page: {context.page_title} ({context.route})\n"
         prompt += f"Role: {context.user_role}\n"
+        if context.current_project:
+            prompt += f"Current project: {context.current_project}\n"
+        if context.relevant_data:
+            hint = context.relevant_data.get("hint") or context.relevant_data.get("page", "")
+            if hint:
+                prompt += f"Context hint: {hint}\n"
         
         # Add only most relevant help content (limit to 2 for speed)
         if similar_content:
@@ -510,10 +516,7 @@ Give clear steps. Use bullet points."""
                 content_text = content['content_text'][:200]  # Reduced from 300
                 prompt += f"- {content_text}...\n"
         
-        return prompt
-        
         prompt += "Please provide helpful guidance based on the user's current context and available information."
-        
         return prompt
     
     def _extract_help_sources(self, similar_content: List[Dict]) -> List[Dict]:

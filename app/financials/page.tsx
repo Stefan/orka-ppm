@@ -38,7 +38,17 @@ function getInitialViewMode(searchParams: ReturnType<typeof useSearchParams>): V
   return (tab && TAB_PARAM_VALID.includes(tab as ViewMode)) ? (tab as ViewMode) : 'overview'
 }
 
-export default function Financials() {
+function FinancialsFallback() {
+  return (
+    <AppLayout>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+      </div>
+    </AppLayout>
+  )
+}
+
+function FinancialsContent() {
   const { session } = useAuth()
   const searchParams = useSearchParams()
   const { t } = useTranslations()
@@ -346,5 +356,13 @@ export default function Financials() {
         )}
       </ResponsiveContainer>
     </AppLayout>
+  )
+}
+
+export default function Financials() {
+  return (
+    <Suspense fallback={<FinancialsFallback />}>
+      <FinancialsContent />
+    </Suspense>
   )
 }

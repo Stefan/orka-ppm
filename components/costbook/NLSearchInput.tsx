@@ -1,10 +1,11 @@
 'use client'
 
 import React, { useState, useCallback, useRef, useEffect } from 'react'
-import { Search, X, Sparkles, ChevronDown } from 'lucide-react'
+import { Search, X, Sparkles, ChevronDown, Mic, MicOff } from 'lucide-react'
 import {
   parseNLQuery,
   getAutocompleteSuggestions,
+  getSimilarSearches,
   ParseResult,
   FilterCriteria
 } from '@/lib/nl-query-parser'
@@ -51,9 +52,12 @@ export function NLSearchInput({
   const [parseResult, setParseResult] = useState<ParseResult | null>(null)
   const [suggestions, setSuggestions] = useState<Array<{ query: string; description: string }>>([])
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1)
+  const [isListening, setIsListening] = useState(false)
+  const [voiceError, setVoiceError] = useState<string | null>(null)
   
   const inputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const recognitionRef = useRef<{ stop: () => void; start: () => void } | null>(null)
   
   // Parse query when value changes
   useEffect(() => {
@@ -144,6 +148,50 @@ export function NLSearchInput({
         break
     }
   }, [showSuggestions, suggestions, selectedSuggestionIndex, handleSuggestionSelect])
+
+  const startVoiceSearch = useCallback(() => {
+    setVoiceError(null)
+    const win = typeof window !== 'undefined' ? window : null
+    type RecInstance = { start: () => void; stop: () => void; onresult: (e: { results: Array<Array<{ transcript: string }>> }) => void; onerror: () => void; onend: () => void; continuous?: boolean; interimResults?: boolean; lang?: string }
+    const SpeechRecognition = win && ((win as unknown as { webkitSpeechRecognition?: new () => RecInstance }).webkitSpeechRecognition ?? (win as unknown as { SpeechRecognition?: new () => RecInstance }).SpeechRecognition)
+    if (!SpeechRecognition) {
+      setVoiceError('Voice not supported')
+      return
+    }
+    try {
+      const rec = new SpeechRecognition()
+      rec.continuous = false
+      rec.interimResults = false
+      rec.lang = typeof navigator !== 'undefined' ? navigator.language : 'en-US'
+      rec.onresult = (e: { results: Array<Array<{ transcript: string }>> }) => {
+        const transcript = (e.results?.[0]?.[0]?.transcript ?? '').trim()
+        if (transcript) {
+          const result = parseNLQuery(transcript)
+          onChange(transcript)
+          onFilterChange?.(result.criteria, result)
+        }
+        setIsListening(false)
+        recognitionRef.current = null
+      }
+      rec.onerror = () => {
+        setIsListening(false)
+        setVoiceError('Voice input failed')
+        recognitionRef.current = null
+      }
+      rec.onend = () => {
+        setIsListening(false)
+        recognitionRef.current = null
+      }
+      recognitionRef.current = rec
+      rec.start()
+      setIsListening(true)
+    } catch {
+      setVoiceError('Could not start voice')
+      setIsListening(false)
+    }
+  }, [onChange, onFilterChange])
+
+  const similarSearches = value.trim() ? getSimilarSearches(value, 3) : []
   
   const hasValue = value.length > 0
   const hasFilters = parseResult && Object.keys(parseResult.criteria).length > 0
@@ -206,6 +254,19 @@ export function NLSearchInput({
           </div>
         )}
         
+        {/* Voice search */}
+        {typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) && (
+          <button
+            type="button"
+            onClick={startVoiceSearch}
+            disabled={isListening}
+            className={`p-1.5 mr-1 rounded-full transition-colors ${isListening ? 'bg-red-100 text-red-600' : 'text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
+            aria-label={isListening ? 'Listening...' : 'Voice search'}
+            title={voiceError || (isListening ? 'Listening...' : 'Search by voice')}
+          >
+            {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+          </button>
+        )}
         {/* Clear button */}
         {hasValue && (
           <button
@@ -218,6 +279,9 @@ export function NLSearchInput({
           </button>
         )}
       </div>
+      {voiceError && (
+        <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">{voiceError}</p>
+      )}
       
       {/* Filter interpretation chips */}
       {hasValue && parseResult && parseResult.patterns.length > 0 && (
@@ -246,6 +310,25 @@ export function NLSearchInput({
           selectedIndex={selectedSuggestionIndex}
           query={value}
         />
+      )}
+
+      {/* Similar searches (Ähnliche Suchen) */}
+      {hasValue && similarSearches.length > 0 && (
+        <div className="mt-2 px-1">
+          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Similar searches</p>
+          <div className="flex flex-wrap gap-1">
+            {similarSearches.map((s) => (
+              <button
+                key={s.query}
+                type="button"
+                onClick={() => handleSuggestionSelect(s.query)}
+                className="px-2 py-1 text-xs rounded-md bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+              >
+                {s.query}
+              </button>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   )

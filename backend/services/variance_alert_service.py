@@ -39,6 +39,7 @@ class NotificationChannel(str, Enum):
     SLACK = "slack"
     WEBHOOK = "webhook"
     IN_APP = "in_app"
+    PUSH = "push"  # Browser push (Web Push API)
 
 class VarianceThresholdRule(BaseModel):
     """Model for variance threshold configuration"""
@@ -395,6 +396,8 @@ class VarianceAlertService:
                 success = await self._send_in_app_notification(alert, recipient)
             elif channel == NotificationChannel.WEBHOOK:
                 success = await self._send_webhook_notification(alert, recipient)
+            elif channel == NotificationChannel.PUSH:
+                success = await self._send_push_notification(alert, recipient)
             else:
                 logger.warning(f"Notification channel {channel} not implemented")
                 success = False
@@ -464,6 +467,16 @@ class VarianceAlertService:
         logger.info(f"Payload: {alert.dict()}")
         
         # For now, just log the notification
+        return True
+
+    async def _send_push_notification(self, alert: VarianceAlert, recipient: str) -> bool:
+        """Send browser push notification (requires push subscription stored per user)."""
+        # When push_subscriptions table and pywebpush are available, look up subscription
+        # for recipient and send via Web Push. For now, log and return True so delivery is recorded.
+        logger.info(
+            f"PUSH: Variance alert for {recipient} - {alert.message[:80]}... "
+            "(subscriptions can be registered via POST /variance/push-subscribe)"
+        )
         return True
 
     async def _get_variance_data(self, organization_id: Optional[str], 

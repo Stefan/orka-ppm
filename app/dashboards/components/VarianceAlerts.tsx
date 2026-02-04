@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, memo } from 'react'
-import { AlertTriangle, CheckCircle, Clock, X } from 'lucide-react'
+import { useState, useEffect, memo, useCallback } from 'react'
+import { AlertTriangle, CheckCircle, Clock, X, ChevronDown, ChevronUp, Lightbulb, Zap } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
 import { resilientFetch } from '@/lib/api/resilient-fetch'
 import { usePermissions } from '@/app/providers/EnhancedAuthProvider'
@@ -18,6 +18,20 @@ interface VarianceAlert {
   resolved: boolean
 }
 
+interface RootCause {
+  cause: string
+  confidence_pct: number
+}
+
+interface AutoFixSuggestion {
+  id: string
+  description: string
+  metric: string
+  change: number
+  unit: string
+  impact: string
+}
+
 interface VarianceAlertsProps {
   session: any
   onAlertCount?: (count: number) => void
@@ -30,6 +44,12 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showAll, setShowAll] = useState(false)
+  const [expandedRootCause, setExpandedRootCause] = useState<string | null>(null)
+  const [rootCauseCache, setRootCauseCache] = useState<Record<string, RootCause[]>>({})
+  const [suggestionsAlertId, setSuggestionsAlertId] = useState<string | null>(null)
+  const [suggestions, setSuggestions] = useState<AutoFixSuggestion[]>([])
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false)
+  const [pushEnabled, setPushEnabled] = useState(false)
 
   // Determine if user can manage alerts - use prop if provided, otherwise check permission
   const canManageAlerts = showAdminActions !== undefined 
@@ -92,12 +112,72 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
           alert?.id === alertId ? { ...alert, resolved: true } : alert
         ) || [])
       }
-    } catch (error) {
-      console.error('Error resolving alert:', error)
-      // For demo purposes, still mark as resolved
+    } catch (err) {
+      console.error('Error resolving alert:', err)
       setAlerts(prev => prev?.map(alert => 
         alert?.id === alertId ? { ...alert, resolved: true } : alert
       ) || [])
+    }
+  }
+
+  const fetchRootCause = useCallback(async (alertId: string) => {
+    if (rootCauseCache[alertId]) return
+    try {
+      const res = await fetch(getApiUrl(`/variance/alerts/${alertId}/root-cause`), {
+        headers: { 'Authorization': `Bearer ${session?.access_token || ''}` },
+      })
+      const data = await res.json().catch(() => ({}))
+      if (data?.causes?.length) {
+        setRootCauseCache(prev => ({ ...prev, [alertId]: data.causes }))
+      }
+    } catch {
+      // ignore
+    }
+  }, [session?.access_token, rootCauseCache])
+
+  const toggleRootCause = (alertId: string) => {
+    if (expandedRootCause === alertId) {
+      setExpandedRootCause(null)
+    } else {
+      setExpandedRootCause(alertId)
+      fetchRootCause(alertId)
+    }
+  }
+
+  const openSuggestions = async (alertId: string) => {
+    setSuggestionsAlertId(alertId)
+    setSuggestionsLoading(true)
+    setSuggestions([])
+    try {
+      const res = await fetch(getApiUrl(`/variance/alerts/${alertId}/suggestions`), {
+        headers: { 'Authorization': `Bearer ${session?.access_token || ''}` },
+      })
+      const data = await res.json().catch(() => ({}))
+      setSuggestions(data?.suggestions || [])
+    } catch {
+      setSuggestions([])
+    } finally {
+      setSuggestionsLoading(false)
+    }
+  }
+
+  const requestPushPermission = async () => {
+    if (typeof window === 'undefined' || !('Notification' in window)) return
+    try {
+      const permission = await Notification.requestPermission()
+      if (permission === 'granted') {
+        setPushEnabled(true)
+        await fetch(getApiUrl('/variance/push-subscribe'), {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session?.access_token || ''}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ subscription: { endpoint: 'pending', keys: {} } }),
+        }).catch(() => {})
+      }
+    } catch {
+      // ignore
     }
   }
 
@@ -168,16 +248,30 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
         <h3 className="text-lg font-semibold text-gray-900">
           Variance Alerts ({activeAlerts?.length || 0})
         </h3>
-        {(alerts?.length || 0) > 3 && (
-          <button
-            onClick={() => setShowAll(!showAll)}
-            className="text-sm text-blue-600 hover:text-blue-800"
-          >
-            {showAll ? 'Show Less' : `Show All (${alerts?.length || 0})`}
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {typeof window !== 'undefined' && 'Notification' in window && (
+            <button
+              type="button"
+              onClick={requestPushPermission}
+              className={`text-xs px-2 py-1 rounded border ${
+                pushEnabled ? 'bg-blue-100 border-blue-300 text-blue-800' : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+              }`}
+              title="Get browser push for new alerts"
+            >
+              {pushEnabled ? 'Push on' : 'Push alerts'}
+            </button>
+          )}
+          {(alerts?.length || 0) > 3 && (
+            <button
+              onClick={() => setShowAll(!showAll)}
+              className="text-sm text-blue-600 hover:text-blue-800"
+            >
+              {showAll ? 'Show Less' : `Show All (${alerts?.length || 0})`}
+            </button>
+          )}
+        </div>
       </div>
-      
+
       <div className="space-y-3">
         {displayAlerts?.map((alert) => (
           <div
@@ -211,7 +305,7 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
                   </div>
                 </div>
               </div>
-              
+
               {!alert.resolved && canManageAlerts && (
                 <button
                   onClick={() => resolveAlert(alert.id)}
@@ -221,14 +315,52 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
                   <X className="h-4 w-4" />
                 </button>
               )}
-              
+
               {!alert.resolved && !canManageAlerts && (
                 <div className="ml-2 text-xs text-gray-500 italic">
                   Admin only
                 </div>
               )}
             </div>
-            
+
+            {!alert.resolved && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => toggleRootCause(alert.id)}
+                  className="flex items-center gap-1 text-xs font-medium text-gray-700 hover:text-gray-900"
+                >
+                  {expandedRootCause === alert.id ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                  Root cause
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openSuggestions(alert.id)}
+                  className="flex items-center gap-1 text-xs font-medium text-blue-700 hover:text-blue-900"
+                >
+                  <Lightbulb className="h-3 w-3" />
+                  Suggestions
+                </button>
+              </div>
+            )}
+
+            {expandedRootCause === alert.id && (
+              <div className="mt-2 pt-2 border-t border-gray-200/80">
+                <p className="text-xs font-medium text-gray-600 mb-1">AI Root Cause</p>
+                {rootCauseCache[alert.id]?.length ? (
+                  <ul className="text-xs space-y-1">
+                    {rootCauseCache[alert.id].map((c, i) => (
+                      <li key={i}>
+                        {c.cause} <span className="text-gray-500">({c.confidence_pct}%)</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-xs text-gray-500">Loading…</p>
+                )}
+              </div>
+            )}
+
             {alert.resolved && (
               <div className="mt-2 flex items-center text-xs text-gray-600">
                 <CheckCircle className="h-3 w-3 mr-1" />
@@ -238,7 +370,55 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
           </div>
         ))}
       </div>
-      
+
+      {suggestionsAlertId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="suggestions-title"
+        >
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+              <h4 id="suggestions-title" className="font-semibold text-gray-900 flex items-center gap-2">
+                <Zap className="h-4 w-4 text-amber-500" />
+                Auto-fix suggestions
+              </h4>
+              <button
+                type="button"
+                onClick={() => { setSuggestionsAlertId(null); setSuggestions([]) }}
+                className="p-1 rounded hover:bg-gray-100"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto flex-1">
+              {suggestionsLoading ? (
+                <p className="text-sm text-gray-500">Loading suggestions…</p>
+              ) : suggestions.length === 0 ? (
+                <p className="text-sm text-gray-500">No suggestions for this alert.</p>
+              ) : (
+                <ul className="space-y-3">
+                  {suggestions.map((s) => (
+                    <li key={s.id} className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                      <p className="text-sm font-medium text-gray-900">{s.description}</p>
+                      <p className="text-xs text-gray-600 mt-1">{s.impact}</p>
+                      <button
+                        type="button"
+                        className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium"
+                      >
+                        Simulate impact
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {error && (
         <div className="mt-3 text-xs text-gray-500">
           Note: Using demo data - {error}

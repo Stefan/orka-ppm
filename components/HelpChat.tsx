@@ -7,7 +7,9 @@ import {
   MessageSquare,
   Loader2,
   AlertCircle,
-  RefreshCw
+  RefreshCw,
+  Mic,
+  MicOff
 } from 'lucide-react'
 import { useHelpChat } from '../hooks/useHelpChat'
 import { useAuth } from '../app/providers/SupabaseAuthProvider'
@@ -75,6 +77,31 @@ export function HelpChat({ className }: HelpChatProps) {
   const [feedbackMessageId, setFeedbackMessageId] = useState<string | null>(null)
   const [announceMessage, setAnnounceMessage] = useState('')
   const [ragData, setRagData] = useState<Record<string, RAGMessageData>>({})
+  const [isListening, setIsListening] = useState(false)
+
+  const startVoiceInput = useCallback(() => {
+    if (typeof window === 'undefined') return
+    const win = window as unknown as { webkitSpeechRecognition?: new () => { start: () => void; onresult: (e: { results: Array<Array<{ transcript: string }>> }) => void; onerror: () => void; onend: () => void }; SpeechRecognition?: new () => { start: () => void; onresult: (e: { results: Array<Array<{ transcript: string }>> }) => void; onerror: () => void; onend: () => void } }
+    const Rec = win.webkitSpeechRecognition ?? win.SpeechRecognition
+    if (!Rec) return
+    try {
+      const rec = new Rec()
+      rec.continuous = false
+      rec.interimResults = false
+      rec.lang = navigator.language || 'en-US'
+      rec.onresult = (e: { results: Array<Array<{ transcript: string }>> }) => {
+        const t = (e.results?.[0]?.[0]?.transcript ?? '').trim()
+        if (t) setInputValue(t)
+        setIsListening(false)
+      }
+      rec.onerror = () => setIsListening(false)
+      rec.onend = () => setIsListening(false)
+      rec.start()
+      setIsListening(true)
+    } catch {
+      setIsListening(false)
+    }
+  }, [])
 
   // Get the correct send button text based on current language
   const getSendButtonText = useCallback(() => {
@@ -447,6 +474,21 @@ export function HelpChat({ className }: HelpChatProps) {
                     Press Enter to send, Shift+Enter for new line, Escape to close chat
                   </div>
                 </div>
+                {typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) && (
+                  <button
+                    type="button"
+                    onClick={startVoiceInput}
+                    disabled={isListening || !canSendMessage}
+                    className={cn(
+                      'p-2 rounded-lg min-h-[40px] min-w-[40px] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
+                      isListening ? 'bg-red-100 text-red-600' : 'text-gray-500 hover:bg-gray-100'
+                    )}
+                    aria-label={isListening ? 'Listening...' : 'Voice input'}
+                    title={isListening ? 'Listening...' : 'Voice input'}
+                  >
+                    {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                  </button>
+                )}
                 <button
                   type="submit"
                   disabled={!canSendMessage || !inputValue.trim()}
@@ -670,31 +712,47 @@ export function HelpChat({ className }: HelpChatProps) {
                     Press Enter to send, Shift+Enter for new line, Escape to close chat
                   </div>
                 </div>
-                <button
-                  type="submit"
-                  disabled={!canSendMessage || !inputValue.trim()}
-                  className={cn(
-                    'w-full px-3 py-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
-                    canSendMessage && inputValue.trim()
-                      ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed focus:ring-gray-300'
+                <div className="flex items-center gap-2">
+                  {typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) && (
+                    <button
+                      type="button"
+                      onClick={startVoiceInput}
+                      disabled={isListening || !canSendMessage}
+                      className={cn(
+                        'p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
+                        isListening ? 'bg-red-100 text-red-600' : 'text-gray-500 hover:bg-gray-100'
+                      )}
+                      aria-label={isListening ? 'Listening...' : 'Voice input'}
+                      title={isListening ? 'Listening...' : 'Voice input'}
+                    >
+                      {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                    </button>
                   )}
-                  aria-label={ARIA_LABELS.sendButton}
-                  title={ARIA_LABELS.sendButton}
-                >
-                  {state.isLoading ? (
-                    <Loader2
-                      className="h-4 w-4 animate-spin mx-auto"
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <Send
-                      className="h-4 w-4 mr-2"
-                      aria-hidden="true"
-                    />
-                  )}
-                  {state.isLoading ? t('helpChat.typing') : getSendButtonText()}
-                </button>
+                  <button
+                    type="submit"
+                    disabled={!canSendMessage || !inputValue.trim()}
+                    className={cn(
+                      'flex-1 px-3 py-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
+                      canSendMessage && inputValue.trim()
+                        ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed focus:ring-gray-300'
+                    )}
+                    aria-label={ARIA_LABELS.sendButton}
+                    title={ARIA_LABELS.sendButton}
+                  >
+                    {state.isLoading ? (
+                      <Loader2
+                        className="h-4 w-4 animate-spin mx-auto"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <>
+                        <Send className="h-4 w-4 mr-2" aria-hidden="true" />
+                        {getSendButtonText()}
+                      </>
+                    )}
+                  </button>
+                </div>
               </form>
             </footer>
       </aside>

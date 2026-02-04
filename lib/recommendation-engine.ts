@@ -28,6 +28,17 @@ export interface EnhancedRecommendation extends Recommendation {
 }
 
 /**
+ * User/tenant context for personalized recommendations
+ */
+export interface RecommendationUserContext {
+  userId?: string
+  tenantId?: string
+  organizationId?: string
+  /** Display name for personalization (e.g. "Roche-User") */
+  tenantName?: string
+}
+
+/**
  * Recommendation generation configuration
  */
 export interface RecommendationConfig {
@@ -39,6 +50,8 @@ export interface RecommendationConfig {
   includeLowPriority?: boolean
   /** Categories to include */
   categories?: EnhancedRecommendation['category'][]
+  /** Optional user/tenant context for personalized recommendation text */
+  userContext?: RecommendationUserContext
 }
 
 const DEFAULT_CONFIG: Required<RecommendationConfig> = {
@@ -51,12 +64,22 @@ const DEFAULT_CONFIG: Required<RecommendationConfig> = {
 /**
  * Generate smart recommendations based on project data and anomalies
  */
+function personalizeTitle(title: string, userContext?: RecommendationUserContext): string {
+  if (!userContext?.tenantName) return title
+  return `For ${userContext.tenantName}: ${title}`
+}
+
+function personalizeDescription(description: string, userContext?: RecommendationUserContext): string {
+  if (!userContext?.tenantName) return description
+  return description
+}
+
 export function generateRecommendations(
   projects: ProjectWithFinancials[],
   anomalies: AnomalyResult[] = [],
   config: RecommendationConfig = {}
 ): EnhancedRecommendation[] {
-  const { minConfidence, maxRecommendations, includeLowPriority, categories } = {
+  const { minConfidence, maxRecommendations, includeLowPriority, categories, userContext } = {
     ...DEFAULT_CONFIG,
     ...config
   }
@@ -99,8 +122,16 @@ export function generateRecommendations(
   // Sort by priority (descending)
   filtered.sort((a, b) => b.priority - a.priority)
 
-  // Limit results
-  return filtered.slice(0, maxRecommendations)
+  // Apply personalization labels when userContext is provided
+  const limited = filtered.slice(0, maxRecommendations)
+  if (userContext?.tenantName) {
+    return limited.map(r => ({
+      ...r,
+      title: personalizeTitle(r.title, userContext),
+      description: r.description,
+    }))
+  }
+  return limited
 }
 
 /**

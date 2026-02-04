@@ -18,7 +18,12 @@ import {
   UserCog,
   Layers,
   Shield,
-  Settings
+  Settings,
+  Target,
+  Calendar,
+  BookOpen,
+  Upload,
+  WifiOff
 } from 'lucide-react'
 
 export interface MobileNavProps {
@@ -33,21 +38,26 @@ const NAV_ITEMS = [
   // Projects & Resources
   { href: '/projects', label: 'All Projects', icon: GitBranch, group: 'Projects' },
   { href: '/resources', label: 'Resource Management', icon: Users, group: 'Projects' },
+  { href: '/import', label: 'Import', icon: Upload, group: 'Projects' },
 
   // Financial Management
   { href: '/financials', label: 'Budget & Cost Tracking', icon: DollarSign, group: 'Financials' },
   { href: '/reports', label: 'Reports & Analytics', icon: FileText, group: 'Financials' },
+  { href: '/project-controls', label: 'Project Controls (ETC/EAC)', icon: Target, group: 'Financials' },
+  { href: '/reports/pmr', label: 'PMR Report', icon: BookOpen, group: 'Financials' },
 
   // Risk & Analysis
   { href: '/risks', label: 'Risk Management', icon: AlertTriangle, group: 'Analysis' },
   { href: '/scenarios', label: 'What-If Scenarios', icon: GitBranch, group: 'Analysis' },
   { href: '/monte-carlo', label: 'Monte Carlo Analysis', icon: BarChart3, group: 'Analysis' },
   { href: '/audit', label: 'Audit Trail', icon: FileText, group: 'Analysis' },
+  { href: '/schedules', label: 'Schedule Management', icon: Calendar, group: 'Analysis' },
 
   // Change & Feedback
   { href: '/changes', label: 'Change Management', icon: GitPullRequest, group: 'Management' },
   { href: '/feedback', label: 'Feedback & Ideas', icon: MessageSquare, group: 'Management' },
   { href: '/features', label: 'Features Overview', icon: Layers, group: 'Management' },
+  { href: '/offline', label: 'Offline Status', icon: WifiOff, group: 'Management' },
   { href: '/settings', label: 'Settings', icon: Settings, group: 'Management' },
 
   // Administration

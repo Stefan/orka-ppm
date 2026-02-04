@@ -25,7 +25,12 @@ import {
   Settings,
   Sun,
   Moon,
-  Monitor
+  Monitor,
+  Target,
+  Calendar,
+  BookOpen,
+  Upload,
+  WifiOff
 } from 'lucide-react'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
 import { useTheme } from '@/app/providers/ThemeProvider'
@@ -227,6 +232,18 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   <Users className="h-5 w-5 mr-3 flex-shrink-0" />
                   <span className="font-medium">Resource Management</span>
                 </Link>
+                <Link
+                  href="/import"
+                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
+                    pathname === '/import'
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
+                  }`}
+                  onClick={() => setProjectsMenuOpen(false)}
+                >
+                  <Upload className="h-5 w-5 mr-3 flex-shrink-0" />
+                  <span className="font-medium">Import</span>
+                </Link>
               </div>
             )}
           </div>
@@ -236,7 +253,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             <button
               onClick={() => setFinancialsMenuOpen(!financialsMenuOpen)}
               className={`flex items-center space-x-1 ${navLinkBase} ${
-                financialsMenuOpen || pathname === '/financials' || pathname.startsWith('/financials/') || pathname === '/reports' || pathname.startsWith('/reports/')
+                financialsMenuOpen || pathname === '/financials' || pathname.startsWith('/financials/') || pathname === '/reports' || pathname.startsWith('/reports/') || pathname === '/project-controls'
                   ? navLinkActive
                   : navLinkInactive
               }`}
@@ -276,6 +293,30 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   <FileText className="h-5 w-5 mr-3 flex-shrink-0" />
                   <span className="font-medium">Reports & Analytics</span>
                 </Link>
+                <Link
+                  href="/project-controls"
+                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
+                    pathname === '/project-controls'
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
+                  }`}
+                  onClick={() => setFinancialsMenuOpen(false)}
+                >
+                  <Target className="h-5 w-5 mr-3 flex-shrink-0" />
+                  <span className="font-medium">Project Controls (ETC/EAC)</span>
+                </Link>
+                <Link
+                  href="/reports/pmr"
+                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
+                    pathname === '/reports/pmr'
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
+                  }`}
+                  onClick={() => setFinancialsMenuOpen(false)}
+                >
+                  <BookOpen className="h-5 w-5 mr-3 flex-shrink-0" />
+                  <span className="font-medium">PMR Report</span>
+                </Link>
               </div>
             )}
           </div>
@@ -285,7 +326,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             <button
               onClick={() => setAnalysisMenuOpen(!analysisMenuOpen)}
               className={`flex items-center space-x-1 ${navLinkBase} ${
-                analysisMenuOpen || ['/risks', '/scenarios', '/monte-carlo', '/audit'].includes(pathname)
+                analysisMenuOpen || ['/risks', '/scenarios', '/monte-carlo', '/audit', '/schedules'].includes(pathname) || pathname.startsWith('/schedules/')
                   ? navLinkActive
                   : navLinkInactive
               }`}
@@ -349,6 +390,18 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   <FileText className="h-5 w-5 mr-3 flex-shrink-0" />
                   <span className="font-medium">Audit Trail</span>
                 </Link>
+                <Link
+                  href="/schedules"
+                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
+                    pathname === '/schedules' || pathname.startsWith('/schedules/')
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
+                  }`}
+                  onClick={() => setAnalysisMenuOpen(false)}
+                >
+                  <Calendar className="h-5 w-5 mr-3 flex-shrink-0" />
+                  <span className="font-medium">Schedule Management</span>
+                </Link>
               </div>
             )}
           </div>
@@ -358,7 +411,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             <button
               onClick={() => setManagementMenuOpen(!managementMenuOpen)}
               className={`flex items-center space-x-1 ${navLinkBase} ${
-                managementMenuOpen || ['/changes', '/feedback', '/features'].includes(pathname)
+                managementMenuOpen || ['/changes', '/feedback', '/features', '/offline'].includes(pathname)
                   ? navLinkActive
                   : navLinkInactive
               }`}
@@ -409,6 +462,18 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 >
                   <Layers className="h-5 w-5 mr-3 flex-shrink-0" />
                   <span className="font-medium">Features Overview</span>
+                </Link>
+                <Link
+                  href="/offline"
+                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
+                    pathname === '/offline'
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
+                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
+                  }`}
+                  onClick={() => setManagementMenuOpen(false)}
+                >
+                  <WifiOff className="h-5 w-5 mr-3 flex-shrink-0" />
+                  <span className="font-medium">Offline Status</span>
                 </Link>
               </div>
             )}

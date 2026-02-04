@@ -139,7 +139,7 @@ const queryPatterns: QueryPattern[] = [
     interpretation: 'projects under budget'
   },
   
-  // High variance patterns
+  // High variance patterns (including semantic: forecast, panels)
   {
     patterns: [
       /high\s*variance/i,
@@ -147,6 +147,10 @@ const queryPatterns: QueryPattern[] = [
       /significant\s*variance/i,
       /variance\s*outlier/i,
       /hohe\s*varianz/i, // German: high variance
+      /(?:high\s*)?variance\s*in\s*forecast/i,
+      /forecast\s*(?:with\s*)?high\s*variance/i,
+      /hohe\s*varianz\s*in\s*forecast/i,
+      /variance\s*in\s*forecast/i,
     ],
     extract: () => ({ highVariance: true }),
     interpretation: 'projects with high variance'
@@ -512,6 +516,72 @@ export function getAutocompleteSuggestions(
   })
   
   return unique.slice(0, limit)
+}
+
+/** Similar-search mappings: intent key -> similar phrasings for "Ähnliche Suchen" */
+const similarSearchMap: Record<string, Array<{ query: string; description: string }>> = {
+  over_budget: [
+    { query: 'exceeded budget', description: 'Projects over budget' },
+    { query: 'above budget', description: 'Budget exceeded' },
+    { query: 'negative variance', description: 'Over committed' },
+  ],
+  high_variance: [
+    { query: 'variance > 50000', description: 'Variance over $50k' },
+    { query: 'large variance', description: 'Unusual variance' },
+    { query: 'open committed pro vendor', description: 'By vendor' },
+  ],
+  under_budget: [
+    { query: 'within budget', description: 'Under budget' },
+    { query: 'positive variance', description: 'Under spend' },
+  ],
+  at_risk: [
+    { query: 'low health', description: 'Low health score' },
+    { query: 'health < 50', description: 'Critical health' },
+  ],
+  vendor: [
+    { query: 'vendor ', description: 'Filter by vendor' },
+    { query: 'open committed pro vendor', description: 'Committed by vendor' },
+  ],
+  sort: [
+    { query: 'sort by variance desc', description: 'Highest variance first' },
+    { query: 'sort by budget desc', description: 'Largest budget first' },
+  ],
+}
+
+/**
+ * Get 2–3 similar search phrasings for the current query (for "Ähnliche Suchen").
+ */
+export function getSimilarSearches(
+  query: string,
+  limit: number = 3
+): Array<{ query: string; description: string }> {
+  const trimmed = query.trim().toLowerCase()
+  if (!trimmed) return []
+  const result = parseNLQuery(trimmed)
+  const out: Array<{ query: string; description: string }> = []
+  const added = new Set<string>()
+  if (result.criteria.overBudget) {
+    similarSearchMap.over_budget.forEach(s => { if (!added.has(s.query)) { added.add(s.query); out.push(s) } })
+  }
+  if (result.criteria.highVariance || result.criteria.varianceMin !== undefined) {
+    similarSearchMap.high_variance.forEach(s => { if (!added.has(s.query)) { added.add(s.query); out.push(s) } })
+  }
+  if (result.criteria.underBudget) {
+    similarSearchMap.under_budget.forEach(s => { if (!added.has(s.query)) { added.add(s.query); out.push(s) } })
+  }
+  if (result.criteria.lowHealth || (result.criteria.healthMax !== undefined && result.criteria.healthMax <= 50)) {
+    similarSearchMap.at_risk.forEach(s => { if (!added.has(s.query)) { added.add(s.query); out.push(s) } })
+  }
+  if (result.criteria.vendorName) {
+    similarSearchMap.vendor.forEach(s => { if (!added.has(s.query)) { added.add(s.query); out.push(s) } })
+  }
+  if (result.criteria.sortBy) {
+    similarSearchMap.sort.forEach(s => { if (!added.has(s.query)) { added.add(s.query); out.push(s) } })
+  }
+  if (out.length === 0) {
+    exampleQueries.slice(0, limit).forEach(s => out.push(s))
+  }
+  return out.slice(0, limit)
 }
 
 /**

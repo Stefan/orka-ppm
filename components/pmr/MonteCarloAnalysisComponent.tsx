@@ -829,14 +829,50 @@ export default function MonteCarloAnalysisComponent({
               ))}
             </div>
 
-            {selectedScenarios.length >= 2 && (
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  {selectedScenarios.length} scenarios selected for comparison. 
-                  Detailed comparison analysis would be displayed here.
-                </p>
-              </div>
-            )}
+            {selectedScenarios.length >= 2 && (() => {
+              const toCompare = scenarios.filter(s => selectedScenarios.includes(s.id))
+              const hasResults = toCompare.every(s => s.results?.results)
+              if (!hasResults) {
+                return (
+                  <div className="mt-6 p-4 bg-amber-50 rounded-lg">
+                    <p className="text-sm text-amber-800">
+                      Load and run each scenario to see comparison. Select scenarios that have results.
+                    </p>
+                  </div>
+                )
+              }
+              const budgetP50 = (s: ScenarioConfig) => s.results?.results?.budget_analysis?.percentiles?.p50 ?? 0
+              const budgetP90 = (s: ScenarioConfig) => s.results?.results?.budget_analysis?.percentiles?.p90 ?? 0
+              const expectedCost = (s: ScenarioConfig) => s.results?.results?.budget_analysis?.expected_final_cost ?? s.results?.results?.budget_analysis?.percentiles?.p50 ?? 0
+              const scheduleP50 = (s: ScenarioConfig) => s.results?.results?.schedule_analysis?.percentiles?.p50 ?? 0
+              return (
+                <div className="mt-6 overflow-x-auto">
+                  <h5 className="text-sm font-semibold text-gray-700 mb-2">Side-by-side comparison</h5>
+                  <table className="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="text-left px-3 py-2 border-b border-gray-200 font-medium">Scenario</th>
+                        <th className="text-right px-3 py-2 border-b border-gray-200 font-medium">P50 (Budget)</th>
+                        <th className="text-right px-3 py-2 border-b border-gray-200 font-medium">P90 (Budget)</th>
+                        <th className="text-right px-3 py-2 border-b border-gray-200 font-medium">Expected Cost</th>
+                        <th className="text-right px-3 py-2 border-b border-gray-200 font-medium">P50 (Schedule)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {toCompare.map(s => (
+                        <tr key={s.id} className="border-b border-gray-100 hover:bg-gray-50">
+                          <td className="px-3 py-2 font-medium">{s.name}</td>
+                          <td className="text-right px-3 py-2">${Number(budgetP50(s)).toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                          <td className="text-right px-3 py-2">${Number(budgetP90(s)).toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                          <td className="text-right px-3 py-2">${Number(expectedCost(s)).toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                          <td className="text-right px-3 py-2">{Number(scheduleP50(s)).toLocaleString(undefined, { maximumFractionDigits: 0 })} days</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )
+            })()}
           </div>
         </div>
       )}
