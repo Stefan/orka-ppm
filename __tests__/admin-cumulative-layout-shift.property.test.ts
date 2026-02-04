@@ -295,8 +295,8 @@ describe('Admin Performance Optimization - Cumulative Layout Shift', () => {
 
             await new Promise(resolve => setTimeout(resolve, 100))
 
-            // Verify single shift is reasonable
-            expect(shiftValue).toBeLessThanOrEqual(0.05)
+            // Verify single shift is reasonable (allow float32 rounding: Math.fround(0.05) === 0.05000000074505806)
+            expect(shiftValue).toBeLessThanOrEqual(0.05 + 1e-9)
 
             // Verify total CLS is under threshold
             const cls = calculateCLS([{ value: shiftValue, hadRecentInput: false }])

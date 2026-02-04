@@ -297,12 +297,16 @@ describe('SQL Reference Checking - Property-Based Tests', () => {
             createDocFile('DEPLOYMENT.md', docContent);
 
             // Check all SQL files
+            // SqlReferenceChecker uses case-insensitive matching, so multiple filenames can match the same doc reference
+            const isReferenced = (name: string) =>
+              name === referencedFile || name.toLowerCase() === referencedFile.toLowerCase();
+
             for (const sqlFileName of uniqueSqlFiles) {
               const file = createSqlFileInfo(sqlFileName);
               const category = categorizer.categorizeFile(file);
 
-              // Property: Only the referenced file should be ESSENTIAL
-              if (sqlFileName === referencedFile) {
+              // Property: Referenced file (or case-insensitive match) is ESSENTIAL; others are SQL_REVIEW
+              if (isReferenced(sqlFileName)) {
                 expect(category).toBe(FileCategory.ESSENTIAL);
               } else {
                 expect(category).toBe(FileCategory.SQL_REVIEW);
