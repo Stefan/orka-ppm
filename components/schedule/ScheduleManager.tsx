@@ -6,7 +6,7 @@
 
 import React, { useState, useCallback } from 'react'
 import type { ScheduleListItem } from '@/types/schedule'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFooter } from '@/components/ui/Dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFooter } from '@/components/ui'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Search, Plus, Calendar, Filter } from 'lucide-react'
