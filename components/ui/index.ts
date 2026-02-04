@@ -24,8 +24,8 @@ export type { BadgeProps } from './badge'
 export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from './Table'
 export type { TableProps } from './Table'
 
-export { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogBody, DialogFooter } from './Dialog'
-export type { DialogProps, DialogContentProps } from './Dialog'
+export { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogBody, DialogFooter } from './dialog'
+export type { DialogProps, DialogContentProps } from './dialog'
 
 export { Modal, ModalFooter } from './Modal'
 

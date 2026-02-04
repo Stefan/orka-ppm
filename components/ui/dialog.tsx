@@ -1,6 +1,6 @@
 /**
  * Dialog/Modal Component
- * 
+ *
  * A professional modal dialog with smooth animations and proper accessibility.
  */
 
@@ -19,12 +19,12 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onOpenChange(false)
     }
-    
+
     if (open) {
       document.addEventListener('keydown', handleEscape)
       document.body.style.overflow = 'hidden'
     }
-    
+
     return () => {
       document.removeEventListener('keydown', handleEscape)
       document.body.style.overflow = ''
@@ -32,12 +32,12 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
   }, [open, onOpenChange])
 
   if (!open) return null
-  
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div 
+      <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={() => onOpenChange(false)} 
+        onClick={() => onOpenChange(false)}
       />
       <div className="relative z-50">
         {children}
@@ -53,21 +53,21 @@ export interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement>
   onClose?: () => void
 }
 
-export function DialogContent({ 
-  children, 
+export function DialogContent({
+  children,
   className,
   showClose = true,
   onClose,
-  ...props 
+  ...props
 }: DialogContentProps) {
   return (
-    <div 
+    <div
       className={cn(
         'bg-white rounded-xl shadow-2xl',
         'w-full max-w-lg',
         'max-h-[90vh] overflow-auto',
         className
-      )} 
+      )}
       {...props}
     >
       {showClose && onClose && (
