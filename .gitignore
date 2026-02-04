@@ -80,6 +80,9 @@ playwright-report/
 *.webm
 *.png.diff
 
+# Jest coverage
+coverage/
+
 # Development artifacts
 .swc/
 .vercel
