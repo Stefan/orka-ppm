@@ -2,11 +2,12 @@
 
 /**
  * Health check: ensure optional dependencies are installed when referenced in code.
- * Fails early if code imports a package (e.g. @sentry/nextjs) that is not in package.json,
+ * Fails early if code imports a package that is not in package.json,
  * avoiding "Module not found" at build time.
  *
  * Optional packages list: add any package that is optionally used (dynamic import or try/require)
  * so that when it appears in source, we require it to be installed.
+ * (@sentry/nextjs omitted: not compatible with Next 16; code uses try/catch in next.config and no-op sentry.client.config.)
  */
 
 const fs = require('fs');
@@ -15,9 +16,7 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
 const PACKAGE_JSON = path.join(ROOT, 'package.json');
 
-const OPTIONAL_PACKAGES = [
-  { name: '@sentry/nextjs', pattern: /@sentry\/nextjs|from\s+['"]@sentry\/nextjs|require\s*\(\s*['"]@sentry\/nextjs/ },
-];
+const OPTIONAL_PACKAGES = [];
 
 // Only check app/components/lib/instrumentation; next.config often uses optional require() in try/catch
 const SOURCE_DIRS = ['app', 'components', 'lib', 'instrumentation.ts'];
