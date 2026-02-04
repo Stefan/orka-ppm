@@ -18,8 +18,8 @@ export { Select } from './Select'
 export { Alert, AlertTitle, AlertDescription } from './Alert'
 export type { AlertProps } from './Alert'
 
-export { Badge } from './Badge'
-export type { BadgeProps } from './Badge'
+export { Badge } from './badge'
+export type { BadgeProps } from './badge'
 
 export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from './Table'
 export type { TableProps } from './Table'

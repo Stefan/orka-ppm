@@ -163,7 +163,8 @@ jobs:
       - name: Run E2E structure tests
         id: e2e-tests
         run: |
-          npm run test:structure:e2e -- --reporter=junit --reporter=json
+          mkdir -p test-results
+          npm run test:structure:e2e
           TEST_EXIT_CODE=$?
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit $TEST_EXIT_CODE
@@ -213,6 +214,7 @@ jobs:
           path: test-results/results.xml
           reporter: java-junit
           fail-on-error: false
+          fail-on-empty: false
       
       - name: Check test status
         if: steps.e2e-tests.outputs.exit_code != '0'
