@@ -300,6 +300,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Verify build files
+        run: |
+          for f in app/changes/components/ChangeOrderIntegration.tsx app/dashboards/components/ChangeOrderWidgets.tsx app/dashboards/components/ProjectControlsWidgets.tsx; do
+            test -f "$f" || { echo "::error::Missing $f. Push a new commit or merge main into your branch."; exit 1; }
+          done
+          echo "Build files OK (commit $(git rev-parse --short HEAD))"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

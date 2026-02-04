@@ -24,6 +24,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Verify build files exist
+        run: |
+          echo "Commit: $(git rev-parse HEAD)"
+          for f in app/changes/components/ChangeOrderIntegration.tsx app/dashboards/components/ChangeOrderWidgets.tsx app/dashboards/components/ProjectControlsWidgets.tsx; do
+            if [ ! -f "$f" ]; then echo "::error::Missing $f (build will fail). If you re-ran an old workflow, push a new commit. If this is a PR, merge main into your branch."; exit 1; fi
+          done
+          grep -q "from '@/components/ui'" components/schedule/ResourceAssignmentDialog.tsx || { echo "::error::Schedule components must import from @/components/ui (barrel)."; exit 1; }
+          echo "All required files present."
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
