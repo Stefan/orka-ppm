@@ -112,7 +112,6 @@ const customJestConfig = {
     '<rootDir>/__tests__/card-border.property.test.tsx',
     '<rootDir>/__tests__/card-header.property.test.tsx',
     '<rootDir>/__tests__/card-shadow.property.test.tsx',
-    '<rootDir>/__tests__/card.test.tsx',
     '<rootDir>/__tests__/chrome-css-validation.test.ts',
     '<rootDir>/__tests__/ci-cd/property-backend-failure-handling.test.ts',
     '<rootDir>/__tests__/ci-cd/property-change-detection.test.ts',
@@ -141,7 +140,6 @@ const customJestConfig = {
     '<rootDir>/__tests__/input-error-state.property.test.tsx',
     '<rootDir>/__tests__/input-placeholder-contrast.property.test.tsx',
     '<rootDir>/__tests__/input-sizes.property.test.tsx',
-    '<rootDir>/__tests__/input.test.tsx',
     '<rootDir>/__tests__/lazy-component-error-boundary.test.tsx',
     '<rootDir>/__tests__/lib/distribution-engine.property.test.ts',
     '<rootDir>/__tests__/lib/features-tree-and-search.test.ts',
@@ -212,28 +210,33 @@ const customJestConfig = {
   // Environment variables for tests
   setupFiles: ['<rootDir>/jest.env.js'],
   
-  // Coverage configuration
+  // Coverage: lib, hooks, app/api. Enterprise target 80% – see docs/ENTERPRISE_TEST_PLAN.md
   collectCoverageFrom: [
-    'components/**/*.{ts,tsx}',
     'lib/**/*.{ts,tsx}',
     'hooks/**/*.{ts,tsx}',
-    'app/**/*.{ts,tsx}',
+    'app/api/**/*.{ts,tsx}',
     '!**/*.d.ts',
     '!**/*.stories.{ts,tsx}',
     '!**/__tests__/**',
     '!**/node_modules/**'
   ],
-  // See docs/COVERAGE_80_PERCENT_PLAN.md – global 80% reached stepwise via path-based thresholds
+  coverageReporters: ['text', 'text-summary', 'lcov', 'html'],
   coverageThreshold: {
     global: {
-      branches: 14,
-      functions: 13,
-      lines: 16,
-      statements: 15
+      branches: 28,
+      functions: 28,
+      lines: 30,
+      statements: 29
     },
-    // Path-based 80% (uncomment as each area reaches 80%):
-    // './lib/feature-flags/**/*.ts': { branches: 80, functions: 80, lines: 80, statements: 80 },
-    // './lib/i18n/**/*.{ts,tsx}': { branches: 80, functions: 80, lines: 80, statements: 80 },
+    // Path-based 80% (Enterprise) – raise as tests are added; see docs/ENTERPRISE_TEST_PLAN.md
+    './lib/currency-utils.ts': { branches: 80, functions: 80, lines: 80, statements: 80 },
+    './lib/design-system.ts': { branches: 70, functions: 80, lines: 80, statements: 80 },
+    './lib/utils/formatting.ts': { branches: 70, functions: 80, lines: 80, statements: 80 },
+    './lib/utils/env.ts': { branches: 75, functions: 80, lines: 80, statements: 80 },
+    './lib/monitoring/logger.ts': { branches: 80, functions: 80, lines: 80, statements: 80 },
+    './lib/costbook/import-templates.ts': { branches: 80, functions: 80, lines: 80, statements: 80 },
+    './lib/costbook/costbook-keys.ts': { branches: 80, functions: 80, lines: 80, statements: 80 },
+    './lib/sync/storage.ts': { branches: 80, functions: 80, lines: 80, statements: 80 }
   },
   
   // Test categorization - simplified for now

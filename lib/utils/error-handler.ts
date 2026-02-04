@@ -111,6 +111,8 @@ export class ErrorHandler {
   ): AppError {
     const appError: AppError = {
       ...error,
+      message: error.message,
+      name: error.name,
       code: code || 'UNKNOWN_ERROR',
       timestamp: Date.now(),
       context: {

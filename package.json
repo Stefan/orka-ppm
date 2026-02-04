@@ -40,6 +40,7 @@
     "test:coverage": "jest --coverage --passWithNoTests",
     "test:coverage:summary": "node scripts/coverage-summary.js",
     "test:ci": "jest --ci --coverage --watchAll=false --passWithNoTests",
+    "test:api-and-hooks": "jest __tests__/api-routes hooks/__tests__ lib/monitoring/__tests__/intercept-console-error.test.ts --passWithNoTests --silent",
     "test:bundle": "node scripts/check-bundle-size.js",
     "test:syntax": "node scripts/syntax-check.js",
     "test:optional-deps": "node scripts/check-optional-deps.js",

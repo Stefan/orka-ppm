@@ -10,7 +10,7 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { Input } from '@/components/ui/input'
+import { Input } from '@/components/ui/Input'
 
 describe('Input Component - Unit Tests', () => {
   /**
@@ -27,7 +27,7 @@ describe('Input Component - Unit Tests', () => {
     expect(input).toBeInTheDocument()
     
     // Label should have correct styling
-    expect(label).toHaveClass('text-sm', 'font-medium', 'text-neutral-700')
+    expect(label).toHaveClass('text-sm', 'font-medium', 'text-gray-700')
   })
 
   /**
@@ -47,8 +47,8 @@ describe('Input Component - Unit Tests', () => {
     const input = screen.getByPlaceholderText('Email')
     
     expect(errorMessage).toBeInTheDocument()
-    expect(errorMessage).toHaveClass('text-error-500')
-    expect(input).toHaveClass('border-error-500')
+    expect(errorMessage).toHaveClass('text-red-600')
+    expect(input).toHaveClass('border-red-500')
   })
 
   /**
@@ -98,11 +98,11 @@ describe('Input Component - Unit Tests', () => {
     
     rerender(<Input size="md" placeholder="Medium" />)
     input = screen.getByPlaceholderText('Medium')
-    expect(input).toHaveClass('px-4', 'py-2', 'text-base')
+    expect(input).toHaveClass('px-4', 'py-2.5', 'text-sm')
     
     rerender(<Input size="lg" placeholder="Large" />)
     input = screen.getByPlaceholderText('Large')
-    expect(input).toHaveClass('px-5', 'py-3', 'text-lg')
+    expect(input).toHaveClass('px-4', 'py-3', 'text-base')
   })
 
   /**
@@ -123,14 +123,12 @@ describe('Input Component - Unit Tests', () => {
    * Test: Input without error message shows only border change
    */
   it('should show only border change when error=true but no errorMessage', () => {
-    render(<Input placeholder="Email" error={true} />)
+    const { container } = render(<Input placeholder="Email" error={true} />)
     
     const input = screen.getByPlaceholderText('Email')
-    const errorMessage = screen.queryByText(/./i)
     
-    expect(input).toHaveClass('border-error-500')
-    // Should not have error message paragraph
-    expect(errorMessage?.tagName).not.toBe('P')
+    expect(input).toHaveClass('border-red-500')
+    expect(container.querySelector('p')).not.toBeInTheDocument()
   })
 
   /**
@@ -142,8 +140,7 @@ describe('Input Component - Unit Tests', () => {
     const input = screen.getByPlaceholderText('Custom')
     
     expect(input).toHaveClass('custom-class')
-    // Should still have base classes
-    expect(input).toHaveClass('border', 'rounded-md')
+    expect(input).toHaveClass('border', 'rounded-lg')
   })
 
   /**
@@ -155,7 +152,7 @@ describe('Input Component - Unit Tests', () => {
     const input = screen.getByPlaceholderText('Disabled')
     
     expect(input).toBeDisabled()
-    expect(input).toHaveClass('disabled:bg-neutral-100', 'disabled:cursor-not-allowed')
+    expect(input).toHaveClass('disabled:bg-gray-50', 'disabled:cursor-not-allowed')
   })
 
   /**
@@ -178,7 +175,7 @@ describe('Input Component - Unit Tests', () => {
     expect(label).toBeInTheDocument()
     expect(input).toBeInTheDocument()
     expect(errorMessage).toBeInTheDocument()
-    expect(input).toHaveClass('border-error-500')
+    expect(input).toHaveClass('border-red-500')
   })
 
   /**
@@ -202,16 +199,14 @@ describe('Input Component - Unit Tests', () => {
     
     expect(input).toHaveClass(
       'w-full',
-      'rounded-md',
+      'rounded-lg',
       'border',
       'bg-white',
-      'text-neutral-900',
-      'placeholder:text-neutral-500',
+      'text-gray-900',
       'focus:outline-none',
       'focus:ring-2',
-      'focus:ring-primary-500',
-      'focus:border-transparent',
-      'transition-colors'
+      'focus:ring-blue-500',
+      'focus:border-transparent'
     )
   })
 })

@@ -60,3 +60,9 @@ jobs:
         with:
           flags: frontend-unit
           fail_ci_if_error: false
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-unit-coverage
+          path: coverage/
+          retention-days: 14

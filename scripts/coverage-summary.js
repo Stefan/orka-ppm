@@ -13,7 +13,8 @@ const ROOT = path.resolve(__dirname, '..');
 const COV_JSON = path.join(ROOT, 'coverage', 'coverage-final.json');
 const COV_LCOV = path.join(ROOT, 'coverage', 'lcov.info');
 
-const DIRS = ['lib', 'app', 'components', 'hooks'];
+const DIRS = ['lib', 'hooks', 'app/api'];
+const LABELS = { lib: 'lib', hooks: 'hooks', 'app/api': 'app/api' };
 
 function fromLcov() {
   if (!fs.existsSync(COV_LCOV)) return null;
@@ -64,13 +65,13 @@ function fromJson() {
 function aggregateByDir(files) {
   const byDir = {};
   for (const [file, data] of Object.entries(files)) {
-    const top = file.split(path.sep)[0];
-    if (!DIRS.includes(top)) continue;
-    if (!byDir[top]) byDir[top] = { statements: 0, covered: 0, branches: 0, branchHits: 0 };
-    byDir[top].statements += data.statements;
-    byDir[top].covered += data.covered;
-    byDir[top].branches += (data.branches !== undefined ? data.branches : data.statements);
-    byDir[top].branchHits += (data.branchHits !== undefined ? data.branchHits : data.covered);
+    const key = file.startsWith('app' + path.sep + 'api') ? 'app/api' : file.split(path.sep)[0];
+    if (!DIRS.includes(key)) continue;
+    if (!byDir[key]) byDir[key] = { statements: 0, covered: 0, branches: 0, branchHits: 0 };
+    byDir[key].statements += data.statements;
+    byDir[key].covered += data.covered;
+    byDir[key].branches += (data.branches !== undefined ? data.branches : data.statements);
+    byDir[key].branchHits += (data.branchHits !== undefined ? data.branchHits : data.covered);
   }
   return byDir;
 }
@@ -83,17 +84,17 @@ function main() {
     process.exit(1);
   }
   const byDir = aggregateByDir(files);
-  console.log('\nCoverage by directory (target 80%):\n');
+  console.log('\nCoverage by directory (Enterprise target 80% – see docs/ENTERPRISE_TEST_PLAN.md):\n');
   for (const dir of DIRS) {
     const d = byDir[dir];
     if (!d) {
-      console.log(`  ${dir}: (no data)`);
+      console.log(`  ${LABELS[dir] || dir}: (no data)`);
       continue;
     }
     const linePct = d.statements ? ((d.covered / d.statements) * 100).toFixed(1) : '0';
     const branchPct = d.branches ? ((d.branchHits / d.branches) * 100).toFixed(1) : '0';
     const status = parseFloat(linePct) >= 80 ? '\u2713' : '-';
-    console.log(`  ${dir}:  lines ${linePct}%  branches ${branchPct}%  ${status}`);
+    console.log(`  ${LABELS[dir] || dir}:  lines ${linePct}%  branches ${branchPct}%  ${status}`);
   }
   console.log('');
 }

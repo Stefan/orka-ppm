@@ -43,7 +43,7 @@ This document outlines the implementation tasks for the Change Order Management 
 - `backend/apply_change_orders_migration.py` (new)
 
 **Requirements Reference**: Requirements 1-10 (Data persistence)
-
+pull th epush all changes to github, merge if necessary
 ---
 
 ## Phase 2: Service Layer Implementation

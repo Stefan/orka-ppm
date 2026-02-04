@@ -190,6 +190,8 @@ describe('Frontend PBT Framework', () => {
     });
 
     it('should detect failing property tests', () => {
+      // Suppress expected PBT failure report (this test asserts the framework detects failures)
+      const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const result = pbtFramework.runPropertyTest(
         'test-failing',
         fc.integer({ min: 0, max: 100 }),
@@ -200,6 +202,7 @@ describe('Frontend PBT Framework', () => {
         },
         { numRuns: 100 }
       );
+      spy.mockRestore();
 
       expect(result.passed).toBe(false);
       expect(result.error).toBeDefined();
