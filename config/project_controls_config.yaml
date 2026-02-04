@@ -1,0 +1,10 @@
+# Project Controls configuration
+
+project_controls:
+  default_etc_method: bottom_up
+  default_eac_method: current_performance
+  confidence_level: 0.8
+
+forecast:
+  default_scenario: most_likely
+  risk_contingency_pct: 10

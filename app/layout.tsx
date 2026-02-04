@@ -1,6 +1,7 @@
 import React from 'react'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { SupabaseAuthProvider } from './providers/SupabaseAuthProvider'
 import { FeatureFlagProvider } from '@/contexts/FeatureFlagContext'
 import { EnhancedAuthProvider } from './providers/EnhancedAuthProvider'
@@ -18,6 +19,12 @@ import './critical.css'
 
 // Import globals.css - Next.js will handle optimization
 import './globals.css'
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { staleTime: 5 * 60 * 1000 },
+  },
+})
 
 const inter = Inter({
   subsets: ['latin'],
@@ -124,6 +131,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <PredictivePrefetcher enabled={true} />
         <PerformanceOptimizer>
           <ErrorBoundary>
+            <QueryClientProvider client={queryClient}>
             <SupabaseAuthProvider>
               <ThemeProvider>
                 <EnhancedAuthProvider>
@@ -137,6 +145,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </EnhancedAuthProvider>
               </ThemeProvider>
             </SupabaseAuthProvider>
+            </QueryClientProvider>
           </ErrorBoundary>
         </PerformanceOptimizer>
       </body>

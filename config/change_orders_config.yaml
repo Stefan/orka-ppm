@@ -1,0 +1,17 @@
+# Change Orders configuration
+# Copy to change_orders_config.local.yaml and override as needed
+
+change_orders:
+  numbering_prefix: "CO"
+  default_priority: "medium"
+  max_line_items: 100
+
+approval_workflow:
+  default_levels: 2
+  cost_threshold_level_2: 50000
+  cost_threshold_level_3: 200000
+
+cost_analysis:
+  default_confidence: 0.8
+  default_overhead_pct: 15
+  default_profit_pct: 10

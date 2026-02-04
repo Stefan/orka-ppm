@@ -6,7 +6,18 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
 
 ## Tasks
 
-- [ ] 1. Setup und Datenmodelle
+### Task 1: Setup und Datenmodelle
+
+**Status**: completed
+
+**Description**: Erstelle Projektstruktur, TypeScript Interfaces, Supabase Migration, und Zustand Store.
+
+**Files to Create/Modify**:
+- `components/register-nested-grids/types.ts` (new)
+- `lib/register-nested-grids/store.ts` (new)
+- `backend/migrations/043_nested_grid_schema.sql` (new)
+
+- [x] 1. Setup und Datenmodelle
   - Erstelle Projektstruktur für das Feature unter `src/features/register-nested-grids/`
   - Definiere TypeScript Interfaces für alle Datenmodelle (NestedGridConfig, Section, ColumnConfig, etc.)
   - Erstelle Supabase Migrations für Database Schema (nested_grid_configs, nested_grid_sections, nested_grid_columns, nested_grid_user_state, ai_suggestions, nested_grid_changes)
@@ -17,8 +28,8 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
   - **Property 16: Validation vor Speichern**
   - **Validates: Requirements 7.5**
 
-- [ ] 2. React Query Hooks und API Integration
-  - [ ] 2.1 Implementiere React Query Hooks für Nested Grid Daten
+- [x] 2. React Query Hooks und API Integration
+  - [x] 2.1 Implementiere React Query Hooks für Nested Grid Daten
     - `useNestedGridData` für Datenabruf mit Caching
     - `useUpdateNestedGridItem` für Inline-Editing Updates
     - `useReorderRows` für Drag & Drop Reordering
@@ -29,7 +40,7 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
     - **Property 10: Data Refresh on Return**
     - **Validates: Requirements 5.2**
   
-  - [ ] 2.3 Implementiere Supabase API Functions
+  - [x] 2.3 Implementiere Supabase API Functions
     - `fetchNestedGridData` mit Permission Checks
     - `updateNestedGridItem` mit Validation
     - `reorderNestedGridRows` mit Error Handling
@@ -40,14 +51,14 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
     - **Property 13: Permission Check vor Datenladen**
     - **Validates: Requirements 6.4**
 
-- [ ] 3. Column Definition System
-  - [ ] 3.1 Erstelle COLUMN_DEFINITIONS Konstante mit allen Item Types
+- [x] 3. Column Definition System
+  - [x] 3.1 Erstelle COLUMN_DEFINITIONS Konstante mit allen Item Types
     - Tasks Columns (Status, Due Date, Assignee, Priority, etc.)
     - Registers Columns (Name, Budget, EAC, Variance, etc.)
     - Cost Registers Columns (EAC, Variance, Commitments, Actuals, etc.)
     - _Requirements: 3.1, 3.2, 3.3_
   
-  - [ ] 3.2 Implementiere Dynamic Column Selector Component
+  - [x] 3.2 Implementiere Dynamic Column Selector Component
     - Filtert Columns basierend auf Item Type
     - Zeigt mindestens 10 Columns pro Type
     - Drag & Drop für Display Order
@@ -64,8 +75,8 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
 - [ ] 4. Checkpoint - Core Data Layer Complete
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Admin Panel Components
-  - [ ] 5.1 Erstelle NestedGridsTab Component
+- [x] 5. Admin Panel Components
+  - [x] 5.1 Erstelle NestedGridsTab Component
     - Tab-Container mit Enable Linked Items Toggle
     - Read-only State wenn Enable Linked Items deaktiviert
     - Section List mit Add/Remove Funktionalität
@@ -75,7 +86,7 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
     - **Property 1: Admin Panel Editability basierend auf Enable Flag**
     - **Validates: Requirements 1.2, 1.3**
   
-  - [ ] 5.3 Erstelle SectionItem Component
+  - [x] 5.3 Erstelle SectionItem Component
     - Item Type Selector (Tasks, Registers, Cost Registers)
     - Column Selector Integration (Dynamic)
     - Display Order Manager mit Drag & Drop
@@ -92,15 +103,15 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
     - Error Handling mit User Feedback
     - _Requirements: 2.1, 2.2_
 
-- [ ] 6. AI Suggestion Engine
-  - [ ] 6.1 Erstelle AI Suggestion Service
+- [x] 6. AI Suggestion Engine
+  - [x] 6.1 Erstelle AI Suggestion Service
     - `generateColumnSuggestions` basierend auf Historical Data
     - `suggestFilters` basierend auf User Behavior
     - Integration mit Supabase AI Suggestions Table
     - // 10x: AI-Auto-Konfiguration für Columns
     - _Requirements: 2.6, 9.6_
   
-  - [ ] 6.2 Erstelle AISuggestionPanel Component
+  - [x] 6.2 Erstelle AISuggestionPanel Component
     - Zeigt beliebte Column-Kombinationen
     - "Apply Suggestion" Button
     - Confidence Score Display
@@ -117,8 +128,8 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
 - [ ] 7. Checkpoint - Admin Panel Complete
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 8. Core Grid Components
-  - [ ] 8.1 Erstelle RegisterGrid Component (ag-grid-react)
+- [x] 8. Core Grid Components
+  - [x] 8.1 Erstelle RegisterGrid Component
     - Grid Setup mit Column Definitions
     - Chevron Icon für Rows mit Linked Items
     - Expand/Collapse Handler
@@ -129,13 +140,13 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
     - **Property 6: Nested Grid Expand/Collapse Behavior**
     - **Validates: Requirements 4.1, 4.2, 4.6**
   
-  - [ ] 8.3 Erstelle NestedGridContainer Component
+  - [x] 8.3 Erstelle NestedGridContainer Component
     - Container für Nested Grid mit Loading State
     - Permission Guard Integration
     - Error Boundary
     - _Requirements: 4.2, 6.1_
   
-  - [ ] 8.4 Erstelle NestedGrid Component (ag-grid-react)
+  - [x] 8.4 Erstelle NestedGrid Component
     - Grid mit konfigurierten Columns
     - Nesting Level Tracking (max 2)
     - Recursive Nesting Support
@@ -150,8 +161,8 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
     - **Property 8: Nested Items Chevron Display**
     - **Validates: Requirements 4.4**
 
-- [ ] 9. State Preservation System
-  - [ ] 9.1 Implementiere ScrollPositionManager
+- [x] 9. State Preservation System
+  - [x] 9.1 Implementiere ScrollPositionManager
     - Speichert Scroll-Position in Zustand Store
     - Lädt Scroll-Position beim Component Mount
     - Speichert zu Supabase User State
@@ -167,15 +178,15 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
     - **Property 9: State Preservation Round-Trip**
     - **Validates: Requirements 5.1, 5.5**
 
-- [ ] 10. AI Change Detection
-  - [ ] 10.1 Implementiere Change Detection Service
+- [x] 10. AI Change Detection
+  - [x] 10.1 Implementiere Change Detection Service
     - `detectChanges` vergleicht Previous vs Current Data
     - Identifiziert Added, Modified, Deleted Items
     - Speichert Changes in nested_grid_changes Table
     - // 10x: AI-Highlight Changes ("3 neue Items seit letztem View")
     - _Requirements: 5.3, 5.4_
   
-  - [ ] 10.2 Erstelle AIChangeHighlight Component
+  - [x] 10.2 Erstelle AIChangeHighlight Component
     - Zeigt Highlights für geänderte Items
     - Notification für neue Items mit Anzahl
     - Visual Indicators (Badges, Colors)
@@ -188,15 +199,15 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
 - [ ] 11. Checkpoint - Grid Display Complete
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 12. Permission System
-  - [ ] 12.1 Erstelle PermissionGuard Component
+- [x] 12. Permission System
+  - [x] 12.1 Erstelle PermissionGuard Component
     - Prüft View/Edit Permissions
     - Zeigt Warning Message bei Denied
     - Lädt AI-generierte Alternativen
     - // 10x: AI-Alternative ("Zeig Summary statt Details")
     - _Requirements: 6.1, 6.2, 6.3_
   
-  - [ ] 12.2 Implementiere Permission Check Service
+  - [x] 12.2 Implementiere Permission Check Service
     - `checkPermission` für verschiedene Actions
     - `getAlternative` für Permission Denied Cases
     - Section-Level Permission Checks
@@ -206,8 +217,8 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
     - **Property 12: Permission-basiertes Nested Grid Verhalten**
     - **Validates: Requirements 6.1, 6.2, 6.3**
 
-- [ ] 13. Inline Editing System
-  - [ ] 13.1 Erstelle EditableCell Component
+- [x] 13. Inline Editing System
+  - [x] 13.1 Erstelle EditableCell Component
     - Inline Editing ohne Popups
     - Visuelle Kennzeichnung (Editable Indicator)
     - Validation Rules Integration
@@ -234,8 +245,8 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
     - Error Messages Display
     - _Requirements: 7.5_
 
-- [ ] 14. Drag & Drop System
-  - [ ] 14.1 Setup react-dnd Provider
+- [x] 14. Drag & Drop System
+  - [x] 14.1 DraggableRow mit @dnd-kit
     - DndProvider in App Root
     - HTML5Backend Configuration
     - _Requirements: 8.1, 8.2, 8.3_
@@ -270,8 +281,9 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
 - [ ] 15. Checkpoint - Editing & Drag&Drop Complete
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 16. Filter System
-  - [ ] 16.1 Erstelle FilterBar Component
+- [x] 16. Filter System
+  - [x] 16.1 Filter Logic (applyFilters)
+  - [x] 16.2 FilterBar Component
     - Filter UI mit Add/Remove Buttons
     - Field Selector (basierend auf Columns)
     - Operator Selector (Equals, Contains, etc.)
@@ -307,8 +319,8 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
     - **Property 23: Filter State Preservation**
     - **Validates: Requirements 9.5**
 
-- [ ] 17. Costbook Integration
-  - [ ] 17.1 Erstelle Costbook View mit Projects Grid
+- [x] 17. Costbook Integration
+  - [x] 17.1 CostbookRegisterGrid Component
     - RegisterGrid Integration für Projects
     - Nested Grid Configuration für Commitments/Actuals
     - Multi-Level Nesting Setup (Projects → Commitments/Actuals → Details)
@@ -325,8 +337,8 @@ Dieser Implementation Plan bricht das Register Nested Grids Feature in diskrete,
     - **Property 25: Costbook Integration Completeness**
     - **Validates: Requirements 10.4**
 
-- [ ] 18. Error Handling & Edge Cases
-  - [ ] 18.1 Implementiere Error Handler Service
+- [x] 18. Error Handling & Edge Cases
+  - [x] 18.1 Implementiere Error Handler Service
     - Generic Error Handler für alle Operation Types
     - Error Logging
     - User Notifications (Toast/Snackbar)

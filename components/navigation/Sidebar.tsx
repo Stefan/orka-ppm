@@ -171,6 +171,16 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
                 </Link>
               </li>
             </PermissionGuard>
+            <li>
+              <Link 
+                href="/project-controls" 
+                prefetch={true}
+                className="block py-3 px-4 rounded hover:bg-gray-700 transition-colors min-h-[44px] flex items-center"
+                onClick={handleLinkClick}
+              >
+                Project Controls
+              </Link>
+            </li>
             <PermissionGuard permission="audit_read">
               <li>
                 <Link 
@@ -457,6 +467,22 @@ export default function Sidebar({ isOpen = true, onToggle, isMobile = false }: S
             </Link>
           </li>
         )}
+        <li style={{ display: 'block', width: '100%' }}>
+          <Link 
+            href="/project-controls" 
+            prefetch={true}
+            style={{ 
+              display: 'block', 
+              padding: '0.5rem 1rem', 
+              borderRadius: '0.375rem', 
+              color: '#ffffff', 
+              textDecoration: 'none',
+              transition: 'background-color 0.2s'
+            }}
+          >
+            Project Controls
+          </Link>
+        </li>
         {hasPermission('audit_read') && (
           <li style={{ display: 'block', width: '100%' }}>
             <Link 

@@ -52,6 +52,14 @@ from routers.features import router as features_router
 from routers.feature_toggles import router as feature_toggles_router
 from routers.erp import router as erp_router
 from routers.costbook import router as costbook_router
+from routers.change_orders import router as change_orders_router
+from routers.change_approvals import router as change_approvals_router
+from routers.contract_integration import router as contract_integration_router
+from routers.change_analytics import router as change_analytics_router
+from routers.project_controls import router as project_controls_router
+from routers.forecasts import router as forecasts_router
+from routers.earned_value import router as earned_value_router
+from routers.performance_analytics import router as performance_analytics_router
 
 # Import performance tracking middleware
 from middleware.performance_tracker import PerformanceMiddleware, performance_tracker
@@ -224,6 +232,14 @@ app.include_router(feature_toggles_router)
 app.include_router(features_router)
 app.include_router(erp_router)
 app.include_router(costbook_router)
+app.include_router(change_orders_router)
+app.include_router(change_approvals_router)
+app.include_router(contract_integration_router)
+app.include_router(change_analytics_router)
+app.include_router(project_controls_router)
+app.include_router(forecasts_router)
+app.include_router(earned_value_router)
+app.include_router(performance_analytics_router)
 
 # Add performance tracking middleware
 app.add_middleware(PerformanceMiddleware, tracker=performance_tracker)

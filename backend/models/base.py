@@ -64,11 +64,25 @@ class LanguageCode(str, Enum):
     es = "es"
     it = "it"
 
+class ChangeOrderPermission(str, Enum):
+    """Permissions for change order management"""
+    change_order_read = "change_order:read"
+    change_order_create = "change_order:create"
+    change_order_edit = "change_order:edit"
+    change_order_submit = "change_order:submit"
+    change_order_approve = "change_order:approve"
+    change_order_reject = "change_order:reject"
+    cost_analysis_create = "cost_analysis:create"
+    cost_analysis_approve = "cost_analysis:approve"
+    contract_integration_manage = "contract_integration:manage"
+    change_order_admin = "change_order:admin"
+
+
 class BaseResponse(BaseModel):
     """Base response model with common fields"""
     id: str
     created_at: datetime
     updated_at: datetime
-    
+
     class Config:
         from_attributes = True

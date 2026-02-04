@@ -9,6 +9,7 @@ from .resources import *
 from .risks import *
 from .schedule import *
 from .change_management import *
+from .change_orders import *
 from .feedback import *
 from .help_content import *
 from .project_controls import *

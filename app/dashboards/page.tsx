@@ -47,6 +47,14 @@ const ScheduleDashboardWidgets = dynamic(() => import('./components/ScheduleDash
   ssr: false,
   loading: () => <div className="h-32 bg-gray-100 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
 })
+const ChangeOrderWidgets = dynamic(() => import('./components/ChangeOrderWidgets'), {
+  ssr: false,
+  loading: () => <div className="h-24 bg-gray-100 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
+})
+const ProjectControlsWidgets = dynamic(() => import('./components/ProjectControlsWidgets'), {
+  ssr: false,
+  loading: () => <div className="h-24 bg-gray-100 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
+})
 
 // KPI Card Component - balanced sizing with design tokens
 function KPICard({ label, value, change, icon: Icon, color, testId }: any) {
@@ -423,6 +431,20 @@ export default function CompactDashboard() {
         {session?.access_token && (
           <Suspense fallback={<div className="h-32 bg-gray-100 rounded-lg animate-pulse" />}>
             <ScheduleDashboardWidgets accessToken={session.access_token} />
+          </Suspense>
+        )}
+
+        {/* Change Orders widget */}
+        {recentProjects.length > 0 && (
+          <Suspense fallback={<div className="h-24 bg-gray-100 rounded-lg animate-pulse" />}>
+            <ChangeOrderWidgets projectIds={recentProjects.map((p) => p.id)} />
+          </Suspense>
+        )}
+
+        {/* Project Controls widget */}
+        {recentProjects.length > 0 && (
+          <Suspense fallback={<div className="h-24 bg-gray-100 rounded-lg animate-pulse" />}>
+            <ProjectControlsWidgets projectIds={recentProjects.map((p) => p.id)} />
           </Suspense>
         )}
 
