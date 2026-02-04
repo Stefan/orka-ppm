@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogBody,
   DialogFooter,
-} from '@/components/ui/Dialog'
+} from '@/components/ui'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 
