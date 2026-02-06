@@ -53,11 +53,11 @@ export function OptimizedImage({
   if (hasError) {
     return (
       <div 
-        className={`bg-gray-100 flex items-center justify-center ${className}`}
+        className={`bg-gray-100 dark:bg-slate-700 flex items-center justify-center ${className}`}
         role="img"
         aria-label={alt}
       >
-        <span className="text-gray-400 text-sm">Image unavailable</span>
+        <span className="text-gray-400 dark:text-slate-500 text-sm">Image unavailable</span>
       </div>
     )
   }

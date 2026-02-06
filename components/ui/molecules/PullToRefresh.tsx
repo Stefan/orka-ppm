@@ -123,7 +123,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
   const defaultLoadingIndicator = (
     <div className="flex items-center justify-center space-x-2">
       <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent" />
-      <span className="text-sm text-gray-600">Refreshing...</span>
+      <span className="text-sm text-gray-600 dark:text-slate-400">Refreshing...</span>
     </div>
   )
 
@@ -132,14 +132,14 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
     <div className="flex flex-col items-center space-y-2">
       <div 
         className={cn(
-          'w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center transition-all duration-200',
-          isReadyToRefresh && 'border-blue-500 bg-blue-50 rotate-180'
+          'w-8 h-8 rounded-full border-2 border-gray-300 dark:border-slate-600 flex items-center justify-center transition-all duration-200',
+          isReadyToRefresh && 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 rotate-180'
         )}
       >
         <svg
           className={cn(
-            'w-4 h-4 text-gray-400 transition-all duration-200',
-            isReadyToRefresh && 'text-blue-500'
+            'w-4 h-4 text-gray-400 dark:text-slate-500 transition-all duration-200',
+            isReadyToRefresh && 'text-blue-500 dark:text-blue-400'
           )}
           fill="none"
           stroke="currentColor"
@@ -154,8 +154,8 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
         </svg>
       </div>
       <span className={cn(
-        'text-xs text-gray-500 transition-colors duration-200',
-        isReadyToRefresh && 'text-blue-600'
+        'text-xs text-gray-500 dark:text-slate-400 transition-colors duration-200',
+        isReadyToRefresh && 'text-blue-600 dark:text-blue-400'
       )}>
         {isReadyToRefresh ? 'Release to refresh' : 'Pull to refresh'}
       </span>
@@ -183,7 +183,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
     >
       {/* Pull indicator */}
       <div
-        className="absolute top-0 left-0 right-0 flex items-end justify-center pb-4 bg-gray-50"
+        className="absolute top-0 left-0 right-0 flex items-end justify-center pb-4 bg-gray-50 dark:bg-slate-800/50"
         style={indicatorStyle}
       >
         {(isPulling || isRefreshing) && (

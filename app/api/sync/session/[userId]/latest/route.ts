@@ -1,9 +1,10 @@
 /**
  * Latest Session State Retrieval API Endpoint
- * Gets the latest session state for a user
+ * Gets the latest session state for a user. Requires Authorization; params.userId must match token sub.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { enforceSyncAuth } from '@/lib/auth/verify-jwt'
 
 interface SessionState {
   userId: string
@@ -24,18 +25,25 @@ interface SessionState {
 const sessionStates = new Map<string, SessionState>()
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const { userId } = await params
-    
     if (!userId) {
       return NextResponse.json({
         error: 'Missing required parameter: userId'
       }, { status: 400 })
     }
-    
+
+    const auth = await enforceSyncAuth(request.headers.get('Authorization'), userId)
+    if (auth instanceof Response) {
+      return NextResponse.json(
+        (await auth.json().catch(() => ({ error: 'Unauthorized' }))) as { error: string },
+        { status: auth.status }
+      )
+    }
+
     const sessionState = sessionStates.get(userId)
     
     if (!sessionState) {

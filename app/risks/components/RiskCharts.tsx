@@ -53,8 +53,8 @@ const RiskCharts = React.memo(function RiskCharts({
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Risk by Category */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Risks by Category</h3>
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Risks by Category</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={categoryData}>
               <XAxis dataKey="category" />
@@ -69,8 +69,8 @@ const RiskCharts = React.memo(function RiskCharts({
         </div>
 
         {/* Risk by Status */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Risks by Status</h3>
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Risks by Status</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -97,8 +97,8 @@ const RiskCharts = React.memo(function RiskCharts({
 
   if (viewMode === 'matrix') {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Risk Probability-Impact Matrix</h3>
+      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Risk Probability-Impact Matrix</h3>
         <ResponsiveContainer width="100%" height={500}>
           <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
             <XAxis 
@@ -138,23 +138,23 @@ const RiskCharts = React.memo(function RiskCharts({
         <div className="mt-4 grid grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="flex items-center">
             <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: RISK_COLORS.technical }}></div>
-            <span className="text-sm text-gray-700">Technical</span>
+            <span className="text-sm text-gray-700 dark:text-slate-300">Technical</span>
           </div>
           <div className="flex items-center">
             <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: RISK_COLORS.financial }}></div>
-            <span className="text-sm text-gray-700">Financial</span>
+            <span className="text-sm text-gray-700 dark:text-slate-300">Financial</span>
           </div>
           <div className="flex items-center">
             <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: RISK_COLORS.resource }}></div>
-            <span className="text-sm text-gray-700">Resource</span>
+            <span className="text-sm text-gray-700 dark:text-slate-300">Resource</span>
           </div>
           <div className="flex items-center">
             <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: RISK_COLORS.schedule }}></div>
-            <span className="text-sm text-gray-700">Schedule</span>
+            <span className="text-sm text-gray-700 dark:text-slate-300">Schedule</span>
           </div>
           <div className="flex items-center">
             <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: RISK_COLORS.external }}></div>
-            <span className="text-sm text-gray-700">External</span>
+            <span className="text-sm text-gray-700 dark:text-slate-300">External</span>
           </div>
         </div>
       </div>
@@ -163,8 +163,8 @@ const RiskCharts = React.memo(function RiskCharts({
 
   if (viewMode === 'trends' && trendData) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Risk Trends Over Time</h3>
+      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Risk Trends Over Time</h3>
         <ResponsiveContainer width="100%" height={400}>
           <AreaChart data={trendData}>
             <XAxis 

@@ -1503,6 +1503,34 @@ async def approve_project(
         )
 
 
+# ==================== User Workflow Instances Endpoints ====================
+# Must be declared before /instances/{id} so "my-workflows" is not matched as UUID.
+
+
+@router.get("/instances/my-workflows")
+async def get_my_workflow_instances():
+    """
+    Get workflow instances where the current user is involved.
+
+    Returns workflows where the user is either the initiator or an approver.
+    This endpoint supports the dashboard workflow display.
+
+    Args:
+        current_user: Authenticated user
+
+    Returns:
+        Dict containing list of workflow instances
+
+    Requirements: 7.2, 7.4
+    """
+    # For now, return empty workflows list to avoid database queries
+    # TODO: Implement proper workflow instance retrieval
+    return {"workflows": []}
+
+
+# ==================== Single Instance Endpoints ====================
+
+
 @router.get("/instances/{id}", response_model=WorkflowInstanceResponse)
 async def get_workflow_instance(
     id: UUID,
@@ -1658,30 +1686,6 @@ async def advance_workflow_instance(
             status_code=500,
             detail=f"Failed to advance workflow: {str(e)}"
         )
-
-
-# ==================== User Workflow Instances Endpoints ====================
-
-
-@router.get("/instances/my-workflows")
-async def get_my_workflow_instances():
-    """
-    Get workflow instances where the current user is involved.
-
-    Returns workflows where the user is either the initiator or an approver.
-    This endpoint supports the dashboard workflow display.
-
-    Args:
-        current_user: Authenticated user
-
-    Returns:
-        Dict containing list of workflow instances
-
-    Requirements: 7.2, 7.4
-    """
-    # For now, return empty workflows list to avoid database queries
-    # TODO: Implement proper workflow instance retrieval
-    return {"workflows": []}
 
 
 # ==================== Workflow Template Endpoints ====================

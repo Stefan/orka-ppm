@@ -185,7 +185,11 @@ export function usePerformanceMonitoring(options: {
   // ========================================================================
 
   const captureResourceTiming = useCallback(() => {
-    if (!enabled || typeof window === 'undefined') {
+    if (
+      !enabled ||
+      typeof window === 'undefined' ||
+      typeof performance?.getEntriesByType !== 'function'
+    ) {
       return {
         totalResources: 0,
         totalSize: 0,

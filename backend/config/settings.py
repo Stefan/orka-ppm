@@ -18,9 +18,13 @@ class Settings:
     SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
     SUPABASE_ANON_KEY: str = os.getenv("SUPABASE_ANON_KEY", "")
     SUPABASE_SERVICE_ROLE_KEY: str = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+    # JWT Secret from Supabase Project Settings > API (required for signature verification)
+    SUPABASE_JWT_SECRET: str = os.getenv("SUPABASE_JWT_SECRET", "")
     
     # Security Configuration
     SECRET_KEY: str = os.getenv("SECRET_KEY", os.getenv("SUPABASE_SERVICE_ROLE_KEY", "default-secret-key-change-in-production"))
+    # Only allow unauthenticated default admin when explicitly set (e.g. local dev)
+    ALLOW_DEV_DEFAULT_USER: bool = os.getenv("ALLOW_DEV_DEFAULT_USER", "false").lower() in ("true", "1", "yes")
     
     # OpenAI Configuration
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")

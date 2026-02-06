@@ -637,167 +637,177 @@
     "panels": {
       "editor": "Éditeur",
       "insights": "Informations",
-      "collaboration": "Collab"
-    }
-  },
-  "pmr.insights": {
-    "title": "Informations IA",
-    "refresh": "Actualiser",
-    "generating": "Génération d'informations...",
-    "noInsights": "Aucune information disponible",
-    "generateInsights": "Générer des informations",
-    "totalInsights": "Total des Informations",
-    "validated": "Validé",
-    "highPriority": "Haute Priorité",
-    "filters": {
-      "toggle": "Basculer les filtres",
-      "categories": "Catégories",
-      "minConfidence": "Confiance Min",
-      "clearAll": "Effacer tous les filtres"
-    },
-    "categories": {
-      "budget": "budget",
-      "schedule": "calendrier",
-      "resource": "ressource",
-      "risk": "risque",
-      "quality": "qualité"
-    },
-    "types": {
-      "prediction": "prédiction",
-      "recommendation": "recommandation",
-      "alert": "alerte",
-      "summary": "résumé"
-    },
-    "priorities": {
-      "low": "faible",
-      "medium": "moyen",
-      "high": "élevé",
-      "critical": "critique"
-    },
-    "card": {
-      "confidence": "{percent}% de confiance",
-      "validated": "Validé",
-      "details": "Détails",
-      "predictedImpact": "Impact Prévu",
-      "recommendedActions": "Actions Recommandées",
-      "supportingData": "Données de Support",
-      "validationNotes": "Notes de Validation",
-      "validate": "Valider",
-      "markInvalid": "Marquer comme invalide",
-      "apply": "Appliquer",
-      "markHelpful": "Marquer comme utile",
-      "markNotHelpful": "Marquer comme non utile"
-    }
-  },
-  "pmr.collaboration": {
-    "title": "Collaboration",
-    "tabs": {
-      "users": "Utilisateurs",
-      "comments": "Commentaires",
-      "conflicts": "Conflits"
-    },
-    "users": {
-      "you": "(Vous)",
-      "active": "Actif {time}",
-      "noUsers": "Aucun autre utilisateur en ligne"
-    },
-    "comments": {
-      "sectionPlaceholder": "ID de section (ex: executive-summary)",
-      "addPlaceholder": "Ajouter un commentaire...",
-      "sendComment": "Envoyer le Commentaire",
-      "on": "sur {section}",
-      "resolveComment": "Résoudre le commentaire",
-      "noComments": "Aucun commentaire pour le moment"
-    },
-    "conflicts": {
-      "types": {
-        "simultaneousEdit": "Conflit d'Édition Simultanée",
-        "versionMismatch": "Incompatibilité de Version",
-        "permissionConflict": "Conflit de Permission"
-      },
-      "section": "Section: {section}",
-      "usersConflicting": "{count} utilisateurs ont effectué des modifications conflictuelles",
-      "conflictingChanges": "Modifications Conflictuelles:",
-      "user": "Utilisateur: {userId}",
-      "resolve": "Résoudre le Conflit:",
-      "useLatest": "Utiliser la Dernière",
-      "mergeChanges": "Fusionner les Modifications",
-      "resolveManually": "Résoudre Manuellement",
-      "noConflicts": "Aucun conflit détecté"
-    },
-    "footer": {
-      "online": "{count} en ligne",
-      "comments": "{count} commentaires",
-      "conflicts": "{count} conflits"
-    },
-    "time": {
-      "justNow": "À l'instant",
-      "minutesAgo": "il y a {minutes}m",
-      "hoursAgo": "il y a {hours}h"
-    }
-  },
-  "pmr.export": {
-    "title": "Exporter le Rapport",
-    "subtitle": "Configurez et exportez votre rapport PMR dans plusieurs formats",
-    "tabs": {
-      "configure": "Configurer l'Export",
-      "queue": "File d'Attente d'Export"
-    },
-    "formats": {
-      "label": "Format d'Export",
-      "pdf": "Document PDF",
-      "excel": "Feuille de Calcul Excel",
-      "powerpoint": "Présentation PowerPoint",
-      "word": "Document Word"
-    },
-    "templates": {
-      "label": "Modèle (Optionnel)",
-      "default": "Modèle par Défaut",
-      "defaultDescription": "Format standard avec toutes les sections",
-      "recommended": "Recommandé"
-    },
-    "options": {
-      "label": "Options d'Export",
-      "includeCharts": "Inclure les graphiques et visualisations",
-      "includeRawData": "Inclure les tableaux de données brutes"
+      "collaboration": "Collaboration"
     },
     "sections": {
-      "label": "Sections à Inclure",
-      "selectAll": "Tout Sélectionner",
-      "deselectAll": "Tout Désélectionner"
+      "executive-summary": "Résumé Exécutif",
+      "budget-status": "État du Budget"
     },
-    "branding": {
-      "label": "Image de Marque (Optionnel)",
-      "companyName": "Nom de l'Entreprise",
-      "companyNamePlaceholder": "Entrez le nom de l'entreprise",
-      "logoUrl": "URL du Logo",
-      "logoUrlPlaceholder": "https://exemple.com/logo.png",
-      "colorScheme": "Schéma de Couleurs",
-      "schemes": {
-        "corporateBlue": "Bleu Corporate",
-        "professionalGray": "Gris Professionnel",
-        "modernGreen": "Vert Moderne"
+    "placeholderContent": {
+      "executive-summary": "Ceci est la section du résumé exécutif...",
+      "budget-status": "Analyse de la performance budgétaire...",
+      "reportTitle": "Rapport Mensuel du Projet Janvier 2026",
+      "reportTitleTemplate": "Rapport Mensuel du Projet {month} {year}"
+    },
+    "insights": {
+      "title": "Informations IA",
+      "refresh": "Actualiser",
+      "generating": "Génération d'informations...",
+      "noInsights": "Aucune information disponible",
+      "generateInsights": "Générer des informations",
+      "totalInsights": "Total des Informations",
+      "validated": "Validé",
+      "highPriority": "Haute Priorité",
+      "filters": {
+        "toggle": "Basculer les filtres",
+        "categories": "Catégories",
+        "minConfidence": "Confiance Min",
+        "clearAll": "Effacer tous les filtres"
+      },
+      "categories": {
+        "budget": "budget",
+        "schedule": "calendrier",
+        "resource": "ressource",
+        "risk": "risque",
+        "quality": "qualité"
+      },
+      "types": {
+        "prediction": "prédiction",
+        "recommendation": "recommandation",
+        "alert": "alerte",
+        "summary": "résumé"
+      },
+      "priorities": {
+        "low": "faible",
+        "medium": "moyen",
+        "high": "élevé",
+        "critical": "critique"
+      },
+      "card": {
+        "confidence": "{percent}% de confiance",
+        "validated": "Validé",
+        "details": "Détails",
+        "predictedImpact": "Impact Prévu",
+        "recommendedActions": "Actions Recommandées",
+        "supportingData": "Données de Support",
+        "validationNotes": "Notes de Validation",
+        "validate": "Valider",
+        "markInvalid": "Marquer comme invalide",
+        "apply": "Appliquer",
+        "markHelpful": "Marquer comme utile",
+        "markNotHelpful": "Marquer comme non utile"
       }
     },
-    "actions": {
-      "export": "Exporter en {format}",
-      "exporting": "Exportation...",
-      "download": "Télécharger",
-      "cancel": "Annuler",
-      "delete": "Supprimer"
+    "collaboration": {
+      "title": "Collaboration",
+      "tabs": {
+        "users": "Utilisateurs",
+        "comments": "Commentaires",
+        "conflicts": "Conflits"
+      },
+      "users": {
+        "you": "(Vous)",
+        "active": "Actif {time}",
+        "noUsers": "Aucun autre utilisateur en ligne"
+      },
+      "comments": {
+        "sectionPlaceholder": "ID de section (ex: executive-summary)",
+        "addPlaceholder": "Ajouter un commentaire...",
+        "sendComment": "Envoyer le Commentaire",
+        "on": "sur {section}",
+        "resolveComment": "Résoudre le commentaire",
+        "noComments": "Aucun commentaire pour le moment"
+      },
+      "conflicts": {
+        "types": {
+          "simultaneousEdit": "Conflit d'Édition Simultanée",
+          "versionMismatch": "Incompatibilité de Version",
+          "permissionConflict": "Conflit de Permission"
+        },
+        "section": "Section: {section}",
+        "usersConflicting": "{count} utilisateurs ont effectué des modifications conflictuelles",
+        "conflictingChanges": "Modifications Conflictuelles:",
+        "user": "Utilisateur: {userId}",
+        "resolve": "Résoudre le Conflit:",
+        "useLatest": "Utiliser la Dernière",
+        "mergeChanges": "Fusionner les Modifications",
+        "resolveManually": "Résoudre Manuellement",
+        "noConflicts": "Aucun conflit détecté"
+      },
+      "footer": {
+        "online": "{count} en ligne",
+        "comments": "{count} commentaires",
+        "conflicts": "{count} conflits"
+      },
+      "time": {
+        "justNow": "À l'instant",
+        "minutesAgo": "il y a {minutes}m",
+        "hoursAgo": "il y a {hours}h"
+      }
     },
-    "queue": {
-      "empty": "Aucun export pour le moment",
-      "emptyDescription": "Configurez et lancez un export pour le voir ici",
-      "started": "Démarré {date}",
-      "fileSize": "Taille du fichier: {size} KB",
-      "error": "Erreur: {message}"
-    },
-    "status": {
-      "queued": "En Attente",
-      "processing": "En Cours",
-      "completed": "Terminé",
-      "failed": "Échoué"
+    "export": {
+      "title": "Exporter le Rapport",
+      "subtitle": "Configurez et exportez votre rapport PMR dans plusieurs formats",
+      "tabs": {
+        "configure": "Configurer l'Export",
+        "queue": "File d'Attente d'Export"
+      },
+      "formats": {
+        "label": "Format d'Export",
+        "pdf": "Document PDF",
+        "excel": "Feuille de Calcul Excel",
+        "powerpoint": "Présentation PowerPoint",
+        "word": "Document Word"
+      },
+      "templates": {
+        "label": "Modèle (Optionnel)",
+        "default": "Modèle par Défaut",
+        "defaultDescription": "Format standard avec toutes les sections",
+        "recommended": "Recommandé"
+      },
+      "options": {
+        "label": "Options d'Export",
+        "includeCharts": "Inclure les graphiques et visualisations",
+        "includeRawData": "Inclure les tableaux de données brutes"
+      },
+      "sections": {
+        "label": "Sections à Inclure",
+        "selectAll": "Tout Sélectionner",
+        "deselectAll": "Tout Désélectionner"
+      },
+      "branding": {
+        "label": "Image de Marque (Optionnel)",
+        "companyName": "Nom de l'Entreprise",
+        "companyNamePlaceholder": "Entrez le nom de l'entreprise",
+        "logoUrl": "URL du Logo",
+        "logoUrlPlaceholder": "https://exemple.com/logo.png",
+        "colorScheme": "Schéma de Couleurs",
+        "schemes": {
+          "corporateBlue": "Bleu Corporate",
+          "professionalGray": "Gris Professionnel",
+          "modernGreen": "Vert Moderne"
+        }
+      },
+      "actions": {
+        "export": "Exporter en {format}",
+        "exporting": "Exportation...",
+        "download": "Télécharger",
+        "cancel": "Annuler",
+        "delete": "Supprimer"
+      },
+      "queue": {
+        "empty": "Aucun export pour le moment",
+        "emptyDescription": "Configurez et lancez un export pour le voir ici",
+        "started": "Démarré {date}",
+        "fileSize": "Taille du fichier: {size} KB",
+        "error": "Erreur: {message}"
+      },
+      "status": {
+        "queued": "En Attente",
+        "processing": "En Cours",
+        "completed": "Terminé",
+        "failed": "Échoué"
+      }
     }
   },
   "feedback": {

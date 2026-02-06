@@ -18,6 +18,9 @@ describe('POST /api/projects/import', () => {
   })
 
   it('returns 401 when no token (no header, no cookies)', async () => {
+    const fetchSpy = jest.fn()
+    global.fetch = fetchSpy as typeof fetch
+
     const request = createMockNextRequestWithCookies({
       url: 'http://localhost:3000/api/projects/import',
       method: 'POST',
@@ -33,7 +36,7 @@ describe('POST /api/projects/import', () => {
     expect(response.status).toBe(401)
     expect((data as Record<string, unknown>).message).toContain('Authentication required')
     expect((data as Record<string, unknown>).success).toBe(false)
-    expect(global.fetch).not.toHaveBeenCalled()
+    expect(fetchSpy).not.toHaveBeenCalled()
   })
 
   it('forwards request to backend when Bearer token is present and returns backend response', async () => {

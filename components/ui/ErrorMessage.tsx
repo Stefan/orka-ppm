@@ -33,34 +33,34 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({
   const config = {
     error: {
       icon: AlertCircle,
-      bgColor: 'bg-red-50',
-      borderColor: 'border-red-200',
-      iconColor: 'text-red-500',
-      titleColor: 'text-red-800',
+      bgColor: 'bg-red-50 dark:bg-red-900/20',
+      borderColor: 'border-red-200 dark:border-red-800',
+      iconColor: 'text-red-500 dark:text-red-400',
+      titleColor: 'text-red-800 dark:text-red-300',
       messageColor: 'text-red-700'
     },
     warning: {
       icon: AlertTriangle,
-      bgColor: 'bg-yellow-50',
-      borderColor: 'border-yellow-200',
-      iconColor: 'text-yellow-500',
-      titleColor: 'text-yellow-800',
+      bgColor: 'bg-yellow-50 dark:bg-yellow-900/20',
+      borderColor: 'border-yellow-200 dark:border-yellow-800',
+      iconColor: 'text-yellow-500 dark:text-yellow-400',
+      titleColor: 'text-yellow-800 dark:text-yellow-300',
       messageColor: 'text-yellow-700'
     },
     info: {
       icon: Info,
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200',
-      iconColor: 'text-blue-500',
-      titleColor: 'text-blue-800',
+      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+      borderColor: 'border-blue-200 dark:border-blue-800',
+      iconColor: 'text-blue-500 dark:text-blue-400',
+      titleColor: 'text-blue-800 dark:text-blue-300',
       messageColor: 'text-blue-700'
     },
     success: {
       icon: CheckCircle,
-      bgColor: 'bg-green-50',
-      borderColor: 'border-green-200',
-      iconColor: 'text-green-500',
-      titleColor: 'text-green-800',
+      bgColor: 'bg-green-50 dark:bg-green-900/20',
+      borderColor: 'border-green-200 dark:border-green-800',
+      iconColor: 'text-green-500 dark:text-green-400',
+      titleColor: 'text-green-800 dark:text-green-300',
       messageColor: 'text-green-700'
     }
   }
@@ -100,7 +100,7 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({
                     'px-3 py-1.5 text-sm font-medium rounded-md transition-colors',
                     action.variant === 'primary'
                       ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                      : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700'
                   )}
                 >
                   {action.label}
@@ -113,7 +113,7 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({
         {onDismiss && (
           <button
             onClick={onDismiss}
-            className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+            className="text-gray-400 hover:text-gray-600 dark:text-slate-400 transition-colors flex-shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -185,16 +185,16 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   return (
     <div className={cn('text-center py-12', className)}>
       {icon && (
-        <div className="flex justify-center mb-4 text-gray-400">
+        <div className="flex justify-center mb-4 text-gray-400 dark:text-slate-500">
           {icon}
         </div>
       )}
       
-      <h3 className="text-lg font-medium text-gray-900 mb-2">
+      <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-2">
         {title}
       </h3>
       
-      <p className="text-sm text-gray-600 mb-6 max-w-md mx-auto">
+      <p className="text-sm text-gray-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
         {description}
       </p>
       

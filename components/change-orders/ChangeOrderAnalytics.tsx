@@ -51,7 +51,7 @@ export default function ChangeOrderAnalytics({ projectId }: ChangeOrderAnalytics
       <TrendAnalysisChart trends={[]} />
       {recent.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Recent Change Orders</h4>
+          <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Recent Change Orders</h4>
           <div className="space-y-2">
             {recent.slice(0, 5).map((co) => (
               <div key={co.id} className="flex justify-between items-center p-2 border rounded">

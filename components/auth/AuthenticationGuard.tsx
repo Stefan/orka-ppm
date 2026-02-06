@@ -164,16 +164,16 @@ export const AuthenticationGuard: React.FC<AuthenticationGuardProps> = ({
   // Show loading state
   if (authState.isLoading && showLoadingSpinner) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-800/50 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-              <Loader className="w-8 h-8 text-blue-600 animate-spin" />
+            <div className="mx-auto mb-4 w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+              <Loader className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-spin" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100">
               Authenticating...
             </h2>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-slate-400">
               Please wait while we verify your session
             </p>
           </CardHeader>
@@ -198,20 +198,20 @@ export const AuthenticationGuard: React.FC<AuthenticationGuardProps> = ({
 
     // Default authentication error UI
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-800/50 flex items-center justify-center p-4">
         <Card className="w-full max-w-lg">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+            <div className="mx-auto mb-4 w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
               {authState.hasTimedOut ? (
-                <AlertTriangle className="w-8 h-8 text-red-600" />
+                <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
               ) : (
-                <Shield className="w-8 h-8 text-red-600" />
+                <Shield className="w-8 h-8 text-red-600 dark:text-red-400" />
               )}
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
               {authState.hasTimedOut ? 'Authentication Timeout' : 'Authentication Required'}
             </h2>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-slate-400">
               {authState.hasTimedOut 
                 ? 'Authentication is taking longer than expected. Please try again.'
                 : authState.error 
@@ -223,12 +223,12 @@ export const AuthenticationGuard: React.FC<AuthenticationGuardProps> = ({
           
           <CardContent className="space-y-4">
             {authState.error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
                 <p className="text-sm text-red-700">
                   <strong>Error:</strong> {authState.error.message}
                 </p>
                 {authState.retryCount > 0 && (
-                  <p className="text-xs text-red-600 mt-1">
+                  <p className="text-xs text-red-600 dark:text-red-400 mt-1">
                     Retry attempts: {authState.retryCount}/{retryAttempts}
                   </p>
                 )}
@@ -259,7 +259,7 @@ export const AuthenticationGuard: React.FC<AuthenticationGuardProps> = ({
 
             {enableGuestMode && (
               <div className="pt-4 border-t">
-                <p className="text-sm text-gray-600 text-center mb-3">
+                <p className="text-sm text-gray-600 dark:text-slate-400 text-center mb-3">
                   Or continue with limited functionality
                 </p>
                 <Button
@@ -280,11 +280,11 @@ export const AuthenticationGuard: React.FC<AuthenticationGuardProps> = ({
 
             {process.env.NODE_ENV === 'development' && (
               <details className="mt-4">
-                <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900">
+                <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100">
                   Debug Information
                 </summary>
-                <div className="mt-2 p-3 bg-gray-100 rounded-md">
-                  <pre className="text-xs text-gray-800 whitespace-pre-wrap">
+                <div className="mt-2 p-3 bg-gray-100 dark:bg-slate-700 rounded-md">
+                  <pre className="text-xs text-gray-800 dark:text-slate-200 whitespace-pre-wrap">
                     {JSON.stringify({
                       hasSession: !!session,
                       hasUser: !!user,

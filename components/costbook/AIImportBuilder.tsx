@@ -38,15 +38,15 @@ export function AIImportBuilder({ onImport, onClose, className = '' }: AIImportB
   const mapping = Object.fromEntries(suggestions.map(s => [s.csvHeader, s.suggestedSchemaColumn]))
 
   return (
-    <div className={`bg-white rounded-lg shadow-lg p-6 max-w-xl ${className}`}>
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">AI Import Builder</h2>
+    <div className={`bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 max-w-xl ${className}`}>
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">AI Import Builder</h2>
       <div className="flex gap-2 mb-6">
         {STEPS.map((s, i) => (
           <button
             key={s}
             type="button"
             onClick={() => setStep(i)}
-            className={`px-3 py-1 rounded text-sm ${step === i ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'}`}
+            className={`px-3 py-1 rounded text-sm ${step === i ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300'}`}
           >
             {s}
           </button>
@@ -54,17 +54,17 @@ export function AIImportBuilder({ onImport, onClose, className = '' }: AIImportB
       </div>
       {step === 0 && (
         <div>
-          <label className="block text-sm text-gray-600 mb-2">Select CSV file</label>
+          <label className="block text-sm text-gray-600 dark:text-slate-400 mb-2">Select CSV file</label>
           <input type="file" accept=".csv" onChange={handleFileSelect} className="block w-full text-sm" />
         </div>
       )}
       {step === 1 && (
         <div className="space-y-2">
-          <p className="text-sm text-gray-600">Suggested mapping (confidence)</p>
+          <p className="text-sm text-gray-600 dark:text-slate-400">Suggested mapping (confidence)</p>
           {suggestions.map((s) => (
             <div key={s.csvHeader} className="flex justify-between text-sm">
-              <span className="text-gray-700">{s.csvHeader}</span>
-              <span className="text-gray-500">{s.suggestedSchemaColumn} ({(s.confidence * 100).toFixed(0)}%)</span>
+              <span className="text-gray-700 dark:text-slate-300">{s.csvHeader}</span>
+              <span className="text-gray-500 dark:text-slate-400">{s.suggestedSchemaColumn} ({(s.confidence * 100).toFixed(0)}%)</span>
             </div>
           ))}
           <button type="button" onClick={() => setStep(2)} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
@@ -74,17 +74,17 @@ export function AIImportBuilder({ onImport, onClose, className = '' }: AIImportB
       )}
       {step === 2 && (
         <div>
-          <p className="text-sm text-gray-600 mb-2">Preview mapping and import.</p>
+          <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">Preview mapping and import.</p>
           <button type="button" onClick={() => { setStep(3); onImport?.(mapping); }} className="px-4 py-2 bg-blue-600 text-white rounded">
             Import
           </button>
         </div>
       )}
       {step === 3 && (
-        <div className="text-green-600">Import complete.</div>
+        <div className="text-green-600 dark:text-green-400">Import complete.</div>
       )}
       {onClose && (
-        <button type="button" onClick={onClose} className="mt-4 text-sm text-gray-500">
+        <button type="button" onClick={onClose} className="mt-4 text-sm text-gray-500 dark:text-slate-400">
           Close
         </button>
       )}

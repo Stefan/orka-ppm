@@ -40,8 +40,8 @@ const DashboardCharts = memo(({ projects }: DashboardChartsProps) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Budget Chart */}
-      <ContentReservoir reserveHeight={400} className="bg-white p-6 rounded-lg shadow-sm">
-        <h3 className="text-lg font-semibold mb-4">Budget Overview</h3>
+      <ContentReservoir reserveHeight={400} className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-slate-100">Budget Overview</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData}>
             <XAxis dataKey="name" />
@@ -55,8 +55,8 @@ const DashboardCharts = memo(({ projects }: DashboardChartsProps) => {
       </ContentReservoir>
 
       {/* Status Distribution */}
-      <ContentReservoir reserveHeight={400} className="bg-white p-6 rounded-lg shadow-sm">
-        <h3 className="text-lg font-semibold mb-4">Project Status</h3>
+      <ContentReservoir reserveHeight={400} className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-slate-100">Project Status</h3>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie

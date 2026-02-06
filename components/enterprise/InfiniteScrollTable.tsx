@@ -59,12 +59,12 @@ export function InfiniteScrollTable<T>({
 
   return (
     <div className={`overflow-auto ${className}`}>
-      <table className="min-w-full divide-y divide-gray-200">
-        {header && <thead className="bg-gray-50">{header}</thead>}
-        <tbody className="bg-white divide-y divide-gray-200">
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+        {header && <thead className="bg-gray-50 dark:bg-slate-800/50">{header}</thead>}
+        <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
           {items.length === 0 && !loading && (
             <tr>
-              <td colSpan={100} className="px-4 py-8 text-center text-gray-500">
+              <td colSpan={100} className="px-4 py-8 text-center text-gray-500 dark:text-slate-400">
                 {emptyMessage}
               </td>
             </tr>

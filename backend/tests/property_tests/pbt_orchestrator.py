@@ -340,24 +340,30 @@ class TestOrchestrator:
         """Execute a backend test suite using pytest"""
         start_time = time.time()
         
-        # Construct pytest command
+        # Construct pytest command; run from backend/ so imports (e.g. monte_carlo) resolve
         test_file = self.backend_test_dir / f"{suite_name}.py"
+        backend_root = self.backend_test_dir.parent.parent
+        backend_root_abs = backend_root.resolve()
+        try:
+            test_path = str(test_file.relative_to(backend_root))
+        except ValueError:
+            test_path = str(test_file)
+        json_report_path = self.output_dir / f"{suite_name}_report.json"
         cmd = [
             sys.executable, "-m", "pytest",
-            str(test_file),
+            test_path,
             "-v",
             "--tb=short",
             "--json-report",
-            f"--json-report-file={self.output_dir / f'{suite_name}_report.json'}"
+            f"--json-report-file={json_report_path}"
         ]
         
         try:
-            # Run pytest
             process = await asyncio.create_subprocess_exec(
                 *cmd,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
-                cwd=self.backend_test_dir.parent
+                cwd=str(backend_root_abs)
             )
             
             stdout, stderr = await process.communicate()
@@ -413,11 +419,13 @@ class TestOrchestrator:
         
         try:
             # Run Jest
+            # Run from project root so npm test and Jest config resolve correctly
+            frontend_cwd = self.frontend_test_dir.parent
             process = await asyncio.create_subprocess_exec(
                 *cmd,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
-                cwd=self.frontend_test_dir.parent.parent
+                cwd=str(frontend_cwd)
             )
             
             stdout, stderr = await process.communicate()
@@ -705,6 +713,13 @@ class TestOrchestrator:
         return "\n".join(lines)
 
 
+def _project_root() -> Path:
+    """Resolve project root (repo root) from this script's location. Always returns an absolute path."""
+    script_dir = Path(__file__).resolve().parent
+    # backend/tests/property_tests -> backend/tests -> backend -> repo root
+    return script_dir.parent.parent.parent.resolve()
+
+
 # Convenience function for running orchestration
 async def run_orchestration(
     backend_test_dir: str = "backend/tests/property_tests",
@@ -719,9 +734,9 @@ async def run_orchestration(
     Run property-based test orchestration.
     
     Args:
-        backend_test_dir: Path to backend property tests
-        frontend_test_dir: Path to frontend tests
-        output_dir: Path for test reports
+        backend_test_dir: Path to backend property tests (relative to project root)
+        frontend_test_dir: Path to frontend tests (relative to project root)
+        output_dir: Path for test reports (relative to project root)
         parallel: Run backend/frontend in parallel
         verbose: Enable verbose output
         backend_only: Run only backend tests
@@ -730,10 +745,14 @@ async def run_orchestration(
     Returns:
         Complete orchestration report
     """
+    root = _project_root()
+    backend_path = Path(backend_test_dir) if Path(backend_test_dir).is_absolute() else root / backend_test_dir
+    frontend_path = Path(frontend_test_dir) if Path(frontend_test_dir).is_absolute() else root / frontend_test_dir
+    out_path = Path(output_dir) if Path(output_dir).is_absolute() else root / output_dir
     orchestrator = TestOrchestrator(
-        backend_test_dir=Path(backend_test_dir),
-        frontend_test_dir=Path(frontend_test_dir),
-        output_dir=Path(output_dir),
+        backend_test_dir=backend_path,
+        frontend_test_dir=frontend_path,
+        output_dir=out_path,
         parallel_execution=parallel,
         verbose=verbose
     )

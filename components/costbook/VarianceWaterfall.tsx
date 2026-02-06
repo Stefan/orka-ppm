@@ -158,10 +158,10 @@ export function VarianceWaterfall({
       className={`w-full ${className}`} 
       data-testid={testId}
     >
-      <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+      <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2 flex items-center gap-2">
         <span>Budget Variance Breakdown</span>
         <span className={`text-xs px-2 py-0.5 rounded-full ${
-          variance >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+          variance >= 0 ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-700'
         }`}>
           {variance >= 0 ? 'Under Budget' : 'Over Budget'}
         </span>
@@ -198,19 +198,19 @@ export function VarianceWaterfall({
       <div className="flex flex-wrap justify-center gap-4 mt-2 text-xs">
         <div className="flex items-center gap-1">
           <span className="w-3 h-3 bg-blue-500 rounded" />
-          <span className="text-gray-600">Budget</span>
+          <span className="text-gray-600 dark:text-slate-400">Budget</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="w-3 h-3 bg-orange-500 rounded" />
-          <span className="text-gray-600">Commitments</span>
+          <span className="text-gray-600 dark:text-slate-400">Commitments</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="w-3 h-3 bg-purple-500 rounded" />
-          <span className="text-gray-600">Actuals</span>
+          <span className="text-gray-600 dark:text-slate-400">Actuals</span>
         </div>
         <div className="flex items-center gap-1">
           <span className={`w-3 h-3 ${variance >= 0 ? 'bg-green-500' : 'bg-red-500'} rounded`} />
-          <span className="text-gray-600">Variance</span>
+          <span className="text-gray-600 dark:text-slate-400">Variance</span>
         </div>
       </div>
     </div>

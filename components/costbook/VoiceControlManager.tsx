@@ -42,13 +42,13 @@ export function VoiceControlManager({ onCommand, className = '' }: VoiceControlM
       <button
         type="button"
         onClick={toggle}
-        className={`p-2 rounded-full ${listening ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}`}
+        className={`p-2 rounded-full ${listening ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400' : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300'}`}
         title={listening ? 'Stop listening' : 'Start voice control'}
       >
         {listening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
       </button>
       {lastCommand && lastCommand.type !== 'unknown' && (
-        <span className="text-xs text-gray-500">Last: {lastCommand.type}</span>
+        <span className="text-xs text-gray-500 dark:text-slate-400">Last: {lastCommand.type}</span>
       )}
     </div>
   )

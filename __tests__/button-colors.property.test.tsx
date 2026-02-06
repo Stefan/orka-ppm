@@ -70,9 +70,24 @@ describe('Button Color Property Tests', () => {
             'active:bg-gray-800', 'active:bg-gray-900'
           ]
           
+          // Dark mode variants (added by dark mode compliance)
+          const validDarkColors = [
+            // Slate (dark mode equivalents of gray)
+            'dark:bg-slate-700', 'dark:bg-slate-800', 'dark:bg-slate-800/50',
+            'dark:text-slate-100', 'dark:text-slate-200', 'dark:text-slate-300',
+            'dark:text-slate-400', 'dark:text-slate-500',
+            'dark:border-slate-600', 'dark:border-slate-700',
+            'dark:hover:bg-slate-600', 'dark:hover:bg-slate-700',
+            // Blue dark variants
+            'dark:text-blue-400', 'dark:bg-blue-900/30',
+            // Red dark variants
+            'dark:text-red-400', 'dark:bg-red-900/30',
+          ]
+
           const validColors = [
             ...validBlueColors,
             ...validGrayColors,
+            ...validDarkColors,
             'text-white', // White is a standard color
             'bg-transparent' // Transparent for outline variant
           ]

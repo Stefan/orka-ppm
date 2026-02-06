@@ -35,12 +35,12 @@ export default function NestedGrid({
   return (
     <div className="overflow-auto max-h-48">
       <table className="min-w-full border-collapse text-sm">
-        <thead className="bg-gray-100">
+        <thead className="bg-gray-100 dark:bg-slate-700">
           <tr>
             {columns.map((col) => (
               <th
                 key={col.id}
-                className="border-b border-gray-200 px-2 py-1.5 text-left text-xs font-medium text-gray-600"
+                className="border-b border-gray-200 dark:border-slate-700 px-2 py-1.5 text-left text-xs font-medium text-gray-600 dark:text-slate-400"
               >
                 {col.headerName}
               </th>
@@ -49,7 +49,7 @@ export default function NestedGrid({
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={(row.id as string) ?? i} className="border-b border-gray-100 hover:bg-gray-50">
+            <tr key={(row.id as string) ?? i} className="border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
               {columns.map((col) => (
                 <td key={col.id} className="px-2 py-1.5">
                   {getCellValue(row, col)}
@@ -60,7 +60,7 @@ export default function NestedGrid({
         </tbody>
       </table>
       {rows.length === 0 && (
-        <div className="p-4 text-sm text-gray-400 text-center">No items</div>
+        <div className="p-4 text-sm text-gray-400 dark:text-slate-500 text-center">No items</div>
       )}
     </div>
   )

@@ -119,15 +119,15 @@ export function ImageWithStabilizedLayout({
           {...props}
         />
       ) : (
-        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-          <div className="text-gray-400 text-sm">Image not available</div>
+        <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center">
+          <div className="text-gray-400 dark:text-slate-500 text-sm">Image not available</div>
         </div>
       )}
       
       {/* Loading placeholder */}
       {!isLoaded && !hasError && (
-        <div className="absolute inset-0 bg-gray-100 animate-pulse flex items-center justify-center">
-          <div className="text-gray-400 text-sm">Loading...</div>
+        <div className="absolute inset-0 bg-gray-100 dark:bg-slate-700 animate-pulse flex items-center justify-center">
+          <div className="text-gray-400 dark:text-slate-500 text-sm">Loading...</div>
         </div>
       )}
     </div>

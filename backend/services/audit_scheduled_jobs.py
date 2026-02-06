@@ -4,10 +4,12 @@ Audit Trail Scheduled Jobs
 This module implements the scheduled job functions for the AI-Empowered Audit Trail feature.
 These jobs are executed by the AuditScheduler at configured intervals.
 
-Requirements: 1.1, 1.4, 1.5, 1.6, 3.10, 4.11, 5.9, 5.10
+Requirements: 1.1, 1.4, 1.5, 1.6, 3.10, 4.11, 5.9, 5.10, 10.9
 """
 
+import json
 import logging
+import time
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 from uuid import UUID
@@ -78,6 +80,7 @@ class AuditScheduledJobs:
         """
         try:
             logger.info("Starting scheduled anomaly detection job")
+            t0 = time.perf_counter()
             
             # Define time range (last 24 hours)
             end_time = datetime.now()
@@ -104,6 +107,17 @@ class AuditScheduledJobs:
                 except Exception as e:
                     logger.error(f"Failed to process anomaly {anomaly.id}: {str(e)}")
                     continue
+            
+            elapsed_ms = int((time.perf_counter() - t0) * 1000)
+            if self.redis:
+                try:
+                    self.redis.setex(
+                        "audit:metrics:anomaly_detection_latency_ms",
+                        86400,
+                        json.dumps(elapsed_ms)
+                    )
+                except Exception as e:
+                    logger.debug("Could not store anomaly latency metric: %s", e)
             
             logger.info("Completed scheduled anomaly detection job")
             

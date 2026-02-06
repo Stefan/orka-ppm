@@ -634,166 +634,176 @@
       "editor": "Editor",
       "insights": "Iisichte",
       "collaboration": "Zämmearbet"
-    }
-  },
-  "pmr.insights": {
-    "title": "AI-Iisichte",
-    "refresh": "Aktualisiere",
-    "generating": "Iisichte wärde generiert...",
-    "noInsights": "Kei Iisichte verfüegbar",
-    "generateInsights": "Iisichte generiere",
-    "totalInsights": "Alli Iisichte",
-    "validated": "Validiert",
-    "highPriority": "Hohi Priorität",
-    "filters": {
-      "toggle": "Filter umschalte",
-      "categories": "Kategorie",
-      "minConfidence": "Min. Vertraue",
-      "clearAll": "Alli Filter lösche"
-    },
-    "categories": {
-      "budget": "Budget",
-      "schedule": "Zyytplan",
-      "resource": "Ressurse",
-      "risk": "Risiko",
-      "quality": "Qualität"
-    },
-    "types": {
-      "prediction": "Vorhersag",
-      "recommendation": "Empfählig",
-      "alert": "Alarm",
-      "summary": "Zämmefassig"
-    },
-    "priorities": {
-      "low": "nidrig",
-      "medium": "mittel",
-      "high": "hoch",
-      "critical": "kritisch"
-    },
-    "card": {
-      "confidence": "{percent}% Vertraue",
-      "validated": "Validiert",
-      "details": "Details",
-      "predictedImpact": "Vorhergsaiti Uuswirkig",
-      "recommendedActions": "Empfohleni Massnahme",
-      "supportingData": "Unterstützendi Date",
-      "validationNotes": "Validierigs-Notize",
-      "validate": "Validiere",
-      "markInvalid": "Als ungültig markiere",
-      "apply": "Aawände",
-      "markHelpful": "Als hilfryych markiere",
-      "markNotHelpful": "Als nöd hilfryych markiere"
-    }
-  },
-  "pmr.collaboration": {
-    "title": "Zämmearbet",
-    "tabs": {
-      "users": "Benutzer",
-      "comments": "Kommentär",
-      "conflicts": "Konflikte"
-    },
-    "users": {
-      "you": "(Du)",
-      "active": "Aktiv {time}",
-      "noUsers": "Kei anderi Benutzer online"
-    },
-    "comments": {
-      "sectionPlaceholder": "Abschnitts-ID (z.B. executive-summary)",
-      "addPlaceholder": "Kommentär hinzuefüege...",
-      "sendComment": "Kommentär schicke",
-      "on": "bi {section}",
-      "resolveComment": "Kommentär uuflöse",
-      "noComments": "No kei Kommentär"
-    },
-    "conflicts": {
-      "types": {
-        "simultaneousEdit": "Glyychzyytigi Bearbeitigs-Konflikt",
-        "versionMismatch": "Versions-Konflikt",
-        "permissionConflict": "Berechtigungs-Konflikt"
-      },
-      "section": "Abschnitt: {section}",
-      "usersConflicting": "{count} Benutzer händ widersprüüchlichi Änderige gmacht",
-      "conflictingChanges": "Widersprüüchlichi Änderige:",
-      "user": "Benutzer: {userId}",
-      "resolve": "Konflikt uuflöse:",
-      "useLatest": "Nöischti verwände",
-      "mergeChanges": "Änderige zämmefüehre",
-      "resolveManually": "Manuell uuflöse",
-      "noConflicts": "Kei Konflikte erkannt"
-    },
-    "footer": {
-      "online": "{count} online",
-      "comments": "{count} Kommentär",
-      "conflicts": "{count} Konflikte"
-    },
-    "time": {
-      "justNow": "Grad äbe",
-      "minutesAgo": "vor {minutes}m",
-      "hoursAgo": "vor {hours}h"
-    }
-  },
-  "pmr.export": {
-    "title": "Bricht exportiere",
-    "subtitle": "Konfiguriere und exportiere diin PMR-Bricht in mehrere Formate",
-    "tabs": {
-      "configure": "Export konfiguriere",
-      "queue": "Export-Warteschlange"
-    },
-    "formats": {
-      "label": "Exportformat",
-      "pdf": "PDF-Dokumänt",
-      "excel": "Excel-Tabälle",
-      "powerpoint": "PowerPoint-Präsentation",
-      "word": "Word-Dokumänt"
-    },
-    "templates": {
-      "label": "Vorlag (Optional)",
-      "default": "Standardvorlag",
-      "defaultDescription": "Standardformat mit allne Abschnitt",
-      "recommended": "Empfohle"
-    },
-    "options": {
-      "label": "Exportoptione",
-      "includeCharts": "Diagramm und Visualisierige iischliesse",
-      "includeRawData": "Rohdatetabälle iischliesse"
     },
     "sections": {
-      "label": "Iizschliessendi Abschnitt",
-      "selectAll": "Alli uuswähle",
-      "deselectAll": "Alli abwähle"
+      "executive-summary": "Läitigssummary",
+      "budget-status": "Budget-Status"
     },
-    "branding": {
-      "label": "Branding (Optional)",
-      "companyName": "Firmename",
-      "companyNamePlaceholder": "Firmename iigää",
-      "logoUrl": "Logo-URL",
-      "logoUrlPlaceholder": "https://byschpil.ch/logo.png",
-      "colorScheme": "Farbschema",
-      "schemes": {
-        "corporateBlue": "Unternehmensblau",
-        "professionalGray": "Professionells Grau",
-        "modernGreen": "Modärns Grüen"
+    "placeholderContent": {
+      "executive-summary": "Das isch dr Abschnitt Läitigssummary...",
+      "budget-status": "Budget-Performance-Analyse...",
+      "reportTitle": "Projäkt-Monatsbericht Januar 2026",
+      "reportTitleTemplate": "Projäkt-Monatsbericht {month} {year}"
+    },
+    "insights": {
+      "title": "AI-Iisichte",
+      "refresh": "Aktualisiere",
+      "generating": "Iisichte wärde generiert...",
+      "noInsights": "Kei Iisichte verfüegbar",
+      "generateInsights": "Iisichte generiere",
+      "totalInsights": "Alli Iisichte",
+      "validated": "Validiert",
+      "highPriority": "Hohi Priorität",
+      "filters": {
+        "toggle": "Filter umschalte",
+        "categories": "Kategorie",
+        "minConfidence": "Min. Vertraue",
+        "clearAll": "Alli Filter lösche"
+      },
+      "categories": {
+        "budget": "Budget",
+        "schedule": "Zyytplan",
+        "resource": "Ressurse",
+        "risk": "Risiko",
+        "quality": "Qualität"
+      },
+      "types": {
+        "prediction": "Vorhersag",
+        "recommendation": "Empfählig",
+        "alert": "Alarm",
+        "summary": "Zämmefassig"
+      },
+      "priorities": {
+        "low": "nidrig",
+        "medium": "mittel",
+        "high": "hoch",
+        "critical": "kritisch"
+      },
+      "card": {
+        "confidence": "{percent}% Vertraue",
+        "validated": "Validiert",
+        "details": "Details",
+        "predictedImpact": "Vorhergsaiti Uuswirkig",
+        "recommendedActions": "Empfohleni Massnahme",
+        "supportingData": "Unterstützendi Date",
+        "validationNotes": "Validierigs-Notize",
+        "validate": "Validiere",
+        "markInvalid": "Als ungültig markiere",
+        "apply": "Aawände",
+        "markHelpful": "Als hilfryych markiere",
+        "markNotHelpful": "Als nöd hilfryych markiere"
       }
     },
-    "actions": {
-      "export": "Als {format} exportiere",
-      "exporting": "Am Exportiere...",
-      "download": "Abelade",
-      "cancel": "Abbreche",
-      "delete": "Lösche"
+    "collaboration": {
+      "title": "Zämmearbet",
+      "tabs": {
+        "users": "Benutzer",
+        "comments": "Kommentär",
+        "conflicts": "Konflikte"
+      },
+      "users": {
+        "you": "(Du)",
+        "active": "Aktiv {time}",
+        "noUsers": "Kei anderi Benutzer online"
+      },
+      "comments": {
+        "sectionPlaceholder": "Abschnitts-ID (z.B. executive-summary)",
+        "addPlaceholder": "Kommentär hinzuefüege...",
+        "sendComment": "Kommentär schicke",
+        "on": "bi {section}",
+        "resolveComment": "Kommentär uuflöse",
+        "noComments": "No kei Kommentär"
+      },
+      "conflicts": {
+        "types": {
+          "simultaneousEdit": "Glyychzyytigi Bearbeitigs-Konflikt",
+          "versionMismatch": "Versions-Konflikt",
+          "permissionConflict": "Berechtigungs-Konflikt"
+        },
+        "section": "Abschnitt: {section}",
+        "usersConflicting": "{count} Benutzer händ widersprüüchlichi Änderige gmacht",
+        "conflictingChanges": "Widersprüüchlichi Änderige:",
+        "user": "Benutzer: {userId}",
+        "resolve": "Konflikt uuflöse:",
+        "useLatest": "Nöischti verwände",
+        "mergeChanges": "Änderige zämmefüehre",
+        "resolveManually": "Manuell uuflöse",
+        "noConflicts": "Kei Konflikte erkannt"
+      },
+      "footer": {
+        "online": "{count} online",
+        "comments": "{count} Kommentär",
+        "conflicts": "{count} Konflikte"
+      },
+      "time": {
+        "justNow": "Grad äbe",
+        "minutesAgo": "vor {minutes}m",
+        "hoursAgo": "vor {hours}h"
+      }
     },
-    "queue": {
-      "empty": "No kei Exporte",
-      "emptyDescription": "Konfiguriere und starte en Export, zum ihn do z'gseh",
-      "started": "Gstartet {date}",
-      "fileSize": "Dateigrössi: {size} KB",
-      "error": "Fähler: {message}"
-    },
-    "status": {
-      "queued": "I de Warteschlange",
-      "processing": "Wird verarbeitet",
-      "completed": "Abgschlosse",
-      "failed": "Fählgschlage"
+    "export": {
+      "title": "Bricht exportiere",
+      "subtitle": "Konfiguriere und exportiere diin PMR-Bricht in mehrere Formate",
+      "tabs": {
+        "configure": "Export konfiguriere",
+        "queue": "Export-Warteschlange"
+      },
+      "formats": {
+        "label": "Exportformat",
+        "pdf": "PDF-Dokumänt",
+        "excel": "Excel-Tabälle",
+        "powerpoint": "PowerPoint-Präsentation",
+        "word": "Word-Dokumänt"
+      },
+      "templates": {
+        "label": "Vorlag (Optional)",
+        "default": "Standardvorlag",
+        "defaultDescription": "Standardformat mit allne Abschnitt",
+        "recommended": "Empfohle"
+      },
+      "options": {
+        "label": "Exportoptione",
+        "includeCharts": "Diagramm und Visualisierige iischliesse",
+        "includeRawData": "Rohdatetabälle iischliesse"
+      },
+      "sections": {
+        "label": "Iizschliessendi Abschnitt",
+        "selectAll": "Alli uuswähle",
+        "deselectAll": "Alli abwähle"
+      },
+      "branding": {
+        "label": "Branding (Optional)",
+        "companyName": "Firmename",
+        "companyNamePlaceholder": "Firmename iigää",
+        "logoUrl": "Logo-URL",
+        "logoUrlPlaceholder": "https://byschpil.ch/logo.png",
+        "colorScheme": "Farbschema",
+        "schemes": {
+          "corporateBlue": "Unternehmensblau",
+          "professionalGray": "Professionells Grau",
+          "modernGreen": "Modärns Grüen"
+        }
+      },
+      "actions": {
+        "export": "Als {format} exportiere",
+        "exporting": "Am Exportiere...",
+        "download": "Abelade",
+        "cancel": "Abbreche",
+        "delete": "Lösche"
+      },
+      "queue": {
+        "empty": "No kei Exporte",
+        "emptyDescription": "Konfiguriere und starte en Export, zum ihn do z'gseh",
+        "started": "Gstartet {date}",
+        "fileSize": "Dateigrössi: {size} KB",
+        "error": "Fähler: {message}"
+      },
+      "status": {
+        "queued": "I de Warteschlange",
+        "processing": "Wird verarbeitet",
+        "completed": "Abgschlosse",
+        "failed": "Fählgschlage"
+      }
     }
   },
   "feedback": {

@@ -1,9 +1,11 @@
 /**
  * Offline Changes Sync API Endpoint
  * Handles synchronization of changes made while offline
+ * Requires Authorization: Bearer <token>. UserId in body/query must match token sub.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { enforceSyncAuth } from '@/lib/auth/verify-jwt'
 
 interface OfflineChange {
   id: string
@@ -22,12 +24,19 @@ const offlineChanges = new Map<string, OfflineChange[]>()
 
 export async function POST(request: NextRequest) {
   try {
-    const change: OfflineChange = await request.json()
-    
+    const change: OfflineChange = await request.json().catch(() => ({}))
     if (!change.userId || !change.deviceId || !change.type || !change.entity) {
       return NextResponse.json({
         error: 'Missing required fields: userId, deviceId, type, entity'
       }, { status: 400 })
+    }
+
+    const auth = await enforceSyncAuth(request.headers.get('Authorization'), change.userId)
+    if (auth instanceof Response) {
+      return NextResponse.json(
+        (await auth.json().catch(() => ({ error: 'Unauthorized' }))) as { error: string },
+        { status: auth.status }
+      )
     }
 
     // Get existing changes for user or initialize empty array
@@ -62,14 +71,16 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const userId = searchParams.get('userId')
-    
-    if (!userId) {
-      return NextResponse.json({
-        error: 'Missing required parameter: userId'
-      }, { status: 400 })
+    const queryUserId = searchParams.get('userId')
+    const auth = await enforceSyncAuth(request.headers.get('Authorization'), queryUserId)
+    if (auth instanceof Response) {
+      return NextResponse.json(
+        (await auth.json().catch(() => ({ error: 'Unauthorized' }))) as { error: string },
+        { status: auth.status }
+      )
     }
-    
+    const userId = auth.userId
+
     const userChanges = offlineChanges.get(userId) || []
     
     return NextResponse.json({

@@ -22,8 +22,7 @@ import {
   Target,
   Calendar,
   BookOpen,
-  Upload,
-  WifiOff
+  Upload
 } from 'lucide-react'
 
 export interface MobileNavProps {
@@ -38,13 +37,13 @@ const NAV_ITEMS = [
   // Projects & Resources
   { href: '/projects', label: 'All Projects', icon: GitBranch, group: 'Projects' },
   { href: '/resources', label: 'Resource Management', icon: Users, group: 'Projects' },
-  { href: '/import', label: 'Import', icon: Upload, group: 'Projects' },
+  { href: '/projects/import', label: 'Import', icon: Upload, group: 'Projects' },
 
   // Financial Management
   { href: '/financials', label: 'Budget & Cost Tracking', icon: DollarSign, group: 'Financials' },
   { href: '/reports', label: 'Reports & Analytics', icon: FileText, group: 'Financials' },
   { href: '/project-controls', label: 'Project Controls (ETC/EAC)', icon: Target, group: 'Financials' },
-  { href: '/reports/pmr', label: 'PMR Report', icon: BookOpen, group: 'Financials' },
+  { href: '/reports/pmr', label: 'Project Monthly Report', shortLabel: 'PMR', icon: BookOpen, group: 'Financials' },
 
   // Risk & Analysis
   { href: '/risks', label: 'Risk Management', icon: AlertTriangle, group: 'Analysis' },
@@ -57,7 +56,6 @@ const NAV_ITEMS = [
   { href: '/changes', label: 'Change Management', icon: GitPullRequest, group: 'Management' },
   { href: '/feedback', label: 'Feedback & Ideas', icon: MessageSquare, group: 'Management' },
   { href: '/features', label: 'Features Overview', icon: Layers, group: 'Management' },
-  { href: '/offline', label: 'Offline Status', icon: WifiOff, group: 'Management' },
   { href: '/settings', label: 'Settings', icon: Settings, group: 'Management' },
 
   // Administration
@@ -165,12 +163,21 @@ export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
                             flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all
                             ${isActive
                               ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium'
-                              : 'text-gray-900 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700'
+                              : 'text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700/80'
                             }
                           `}
                         >
                           <Icon className="h-5 w-5 flex-shrink-0" />
-                          <span className="text-sm">{item.label}</span>
+                          <span className="text-sm">
+                            {'shortLabel' in item && item.shortLabel ? (
+                              <>
+                                <span className="hidden sm:inline">{item.label}</span>
+                                <span className="sm:hidden">{item.shortLabel}</span>
+                              </>
+                            ) : (
+                              item.label
+                            )}
+                          </span>
                         </Link>
                       </li>
                     )

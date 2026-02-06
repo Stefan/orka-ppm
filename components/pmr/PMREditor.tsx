@@ -115,8 +115,8 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
       disabled={disabled}
       className={`p-2 rounded-md transition-colors ${
         isActive
-          ? 'bg-blue-100 text-blue-700'
-          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700'
+          : 'text-gray-600 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100'
       } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       title={title}
     >
@@ -125,11 +125,11 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
   )
 
   return (
-    <div className="border-b border-gray-200 bg-white sticky top-0 z-10">
+    <div className="border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 sticky top-0 z-10">
       <div className="flex items-center justify-between p-2">
         <div className="flex items-center space-x-1">
           {/* Text Formatting */}
-          <div className="flex items-center space-x-1 border-r border-gray-200 pr-2">
+          <div className="flex items-center space-x-1 border-r border-gray-200 dark:border-slate-700 pr-2">
             <ToolbarButton
               onClick={() => editor.chain().focus().toggleBold().run()}
               isActive={editor.isActive('bold')}
@@ -151,7 +151,7 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
           </div>
 
           {/* Headings */}
-          <div className="flex items-center space-x-1 border-r border-gray-200 px-2">
+          <div className="flex items-center space-x-1 border-r border-gray-200 dark:border-slate-700 px-2">
             <ToolbarButton
               onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
               isActive={editor.isActive('heading', { level: 1 })}
@@ -173,7 +173,7 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
           </div>
 
           {/* Lists */}
-          <div className="flex items-center space-x-1 border-r border-gray-200 px-2">
+          <div className="flex items-center space-x-1 border-r border-gray-200 dark:border-slate-700 px-2">
             <ToolbarButton
               onClick={() => editor.chain().focus().toggleBulletList().run()}
               isActive={editor.isActive('bulletList')}
@@ -189,7 +189,7 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
           </div>
 
           {/* Other */}
-          <div className="flex items-center space-x-1 border-r border-gray-200 px-2">
+          <div className="flex items-center space-x-1 border-r border-gray-200 dark:border-slate-700 px-2">
             <ToolbarButton
               onClick={() => editor.chain().focus().toggleBlockquote().run()}
               isActive={editor.isActive('blockquote')}
@@ -217,12 +217,12 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
         {/* Right Side - Stats and Save */}
         <div className="flex items-center space-x-4">
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-gray-500 dark:text-slate-400">
             {wordCount} words · {characterCount} characters
           </div>
           
           {hasUnsavedChanges && (
-            <div className="flex items-center space-x-1 text-xs text-orange-600">
+            <div className="flex items-center space-x-1 text-xs text-orange-600 dark:text-orange-400">
               <AlertCircle className="h-3 w-3" />
               <span>Unsaved changes</span>
             </div>
@@ -267,14 +267,14 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
   const activeCollaborators = collaborators.filter(c => c.section_id === section.section_id)
 
   return (
-    <div className="border border-gray-200 rounded-lg bg-white">
+    <div className="border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800">
       {/* Section Header */}
       <div 
-        className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+        className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 transition-colors"
         onClick={onToggle}
       >
         <div className="flex items-center space-x-3 flex-1">
-          <button className="text-gray-400 hover:text-gray-600">
+          <button className="text-gray-400 hover:text-gray-600 dark:text-slate-400">
             {isExpanded ? (
               <ChevronDown className="h-5 w-5" />
             ) : (
@@ -284,23 +284,23 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
           
           <div className="flex-1">
             <div className="flex items-center space-x-2">
-              <h3 className="text-base font-medium text-gray-900">{section.title}</h3>
+              <h3 className="text-base font-medium text-gray-900 dark:text-slate-100">{section.title}</h3>
               
               {section.ai_generated && (
-                <span className="flex items-center space-x-1 px-2 py-1 text-xs font-medium text-purple-700 bg-purple-100 rounded-full">
+                <span className="flex items-center space-x-1 px-2 py-1 text-xs font-medium text-purple-700 bg-purple-100 dark:bg-purple-900/30 rounded-full">
                   <Sparkles className="h-3 w-3" />
                   <span>AI Generated</span>
                 </span>
               )}
               
               {section.confidence_score !== undefined && (
-                <span className="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
+                <span className="px-2 py-1 text-xs font-medium text-gray-600 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-full">
                   {Math.round(section.confidence_score * 100)}% confidence
                 </span>
               )}
             </div>
             
-            <div className="flex items-center space-x-4 mt-1 text-xs text-gray-500">
+            <div className="flex items-center space-x-4 mt-1 text-xs text-gray-500 dark:text-slate-400">
               <span>Last modified: {new Date(section.last_modified).toLocaleString()}</span>
               <span>By: {section.modified_by}</span>
             </div>
@@ -310,17 +310,17 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
         <div className="flex items-center space-x-2">
           {/* Collaboration Indicators */}
           {activeCollaborators.length > 0 && (
-            <div className="flex items-center space-x-1 px-2 py-1 bg-blue-50 rounded-md">
-              <Users className="h-4 w-4 text-blue-600" />
-              <span className="text-xs text-blue-600">{activeCollaborators.length}</span>
+            <div className="flex items-center space-x-1 px-2 py-1 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+              <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <span className="text-xs text-blue-600 dark:text-blue-400">{activeCollaborators.length}</span>
             </div>
           )}
 
           {/* Conflict Indicator */}
           {hasConflicts && (
-            <div className="flex items-center space-x-1 px-2 py-1 bg-red-50 rounded-md">
-              <AlertCircle className="h-4 w-4 text-red-600" />
-              <span className="text-xs text-red-600">Conflict</span>
+            <div className="flex items-center space-x-1 px-2 py-1 bg-red-50 dark:bg-red-900/20 rounded-md">
+              <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+              <span className="text-xs text-red-600 dark:text-red-400">Conflict</span>
             </div>
           )}
         </div>
@@ -328,12 +328,12 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
 
       {/* Section Content */}
       {isExpanded && (
-        <div className="border-t border-gray-200">
+        <div className="border-t border-gray-200 dark:border-slate-700">
           {/* Conflicts Warning */}
           {hasConflicts && (
-            <div className="p-4 bg-red-50 border-b border-red-200">
+            <div className="p-4 bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800">
               <div className="flex items-start space-x-2">
-                <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <h4 className="text-sm font-medium text-red-900">Editing Conflict Detected</h4>
                   <p className="text-sm text-red-700 mt-1">
@@ -341,7 +341,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
                   </p>
                   <div className="mt-2 space-y-1">
                     {conflicts.map(conflict => (
-                      <div key={conflict.id} className="text-xs text-red-600">
+                      <div key={conflict.id} className="text-xs text-red-600 dark:text-red-400">
                         Conflict with {conflict.conflicting_users.join(', ')}
                       </div>
                     ))}
@@ -353,9 +353,9 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
 
           {/* Active Collaborators */}
           {activeCollaborators.length > 0 && (
-            <div className="p-3 bg-blue-50 border-b border-blue-200">
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800">
               <div className="flex items-center space-x-2">
-                <Users className="h-4 w-4 text-blue-600" />
+                <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 <span className="text-sm text-blue-900">
                   Currently editing: {activeCollaborators.map(c => c.user_name).join(', ')}
                 </span>
@@ -374,23 +374,23 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
           {aiSuggestions.length > 0 && (
             <div className="p-4 bg-purple-50 border-t border-purple-200">
               <div className="flex items-center space-x-2 mb-3">
-                <Sparkles className="h-4 w-4 text-purple-600" />
+                <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                 <h4 className="text-sm font-medium text-purple-900">AI Suggestions</h4>
               </div>
               <div className="space-y-2">
                 {aiSuggestions.map(suggestion => (
-                  <div key={suggestion.id} className="bg-white p-3 rounded-md border border-purple-200">
+                  <div key={suggestion.id} className="bg-white dark:bg-slate-800 p-3 rounded-md border border-purple-200">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h5 className="text-sm font-medium text-gray-900">{suggestion.title}</h5>
-                        <p className="text-sm text-gray-600 mt-1">{suggestion.description}</p>
+                        <h5 className="text-sm font-medium text-gray-900 dark:text-slate-100">{suggestion.title}</h5>
+                        <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">{suggestion.description}</p>
                         {suggestion.preview && (
-                          <div className="mt-2 p-2 bg-gray-50 rounded text-xs text-gray-700">
+                          <div className="mt-2 p-2 bg-gray-50 dark:bg-slate-800/50 rounded text-xs text-gray-700 dark:text-slate-300">
                             {suggestion.preview}
                           </div>
                         )}
                       </div>
-                      <span className="ml-2 px-2 py-1 text-xs font-medium text-purple-700 bg-purple-100 rounded-full">
+                      <span className="ml-2 px-2 py-1 text-xs font-medium text-purple-700 bg-purple-100 dark:bg-purple-900/30 rounded-full">
                         {Math.round(suggestion.confidence * 100)}%
                       </span>
                     </div>
@@ -401,11 +401,11 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
           )}
 
           {/* Section Actions */}
-          <div className="p-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+          <div className="p-4 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between">
             <button
               onClick={onRequestSuggestions}
               disabled={isLoadingSuggestions}
-              className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-purple-700 bg-purple-100 rounded-md hover:bg-purple-200 disabled:opacity-50 transition-colors"
+              className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-purple-700 bg-purple-100 dark:bg-purple-900/30 rounded-md hover:bg-purple-200 disabled:opacity-50 transition-colors"
             >
               {isLoadingSuggestions ? (
                 <>
@@ -422,7 +422,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
 
             <button
               onClick={onSave}
-              className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-colors"
+              className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-100 dark:bg-blue-900/30 rounded-md hover:bg-blue-200 transition-colors"
             >
               <CheckCircle className="h-4 w-4" />
               <span>Save Section</span>
@@ -582,26 +582,26 @@ const PMREditor: React.FC<PMREditorProps> = ({
   const wordCount = editor?.storage.characterCount.words() || 0
 
   return (
-    <div className={`flex flex-col h-full bg-gray-50 ${className}`}>
+    <div className={`flex flex-col h-full bg-gray-50 dark:bg-slate-800/50 ${className}`}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-4">
+      <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">{report.title}</h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100">{report.title}</h2>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
               {report.report_month} {report.report_year} · Version {report.version}
             </p>
           </div>
 
           <div className="flex items-center space-x-2">
             {/* View Mode Toggle */}
-            <div className="flex items-center space-x-1 bg-gray-100 rounded-md p-1">
+            <div className="flex items-center space-x-1 bg-gray-100 dark:bg-slate-700 rounded-md p-1">
               <button
                 onClick={() => setViewMode('edit')}
                 className={`flex items-center space-x-1 px-3 py-1 text-sm font-medium rounded-md transition-colors ${
                   viewMode === 'edit'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100'
                 }`}
               >
                 <Edit3 className="h-4 w-4" />
@@ -611,8 +611,8 @@ const PMREditor: React.FC<PMREditorProps> = ({
                 onClick={() => setViewMode('preview')}
                 className={`flex items-center space-x-1 px-3 py-1 text-sm font-medium rounded-md transition-colors ${
                   viewMode === 'preview'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100'
                 }`}
               >
                 <Eye className="h-4 w-4" />
@@ -622,8 +622,8 @@ const PMREditor: React.FC<PMREditorProps> = ({
 
             {/* Collaboration Status */}
             {collaborationSession && (
-              <div className="flex items-center space-x-2 px-3 py-2 bg-blue-50 rounded-md">
-                <Users className="h-4 w-4 text-blue-600" />
+              <div className="flex items-center space-x-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+                <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 <span className="text-sm text-blue-900">
                   {collaborationSession.participants.length} collaborators
                 </span>

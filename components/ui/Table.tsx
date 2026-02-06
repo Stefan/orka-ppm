@@ -14,7 +14,7 @@ export interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> 
 
 export function Table({ children, className, ...props }: TableProps) {
   return (
-    <div className="w-full overflow-auto rounded-lg border border-gray-200">
+    <div className="w-full overflow-auto rounded-lg border border-gray-200 dark:border-slate-700">
       <table
         className={cn('w-full text-sm', className)}
         {...props}
@@ -27,7 +27,7 @@ export function Table({ children, className, ...props }: TableProps) {
 
 export function TableHeader({ children, className, ...props }: React.HTMLAttributes<HTMLTableSectionElement>) {
   return (
-    <thead className={cn('bg-gray-50 border-b border-gray-200', className)} {...props}>
+    <thead className={cn('bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700', className)} {...props}>
       {children}
     </thead>
   )
@@ -45,7 +45,7 @@ export function TableRow({ children, className, ...props }: React.HTMLAttributes
   return (
     <tr
       className={cn(
-        'transition-colors hover:bg-gray-50',
+        'transition-colors hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50',
         className
       )}
       {...props}
@@ -59,7 +59,7 @@ export function TableHead({ children, className, ...props }: React.ThHTMLAttribu
   return (
     <th
       className={cn(
-        'px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider',
+        'px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider',
         className
       )}
       {...props}
@@ -73,7 +73,7 @@ export function TableCell({ children, className, ...props }: React.TdHTMLAttribu
   return (
     <td
       className={cn(
-        'px-4 py-3 text-gray-900',
+        'px-4 py-3 text-gray-900 dark:text-slate-100',
         className
       )}
       {...props}

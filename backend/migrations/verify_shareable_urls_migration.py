@@ -17,7 +17,7 @@ from pathlib import Path
 backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
 
-from config.database import get_supabase_client
+from config.database import get_db
 from supabase import Client
 
 
@@ -29,7 +29,7 @@ def verify_migration():
     
     # Get database client
     try:
-        supabase: Client = get_supabase_client()
+        supabase: Client = get_db()
         print("✓ Connected to database")
     except Exception as e:
         print(f"✗ Failed to connect to database: {e}")
@@ -137,7 +137,7 @@ def test_basic_operations():
     print("=" * 60)
     
     try:
-        supabase: Client = get_supabase_client()
+        supabase: Client = get_db()
         
         # Test project_shares table structure
         print("\nTesting project_shares table structure...")

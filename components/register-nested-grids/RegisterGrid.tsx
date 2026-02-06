@@ -40,15 +40,15 @@ export default function RegisterGrid<T extends { id: string }>({
   )
 
   return (
-    <div className="overflow-auto rounded-lg border border-gray-200">
+    <div className="overflow-auto rounded-lg border border-gray-200 dark:border-slate-700">
       <table className="min-w-full border-collapse">
-        <thead className="bg-gray-100">
+        <thead className="bg-gray-100 dark:bg-slate-700">
           <tr>
-            <th className="w-10 border-b border-gray-200 p-2" />
+            <th className="w-10 border-b border-gray-200 dark:border-slate-700 p-2" />
             {columns.map((col) => (
               <th
                 key={col.field}
-                className="border-b border-gray-200 px-3 py-2 text-left text-xs font-medium uppercase text-gray-600"
+                className="border-b border-gray-200 dark:border-slate-700 px-3 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-slate-400"
               >
                 {col.headerName}
               </th>
@@ -63,13 +63,13 @@ export default function RegisterGrid<T extends { id: string }>({
 
             return (
               <React.Fragment key={rowId}>
-                <tr className="bg-white hover:bg-gray-50">
-                  <td className="w-10 border-b border-gray-100 p-2">
+                <tr className="bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700">
+                  <td className="w-10 border-b border-gray-100 dark:border-slate-700 p-2">
                     {hasLinked && (
                       <button
                         type="button"
                         onClick={() => handleExpand(rowId)}
-                        className="rounded p-0.5 hover:bg-gray-200"
+                        className="rounded p-0.5 hover:bg-gray-200 dark:hover:bg-slate-600"
                         aria-expanded={expanded}
                         data-testid={`expand-row-${rowId}`}
                       >
@@ -84,7 +84,7 @@ export default function RegisterGrid<T extends { id: string }>({
                   {columns.map((col) => (
                     <td
                       key={col.field}
-                      className="border-b border-gray-100 px-3 py-2 text-sm"
+                      className="border-b border-gray-100 dark:border-slate-700 px-3 py-2 text-sm"
                     >
                       {renderCell(row, col.field)}
                     </td>
@@ -92,7 +92,7 @@ export default function RegisterGrid<T extends { id: string }>({
                 </tr>
                 {expanded && config?.enableLinkedItems && config.sections.length > 0 && (
                   <tr>
-                    <td colSpan={columns.length + 1} className="p-0 bg-gray-50">
+                    <td colSpan={columns.length + 1} className="p-0 bg-gray-50 dark:bg-slate-800/50">
                       <NestedGridContainer
                         parentRowId={rowId}
                         sections={config.sections}

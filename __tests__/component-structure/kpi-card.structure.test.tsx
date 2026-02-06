@@ -15,7 +15,7 @@ import { TrendingUp, TrendingDown, DollarSign, Clock, BarChart3 } from 'lucide-r
 function KPICard({ label, value, change, icon: Icon, color, testId }: any) {
   const isPositive = change >= 0;
   return (
-    <div data-testid={testId} className="bg-white rounded-lg border border-gray-200 px-4 py-3 hover:shadow-md transition-all duration-200 cursor-pointer group">
+    <div data-testid={testId} className="bg-white rounded-lg border border-gray-300 px-4 py-3 hover:shadow-md transition-all duration-200 cursor-pointer group">
       <div className="flex items-center justify-between gap-3">
         <div className="flex-1 min-w-0">
           <p data-testid="kpi-card-label" className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate mb-1">{label}</p>
@@ -276,7 +276,7 @@ describe('Dashboard KPI Card Component Structure', () => {
       expect(card).toHaveClass('bg-white');
       expect(card).toHaveClass('rounded-lg');
       expect(card).toHaveClass('border');
-      expect(card).toHaveClass('border-gray-200');
+      expect(card).toHaveClass('border-gray-300');
     });
 
     it('has hover effects', () => {

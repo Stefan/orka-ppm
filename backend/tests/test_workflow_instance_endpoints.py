@@ -2,6 +2,7 @@
 Tests for workflow instance management endpoints
 
 Tests the workflow instance management endpoints including:
+- GET /api/workflows/instances/my-workflows - List current user's workflow instances (must be 200, not 422)
 - POST /workflows/{id}/instances - Create workflow instance
 - GET /workflows/{id}/instances - List workflow instances
 - GET /workflow-instances/{id} - Get workflow instance (legacy)
@@ -48,6 +49,34 @@ def sample_entity_data():
         "entity_id": str(uuid4()),
         "project_id": str(uuid4())
     }
+
+
+class TestGetMyWorkflows:
+    """
+    Test GET /api/workflows/instances/my-workflows endpoint.
+
+    This path must be declared before /instances/{id} in the router so that
+    'my-workflows' is not matched as a UUID (which would cause 422).
+    """
+
+    def test_my_workflows_returns_200_not_422(self, test_client):
+        """GET my-workflows must return 200 with workflows key; must not return 422 from UUID validation."""
+        response = test_client.get("/api/workflows/instances/my-workflows")
+        assert response.status_code == 200, (
+            f"Expected 200 for GET /api/workflows/instances/my-workflows, got {response.status_code}. "
+            "Ensure /instances/my-workflows is declared before /instances/{{id}} in the router."
+        )
+        data = response.json()
+        assert "workflows" in data, "Response must contain 'workflows' key"
+        assert isinstance(data["workflows"], list), "'workflows' must be a list"
+
+    def test_my_workflows_response_shape(self, test_client):
+        """Response must have expected shape for dashboard consumption."""
+        response = test_client.get("/api/workflows/instances/my-workflows")
+        assert response.status_code == 200
+        data = response.json()
+        assert "workflows" in data
+        assert isinstance(data["workflows"], list)
 
 
 class TestCreateWorkflowInstance:

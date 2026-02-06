@@ -20,12 +20,12 @@ export default function LoginPage() {
   if (loading) {
     return (
       <div
-        className="min-h-screen flex items-center justify-center bg-gray-50"
+        className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-800/50"
         style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f9fafb' }}
       >
         <div className="text-center" style={{ textAlign: 'center' }}>
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" style={{ width: 48, height: 48, borderWidth: 2, borderColor: '#2563eb', borderRadius: '50%', borderTopColor: 'transparent' }} />
-          <p className="mt-4 text-gray-600" style={{ marginTop: 16, color: '#4b5563' }}>{t('auth.loading')}</p>
+          <p className="mt-4 text-gray-600 dark:text-slate-400" style={{ marginTop: 16, color: '#4b5563' }}>{t('auth.loading')}</p>
         </div>
       </div>
     )
@@ -42,12 +42,12 @@ export default function LoginPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-gray-50"
+      className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-800/50"
       style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f9fafb' }}
     >
       <div className="text-center" style={{ textAlign: 'center' }}>
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" style={{ width: 48, height: 48, borderWidth: 2, borderColor: '#2563eb', borderRadius: '50%', borderTopColor: 'transparent' }} />
-        <p className="mt-4 text-gray-600" style={{ marginTop: 16, color: '#4b5563' }}>{t('auth.redirecting')}</p>
+        <p className="mt-4 text-gray-600 dark:text-slate-400" style={{ marginTop: 16, color: '#4b5563' }}>{t('auth.redirecting')}</p>
       </div>
     </div>
   )
@@ -133,7 +133,7 @@ function LoginForm() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-800/50 py-12 px-4 sm:px-6 lg:px-8"
       style={{ minHeight: '100vh', background: '#f9fafb', color: '#111827' }}
     >
       <div className="fixed top-4 right-4 z-50">
@@ -142,10 +142,10 @@ function LoginForm() {
 
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900" style={{ color: '#111827' }}>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-slate-100" style={{ color: '#111827' }}>
             {isSignup ? t('auth.signUp') : t('auth.signIn')}
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-slate-400">
             {t('auth.subtitle')}
           </p>
         </div>
@@ -177,7 +177,7 @@ function LoginForm() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-md border border-neutral-300 bg-white text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors px-4 py-2 text-base pr-12"
+                  className="w-full rounded-md border border-neutral-300 bg-white dark:bg-slate-800 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors px-4 py-2 text-base pr-12"
                   placeholder={isSignup ? t('auth.newPasswordPlaceholder') : t('auth.passwordPlaceholder')}
                 />
                 <button
@@ -194,7 +194,7 @@ function LoginForm() {
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
               <p className="text-sm text-red-700">{error}</p>
             </div>
           )}
@@ -217,12 +217,12 @@ function LoginForm() {
             <button
               type="button"
               onClick={() => setIsSignup(!isSignup)}
-              className="text-blue-600 hover:text-blue-500 text-sm"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-500 text-sm"
             >
               {isSignup ? t('auth.alreadyHaveAccount') : t('auth.needAccount')}
             </button>
             {!isSignup && (
-              <a href="/forgot-password" className="text-blue-600 hover:text-blue-500 text-sm">
+              <a href="/forgot-password" className="text-blue-600 dark:text-blue-400 hover:text-blue-500 text-sm">
                 {t('auth.forgotPassword')}
               </a>
             )}

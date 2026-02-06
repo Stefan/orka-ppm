@@ -68,12 +68,12 @@ export function TaskEditModal({
       >
         <DialogHeader>
           <DialogTitle>Edit Task</DialogTitle>
-          <p className="text-sm text-gray-500 font-mono mt-0.5">{task.wbs_code}</p>
-          <p className="text-sm text-gray-700 mt-1">{task.name}</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400 font-mono mt-0.5">{task.wbs_code}</p>
+          <p className="text-sm text-gray-700 dark:text-slate-300 mt-1">{task.name}</p>
         </DialogHeader>
         <DialogBody className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Progress (%)
             </label>
             <div className="flex items-center gap-2">
@@ -89,7 +89,7 @@ export function TaskEditModal({
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Planned start
             </label>
             <Input
@@ -100,7 +100,7 @@ export function TaskEditModal({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Planned end
             </label>
             <Input

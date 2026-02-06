@@ -352,11 +352,11 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
       const data = payload[0].payload
       
       return (
-        <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200 max-w-xs">
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 max-w-xs">
           <div className="flex items-center justify-between mb-2">
-            <p className="font-medium text-gray-900">{`${nameKey}: ${label}`}</p>
+            <p className="font-medium text-gray-900 dark:text-slate-100">{`${nameKey}: ${label}`}</p>
             {enableRealTime && data.timestamp && (
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-500 dark:text-slate-400">
                 {new Date(data.timestamp).toLocaleTimeString()}
               </span>
             )}
@@ -372,11 +372,11 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
               {enableRealTime && isRealTimeActive && index === 0 && data.previousValue && (
                 <div className="flex items-center text-xs">
                   {data.value > data.previousValue ? (
-                    <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
+                    <TrendingUp className="h-3 w-3 text-green-500 dark:text-green-400 mr-1" />
                   ) : (
-                    <TrendingUp className="h-3 w-3 text-red-500 mr-1 transform rotate-180" />
+                    <TrendingUp className="h-3 w-3 text-red-500 dark:text-red-400 mr-1 transform rotate-180" />
                   )}
-                  <span className={data.value > data.previousValue ? 'text-green-600' : 'text-red-600'}>
+                  <span className={data.value > data.previousValue ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
                     {((data.value - data.previousValue) / data.previousValue * 100).toFixed(1)}%
                   </span>
                 </div>
@@ -389,7 +389,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
             {Object.entries(data).map(([key, value]) => {
               if (key !== nameKey && key !== dataKey && key !== 'timestamp' && key !== 'previousValue' && typeof value !== 'object') {
                 return (
-                  <p key={key} className="text-sm text-gray-600">
+                  <p key={key} className="text-sm text-gray-600 dark:text-slate-400">
                     {`${key}: ${value}`}
                   </p>
                 )
@@ -399,11 +399,11 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
           </div>
           
           {/* Interactive Actions */}
-          <div className="mt-3 pt-2 border-t border-gray-200 space-y-1">
+          <div className="mt-3 pt-2 border-t border-gray-200 dark:border-slate-700 space-y-1">
             {enableDrillDown && currentLevel < drillDownLevels.length && (
               <button
                 onClick={() => handleDrillDown(data)}
-                className="w-full text-left text-xs text-blue-600 hover:text-blue-800 flex items-center"
+                className="w-full text-left text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center"
               >
                 <TrendingUp className="h-3 w-3 mr-1" />
                 Click to drill down
@@ -412,7 +412,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
             
             <button
               onClick={() => handleDataPointAction(data, 'details')}
-              className="w-full text-left text-xs text-gray-600 hover:text-gray-800 flex items-center"
+              className="w-full text-left text-xs text-gray-600 hover:text-gray-800 dark:text-slate-200 flex items-center"
             >
               <Eye className="h-3 w-3 mr-1" />
               View details
@@ -420,7 +420,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
             
             <button
               onClick={() => handleDataPointAction(data, 'filter')}
-              className="w-full text-left text-xs text-gray-600 hover:text-gray-800 flex items-center"
+              className="w-full text-left text-xs text-gray-600 hover:text-gray-800 dark:text-slate-200 flex items-center"
             >
               <Filter className="h-3 w-3 mr-1" />
               Filter by this value
@@ -714,18 +714,18 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
   }
 
   return (
-    <div className={`relative bg-white rounded-lg border border-gray-200 ${className}`}>
+    <div className={`relative bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
         <div className="flex-1">
           {title && (
             <div className="flex items-center space-x-2 mb-2">
-              <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{title}</h3>
               {enableRealTime && (
                 <div className={`flex items-center text-sm px-2 py-1 rounded-full ${
                   isRealTimeActive 
-                    ? 'bg-green-100 text-green-700' 
-                    : 'bg-gray-100 text-gray-600'
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700' 
+                    : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300'
                 }`}>
                   <Zap className="h-3 w-3 mr-1" />
                   {isRealTimeActive ? 'Live' : 'Static'}
@@ -737,12 +737,12 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
           {/* Connection Status */}
           {enableRealTime && (
             <div className={`flex items-center text-xs space-x-3 ${
-              isConnected ? 'text-green-600' : 'text-red-600'
+              isConnected ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
             }`}>
               {isConnected ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
               <span>{isConnected ? 'Connected' : 'Disconnected'}</span>
               {isConnected && connectionLatency > 0 && (
-                <span className="text-gray-500">
+                <span className="text-gray-500 dark:text-slate-400">
                   {connectionLatency}ms
                 </span>
               )}
@@ -751,10 +751,10 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
           
           {/* Breadcrumb */}
           {breadcrumb.length > 0 && (
-            <nav className="flex items-center space-x-2 text-sm text-gray-600 mt-2">
+            <nav className="flex items-center space-x-2 text-sm text-gray-600 dark:text-slate-400 mt-2">
               <button
                 onClick={() => handleDrillUp(0)}
-                className="hover:text-blue-600 transition-colors"
+                className="hover:text-blue-600 dark:text-blue-400 transition-colors"
               >
                 Home
               </button>
@@ -763,7 +763,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
                   <span>/</span>
                   <button
                     onClick={() => handleDrillUp(index + 1)}
-                    className="hover:text-blue-600 transition-colors"
+                    className="hover:text-blue-600 dark:text-blue-400 transition-colors"
                   >
                     {crumb}
                   </button>
@@ -776,7 +776,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
         <div className="flex items-center space-x-2">
           {/* Performance Metrics */}
           {enableRealTime && isRealTimeActive && (
-            <div className="hidden sm:flex items-center text-xs text-gray-500 space-x-2 mr-2">
+            <div className="hidden sm:flex items-center text-xs text-gray-500 dark:text-slate-400 space-x-2 mr-2">
               <span>FPS: {performanceMetrics.fps}</span>
               <span>Points: {performanceMetrics.dataPoints}</span>
               <span>Render: {performanceMetrics.renderTime.toFixed(1)}ms</span>
@@ -789,8 +789,8 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
               onClick={toggleRealTime}
               className={`p-2 rounded-lg transition-colors ${
                 isRealTimeActive 
-                  ? 'bg-red-100 text-red-600 hover:bg-red-200' 
-                  : 'bg-green-100 text-green-600 hover:bg-green-200'
+                  ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 hover:bg-red-200' 
+                  : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200'
               }`}
               title={isRealTimeActive ? 'Stop Real-time Updates' : 'Start Real-time Updates'}
             >
@@ -802,7 +802,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`p-2 rounded-lg transition-colors ${
-                showFilters ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-100'
+                showFilters ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' : 'text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700'
               }`}
               title="Toggle Filters"
             >
@@ -812,7 +812,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
           
           <button
             onClick={(e) => handleContextMenu(e)}
-            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors"
             title="More Options"
           >
             <MoreVertical className="h-4 w-4" />
@@ -822,25 +822,25 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
 
       {/* Filters */}
       {showFilters && enableFiltering && (
-        <div className="p-4 border-b border-gray-200 bg-gray-50">
+        <div className="p-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Search</label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
                 <input
                   type="text"
                   value={filters.searchTerm}
                   onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
                   placeholder="Search items..."
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm"
                 />
               </div>
             </div>
             
             {type !== 'pie' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Value Range (%)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Value Range (%)</label>
                 <div className="flex space-x-2">
                   <input
                     type="number"
@@ -851,7 +851,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
                     }))}
                     min="0"
                     max="100"
-                    className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                    className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm"
                   />
                   <input
                     type="number"
@@ -862,7 +862,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
                     }))}
                     min="0"
                     max="100"
-                    className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                    className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm"
                   />
                 </div>
               </div>
@@ -875,7 +875,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
                   visibleSeries: [dataKey],
                   valueRange: [0, 100]
                 })}
-                className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm"
+                className="w-full px-4 py-2 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 text-sm"
               >
                 Clear Filters
               </button>
@@ -896,12 +896,12 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
       </div>
 
       {/* Stats */}
-      <div className="px-4 py-2 border-t border-gray-200 bg-gray-50 text-xs text-gray-500">
+      <div className="px-4 py-2 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 text-xs text-gray-500 dark:text-slate-400">
         <div className="flex justify-between items-center">
           <span>
             Showing {filteredData.length} of {data.length} items
             {enableRealTime && isRealTimeActive && (
-              <span className="ml-2 text-green-600">• Live Updates Active</span>
+              <span className="ml-2 text-green-600 dark:text-green-400">• Live Updates Active</span>
             )}
           </span>
           <div className="flex items-center space-x-4">
@@ -925,7 +925,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
             onClick={closeContextMenu}
           />
           <div 
-            className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-48"
+            className="fixed z-50 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 py-2 min-w-48"
             style={{ 
               left: contextMenuPosition.x, 
               top: contextMenuPosition.y,
@@ -933,33 +933,33 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
             }}
           >
             {/* Export Options */}
-            <div className="px-3 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide">
+            <div className="px-3 py-1 text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wide">
               Export
             </div>
             <button
               onClick={() => exportData('json')}
-              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 flex items-center"
             >
               <Download className="h-4 w-4 mr-2" />
               Export as JSON
             </button>
             <button
               onClick={() => exportData('csv')}
-              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 flex items-center"
             >
               <Download className="h-4 w-4 mr-2" />
               Export as CSV
             </button>
             <button
               onClick={() => exportData('image')}
-              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 flex items-center"
             >
               <Download className="h-4 w-4 mr-2" />
               Export as PNG
             </button>
             <button
               onClick={() => exportAsImage('svg')}
-              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 flex items-center"
             >
               <Download className="h-4 w-4 mr-2" />
               Export as SVG
@@ -968,7 +968,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
             <hr className="my-2" />
             
             {/* Chart Actions */}
-            <div className="px-3 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide">
+            <div className="px-3 py-1 text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wide">
               Actions
             </div>
             <button
@@ -983,7 +983,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
                 })
                 closeContextMenu()
               }}
-              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 flex items-center"
             >
               <Eye className="h-4 w-4 mr-2" />
               Reset View
@@ -995,7 +995,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
                   setShowFilters(!showFilters)
                   closeContextMenu()
                 }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 flex items-center"
               >
                 <Filter className="h-4 w-4 mr-2" />
                 {showFilters ? 'Hide Filters' : 'Show Filters'}
@@ -1008,7 +1008,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
                   toggleRealTime()
                   closeContextMenu()
                 }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 flex items-center"
               >
                 {isRealTimeActive ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
                 {isRealTimeActive ? 'Stop Real-time' : 'Start Real-time'}
@@ -1023,7 +1023,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
                     handleDrillDown(selectedDataPoint)
                     closeContextMenu()
                   }}
-                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 flex items-center"
                 >
                   <TrendingUp className="h-4 w-4 mr-2" />
                   Drill Down
@@ -1035,7 +1035,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({
             {enableRealTime && isRealTimeActive && (
               <>
                 <hr className="my-2" />
-                <div className="px-4 py-2 text-xs text-gray-500">
+                <div className="px-4 py-2 text-xs text-gray-500 dark:text-slate-400">
                   <div>FPS: {performanceMetrics.fps}</div>
                   <div>Render: {performanceMetrics.renderTime.toFixed(1)}ms</div>
                   <div>Latency: {connectionLatency}ms</div>

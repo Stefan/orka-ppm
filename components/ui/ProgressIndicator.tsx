@@ -40,7 +40,7 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
                     isCompleted && 'bg-green-500 border-green-500',
                     isInProgress && 'bg-blue-500 border-blue-500 animate-pulse',
                     isError && 'bg-red-500 border-red-500',
-                    !isCompleted && !isInProgress && !isError && 'bg-white border-gray-300'
+                    !isCompleted && !isInProgress && !isError && 'bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600'
                   )}
                 >
                   {isCompleted && <Check className="w-5 h-5 text-white" />}
@@ -48,7 +48,7 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
                   {!isCompleted && !isInProgress && (
                     <span className={cn(
                       'text-sm font-medium',
-                      isError ? 'text-white' : 'text-gray-500'
+                      isError ? 'text-white' : 'text-gray-500 dark:text-slate-400'
                     )}>
                       {index + 1}
                     </span>
@@ -71,16 +71,16 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
                 <h4
                   className={cn(
                     'text-sm font-medium transition-colors',
-                    isActive && 'text-blue-600',
-                    isCompleted && 'text-green-600',
-                    isError && 'text-red-600',
-                    !isActive && !isCompleted && !isError && 'text-gray-700'
+                    isActive && 'text-blue-600 dark:text-blue-400',
+                    isCompleted && 'text-green-600 dark:text-green-400',
+                    isError && 'text-red-600 dark:text-red-400',
+                    !isActive && !isCompleted && !isError && 'text-gray-700 dark:text-slate-300'
                   )}
                 >
                   {step.label}
                 </h4>
                 {step.description && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                     {step.description}
                   </p>
                 )}
@@ -134,9 +134,9 @@ export const LinearProgress: React.FC<LinearProgressProps> = ({
     <div className={cn('space-y-2', className)}>
       {(label || showPercentage) && (
         <div className="flex items-center justify-between text-sm">
-          {label && <span className="text-gray-700">{label}</span>}
+          {label && <span className="text-gray-700 dark:text-slate-300">{label}</span>}
           {showPercentage && (
-            <span className="text-gray-600 font-medium">
+            <span className="text-gray-600 dark:text-slate-400 font-medium">
               {Math.round(percentage)}%
             </span>
           )}
@@ -186,10 +186,10 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
   const offset = circumference - (percentage / 100) * circumference
 
   const variantColors = {
-    default: 'text-blue-600',
-    success: 'text-green-600',
-    warning: 'text-yellow-600',
-    error: 'text-red-600'
+    default: 'text-blue-600 dark:text-blue-400',
+    success: 'text-green-600 dark:text-green-400',
+    warning: 'text-yellow-600 dark:text-yellow-400',
+    error: 'text-red-600 dark:text-red-400'
   }
 
   return (
@@ -229,7 +229,7 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
         {/* Center text */}
         {showPercentage && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-2xl font-bold text-gray-900">
+            <span className="text-2xl font-bold text-gray-900 dark:text-slate-100">
               {Math.round(percentage)}%
             </span>
           </div>
@@ -237,7 +237,7 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
       </div>
       
       {label && (
-        <span className="text-sm text-gray-600 text-center">{label}</span>
+        <span className="text-sm text-gray-600 dark:text-slate-400 text-center">{label}</span>
       )}
     </div>
   )

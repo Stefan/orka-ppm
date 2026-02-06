@@ -369,18 +369,18 @@ export default function PerformanceMonitoringInterface({
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'text-red-800 bg-red-100'
-      case 'high': return 'text-orange-800 bg-orange-100'
-      case 'medium': return 'text-yellow-800 bg-yellow-100'
-      case 'low': return 'text-green-800 bg-green-100'
-      default: return 'text-gray-800 bg-gray-100'
+      case 'critical': return 'text-red-800 dark:text-red-300 bg-red-100 dark:bg-red-900/30'
+      case 'high': return 'text-orange-800 dark:text-orange-300 bg-orange-100 dark:bg-orange-900/30'
+      case 'medium': return 'text-yellow-800 dark:text-yellow-300 bg-yellow-100 dark:bg-yellow-900/30'
+      case 'low': return 'text-green-800 dark:text-green-300 bg-green-100 dark:bg-green-900/30'
+      default: return 'text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-700'
     }
   }
 
   const getPerformanceIcon = (score: number) => {
-    if (score >= 4.5) return <ArrowUp className="h-4 w-4 text-green-600" />
-    if (score >= 3.5) return <Minus className="h-4 w-4 text-yellow-600" />
-    return <ArrowDown className="h-4 w-4 text-red-600" />
+    if (score >= 4.5) return <ArrowUp className="h-4 w-4 text-green-600 dark:text-green-400" />
+    if (score >= 3.5) return <Minus className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+    return <ArrowDown className="h-4 w-4 text-red-600 dark:text-red-400" />
   }
 
   if (loading) {
@@ -394,9 +394,9 @@ export default function PerformanceMonitoringInterface({
   if (!performanceData) {
     return (
       <div className="text-center py-12">
-        <AlertTriangle className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-sm font-medium text-gray-900">No performance data available</h3>
-        <p className="mt-1 text-sm text-gray-500">
+        <AlertTriangle className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500" />
+        <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-slate-100">No performance data available</h3>
+        <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
           Performance monitoring data could not be loaded for the selected criteria.
         </p>
       </div>
@@ -406,11 +406,11 @@ export default function PerformanceMonitoringInterface({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Performance Monitoring</h2>
-            <p className="text-gray-600 mt-1">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Performance Monitoring</h2>
+            <p className="text-gray-600 dark:text-slate-400 mt-1">
               Approval time tracking, bottleneck identification, and team performance analysis
             </p>
           </div>
@@ -418,19 +418,19 @@ export default function PerformanceMonitoringInterface({
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-slate-200 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
             >
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
               Refresh
             </button>
             <button
               onClick={handleExport}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-slate-200 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
             >
               <Download className="h-4 w-4" />
               Export
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50">
+            <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-slate-200 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
               <Filter className="h-4 w-4" />
               Filters
             </button>
@@ -439,8 +439,8 @@ export default function PerformanceMonitoringInterface({
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+        <div className="border-b border-gray-200 dark:border-slate-700">
           <nav className="flex space-x-8 px-6">
             {[
               { id: 'approval', label: 'Approval Times', icon: Clock },
@@ -455,8 +455,8 @@ export default function PerformanceMonitoringInterface({
                   onClick={() => setActiveView(tab.id as any)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm ${
                     activeView === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300 hover:border-gray-300 dark:border-slate-600'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -472,8 +472,8 @@ export default function PerformanceMonitoringInterface({
           {activeView === 'approval' && (
             <div className="space-y-6">
               {/* Approval Time Trend */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Approval Time Trend</h3>
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Approval Time Trend</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <ComposedChart data={performanceData.overall_approval_time_trend}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -490,57 +490,57 @@ export default function PerformanceMonitoringInterface({
               </div>
 
               {/* Approver Performance Table */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Approver Performance Analysis</h3>
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Approver Performance Analysis</h3>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+                    <thead className="bg-gray-50 dark:bg-slate-800/50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Approver
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Total Approvals
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Avg Time (hours)
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Overdue
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Approval Rate
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Bottleneck Score
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                       {performanceData.approval_time_metrics.map((approver, index) => (
-                        <tr key={index} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <tr key={index} className="hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-slate-100">
                             {approver.approver_name}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                             {approver.total_approvals}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <span className={`${approver.avg_approval_time_hours > 24 ? 'text-red-600' : approver.avg_approval_time_hours > 12 ? 'text-yellow-600' : 'text-green-600'}`}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
+                            <span className={`${approver.avg_approval_time_hours > 24 ? 'text-red-600 dark:text-red-400' : approver.avg_approval_time_hours > 12 ? 'text-yellow-600 dark:text-yellow-400' : 'text-green-600 dark:text-green-400'}`}>
                               {approver.avg_approval_time_hours.toFixed(1)}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                             {approver.overdue_approvals > 0 ? (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
                                 {approver.overdue_approvals}
                               </span>
                             ) : (
-                              <span className="text-green-600">0</span>
+                              <span className="text-green-600 dark:text-green-400">0</span>
                             )}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <span className={`${approver.approval_rate > 90 ? 'text-green-600' : approver.approval_rate > 80 ? 'text-yellow-600' : 'text-red-600'}`}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
+                            <span className={`${approver.approval_rate > 90 ? 'text-green-600 dark:text-green-400' : approver.approval_rate > 80 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
                               {approver.approval_rate.toFixed(1)}%
                             </span>
                           </td>
@@ -555,7 +555,7 @@ export default function PerformanceMonitoringInterface({
                                   style={{ width: `${Math.min(100, (approver.bottleneck_score / 5) * 100)}%` }}
                                 ></div>
                               </div>
-                              <span className="ml-2 text-sm text-gray-600">
+                              <span className="ml-2 text-sm text-gray-600 dark:text-slate-400">
                                 {approver.bottleneck_score.toFixed(1)}
                               </span>
                             </div>
@@ -573,8 +573,8 @@ export default function PerformanceMonitoringInterface({
           {activeView === 'success' && (
             <div className="space-y-6">
               {/* Success Rate Trend */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Implementation Success Rate Trend</h3>
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Implementation Success Rate Trend</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <ComposedChart data={performanceData.success_rate_trend}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -591,61 +591,61 @@ export default function PerformanceMonitoringInterface({
               </div>
 
               {/* Change Success Metrics by Type */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Success Metrics by Change Type</h3>
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Success Metrics by Change Type</h3>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+                    <thead className="bg-gray-50 dark:bg-slate-800/50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Change Type
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Total Changes
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Success Rate
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Cost Variance
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Schedule Variance
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Impact Accuracy
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                       {performanceData.change_success_metrics.map((metric, index) => (
-                        <tr key={index} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 capitalize">
+                        <tr key={index} className="hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-slate-100 capitalize">
                             {metric.change_type}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                             {metric.total_changes}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              metric.success_rate > 90 ? 'bg-green-100 text-green-800' :
-                              metric.success_rate > 80 ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-red-100 text-red-800'
+                              metric.success_rate > 90 ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' :
+                              metric.success_rate > 80 ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' :
+                              'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                             }`}>
                               {metric.success_rate.toFixed(1)}%
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <span className={`${metric.avg_cost_variance > 20 ? 'text-red-600' : metric.avg_cost_variance > 10 ? 'text-yellow-600' : 'text-green-600'}`}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
+                            <span className={`${metric.avg_cost_variance > 20 ? 'text-red-600 dark:text-red-400' : metric.avg_cost_variance > 10 ? 'text-yellow-600 dark:text-yellow-400' : 'text-green-600 dark:text-green-400'}`}>
                               ±{metric.avg_cost_variance.toFixed(1)}%
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <span className={`${metric.avg_schedule_variance > 15 ? 'text-red-600' : metric.avg_schedule_variance > 10 ? 'text-yellow-600' : 'text-green-600'}`}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
+                            <span className={`${metric.avg_schedule_variance > 15 ? 'text-red-600 dark:text-red-400' : metric.avg_schedule_variance > 10 ? 'text-yellow-600 dark:text-yellow-400' : 'text-green-600 dark:text-green-400'}`}>
                               ±{metric.avg_schedule_variance.toFixed(1)}%
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                             <div className="flex items-center">
                               <div className="w-16 bg-gray-200 rounded-full h-2">
                                 <div 
@@ -656,7 +656,7 @@ export default function PerformanceMonitoringInterface({
                                   style={{ width: `${metric.impact_accuracy_score}%` }}
                                 ></div>
                               </div>
-                              <span className="ml-2 text-sm text-gray-600">
+                              <span className="ml-2 text-sm text-gray-600 dark:text-slate-400">
                                 {metric.impact_accuracy_score.toFixed(1)}%
                               </span>
                             </div>
@@ -674,8 +674,8 @@ export default function PerformanceMonitoringInterface({
           {activeView === 'team' && (
             <div className="space-y-6">
               {/* Workload Distribution */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Team Workload Distribution</h3>
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Team Workload Distribution</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={performanceData.workload_distribution}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -690,48 +690,48 @@ export default function PerformanceMonitoringInterface({
               </div>
 
               {/* Team Performance Metrics */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Individual Performance Metrics</h3>
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Individual Performance Metrics</h3>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+                    <thead className="bg-gray-50 dark:bg-slate-800/50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Team Member
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Role
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Changes Handled
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Avg Processing Time
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Quality Score
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Workload %
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Efficiency
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                       {performanceData.team_performance_metrics.map((member, index) => (
-                        <tr key={index} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <tr key={index} className="hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-slate-100">
                             {member.team_member_name}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                             {member.role}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                             {member.changes_handled}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                             {member.avg_processing_time_hours.toFixed(1)}h
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -745,16 +745,16 @@ export default function PerformanceMonitoringInterface({
                                   style={{ width: `${member.quality_score}%` }}
                                 ></div>
                               </div>
-                              <span className="ml-2 text-sm text-gray-600">
+                              <span className="ml-2 text-sm text-gray-600 dark:text-slate-400">
                                 {member.quality_score.toFixed(1)}%
                               </span>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              member.workload_percentage > 90 ? 'bg-red-100 text-red-800' :
-                              member.workload_percentage > 80 ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-green-100 text-green-800'
+                              member.workload_percentage > 90 ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' :
+                              member.workload_percentage > 80 ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' :
+                              'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
                             }`}>
                               {member.workload_percentage}%
                             </span>
@@ -762,7 +762,7 @@ export default function PerformanceMonitoringInterface({
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               {getPerformanceIcon(member.efficiency_rating)}
-                              <span className="ml-2 text-sm text-gray-600">
+                              <span className="ml-2 text-sm text-gray-600 dark:text-slate-400">
                                 {member.efficiency_rating.toFixed(1)}/5.0
                               </span>
                             </div>
@@ -782,37 +782,37 @@ export default function PerformanceMonitoringInterface({
               {/* Bottleneck Analysis Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {performanceData.bottleneck_analysis.map((bottleneck, index) => (
-                  <div key={index} className="bg-white border border-gray-200 rounded-lg p-6">
+                  <div key={index} className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <AlertTriangle className="h-5 w-5 text-orange-600" />
-                          <h3 className="text-lg font-medium text-gray-900 capitalize">
+                          <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                          <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 capitalize">
                             {bottleneck.bottleneck_type} Bottleneck
                           </h3>
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSeverityColor(bottleneck.impact_severity)}`}>
                             {bottleneck.impact_severity}
                           </span>
                         </div>
-                        <p className="text-gray-600 mb-4">{bottleneck.description}</p>
+                        <p className="text-gray-600 dark:text-slate-400 mb-4">{bottleneck.description}</p>
                         
                         <div className="grid grid-cols-2 gap-4 mb-4">
                           <div>
-                            <p className="text-sm text-gray-500">Affected Changes</p>
-                            <p className="text-lg font-semibold text-gray-900">{bottleneck.affected_changes}</p>
+                            <p className="text-sm text-gray-500 dark:text-slate-400">Affected Changes</p>
+                            <p className="text-lg font-semibold text-gray-900 dark:text-slate-100">{bottleneck.affected_changes}</p>
                           </div>
                           <div>
-                            <p className="text-sm text-gray-500">Avg Delay</p>
-                            <p className="text-lg font-semibold text-gray-900">{bottleneck.avg_delay_days.toFixed(1)} days</p>
+                            <p className="text-sm text-gray-500 dark:text-slate-400">Avg Delay</p>
+                            <p className="text-lg font-semibold text-gray-900 dark:text-slate-100">{bottleneck.avg_delay_days.toFixed(1)} days</p>
                           </div>
                         </div>
                         
                         <div className="mb-4">
-                          <p className="text-sm font-medium text-gray-900 mb-2">Suggested Actions:</p>
-                          <ul className="text-sm text-gray-600 space-y-1">
+                          <p className="text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">Suggested Actions:</p>
+                          <ul className="text-sm text-gray-600 dark:text-slate-400 space-y-1">
                             {bottleneck.suggested_actions.map((action, actionIndex) => (
                               <li key={actionIndex} className="flex items-start gap-2">
-                                <span className="text-blue-600 mt-1">•</span>
+                                <span className="text-blue-600 dark:text-blue-400 mt-1">•</span>
                                 {action}
                               </li>
                             ))}
@@ -822,14 +822,14 @@ export default function PerformanceMonitoringInterface({
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleBottleneckAction(bottleneck, 'view_details')}
-                            className="flex items-center gap-1 px-3 py-1 text-sm text-blue-600 hover:text-blue-800 border border-blue-300 rounded hover:bg-blue-50"
+                            className="flex items-center gap-1 px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 border border-blue-300 rounded hover:bg-blue-50 dark:hover:bg-slate-700"
                           >
                             <Eye className="h-4 w-4" />
                             View Details
                           </button>
                           <button
                             onClick={() => handleBottleneckAction(bottleneck, 'create_action_plan')}
-                            className="flex items-center gap-1 px-3 py-1 text-sm text-green-600 hover:text-green-800 border border-green-300 rounded hover:bg-green-50"
+                            className="flex items-center gap-1 px-3 py-1 text-sm text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 border border-green-300 dark:border-green-700 rounded hover:bg-green-50 dark:hover:bg-green-900/20"
                           >
                             <Target className="h-4 w-4" />
                             Create Action Plan
@@ -842,8 +842,8 @@ export default function PerformanceMonitoringInterface({
               </div>
 
               {/* Bottleneck Impact Chart */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Bottleneck Impact Analysis</h3>
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Bottleneck Impact Analysis</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <ScatterChart data={performanceData.bottleneck_analysis}>
                     <CartesianGrid strokeDasharray="3 3" />

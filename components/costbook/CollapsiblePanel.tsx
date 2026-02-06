@@ -122,7 +122,7 @@ export function CollapsiblePanel({
           flex items-center justify-between
           px-4 py-3
           bg-white dark:bg-slate-700
-          hover:bg-gray-50 dark:hover:bg-slate-600
+          hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-600
           transition-colors
           cursor-pointer
           focus:outline-none
@@ -273,7 +273,7 @@ export function ExpandableCard({
           </div>
           <button
             onClick={() => setIsExpanded(true)}
-            className="p-1 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+            className="p-1 text-gray-600 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
             title="Expand"
           >
             <Maximize2 className="w-4 h-4" />
@@ -297,7 +297,7 @@ export function ExpandableCard({
             </div>
             <button
               onClick={() => setIsExpanded(false)}
-              className="p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+              className="p-2 text-gray-600 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
               title="Minimize"
             >
               <Minimize2 className="w-5 h-5" />

@@ -66,7 +66,7 @@ export function FeatureDetailCard({
       <div className="p-6">
         {/* Title and icon */}
         <div className="flex items-start gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex-shrink-0">
+        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-400 flex-shrink-0">
           <Icon className="h-6 w-6" />
         </div>
           <div className="flex-1 min-w-0">
@@ -148,7 +148,7 @@ export function FeatureDetailCard({
             <button
               type="button"
               onClick={() => onExplain(feature)}
-              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
               data-testid="feature-explain-button"
             >
               <MessageCircle className="h-4 w-4" />

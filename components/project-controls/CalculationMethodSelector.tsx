@@ -17,7 +17,7 @@ export default function CalculationMethodSelector({
 }: CalculationMethodSelectorProps) {
   return (
     <div>
-      <label className="block text-sm text-gray-600 mb-1">{label}</label>
+      <label className="block text-sm text-gray-600 dark:text-slate-400 mb-1">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}

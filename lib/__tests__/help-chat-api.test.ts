@@ -12,9 +12,16 @@ import type {
   HelpContextResponse,
   ProactiveTipsResponse
 } from '../../types/help-chat'
+import * as libApi from '../api'
 
 // Mock fetch globally
 global.fetch = jest.fn()
+
+// Mock apiRequest for methods that use lib/api (languages, language preference, translate, etc.)
+jest.mock('../api', () => ({
+  ...jest.requireActual('../api'),
+  apiRequest: jest.fn()
+}))
 
 describe('HelpChatAPIService', () => {
   let apiService: HelpChatAPIService
@@ -394,7 +401,37 @@ describe('HelpChatAPIService', () => {
         expect.stringContaining('/ai/help/feedback'),
         expect.objectContaining({
           method: 'POST',
-          body: JSON.stringify(mockFeedback)
+          body: JSON.stringify({
+            message_id: mockFeedback.messageId,
+            query_id: undefined,
+            rating: mockFeedback.rating,
+            feedback_text: mockFeedback.feedbackText,
+            feedback_type: mockFeedback.feedbackType
+          })
+        })
+      )
+    })
+
+    it('should submit feedback with queryId only (help_query_feedback)', async () => {
+      const mockFeedback: HelpFeedbackRequest = {
+        queryId: 'query-uuid-123',
+        rating: 4,
+        feedbackType: 'helpful'
+      }
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true, message: 'Feedback submitted successfully' }),
+        headers: new Headers()
+      } as Response)
+
+      await apiService.submitFeedback(mockFeedback)
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/ai/help/feedback'),
+        expect.objectContaining({
+          method: 'POST',
+          body: expect.stringContaining('"query_id":"query-uuid-123"')
         })
       )
     })
@@ -406,7 +443,7 @@ describe('HelpChatAPIService', () => {
         feedbackType: 'helpful'
       } as HelpFeedbackRequest
 
-      await expect(apiService.submitFeedback(invalidFeedback)).rejects.toThrow('Message ID is required')
+      await expect(apiService.submitFeedback(invalidFeedback)).rejects.toThrow('Message ID or query ID is required')
 
       const invalidRating = {
         messageId: 'msg-123',
@@ -659,6 +696,169 @@ describe('HelpChatAPIService', () => {
       }
 
       expect(chunks.length).toBeGreaterThan(0)
+    })
+  })
+
+  describe('Rate limit status', () => {
+    it('should return rate limit status with remaining and reset time', () => {
+      const status = apiService.getRateLimitStatus()
+      expect(status).toHaveProperty('minute')
+      expect(status.minute).toHaveProperty('remaining')
+      expect(status.minute).toHaveProperty('resetTime')
+      expect(status).toHaveProperty('hour')
+      expect(status.hour).toHaveProperty('remaining')
+      expect(status.hour).toHaveProperty('resetTime')
+    })
+  })
+
+  describe('Language and API helpers', () => {
+    const mockApiRequest = (libApi as { apiRequest: jest.Mock }).apiRequest
+
+    beforeEach(() => {
+      mockApiRequest.mockReset()
+    })
+
+    it('should get supported languages', async () => {
+      mockApiRequest.mockResolvedValue({ data: [{ code: 'en', name: 'English' }, { code: 'de', name: 'German' }] })
+      const result = await apiService.getSupportedLanguages()
+      expect(result).toHaveLength(2)
+      expect(result[0]).toEqual({ code: 'en', name: 'English' })
+    })
+
+    it('should return empty array when languages endpoint fails', async () => {
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+      mockApiRequest.mockRejectedValue(new Error('Network error'))
+      const result = await apiService.getSupportedLanguages()
+      expect(result).toEqual([])
+      warn.mockRestore()
+    })
+
+    it('should get user language preference', async () => {
+      mockApiRequest.mockResolvedValue({ data: { language: 'de' } })
+      const result = await apiService.getUserLanguagePreference()
+      expect(result).toEqual({ language: 'de' })
+    })
+
+    it('should set user language preference', async () => {
+      mockApiRequest.mockResolvedValue({ data: { success: true, message: 'Updated' } })
+      const result = await apiService.setUserLanguagePreference('de')
+      expect(result).toEqual({ success: true, message: 'Updated' })
+    })
+
+    it('should detect language', async () => {
+      mockApiRequest.mockResolvedValue({ data: { language: 'en', confidence: 0.9 } })
+      const result = await apiService.detectLanguage('Hello world')
+      expect(result).toHaveProperty('data')
+      expect((result as { data: { language: string } }).data.language).toBe('en')
+    })
+
+    it('should translate content', async () => {
+      mockApiRequest.mockResolvedValue({ data: { translated: 'Hallo Welt' } })
+      const result = await apiService.translateContent('Hello world', 'de', 'en', 'general')
+      expect(result).toHaveProperty('data')
+      expect((result as { data: { translated: string } }).data.translated).toBe('Hallo Welt')
+    })
+
+    it('should clear translation cache', async () => {
+      mockApiRequest.mockResolvedValue({ data: { success: true, message: 'Cache cleared' } })
+      const result = await apiService.clearTranslationCache()
+      expect(result).toEqual({ success: true, message: 'Cache cleared' })
+    })
+
+    it('should clear translation cache for language', async () => {
+      mockApiRequest.mockResolvedValue({ data: { success: true } })
+      const result = await apiService.clearTranslationCache('de')
+      expect(result).toEqual({ success: true })
+    })
+
+    it('should get performance metrics', async () => {
+      mockApiRequest.mockResolvedValue({ data: { queriesToday: 10 } })
+      const result = await apiService.getPerformanceMetrics()
+      expect(result).toHaveProperty('data')
+      expect((result as { data: { queriesToday: number } }).data.queriesToday).toBe(10)
+    })
+
+    it('should clear admin cache', async () => {
+      mockApiRequest.mockResolvedValue({ data: { cleared: true } })
+      const result = await apiService.clearCache('*')
+      expect(result).toHaveProperty('data')
+      expect((result as { data: { cleared: boolean } }).data.cleared).toBe(true)
+    })
+
+    it('should get health status', async () => {
+      mockApiRequest.mockResolvedValue({ data: { status: 'ok' } })
+      const result = await apiService.getHealthStatus()
+      expect(result).toHaveProperty('data')
+      expect((result as { data: { status: string } }).data.status).toBe('ok')
+    })
+  })
+
+  describe('Dismiss proactive tip', () => {
+    it('should dismiss proactive tip', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true, message: 'Dismissed' }),
+        headers: new Headers()
+      } as Response)
+
+      const result = await apiService.dismissProactiveTip('tip-1')
+      expect(result).toEqual({ success: true, message: 'Dismissed' })
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/ai/help/tips/dismiss'),
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ tip_id: 'tip-1' })
+        })
+      )
+    })
+  })
+
+  describe('Visual guides', () => {
+    it('should get visual guide recommendations', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ([{ id: 'vg-1', title: 'Guide 1' }]),
+        headers: new Headers()
+      } as Response)
+
+      const result = await apiService.getVisualGuideRecommendations(
+        { route: '/projects', pageTitle: 'Projects', userRole: 'user' },
+        5
+      )
+      expect(result).toEqual([{ id: 'vg-1', title: 'Guide 1' }])
+    })
+
+    it('should get visual guide by id', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ id: 'vg-1', steps: [] }),
+        headers: new Headers()
+      } as Response)
+
+      const result = await apiService.getVisualGuide('vg-1')
+      expect(result).toEqual({ id: 'vg-1', steps: [] })
+    })
+
+    it('should throw on visual guide 404', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found',
+        headers: new Headers()
+      } as Response)
+
+      await expect(apiService.getVisualGuide('missing')).rejects.toThrow('Visual guide not found')
+    })
+
+    it('should track visual guide completion', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true }),
+        headers: new Headers()
+      } as Response)
+
+      const result = await apiService.trackVisualGuideCompletion('vg-1', ['step1'], 120)
+      expect(result).toEqual({ success: true })
     })
   })
 })

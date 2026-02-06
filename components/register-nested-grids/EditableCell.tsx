@@ -62,11 +62,11 @@ export default function EditableCell({
               setError(null)
             }
           }}
-          className={`flex-1 px-2 py-0.5 text-sm border rounded ${error ? 'border-red-400' : 'border-gray-300'}`}
+          className={`flex-1 px-2 py-0.5 text-sm border rounded ${error ? 'border-red-400' : 'border-gray-300 dark:border-slate-600'}`}
           data-testid="editable-cell-input"
           autoFocus
         />
-        {error && <span className="text-xs text-red-500">{error}</span>}
+        {error && <span className="text-xs text-red-500 dark:text-red-400">{error}</span>}
       </div>
     )
   }

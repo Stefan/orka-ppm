@@ -92,11 +92,11 @@ function TreeNode({
   // Get appropriate folder/file icon
   const getNodeIcon = () => {
     if (!hasChildren) {
-      return <FileText className="w-4 h-4 text-gray-400" />
+      return <FileText className="w-4 h-4 text-gray-400 dark:text-slate-500" />
     }
     return isExpanded 
-      ? <FolderOpen className="w-4 h-4 text-blue-500" />
-      : <Folder className="w-4 h-4 text-blue-500" />
+      ? <FolderOpen className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+      : <Folder className="w-4 h-4 text-blue-500 dark:text-blue-400" />
   }
 
   return (
@@ -104,7 +104,7 @@ function TreeNode({
       <div
         className={`
           flex items-center py-2 px-3 border-b border-gray-100 dark:border-gray-800
-          hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer
+          hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer
           ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20 border-l-2 border-l-blue-500' : ''}
         `}
         onClick={() => onSelect(node)}
@@ -125,8 +125,8 @@ function TreeNode({
               aria-label={isExpanded ? 'Collapse' : 'Expand'}
             >
               {isExpanded 
-                ? <ChevronDown className="w-4 h-4 text-gray-500" />
-                : <ChevronRight className="w-4 h-4 text-gray-500" />
+                ? <ChevronDown className="w-4 h-4 text-gray-500 dark:text-slate-400" />
+                : <ChevronRight className="w-4 h-4 text-gray-500 dark:text-slate-400" />
               }
             </button>
           ) : (
@@ -185,9 +185,9 @@ function TreeNode({
             style={{ marginLeft: indentPx + 18 }}
           />
           
-          {node.children.map(child => (
+          {node.children.map((child, index) => (
             <TreeNode
-              key={child.id}
+              key={`${child.id}-${index}`}
               node={child}
               level={level + 1}
               currency={currency}
@@ -272,9 +272,9 @@ export function HierarchyTreeView({
         data-testid={testId}
       >
         {viewType === 'ces' ? (
-          <Layers className="w-12 h-12 text-gray-400 mb-4" />
+          <Layers className="w-12 h-12 text-gray-400 dark:text-slate-500 mb-4" />
         ) : (
-          <GitBranch className="w-12 h-12 text-gray-400 mb-4" />
+          <GitBranch className="w-12 h-12 text-gray-400 dark:text-slate-500 mb-4" />
         )}
         <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">
           No {viewType === 'ces' ? 'CES' : 'WBS'} data available
@@ -295,7 +295,7 @@ export function HierarchyTreeView({
       <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2">
           {viewType === 'ces' ? (
-            <Layers className="w-5 h-5 text-blue-500" />
+            <Layers className="w-5 h-5 text-blue-500 dark:text-blue-400" />
           ) : (
             <GitBranch className="w-5 h-5 text-purple-500" />
           )}
@@ -321,7 +321,7 @@ export function HierarchyTreeView({
       </div>
 
       {/* Column headers */}
-      <div className="flex items-center py-2 px-3 bg-gray-100 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+      <div className="flex items-center py-2 px-3 bg-gray-100 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
         <div className="flex-1 pl-8">Name</div>
         {showBudget && <div className="w-28 text-right">Budget</div>}
         {showSpend && <div className="w-28 text-right">Spend</div>}

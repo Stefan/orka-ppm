@@ -23,8 +23,8 @@ export default function ChangeOrdersPage() {
       <ResponsiveContainer padding="md">
         <div className="space-y-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Change Orders</h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Change Orders</h1>
+            <p className="text-gray-600 dark:text-slate-400 mt-1">
               Select a project to manage formal change orders with cost impact analysis
             </p>
           </div>
@@ -34,7 +34,7 @@ export default function ChangeOrdersPage() {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
             </div>
           ) : projects.length === 0 ? (
-            <div className="py-12 text-center text-gray-500 bg-white rounded-lg border">
+            <div className="py-12 text-center text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-800 rounded-lg border">
               No projects found. Create a project first to manage change orders.
             </div>
           ) : (
@@ -43,14 +43,14 @@ export default function ChangeOrdersPage() {
                 <Link
                   key={project.id}
                   href={`/changes/orders/${project.id}`}
-                  className="flex items-center gap-4 p-4 bg-white rounded-lg border hover:border-indigo-300 hover:shadow-md transition-shadow"
+                  className="flex items-center gap-4 p-4 bg-white dark:bg-slate-800 rounded-lg border hover:border-indigo-300 hover:shadow-md transition-shadow"
                 >
                   <div className="p-2 bg-indigo-50 rounded-lg">
-                    <FileText className="w-6 h-6 text-indigo-600" />
+                    <FileText className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-gray-900 truncate">{project.name}</p>
-                    <p className="text-sm text-gray-500 capitalize">{project.status}</p>
+                    <p className="font-medium text-gray-900 dark:text-slate-100 truncate">{project.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-slate-400 capitalize">{project.status}</p>
                   </div>
                 </Link>
               ))}

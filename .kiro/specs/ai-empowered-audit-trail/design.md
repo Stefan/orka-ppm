@@ -1,5 +1,20 @@
 # Design Document: AI-Empowered Audit Trail
 
+## Requirements Coverage
+
+| Requirement | Design section |
+|-------------|----------------|
+| Req 1: AI-Powered Anomaly Detection | Architecture, Data Flow (Anomaly), Backend: Anomaly Detection Service (`backend/services/audit_anomaly_service.py`), Frontend: AnomalyDashboard |
+| Req 2: Visual Timeline with AI Insights | Backend: Audit RAG / timeline API, Frontend: Timeline Component (`components/audit/Timeline.tsx`), Audit Dashboard Page (`app/audit/page.tsx`) |
+| Req 3: AI Summaries and Semantic Search with RAG | Data Flow (Semantic Search), Backend: Audit RAG Agent (`backend/services/audit_rag_agent.py`), Frontend: SemanticSearch |
+| Req 4: Auto-Tagging and Categorization with ML | Backend: ML Classification Service (`backend/services/audit_ml_service.py`), Data Models (audit_logs category, risk_level, tags) |
+| Req 5: Integration with External Tools and Export | Backend: Export Service (`backend/services/audit_export_service.py`), Integration Hub (`backend/services/audit_integration_hub.py`), API export and integration endpoints |
+| Req 6: Compliance and Security | Data Models (hash, previous_hash, encryption), Backend: `backend/services/audit_encryption_service.py`, `backend/services/audit_compliance_service.py` |
+| Req 7: Performance and Scalability | Architecture (Redis, connection pooling), Data Flow, Backend caching and indexes in Data Models |
+| Req 8: AI Bias Detection and Fairness | Bias & Fairness subsection below; Backend: `backend/services/audit_bias_detection_service.py` |
+| Req 9: Multi-Tenant Architecture Support | Data Models (tenant_id on audit_logs, audit_embeddings, audit_anomalies), all services filter by tenant_id |
+| Req 10: Real-Time Monitoring Dashboard | Real-Time Dashboard subsection below; API `GET /audit/dashboard/stats`, Frontend: Audit Dashboard, AnomalyDashboard (WebSocket) |
+
 ## Overview
 
 The AI-Empowered Audit Trail feature extends the existing audit logging infrastructure with advanced AI capabilities including anomaly detection, semantic search, auto-tagging, and intelligent insights. The system leverages the existing `audit_logs` and `audit_logs` tables, integrates with the current AI agents infrastructure (`RAGReporterAgent`, `ResourceOptimizerAgent`, `RiskForecasterAgent`), and extends the help chat RAG system for audit log queries.
@@ -623,6 +638,19 @@ export function SemanticSearch({ onSearch, results, loading }: SemanticSearchPro
   // Related events
 }
 ```
+
+### Bias & Fairness (Requirement 8)
+
+AI bias detection and fairness are implemented by the **Bias Detection Service** (`backend/services/audit_bias_detection_service.py`). The service tracks anomaly detection rates by user role, department, and entity type; flags potential bias when rates differ by more than 20% across groups; and supports monthly bias reports. ML predictions are logged with confidence scores; predictions below 0.6 are flagged for human review. The API supports feedback and dispute recording (e.g. `POST /audit/anomaly/{anomaly_id}/feedback`). Design details for feature attribution and dispute handling are aligned with the audit_anomalies and audit_ml_models schema.
+
+### Real-Time Dashboard (Requirement 10)
+
+The real-time monitoring dashboard is served by the Audit Dashboard Page (`app/audit/page.tsx`) and uses:
+
+- **API:** `GET /audit/dashboard/stats` for aggregated stats (event counts, volume chart, recent anomalies, top users, top event types, category breakdown). Polling every 30 seconds or WebSocket updates satisfy real-time event counts and critical anomaly notifications.
+- **Frontend:** Timeline/Visualizer components display event volume, recent anomalies with severity, top users, top event types, and category breakdown. The Anomaly Dashboard (`components/audit/AnomalyDashboard.tsx`) consumes real-time updates via WebSocket. Clicking a dashboard metric navigates to the filtered timeline view.
+
+System health metrics (anomaly detection latency, search response time) can be included in the dashboard stats response and displayed in the same UI.
 
 ## Data Models
 

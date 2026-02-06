@@ -106,30 +106,30 @@ export default function DesignSystemPage() {
   })).filter(section => section.children && section.children.length > 0)
 
   return (
-    <div className="h-screen flex bg-white">
+    <div className="h-screen flex bg-white dark:bg-slate-800">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-gray-200 flex flex-col bg-gray-50">
+      <aside className="w-64 border-r border-gray-200 dark:border-slate-700 flex flex-col bg-gray-50 dark:bg-slate-800/50">
         {/* Search Header */}
-        <div className="p-3 border-b border-gray-200">
+        <div className="p-3 border-b border-gray-200 dark:border-slate-700">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500" />
             <input
               type="text"
               placeholder="Find components"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-16 py-2 text-sm bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-9 pr-16 py-2 text-sm bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 border border-gray-200 rounded text-gray-500">⌘</kbd>
-              <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 border border-gray-200 rounded text-gray-500">K</kbd>
+              <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-slate-700 border border-gray-200 dark:border-slate-700 rounded text-gray-600 dark:text-slate-300">⌘</kbd>
+              <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-slate-700 border border-gray-200 dark:border-slate-700 rounded text-gray-600 dark:text-slate-300">K</kbd>
             </div>
           </div>
           <div className="flex items-center gap-2 mt-2">
-            <button className="p-1.5 rounded hover:bg-gray-200 text-gray-500">
+            <button className="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-500 dark:text-slate-400">
               <Filter className="w-4 h-4" />
             </button>
-            <button className="p-1.5 rounded hover:bg-gray-200 text-gray-500">
+            <button className="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-500 dark:text-slate-400">
               <Plus className="w-4 h-4" />
             </button>
           </div>
@@ -138,19 +138,19 @@ export default function DesignSystemPage() {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-2">
           <div className="px-3 py-2">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Components</span>
+            <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Components</span>
           </div>
           
           {filteredNavItems.map((section) => (
             <div key={section.id} className="mb-1">
               <button
                 onClick={() => toggleSection(section.id)}
-                className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100"
+                className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700"
               >
                 {expandedSections[section.id] ? (
-                  <ChevronDown className="w-3 h-3 text-gray-400" />
+                  <ChevronDown className="w-3 h-3 text-gray-400 dark:text-slate-500" />
                 ) : (
-                  <ChevronRight className="w-3 h-3 text-gray-400" />
+                  <ChevronRight className="w-3 h-3 text-gray-400 dark:text-slate-500" />
                 )}
                 <span className="text-orange-500">{section.icon}</span>
                 <span className="font-medium">{section.label}</span>
@@ -166,12 +166,12 @@ export default function DesignSystemPage() {
                         'w-full flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors',
                         activeComponent === child.id
                           ? 'bg-blue-500 text-white'
-                          : 'text-gray-600 hover:bg-gray-100'
+                          : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700'
                       )}
                     >
                       <Bookmark className={cn(
                         'w-3 h-3',
-                        activeComponent === child.id ? 'text-white' : 'text-gray-400'
+                        activeComponent === child.id ? 'text-white' : 'text-gray-400 dark:text-slate-500'
                       )} />
                       <span>{child.label}</span>
                     </button>
@@ -186,28 +186,28 @@ export default function DesignSystemPage() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Toolbar */}
-        <header className="h-12 border-b border-gray-200 flex items-center justify-between px-4 bg-white">
+        <header className="h-12 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-4 bg-white dark:bg-slate-800">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-500 dark:text-slate-400">
               {navItems.find(s => s.children?.some(c => c.id === activeComponent))?.label}
             </span>
             <ChevronRight className="w-4 h-4 text-gray-300" />
-            <span className="text-sm font-medium text-gray-900">
+            <span className="text-sm font-medium text-gray-900 dark:text-slate-100">
               {navItems.flatMap(s => s.children || []).find(c => c.id === activeComponent)?.label}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <button className="p-2 rounded hover:bg-gray-100 text-gray-500">
+            <button className="p-2 rounded hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 text-gray-600 dark:text-slate-300">
               <RefreshCw className="w-4 h-4" />
             </button>
-            <button className="p-2 rounded hover:bg-gray-100 text-gray-500">
+            <button className="p-2 rounded hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 text-gray-600 dark:text-slate-300">
               <ExternalLink className="w-4 h-4" />
             </button>
           </div>
         </header>
 
         {/* Component Preview */}
-        <div className="flex-1 overflow-auto p-8 bg-gray-50">
+        <div className="flex-1 overflow-auto p-8 bg-gray-50 dark:bg-slate-800/50">
           <div className="max-w-4xl mx-auto">
             <ComponentPreview componentId={activeComponent} />
           </div>
@@ -312,7 +312,7 @@ function ComponentPreview({ componentId }: { componentId: ComponentId }) {
         <PreviewCard title="Basic Card" description="A simple card with content only.">
           <Card>
             <CardContent className="p-6">
-              <p className="text-gray-600">This is a basic card with some content inside.</p>
+              <p className="text-gray-600 dark:text-slate-400">This is a basic card with some content inside.</p>
             </CardContent>
           </Card>
         </PreviewCard>
@@ -322,11 +322,11 @@ function ComponentPreview({ componentId }: { componentId: ComponentId }) {
         <PreviewCard title="Card with Header" description="Cards can have a header section for titles.">
           <Card>
             <CardHeader>
-              <h3 className="text-lg font-semibold text-gray-900">Card Title</h3>
-              <p className="text-sm text-gray-500">Card subtitle or description</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Card Title</h3>
+              <p className="text-sm text-gray-500 dark:text-slate-400">Card subtitle or description</p>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">This card has a header with a title and description.</p>
+              <p className="text-gray-600 dark:text-slate-400">This card has a header with a title and description.</p>
             </CardContent>
           </Card>
         </PreviewCard>
@@ -336,10 +336,10 @@ function ComponentPreview({ componentId }: { componentId: ComponentId }) {
         <PreviewCard title="Card with Footer" description="Cards can have a footer section for actions.">
           <Card>
             <CardHeader>
-              <h3 className="text-lg font-semibold text-gray-900">Confirm Action</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Confirm Action</h3>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">Are you sure you want to proceed with this action?</p>
+              <p className="text-gray-600 dark:text-slate-400">Are you sure you want to proceed with this action?</p>
             </CardContent>
             <CardFooter className="flex justify-end gap-2">
               <Button variant="ghost">Cancel</Button>
@@ -356,10 +356,10 @@ function ComponentPreview({ componentId }: { componentId: ComponentId }) {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-gray-900">Clickable Card</h3>
-                    <p className="text-sm text-gray-500">Hover to see effect</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-slate-100">Clickable Card</h3>
+                    <p className="text-sm text-gray-500 dark:text-slate-400">Hover to see effect</p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 dark:text-slate-500" />
                 </div>
               </CardContent>
             </Card>
@@ -368,8 +368,8 @@ function ComponentPreview({ componentId }: { componentId: ComponentId }) {
                 <div className="flex items-start gap-3">
                   <Info className="w-5 h-5 text-blue-500 flex-shrink-0" />
                   <div>
-                    <h3 className="font-semibold text-gray-900">Info Card</h3>
-                    <p className="text-sm text-gray-500">With accent border</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-slate-100">Info Card</h3>
+                    <p className="text-sm text-gray-500 dark:text-slate-400">With accent border</p>
                   </div>
                 </div>
               </CardContent>
@@ -381,28 +381,28 @@ function ComponentPreview({ componentId }: { componentId: ComponentId }) {
       return (
         <PreviewCard title="Status Cards" description="Cards can indicate different statuses with colors.">
           <div className="grid grid-cols-2 gap-4">
-            <Card className="border-l-4 border-l-green-500 bg-green-50">
+            <Card className="border-l-4 border-l-green-500 bg-green-50 dark:bg-green-900/20">
               <CardContent className="p-4 flex items-center gap-2">
-                <Check className="w-5 h-5 text-green-600" />
-                <span className="font-medium text-green-800">Success</span>
+                <Check className="w-5 h-5 text-green-600 dark:text-green-400" />
+                <span className="font-medium text-green-800 dark:text-green-300">Success</span>
               </CardContent>
             </Card>
-            <Card className="border-l-4 border-l-yellow-500 bg-yellow-50">
+            <Card className="border-l-4 border-l-yellow-500 bg-yellow-50 dark:bg-yellow-900/20">
               <CardContent className="p-4 flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-yellow-600" />
-                <span className="font-medium text-yellow-800">Warning</span>
+                <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+                <span className="font-medium text-yellow-800 dark:text-yellow-300">Warning</span>
               </CardContent>
             </Card>
-            <Card className="border-l-4 border-l-red-500 bg-red-50">
+            <Card className="border-l-4 border-l-red-500 bg-red-50 dark:bg-red-900/20">
               <CardContent className="p-4 flex items-center gap-2">
-                <X className="w-5 h-5 text-red-600" />
-                <span className="font-medium text-red-800">Error</span>
+                <X className="w-5 h-5 text-red-600 dark:text-red-400" />
+                <span className="font-medium text-red-800 dark:text-red-300">Error</span>
               </CardContent>
             </Card>
-            <Card className="border-l-4 border-l-blue-500 bg-blue-50">
+            <Card className="border-l-4 border-l-blue-500 bg-blue-50 dark:bg-blue-900/20">
               <CardContent className="p-4 flex items-center gap-2">
-                <Info className="w-5 h-5 text-blue-600" />
-                <span className="font-medium text-blue-800">Info</span>
+                <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <span className="font-medium text-blue-800 dark:text-blue-300">Info</span>
               </CardContent>
             </Card>
           </div>
@@ -455,7 +455,7 @@ function ComponentPreview({ componentId }: { componentId: ComponentId }) {
         <PreviewCard title="Special Inputs" description="Inputs with icons and special functionality.">
           <div className="max-w-md space-y-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500" />
               <Input className="pl-10" placeholder="Search..." />
             </div>
             <div className="relative">
@@ -466,7 +466,7 @@ function ComponentPreview({ componentId }: { componentId: ComponentId }) {
               />
               <button 
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-slate-400"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -492,10 +492,10 @@ function ComponentPreview({ componentId }: { componentId: ComponentId }) {
 
 function PreviewCard({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-      <div className="p-6 border-b border-gray-100">
-        <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
-        <p className="text-gray-500 mt-1">{description}</p>
+    <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 overflow-hidden">
+      <div className="p-6 border-b border-gray-100 dark:border-slate-700">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100">{title}</h2>
+        <p className="text-gray-500 dark:text-slate-400 mt-1">{description}</p>
       </div>
       <div className="p-6">
         {children}
@@ -543,15 +543,15 @@ function ColorsPreview() {
       <div className="space-y-6">
         {colorGroups.map((group) => (
           <div key={group.name}>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">{group.name}</h3>
+            <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">{group.name}</h3>
             <div className="flex flex-wrap gap-3">
               {group.colors.map((color) => (
                 <div key={color.name} className="text-center">
                   <div 
-                    className="w-14 h-14 rounded-lg shadow-sm border border-gray-200"
+                    className="w-14 h-14 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700"
                     style={{ backgroundColor: color.value }}
                   />
-                  <p className="text-xs text-gray-600 mt-1">{color.name}</p>
+                  <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">{color.name}</p>
                 </div>
               ))}
             </div>
@@ -566,25 +566,25 @@ function TypographyPreview() {
   return (
     <PreviewCard title="Typography" description="Text styles and font sizes used in the design system.">
       <div className="space-y-4">
-        <div className="pb-4 border-b border-gray-100">
-          <h1 className="text-3xl font-bold text-gray-900">Heading 1</h1>
-          <p className="text-xs text-gray-400 mt-1">text-3xl font-bold</p>
+        <div className="pb-4 border-b border-gray-100 dark:border-slate-700">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Heading 1</h1>
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">text-3xl font-bold</p>
         </div>
-        <div className="pb-4 border-b border-gray-100">
-          <h2 className="text-2xl font-semibold text-gray-900">Heading 2</h2>
-          <p className="text-xs text-gray-400 mt-1">text-2xl font-semibold</p>
+        <div className="pb-4 border-b border-gray-100 dark:border-slate-700">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-slate-100">Heading 2</h2>
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">text-2xl font-semibold</p>
         </div>
-        <div className="pb-4 border-b border-gray-100">
-          <h3 className="text-xl font-semibold text-gray-900">Heading 3</h3>
-          <p className="text-xs text-gray-400 mt-1">text-xl font-semibold</p>
+        <div className="pb-4 border-b border-gray-100 dark:border-slate-700">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100">Heading 3</h3>
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">text-xl font-semibold</p>
         </div>
-        <div className="pb-4 border-b border-gray-100">
-          <p className="text-base text-gray-700">Body text - The quick brown fox jumps over the lazy dog.</p>
-          <p className="text-xs text-gray-400 mt-1">text-base</p>
+        <div className="pb-4 border-b border-gray-100 dark:border-slate-700">
+          <p className="text-base text-gray-700 dark:text-slate-300">Body text - The quick brown fox jumps over the lazy dog.</p>
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">text-base</p>
         </div>
         <div>
-          <p className="text-sm text-gray-600">Small text - Used for captions and secondary information.</p>
-          <p className="text-xs text-gray-400 mt-1">text-sm</p>
+          <p className="text-sm text-gray-600 dark:text-slate-400">Small text - Used for captions and secondary information.</p>
+          <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">text-sm</p>
         </div>
       </div>
     </PreviewCard>
@@ -615,9 +615,9 @@ function IconsPreview() {
     <PreviewCard title="Icons" description="Lucide React icons used in the application.">
       <div className="grid grid-cols-8 gap-4">
         {icons.map(({ Icon, name }) => (
-          <div key={name} className="flex flex-col items-center p-3 rounded-lg hover:bg-gray-50">
-            <Icon className="w-5 h-5 text-gray-700" />
-            <span className="text-xs text-gray-500 mt-2">{name}</span>
+          <div key={name} className="flex flex-col items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
+            <Icon className="w-5 h-5 text-gray-700 dark:text-slate-300" />
+            <span className="text-xs text-gray-500 dark:text-slate-400 mt-2">{name}</span>
           </div>
         ))}
       </div>
@@ -639,12 +639,12 @@ function SpacingPreview() {
       <div className="space-y-3">
         {spacings.map((spacing) => (
           <div key={spacing.name} className="flex items-center gap-4">
-            <span className="w-8 text-sm text-gray-500 font-mono">{spacing.name}</span>
+            <span className="w-8 text-sm text-gray-500 dark:text-slate-400 font-mono">{spacing.name}</span>
             <div 
               className="h-4 bg-blue-500 rounded"
               style={{ width: spacing.value }}
             />
-            <span className="text-sm text-gray-600">{spacing.value}</span>
+            <span className="text-sm text-gray-600 dark:text-slate-400">{spacing.value}</span>
           </div>
         ))}
       </div>

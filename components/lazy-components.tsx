@@ -200,7 +200,7 @@ export const LazyVirtualizedProjectSelector = dynamic(
 export const LazyVarianceKPIs = dynamic(
   () => import('../app/dashboards/components/VarianceKPIs'),
   {
-    loading: () => <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>,
+    loading: () => <div className="h-20 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse"></div>,
     ssr: false
   }
 )
@@ -208,7 +208,7 @@ export const LazyVarianceKPIs = dynamic(
 export const LazyVarianceTrends = dynamic(
   () => import('../app/dashboards/components/VarianceTrends'),
   {
-    loading: () => <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>,
+    loading: () => <div className="h-20 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse"></div>,
     ssr: false
   }
 )

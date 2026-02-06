@@ -94,10 +94,10 @@ export const FormField: React.FC<FormFieldProps> = ({
       <div className="flex items-center justify-between">
         <label
           htmlFor={name}
-          className="block text-sm font-medium text-gray-700"
+          className="block text-sm font-medium text-gray-700 dark:text-slate-300"
         >
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="text-red-500 dark:text-red-400 ml-1">*</span>}
         </label>
         
         {tooltip && (
@@ -106,7 +106,7 @@ export const FormField: React.FC<FormFieldProps> = ({
               type="button"
               onMouseEnter={() => setShowTooltip(true)}
               onMouseLeave={() => setShowTooltip(false)}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 dark:text-slate-400 transition-colors"
             >
               <HelpCircle className="w-4 h-4" />
             </button>
@@ -124,11 +124,11 @@ export const FormField: React.FC<FormFieldProps> = ({
       {renderInput()}
       
       {helpText && !error && (
-        <p className="text-xs text-gray-500">{helpText}</p>
+        <p className="text-xs text-gray-500 dark:text-slate-400">{helpText}</p>
       )}
       
       {error && (
-        <div className="flex items-start gap-2 text-sm text-red-600">
+        <div className="flex items-start gap-2 text-sm text-red-600 dark:text-red-400">
           <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>
@@ -155,10 +155,10 @@ export const FormSection: React.FC<FormSectionProps> = ({
 }) => {
   return (
     <div className={cn('space-y-4', className)}>
-      <div className="border-b border-gray-200 pb-3">
-        <h3 className="text-base font-semibold text-gray-900">{title}</h3>
+      <div className="border-b border-gray-200 dark:border-slate-700 pb-3">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-slate-100">{title}</h3>
         {description && (
-          <p className="text-sm text-gray-600 mt-1">{description}</p>
+          <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">{description}</p>
         )}
       </div>
       <div className="space-y-4">
@@ -199,20 +199,20 @@ export const CheckboxField: React.FC<CheckboxFieldProps> = ({
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
         disabled={disabled}
-        className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="mt-1 w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-slate-600 rounded focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
       />
       <div className="flex-1">
         <label
           htmlFor={name}
           className={cn(
-            'text-sm font-medium text-gray-700 cursor-pointer',
+            'text-sm font-medium text-gray-700 dark:text-slate-300 cursor-pointer',
             disabled && 'opacity-50 cursor-not-allowed'
           )}
         >
           {label}
         </label>
         {description && (
-          <p className="text-xs text-gray-500 mt-1">{description}</p>
+          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{description}</p>
         )}
       </div>
     </div>

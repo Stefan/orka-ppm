@@ -44,4 +44,25 @@ describe('Property 21: Filter Application Logic', () => {
     expect(result).toHaveLength(1)
     expect(result[0]).toEqual({ id: '1', a: 1, b: 2 })
   })
+
+  it('Property 22: Filter Removal Round-Trip – removing a filter widens result', () => {
+    const data = [
+      { id: '1', a: 1, b: 2 },
+      { id: '2', a: 1, b: 3 },
+      { id: '3', a: 2, b: 2 },
+    ]
+    const filtersBoth: Filter[] = [
+      { id: 'f1', field: 'a', operator: 'equals' as const, value: 1, label: 'A' },
+      { id: 'f2', field: 'b', operator: 'equals' as const, value: 2, label: 'B' },
+    ]
+    const filtersOne: Filter[] = [
+      { id: 'f1', field: 'a', operator: 'equals' as const, value: 1, label: 'A' },
+    ]
+    const withBoth = applyFilters(data, filtersBoth)
+    const withOne = applyFilters(data, filtersOne)
+    expect(withBoth.length).toBeLessThanOrEqual(withOne.length)
+    withBoth.forEach((row) => {
+      expect(withOne.some((r) => (r as { id: string }).id === (row as { id: string }).id)).toBe(true)
+    })
+  })
 })

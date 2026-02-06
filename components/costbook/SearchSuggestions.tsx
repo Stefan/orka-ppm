@@ -60,7 +60,7 @@ function highlightMatch(text: string, query: string): React.ReactNode {
   return (
     <>
       {text.slice(0, index)}
-      <mark className="bg-yellow-100 text-yellow-900 rounded px-0.5">
+      <mark className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 rounded px-0.5">
         {text.slice(index, index + query.length)}
       </mark>
       {text.slice(index + query.length)}
@@ -85,7 +85,7 @@ export function SearchSuggestions({
     <div
       className={`
         absolute z-50 mt-1 w-full
-        bg-white border border-gray-200 rounded-lg shadow-lg
+        bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg
         max-h-[300px] overflow-y-auto
         ${className}
       `}
@@ -93,8 +93,8 @@ export function SearchSuggestions({
       data-testid={testId}
     >
       {/* AI-powered header */}
-      <div className="px-3 py-2 border-b border-gray-100 bg-gray-50">
-        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+      <div className="px-3 py-2 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+        <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-slate-400">
           <Sparkles className="w-3 h-3 text-purple-500" />
           <span>AI-powered suggestions</span>
         </div>
@@ -110,8 +110,8 @@ export function SearchSuggestions({
                 w-full px-3 py-2 flex items-start gap-3 text-left
                 transition-colors
                 ${index === selectedIndex
-                  ? 'bg-blue-50 text-blue-900'
-                  : 'hover:bg-gray-50 text-gray-700'
+                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-900'
+                  : 'hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 text-gray-700 dark:text-slate-300'
                 }
               `}
               role="option"
@@ -119,7 +119,7 @@ export function SearchSuggestions({
             >
               <span className={`
                 mt-0.5
-                ${index === selectedIndex ? 'text-blue-500' : 'text-gray-400'}
+                ${index === selectedIndex ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-slate-500'}
               `}>
                 {getSuggestionIcon(suggestion.query)}
               </span>
@@ -129,7 +129,7 @@ export function SearchSuggestions({
                 </div>
                 <div className={`
                   text-xs truncate
-                  ${index === selectedIndex ? 'text-blue-600' : 'text-gray-500'}
+                  ${index === selectedIndex ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-slate-400'}
                 `}>
                   {suggestion.description}
                 </div>
@@ -140,8 +140,8 @@ export function SearchSuggestions({
       </ul>
       
       {/* Footer hint */}
-      <div className="px-3 py-2 border-t border-gray-100 bg-gray-50">
-        <div className="flex items-center justify-between text-xs text-gray-400">
+      <div className="px-3 py-2 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+        <div className="flex items-center justify-between text-xs text-gray-400 dark:text-slate-500">
           <span>↑↓ to navigate</span>
           <span>Enter to select</span>
         </div>
@@ -179,21 +179,21 @@ export function NoResults({
       `}
       data-testid={testId}
     >
-      <div className="w-16 h-16 mb-4 flex items-center justify-center bg-gray-100 rounded-full">
-        <Search className="w-8 h-8 text-gray-400" />
+      <div className="w-16 h-16 mb-4 flex items-center justify-center bg-gray-100 dark:bg-slate-700 rounded-full">
+        <Search className="w-8 h-8 text-gray-400 dark:text-slate-500" />
       </div>
       
-      <h3 className="text-lg font-medium text-gray-900 mb-2">
+      <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-2">
         No results found
       </h3>
       
-      <p className="text-sm text-gray-500 mb-6 max-w-sm">
+      <p className="text-sm text-gray-500 dark:text-slate-400 mb-6 max-w-sm">
         No projects match "{query}". Try a different search or use one of the suggestions below.
       </p>
       
       {/* Example queries */}
       <div className="w-full max-w-md">
-        <h4 className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
+        <h4 className="text-xs font-medium text-gray-400 dark:text-slate-500 uppercase tracking-wide mb-3">
           Try these searches
         </h4>
         <div className="grid grid-cols-2 gap-2">
@@ -203,15 +203,15 @@ export function NoResults({
               onClick={() => onSuggestionSelect?.(example.query)}
               className="
                 px-3 py-2 text-left text-sm
-                bg-gray-50 hover:bg-gray-100
-                border border-gray-200 rounded-lg
+                bg-gray-50 dark:bg-slate-800/50 hover:bg-gray-100 dark:hover:bg-slate-600
+                border border-gray-200 dark:border-slate-700 rounded-lg
                 transition-colors
               "
             >
-              <div className="font-medium text-gray-700 truncate">
+              <div className="font-medium text-gray-700 dark:text-slate-300 truncate">
                 {example.query}
               </div>
-              <div className="text-xs text-gray-500 truncate">
+              <div className="text-xs text-gray-500 dark:text-slate-400 truncate">
                 {example.description}
               </div>
             </button>
@@ -275,7 +275,7 @@ export function SearchHelp({
   return (
     <div
       className={`
-        bg-white border border-gray-200 rounded-lg
+        bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg
         p-4
         ${className}
       `}
@@ -283,18 +283,18 @@ export function SearchHelp({
     >
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-5 h-5 text-purple-500" />
-        <h3 className="font-medium text-gray-900">AI Search Guide</h3>
+        <h3 className="font-medium text-gray-900 dark:text-slate-100">AI Search Guide</h3>
       </div>
       
-      <p className="text-sm text-gray-500 mb-4">
+      <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
         Use natural language to search and filter projects. Here are some examples:
       </p>
       
       <div className="space-y-4">
         {categories.map((category) => (
           <div key={category.title}>
-            <div className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-              <span className="text-gray-400">{category.icon}</span>
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+              <span className="text-gray-400 dark:text-slate-500">{category.icon}</span>
               {category.title}
             </div>
             <div className="grid grid-cols-2 gap-1.5 pl-6">
@@ -304,12 +304,12 @@ export function SearchHelp({
                   onClick={() => onExampleClick?.(example.query)}
                   className="
                     px-2 py-1.5 text-left text-xs
-                    bg-gray-50 hover:bg-gray-100
+                    bg-gray-50 dark:bg-slate-800/50 hover:bg-gray-100 dark:hover:bg-slate-600
                     rounded transition-colors
                     group
                   "
                 >
-                  <span className="font-medium text-gray-700 group-hover:text-blue-600">
+                  <span className="font-medium text-gray-700 dark:text-slate-300 group-hover:text-blue-600">
                     {example.query}
                   </span>
                 </button>
@@ -319,8 +319,8 @@ export function SearchHelp({
         ))}
       </div>
       
-      <div className="mt-4 pt-4 border-t border-gray-100">
-        <p className="text-xs text-gray-400">
+      <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700">
+        <p className="text-xs text-gray-400 dark:text-slate-500">
           Tip: Combine queries for more specific results, e.g., "active budget &gt; 50k"
         </p>
       </div>

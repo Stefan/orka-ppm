@@ -98,7 +98,7 @@ export default function ChromeScrollTestPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-slate-800">
       {/* Test Header */}
       <div className="bg-blue-600 text-white p-6">
         <h1 className="text-2xl font-bold mb-4">Chrome Scroll Black Bar Fix - Test Page</h1>
@@ -114,19 +114,19 @@ export default function ChromeScrollTestPage() {
           <div>
             <button
               onClick={runTests}
-              className="bg-white text-blue-600 px-4 py-2 rounded mr-2 mb-2"
+              className="bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 px-4 py-2 rounded mr-2 mb-2"
             >
               Run Tests
             </button>
             <button
               onClick={scrollToBottom}
-              className="bg-white text-blue-600 px-4 py-2 rounded mr-2 mb-2"
+              className="bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 px-4 py-2 rounded mr-2 mb-2"
             >
               Scroll to Bottom
             </button>
             <button
               onClick={scrollToTop}
-              className="bg-white text-blue-600 px-4 py-2 rounded mb-2"
+              className="bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 px-4 py-2 rounded mb-2"
             >
               Scroll to Top
             </button>
@@ -135,22 +135,22 @@ export default function ChromeScrollTestPage() {
       </div>
 
       {/* Test Results */}
-      <div className="p-6 bg-gray-50">
+      <div className="p-6 bg-gray-50 dark:bg-slate-800/50">
         <h2 className="text-xl font-semibold mb-4">Test Results</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className={`p-4 rounded ${testResults.backgroundConsistency ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          <div className={`p-4 rounded ${testResults.backgroundConsistency ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'}`}>
             <h3 className="font-semibold">Background Consistency</h3>
             <p>{testResults.backgroundConsistency ? '✅ Pass' : '❌ Fail'}</p>
           </div>
-          <div className={`p-4 rounded ${testResults.overscrollContainment ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          <div className={`p-4 rounded ${testResults.overscrollContainment ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'}`}>
             <h3 className="font-semibold">Overscroll Containment</h3>
             <p>{testResults.overscrollContainment ? '✅ Pass' : '❌ Fail'}</p>
           </div>
-          <div className={`p-4 rounded ${testResults.momentumHandling ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          <div className={`p-4 rounded ${testResults.momentumHandling ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'}`}>
             <h3 className="font-semibold">Momentum Handling</h3>
             <p>{testResults.momentumHandling ? '✅ Pass' : '❌ Fail'}</p>
           </div>
-          <div className={`p-4 rounded ${testResults.flexboxGaps ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          <div className={`p-4 rounded ${testResults.flexboxGaps ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'}`}>
             <h3 className="font-semibold">Flexbox Layout</h3>
             <p>{testResults.flexboxGaps ? '✅ Pass' : '❌ Fail'}</p>
           </div>
@@ -158,7 +158,7 @@ export default function ChromeScrollTestPage() {
 
         {/* Scroll Metrics */}
         {scrollMetrics && (
-          <div className="bg-white p-4 rounded shadow">
+          <div className="bg-white dark:bg-slate-800 p-4 rounded shadow">
             <h3 className="font-semibold mb-2">Scroll Performance Metrics</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
               <div>
@@ -187,7 +187,7 @@ export default function ChromeScrollTestPage() {
       {/* Main Content Area - This is where we test Chrome scroll behavior */}
       <div 
         ref={mainContentRef}
-        className="flex-1 min-h-screen bg-white overflow-auto chrome-scroll-optimized chrome-background-coverage chrome-flex-optimized"
+        className="flex-1 min-h-screen bg-white dark:bg-slate-800 overflow-auto chrome-scroll-optimized chrome-background-coverage chrome-flex-optimized"
         style={{
           // Chrome-specific optimizations
           WebkitOverflowScrolling: 'touch',
@@ -206,7 +206,7 @@ export default function ChromeScrollTestPage() {
           
           {/* Short Content Scenario */}
           <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-4 text-blue-600">Test Scenario 1: Short Content</h3>
+            <h3 className="text-xl font-semibold mb-4 text-blue-600 dark:text-blue-400">Test Scenario 1: Short Content</h3>
             <p className="mb-4">
               This section tests Chrome scroll behavior with content shorter than the viewport height.
               In Chrome, this scenario can cause black bars to appear when scrolling past the content boundaries.
@@ -219,7 +219,7 @@ export default function ChromeScrollTestPage() {
 
           {/* Long Content Scenario */}
           <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-4 text-green-600">Test Scenario 2: Long Content</h3>
+            <h3 className="text-xl font-semibold mb-4 text-green-600 dark:text-green-400">Test Scenario 2: Long Content</h3>
             <p className="mb-4">
               This section provides long content to test Chrome scroll momentum and background consistency
               during normal scrolling operations.
@@ -227,14 +227,14 @@ export default function ChromeScrollTestPage() {
             
             {/* Generate long content */}
             {Array.from({ length: 50 }, (_, i) => (
-              <div key={i} className="mb-4 p-4 bg-gray-50 rounded">
+              <div key={i} className="mb-4 p-4 bg-gray-50 dark:bg-slate-800/50 rounded">
                 <h4 className="font-semibold mb-2">Content Block {i + 1}</h4>
                 <p>
                   This is test content block {i + 1}. It contains enough text to create a scrollable area
                   that will test Chrome's scroll momentum behavior. The background should remain consistently
                   white throughout all scroll operations, including momentum scrolling and overscroll boundaries.
                 </p>
-                <p className="mt-2 text-sm text-gray-600">
+                <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
                   Watch for any black bars or background artifacts during scrolling, especially when using
                   Chrome's aggressive scroll momentum or when reaching scroll boundaries.
                 </p>
@@ -244,7 +244,7 @@ export default function ChromeScrollTestPage() {
 
           {/* Flexbox Test Scenario */}
           <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-4 text-purple-600">Test Scenario 3: Flexbox Layout</h3>
+            <h3 className="text-xl font-semibold mb-4 text-purple-600 dark:text-purple-400">Test Scenario 3: Flexbox Layout</h3>
             <p className="mb-4">
               This section tests Chrome flexbox rendering to ensure no gaps appear that could show
               parent backgrounds during scroll operations.
@@ -252,7 +252,7 @@ export default function ChromeScrollTestPage() {
             
             <div className="flex flex-col space-y-4">
               {Array.from({ length: 10 }, (_, i) => (
-                <div key={i} className="flex-1 bg-yellow-50 p-4 rounded">
+                <div key={i} className="flex-1 bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded">
                   <p>Flexbox item {i + 1} - No gaps should be visible between items</p>
                 </div>
               ))}
@@ -261,13 +261,13 @@ export default function ChromeScrollTestPage() {
 
           {/* Overscroll Test Scenario */}
           <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-4 text-red-600">Test Scenario 4: Overscroll Boundaries</h3>
+            <h3 className="text-xl font-semibold mb-4 text-red-600 dark:text-red-400">Test Scenario 4: Overscroll Boundaries</h3>
             <p className="mb-4">
               This is the final section. Try scrolling past this content (overscrolling) to test
               Chrome's boundary handling and ensure no black bars appear.
             </p>
             
-            <div className="bg-red-50 p-6 rounded">
+            <div className="bg-red-50 dark:bg-red-900/20 p-6 rounded">
               <p className="font-semibold">End of Content</p>
               <p>
                 Try scrolling down past this point with momentum. Chrome should contain the overscroll

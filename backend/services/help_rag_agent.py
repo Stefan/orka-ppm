@@ -126,7 +126,8 @@ class HelpRAGAgent(RAGReporterAgent):
                     {"role": "user", "content": user_prompt}
                 ],
                 temperature=0,  # Deterministic for speed
-                max_tokens=300  # Reduced from 400 for sub-3s responses
+                max_tokens=300,  # Reduced from 400 for sub-3s responses
+                timeout=10.0,  # Task 17: 10s timeout with fallback in router
             )
             
             ai_response = response.choices[0].message.content

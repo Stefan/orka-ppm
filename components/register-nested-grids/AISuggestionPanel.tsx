@@ -33,13 +33,13 @@ export default function AISuggestionPanel({ itemType, onApply }: AISuggestionPan
       <div className="space-y-1">
         {suggestions.map((s, i) => (
           <div key={i} className="flex items-center justify-between text-xs">
-            <span className="text-gray-700 truncate flex-1">{s.suggestion.reason}</span>
-            <span className="text-gray-500 ml-1">{(s.confidence * 100).toFixed(0)}%</span>
+            <span className="text-gray-700 dark:text-slate-300 truncate flex-1">{s.suggestion.reason}</span>
+            <span className="text-gray-500 dark:text-slate-400 ml-1">{(s.confidence * 100).toFixed(0)}%</span>
             {onApply && s.suggestion.columns && (
               <button
                 type="button"
                 onClick={() => onApply(s.suggestion.columns!)}
-                className="ml-2 px-2 py-0.5 text-indigo-600 hover:bg-indigo-100 rounded text-xs"
+                className="ml-2 px-2 py-0.5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:bg-indigo-900/30 rounded text-xs"
               >
                 Apply
               </button>

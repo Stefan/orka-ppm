@@ -30,11 +30,11 @@ export default function ProjectControlsPage() {
       <ResponsiveContainer padding="md">
         <div className="space-y-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Project Controls</h1>
-            <p className="text-gray-600 mt-1">ETC, EAC, Earned Value, and Performance Analytics</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Project Controls</h1>
+            <p className="text-gray-600 dark:text-slate-400 mt-1">ETC, EAC, Earned Value, and Performance Analytics</p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Project</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Project</label>
             <select
               value={selectedProjectId ?? ''}
               onChange={(e) => setSelectedProjectId(e.target.value || null)}

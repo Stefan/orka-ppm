@@ -505,7 +505,7 @@ export function ProjectCard({
       {/* Expand/Collapse Button */}
       <button
         onClick={toggleExpanded}
-        className="w-full flex items-center justify-center gap-2 py-2 text-sm text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all rounded-md border border-transparent hover:border-gray-200 dark:hover:border-slate-600"
+        className="w-full flex items-center justify-center gap-2 py-2 text-sm text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700 transition-all rounded-md border border-transparent hover:border-gray-200 dark:border-slate-700 dark:hover:border-slate-600"
         aria-expanded={expanded}
       >
         {expanded ? (
@@ -685,7 +685,7 @@ export function ProjectRow({
       className={`
         flex items-center justify-between 
         p-3 
-        hover:bg-gray-50 dark:hover:bg-slate-700
+        hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700
         border-b border-gray-100 dark:border-slate-700
         ${onClick ? 'cursor-pointer' : ''}
       `}

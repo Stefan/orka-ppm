@@ -146,7 +146,7 @@ export const InfoTooltip: React.FC<InfoTooltipProps> = ({
       <button
         type="button"
         className={cn(
-          'inline-flex items-center justify-center w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors',
+          'inline-flex items-center justify-center w-4 h-4 text-gray-400 hover:text-gray-600 dark:text-slate-400 transition-colors',
           className
         )}
       >

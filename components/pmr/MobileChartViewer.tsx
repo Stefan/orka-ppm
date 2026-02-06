@@ -99,11 +99,11 @@ const MobileChartViewer: React.FC<MobileChartViewerProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`flex flex-col h-full bg-white ${className}`}
+      className={`flex flex-col h-full bg-white dark:bg-slate-800 ${className}`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
-        <h3 className="text-base font-semibold text-gray-900 truncate flex-1">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 sticky top-0 z-10">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-slate-100 truncate flex-1">
           {title}
         </h3>
 
@@ -111,7 +111,7 @@ const MobileChartViewer: React.FC<MobileChartViewerProps> = ({
           {onExport && (
             <button
               onClick={onExport}
-              className="p-2 text-gray-600 hover:bg-gray-100 rounded-md"
+              className="p-2 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-md"
               title="Export chart"
             >
               <Download className="h-5 w-5" />
@@ -120,7 +120,7 @@ const MobileChartViewer: React.FC<MobileChartViewerProps> = ({
           
           <button
             onClick={toggleFullscreen}
-            className="p-2 text-gray-600 hover:bg-gray-100 rounded-md"
+            className="p-2 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-md"
             title="Toggle fullscreen"
           >
             <Maximize2 className="h-5 w-5" />
@@ -129,7 +129,7 @@ const MobileChartViewer: React.FC<MobileChartViewerProps> = ({
           {onClose && (
             <button
               onClick={onClose}
-              className="p-2 text-gray-600 hover:bg-gray-100 rounded-md"
+              className="p-2 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-md"
               title="Close"
             >
               <X className="h-5 w-5" />
@@ -141,7 +141,7 @@ const MobileChartViewer: React.FC<MobileChartViewerProps> = ({
       {/* Chart Container */}
       <div
         ref={elementRef as React.RefObject<HTMLDivElement>}
-        className="flex-1 overflow-hidden relative bg-gray-50"
+        className="flex-1 overflow-hidden relative bg-gray-50 dark:bg-slate-800/50"
       >
         <div
           ref={chartRef}
@@ -153,15 +153,15 @@ const MobileChartViewer: React.FC<MobileChartViewerProps> = ({
         >
           {/* Placeholder for actual chart component */}
           <div className="w-full h-full p-4">
-            <div className="w-full h-full bg-white rounded-lg shadow-sm border border-gray-200 flex items-center justify-center">
+            <div className="w-full h-full bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-center">
               <div className="text-center">
                 <div className="text-4xl font-bold text-gray-300 mb-2">
                   {chartType.toUpperCase()}
                 </div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-slate-400">
                   Chart visualization would render here
                 </p>
-                <p className="text-xs text-gray-400 mt-2">
+                <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">
                   Pinch to zoom • Double tap to reset
                 </p>
               </div>
@@ -185,11 +185,11 @@ const MobileChartViewer: React.FC<MobileChartViewerProps> = ({
       </div>
 
       {/* Zoom Controls */}
-      <div className="flex items-center justify-center space-x-2 p-4 border-t border-gray-200 bg-white">
+      <div className="flex items-center justify-center space-x-2 p-4 border-t border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
         <button
           onClick={handleZoomOut}
           disabled={scale <= 0.5}
-          className="p-3 text-gray-600 hover:bg-gray-100 rounded-md disabled:opacity-30 disabled:cursor-not-allowed"
+          className="p-3 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-md disabled:opacity-30 disabled:cursor-not-allowed"
           title="Zoom out"
         >
           <ZoomOut className="h-5 w-5" />
@@ -210,7 +210,7 @@ const MobileChartViewer: React.FC<MobileChartViewerProps> = ({
         <button
           onClick={handleZoomIn}
           disabled={scale >= 3}
-          className="p-3 text-gray-600 hover:bg-gray-100 rounded-md disabled:opacity-30 disabled:cursor-not-allowed"
+          className="p-3 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-md disabled:opacity-30 disabled:cursor-not-allowed"
           title="Zoom in"
         >
           <ZoomIn className="h-5 w-5" />
@@ -218,7 +218,7 @@ const MobileChartViewer: React.FC<MobileChartViewerProps> = ({
 
         <button
           onClick={handleReset}
-          className="p-3 text-gray-600 hover:bg-gray-100 rounded-md"
+          className="p-3 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-md"
           title="Reset zoom"
         >
           <RotateCcw className="h-5 w-5" />
@@ -226,8 +226,8 @@ const MobileChartViewer: React.FC<MobileChartViewerProps> = ({
       </div>
 
       {/* Scale Display */}
-      <div className="px-4 py-2 bg-gray-50 border-t border-gray-200 text-center">
-        <span className="text-xs text-gray-600">
+      <div className="px-4 py-2 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700 text-center">
+        <span className="text-xs text-gray-600 dark:text-slate-400">
           Zoom: {Math.round(scale * 100)}%
         </span>
       </div>

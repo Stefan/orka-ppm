@@ -169,7 +169,7 @@ export const FinancialDataDisplay: React.FC<FinancialDataDisplayProps> = ({
 
   if (accessLevel === 'none' || !filteredData) {
     return (
-      <div className={`text-gray-500 italic ${className}`}>
+      <div className={`text-gray-500 dark:text-slate-400 italic ${className}`}>
         You do not have permission to view financial data.
       </div>
     )
@@ -178,7 +178,7 @@ export const FinancialDataDisplay: React.FC<FinancialDataDisplayProps> = ({
   return (
     <div className={className}>
       {showAccessIndicator && accessLevel === 'summary' && (
-        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
           <div className="flex items-center">
             <svg
               className="h-5 w-5 text-blue-400 mr-2"
@@ -193,7 +193,7 @@ export const FinancialDataDisplay: React.FC<FinancialDataDisplayProps> = ({
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <span className="text-sm text-blue-800">
+            <span className="text-sm text-blue-800 dark:text-blue-300">
               Showing summary financial data. Detailed breakdowns are not available.
             </span>
           </div>
@@ -204,10 +204,10 @@ export const FinancialDataDisplay: React.FC<FinancialDataDisplayProps> = ({
         {/* Display filtered financial data */}
         {Object.entries(filteredData).map(([key, value]) => (
           <div key={key} className="flex justify-between items-center">
-            <span className="text-sm font-medium text-gray-700 capitalize">
+            <span className="text-sm font-medium text-gray-700 dark:text-slate-300 capitalize">
               {key.replace(/_/g, ' ')}:
             </span>
-            <span className="text-sm text-gray-900">
+            <span className="text-sm text-gray-900 dark:text-slate-100">
               {typeof value === 'number' 
                 ? value.toLocaleString('en-US', { 
                     style: key.includes('currency') ? 'currency' : 'decimal',

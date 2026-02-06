@@ -104,25 +104,25 @@ export function FeedbackAnalytics({
 
   // Get satisfaction color
   const getSatisfactionColor = (score: number) => {
-    if (score >= 0.8) return 'text-green-600 bg-green-50'
-    if (score >= 0.6) return 'text-yellow-600 bg-yellow-50'
-    return 'text-red-600 bg-red-50'
+    if (score >= 0.8) return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20'
+    if (score >= 0.6) return 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20'
+    return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20'
   }
 
   // Get rating color
   const getRatingColor = (rating: number) => {
-    if (rating >= 4) return 'text-green-600'
-    if (rating >= 3) return 'text-yellow-600'
-    return 'text-red-600'
+    if (rating >= 4) return 'text-green-600 dark:text-green-400'
+    if (rating >= 3) return 'text-yellow-600 dark:text-yellow-400'
+    return 'text-red-600 dark:text-red-400'
   }
 
   if (loading && !data) {
     return (
-      <div className={cn('p-6 bg-white rounded-lg border border-gray-200', className)}>
+      <div className={cn('p-6 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700', className)}>
         <div className="flex items-center justify-center h-64">
           <div className="flex items-center space-x-3">
             <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-            <span className="text-gray-600">Loading analytics...</span>
+            <span className="text-gray-600 dark:text-slate-400">Loading analytics...</span>
           </div>
         </div>
       </div>
@@ -131,15 +131,15 @@ export function FeedbackAnalytics({
 
   if (error) {
     return (
-      <div className={cn('p-6 bg-white rounded-lg border border-gray-200', className)}>
+      <div className={cn('p-6 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700', className)}>
         <div className="flex items-center justify-center h-64">
           <div className="text-center space-y-4">
-            <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
+            <AlertCircle className="h-12 w-12 text-red-500 dark:text-red-400 mx-auto" />
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">
                 Failed to Load Analytics
               </h3>
-              <p className="text-gray-600 mb-4">{error}</p>
+              <p className="text-gray-600 dark:text-slate-400 mb-4">{error}</p>
               <button
                 onClick={handleRefresh}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -162,19 +162,19 @@ export function FeedbackAnalytics({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Help Chat Analytics</h2>
-          <p className="text-gray-600 mt-1">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Help Chat Analytics</h2>
+          <p className="text-gray-600 dark:text-slate-400 mt-1">
             Usage patterns and feedback insights for the AI help system
           </p>
         </div>
         <div className="flex items-center space-x-4">
           {/* Period selector */}
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">Period:</span>
+            <span className="text-sm text-gray-600 dark:text-slate-400">Period:</span>
             <select
               value={selectedPeriod}
               onChange={(e) => handlePeriodChange(Number(e.target.value))}
-              className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="px-3 py-1 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value={7}>Last 7 days</option>
               <option value={30}>Last 30 days</option>
@@ -187,7 +187,7 @@ export function FeedbackAnalytics({
           <button
             onClick={handleRefresh}
             disabled={loading}
-            className="flex items-center space-x-2 px-3 py-1 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
+            className="flex items-center space-x-2 px-3 py-1 text-gray-600 hover:text-gray-800 dark:text-slate-200 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 transition-colors disabled:opacity-50"
           >
             <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
             <span className="text-sm">Refresh</span>
@@ -198,26 +198,26 @@ export function FeedbackAnalytics({
       {/* Key metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total queries */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-gray-200 dark:border-slate-700">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <MessageSquare className="h-6 w-6 text-blue-600" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <MessageSquare className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Total Queries</p>
-              <p className="text-2xl font-bold text-gray-900">{data.total_queries.toLocaleString()}</p>
+              <p className="text-sm text-gray-600 dark:text-slate-400">Total Queries</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">{data.total_queries.toLocaleString()}</p>
             </div>
           </div>
         </div>
 
         {/* Average rating */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-gray-200 dark:border-slate-700">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <Star className="h-6 w-6 text-yellow-600" />
+            <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
+              <Star className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Average Rating</p>
+              <p className="text-sm text-gray-600 dark:text-slate-400">Average Rating</p>
               <div className="flex items-center space-x-2">
                 <p className={cn('text-2xl font-bold', getRatingColor(data.average_rating))}>
                   {data.average_rating.toFixed(1)}
@@ -229,7 +229,7 @@ export function FeedbackAnalytics({
                       className={cn(
                         'h-4 w-4',
                         star <= data.average_rating
-                          ? 'text-yellow-500 fill-current'
+                          ? 'text-yellow-500 dark:text-yellow-400 fill-current'
                           : 'text-gray-300'
                       )}
                     />
@@ -241,15 +241,15 @@ export function FeedbackAnalytics({
         </div>
 
         {/* User satisfaction */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-gray-200 dark:border-slate-700">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <ThumbsUp className="h-6 w-6 text-green-600" />
+            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+              <ThumbsUp className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">User Satisfaction</p>
+              <p className="text-sm text-gray-600 dark:text-slate-400">User Satisfaction</p>
               <div className="flex items-center space-x-2">
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                   {Math.round(data.user_satisfaction * 100)}%
                 </p>
                 <span className={cn(
@@ -265,15 +265,15 @@ export function FeedbackAnalytics({
         </div>
 
         {/* Total feedback */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-gray-200 dark:border-slate-700">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Users className="h-6 w-6 text-purple-600" />
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+              <Users className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Total Feedback</p>
-              <p className="text-2xl font-bold text-gray-900">{data.total_feedback.toLocaleString()}</p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-sm text-gray-600 dark:text-slate-400">Total Feedback</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">{data.total_feedback.toLocaleString()}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                 {data.total_queries > 0 
                   ? `${Math.round((data.total_feedback / data.total_queries) * 100)}% response rate`
                   : 'No queries yet'
@@ -287,10 +287,10 @@ export function FeedbackAnalytics({
       {/* Charts and detailed analytics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Common topics */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-gray-200 dark:border-slate-700">
           <div className="flex items-center space-x-2 mb-4">
-            <BarChart3 className="h-5 w-5 text-gray-600" />
-            <h3 className="text-lg font-semibold text-gray-900">Common Topics</h3>
+            <BarChart3 className="h-5 w-5 text-gray-600 dark:text-slate-400" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Common Topics</h3>
           </div>
           <div className="space-y-3">
             {data.common_topics.map((topic) => {
@@ -300,8 +300,8 @@ export function FeedbackAnalytics({
               return (
                 <div key={topic.topic} className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-gray-700">{topic.topic}</span>
-                    <span className="text-sm text-gray-500">{topic.count}</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{topic.topic}</span>
+                    <span className="text-sm text-gray-500 dark:text-slate-400">{topic.count}</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
@@ -316,34 +316,34 @@ export function FeedbackAnalytics({
         </div>
 
         {/* Tip effectiveness */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-gray-200 dark:border-slate-700">
           <div className="flex items-center space-x-2 mb-4">
-            <TrendingUp className="h-5 w-5 text-gray-600" />
-            <h3 className="text-lg font-semibold text-gray-900">Tip Effectiveness</h3>
+            <TrendingUp className="h-5 w-5 text-gray-600 dark:text-slate-400" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Tip Effectiveness</h3>
           </div>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Tips Shown</span>
-              <span className="text-lg font-semibold text-gray-900">
+              <span className="text-sm text-gray-600 dark:text-slate-400">Tips Shown</span>
+              <span className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                 {data.tip_effectiveness.tips_shown.toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Tips Dismissed</span>
-              <span className="text-lg font-semibold text-gray-900">
+              <span className="text-sm text-gray-600 dark:text-slate-400">Tips Dismissed</span>
+              <span className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                 {data.tip_effectiveness.tips_dismissed.toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Engagement Rate</span>
-              <span className="text-lg font-semibold text-green-600">
+              <span className="text-sm text-gray-600 dark:text-slate-400">Engagement Rate</span>
+              <span className="text-lg font-semibold text-green-600 dark:text-green-400">
                 {Math.round(data.tip_effectiveness.engagement_rate * 100)}%
               </span>
             </div>
             
             {/* Engagement visualization */}
             <div className="mt-4">
-              <div className="flex justify-between text-xs text-gray-500 mb-1">
+              <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400 mb-1">
                 <span>Engagement</span>
                 <span>{Math.round(data.tip_effectiveness.engagement_rate * 100)}%</span>
               </div>
@@ -359,7 +359,7 @@ export function FeedbackAnalytics({
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-200">
+      <div className="flex items-center justify-between text-sm text-gray-500 dark:text-slate-400 pt-4 border-t border-gray-200 dark:border-slate-700">
         <div className="flex items-center space-x-2">
           <Clock className="h-4 w-4" />
           <span>Last updated: {lastRefresh.toLocaleString()}</span>

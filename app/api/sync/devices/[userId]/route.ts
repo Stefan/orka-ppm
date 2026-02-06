@@ -1,9 +1,10 @@
 /**
  * User Devices Retrieval API Endpoint
- * Gets all registered devices for a user
+ * Gets all registered devices for a user. Requires Authorization; params.userId must match token sub.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { enforceSyncAuth } from '@/lib/auth/verify-jwt'
 
 interface DeviceInfo {
   id: string
@@ -19,18 +20,25 @@ interface DeviceInfo {
 const registeredDevices = new Map<string, DeviceInfo[]>()
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const { userId } = await params
-    
     if (!userId) {
       return NextResponse.json({
         error: 'Missing required parameter: userId'
       }, { status: 400 })
     }
-    
+
+    const auth = await enforceSyncAuth(request.headers.get('Authorization'), userId)
+    if (auth instanceof Response) {
+      return NextResponse.json(
+        (await auth.json().catch(() => ({ error: 'Unauthorized' }))) as { error: string },
+        { status: auth.status }
+      )
+    }
+
     const userDevices = registeredDevices.get(userId) || []
     
     return NextResponse.json(userDevices, { status: 200 })

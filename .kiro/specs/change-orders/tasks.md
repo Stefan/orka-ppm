@@ -624,6 +624,68 @@ pull th epush all changes to github, merge if necessary
 
 ---
 
+## Phase 8: AI-Enhanced Change Orders
+
+Phase 8 is optional and corresponds to AI support for change orders (genannte Bereiche). It builds on Phase 2 (Cost Impact Analyzer), Phase 3 (API), and Phase 4 (Approval UI). No new data models are required if AI is added as additional services/endpoints only.
+
+### Task 8.1: AI Impact Estimation
+
+**Status**: pending
+
+**Description**: Add AI-assisted cost impact estimation for change order descriptions and line items.
+
+**Implementation Details**:
+- Extend Cost Impact Analyzer or add a dedicated service/endpoint for AI-based cost estimation (LLM or rule-based with fallback) given change order description and line items.
+- Optionally integrate with Monte Carlo or EAC for "simulate impact" workflows.
+- Return estimated impact range and confidence; support optional "Apply" / "Simulate" from frontend.
+
+**Files to Create/Modify**:
+- `backend/services/cost_impact_analyzer_service.py` (extend) or `backend/services/change_order_ai_impact_service.py` (new)
+- `backend/routers/change_orders.py` or new route (e.g. POST /change-orders/ai-estimate) (extend or add)
+- Optionally: `components/change-orders/CostImpactCalculator.tsx` (extend for AI estimate display)
+
+**Requirements Reference**: Requirements 2, 9 (Cost Impact Analysis, Negotiation and Pricing)
+
+---
+
+### Task 8.2: AI Recommendations for Approvals
+
+**Status**: pending
+
+**Description**: Provide AI-generated recommendations and checkpoints in the approval workflow based on category, amount, and history.
+
+**Implementation Details**:
+- Backend: Service or endpoint that returns recommendations (e.g. typical review points for owner_directed, risk note when amount exceeds threshold) based on change_order category, proposed cost, and optional history.
+- Frontend: Display AI hints in the approval workflow (e.g. in ApprovalWorkflowTracker or ChangeRequestDetail) without overriding human decisions.
+
+**Files to Create/Modify**:
+- `backend/services/change_order_ai_recommendations_service.py` (new) or extend existing approval/workflow service
+- `backend/routers/change_approvals.py` (extend with e.g. GET /change-orders/{id}/ai-recommendations)
+- `components/change-orders/ApprovalWorkflowTracker.tsx` or `app/changes/components/ChangeRequestDetail.tsx` (extend to show AI recommendations)
+
+**Requirements Reference**: Requirements 3, 10 (Approval Workflows, Reporting and Analytics)
+
+---
+
+### Task 8.3: Optional Integration with Variance and Audit
+
+**Status**: pending
+
+**Description**: Use variance alerts and audit context to improve AI recommendations or root-cause hints for change orders.
+
+**Implementation Details**:
+- If variance alerts or audit events are linked to change orders (e.g. by project_id or entity references), read that context when generating AI recommendations or impact explanations.
+- Optional: surface root-cause or variance context in the change order detail or approval UI.
+
+**Files to Create/Modify**:
+- `backend/services/change_order_ai_recommendations_service.py` or `change_order_ai_impact_service.py` (extend to call variance/audit services or APIs)
+- Optional: `app/api/audit/` or variance API usage from change-order backend
+- Optional: `components/change-orders/` (extend to show variance/audit context)
+
+**Requirements Reference**: Requirements 2, 5, 7 (Cost Impact, Tracking, Project Controls Integration)
+
+---
+
 ## Dependencies and Prerequisites
 
 ### External Dependencies
@@ -665,6 +727,8 @@ pull th epush all changes to github, merge if necessary
 - Comprehensive error handling and validation
 - Full audit trail and compliance reporting
 - Responsive design for mobile and desktop access
+
+Phase 8 (AI-Enhanced Change Orders) is optional and covers the AI support opportunities for change orders described in the genannte Bereiche.
 
 ## Risk Mitigation
 

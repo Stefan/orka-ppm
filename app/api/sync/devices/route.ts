@@ -1,9 +1,11 @@
 /**
  * Cross-Device Sync API Endpoint
  * Handles device registration and synchronization
+ * Requires Authorization: Bearer <token>. UserId in body/query must match token sub.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { enforceSyncAuth } from '@/lib/auth/verify-jwt'
 
 export interface DeviceInfo {
   id: string
@@ -24,12 +26,19 @@ interface DeviceRegistrationRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    const body: DeviceRegistrationRequest = await request.json()
-    
+    const body: DeviceRegistrationRequest = await request.json().catch(() => ({}))
     if (!body.userId || !body.device) {
       return NextResponse.json({
         error: 'Missing required fields: userId and device'
       }, { status: 400 })
+    }
+
+    const auth = await enforceSyncAuth(request.headers.get('Authorization'), body.userId)
+    if (auth instanceof Response) {
+      return NextResponse.json(
+        (await auth.json().catch(() => ({ error: 'Unauthorized' }))) as { error: string },
+        { status: auth.status }
+      )
     }
 
     // Get existing devices for user or initialize empty array
@@ -73,14 +82,16 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const userId = searchParams.get('userId')
-    
-    if (!userId) {
-      return NextResponse.json({
-        error: 'Missing required parameter: userId'
-      }, { status: 400 })
+    const queryUserId = searchParams.get('userId')
+    const auth = await enforceSyncAuth(request.headers.get('Authorization'), queryUserId)
+    if (auth instanceof Response) {
+      return NextResponse.json(
+        (await auth.json().catch(() => ({ error: 'Unauthorized' }))) as { error: string },
+        { status: auth.status }
+      )
     }
-    
+    const userId = auth.userId
+
     const userDevices = registeredDevices.get(userId) || []
     
     return NextResponse.json({

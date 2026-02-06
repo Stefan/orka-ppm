@@ -12,6 +12,9 @@ import {
 } from '../loader';
 import { SupportedLocale, SUPPORTED_LANGUAGES } from '../types';
 
+// Loader calls fetch(url, { cache: 'no-store' })
+const FETCH_OPTIONS = { cache: 'no-store' as RequestCache };
+
 // Mock fetch globally
 global.fetch = jest.fn();
 
@@ -35,11 +38,27 @@ const translationDictionaryArb = fc.dictionary(
 );
 
 describe('Translation Loader Property Tests', () => {
+  let consoleErrorSpy: jest.SpyInstance;
+  let consoleWarnSpy: jest.SpyInstance;
+  let consoleLogSpy: jest.SpyInstance;
+  const originalNodeEnv = process.env.NODE_ENV;
+
   beforeEach(() => {
-    // Clear cache before each test
+    // Loader reads from cache only when NODE_ENV === 'production'; set so cache tests pass
+    process.env.NODE_ENV = 'production';
     clearTranslationCache();
-    // Clear all mocks
     jest.clearAllMocks();
+    // Suppress loader console output during tests (Property 6 tests trigger intentional errors and fallbacks)
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnv;
+    consoleErrorSpy?.mockRestore?.();
+    consoleWarnSpy?.mockRestore?.();
+    consoleLogSpy?.mockRestore?.();
   });
 
   /**
@@ -93,7 +112,7 @@ describe('Translation Loader Property Tests', () => {
 
           // Verify fetch was called exactly once
           expect(global.fetch).toHaveBeenCalledTimes(1);
-          expect(global.fetch).toHaveBeenCalledWith(`/locales/${selectedLocale}.json`);
+          expect(global.fetch).toHaveBeenCalledWith(`/locales/${selectedLocale}.json`, FETCH_OPTIONS);
         }
       ),
       { numRuns: 100 }

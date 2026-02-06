@@ -396,18 +396,18 @@ export default function ImpactEstimationTools({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{t('impactEstimation.title')}</h2>
-            <p className="text-gray-600 mt-1">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">{t('impactEstimation.title')}</h2>
+            <p className="text-gray-600 dark:text-slate-400 mt-1">
               {t('impactEstimation.subtitle')}
             </p>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={resetCalculator}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-slate-200 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
             >
               <RotateCcw className="h-4 w-4" />
               {t('impactEstimation.reset')}
@@ -424,8 +424,8 @@ export default function ImpactEstimationTools({
       </div>
 
       {/* Tab Navigation */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+        <div className="border-b border-gray-200 dark:border-slate-700">
           <nav className="flex space-x-8 px-6">
             {[
               { id: 'calculator', label: t('impactEstimation.tabs.calculator'), icon: Calculator },
@@ -439,8 +439,8 @@ export default function ImpactEstimationTools({
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300 hover:border-gray-300 dark:border-slate-600'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -459,14 +459,14 @@ export default function ImpactEstimationTools({
                 {/* Calculator Inputs */}
                 <div className="lg:col-span-2 space-y-6">
                   {/* Cost Factors */}
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                      <DollarSign className="h-5 w-5 text-green-600" />
+                  <div className="bg-gray-50 dark:bg-slate-800/50 p-6 rounded-lg">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+                      <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
                       Cost Factors
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                           Material Cost Change ($)
                         </label>
                         <input
@@ -476,11 +476,11 @@ export default function ImpactEstimationTools({
                             ...prev,
                             material_cost_change: parseFloat(e.target.value) || 0
                           }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                           Additional Labor Hours
                         </label>
                         <input
@@ -490,11 +490,11 @@ export default function ImpactEstimationTools({
                             ...prev,
                             labor_hours_change: parseFloat(e.target.value) || 0
                           }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                           Labor Rate ($/hour)
                         </label>
                         <input
@@ -504,11 +504,11 @@ export default function ImpactEstimationTools({
                             ...prev,
                             labor_rate: parseFloat(e.target.value) || 0
                           }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                           Additional Equipment Days
                         </label>
                         <input
@@ -518,11 +518,11 @@ export default function ImpactEstimationTools({
                             ...prev,
                             equipment_days_change: parseFloat(e.target.value) || 0
                           }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                           Overhead Percentage (%)
                         </label>
                         <input
@@ -532,11 +532,11 @@ export default function ImpactEstimationTools({
                             ...prev,
                             overhead_percentage: parseFloat(e.target.value) || 0
                           }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                           Contingency Percentage (%)
                         </label>
                         <input
@@ -546,16 +546,16 @@ export default function ImpactEstimationTools({
                             ...prev,
                             contingency_percentage: parseFloat(e.target.value) || 0
                           }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                       </div>
                     </div>
                   </div>
 
                   {/* Schedule Factors */}
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                      <Calendar className="h-5 w-5 text-blue-600" />
+                  <div className="bg-gray-50 dark:bg-slate-800/50 p-6 rounded-lg">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+                      <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       Schedule Factors
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -568,9 +568,9 @@ export default function ImpactEstimationTools({
                             ...prev,
                             critical_path_impact: e.target.checked
                           }))}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          className="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-slate-600 rounded"
                         />
-                        <label htmlFor="critical_path" className="ml-2 text-sm text-gray-700">
+                        <label htmlFor="critical_path" className="ml-2 text-sm text-gray-700 dark:text-slate-300">
                           Critical Path Impact
                         </label>
                       </div>
@@ -583,9 +583,9 @@ export default function ImpactEstimationTools({
                             ...prev,
                             parallel_work_possible: e.target.checked
                           }))}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          className="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-slate-600 rounded"
                         />
-                        <label htmlFor="parallel_work" className="ml-2 text-sm text-gray-700">
+                        <label htmlFor="parallel_work" className="ml-2 text-sm text-gray-700 dark:text-slate-300">
                           Parallel Work Possible
                         </label>
                       </div>
@@ -598,14 +598,14 @@ export default function ImpactEstimationTools({
                             ...prev,
                             weather_dependency: e.target.checked
                           }))}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          className="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-slate-600 rounded"
                         />
-                        <label htmlFor="weather_dependency" className="ml-2 text-sm text-gray-700">
+                        <label htmlFor="weather_dependency" className="ml-2 text-sm text-gray-700 dark:text-slate-300">
                           Weather Dependent
                         </label>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                           Resource Availability (0.1 - 1.0)
                         </label>
                         <input
@@ -618,16 +618,16 @@ export default function ImpactEstimationTools({
                             ...prev,
                             resource_availability: parseFloat(e.target.value) || 1.0
                           }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                       </div>
                     </div>
                   </div>
 
                   {/* Risk Factors */}
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                      <AlertTriangle className="h-5 w-5 text-red-600" />
+                  <div className="bg-gray-50 dark:bg-slate-800/50 p-6 rounded-lg">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
                       Risk Factors
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -638,7 +638,7 @@ export default function ImpactEstimationTools({
                         { key: 'external_dependencies', label: 'External Dependencies' }
                       ].map(factor => (
                         <div key={factor.key}>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                             {factor.label}
                           </label>
                           <select
@@ -647,7 +647,7 @@ export default function ImpactEstimationTools({
                               ...prev,
                               [factor.key]: e.target.value
                             }))}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           >
                             <option value="low">Low</option>
                             <option value="medium">Medium</option>
@@ -662,37 +662,37 @@ export default function ImpactEstimationTools({
                 {/* Results Panel */}
                 <div className="space-y-6">
                   {/* Current Estimate */}
-                  <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Current Estimate</h3>
+                  <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Current Estimate</h3>
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Cost Impact:</span>
-                        <span className="font-bold text-lg text-red-600">
+                        <span className="text-gray-600 dark:text-slate-400">Cost Impact:</span>
+                        <span className="font-bold text-lg text-red-600 dark:text-red-400">
                           ${estimate.cost_impact.toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Schedule Impact:</span>
-                        <span className="font-bold text-lg text-orange-600">
+                        <span className="text-gray-600 dark:text-slate-400">Schedule Impact:</span>
+                        <span className="font-bold text-lg text-orange-600 dark:text-orange-400">
                           {estimate.schedule_impact_days} days
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Additional Resources:</span>
-                        <span className="font-medium text-blue-600">
+                        <span className="text-gray-600 dark:text-slate-400">Additional Resources:</span>
+                        <span className="font-medium text-blue-600 dark:text-blue-400">
                           ${estimate.resource_impact.additional_resources.toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">New Risks:</span>
-                        <span className="font-medium text-purple-600">
+                        <span className="text-gray-600 dark:text-slate-400">New Risks:</span>
+                        <span className="font-medium text-purple-600 dark:text-purple-400">
                           {estimate.risk_impact.new_risks_count}
                         </span>
                       </div>
                       <div className="border-t pt-4">
                         <div className="flex justify-between items-center">
-                          <span className="text-gray-600">Confidence Level:</span>
-                          <span className="font-medium text-green-600">
+                          <span className="text-gray-600 dark:text-slate-400">Confidence Level:</span>
+                          <span className="font-medium text-green-600 dark:text-green-400">
                             {(estimate.confidence_level * 100).toFixed(0)}%
                           </span>
                         </div>
@@ -727,13 +727,13 @@ export default function ImpactEstimationTools({
 
                   {/* Template Selection */}
                   {selectedTemplate && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="bg-blue-50 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                       <div className="flex items-center gap-2 mb-2">
-                        <FileText className="h-4 w-4 text-blue-600" />
+                        <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                         <span className="font-medium text-blue-900">Template Applied</span>
                       </div>
-                      <p className="text-sm text-blue-800">{selectedTemplate.name}</p>
-                      <p className="text-xs text-blue-600 mt-1">{selectedTemplate.description}</p>
+                      <p className="text-sm text-blue-800 dark:text-blue-300">{selectedTemplate.name}</p>
+                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">{selectedTemplate.description}</p>
                     </div>
                   )}
                 </div>
@@ -746,8 +746,8 @@ export default function ImpactEstimationTools({
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900">Scenario Analysis</h3>
-                  <p className="text-gray-600">Compare different outcome scenarios based on your current estimate</p>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Scenario Analysis</h3>
+                  <p className="text-gray-600 dark:text-slate-400">Compare different outcome scenarios based on your current estimate</p>
                 </div>
                 <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
                   <Target className="h-4 w-4" />
@@ -757,30 +757,30 @@ export default function ImpactEstimationTools({
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {scenarios.map((scenario) => (
-                  <div key={scenario.id} className="bg-white border border-gray-200 rounded-lg p-6">
+                  <div key={scenario.id} className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className="font-medium text-gray-900">{scenario.name}</h4>
+                      <h4 className="font-medium text-gray-900 dark:text-slate-100">{scenario.name}</h4>
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        scenario.id === 'optimistic' ? 'bg-green-100 text-green-800' :
-                        scenario.id === 'realistic' ? 'bg-blue-100 text-blue-800' :
-                        'bg-red-100 text-red-800'
+                        scenario.id === 'optimistic' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' :
+                        scenario.id === 'realistic' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' :
+                        'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                       }`}>
                         {(scenario.results.confidence_level * 100).toFixed(0)}% confidence
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-4">{scenario.description}</p>
+                    <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{scenario.description}</p>
                     
                     <div className="space-y-3">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Cost Impact:</span>
+                        <span className="text-gray-600 dark:text-slate-400">Cost Impact:</span>
                         <span className="font-medium">${scenario.results.cost_impact.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Schedule Impact:</span>
+                        <span className="text-gray-600 dark:text-slate-400">Schedule Impact:</span>
                         <span className="font-medium">{scenario.results.schedule_impact_days} days</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">New Risks:</span>
+                        <span className="text-gray-600 dark:text-slate-400">New Risks:</span>
                         <span className="font-medium">{scenario.results.risk_impact.new_risks_count}</span>
                       </div>
                     </div>
@@ -791,7 +791,7 @@ export default function ImpactEstimationTools({
                           setEstimate(scenario.results)
                           onEstimateUpdate(scenario.results)
                         }}
-                        className="w-full text-blue-600 hover:text-blue-800 text-sm font-medium"
+                        className="w-full text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
                       >
                         Apply This Scenario
                       </button>
@@ -807,8 +807,8 @@ export default function ImpactEstimationTools({
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900">Template Library</h3>
-                  <p className="text-gray-600">Pre-configured estimation templates for common change types</p>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Template Library</h3>
+                  <p className="text-gray-600 dark:text-slate-400">Pre-configured estimation templates for common change types</p>
                 </div>
                 <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
                   <Lightbulb className="h-4 w-4" />
@@ -818,35 +818,35 @@ export default function ImpactEstimationTools({
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {templates.map((template) => (
-                  <div key={template.id} className="bg-white border border-gray-200 rounded-lg p-6">
+                  <div key={template.id} className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className="font-medium text-gray-900">{template.name}</h4>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 capitalize">
+                      <h4 className="font-medium text-gray-900 dark:text-slate-100">{template.name}</h4>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200 capitalize">
                         {template.change_type}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-4">{template.description}</p>
+                    <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">{template.description}</p>
                     
                     <div className="space-y-2 mb-4">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Cost Multiplier:</span>
+                        <span className="text-gray-600 dark:text-slate-400">Cost Multiplier:</span>
                         <span className="font-medium">{template.default_values.cost_multiplier}x</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Schedule Multiplier:</span>
+                        <span className="text-gray-600 dark:text-slate-400">Schedule Multiplier:</span>
                         <span className="font-medium">{template.default_values.schedule_multiplier}x</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Risk Factor:</span>
+                        <span className="text-gray-600 dark:text-slate-400">Risk Factor:</span>
                         <span className="font-medium">{template.default_values.risk_factor}x</span>
                       </div>
                     </div>
 
                     <div className="mb-4">
-                      <h5 className="text-sm font-medium text-gray-900 mb-2">Estimation Rules:</h5>
+                      <h5 className="text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">Estimation Rules:</h5>
                       <div className="space-y-1">
                         {template.estimation_rules.slice(0, 2).map((rule, index) => (
-                          <div key={index} className="text-xs text-gray-600">
+                          <div key={index} className="text-xs text-gray-600 dark:text-slate-400">
                             • {rule.condition}: +{(rule.adjustment * 100).toFixed(0)}%
                           </div>
                         ))}
@@ -860,7 +860,7 @@ export default function ImpactEstimationTools({
                       >
                         Apply Template
                       </button>
-                      <button className="px-3 py-2 border border-gray-300 rounded text-sm text-gray-600 hover:text-gray-800">
+                      <button className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded text-sm text-gray-600 hover:text-gray-800 dark:text-slate-200">
                         <Copy className="h-4 w-4" />
                       </button>
                     </div>

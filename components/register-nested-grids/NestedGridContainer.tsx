@@ -1,8 +1,8 @@
 'use client'
 
 /**
- * Container for nested grid with loading and permission guard
- * Requirements: 4.2, 6.1
+ * Container for nested grid with loading, permission guard and error boundary
+ * Requirements: 4.2, 6.1, 18.3
  */
 
 import React, { useRef } from 'react'
@@ -11,6 +11,7 @@ import { detectChanges } from '@/lib/register-nested-grids/change-detection'
 import type { Section } from './types'
 import NestedGrid from './NestedGrid'
 import AIChangeHighlight from './AIChangeHighlight'
+import NestedGridErrorBoundary from './NestedGridErrorBoundary'
 
 interface NestedGridContainerProps {
   parentRowId: string
@@ -36,13 +37,13 @@ export default function NestedGridContainer({
 
   if (isLoading) {
     return (
-      <div className="p-4 text-sm text-gray-500">Loading...</div>
+      <div className="p-4 text-sm text-gray-500 dark:text-slate-400">Loading...</div>
     )
   }
 
   if (error) {
     return (
-      <div className="p-4 text-sm text-red-500">
+      <div className="p-4 text-sm text-red-500 dark:text-red-400">
         Failed to load: {(error as Error).message}
       </div>
     )
@@ -56,15 +57,17 @@ export default function NestedGridContainer({
   if (rows.length) prevRef.current = rows
 
   return (
-    <div className="border-l-4 border-indigo-200 pl-2 py-2 space-y-1">
-      {highlights.length > 0 && newCount > 0 && <AIChangeHighlight changes={highlights} newCount={newCount} />}
-      <NestedGrid
-        parentRowId={parentRowId}
-        section={firstSection}
-        rows={rows}
-        registerId={registerId}
-        nestingLevel={nestingLevel}
-      />
-    </div>
+    <NestedGridErrorBoundary>
+      <div className="border-l-4 border-indigo-200 pl-2 py-2 space-y-1">
+        {highlights.length > 0 && newCount > 0 && <AIChangeHighlight changes={highlights} newCount={newCount} />}
+        <NestedGrid
+          parentRowId={parentRowId}
+          section={firstSection}
+          rows={rows}
+          registerId={registerId}
+          nestingLevel={nestingLevel}
+        />
+      </div>
+    </NestedGridErrorBoundary>
   )
 }

@@ -221,28 +221,28 @@ function RecommendationCard({
         <div className="flex items-center gap-2 pt-2 border-t border-gray-200/50 dark:border-slate-600/50">
           <button
             onClick={onView}
-            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-slate-700/50 rounded transition-colors"
+            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:bg-slate-800/50 dark:hover:bg-slate-700/50 rounded transition-colors"
           >
             <Eye className="w-3 h-3" />
             Details
           </button>
           <button
             onClick={onAccept}
-            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 hover:bg-green-100/50 dark:hover:bg-green-900/30 rounded transition-colors"
+            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 hover:bg-green-100 dark:bg-green-900/30/50 dark:hover:bg-green-900/30 rounded transition-colors"
           >
             <Check className="w-3 h-3" />
             Accept
           </button>
           <button
             onClick={onDefer}
-            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-100/50 dark:hover:bg-blue-900/30 rounded transition-colors"
+            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-800 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-100 dark:bg-blue-900/30/50 dark:hover:bg-blue-900/30 rounded transition-colors"
           >
             <Clock3 className="w-3 h-3" />
             Defer
           </button>
           <button
             onClick={onReject}
-            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100/50 dark:hover:bg-slate-700/50 rounded transition-colors"
+            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-gray-600 dark:text-slate-300 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:bg-slate-700/50 dark:hover:bg-slate-700/50 rounded transition-colors"
           >
             <X className="w-3 h-3" />
             Dismiss
@@ -311,7 +311,7 @@ export function RecommendationsPanel({
       <div
         className={`
           flex items-center justify-between p-4 
-          ${collapsible ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700' : ''} 
+          ${collapsible ? 'cursor-pointer hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700' : ''} 
           border-b border-gray-200 dark:border-slate-700
         `}
         onClick={collapsible ? () => setIsCollapsed(!isCollapsed) : undefined}
@@ -397,7 +397,7 @@ export function RecommendationsPanel({
           {filteredRecommendations.length > initialLimit && (
             <button
               onClick={() => setShowAll(!showAll)}
-              className="w-full mt-3 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
+              className="w-full mt-3 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700 rounded-lg transition-colors"
             >
               {showAll 
                 ? `Show less` 
@@ -438,7 +438,7 @@ export function RecommendationsBadge({
       onClick={onClick}
       className={`
         inline-flex items-center gap-1.5 px-3 py-1.5
-        bg-purple-50 hover:bg-purple-100
+        bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/30
         text-purple-700 font-medium text-sm
         rounded-full transition-colors
         ${className}
@@ -447,7 +447,7 @@ export function RecommendationsBadge({
       <Sparkles className="w-4 h-4" />
       <span>{count} recommendations</span>
       {highPriorityCount > 0 && (
-        <span className="px-1.5 py-0.5 text-xs bg-red-100 text-red-700 rounded-full">
+        <span className="px-1.5 py-0.5 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 rounded-full">
           {highPriorityCount} urgent
         </span>
       )}

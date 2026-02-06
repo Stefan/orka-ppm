@@ -128,23 +128,23 @@ export default function ShareableURLWidget({
       {/* Modal */}
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b">
               <div className="flex items-center gap-3">
-                <Share2 className="w-6 h-6 text-blue-600" />
+                <Share2 className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100">
                     {t('shared.shareableUrl.title')}
                   </h2>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
                     {projectName}
                   </p>
                 </div>
               </div>
               <button
                 onClick={handleClose}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-400 hover:text-gray-600 dark:text-slate-400 transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -155,20 +155,20 @@ export default function ShareableURLWidget({
               {/* Permissions Configuration */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <Shield className="w-5 h-5 text-gray-700" />
-                  <h3 className="text-lg font-medium text-gray-900">
+                  <Shield className="w-5 h-5 text-gray-700 dark:text-slate-300" />
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">
                     {t('shared.shareableUrl.accessPermissions')}
                   </h3>
                 </div>
-                <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
+                <div className="space-y-2 bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg">
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={permissions.can_view_basic_info}
                       onChange={() => togglePermission('can_view_basic_info')}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-gray-700 dark:text-slate-300">
                       {t('shared.shareableUrl.permissions.viewBasicInfo')}
                     </span>
                   </label>
@@ -178,9 +178,9 @@ export default function ShareableURLWidget({
                       type="checkbox"
                       checked={permissions.can_view_timeline}
                       onChange={() => togglePermission('can_view_timeline')}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-gray-700 dark:text-slate-300">
                       {t('shared.shareableUrl.permissions.viewTimeline')}
                     </span>
                   </label>
@@ -190,9 +190,9 @@ export default function ShareableURLWidget({
                       type="checkbox"
                       checked={permissions.can_view_financial}
                       onChange={() => togglePermission('can_view_financial')}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-gray-700 dark:text-slate-300">
                       {t('shared.shareableUrl.permissions.viewFinancial')}
                     </span>
                   </label>
@@ -202,9 +202,9 @@ export default function ShareableURLWidget({
                       type="checkbox"
                       checked={permissions.can_view_risks}
                       onChange={() => togglePermission('can_view_risks')}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-gray-700 dark:text-slate-300">
                       {t('shared.shareableUrl.permissions.viewRisks')}
                     </span>
                   </label>
@@ -214,9 +214,9 @@ export default function ShareableURLWidget({
                       type="checkbox"
                       checked={permissions.can_view_resources}
                       onChange={() => togglePermission('can_view_resources')}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-gray-700 dark:text-slate-300">
                       {t('shared.shareableUrl.permissions.viewResources')}
                     </span>
                   </label>
@@ -226,8 +226,8 @@ export default function ShareableURLWidget({
               {/* Expiration Configuration */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <Calendar className="w-5 h-5 text-gray-700" />
-                  <h3 className="text-lg font-medium text-gray-900">
+                  <Calendar className="w-5 h-5 text-gray-700 dark:text-slate-300" />
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">
                     {t('shared.shareableUrl.linkExpiration')}
                   </h3>
                 </div>
@@ -238,13 +238,13 @@ export default function ShareableURLWidget({
                     max="365"
                     value={expirationDays}
                     onChange={(e) => setExpirationDays(parseInt(e.target.value) || 7)}
-                    className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-24 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-gray-600 dark:text-slate-400">
                     {t('shared.shareableUrl.daysFromNow')}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-2">
                   {t('shared.shareableUrl.linkExpiresOn', {
                     date: new Date(Date.now() + expirationDays * 24 * 60 * 60 * 1000).toLocaleDateString()
                   })}
@@ -253,15 +253,15 @@ export default function ShareableURLWidget({
 
               {/* Error Message */}
               {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-sm text-red-800">{error}</p>
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                  <p className="text-sm text-red-800 dark:text-red-300">{error}</p>
                 </div>
               )}
 
               {/* Generated URL Display */}
               {generatedURL && (
                 <div className="space-y-3">
-                  <h3 className="text-lg font-medium text-gray-900">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">
                     {t('shared.shareableUrl.shareableLink')}
                   </h3>
                   <div className="flex items-center gap-2">
@@ -269,7 +269,7 @@ export default function ShareableURLWidget({
                       type="text"
                       value={generatedURL}
                       readOnly
-                      className="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm font-mono"
+                      className="flex-1 px-3 py-2 bg-gray-50 dark:bg-slate-800/50 border border-gray-300 dark:border-slate-600 rounded-lg text-sm font-mono"
                     />
                     <button
                       onClick={handleCopyURL}
@@ -288,7 +288,7 @@ export default function ShareableURLWidget({
                       )}
                     </button>
                   </div>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 dark:text-slate-400">
                     {t('shared.shareableUrl.shareDescription')}
                   </p>
                 </div>
@@ -296,10 +296,10 @@ export default function ShareableURLWidget({
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-3 p-6 border-t bg-gray-50">
+            <div className="flex items-center justify-end gap-3 p-6 border-t bg-gray-50 dark:bg-slate-800/50">
               <button
                 onClick={handleClose}
-                className="px-4 py-2 text-gray-700 hover:text-gray-900 transition-colors"
+                className="px-4 py-2 text-gray-700 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100 transition-colors"
               >
                 {t('common.close')}
               </button>

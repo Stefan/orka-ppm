@@ -51,9 +51,9 @@ export const OfflineSyncStatus: React.FC<OfflineSyncStatusProps> = ({
 
   const formatChangeType = (change: OfflineChange) => {
     const typeColors = {
-      create: 'text-green-600 bg-green-100',
-      update: 'text-blue-600 bg-blue-100',
-      delete: 'text-red-600 bg-red-100'
+      create: 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30',
+      update: 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30',
+      delete: 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30'
     }
     
     return (
@@ -81,38 +81,38 @@ export const OfflineSyncStatus: React.FC<OfflineSyncStatusProps> = ({
   }
 
   return (
-    <div className={`bg-white border border-gray-200 rounded-lg shadow-sm ${className}`}>
+    <div className={`bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-sm ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-3">
           {isOnline ? (
-            <Wifi className="h-5 w-5 text-green-500" />
+            <Wifi className="h-5 w-5 text-green-500 dark:text-green-400" />
           ) : (
-            <WifiOff className="h-5 w-5 text-red-500" />
+            <WifiOff className="h-5 w-5 text-red-500 dark:text-red-400" />
           )}
           
           <div>
             <div className="flex items-center space-x-2">
-              <h3 className="font-medium text-gray-900">
+              <h3 className="font-medium text-gray-900 dark:text-slate-100">
                 {isOnline ? 'Online' : 'Offline'}
               </h3>
               
               {isSyncing && (
-                <div className="flex items-center space-x-1 text-blue-600">
+                <div className="flex items-center space-x-1 text-blue-600 dark:text-blue-400">
                   <RefreshCw className="h-4 w-4 animate-spin" />
                   <span className="text-sm">Syncing...</span>
                 </div>
               )}
               
               {hasOfflineChanges && (
-                <div className="flex items-center space-x-1 text-amber-600">
+                <div className="flex items-center space-x-1 text-amber-600 dark:text-amber-400">
                   <Clock className="h-4 w-4" />
                   <span className="text-sm">{offlineChanges.length} pending</span>
                 </div>
               )}
             </div>
             
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 dark:text-slate-400">
               {lastSyncTime ? (
                 `Last sync: ${formatTimestamp(lastSyncTime)}`
               ) : (
@@ -137,12 +137,12 @@ export const OfflineSyncStatus: React.FC<OfflineSyncStatusProps> = ({
           {hasOfflineChanges && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors"
             >
               {isExpanded ? (
-                <ChevronUp className="h-4 w-4 text-gray-500" />
+                <ChevronUp className="h-4 w-4 text-gray-500 dark:text-slate-400" />
               ) : (
-                <ChevronDown className="h-4 w-4 text-gray-500" />
+                <ChevronDown className="h-4 w-4 text-gray-500 dark:text-slate-400" />
               )}
             </button>
           )}
@@ -151,24 +151,24 @@ export const OfflineSyncStatus: React.FC<OfflineSyncStatusProps> = ({
 
       {/* Offline Changes List */}
       {isExpanded && hasOfflineChanges && (
-        <div className="border-t border-gray-200">
+        <div className="border-t border-gray-200 dark:border-slate-700">
           <div className="p-4">
-            <h4 className="font-medium text-gray-900 mb-3">Pending Changes</h4>
+            <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-3">Pending Changes</h4>
             <div className="space-y-3 max-h-60 overflow-y-auto">
               {offlineChanges.map((change) => (
                 <div
                   key={change.id}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg"
                 >
                   <div className="flex items-center space-x-3">
                     <div className="flex-shrink-0">
                       {formatChangeType(change)}
                     </div>
                     <div>
-                      <div className="font-medium text-sm text-gray-900">
+                      <div className="font-medium text-sm text-gray-900 dark:text-slate-100">
                         {change.entity} {change.entityId}
                       </div>
-                      <div className="text-xs text-gray-600">
+                      <div className="text-xs text-gray-600 dark:text-slate-400">
                         {formatTimestamp(change.timestamp)}
                       </div>
                     </div>
@@ -190,7 +190,7 @@ export const OfflineSyncStatus: React.FC<OfflineSyncStatusProps> = ({
 
       {/* Status Messages */}
       {!isOnline && (
-        <div className="border-t border-gray-200 p-4 bg-amber-50">
+        <div className="border-t border-gray-200 dark:border-slate-700 p-4 bg-amber-50">
           <div className="flex items-center space-x-2 text-amber-800">
             <AlertCircle className="h-4 w-4" />
             <span className="text-sm">
@@ -201,8 +201,8 @@ export const OfflineSyncStatus: React.FC<OfflineSyncStatusProps> = ({
       )}
       
       {isOnline && hasOfflineChanges && (
-        <div className="border-t border-gray-200 p-4 bg-blue-50">
-          <div className="flex items-center space-x-2 text-blue-800">
+        <div className="border-t border-gray-200 dark:border-slate-700 p-4 bg-blue-50 dark:bg-blue-900/20">
+          <div className="flex items-center space-x-2 text-blue-800 dark:text-blue-300">
             <Upload className="h-4 w-4" />
             <span className="text-sm">
               You have {offlineChanges.length} change{offlineChanges.length !== 1 ? 's' : ''} waiting to sync.

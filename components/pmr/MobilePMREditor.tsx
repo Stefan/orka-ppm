@@ -164,26 +164,26 @@ const MobilePMREditor: React.FC<MobilePMREditorProps> = ({
   return (
     <div 
       ref={elementRef as React.RefObject<HTMLDivElement>}
-      className={`flex flex-col h-full bg-gray-50 ${className}`}
+      className={`flex flex-col h-full bg-gray-50 dark:bg-slate-800/50 ${className}`}
     >
       {/* Mobile Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
+      <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 sticky top-0 z-20 shadow-sm">
         <div className="flex items-center justify-between p-3">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="p-2 text-gray-600 hover:bg-gray-100 rounded-md"
+            className="p-2 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-md"
           >
             {showMenu ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
 
           <div className="flex-1 mx-3">
-            <h2 className="text-sm font-semibold text-gray-900 truncate">
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-slate-100 truncate">
               {report.title}
             </h2>
-            <div className="flex items-center space-x-2 text-xs text-gray-500">
+            <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-slate-400">
               <span>{currentSectionIndex + 1} / {report.sections.length}</span>
               {!isOnline && (
-                <span className="flex items-center space-x-1 text-orange-600">
+                <span className="flex items-center space-x-1 text-orange-600 dark:text-orange-400">
                   <WifiOff className="h-3 w-3" />
                   <span>Offline</span>
                 </span>
@@ -195,7 +195,7 @@ const MobilePMREditor: React.FC<MobilePMREditorProps> = ({
             {state.pendingChanges > 0 && (
               <button
                 onClick={() => actions.syncOfflineChanges()}
-                className="p-2 text-blue-600 hover:bg-blue-50 rounded-md"
+                className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-md"
                 disabled={!isOnline}
               >
                 <RefreshCw className="h-5 w-5" />
@@ -205,7 +205,7 @@ const MobilePMREditor: React.FC<MobilePMREditorProps> = ({
             <button
               onClick={handleSave}
               disabled={isSaving || !isOnline}
-              className="p-2 text-blue-600 hover:bg-blue-50 rounded-md disabled:opacity-50"
+              className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-md disabled:opacity-50"
             >
               <Save className="h-5 w-5" />
             </button>
@@ -214,7 +214,7 @@ const MobilePMREditor: React.FC<MobilePMREditorProps> = ({
 
         {/* Sync Status Banner */}
         {showSyncStatus && (
-          <div className="px-3 py-2 bg-blue-50 border-t border-blue-200">
+          <div className="px-3 py-2 bg-blue-50 dark:bg-blue-900/20 border-t border-blue-200 dark:border-blue-800">
             <div className="flex items-center space-x-2 text-sm text-blue-900">
               <RefreshCw className="h-4 w-4 animate-spin" />
               <span>Syncing changes...</span>
@@ -235,14 +235,14 @@ const MobilePMREditor: React.FC<MobilePMREditorProps> = ({
 
       {/* Mobile Menu Drawer */}
       {showMenu && (
-        <div className="absolute top-14 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-10">
+        <div className="absolute top-14 left-0 right-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 shadow-lg z-10">
           <div className="p-4 space-y-3">
             <button
               onClick={() => {
                 actions.togglePanel('insights')
                 setShowMenu(false)
               }}
-              className="w-full flex items-center space-x-3 p-3 text-left text-gray-700 hover:bg-gray-50 rounded-md"
+              className="w-full flex items-center space-x-3 p-3 text-left text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 rounded-md"
             >
               <Sparkles className="h-5 w-5" />
               <span>AI Insights</span>
@@ -253,7 +253,7 @@ const MobilePMREditor: React.FC<MobilePMREditorProps> = ({
                 actions.togglePanel('collaboration')
                 setShowMenu(false)
               }}
-              className="w-full flex items-center space-x-3 p-3 text-left text-gray-700 hover:bg-gray-50 rounded-md"
+              className="w-full flex items-center space-x-3 p-3 text-left text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 rounded-md"
             >
               <Users className="h-5 w-5" />
               <span>Collaboration</span>
@@ -264,7 +264,7 @@ const MobilePMREditor: React.FC<MobilePMREditorProps> = ({
                 toggleViewMode()
                 setShowMenu(false)
               }}
-              className="w-full flex items-center space-x-3 p-3 text-left text-gray-700 hover:bg-gray-50 rounded-md"
+              className="w-full flex items-center space-x-3 p-3 text-left text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 rounded-md"
             >
               {state.viewMode === 'compact' ? (
                 <Maximize2 className="h-5 w-5" />
@@ -278,22 +278,22 @@ const MobilePMREditor: React.FC<MobilePMREditorProps> = ({
       )}
 
       {/* Section Navigation */}
-      <div className="bg-white border-b border-gray-200 px-3 py-2">
+      <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-3 py-2">
         <div className="flex items-center justify-between">
           <button
             onClick={goToPreviousSection}
             disabled={currentSectionIndex === 0}
-            className="p-2 text-gray-600 hover:bg-gray-100 rounded-md disabled:opacity-30 disabled:cursor-not-allowed"
+            className="p-2 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-md disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
 
           <div className="flex-1 mx-3 text-center">
-            <h3 className="text-sm font-medium text-gray-900 truncate">
+            <h3 className="text-sm font-medium text-gray-900 dark:text-slate-100 truncate">
               {currentSection?.title}
             </h3>
             {currentSection?.ai_generated && (
-              <span className="inline-flex items-center space-x-1 text-xs text-purple-600 mt-1">
+              <span className="inline-flex items-center space-x-1 text-xs text-purple-600 dark:text-purple-400 mt-1">
                 <Sparkles className="h-3 w-3" />
                 <span>AI Generated</span>
               </span>
@@ -303,7 +303,7 @@ const MobilePMREditor: React.FC<MobilePMREditorProps> = ({
           <button
             onClick={goToNextSection}
             disabled={currentSectionIndex === report.sections.length - 1}
-            className="p-2 text-gray-600 hover:bg-gray-100 rounded-md disabled:opacity-30 disabled:cursor-not-allowed"
+            className="p-2 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-md disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
@@ -328,7 +328,7 @@ const MobilePMREditor: React.FC<MobilePMREditorProps> = ({
       {/* Editor Content */}
       <div className="flex-1 overflow-y-auto">
         <div className={`${state.viewMode === 'compact' ? 'p-4' : 'p-6'}`}>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 min-h-[400px]">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 min-h-[400px]">
             <div className={`prose max-w-none ${state.viewMode === 'compact' ? 'p-4' : 'p-6'}`}>
               <EditorContent editor={editor} />
             </div>
@@ -336,11 +336,11 @@ const MobilePMREditor: React.FC<MobilePMREditorProps> = ({
 
           {/* Section Metadata */}
           {currentSection && (
-            <div className="mt-4 p-3 bg-gray-100 rounded-lg text-xs text-gray-600">
+            <div className="mt-4 p-3 bg-gray-100 dark:bg-slate-700 rounded-lg text-xs text-gray-600 dark:text-slate-300">
               <div className="flex items-center justify-between">
                 <span>Last modified: {new Date(currentSection.last_modified).toLocaleString()}</span>
                 {currentSection.confidence_score && (
-                  <span className="px-2 py-1 bg-white rounded-full">
+                  <span className="px-2 py-1 bg-white dark:bg-slate-800 rounded-full">
                     {Math.round(currentSection.confidence_score * 100)}% confidence
                   </span>
                 )}
@@ -352,14 +352,14 @@ const MobilePMREditor: React.FC<MobilePMREditorProps> = ({
 
       {/* Mobile Footer - Quick Actions */}
       {!state.keyboardVisible && (
-        <div className="bg-white border-t border-gray-200 p-3 safe-area-bottom">
+        <div className="bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 p-3 safe-area-bottom">
           <div className="flex items-center justify-around">
             <button
               onClick={() => actions.togglePanel('insights')}
               className={`flex flex-col items-center space-y-1 p-2 rounded-md ${
                 state.activePanel === 'insights'
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-600'
+                  ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                  : 'text-gray-600 dark:text-slate-400'
               }`}
             >
               <Sparkles className="h-5 w-5" />
@@ -370,8 +370,8 @@ const MobilePMREditor: React.FC<MobilePMREditorProps> = ({
               onClick={() => actions.togglePanel('collaboration')}
               className={`flex flex-col items-center space-y-1 p-2 rounded-md ${
                 state.activePanel === 'collaboration'
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-600'
+                  ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                  : 'text-gray-600 dark:text-slate-400'
               }`}
             >
               <Users className="h-5 w-5" />
@@ -381,7 +381,7 @@ const MobilePMREditor: React.FC<MobilePMREditorProps> = ({
             <button
               onClick={handleSave}
               disabled={isSaving || !isOnline}
-              className="flex flex-col items-center space-y-1 p-2 rounded-md text-blue-600 disabled:opacity-50"
+              className="flex flex-col items-center space-y-1 p-2 rounded-md text-blue-600 dark:text-blue-400 disabled:opacity-50"
             >
               {isSaving ? (
                 <RefreshCw className="h-5 w-5 animate-spin" />
@@ -392,7 +392,7 @@ const MobilePMREditor: React.FC<MobilePMREditorProps> = ({
             </button>
 
             <button
-              className="flex flex-col items-center space-y-1 p-2 rounded-md text-gray-600"
+              className="flex flex-col items-center space-y-1 p-2 rounded-md text-gray-600 dark:text-slate-400"
             >
               <MoreVertical className="h-5 w-5" />
               <span className="text-xs">More</span>
@@ -404,12 +404,12 @@ const MobilePMREditor: React.FC<MobilePMREditorProps> = ({
       {/* Connection Status Indicator */}
       <div className="fixed bottom-20 right-4 z-30">
         {isOnline ? (
-          <div className="flex items-center space-x-2 px-3 py-2 bg-green-500 text-white rounded-full shadow-lg text-xs">
+          <div className="flex items-center space-x-2 px-3 py-2 bg-green-700 text-white rounded-full shadow-lg text-xs">
             <Wifi className="h-4 w-4" />
             <span>Online</span>
           </div>
         ) : (
-          <div className="flex items-center space-x-2 px-3 py-2 bg-orange-500 text-white rounded-full shadow-lg text-xs">
+          <div className="flex items-center space-x-2 px-3 py-2 bg-orange-800 text-white rounded-full shadow-lg text-xs">
             <WifiOff className="h-4 w-4" />
             <span>Offline</span>
           </div>

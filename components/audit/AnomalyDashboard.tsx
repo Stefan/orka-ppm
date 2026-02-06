@@ -253,8 +253,8 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
     return (
       <div className={`flex items-center justify-center p-8 ${className}`}>
         <div className="text-center">
-          <Activity className="h-8 w-8 text-gray-400 animate-pulse mx-auto mb-2" />
-          <p className="text-sm text-gray-600">Loading anomalies...</p>
+          <Activity className="h-8 w-8 text-gray-400 dark:text-slate-500 animate-pulse mx-auto mb-2" />
+          <p className="text-sm text-gray-600 dark:text-slate-400">Loading anomalies...</p>
         </div>
       </div>
     )
@@ -279,13 +279,13 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
               <div className="flex items-center space-x-2">
                 {wsConnected ? (
                   <>
-                    <Wifi className="h-4 w-4 text-green-600" />
-                    <span className="text-xs text-green-600 font-medium">Live</span>
+                    <Wifi className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    <span className="text-xs text-green-600 dark:text-green-400 font-medium">Live</span>
                   </>
                 ) : (
                   <>
-                    <WifiOff className="h-4 w-4 text-gray-400" />
-                    <span className="text-xs text-gray-400 font-medium">Offline</span>
+                    <WifiOff className="h-4 w-4 text-gray-400 dark:text-slate-500" />
+                    <span className="text-xs text-gray-400 dark:text-slate-500 font-medium">Offline</span>
                   </>
                 )}
               </div>
@@ -296,9 +296,9 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
         {/* Empty state */}
         <div className="flex items-center justify-center p-8">
           <div className="text-center">
-            <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">No Anomalies Detected</h3>
-            <p className="text-sm text-gray-600">All audit events appear normal</p>
+            <CheckCircle className="h-12 w-12 text-green-500 dark:text-green-400 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-1">No Anomalies Detected</h3>
+            <p className="text-sm text-gray-600 dark:text-slate-400">All audit events appear normal</p>
           </div>
         </div>
       </div>
@@ -364,7 +364,7 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
                   onAnomalyClick?.(notification)
                   dismissNotification(notification.id)
                 }}
-                className="mt-3 w-full px-3 py-1.5 bg-white text-red-600 rounded text-sm font-medium hover:bg-red-50 transition-colors"
+                className="mt-3 w-full px-3 py-1.5 bg-white dark:bg-slate-800 text-red-600 dark:text-red-400 rounded text-sm font-medium hover:bg-red-50 transition-colors"
               >
                 View Details
               </button>
@@ -391,13 +391,13 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
             <div className="flex items-center space-x-2">
               {wsConnected ? (
                 <>
-                  <Wifi className="h-4 w-4 text-green-600" />
-                  <span className="text-xs text-green-600 font-medium">Live</span>
+                  <Wifi className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  <span className="text-xs text-green-600 dark:text-green-400 font-medium">Live</span>
                 </>
               ) : (
                 <>
-                  <WifiOff className="h-4 w-4 text-gray-400" />
-                  <span className="text-xs text-gray-500">Offline</span>
+                  <WifiOff className="h-4 w-4 text-gray-400 dark:text-slate-500" />
+                  <span className="text-xs text-gray-500 dark:text-slate-400">Offline</span>
                 </>
               )}
             </div>
@@ -451,7 +451,7 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
       </div>
 
       {/* Anomaly List */}
-      <div className="divide-y divide-gray-200">
+      <div className="divide-y divide-gray-200 dark:divide-slate-700">
         {sortedAnomalies.map((anomaly) => {
           const isExpanded = expandedAnomaly === anomaly.id
           const isFeedbackOpen = feedbackAnomaly === anomaly.id
@@ -461,7 +461,7 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
           return (
             <div
               key={anomaly.id}
-              className={`p-6 hover:bg-gray-50 transition-colors ${
+              className={`p-6 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 transition-colors ${
                 anomaly.is_false_positive ? 'opacity-60' : ''
               }`}
               data-testid={`anomaly-${anomaly.id}`}
@@ -471,24 +471,24 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
                     {getCategoryIcon(event.category)}
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                       {event.event_type}
                     </h3>
                     <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                      colorScheme === 'red' ? 'bg-red-100 text-red-700' :
-                      colorScheme === 'orange' ? 'bg-orange-100 text-orange-700' :
-                      'bg-yellow-100 text-yellow-700'
+                      colorScheme === 'red' ? 'bg-red-100 dark:bg-red-900/30 text-red-700' :
+                      colorScheme === 'orange' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700' :
+                      'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700'
                     }`}>
                       {(anomaly.anomaly_score * 100).toFixed(1)}% Anomaly
                     </span>
                     {anomaly.is_false_positive && (
-                      <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-700">
+                      <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300">
                         False Positive
                       </span>
                     )}
                   </div>
 
-                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                  <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-slate-400">
                     <span className="flex items-center">
                       <Clock className="h-4 w-4 mr-1" />
                       {new Date(anomaly.detection_timestamp).toLocaleString()}
@@ -502,7 +502,7 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
 
                 <button
                   onClick={() => toggleExpand(anomaly.id)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                  className="p-2 text-gray-400 hover:text-gray-600 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700"
                   aria-label={isExpanded ? 'Collapse' : 'Expand'}
                 >
                   {isExpanded ? (
@@ -515,7 +515,7 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
 
               {/* Anomaly Score Visualization */}
               <div className="mb-4">
-                <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                <div className="flex items-center justify-between text-xs text-gray-600 dark:text-slate-400 mb-1">
                   <span>Anomaly Score</span>
                   <span className="font-semibold">{(anomaly.anomaly_score * 100).toFixed(2)}%</span>
                 </div>
@@ -533,10 +533,10 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
 
               {/* Expanded Details */}
               {isExpanded && (
-                <div className="space-y-4 mt-4 pt-4 border-t border-gray-200">
+                <div className="space-y-4 mt-4 pt-4 border-t border-gray-200 dark:border-slate-700">
                   {/* Affected Entities */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                       <h4 className="text-sm font-semibold text-blue-900 mb-3 flex items-center">
                         <Info className="h-4 w-4 mr-2" />
                         Affected Entity
@@ -568,10 +568,10 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
                           <div>
                             <dt className="text-xs text-blue-700">Risk Level</dt>
                             <dd className={`text-sm font-semibold ${
-                              event.risk_level === 'Critical' ? 'text-red-600' :
-                              event.risk_level === 'High' ? 'text-orange-600' :
-                              event.risk_level === 'Medium' ? 'text-yellow-600' :
-                              'text-green-600'
+                              event.risk_level === 'Critical' ? 'text-red-600 dark:text-red-400' :
+                              event.risk_level === 'High' ? 'text-orange-600 dark:text-orange-400' :
+                              event.risk_level === 'Medium' ? 'text-yellow-600 dark:text-yellow-400' :
+                              'text-green-600 dark:text-green-400'
                             }`}>
                               {event.risk_level}
                             </dd>
@@ -604,12 +604,12 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
                           <dt className="text-xs text-purple-700">Alert Status</dt>
                           <dd className="text-sm text-purple-900">
                             {anomaly.alert_sent ? (
-                              <span className="flex items-center text-green-600">
+                              <span className="flex items-center text-green-600 dark:text-green-400">
                                 <CheckCircle className="h-4 w-4 mr-1" />
                                 Alert Sent
                               </span>
                             ) : (
-                              <span className="text-gray-600">No Alert</span>
+                              <span className="text-gray-600 dark:text-slate-400">No Alert</span>
                             )}
                           </dd>
                         </div>
@@ -722,17 +722,17 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
 
                   {/* Features Used in Detection */}
                   {anomaly.features_used && Object.keys(anomaly.features_used).length > 0 && (
-                    <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                      <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                    <div className="p-4 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg">
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-slate-100 mb-3">
                         Detection Features
                       </h4>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                         {Object.entries(anomaly.features_used).map(([key, value]) => (
                           <div key={key} className="text-sm">
-                            <dt className="text-xs text-gray-600 font-medium capitalize">
+                            <dt className="text-xs text-gray-600 dark:text-slate-400 font-medium capitalize">
                               {key.replace(/_/g, ' ')}
                             </dt>
-                            <dd className="text-gray-900 font-mono text-xs mt-0.5">
+                            <dd className="text-gray-900 dark:text-slate-100 font-mono text-xs mt-0.5">
                               {typeof value === 'number' ? value.toFixed(3) : String(value)}
                             </dd>
                           </div>
@@ -743,14 +743,14 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
 
                   {/* Feedback History */}
                   {anomaly.is_false_positive && anomaly.feedback_notes && (
-                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                       <h4 className="text-sm font-semibold text-green-900 mb-2 flex items-center">
                         <CheckCircle className="h-4 w-4 mr-2" />
                         Feedback
                       </h4>
-                      <p className="text-sm text-green-800">{anomaly.feedback_notes}</p>
+                      <p className="text-sm text-green-800 dark:text-green-300">{anomaly.feedback_notes}</p>
                       {anomaly.feedback_timestamp && (
-                        <p className="text-xs text-green-600 mt-2">
+                        <p className="text-xs text-green-600 dark:text-green-400 mt-2">
                           Submitted on {new Date(anomaly.feedback_timestamp).toLocaleString()}
                         </p>
                       )}
@@ -764,13 +764,13 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
                 <div className="flex items-center space-x-3 mt-4">
                   <button
                     onClick={() => onAnomalyClick?.(anomaly)}
-                    className="px-4 py-2 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 font-medium"
+                    className="px-4 py-2 text-sm text-blue-800 dark:text-blue-400 bg-blue-50 rounded-lg hover:bg-blue-100 dark:bg-blue-900/30 font-medium"
                   >
                     View Details
                   </button>
                   <button
                     onClick={() => setFeedbackAnomaly(anomaly.id)}
-                    className="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium flex items-center"
+                    className="px-4 py-2 text-sm text-gray-600 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 font-medium flex items-center"
                   >
                     <MessageSquare className="h-4 w-4 mr-1" />
                     Mark as False Positive
@@ -780,13 +780,13 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
 
               {/* Feedback Form - Will be implemented in subtask 14.3 */}
               {isFeedbackOpen && (
-                <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                <div className="mt-4 p-4 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg">
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-1">
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-slate-100 mb-1">
                         Feedback Form
                       </h4>
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs text-gray-600 dark:text-slate-400">
                         Help improve our anomaly detection by providing feedback
                       </p>
                     </div>
@@ -795,7 +795,7 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
                         setFeedbackAnomaly(null)
                         setFeedbackNotes('')
                       }}
-                      className="p-1 text-gray-400 hover:text-gray-600 rounded"
+                      className="p-1 text-gray-400 hover:text-gray-600 dark:text-slate-400 rounded"
                       disabled={submittingFeedback}
                     >
                       <X className="h-4 w-4" />
@@ -805,7 +805,7 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
                   <div className="space-y-4">
                     {/* Feedback Notes */}
                     <div>
-                      <label htmlFor={`feedback-notes-${anomaly.id}`} className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor={`feedback-notes-${anomaly.id}`} className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                         Feedback Notes (Optional)
                       </label>
                       <textarea
@@ -814,10 +814,10 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
                         onChange={(e) => setFeedbackNotes(e.target.value)}
                         placeholder="Explain why this is a false positive..."
                         rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         disabled={submittingFeedback}
                       />
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                         Your feedback helps train our AI models to reduce false positives
                       </p>
                     </div>
@@ -829,7 +829,7 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
                           setFeedbackAnomaly(null)
                           setFeedbackNotes('')
                         }}
-                        className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                        className="px-4 py-2 text-sm text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700"
                         disabled={submittingFeedback}
                       >
                         Cancel

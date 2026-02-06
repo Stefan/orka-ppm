@@ -52,17 +52,17 @@ export default function FilterBar({ fields, filters, onFiltersChange }: FilterBa
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2 p-2 bg-gray-50 rounded border" data-testid="filter-bar">
+    <div className="flex flex-wrap items-center gap-2 p-2 bg-gray-50 dark:bg-slate-800/50 rounded border" data-testid="filter-bar">
       {filters.map((f) => (
         <span
           key={f.id}
-          className="inline-flex items-center gap-1 px-2 py-1 bg-white border rounded text-sm"
+          className="inline-flex items-center gap-1 px-2 py-1 bg-white dark:bg-slate-800 border rounded text-sm"
         >
           {f.label} {f.operator} {String(f.value)}
           <button
             type="button"
             onClick={() => removeFilter(f.id)}
-            className="p-0.5 hover:bg-gray-100 rounded"
+            className="p-0.5 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded"
             aria-label="Remove filter"
           >
             <X className="w-3 h-3" />
@@ -100,14 +100,14 @@ export default function FilterBar({ fields, filters, onFiltersChange }: FilterBa
           <button
             type="button"
             onClick={addFilter}
-            className="text-sm text-indigo-600 hover:underline"
+            className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
           >
             Add
           </button>
           <button
             type="button"
             onClick={() => setShowAdd(false)}
-            className="text-sm text-gray-500"
+            className="text-sm text-gray-500 dark:text-slate-400"
           >
             Cancel
           </button>
@@ -116,7 +116,7 @@ export default function FilterBar({ fields, filters, onFiltersChange }: FilterBa
         <button
           type="button"
           onClick={() => setShowAdd(true)}
-          className="flex items-center gap-1 text-sm text-indigo-600 hover:underline"
+          className="flex items-center gap-1 text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
         >
           <Plus className="w-4 h-4" /> Add filter
         </button>

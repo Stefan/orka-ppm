@@ -14,7 +14,7 @@ interface TrendAnalysisChartProps {
 export default function TrendAnalysisChart({ trends = [] }: TrendAnalysisChartProps) {
   if (!trends.length) {
     return (
-      <div className="p-6 text-center text-gray-500 border rounded-lg">
+      <div className="p-6 text-center text-gray-500 dark:text-slate-400 border rounded-lg">
         No trend data available
       </div>
     )
@@ -24,12 +24,12 @@ export default function TrendAnalysisChart({ trends = [] }: TrendAnalysisChartPr
 
   return (
     <div className="space-y-2">
-      <h4 className="text-sm font-medium text-gray-700">Change Order Trends</h4>
+      <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300">Change Order Trends</h4>
       <div className="space-y-2">
         {trends.map((t) => (
           <div key={t.period} className="flex items-center gap-3">
-            <div className="w-20 text-sm text-gray-600">{t.period}</div>
-            <div className="flex-1 h-6 bg-gray-100 rounded overflow-hidden">
+            <div className="w-20 text-sm text-gray-600 dark:text-slate-400">{t.period}</div>
+            <div className="flex-1 h-6 bg-gray-100 dark:bg-slate-700 rounded overflow-hidden">
               <div
                 className="h-full bg-indigo-500 rounded"
                 style={{ width: `${(t.count / maxCount) * 100}%` }}

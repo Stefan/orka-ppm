@@ -10,7 +10,7 @@ export default function ChangeOrdersProjectPage() {
   if (!projectId) {
     return (
       <div className="flex items-center justify-center min-h-[200px]">
-        <p className="text-gray-500">No project selected</p>
+        <p className="text-gray-500 dark:text-slate-400">No project selected</p>
       </div>
     )
   }

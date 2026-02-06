@@ -59,63 +59,62 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
     if (!step || !isOpen) return
 
     const targetElement = document.querySelector(step.target)
-    if (!targetElement || !tooltipRef.current) return
+    if (!targetElement) return
 
     const targetRect = targetElement.getBoundingClientRect()
-    const tooltipRect = tooltipRef.current.getBoundingClientRect()
     const padding = 16
-
     setHighlightRect(targetRect)
+
+    const tooltipRect = tooltipRef.current?.getBoundingClientRect()
+    const tw = tooltipRect?.width ?? 384
+    const th = tooltipRect?.height ?? 280
 
     let top = 0
     let left = 0
-
     const position = step.position || 'bottom'
 
     switch (position) {
       case 'top':
-        top = targetRect.top - tooltipRect.height - padding
-        left = targetRect.left + (targetRect.width - tooltipRect.width) / 2
+        top = targetRect.top - th - padding
+        left = targetRect.left + (targetRect.width - tw) / 2
         break
       case 'bottom':
         top = targetRect.bottom + padding
-        left = targetRect.left + (targetRect.width - tooltipRect.width) / 2
+        left = targetRect.left + (targetRect.width - tw) / 2
         break
       case 'left':
-        top = targetRect.top + (targetRect.height - tooltipRect.height) / 2
-        left = targetRect.left - tooltipRect.width - padding
+        top = targetRect.top + (targetRect.height - th) / 2
+        left = targetRect.left - tw - padding
         break
       case 'right':
-        top = targetRect.top + (targetRect.height - tooltipRect.height) / 2
+        top = targetRect.top + (targetRect.height - th) / 2
         left = targetRect.right + padding
         break
       case 'center':
-        top = window.innerHeight / 2 - tooltipRect.height / 2
-        left = window.innerWidth / 2 - tooltipRect.width / 2
+        top = window.innerHeight / 2 - th / 2
+        left = window.innerWidth / 2 - tw / 2
         break
     }
 
-    // Keep tooltip within viewport
     const viewportWidth = window.innerWidth
     const viewportHeight = window.innerHeight
-
     if (left < padding) left = padding
-    if (left + tooltipRect.width > viewportWidth - padding) {
-      left = viewportWidth - tooltipRect.width - padding
-    }
+    if (left + tw > viewportWidth - padding) left = viewportWidth - tw - padding
     if (top < padding) top = padding
-    if (top + tooltipRect.height > viewportHeight - padding) {
-      top = viewportHeight - tooltipRect.height - padding
-    }
+    if (top + th > viewportHeight - padding) top = viewportHeight - th - padding
 
     setTooltipPosition({ top, left })
   }, [step, isOpen])
 
-  // Update positions on mount, step change, and window resize
+  // Update positions on mount, step change, and window resize.
+  // Run again after a frame so tooltipRef is definitely mounted and layout is complete.
   useEffect(() => {
     if (!isOpen) return
 
     updatePositions()
+    const raf = requestAnimationFrame(() => {
+      updatePositions()
+    })
 
     const handleResize = () => updatePositions()
     const handleScroll = () => updatePositions()
@@ -124,6 +123,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
     window.addEventListener('scroll', handleScroll, true)
 
     return () => {
+      cancelAnimationFrame(raf)
       window.removeEventListener('resize', handleResize)
       window.removeEventListener('scroll', handleScroll, true)
     }
@@ -231,30 +231,30 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
       {/* Tooltip */}
       <div
         ref={tooltipRef}
-        className={`fixed z-[9999] w-96 bg-white rounded-lg shadow-2xl border border-gray-200 ${className}`}
+        className={`fixed z-[9999] w-96 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-gray-200 dark:border-slate-700 ${className}`}
         style={{
           top: `${tooltipPosition.top}px`,
           left: `${tooltipPosition.left}px`,
         }}
       >
         {/* Header */}
-        <div className="flex items-start justify-between p-4 border-b border-gray-200">
+        <div className="flex items-start justify-between p-4 border-b border-gray-200 dark:border-slate-700">
           <div className="flex items-start space-x-3 flex-1">
             {step.icon && (
-              <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-blue-100 rounded-lg">
+              <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                 {step.icon}
               </div>
             )}
             <div className="flex-1">
-              <h3 className="text-base font-semibold text-gray-900">{step.title}</h3>
-              <p className="text-xs text-gray-500 mt-1">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-slate-100">{step.title}</h3>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                 Step {currentStep + 1} of {steps.length}
               </p>
             </div>
           </div>
           <button
             onClick={handleSkip}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 dark:text-slate-400 transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -262,13 +262,13 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
 
         {/* Content */}
         <div className="p-4">
-          <p className="text-sm text-gray-700">{step.description}</p>
+          <p className="text-sm text-gray-700 dark:text-slate-300">{step.description}</p>
 
           {/* Action button if provided */}
           {step.action && (
             <button
               onClick={step.action.onClick}
-              className="mt-3 w-full px-4 py-2 bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100 transition-colors text-sm font-medium"
+              className="mt-3 w-full px-4 py-2 bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100 dark:bg-blue-900/30 transition-colors text-sm font-medium"
             >
               {step.action.label}
             </button>
@@ -276,7 +276,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-4 bg-gray-50 border-t border-gray-200 rounded-b-lg">
+        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700 rounded-b-lg">
           {/* Progress dots */}
           <div className="flex items-center space-x-1">
             {steps.map((_, index) => (
@@ -300,7 +300,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
             {!isFirstStep && (
               <button
                 onClick={handlePrevious}
-                className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100 transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" />
                 <span>Back</span>
@@ -330,11 +330,11 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
 export const enhancedPMRTourSteps: TourStep[] = [
   {
     id: 'welcome',
-    title: 'Welcome to Enhanced PMR!',
+    title: 'Welcome to Project Monthly Report!',
     description: 'Let\'s take a quick tour of the key features that make Enhanced PMR 3x better than traditional reporting tools. This will only take a minute.',
     target: 'body',
     position: 'center',
-    icon: <Sparkles className="h-6 w-6 text-blue-600" />
+    icon: <Sparkles className="h-6 w-6 text-blue-600 dark:text-blue-400" />
   },
   {
     id: 'editor',
@@ -342,7 +342,7 @@ export const enhancedPMRTourSteps: TourStep[] = [
     description: 'Create and edit your report sections with our powerful rich text editor. Use the toolbar for formatting, and content auto-saves as you type.',
     target: '[data-tour="editor"]',
     position: 'right',
-    icon: <FileText className="h-6 w-6 text-blue-600" />
+    icon: <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
   },
   {
     id: 'ai-insights',
@@ -350,7 +350,7 @@ export const enhancedPMRTourSteps: TourStep[] = [
     description: 'Get intelligent insights, predictions, and recommendations based on your project data. Click "Generate Insights" to see AI analysis of budget, schedule, resources, and risks.',
     target: '[data-tour="ai-insights"]',
     position: 'left',
-    icon: <Sparkles className="h-6 w-6 text-purple-600" />
+    icon: <Sparkles className="h-6 w-6 text-purple-600 dark:text-purple-400" />
   },
   {
     id: 'collaboration',
@@ -358,7 +358,7 @@ export const enhancedPMRTourSteps: TourStep[] = [
     description: 'Work together with your team in real-time. See who\'s online, view their cursors, add comments, and resolve conflicts seamlessly.',
     target: '[data-tour="collaboration"]',
     position: 'left',
-    icon: <Users className="h-6 w-6 text-green-600" />
+    icon: <Users className="h-6 w-6 text-green-600 dark:text-green-400" />
   },
   {
     id: 'export',
@@ -366,7 +366,7 @@ export const enhancedPMRTourSteps: TourStep[] = [
     description: 'Export your reports in PDF, Excel, PowerPoint, or Word format with professional templates and branding. Perfect for stakeholder distribution.',
     target: '[data-tour="export"]',
     position: 'bottom',
-    icon: <Download className="h-6 w-6 text-orange-600" />
+    icon: <Download className="h-6 w-6 text-orange-600 dark:text-orange-400" />
   },
   {
     id: 'preview',
@@ -374,7 +374,7 @@ export const enhancedPMRTourSteps: TourStep[] = [
     description: 'Switch between Edit and Preview modes to see how your report will look to stakeholders. Preview mode is read-only and perfect for review.',
     target: '[data-tour="preview"]',
     position: 'bottom',
-    icon: <Eye className="h-6 w-6 text-indigo-600" />
+    icon: <Eye className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
   },
   {
     id: 'help',
@@ -382,7 +382,7 @@ export const enhancedPMRTourSteps: TourStep[] = [
     description: 'Click the help icon anytime to get contextual assistance, or use the AI chat to ask questions. We\'re here to help you create amazing reports!',
     target: '[data-tour="help"]',
     position: 'bottom',
-    icon: <MessageSquare className="h-6 w-6 text-blue-600" />
+    icon: <MessageSquare className="h-6 w-6 text-blue-600 dark:text-blue-400" />
   }
 ]
 

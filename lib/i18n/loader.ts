@@ -57,9 +57,18 @@ const inFlightRequests = new Map<string, Promise<TranslationDictionary>>();
 export async function loadTranslations(
   locale: string
 ): Promise<TranslationDictionary> {
-  // Check cache first
-  if (translationCache.has(locale)) {
-    return translationCache.get(locale)!;
+  // In development, bypass cache so updated locale files (e.g. new keys) are always loaded
+  const useCache = typeof process !== 'undefined' && process.env.NODE_ENV === 'production';
+  if (useCache && translationCache.has(locale)) {
+    const cached = translationCache.get(locale)!;
+    // #region agent log
+    const pmr = (cached as Record<string, unknown>)?.pmr as Record<string, unknown> | undefined;
+    const sections = pmr?.sections as Record<string, string> | undefined;
+    const placeholderContent = pmr?.placeholderContent as Record<string, string> | undefined;
+    const isTest = typeof process !== 'undefined' && (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined);
+    if (!isTest && typeof fetch !== 'undefined') { fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/loader.ts:cacheHit',message:'loader cache hit',data:{locale,hasPmrSections:!!sections,hasPlaceholderContent:!!placeholderContent,reportTitle:placeholderContent?.reportTitle},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H5'})}).catch(()=>{}); }
+    // #endregion
+    return cached;
   }
 
   // Check if there's already a request in flight for this locale
@@ -70,30 +79,35 @@ export async function loadTranslations(
   // Create the fetch promise
   const fetchPromise = (async () => {
     try {
-      // Fetch from public folder
-      const response = await fetch(`/locales/${locale}.json`);
+      // Fetch from public folder (no-store so updated locale files are always loaded)
+      const response = await fetch(`/locales/${locale}.json`, { cache: 'no-store' });
       
       if (!response.ok) {
         throw new Error(`Failed to load translations for ${locale}: HTTP ${response.status}`);
       }
 
       const translations = await response.json();
-      
+      // #region agent log
+      const pmr = (translations as Record<string, unknown>)?.pmr as Record<string, unknown> | undefined;
+      const sections = pmr?.sections as Record<string, string> | undefined;
+      const placeholderContent = pmr?.placeholderContent as Record<string, string> | undefined;
+      const isTest = typeof process !== 'undefined' && (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined);
+      if (!isTest && typeof fetch !== 'undefined') { fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/loader.ts:afterParse',message:'loader after fetch',data:{locale,hasPmrSections:!!sections,hasPlaceholderContent:!!placeholderContent,reportTitle:placeholderContent?.reportTitle},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{}); }
+      // #endregion
       // Validate structure
       if (typeof translations !== 'object' || translations === null || Array.isArray(translations)) {
         throw new Error(`Invalid translation file format for ${locale}: expected object, got ${Array.isArray(translations) ? 'array' : typeof translations}`);
       }
 
-      // Cache the translations
+      // Always update cache on successful load so isLanguageCached/getCachedTranslations reflect loaded data
       translationCache.set(locale, translations);
-      
       return translations;
     } catch (error) {
       console.error(`Error loading translations for ${locale}:`, error);
       
       // Retry once
       try {
-        const response = await fetch(`/locales/${locale}.json`);
+        const response = await fetch(`/locales/${locale}.json`, { cache: 'no-store' });
         
         if (!response.ok) {
           throw new Error(`Retry failed: HTTP ${response.status}`);
@@ -105,7 +119,6 @@ export async function loadTranslations(
         if (typeof translations !== 'object' || translations === null || Array.isArray(translations)) {
           throw new Error(`Invalid translation file format on retry for ${locale}`);
         }
-        
         translationCache.set(locale, translations);
         return translations;
       } catch (retryError) {

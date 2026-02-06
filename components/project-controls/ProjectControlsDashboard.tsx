@@ -39,7 +39,7 @@ export default function ProjectControlsDashboard({ projectId }: ProjectControlsD
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 -mb-px capitalize ${activeTab === tab ? 'border-b-2 border-indigo-600 font-medium' : 'text-gray-600'}`}
+            className={`px-4 py-2 -mb-px capitalize ${activeTab === tab ? 'border-b-2 border-indigo-600 font-medium' : 'text-gray-600 dark:text-slate-400'}`}
           >
             {tab === 'etc-eac' ? 'ETC/EAC' : tab === 'ev' ? 'Earned Value' : tab}
           </button>

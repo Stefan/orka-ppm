@@ -210,13 +210,13 @@ const PMRChart: React.FC<PMRChartProps> = ({
   const getStatusIndicator = (status?: string) => {
     switch (status) {
       case 'critical':
-        return <AlertTriangle className="h-4 w-4 text-red-500" />
+        return <AlertTriangle className="h-4 w-4 text-red-500 dark:text-red-400" />
       case 'at-risk':
         return <TrendingDown className="h-4 w-4 text-orange-500" />
       case 'on-track':
-        return <TrendingUp className="h-4 w-4 text-green-500" />
+        return <TrendingUp className="h-4 w-4 text-green-500 dark:text-green-400" />
       default:
-        return <Info className="h-4 w-4 text-blue-500" />
+        return <Info className="h-4 w-4 text-blue-500 dark:text-blue-400" />
     }
   }
 
@@ -231,45 +231,45 @@ const PMRChart: React.FC<PMRChartProps> = ({
 
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
             <div className="flex items-center space-x-3">
               {getStatusIndicator(selectedDataPoint.status)}
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                 {selectedDataPoint.name}
               </h3>
             </div>
             <button
               onClick={() => setShowInsightOverlay(false)}
-              className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+              className="p-1 text-gray-400 hover:text-gray-600 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
           {/* Data Point Details */}
-          <div className="p-4 border-b border-gray-200 bg-gray-50">
+          <div className="p-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <p className="text-sm text-gray-600">Value</p>
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-sm text-gray-600 dark:text-slate-400">Value</p>
+                <p className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                   {selectedDataPoint.value.toLocaleString()}
                 </p>
               </div>
               {selectedDataPoint.baseline !== undefined && (
                 <div>
-                  <p className="text-sm text-gray-600">Baseline</p>
-                  <p className="text-lg font-semibold text-gray-900">
+                  <p className="text-sm text-gray-600 dark:text-slate-400">Baseline</p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                     {selectedDataPoint.baseline.toLocaleString()}
                   </p>
                 </div>
               )}
               {selectedDataPoint.variance !== undefined && (
                 <div>
-                  <p className="text-sm text-gray-600">Variance</p>
+                  <p className="text-sm text-gray-600 dark:text-slate-400">Variance</p>
                   <p className={`text-lg font-semibold ${
-                    selectedDataPoint.variance > 0 ? 'text-red-600' : 'text-green-600'
+                    selectedDataPoint.variance > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
                   }`}>
                     {selectedDataPoint.variance > 0 ? '+' : ''}
                     {selectedDataPoint.variance.toFixed(1)}%
@@ -278,8 +278,8 @@ const PMRChart: React.FC<PMRChartProps> = ({
               )}
               {selectedDataPoint.forecast !== undefined && (
                 <div>
-                  <p className="text-sm text-gray-600">Forecast</p>
-                  <p className="text-lg font-semibold text-gray-900">
+                  <p className="text-sm text-gray-600 dark:text-slate-400">Forecast</p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                     {selectedDataPoint.forecast.toLocaleString()}
                   </p>
                 </div>
@@ -289,32 +289,32 @@ const PMRChart: React.FC<PMRChartProps> = ({
 
           {/* AI Insights */}
           <div className="p-4">
-            <h4 className="text-md font-semibold text-gray-900 mb-3">AI Insights</h4>
+            <h4 className="text-md font-semibold text-gray-900 dark:text-slate-100 mb-3">AI Insights</h4>
             <div className="space-y-3">
               {insights.map((insight) => (
                 <div
                   key={insight.id}
                   className={`p-4 rounded-lg border ${
-                    insight.priority === 'critical' ? 'bg-red-50 border-red-200' :
+                    insight.priority === 'critical' ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' :
                     insight.priority === 'high' ? 'bg-orange-50 border-orange-200' :
-                    insight.priority === 'medium' ? 'bg-yellow-50 border-yellow-200' :
-                    'bg-blue-50 border-blue-200'
+                    insight.priority === 'medium' ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800' :
+                    'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
                   }`}
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <h5 className="font-medium text-gray-900">{insight.title}</h5>
-                    <span className="text-xs px-2 py-1 rounded-full bg-white border border-gray-200">
+                    <h5 className="font-medium text-gray-900 dark:text-slate-100">{insight.title}</h5>
+                    <span className="text-xs px-2 py-1 rounded-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
                       {(insight.confidence_score * 100).toFixed(0)}% confidence
                     </span>
                   </div>
-                  <p className="text-sm text-gray-700 mb-3">{insight.content}</p>
+                  <p className="text-sm text-gray-700 dark:text-slate-300 mb-3">{insight.content}</p>
                   
                   {insight.recommended_actions.length > 0 && (
                     <div className="mt-3">
-                      <p className="text-sm font-medium text-gray-900 mb-2">Recommended Actions:</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">Recommended Actions:</p>
                       <ul className="list-disc list-inside space-y-1">
                         {insight.recommended_actions.map((action, idx) => (
-                          <li key={idx} className="text-sm text-gray-700">{action}</li>
+                          <li key={idx} className="text-sm text-gray-700 dark:text-slate-300">{action}</li>
                         ))}
                       </ul>
                     </div>
@@ -325,10 +325,10 @@ const PMRChart: React.FC<PMRChartProps> = ({
           </div>
 
           {/* Actions */}
-          <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end space-x-2">
+          <div className="p-4 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 flex justify-end space-x-2">
             <button
               onClick={() => setShowInsightOverlay(false)}
-              className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 text-sm text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700"
             >
               Close
             </button>
@@ -357,13 +357,13 @@ const PMRChart: React.FC<PMRChartProps> = ({
     if (!expandedView) return null
 
     return (
-      <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
+      <div className="fixed inset-0 z-50 bg-white dark:bg-slate-800 overflow-y-auto">
         <div className="container mx-auto p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">{chartConfig.title}</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">{chartConfig.title}</h2>
             <button
               onClick={() => setExpandedView(false)}
-              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+              className="p-2 text-gray-400 hover:text-gray-600 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700"
             >
               <X className="h-6 w-6" />
             </button>
@@ -394,7 +394,7 @@ const PMRChart: React.FC<PMRChartProps> = ({
         {/* Chart Header with PMR-specific controls */}
         <div className="absolute top-2 right-2 z-10 flex items-center space-x-2">
           {showAIInsights && data.some(d => d.aiInsights && d.aiInsights.length > 0) && (
-            <div className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full flex items-center space-x-1">
+            <div className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 text-xs rounded-full flex items-center space-x-1">
               <Info className="h-3 w-3" />
               <span>AI Insights Available</span>
             </div>
@@ -402,10 +402,10 @@ const PMRChart: React.FC<PMRChartProps> = ({
           
           <button
             onClick={() => setExpandedView(true)}
-            className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 shadow-sm"
+            className="p-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 shadow-sm"
             title="Expand Chart"
           >
-            <Maximize2 className="h-4 w-4 text-gray-600" />
+            <Maximize2 className="h-4 w-4 text-gray-600 dark:text-slate-400" />
           </button>
         </div>
 
@@ -443,7 +443,7 @@ const PMRChart: React.FC<PMRChartProps> = ({
                     setShowInsightOverlay(true)
                     onDataPointClick?.(point)
                   }}
-                  className="px-3 py-1 bg-orange-100 text-orange-700 text-xs rounded-full hover:bg-orange-200 flex items-center space-x-1"
+                  className="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 text-xs rounded-full hover:bg-orange-200 flex items-center space-x-1"
                 >
                   <AlertTriangle className="h-3 w-3" />
                   <span>{point.name}: {criticalInsights.length} alert{criticalInsights.length > 1 ? 's' : ''}</span>

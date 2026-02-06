@@ -12,6 +12,7 @@ import type { AnomalyDetection } from '../../components/audit/AnomalyDashboard'
 import type { SearchResponse } from '../../components/audit/SemanticSearch'
 import type { AuditFilters as AuditFiltersType } from '../../components/audit/AuditFilters'
 import { useFeatureFlag } from '../../contexts/FeatureFlagContext'
+import { GuidedTour, useGuidedTour, TourTriggerButton, auditTourSteps } from '@/components/guided-tour'
 
 // Tab types
 type TabType = 'dashboard' | 'timeline' | 'anomalies' | 'search'
@@ -63,6 +64,7 @@ export default function AuditDashboard() {
   
   // Filters state
   const [auditFilters, setAuditFilters] = useState<AuditFiltersType>({})
+  const { isOpen, startTour, closeTour, completeTour, resetAndStartTour, hasCompletedTour } = useGuidedTour('audit-v1')
 
   // Fetch dashboard stats
   const fetchDashboardStats = useCallback(async () => {
@@ -330,12 +332,12 @@ export default function AuditDashboard() {
     return (
       <AppLayout>
         <div className="p-8">
-          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-4">
             <div className="flex">
               <AlertTriangle className="h-5 w-5 text-yellow-400" />
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-yellow-800">{t('audit.authRequired')}</h3>
-                <p className="mt-1 text-sm text-yellow-700">{t('audit.authRequiredMessage')}</p>
+                <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-300">{t('audit.authRequired')}</h3>
+                <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-400">{t('audit.authRequiredMessage')}</p>
               </div>
             </div>
           </div>
@@ -351,8 +353,8 @@ export default function AuditDashboard() {
         <div data-testid="audit-header" className="flex flex-col space-y-4">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
             <div className="min-w-0 flex-1">
-              <h1 data-testid="audit-title" className="text-2xl sm:text-3xl font-bold text-gray-900">{t('audit.title')}</h1>
-              <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-sm text-gray-600">
+              <h1 data-testid="audit-title" className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-slate-100">{t('audit.title')}</h1>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-sm text-gray-700 dark:text-slate-300">
                 {stats && (
                   <>
                     <span>{(stats.total_events_24h || 0)} {t('audit.events')}</span>
@@ -364,7 +366,7 @@ export default function AuditDashboard() {
                   <span>{t('audit.updated')}: {lastUpdated.toLocaleTimeString()}</span>
                 )}
                 {autoRefresh && (
-                  <span className="flex items-center text-green-600">
+                  <span className="flex items-center text-green-600 dark:text-green-400">
                     <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
                     {t('audit.live')}
                   </span>
@@ -374,12 +376,16 @@ export default function AuditDashboard() {
             
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center gap-2">
+              <TourTriggerButton
+                onStart={hasCompletedTour ? resetAndStartTour : startTour}
+                hasCompletedTour={hasCompletedTour}
+              />
               <button
                 onClick={() => setAutoRefresh(!autoRefresh)}
                 className={`flex items-center justify-center min-h-[44px] px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
                   autoRefresh 
-                    ? 'bg-green-100 text-green-700 hover:bg-green-200' 
-                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50' 
+                    : 'bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-slate-100 hover:bg-gray-200 dark:hover:bg-slate-600'
                 }`}
               >
                 <RefreshCw className={`h-4 w-4 mr-2 ${autoRefresh ? 'animate-spin' : ''}`} />
@@ -389,56 +395,57 @@ export default function AuditDashboard() {
               <button
                 onClick={() => fetchDashboardStats()}
                 disabled={loading}
-                className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 disabled:opacity-50 text-sm font-medium"
+                className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 disabled:opacity-50 text-sm font-medium"
               >
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 <span className="hidden sm:inline">{t('audit.refresh')}</span>
               </button>
               
-              <button
-                onClick={() => handleExport('pdf')}
-                disabled={exportLoading === 'pdf'}
-                className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 disabled:opacity-50 text-sm font-medium"
-              >
-                <FileDown className={`h-4 w-4 mr-2 ${exportLoading === 'pdf' ? 'animate-pulse' : ''}`} />
-                <span className="hidden sm:inline">PDF</span>
-              </button>
-              
-              <button
-                onClick={() => handleExport('csv')}
-                disabled={exportLoading === 'csv'}
-                className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 disabled:opacity-50 text-sm font-medium"
-              >
-                <Download className={`h-4 w-4 mr-2 ${exportLoading === 'csv' ? 'animate-pulse' : ''}`} />
-                <span className="hidden sm:inline">CSV</span>
-              </button>
+              <div data-tour="audit-export" className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={() => handleExport('pdf')}
+                  disabled={exportLoading === 'pdf'}
+                  className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 disabled:opacity-50 text-sm font-medium"
+                >
+                  <FileDown className={`h-4 w-4 mr-2 ${exportLoading === 'pdf' ? 'animate-pulse' : ''}`} />
+                  <span className="hidden sm:inline">PDF</span>
+                </button>
+                <button
+                  onClick={() => handleExport('csv')}
+                  disabled={exportLoading === 'csv'}
+                  className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 disabled:opacity-50 text-sm font-medium"
+                >
+                  <Download className={`h-4 w-4 mr-2 ${exportLoading === 'csv' ? 'animate-pulse' : ''}`} />
+                  <span className="hidden sm:inline">CSV</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Error Banner */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
             <div className="flex">
               <AlertTriangle className="h-5 w-5 text-red-400" />
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">{t('audit.error')}</h3>
-                <p className="mt-1 text-sm text-red-700">{error}</p>
+                <h3 className="text-sm font-medium text-red-800 dark:text-red-300">{t('audit.error')}</h3>
+                <p className="mt-1 text-sm text-red-700 dark:text-red-400">{error}</p>
               </div>
             </div>
           </div>
         )}
 
         {/* Tabs */}
-        <div data-testid="audit-trail" className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="border-b border-gray-200">
+        <div data-testid="audit-trail" data-tour="audit-filter" className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+          <div className="border-b border-gray-200 dark:border-slate-700">
             <nav className="flex -mb-px overflow-x-auto" aria-label="Tabs">
               <button
                 onClick={() => setActiveTab('dashboard')}
                 className={`flex items-center px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap ${
                   activeTab === 'dashboard'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-700 dark:text-slate-300 hover:text-gray-700 dark:hover:text-slate-300 hover:border-gray-300 dark:border-slate-600'
                 }`}
               >
                 <BarChart3 className="h-4 w-4 mr-2" />
@@ -449,8 +456,8 @@ export default function AuditDashboard() {
                 onClick={() => setActiveTab('timeline')}
                 className={`flex items-center px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap ${
                   activeTab === 'timeline'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-700 dark:text-slate-300 hover:text-gray-700 dark:hover:text-slate-300 hover:border-gray-300 dark:border-slate-600'
                 }`}
               >
                 <Clock className="h-4 w-4 mr-2" />
@@ -459,17 +466,18 @@ export default function AuditDashboard() {
               
               {anomalyDetectionEnabled && (
                 <button
+                  data-tour="audit-anomalies"
                   onClick={() => setActiveTab('anomalies')}
                   className={`flex items-center px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap ${
                     activeTab === 'anomalies'
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-700 dark:text-slate-300 hover:text-gray-700 dark:hover:text-slate-300 hover:border-gray-300 dark:border-slate-600'
                   }`}
                 >
                   <AlertTriangle className="h-4 w-4 mr-2" />
                   {t('audit.tabs.anomalies')}
                   {stats && stats.total_anomalies_24h > 0 && (
-                    <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded-full">
+                    <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 rounded-full">
                       {stats.total_anomalies_24h}
                     </span>
                   )}
@@ -480,8 +488,8 @@ export default function AuditDashboard() {
                 onClick={() => setActiveTab('search')}
                 className={`flex items-center px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap ${
                   activeTab === 'search'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-700 dark:text-slate-300 hover:text-gray-700 dark:hover:text-slate-300 hover:border-gray-300 dark:border-slate-600'
                 }`}
               >
                 <Search className="h-4 w-4 mr-2" />
@@ -496,61 +504,61 @@ export default function AuditDashboard() {
               <div className="space-y-6">
                 {loading ? (
                   <div className="text-center py-12">
-                    <RefreshCw className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500">{t('audit.loadingDashboard')}</p>
+                    <RefreshCw className="h-8 w-8 animate-spin text-gray-400 dark:text-slate-500 mx-auto mb-4" />
+                    <p className="text-gray-700 dark:text-slate-300">{t('audit.loadingDashboard')}</p>
                   </div>
                 ) : stats ? (
                   <>
                     {/* Stats Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-medium text-gray-600">{t('audit.stats.totalEvents')}</p>
-                            <p className="text-2xl font-bold text-blue-600">{(stats.total_events_24h || 0).toLocaleString()}</p>
+                            <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('audit.stats.totalEvents')}</p>
+                            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{(stats.total_events_24h || 0).toLocaleString()}</p>
                           </div>
-                          <FileText className="h-8 w-8 text-blue-600" />
+                          <FileText className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                         </div>
                       </div>
                       
-                      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-medium text-gray-600">{t('audit.stats.anomalies')}</p>
-                            <p className="text-2xl font-bold text-red-600">{(stats.total_anomalies_24h || 0).toLocaleString()}</p>
+                            <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('audit.stats.anomalies')}</p>
+                            <p className="text-2xl font-bold text-red-600 dark:text-red-400">{(stats.total_anomalies_24h || 0).toLocaleString()}</p>
                           </div>
-                          <AlertTriangle className="h-8 w-8 text-red-600" />
+                          <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
                         </div>
                       </div>
                       
-                      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-medium text-gray-600">{t('audit.stats.criticalEvents')}</p>
-                            <p className="text-2xl font-bold text-orange-600">{(stats.critical_events_24h || 0).toLocaleString()}</p>
+                            <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('audit.stats.criticalEvents')}</p>
+                            <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{(stats.critical_events_24h || 0).toLocaleString()}</p>
                           </div>
-                          <AlertTriangle className="h-8 w-8 text-orange-600" />
+                          <AlertTriangle className="h-8 w-8 text-orange-600 dark:text-orange-400" />
                         </div>
                       </div>
                       
-                      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-medium text-gray-600">{t('audit.stats.eventRate')}</p>
-                            <p className="text-2xl font-bold text-green-600">
+                            <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('audit.stats.eventRate')}</p>
+                            <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                               {stats.event_volume_chart.length > 0
                                 ? Math.round((stats.total_events_24h || 0) / 24)
                                 : 0}/hr
                             </p>
                           </div>
-                          <BarChart3 className="h-8 w-8 text-green-600" />
+                          <BarChart3 className="h-8 w-8 text-green-600 dark:text-green-400" />
                         </div>
                       </div>
                     </div>
 
                     {/* Category Breakdown Chart */}
-                    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('audit.categoryBreakdown')}</h3>
+                    <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">{t('audit.categoryBreakdown')}</h3>
                       <div className="space-y-3">
                         {Object.entries(stats.category_breakdown).map(([category, count]) => {
                           const percentage = (stats.total_events_24h || 0) > 0
@@ -568,12 +576,12 @@ export default function AuditDashboard() {
                           return (
                             <div key={category}>
                               <div className="flex items-center justify-between mb-1">
-                                <span className="text-sm font-medium text-gray-700">{category}</span>
-                                <span className="text-sm text-gray-600">
+                                <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{category}</span>
+                                <span className="text-sm text-gray-700 dark:text-slate-300">
                                   {count} ({percentage}%)
                                 </span>
                               </div>
-                              <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2">
                                 <div
                                   className={`${color} h-2 rounded-full transition-all duration-300`}
                                   style={{ width: `${percentage}%` }}
@@ -588,59 +596,59 @@ export default function AuditDashboard() {
                     {/* Top Users and Event Types */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {/* Top Users */}
-                      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('audit.topUsers')}</h3>
+                      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">{t('audit.topUsers')}</h3>
                         <div className="space-y-3">
                           {stats.top_users.slice(0, 5).map((user, index) => (
                             <div key={user.user_id} className="flex items-center justify-between">
                               <div className="flex items-center space-x-3">
-                                <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full font-semibold text-sm">
+                                <div className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full font-semibold text-sm">
                                   {index + 1}
                                 </div>
-                                <span className="text-sm font-medium text-gray-700 truncate">
+                                <span className="text-sm font-medium text-gray-700 dark:text-slate-300 truncate">
                                   {user.user_id}
                                 </span>
                               </div>
-                              <span className="text-sm font-bold text-gray-900">
+                              <span className="text-sm font-bold text-gray-900 dark:text-slate-100">
                                 {user.count} {t('audit.events')}
                               </span>
                             </div>
                           ))}
                           {stats.top_users.length === 0 && (
-                            <p className="text-sm text-gray-500 text-center py-4">{t('audit.noUserData')}</p>
+                            <p className="text-sm text-gray-700 dark:text-slate-300 text-center py-4">{t('audit.noUserData')}</p>
                           )}
                         </div>
                       </div>
 
                       {/* Top Event Types */}
-                      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('audit.topEventTypes')}</h3>
+                      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">{t('audit.topEventTypes')}</h3>
                         <div className="space-y-3">
                           {stats.top_event_types.slice(0, 5).map((eventType, index) => (
                             <div key={eventType.event_type} className="flex items-center justify-between">
                               <div className="flex items-center space-x-3">
-                                <div className="flex items-center justify-center w-8 h-8 bg-green-100 text-green-600 rounded-full font-semibold text-sm">
+                                <div className="flex items-center justify-center w-8 h-8 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full font-semibold text-sm">
                                   {index + 1}
                                 </div>
-                                <span className="text-sm font-medium text-gray-700 truncate">
+                                <span className="text-sm font-medium text-gray-700 dark:text-slate-300 truncate">
                                   {eventType.event_type}
                                 </span>
                               </div>
-                              <span className="text-sm font-bold text-gray-900">
+                              <span className="text-sm font-bold text-gray-900 dark:text-slate-100">
                                 {eventType.count} {t('audit.events')}
                               </span>
                             </div>
                           ))}
                           {stats.top_event_types.length === 0 && (
-                            <p className="text-sm text-gray-500 text-center py-4">{t('audit.noEventTypeData')}</p>
+                            <p className="text-sm text-gray-700 dark:text-slate-300 text-center py-4">{t('audit.noEventTypeData')}</p>
                           )}
                         </div>
                       </div>
                     </div>
 
                     {/* Event Volume Chart (24h) */}
-                    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('audit.eventVolume24h')}</h3>
+                    <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">{t('audit.eventVolume24h')}</h3>
                       <div className="h-64">
                         {stats.event_volume_chart.length > 0 ? (
                           <div className="flex items-end justify-between h-full space-x-1">
@@ -657,7 +665,7 @@ export default function AuditDashboard() {
                                       title={`${item.hour}: ${item.count} ${t('audit.events')}`}
                                     ></div>
                                   </div>
-                                  <span className="text-xs text-gray-500 mt-2 truncate w-full text-center">
+                                  <span className="text-xs text-gray-700 dark:text-slate-300 mt-2 truncate w-full text-center">
                                     {item.hour}
                                   </span>
                                 </div>
@@ -665,7 +673,7 @@ export default function AuditDashboard() {
                             })}
                           </div>
                         ) : (
-                          <div className="flex items-center justify-center h-full text-gray-500">
+                          <div className="flex items-center justify-center h-full text-gray-700 dark:text-slate-300">
                             {t('audit.noEventVolumeData')}
                           </div>
                         )}
@@ -673,7 +681,7 @@ export default function AuditDashboard() {
                     </div>
                   </>
                 ) : (
-                  <div className="text-center py-12 text-gray-500">
+                  <div className="text-center py-12 text-gray-700 dark:text-slate-300">
                     {t('audit.noDashboardData')}
                   </div>
                 )}
@@ -716,6 +724,13 @@ export default function AuditDashboard() {
           </div>
         </div>
       </div>
+      <GuidedTour
+        steps={auditTourSteps}
+        isOpen={isOpen}
+        onClose={closeTour}
+        onComplete={completeTour}
+        tourId="audit-v1"
+      />
     </AppLayout>
   )
 }

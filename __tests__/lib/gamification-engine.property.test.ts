@@ -51,4 +51,25 @@ describe('Gamification Engine - Property 39: Badge Criteria Validation', () => {
       expect(desc.length).toBeGreaterThan(0)
     }
   })
+
+  it('Property 39: best_scenario badge when bestScenarioChosen is true', () => {
+    const badges = getEarnedBadges({ bestScenarioChosen: true })
+    expect(badges).toContain('best_scenario')
+  })
+
+  it('Property 39: best_scenario badge when scenariosBetterThanBaseline >= 1', () => {
+    const badges = getEarnedBadges({ scenariosBetterThanBaseline: 2 })
+    expect(badges).toContain('best_scenario')
+  })
+
+  it('Property 39: no best_scenario when neither condition met', () => {
+    const badges = getEarnedBadges({})
+    expect(badges).not.toContain('best_scenario')
+  })
+
+  it('getBadgeDescription returns description for best_scenario', () => {
+    const desc = getBadgeDescription('best_scenario')
+    expect(desc).toBeDefined()
+    expect(desc).toContain('scenario')
+  })
 })

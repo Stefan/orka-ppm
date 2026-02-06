@@ -38,8 +38,8 @@ export default function NavigationStatsPage() {
       <div className="p-8 space-y-6">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Navigation Statistics</h1>
-            <p className="text-gray-600 mt-2">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Navigation Statistics</h1>
+            <p className="text-gray-600 dark:text-slate-400 mt-2">
               Predictive prefetching analytics and navigation patterns
             </p>
           </div>
@@ -65,61 +65,61 @@ export default function NavigationStatsPage() {
 
         {/* Overview Stats */}
         <div className="grid grid-cols-4 gap-4">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Patterns</p>
-                <p className="text-2xl font-bold text-blue-600">{stats?.totalPatterns || 0}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Total Patterns</p>
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats?.totalPatterns || 0}</p>
               </div>
-              <BarChart3 className="h-8 w-8 text-blue-600" />
+              <BarChart3 className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Navigations</p>
-                <p className="text-2xl font-bold text-green-600">{stats?.totalNavigations || 0}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Total Navigations</p>
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats?.totalNavigations || 0}</p>
               </div>
-              <TrendingUp className="h-8 w-8 text-green-600" />
+              <TrendingUp className="h-8 w-8 text-green-600 dark:text-green-400" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Unique Routes</p>
-                <p className="text-2xl font-bold text-purple-600">{stats?.uniqueRoutes || 0}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Unique Routes</p>
+                <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats?.uniqueRoutes || 0}</p>
               </div>
-              <BarChart3 className="h-8 w-8 text-purple-600" />
+              <BarChart3 className="h-8 w-8 text-purple-600 dark:text-purple-400" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Predictions</p>
-                <p className="text-2xl font-bold text-orange-600">{predictions.length}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Predictions</p>
+                <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{predictions.length}</p>
               </div>
-              <TrendingUp className="h-8 w-8 text-orange-600" />
+              <TrendingUp className="h-8 w-8 text-orange-600 dark:text-orange-400" />
             </div>
           </div>
         </div>
 
         {/* Current Page Predictions */}
         {predictions.length > 0 && (
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
               Predicted Next Routes (Current Page)
             </h3>
             <div className="space-y-2">
               {predictions.map((route, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 bg-blue-50 rounded-lg"
+                  className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
                 >
                   <span className="font-medium text-blue-900">{route}</span>
-                  <span className="text-sm text-blue-600">Rank #{index + 1}</span>
+                  <span className="text-sm text-blue-600 dark:text-blue-400">Rank #{index + 1}</span>
                 </div>
               ))}
             </div>
@@ -127,52 +127,52 @@ export default function NavigationStatsPage() {
         )}
 
         {/* Top Navigation Patterns */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Top Navigation Patterns</h3>
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Top Navigation Patterns</h3>
           </div>
           
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+              <thead className="bg-gray-50 dark:bg-slate-800/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     From
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     To
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     Count
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                     Last Visited
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                 {stats?.topPatterns && stats.topPatterns.length > 0 ? (
                   stats.topPatterns.map((pattern, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={index} className="hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-slate-100">
                         {pattern.from}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-100">
                         {pattern.to}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-100">
+                        <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full">
                           {pattern.count}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                         {pattern.lastVisited}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={4} className="px-6 py-8 text-center text-gray-500 dark:text-slate-400">
                       No navigation patterns recorded yet. Navigate between pages to build patterns.
                     </td>
                   </tr>
@@ -183,9 +183,9 @@ export default function NavigationStatsPage() {
         </div>
 
         {/* Info Box */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
           <h4 className="text-sm font-semibold text-blue-900 mb-2">How Predictive Prefetching Works</h4>
-          <ul className="text-sm text-blue-800 space-y-1">
+          <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
             <li>• Tracks your navigation patterns across the application</li>
             <li>• Learns which pages you typically visit after each page</li>
             <li>• Prefetches likely next pages in the background for instant navigation</li>

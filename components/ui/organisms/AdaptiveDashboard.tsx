@@ -112,15 +112,15 @@ const WidgetContent: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
       case 'metric':
         return (
           <div className="text-center">
-            <div className="text-3xl font-bold text-blue-600 mb-2">
+            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
               {widget.data?.value || '0'}
             </div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 dark:text-slate-400">
               {widget.data?.label || 'Metric'}
             </div>
             {widget.data?.change && (
               <div className={`text-xs mt-1 ${
-                widget.data.change > 0 ? 'text-green-600' : 'text-red-600'
+                widget.data.change > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
               }`}>
                 {widget.data.change > 0 ? '+' : ''}{widget.data.change}%
               </div>
@@ -130,9 +130,9 @@ const WidgetContent: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
 
       case 'chart':
         return (
-          <div className="h-32 bg-gray-100 rounded-lg flex items-center justify-center">
-            <BarChart3 className="h-8 w-8 text-gray-400" />
-            <span className="ml-2 text-gray-500">Chart Placeholder</span>
+          <div className="h-32 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center">
+            <BarChart3 className="h-8 w-8 text-gray-400 dark:text-slate-500" />
+            <span className="ml-2 text-gray-500 dark:text-slate-400">Chart Placeholder</span>
           </div>
         )
 
@@ -140,13 +140,13 @@ const WidgetContent: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
         return (
           <div className="space-y-3">
             <div className="flex items-start space-x-2">
-              <Zap className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-gray-700 leading-relaxed">
+              <Zap className="h-5 w-5 text-blue-500 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-gray-700 dark:text-slate-300 leading-relaxed">
                 {widget.data?.insight || 'AI insight content'}
               </div>
             </div>
             {widget.data?.confidence && (
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-gray-500 dark:text-slate-400">
                 Confidence: {Math.round(widget.data.confidence * 100)}%
               </div>
             )}
@@ -172,11 +172,11 @@ const WidgetContent: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
           <div className="space-y-2">
             {widget.data?.rows?.slice(0, 3).map((row: any, index: number) => (
               <div key={index} className="flex justify-between text-sm">
-                <span className="text-gray-700">{row.label}</span>
+                <span className="text-gray-700 dark:text-slate-300">{row.label}</span>
                 <span className="font-medium">{row.value}</span>
               </div>
             )) || (
-              <div className="text-sm text-gray-500">No data available</div>
+              <div className="text-sm text-gray-500 dark:text-slate-400">No data available</div>
             )}
           </div>
         )
@@ -190,17 +190,17 @@ const WidgetContent: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
                   item.status === 'success' ? 'bg-green-500' :
                   item.status === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
                 }`} />
-                <span className="text-gray-700 truncate">{item.name}</span>
+                <span className="text-gray-700 dark:text-slate-300 truncate">{item.name}</span>
               </div>
             )) || (
-              <div className="text-sm text-gray-500">No items available</div>
+              <div className="text-sm text-gray-500 dark:text-slate-400">No items available</div>
             )}
           </div>
         )
 
       default:
         return (
-          <div className="text-center text-gray-500">
+          <div className="text-center text-gray-500 dark:text-slate-400">
             <div className="text-sm">Widget type: {widget.type}</div>
           </div>
         )
@@ -214,7 +214,7 @@ const WidgetContent: React.FC<{ widget: DashboardWidget }> = ({ widget }) => {
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
         </div>
       ) : widget.error ? (
-        <div className="flex-1 flex items-center justify-center text-red-500 text-sm">
+        <div className="flex-1 flex items-center justify-center text-red-500 dark:text-red-400 text-sm">
           <AlertTriangle className="h-4 w-4 mr-1" />
           Error loading widget
         </div>
@@ -369,7 +369,7 @@ export const AdaptiveDashboard: React.FC<AdaptiveDashboardProps> = ({
           className={cn(
             sizeClasses[widget.size],
             'relative group transition-all duration-200',
-            widget.aiRecommended && 'ring-2 ring-blue-200 bg-blue-50/30',
+            widget.aiRecommended && 'ring-2 ring-blue-200 bg-blue-50 dark:bg-blue-900/20/30',
             draggedWidget === widget.id && 'opacity-50 scale-95',
             className
           )}
@@ -378,13 +378,13 @@ export const AdaptiveDashboard: React.FC<AdaptiveDashboardProps> = ({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2 min-w-0 flex-1">
             {enableDragDrop && (
-              <GripVertical className="h-4 w-4 text-gray-400 cursor-move touch-manipulation" />
+              <GripVertical className="h-4 w-4 text-gray-400 dark:text-slate-500 cursor-move touch-manipulation" />
             )}
-            <h3 className="text-sm font-semibold text-gray-900 truncate">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100 truncate">
               {widget.title || 'Untitled Widget'}
             </h3>
             {widget.aiRecommended && (
-              <div className="flex items-center text-blue-600 text-xs bg-blue-100 px-2 py-1 rounded-full">
+              <div className="flex items-center text-blue-800 dark:text-blue-400 text-xs bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded-full">
                 <Zap className="h-3 w-3 mr-1" />
                 AI
               </div>
@@ -417,8 +417,8 @@ export const AdaptiveDashboard: React.FC<AdaptiveDashboardProps> = ({
 
         {/* Widget Footer */}
         {widget.lastUpdated && (
-          <div className="mt-4 pt-3 border-t border-gray-100">
-            <div className="text-xs text-gray-500">
+          <div className="mt-4 pt-3 border-t border-gray-100 dark:border-slate-700">
+            <div className="text-xs text-gray-500 dark:text-slate-400">
               Updated: {widget.lastUpdated.toLocaleTimeString()}
             </div>
           </div>
@@ -461,14 +461,14 @@ export const AdaptiveDashboard: React.FC<AdaptiveDashboardProps> = ({
       <div className="space-y-6">
         {/* Dashboard Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Dashboard</h1>
           
           <div className="flex items-center space-x-4">
             {/* Layout Selector */}
             <select
               value={layout}
               onChange={(e) => handleLayoutChange(e.target.value as any)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm"
+              className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 text-sm"
             >
               <option value="grid">Grid Layout</option>
               <option value="masonry">Masonry Layout</option>
@@ -503,9 +503,9 @@ export const AdaptiveDashboard: React.FC<AdaptiveDashboardProps> = ({
 
         {/* AI Recommendations Banner */}
         {widgets.some(w => w.aiRecommended) && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-blue-50 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <div className="flex items-start space-x-3">
-              <Zap className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
               <div>
                 <h3 className="text-sm font-medium text-blue-900">
                   AI Recommendations Applied
@@ -538,11 +538,11 @@ export const AdaptiveDashboard: React.FC<AdaptiveDashboardProps> = ({
         {/* Empty State */}
         {widgets.length === 0 && (
           <div className="text-center py-12">
-            <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <BarChart3 className="h-12 w-12 text-gray-400 dark:text-slate-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-2">
               No widgets configured
             </h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 dark:text-slate-400 mb-4">
               Add widgets to customize your dashboard experience.
             </p>
             <Button variant="primary">

@@ -976,6 +976,14 @@ async def generate_simulation_charts(
     simulation_id: str
 ):
     """Generate visualization charts for simulation results."""
+    # #region agent log
+    try:
+        _debug_log = open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a")
+        _debug_log.write(json.dumps({"location": "simulations.py:generate_simulation_charts", "message": "handler entry", "data": {"simulation_id": simulation_id}, "timestamp": int(datetime.now().timestamp() * 1000), "sessionId": "debug-session", "hypothesisId": "H1"}) + "\n")
+        _debug_log.close()
+    except Exception:
+        pass
+    # #endregion
     try:
         # Debug logging
         logger.info(f"Monte Carlo visualization request for simulation {simulation_id}")
@@ -986,6 +994,16 @@ async def generate_simulation_charts(
             "message": "Endpoint reached successfully - bypassing all validation",
             "charts": {}
         }
+    except Exception as e:
+        # #region agent log
+        try:
+            _debug_log = open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a")
+            _debug_log.write(json.dumps({"location": "simulations.py:generate_simulation_charts", "message": "handler exception", "data": {"simulation_id": simulation_id, "error": str(e), "type": type(e).__name__}, "timestamp": int(datetime.now().timestamp() * 1000), "sessionId": "debug-session", "hypothesisId": "H2"}) + "\n")
+            _debug_log.close()
+        except Exception:
+            pass
+        # #endregion
+        raise
 
         # Use default config
         req = ChartGenerationRequest()

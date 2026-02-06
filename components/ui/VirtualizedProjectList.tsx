@@ -34,7 +34,7 @@ const VirtualizedProjectList = memo(function VirtualizedProjectList({
   // Only use virtual scrolling for lists with more than 10 items
   if (projects.length <= 10) {
     return (
-      <div className={`divide-y divide-gray-200 ${className}`}>
+      <div className={`divide-y divide-gray-200 dark:divide-slate-700 ${className}`}>
         {projects.map((project) => (
           <ProjectCard key={project.id} project={project} />
         ))}

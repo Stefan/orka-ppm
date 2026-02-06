@@ -47,8 +47,8 @@ function KPIBadge({
   label, 
   value, 
   icon, 
-  colorClass = 'text-gray-700',
-  bgColorClass = 'bg-gray-50',
+  colorClass = 'text-gray-700 dark:text-slate-300',
+  bgColorClass = 'bg-gray-50 dark:bg-slate-800/50',
   size = 'md',
   testId
 }: KPIBadgeProps) {
@@ -81,11 +81,11 @@ function KPIBadge({
       'bg-blue-50': 'dark:bg-blue-900/30',
       'bg-orange-50': 'dark:bg-orange-900/30',
       'bg-purple-50': 'dark:bg-purple-900/30',
-      'bg-gray-50': 'dark:bg-slate-700',
-      'bg-gray-100': 'dark:bg-slate-700',
-      'bg-green-50': 'dark:bg-green-900/30',
-      'bg-green-100': 'dark:bg-green-900/30',
-      'bg-red-50': 'dark:bg-red-900/30'
+      'bg-gray-50 dark:bg-slate-800/50': 'dark:bg-slate-800/50',
+      'bg-gray-100 dark:bg-slate-700': 'dark:bg-slate-700',
+      'bg-green-50 dark:bg-green-900/20': 'dark:bg-green-900/30',
+      'bg-green-100 dark:bg-green-900/30': 'dark:bg-green-900/30',
+      'bg-red-50 dark:bg-red-900/20': 'dark:bg-red-900/30'
     }
     return darkBgMap[lightBg] || 'dark:bg-slate-700'
   }
@@ -145,15 +145,15 @@ export function KPIBadges({
       label: 'Budget',
       value: formatCurrency(kpis.total_budget, currency, { compact }),
       icon: <DollarSign className="w-full h-full" />,
-      colorClass: 'text-blue-600',
-      bgColorClass: 'bg-blue-50',
+      colorClass: 'text-blue-600 dark:text-blue-400',
+      bgColorClass: 'bg-blue-50 dark:bg-blue-900/20',
       testId: `${testId}-budget`
     },
     {
       label: 'Commits',
       value: formatCurrency(kpis.total_commitments, currency, { compact }),
       icon: <CreditCard className="w-full h-full" />,
-      colorClass: 'text-orange-600',
+      colorClass: 'text-orange-600 dark:text-orange-400',
       bgColorClass: 'bg-orange-50',
       testId: `${testId}-commitments`
     },
@@ -161,7 +161,7 @@ export function KPIBadges({
       label: 'Actuals',
       value: formatCurrency(kpis.total_actuals, currency, { compact }),
       icon: <Receipt className="w-full h-full" />,
-      colorClass: 'text-purple-600',
+      colorClass: 'text-purple-600 dark:text-purple-400',
       bgColorClass: 'bg-purple-50',
       testId: `${testId}-actuals`
     },
@@ -169,8 +169,8 @@ export function KPIBadges({
       label: 'Spend',
       value: formatCurrency(kpis.total_spend, currency, { compact }),
       icon: <TrendingUp className="w-full h-full" />,
-      colorClass: 'text-gray-700',
-      bgColorClass: 'bg-gray-100',
+      colorClass: 'text-gray-700 dark:text-slate-300',
+      bgColorClass: 'bg-gray-100 dark:bg-slate-700',
       testId: `${testId}-spend`
     },
     {
@@ -187,16 +187,16 @@ export function KPIBadges({
       label: 'Over',
       value: kpis.over_budget_count.toString(),
       icon: <AlertTriangle className="w-full h-full" />,
-      colorClass: kpis.over_budget_count > 0 ? 'text-red-600' : 'text-gray-500',
-      bgColorClass: kpis.over_budget_count > 0 ? 'bg-red-50' : 'bg-gray-50',
+      colorClass: kpis.over_budget_count > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-slate-400',
+      bgColorClass: kpis.over_budget_count > 0 ? 'bg-red-50 dark:bg-red-900/20' : 'bg-gray-50 dark:bg-slate-800/50',
       testId: `${testId}-over`
     },
     {
       label: 'Under',
       value: kpis.under_budget_count.toString(),
       icon: <CheckCircle className="w-full h-full" />,
-      colorClass: kpis.under_budget_count > 0 ? 'text-green-600' : 'text-gray-500',
-      bgColorClass: kpis.under_budget_count > 0 ? 'bg-green-50' : 'bg-gray-50',
+      colorClass: kpis.under_budget_count > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-slate-400',
+      bgColorClass: kpis.under_budget_count > 0 ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-slate-800/50',
       testId: `${testId}-under`
     }
   ]
@@ -247,17 +247,17 @@ export function SingleKPI({
   className?: string
 }) {
   const trendColors = {
-    up: 'text-green-600',
-    down: 'text-red-600',
-    neutral: 'text-gray-600'
+    up: 'text-green-600 dark:text-green-400',
+    down: 'text-red-600 dark:text-red-400',
+    neutral: 'text-gray-600 dark:text-slate-400'
   }
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      {icon && <span className="text-gray-500">{icon}</span>}
+      {icon && <span className="text-gray-500 dark:text-slate-400">{icon}</span>}
       <div>
-        <span className="text-xs text-gray-500 uppercase">{label}</span>
-        <p className={`font-bold ${trend ? trendColors[trend] : 'text-gray-900'}`}>
+        <span className="text-xs text-gray-500 dark:text-slate-400 uppercase">{label}</span>
+        <p className={`font-bold ${trend ? trendColors[trend] : 'text-gray-900 dark:text-slate-100'}`}>
           {formatCurrency(value, currency)}
         </p>
       </div>

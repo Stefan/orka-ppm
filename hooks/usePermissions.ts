@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, useRef } from 'react'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
+import { hasPermissionInList, hasRoleInList } from '@/lib/rbac/permission-utils'
 import type { Permission, PermissionContext, UserPermissions } from '@/types/rbac'
 
 /**
@@ -339,9 +340,7 @@ export function usePermissions(): UsePermissionsReturn {
 
       // For global permissions (no context), check against loaded permissions
       if (!context) {
-        return permissions.some(perm => 
-          userPermissions.effective_permissions.includes(perm)
-        )
+        return hasPermissionInList(userPermissions.effective_permissions, permission)
       }
 
       // For context-aware permissions, check cache
@@ -360,14 +359,11 @@ export function usePermissions(): UsePermissionsReturn {
    */
   const hasRole = useCallback(
     (role: string | string[]): boolean => {
-      if (!userPermissions || !userPermissions.roles) {
+      if (!userPermissions?.roles?.length) {
         return false
       }
-
-      const roles = Array.isArray(role) ? role : [role]
       const userRoleNames = userPermissions.roles.map(r => r.name)
-
-      return roles.some(r => userRoleNames.includes(r))
+      return hasRoleInList(userRoleNames, role)
     },
     [userPermissions]
   )

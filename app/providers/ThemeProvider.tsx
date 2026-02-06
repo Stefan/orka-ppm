@@ -25,7 +25,9 @@ function getSystemTheme(): 'light' | 'dark' {
 }
 
 /**
- * Apply theme to document
+ * Apply theme to document.
+ * Also strips any leftover inline styles that a previous script (DarkModeForcer)
+ * might have stamped onto elements.
  */
 function applyTheme(theme: Theme) {
   if (typeof document === 'undefined') return
@@ -33,28 +35,33 @@ function applyTheme(theme: Theme) {
   const root = document.documentElement
   const isDark = theme === 'dark' || (theme === 'system' && getSystemTheme() === 'dark')
 
-  // Set data-theme for CSS variables
-  root.removeAttribute('data-theme')
-  root.setAttribute('data-theme', theme)
+  // 1. data-theme attribute for CSS custom properties
+  root.setAttribute('data-theme', isDark ? 'dark' : 'light')
 
-  // Set .dark class for Tailwind dark: variant
+  // 2. .dark class for Tailwind dark: variant
   if (isDark) {
     root.classList.add('dark')
   } else {
     root.classList.remove('dark')
   }
 
-  // color-scheme for native elements (inputs, scrollbars)
+  // 3. color-scheme for native elements (scrollbars, inputs)
   root.style.colorScheme = isDark ? 'dark' : 'light'
 
-  // Set body colors directly via JavaScript
-  const darkBg = '#0f172a'
-  const darkText = '#f1f5f9'
-  const lightBg = '#ffffff'
-  const lightText = '#111827'
-  
-  document.body.style.backgroundColor = isDark ? darkBg : lightBg
-  document.body.style.color = isDark ? darkText : lightText
+  // 4. Strip ALL inline background-color / color styles from every element
+  document.querySelectorAll('[style]').forEach(el => {
+    if (el instanceof HTMLElement) {
+      if (el.style.backgroundColor) el.style.removeProperty('background-color')
+      if (el.style.color) el.style.removeProperty('color')
+      if (el.style.borderColor) el.style.removeProperty('border-color')
+    }
+  })
+
+  // 5. Body colors
+  const bg = isDark ? '#0f172a' : '#ffffff'
+  const fg = isDark ? '#f1f5f9' : '#111827'
+  document.body.style.backgroundColor = bg
+  document.body.style.color = fg
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -80,6 +87,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     } else {
       setResolvedTheme(initialTheme)
     }
+
   }, [])
 
   // Listen for system theme changes
@@ -99,36 +107,33 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => mediaQuery.removeEventListener('change', handleChange)
   }, [theme, mounted])
 
-  // Load theme from user preferences when authenticated
+  // Load theme from user preferences when authenticated (only on initial load)
   useEffect(() => {
     if (!session?.user?.id || !mounted) return
     
-    // Try to load from user preferences
     const loadUserTheme = async () => {
       try {
         const response = await fetch(`/api/sync/preferences?userId=${session.user.id}`)
-        if (response.ok) {
-          const prefs = await response.json()
-          if (prefs?.theme && ['light', 'dark', 'system'].includes(prefs.theme)) {
-            // Only update if different from current
-            if (prefs.theme !== theme) {
-              setThemeState(prefs.theme)
-              applyTheme(prefs.theme)
-              localStorage.setItem(THEME_STORAGE_KEY, prefs.theme)
-              
-              if (prefs.theme === 'system') {
-                setResolvedTheme(getSystemTheme())
-              } else {
-                setResolvedTheme(prefs.theme)
-              }
-            }
-          }
+        if (!response.ok) return
+        const prefs = await response.json()
+        if (!prefs?.theme || !['light', 'dark', 'system'].includes(prefs.theme)) return
+
+        const localTheme = localStorage.getItem(THEME_STORAGE_KEY)
+        if (localTheme && localTheme !== prefs.theme) return
+
+        setThemeState(prefs.theme)
+        applyTheme(prefs.theme)
+        localStorage.setItem(THEME_STORAGE_KEY, prefs.theme)
+        if (prefs.theme === 'system') {
+          setResolvedTheme(getSystemTheme())
+        } else {
+          setResolvedTheme(prefs.theme)
         }
       } catch (error) {
         console.error('Failed to load theme from preferences:', error)
       }
     }
-    
+
     loadUserTheme()
   }, [session?.user?.id, mounted])
 
@@ -137,7 +142,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setThemeState(newTheme)
     applyTheme(newTheme)
     localStorage.setItem(THEME_STORAGE_KEY, newTheme)
-    
     if (newTheme === 'system') {
       setResolvedTheme(getSystemTheme())
     } else {
@@ -180,8 +184,10 @@ export const ThemeScript = () => {
     (function() {
       try {
         var theme = localStorage.getItem('${THEME_STORAGE_KEY}') || 'system';
-        document.documentElement.setAttribute('data-theme', theme);
         var isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        // Always set data-theme to 'light' or 'dark' (never 'system')
+        // so CSS [data-theme="light"]/[data-theme="dark"] selectors always match
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
         if (isDark) {
           document.documentElement.classList.add('dark');
           document.documentElement.style.colorScheme = 'dark';
@@ -189,14 +195,9 @@ export const ThemeScript = () => {
           document.documentElement.classList.remove('dark');
           document.documentElement.style.colorScheme = 'light';
         }
-        // Set body colors directly
-        var darkBg = '#0f172a';
-        var darkText = '#f1f5f9';
-        var lightBg = '#ffffff';
-        var lightText = '#111827';
         document.addEventListener('DOMContentLoaded', function() {
-          document.body.style.backgroundColor = isDark ? darkBg : lightBg;
-          document.body.style.color = isDark ? darkText : lightText;
+          document.body.style.backgroundColor = isDark ? '#0f172a' : '#ffffff';
+          document.body.style.color = isDark ? '#f1f5f9' : '#111827';
         });
       } catch (e) {}
     })();

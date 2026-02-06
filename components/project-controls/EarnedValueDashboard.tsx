@@ -35,7 +35,7 @@ export default function EarnedValueDashboard({ projectId }: EarnedValueDashboard
   }, [projectId])
 
   if (loading) return <div className="p-4">Loading...</div>
-  if (!metrics) return <div className="p-4 text-gray-500">No earned value data</div>
+  if (!metrics) return <div className="p-4 text-gray-500 dark:text-slate-400">No earned value data</div>
 
   const cpi = (metrics.cost_performance_index as number) ?? 0
   const spi = (metrics.schedule_performance_index as number) ?? 0
@@ -45,12 +45,12 @@ export default function EarnedValueDashboard({ projectId }: EarnedValueDashboard
   const schedVars = (variance?.schedule_variances as Array<{ category: string; variance: number; variance_pct?: number; alert?: string }>) ?? []
 
   return (
-    <div className="p-4 bg-white rounded-lg border space-y-4">
+    <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border space-y-4">
       <h3 className="font-semibold">Earned Value Metrics</h3>
       <PerformanceGauges cpi={cpi} spi={spi} tcpi={tcpi} />
       <div className="grid grid-cols-2 gap-4 text-sm">
-        <div><span className="text-gray-500">EAC:</span> ${(metrics.estimate_at_completion as number)?.toLocaleString() ?? '-'}</div>
-        <div><span className="text-gray-500">% Complete:</span> {(metrics.percent_complete as number)?.toFixed(1) ?? '-'}%</div>
+        <div><span className="text-gray-500 dark:text-slate-400">EAC:</span> ${(metrics.estimate_at_completion as number)?.toLocaleString() ?? '-'}</div>
+        <div><span className="text-gray-500 dark:text-slate-400">% Complete:</span> {(metrics.percent_complete as number)?.toFixed(1) ?? '-'}%</div>
       </div>
       <VarianceAnalysisTable costVariances={costVars} scheduleVariances={schedVars} />
     </div>

@@ -24,8 +24,8 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   }
 
   const colorClasses = {
-    primary: 'text-blue-600',
-    secondary: 'text-gray-600',
+    primary: 'text-blue-600 dark:text-blue-400',
+    secondary: 'text-gray-600 dark:text-slate-400',
     white: 'text-white'
   }
 
@@ -49,10 +49,10 @@ export const PageLoader: React.FC<{ message?: string }> = ({ message }) => {
   const { t } = useTranslations()
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-800/50">
       <div className="text-center">
         <LoadingSpinner size="xl" className="mx-auto mb-4" />
-        <p className="text-gray-600">{message || t('common.loading')}</p>
+        <p className="text-gray-600 dark:text-slate-400">{message || t('common.loading')}</p>
       </div>
     </div>
   )

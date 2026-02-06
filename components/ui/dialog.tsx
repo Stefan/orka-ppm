@@ -63,7 +63,7 @@ export function DialogContent({
   return (
     <div
       className={cn(
-        'bg-white rounded-xl shadow-2xl',
+        'bg-white dark:bg-slate-800 rounded-xl shadow-2xl',
         'w-full max-w-lg',
         'max-h-[90vh] overflow-auto',
         className
@@ -73,9 +73,9 @@ export function DialogContent({
       {showClose && onClose && (
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1 rounded-lg hover:bg-gray-100 transition-colors"
+          className="absolute top-4 right-4 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 transition-colors"
         >
-          <X className="w-5 h-5 text-gray-500" />
+          <X className="w-5 h-5 text-gray-500 dark:text-slate-400" />
         </button>
       )}
       {children}
@@ -93,7 +93,7 @@ export function DialogHeader({ className, children, ...props }: React.HTMLAttrib
 
 export function DialogTitle({ className, children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h2 className={cn('text-lg font-semibold text-gray-900', className)} {...props}>
+    <h2 className={cn('text-lg font-semibold text-gray-900 dark:text-slate-100', className)} {...props}>
       {children}
     </h2>
   )
@@ -101,7 +101,7 @@ export function DialogTitle({ className, children, ...props }: React.HTMLAttribu
 
 export function DialogDescription({ className, children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <p className={cn('text-sm text-gray-600 mt-1', className)} {...props}>
+    <p className={cn('text-sm text-gray-600 dark:text-slate-400 mt-1', className)} {...props}>
       {children}
     </p>
   )
@@ -117,7 +117,7 @@ export function DialogBody({ className, children, ...props }: React.HTMLAttribut
 
 export function DialogFooter({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn('px-6 py-4 bg-gray-50 rounded-b-xl flex justify-end gap-3', className)} {...props}>
+    <div className={cn('px-6 py-4 bg-gray-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3', className)} {...props}>
       {children}
     </div>
   )

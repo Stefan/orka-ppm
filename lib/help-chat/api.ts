@@ -643,10 +643,9 @@ export class HelpChatAPIService {
    * Submit feedback for a help response
    */
   async submitFeedback(feedback: HelpFeedbackRequest): Promise<FeedbackResponse> {
-    // Validate feedback
-    if (!feedback.messageId) {
+    if (!feedback.messageId && !feedback.queryId) {
       throw createHelpChatError(
-        'Message ID is required for feedback',
+        'Message ID or query ID is required for feedback',
         'VALIDATION_ERROR',
         { feedback },
         false
@@ -662,12 +661,20 @@ export class HelpChatAPIService {
       )
     }
 
+    const body = {
+      message_id: feedback.messageId ?? undefined,
+      query_id: feedback.queryId ?? undefined,
+      rating: feedback.rating,
+      feedback_text: feedback.feedbackText ?? undefined,
+      feedback_type: feedback.feedbackType
+    }
+
     const operation = async (): Promise<FeedbackResponse> => {
       try {
         const response = await fetch(getApiUrl(HELP_CHAT_CONFIG.endpoints.feedback), {
           method: 'POST',
           headers: this.getAuthHeaders(),
-          body: JSON.stringify(feedback)
+          body: JSON.stringify(body)
         })
 
         if (!response.ok) {

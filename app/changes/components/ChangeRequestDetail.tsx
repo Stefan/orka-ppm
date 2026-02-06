@@ -36,40 +36,40 @@ export default function ChangeRequestDetail({
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'draft':
-        return <FileText className="h-5 w-5 text-gray-500" data-testid="status-icon" />
+        return <FileText className="h-5 w-5 text-gray-500 dark:text-slate-400" data-testid="status-icon" />
       case 'submitted':
       case 'under_review':
-        return <Clock className="h-5 w-5 text-yellow-500" data-testid="status-icon" />
+        return <Clock className="h-5 w-5 text-yellow-500 dark:text-yellow-400" data-testid="status-icon" />
       case 'pending_approval':
         return <AlertCircle className="h-5 w-5 text-orange-500" data-testid="status-icon" />
       case 'approved':
-        return <CheckCircle className="h-5 w-5 text-green-500" data-testid="status-icon" />
+        return <CheckCircle className="h-5 w-5 text-green-500 dark:text-green-400" data-testid="status-icon" />
       case 'rejected':
-        return <XCircle className="h-5 w-5 text-red-500" data-testid="status-icon" />
+        return <XCircle className="h-5 w-5 text-red-500 dark:text-red-400" data-testid="status-icon" />
       case 'implementing':
-        return <Activity className="h-5 w-5 text-blue-500" data-testid="status-icon" />
+        return <Activity className="h-5 w-5 text-blue-500 dark:text-blue-400" data-testid="status-icon" />
       case 'implemented':
       case 'closed':
-        return <CheckCircle className="h-5 w-5 text-green-600" data-testid="status-icon" />
+        return <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" data-testid="status-icon" />
       default:
-        return <FileText className="h-5 w-5 text-gray-500" data-testid="status-icon" />
+        return <FileText className="h-5 w-5 text-gray-500 dark:text-slate-400" data-testid="status-icon" />
     }
   }
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'low':
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200'
       case 'medium':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
       case 'high':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
       case 'critical':
-        return 'bg-orange-100 text-orange-800'
+        return 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
       case 'emergency':
-        return 'bg-red-100 text-red-800'
+        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200'
     }
   }
 
@@ -98,9 +98,9 @@ export default function ChangeRequestDetail({
       error={error || (!changeRequest ? t('requestDetail.notFound') : '')}
       fallback={
         <div className="text-center py-12">
-          <AlertCircle className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">{t('requestDetail.notFound')}</h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <AlertCircle className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500" />
+          <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-slate-100">{t('requestDetail.notFound')}</h3>
+          <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
             {t('requestDetail.notFoundMessage')}
           </p>
           <div className="mt-6">
@@ -117,30 +117,30 @@ export default function ChangeRequestDetail({
       {changeRequest && (
         <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
                 onClick={onBack}
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
+                className="flex items-center gap-2 text-gray-600 hover:text-gray-800 dark:text-slate-200"
               >
                 <ArrowLeft className="h-4 w-4" />
                 {t('requestDetail.backToList')}
               </button>
-              <div className="h-6 border-l border-gray-300"></div>
+              <div className="h-6 border-l border-gray-300 dark:border-slate-600"></div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                   {changeRequest.change_number}
                 </h1>
-                <p className="text-gray-600">{changeRequest.title}</p>
+                <p className="text-gray-600 dark:text-slate-400">{changeRequest.title}</p>
               </div>
             </div>
             
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 {getStatusIcon(changeRequest.status)}
-                <span className="text-sm font-medium text-gray-900 capitalize">
+                <span className="text-sm font-medium text-gray-900 dark:text-slate-100 capitalize">
                   {changeRequest.status.replace('_', ' ')}
                 </span>
               </div>
@@ -160,8 +160,8 @@ export default function ChangeRequestDetail({
       </div>
 
       {/* Tab Navigation */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+        <div className="border-b border-gray-200 dark:border-slate-700">
           <nav className="flex space-x-8 px-6">
             {[
               { id: 'overview', label: t('requestDetail.tabs.overview'), icon: Eye },
@@ -177,8 +177,8 @@ export default function ChangeRequestDetail({
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300 hover:border-gray-300 dark:border-slate-600'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -197,43 +197,43 @@ export default function ChangeRequestDetail({
                 {/* Main Details */}
                 <div className="lg:col-span-2 space-y-6">
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-3">{t('requestDetail.description')}</h3>
-                    <p className="text-gray-700 leading-relaxed">{changeRequest.description}</p>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-3">{t('requestDetail.description')}</h3>
+                    <p className="text-gray-700 dark:text-slate-300 leading-relaxed">{changeRequest.description}</p>
                   </div>
 
                   {changeRequest.justification && (
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-3">{t('requestDetail.justification')}</h3>
-                      <p className="text-gray-700 leading-relaxed">{changeRequest.justification}</p>
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-3">{t('requestDetail.justification')}</h3>
+                      <p className="text-gray-700 dark:text-slate-300 leading-relaxed">{changeRequest.justification}</p>
                     </div>
                   )}
 
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-3">{t('requestDetail.impactAnalysis')}</h3>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-3">{t('requestDetail.impactAnalysis')}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {changeRequest.estimated_cost_impact && (
-                        <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg">
                           <div className="flex items-center gap-2 mb-2">
-                            <DollarSign className="h-4 w-4 text-green-600" />
-                            <span className="font-medium text-gray-900">{t('requestDetail.costImpact')}</span>
+                            <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
+                            <span className="font-medium text-gray-900 dark:text-slate-100">{t('requestDetail.costImpact')}</span>
                           </div>
-                          <p className="text-2xl font-bold text-gray-900">
+                          <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                             ${changeRequest.estimated_cost_impact.toLocaleString()}
                           </p>
-                          <p className="text-sm text-gray-600">{t('requestDetail.estimated')}</p>
+                          <p className="text-sm text-gray-600 dark:text-slate-400">{t('requestDetail.estimated')}</p>
                         </div>
                       )}
 
                       {changeRequest.estimated_schedule_impact_days && (
-                        <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg">
                           <div className="flex items-center gap-2 mb-2">
-                            <Calendar className="h-4 w-4 text-blue-600" />
-                            <span className="font-medium text-gray-900">{t('requestDetail.scheduleImpact')}</span>
+                            <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                            <span className="font-medium text-gray-900 dark:text-slate-100">{t('requestDetail.scheduleImpact')}</span>
                           </div>
-                          <p className="text-2xl font-bold text-gray-900">
+                          <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                             {changeRequest.estimated_schedule_impact_days} {t('common.days')}
                           </p>
-                          <p className="text-sm text-gray-600">{t('requestDetail.estimatedDelay')}</p>
+                          <p className="text-sm text-gray-600 dark:text-slate-400">{t('requestDetail.estimatedDelay')}</p>
                         </div>
                       )}
                     </div>
@@ -241,16 +241,16 @@ export default function ChangeRequestDetail({
 
                   {/* Project Linkages */}
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-3">{t('requestDetail.projectLinkages')}</h3>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-3">{t('requestDetail.projectLinkages')}</h3>
                     <div className="space-y-4">
                       {changeRequest.affected_milestones.length > 0 && (
                         <div>
-                          <h4 className="font-medium text-gray-900 mb-2">{t('requestDetail.affectedMilestones')}</h4>
+                          <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-2">{t('requestDetail.affectedMilestones')}</h4>
                           <div className="flex flex-wrap gap-2">
                             {changeRequest.affected_milestones.map(milestone => (
                               <span
                                 key={milestone.id}
-                                className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                                className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full text-sm"
                               >
                                 <LinkIcon className="h-3 w-3" />
                                 {milestone.name}
@@ -262,16 +262,16 @@ export default function ChangeRequestDetail({
 
                       {changeRequest.affected_pos.length > 0 && (
                         <div>
-                          <h4 className="font-medium text-gray-900 mb-2">{t('requestDetail.affectedPurchaseOrders')}</h4>
+                          <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-2">{t('requestDetail.affectedPurchaseOrders')}</h4>
                           <div className="space-y-2">
                             {changeRequest.affected_pos.map(po => (
                               <div
                                 key={po.id}
-                                className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg"
+                                className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-slate-800/50 rounded-lg"
                               >
-                                <LinkIcon className="h-4 w-4 text-gray-500" />
-                                <span className="font-medium text-gray-900">{po.number}</span>
-                                <span className="text-gray-600">- {po.description}</span>
+                                <LinkIcon className="h-4 w-4 text-gray-500 dark:text-slate-400" />
+                                <span className="font-medium text-gray-900 dark:text-slate-100">{po.number}</span>
+                                <span className="text-gray-600 dark:text-slate-400">- {po.description}</span>
                               </div>
                             ))}
                           </div>
@@ -283,49 +283,49 @@ export default function ChangeRequestDetail({
 
                 {/* Sidebar */}
                 <div className="space-y-6">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-medium text-gray-900 mb-3">{t('requestDetail.requestDetails')}</h3>
+                  <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg">
+                    <h3 className="font-medium text-gray-900 dark:text-slate-100 mb-3">{t('requestDetail.requestDetails')}</h3>
                     <div className="space-y-3 text-sm">
                       <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-gray-500" />
-                        <span className="text-gray-600">{t('requestDetail.requestedBy')}:</span>
+                        <User className="h-4 w-4 text-gray-500 dark:text-slate-400" />
+                        <span className="text-gray-600 dark:text-slate-400">{t('requestDetail.requestedBy')}:</span>
                         <span className="font-medium">{changeRequest.requested_by}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-gray-500" />
-                        <span className="text-gray-600">{t('requestDetail.requested')}:</span>
+                        <Calendar className="h-4 w-4 text-gray-500 dark:text-slate-400" />
+                        <span className="text-gray-600 dark:text-slate-400">{t('requestDetail.requested')}:</span>
                         <span className="font-medium">
                           {new Date(changeRequest.requested_date).toLocaleDateString()}
                         </span>
                       </div>
                       {changeRequest.required_by_date && (
                         <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-gray-500" />
-                          <span className="text-gray-600">{t('requestDetail.requiredBy')}:</span>
+                          <Clock className="h-4 w-4 text-gray-500 dark:text-slate-400" />
+                          <span className="text-gray-600 dark:text-slate-400">{t('requestDetail.requiredBy')}:</span>
                           <span className="font-medium">
                             {new Date(changeRequest.required_by_date).toLocaleDateString()}
                           </span>
                         </div>
                       )}
                       <div className="flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-gray-500" />
-                        <span className="text-gray-600">{t('requestDetail.type')}:</span>
+                        <FileText className="h-4 w-4 text-gray-500 dark:text-slate-400" />
+                        <span className="text-gray-600 dark:text-slate-400">{t('requestDetail.type')}:</span>
                         <span className="font-medium capitalize">{changeRequest.change_type}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-medium text-gray-900 mb-3">{t('requestDetail.project')}</h3>
-                    <p className="text-sm font-medium text-blue-600">{changeRequest.project_name}</p>
+                  <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg">
+                    <h3 className="font-medium text-gray-900 dark:text-slate-100 mb-3">{t('requestDetail.project')}</h3>
+                    <p className="text-sm font-medium text-blue-600 dark:text-blue-400">{changeRequest.project_name}</p>
                   </div>
 
                   {changeRequest.implementation_progress !== undefined && (
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h3 className="font-medium text-gray-900 mb-3">{t('requestDetail.implementationProgress')}</h3>
+                    <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg">
+                      <h3 className="font-medium text-gray-900 dark:text-slate-100 mb-3">{t('requestDetail.implementationProgress')}</h3>
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">{t('requestDetail.progress')}</span>
+                          <span className="text-gray-600 dark:text-slate-400">{t('requestDetail.progress')}</span>
                           <span className="font-medium">{changeRequest.implementation_progress}%</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2" role="progressbar" aria-valuenow={changeRequest.implementation_progress} aria-valuemin={0} aria-valuemax={100}>
@@ -345,7 +345,7 @@ export default function ChangeRequestDetail({
           {/* Timeline Tab */}
           {activeTab === 'timeline' && (
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">{t('requestDetail.timeline.title')}</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">{t('requestDetail.timeline.title')}</h3>
               <div className="flow-root">
                 <ul className="-mb-8">
                   {changeRequest.communications.map((comm, index) => (
@@ -368,12 +368,12 @@ export default function ChangeRequestDetail({
                           </div>
                           <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                             <div>
-                              <p className="text-sm text-gray-500">
-                                <span className="font-medium text-gray-900">{comm.author}</span>{' '}
+                              <p className="text-sm text-gray-500 dark:text-slate-400">
+                                <span className="font-medium text-gray-900 dark:text-slate-100">{comm.author}</span>{' '}
                                 {comm.message}
                               </p>
                             </div>
-                            <div className="text-right text-sm whitespace-nowrap text-gray-500">
+                            <div className="text-right text-sm whitespace-nowrap text-gray-500 dark:text-slate-400">
                               {new Date(comm.timestamp).toLocaleString()}
                             </div>
                           </div>
@@ -390,24 +390,24 @@ export default function ChangeRequestDetail({
           {activeTab === 'approvals' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">{t('requestDetail.approvals.pendingTitle')}</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">{t('requestDetail.approvals.pendingTitle')}</h3>
                 {changeRequest.pending_approvals.length > 0 ? (
                   <div className="space-y-3">
                     {changeRequest.pending_approvals.map(approval => (
-                      <div key={approval.id} className="border border-gray-200 rounded-lg p-4">
+                      <div key={approval.id} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="font-medium text-gray-900">
+                            <p className="font-medium text-gray-900 dark:text-slate-100">
                               {t('requestDetail.approvals.step')} {approval.step_number}: {approval.approver_name}
                             </p>
-                            <p className="text-sm text-gray-600 capitalize">
+                            <p className="text-sm text-gray-600 dark:text-slate-400 capitalize">
                               {t('requestDetail.approvals.status')}: {approval.status}
                             </p>
                           </div>
                           {approval.due_date && (
                             <div className="text-right">
-                              <p className="text-sm text-gray-600">{t('requestDetail.approvals.dueDate')}</p>
-                              <p className="font-medium text-gray-900">
+                              <p className="text-sm text-gray-600 dark:text-slate-400">{t('requestDetail.approvals.dueDate')}</p>
+                              <p className="font-medium text-gray-900 dark:text-slate-100">
                                 {new Date(approval.due_date).toLocaleDateString()}
                               </p>
                             </div>
@@ -417,28 +417,28 @@ export default function ChangeRequestDetail({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">{t('requestDetail.approvals.noPending')}</p>
+                  <p className="text-gray-500 dark:text-slate-400">{t('requestDetail.approvals.noPending')}</p>
                 )}
               </div>
 
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">{t('requestDetail.approvals.historyTitle')}</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">{t('requestDetail.approvals.historyTitle')}</h3>
                 {changeRequest.approval_history.length > 0 ? (
                   <div className="space-y-3">
                     {changeRequest.approval_history.map(approval => (
-                      <div key={approval.id} className="border border-gray-200 rounded-lg p-4">
+                      <div key={approval.id} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
                         <div className="flex items-start justify-between">
                           <div>
-                            <p className="font-medium text-gray-900">{approval.approver_name}</p>
-                            <p className="text-sm text-gray-600 capitalize">
+                            <p className="font-medium text-gray-900 dark:text-slate-100">{approval.approver_name}</p>
+                            <p className="text-sm text-gray-600 dark:text-slate-400 capitalize">
                               {t('requestDetail.approvals.decision')}: <span className="font-medium">{approval.decision}</span>
                             </p>
                             {approval.comments && (
-                              <p className="text-sm text-gray-700 mt-2">{t('requestDetail.approvals.comments')}: {approval.comments}</p>
+                              <p className="text-sm text-gray-700 dark:text-slate-300 mt-2">{t('requestDetail.approvals.comments')}: {approval.comments}</p>
                             )}
                           </div>
                           <div className="text-right">
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-gray-600 dark:text-slate-400">
                               {new Date(approval.decision_date).toLocaleDateString()}
                             </p>
                           </div>
@@ -447,7 +447,7 @@ export default function ChangeRequestDetail({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">{t('requestDetail.approvals.noHistory')}</p>
+                  <p className="text-gray-500 dark:text-slate-400">{t('requestDetail.approvals.noHistory')}</p>
                 )}
               </div>
             </div>
@@ -457,7 +457,7 @@ export default function ChangeRequestDetail({
           {activeTab === 'documents' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-gray-900">Attachments</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Attachments</h3>
                 <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
                   <Upload className="h-4 w-4" />
                   Upload Document
@@ -467,23 +467,23 @@ export default function ChangeRequestDetail({
               {changeRequest.attachments.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {changeRequest.attachments.map(attachment => (
-                    <div key={attachment.id} className="border border-gray-200 rounded-lg p-4">
+                    <div key={attachment.id} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
-                          <FileText className="h-8 w-8 text-gray-500" />
+                          <FileText className="h-8 w-8 text-gray-500 dark:text-slate-400" />
                           <div>
-                            <p className="font-medium text-gray-900 text-sm">
+                            <p className="font-medium text-gray-900 dark:text-slate-100 text-sm">
                               {attachment.filename}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-500 dark:text-slate-400">
                               {formatFileSize(attachment.size)}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-500 dark:text-slate-400">
                               By {attachment.uploaded_by}
                             </p>
                           </div>
                         </div>
-                        <button className="text-blue-600 hover:text-blue-800">
+                        <button className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
                           <Download className="h-4 w-4" />
                         </button>
                       </div>
@@ -492,9 +492,9 @@ export default function ChangeRequestDetail({
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <FileText className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No documents</h3>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <FileText className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500" />
+                  <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-slate-100">No documents</h3>
+                  <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
                     Upload documents to support this change request.
                   </p>
                 </div>
@@ -506,13 +506,13 @@ export default function ChangeRequestDetail({
           {activeTab === 'communications' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">{t('requestDetail.communications.addComment')}</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">{t('requestDetail.communications.addComment')}</h3>
                 <div className="space-y-3">
                   <textarea
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder={t('requestDetail.communications.addCommentPlaceholder')}
                   />
                   <button
@@ -526,26 +526,26 @@ export default function ChangeRequestDetail({
               </div>
 
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">{t('requestDetail.communications.communicationHistory')}</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">{t('requestDetail.communications.communicationHistory')}</h3>
                 <div className="space-y-4">
                   {changeRequest.communications.map(comm => (
-                    <div key={comm.id} className="border border-gray-200 rounded-lg p-4">
+                    <div key={comm.id} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
                       <div className="flex items-start justify-between">
                         <div>
                           <div className="flex items-center gap-2 mb-2">
-                            <span className="font-medium text-gray-900">{comm.author}</span>
+                            <span className="font-medium text-gray-900 dark:text-slate-100">{comm.author}</span>
                             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                              comm.type === 'comment' ? 'bg-blue-100 text-blue-800' :
-                              comm.type === 'status_change' ? 'bg-yellow-100 text-yellow-800' :
-                              comm.type === 'approval' ? 'bg-green-100 text-green-800' :
-                              'bg-gray-100 text-gray-800'
+                              comm.type === 'comment' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' :
+                              comm.type === 'status_change' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' :
+                              comm.type === 'approval' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' :
+                              'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200'
                             }`}>
                               {t(`requestDetail.communications.types.${comm.type}`)}
                             </span>
                           </div>
-                          <p className="text-gray-700">{comm.message}</p>
+                          <p className="text-gray-700 dark:text-slate-300">{comm.message}</p>
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-gray-500 dark:text-slate-400">
                           {new Date(comm.timestamp).toLocaleString()}
                         </div>
                       </div>

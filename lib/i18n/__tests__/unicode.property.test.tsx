@@ -60,7 +60,11 @@ const localStorageMock = (() => {
 global.fetch = jest.fn();
 
 describe('Unicode Character Support Property Tests', () => {
+  const originalNodeEnv = process.env.NODE_ENV;
+
   beforeEach(() => {
+    // Loader reads from cache only when NODE_ENV === 'production'; needed for cache retrieval test
+    process.env.NODE_ENV = 'production';
     // Clear all caches and mocks before each test
     clearTranslationCache();
     localStorageMock.clear();
@@ -72,6 +76,7 @@ describe('Unicode Character Support Property Tests', () => {
   });
 
   afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnv;
     clearTranslationCache();
     localStorageMock.clear();
   });

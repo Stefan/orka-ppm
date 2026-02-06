@@ -33,10 +33,10 @@ export default function DraggableRow({ id, canDrag = true, children }: Draggable
   }
 
   return (
-    <tr ref={setNodeRef} style={style} className={isDragging ? 'bg-gray-100' : ''}>
+    <tr ref={setNodeRef} style={style} className={isDragging ? 'bg-gray-100 dark:bg-slate-700' : ''}>
       {canDrag && (
         <td className="w-8 p-1 cursor-grab active:cursor-grabbing" {...attributes} {...listeners}>
-          <GripVertical className="w-4 h-4 text-gray-400" />
+          <GripVertical className="w-4 h-4 text-gray-400 dark:text-slate-500" />
         </td>
       )}
       {children}

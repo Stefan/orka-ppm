@@ -244,7 +244,7 @@ export function VisualGuideManager({
             setSelectedGuide(null)
             setView('list')
           }}
-          className="absolute top-4 left-4 p-2 bg-white border border-gray-200 rounded-md shadow-sm hover:bg-gray-50 transition-colors z-10"
+          className="absolute top-4 left-4 p-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors z-10"
         >
           ← Back to Guides
         </button>
@@ -253,14 +253,14 @@ export function VisualGuideManager({
   }
 
   return (
-    <div className={cn('flex flex-col h-full bg-white', className)}>
+    <div className={cn('flex flex-col h-full bg-white dark:bg-slate-800', className)}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
         <div className="flex items-center space-x-3">
-          <BookOpen className="h-6 w-6 text-blue-600" />
+          <BookOpen className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Visual Guides</h2>
-            <p className="text-sm text-gray-600">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Visual Guides</h2>
+            <p className="text-sm text-gray-600 dark:text-slate-400">
               {filteredGuides.length} guide{filteredGuides.length !== 1 ? 's' : ''} available
             </p>
           </div>
@@ -282,7 +282,7 @@ export function VisualGuideManager({
 
           <button
             onClick={() => setView(view === 'list' ? 'grid' : 'list')}
-            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+            className="p-2 text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-md transition-colors"
           >
             {view === 'list' ? '⊞' : '☰'}
           </button>
@@ -290,18 +290,18 @@ export function VisualGuideManager({
       </div>
 
       {/* Filters */}
-      <div className="p-4 border-b border-gray-200 bg-gray-50">
+      <div className="p-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
         <div className="flex flex-wrap items-center gap-3">
           {/* Search */}
           <div className="flex-1 min-w-64">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
               <input
                 type="text"
                 placeholder="Search guides..."
                 value={filter.searchQuery || ''}
                 onChange={(e) => setFilter(prev => ({ ...prev, searchQuery: e.target.value }))}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
@@ -313,7 +313,7 @@ export function VisualGuideManager({
               ...prev, 
               category: e.target.value as VisualGuide['category'] || undefined 
             }))}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">All Categories</option>
             <option value="feature">Features</option>
@@ -329,7 +329,7 @@ export function VisualGuideManager({
               ...prev, 
               difficulty: e.target.value as VisualGuide['difficulty'] || undefined 
             }))}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">All Levels</option>
             <option value="beginner">Beginner</option>
@@ -338,12 +338,12 @@ export function VisualGuideManager({
           </select>
 
           {/* Show outdated toggle */}
-          <label className="flex items-center text-sm text-gray-600">
+          <label className="flex items-center text-sm text-gray-600 dark:text-slate-400">
             <input
               type="checkbox"
               checked={filter.showOutdated || false}
               onChange={(e) => setFilter(prev => ({ ...prev, showOutdated: e.target.checked }))}
-              className="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="mr-2 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
             />
             Show outdated
           </label>
@@ -354,13 +354,13 @@ export function VisualGuideManager({
       <div className="flex-1 overflow-y-auto p-4">
         {isLoading ? (
           <div className="flex items-center justify-center h-64">
-            <RefreshCw className="h-8 w-8 animate-spin text-gray-400" />
+            <RefreshCw className="h-8 w-8 animate-spin text-gray-400 dark:text-slate-500" />
           </div>
         ) : filteredGuides.length === 0 ? (
           <div className="text-center py-12">
             <BookOpen className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No guides found</h3>
-            <p className="text-gray-600 mb-4">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-2">No guides found</h3>
+            <p className="text-gray-600 dark:text-slate-400 mb-4">
               {guides.length === 0 
                 ? "No visual guides have been created yet."
                 : "No guides match your current filters."
@@ -413,7 +413,7 @@ function GuideCard({ guide, view, onSelect, onDelete, onRefresh }: GuideCardProp
 
   return (
     <div className={cn(
-      'border border-gray-200 rounded-lg bg-white hover:shadow-md transition-shadow',
+      'border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 hover:shadow-md transition-shadow',
       isGrid ? 'p-4' : 'p-3'
     )}>
       <div className={cn(
@@ -422,7 +422,7 @@ function GuideCard({ guide, view, onSelect, onDelete, onRefresh }: GuideCardProp
       )}>
         {/* Thumbnail */}
         <div className={cn(
-          'flex-shrink-0 bg-gray-100 rounded-md flex items-center justify-center',
+          'flex-shrink-0 bg-gray-100 dark:bg-slate-700 rounded-md flex items-center justify-center',
           isGrid ? 'w-full h-32' : 'w-16 h-16'
         )}>
           {guide.steps[0]?.screenshot ? (
@@ -437,7 +437,7 @@ function GuideCard({ guide, view, onSelect, onDelete, onRefresh }: GuideCardProp
             />
           ) : (
             <Camera className={cn(
-              'text-gray-400',
+              'text-gray-400 dark:text-slate-500',
               isGrid ? 'h-8 w-8' : 'h-6 w-6'
             )} />
           )}
@@ -448,7 +448,7 @@ function GuideCard({ guide, view, onSelect, onDelete, onRefresh }: GuideCardProp
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <h3 className={cn(
-                'font-medium text-gray-900 truncate',
+                'font-medium text-gray-900 dark:text-slate-100 truncate',
                 isGrid ? 'text-base' : 'text-sm'
               )}>
                 {guide.title}
@@ -458,7 +458,7 @@ function GuideCard({ guide, view, onSelect, onDelete, onRefresh }: GuideCardProp
               </h3>
               
               <p className={cn(
-                'text-gray-600 mt-1',
+                'text-gray-600 dark:text-slate-400 mt-1',
                 isGrid ? 'text-sm line-clamp-2' : 'text-xs truncate'
               )}>
                 {guide.description}
@@ -466,7 +466,7 @@ function GuideCard({ guide, view, onSelect, onDelete, onRefresh }: GuideCardProp
 
               {/* Metadata */}
               <div className={cn(
-                'flex items-center text-xs text-gray-500 mt-2',
+                'flex items-center text-xs text-gray-500 dark:text-slate-400 mt-2',
                 isGrid ? 'flex-wrap gap-2' : 'space-x-3'
               )}>
                 <span className="flex items-center">
@@ -487,10 +487,10 @@ function GuideCard({ guide, view, onSelect, onDelete, onRefresh }: GuideCardProp
                 {guide.category && (
                   <span className={cn(
                     'px-2 py-1 rounded-full text-xs font-medium',
-                    guide.category === 'feature' && 'bg-blue-100 text-blue-800',
-                    guide.category === 'workflow' && 'bg-green-100 text-green-800',
-                    guide.category === 'troubleshooting' && 'bg-red-100 text-red-800',
-                    guide.category === 'onboarding' && 'bg-purple-100 text-purple-800'
+                    guide.category === 'feature' && 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
+                    guide.category === 'workflow' && 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
+                    guide.category === 'troubleshooting' && 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300',
+                    guide.category === 'onboarding' && 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300'
                   )}>
                     {guide.category}
                   </span>
@@ -506,14 +506,14 @@ function GuideCard({ guide, view, onSelect, onDelete, onRefresh }: GuideCardProp
                   {guide.tags.slice(0, isGrid ? 4 : 2).map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700"
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300"
                     >
                       <Tag className="h-3 w-3 mr-1" />
                       {tag}
                     </span>
                   ))}
                   {guide.tags.length > (isGrid ? 4 : 2) && (
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-500 dark:text-slate-400">
                       +{guide.tags.length - (isGrid ? 4 : 2)} more
                     </span>
                   )}
@@ -537,7 +537,7 @@ function GuideCard({ guide, view, onSelect, onDelete, onRefresh }: GuideCardProp
               <div className="flex items-center space-x-1">
                 <button
                   onClick={onRefresh}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                  className="p-2 text-gray-400 hover:text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-md transition-colors"
                   title="Refresh screenshots"
                 >
                   <RefreshCw className="h-4 w-4" />
@@ -545,7 +545,7 @@ function GuideCard({ guide, view, onSelect, onDelete, onRefresh }: GuideCardProp
 
                 <button
                   onClick={onDelete}
-                  className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                  className="p-2 text-gray-400 dark:text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
                   title="Delete guide"
                 >
                   <Trash2 className="h-4 w-4" />

@@ -316,7 +316,7 @@ const PerformanceDebugPanel: React.FC<{ performanceState: PerformanceState }> = 
       </Button>
       
       {isOpen && (
-        <div className="absolute bottom-12 right-0 bg-white border border-gray-300 rounded-lg shadow-xl p-4 w-80 max-h-96 overflow-y-auto">
+        <div className="absolute bottom-12 right-0 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg shadow-xl p-4 w-80 max-h-96 overflow-y-auto">
           <h3 className="font-bold text-lg mb-3">Performance Monitor</h3>
           
           {/* Core Web Vitals */}
@@ -325,27 +325,27 @@ const PerformanceDebugPanel: React.FC<{ performanceState: PerformanceState }> = 
             <div className="space-y-1 text-xs">
               <div className="flex justify-between">
                 <span>LCP:</span>
-                <span className={(performanceState.coreWebVitals?.LCP || 0) > 2500 ? 'text-red-600' : 'text-green-600'}>
+                <span className={(performanceState.coreWebVitals?.LCP || 0) > 2500 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
                   {(performanceState.coreWebVitals?.LCP || 0).toFixed(0)}ms
                 </span>
               </div>
               <div className="flex justify-between">
                 <span>FID:</span>
-                <span className={(performanceState.coreWebVitals?.FID || 0) > 100 ? 'text-red-600' : 'text-green-600'}>
+                <span className={(performanceState.coreWebVitals?.FID || 0) > 100 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
                   {(performanceState.coreWebVitals?.FID || 0).toFixed(0)}ms
                 </span>
               </div>
               <div className="flex justify-between">
                 <span>CLS:</span>
-                <span className={(performanceState.coreWebVitals?.CLS || 0) > 0.1 ? 'text-red-600' : 'text-green-600'}>
+                <span className={(performanceState.coreWebVitals?.CLS || 0) > 0.1 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
                   {(performanceState.coreWebVitals?.CLS || 0).toFixed(3)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span>Score:</span>
                 <span className={`font-bold ${
-                  (performanceState.coreWebVitals?.score || 0) > 80 ? 'text-green-600' :
-                  (performanceState.coreWebVitals?.score || 0) > 50 ? 'text-yellow-600' : 'text-red-600'
+                  (performanceState.coreWebVitals?.score || 0) > 80 ? 'text-green-600 dark:text-green-400' :
+                  (performanceState.coreWebVitals?.score || 0) > 50 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'
                 }`}>
                   {(performanceState.coreWebVitals?.score || 0).toFixed(0)}
                 </span>
@@ -405,8 +405,8 @@ const PerformanceDebugPanel: React.FC<{ performanceState: PerformanceState }> = 
                 <div key={budget.metric} className="flex justify-between">
                   <span>{budget.metric}:</span>
                   <span className={
-                    budget.status === 'exceeded' ? 'text-red-600' :
-                    budget.status === 'warning' ? 'text-yellow-600' : 'text-green-600'
+                    budget.status === 'exceeded' ? 'text-red-600 dark:text-red-400' :
+                    budget.status === 'warning' ? 'text-yellow-600 dark:text-yellow-400' : 'text-green-600 dark:text-green-400'
                   }>
                     {(budget.current || 0).toFixed(0)}/{budget.budget || 0}
                   </span>

@@ -49,7 +49,7 @@ export const InputGroup: React.FC<InputGroupProps> = ({
           htmlFor={inputId}
           className={cn(
             'block text-sm font-medium',
-            error ? 'text-error-700' : 'text-gray-700',
+            error ? 'text-error-700' : 'text-gray-700 dark:text-slate-300',
             disabled && 'cursor-not-allowed'
           )}
         >
@@ -96,7 +96,7 @@ export const InputGroup: React.FC<InputGroupProps> = ({
       {helperText && !error && (
         <p
           id={`${inputId}-helper`}
-          className="text-sm text-gray-500"
+          className="text-sm text-gray-500 dark:text-slate-400"
         >
           {helperText}
         </p>

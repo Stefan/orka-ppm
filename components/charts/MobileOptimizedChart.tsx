@@ -325,8 +325,8 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
   const MobileTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200 max-w-xs text-sm">
-          <p className="font-medium text-gray-900 mb-1">{`${nameKey}: ${label}`}</p>
+        <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 max-w-xs text-sm">
+          <p className="font-medium text-gray-900 dark:text-slate-100 mb-1">{`${nameKey}: ${label}`}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} style={{ color: entry.color }} className="font-medium">
               {`${entry.name}: ${typeof entry.value === 'number' ? entry.value.toLocaleString() : entry.value}`}
@@ -461,7 +461,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
   }
 
   const containerClasses = `
-    relative bg-white rounded-lg border border-gray-200 overflow-hidden
+    relative bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 overflow-hidden
     ${viewState.isFullscreen ? 'fixed inset-0 z-50' : ''}
     ${className}
   `
@@ -475,9 +475,9 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
   if (!isMounted) {
     return (
       <div className={containerClasses}>
-        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-gray-50">
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
           {title && (
-            <h3 className="text-sm sm:text-lg font-semibold text-gray-900 truncate">
+            <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-slate-100 truncate">
               {title}
             </h3>
           )}
@@ -489,7 +489,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
             minHeight: '200px'
           }}
         >
-          <div className="text-gray-500 text-sm">Loading chart...</div>
+          <div className="text-gray-500 dark:text-slate-400 text-sm">Loading chart...</div>
         </div>
       </div>
     )
@@ -498,15 +498,15 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
   return (
     <div className={containerClasses}>
       {/* Header */}
-      <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-gray-50">
+      <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
         <div className="flex-1 min-w-0">
           {title && (
-            <h3 className="text-sm sm:text-lg font-semibold text-gray-900 truncate">
+            <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-slate-100 truncate">
               {title}
             </h3>
           )}
           {orientation === 'landscape' && (
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
               Landscape mode - optimized for better viewing
             </p>
           )}
@@ -517,7 +517,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
             <>
               <button
                 onClick={() => handleZoom('out')}
-                className="p-1.5 sm:p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-1.5 sm:p-2 text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors"
                 title="Zoom Out"
                 disabled={viewState.scale <= 0.5}
               >
@@ -525,7 +525,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
               </button>
               <button
                 onClick={() => handleZoom('in')}
-                className="p-1.5 sm:p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-1.5 sm:p-2 text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors"
                 title="Zoom In"
                 disabled={viewState.scale >= 3}
               >
@@ -536,7 +536,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
           
           <button
             onClick={resetView}
-            className="p-1.5 sm:p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-1.5 sm:p-2 text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors"
             title="Reset View"
           >
             <RotateCcw className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -544,7 +544,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
           
           <button
             onClick={toggleFullscreen}
-            className="p-1.5 sm:p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-1.5 sm:p-2 text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors"
             title={viewState.isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
           >
             {viewState.isFullscreen ? (
@@ -557,7 +557,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
           {enableExport && (
             <button
               onClick={exportChart}
-              className="p-1.5 sm:p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-1.5 sm:p-2 text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors"
               title="Export Chart"
             >
               <Download className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -603,8 +603,8 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
               {renderChart()}
             </ResponsiveContainer>
           ) : (
-            <div className="w-full h-full bg-gray-100 animate-pulse rounded flex items-center justify-center">
-              <div className="text-gray-400 text-sm">Loading chart...</div>
+            <div className="w-full h-full bg-gray-100 dark:bg-slate-700 animate-pulse rounded flex items-center justify-center">
+              <div className="text-gray-400 dark:text-slate-500 text-sm">Loading chart...</div>
             </div>
           )}
         </div>
@@ -612,7 +612,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
         {/* Touch interaction hints */}
         {enablePinchZoom && viewState.scale === 1 && (
           <div className="absolute bottom-2 left-2 right-2 text-center">
-            <p className="text-xs text-gray-500 bg-white bg-opacity-80 rounded px-2 py-1 inline-block">
+            <p className="text-xs text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-800 bg-opacity-80 rounded px-2 py-1 inline-block">
               Pinch to zoom • Tap to interact • Double tap to reset
             </p>
           </div>
@@ -628,7 +628,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
 
       {/* Mobile Legend (when hidden from chart) */}
       {showLegend && typeof window !== 'undefined' && window.innerWidth < 768 && type === 'pie' && (
-        <div className="p-3 border-t border-gray-200 bg-gray-50">
+        <div className="p-3 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
           <div className="grid grid-cols-2 gap-2 text-xs">
             {data.map((entry, index) => (
               <div key={index} className="flex items-center">

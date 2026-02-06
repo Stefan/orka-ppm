@@ -173,40 +173,40 @@ export default function ChangeRequestManager() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'draft':
-        return <FileText className="h-4 w-4 text-gray-500" />
+        return <FileText className="h-4 w-4 text-gray-500 dark:text-slate-400" />
       case 'submitted':
       case 'under_review':
-        return <Clock className="h-4 w-4 text-yellow-500" />
+        return <Clock className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
       case 'pending_approval':
         return <AlertCircle className="h-4 w-4 text-orange-500" />
       case 'approved':
-        return <CheckSquare className="h-4 w-4 text-green-500" />
+        return <CheckSquare className="h-4 w-4 text-green-500 dark:text-green-400" />
       case 'rejected':
-        return <AlertCircle className="h-4 w-4 text-red-500" />
+        return <AlertCircle className="h-4 w-4 text-red-500 dark:text-red-400" />
       case 'implementing':
-        return <Clock className="h-4 w-4 text-blue-500" />
+        return <Clock className="h-4 w-4 text-blue-500 dark:text-blue-400" />
       case 'implemented':
       case 'closed':
-        return <CheckSquare className="h-4 w-4 text-green-600" />
+        return <CheckSquare className="h-4 w-4 text-green-600 dark:text-green-400" />
       default:
-        return <FileText className="h-4 w-4 text-gray-500" />
+        return <FileText className="h-4 w-4 text-gray-500 dark:text-slate-400" />
     }
   }
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'low':
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200'
       case 'medium':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
       case 'high':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
       case 'critical':
-        return 'bg-orange-100 text-orange-800'
+        return 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
       case 'emergency':
-        return 'bg-red-100 text-red-800'
+        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200'
     }
   }
 
@@ -253,12 +253,12 @@ export default function ChangeRequestManager() {
           
           {selectedItems.size > 0 && (
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-600 dark:text-slate-400">
                 {selectedItems.size} selected
               </span>
               <button
                 onClick={() => handleBulkAction('approve')}
-                className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
+                className="bg-green-700 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
               >
                 Bulk Approve
               </button>
@@ -275,7 +275,7 @@ export default function ChangeRequestManager() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
           >
             <Filter className="h-4 w-4" />
             Filters
@@ -286,22 +286,22 @@ export default function ChangeRequestManager() {
       {/* Search and Filters */}
       <div className="space-y-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
           <input
             type="text"
             placeholder="Search change requests..."
             value={filters.search}
             onChange={(e) => handleFilterChange('search', e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
         {showFilters && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
             <select
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               {CHANGE_STATUSES.map(status => (
                 <option key={status.value} value={status.value}>
@@ -313,7 +313,7 @@ export default function ChangeRequestManager() {
             <select
               value={filters.change_type}
               onChange={(e) => handleFilterChange('change_type', e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               {CHANGE_TYPES.map(type => (
                 <option key={type.value} value={type.value}>
@@ -325,7 +325,7 @@ export default function ChangeRequestManager() {
             <select
               value={filters.priority}
               onChange={(e) => handleFilterChange('priority', e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               {PRIORITY_LEVELS.map(priority => (
                 <option key={priority.value} value={priority.value}>
@@ -339,78 +339,78 @@ export default function ChangeRequestManager() {
                 type="checkbox"
                 checked={filters.assigned_to_me}
                 onChange={(e) => handleFilterChange('assigned_to_me', e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">Assigned to me</span>
+              <span className="text-sm text-gray-700 dark:text-slate-300">Assigned to me</span>
             </label>
           </div>
         )}
       </div>
 
       {/* Change Requests Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+            <thead className="bg-gray-50 dark:bg-slate-800/50">
               <tr>
                 <th className="px-6 py-3 text-left">
                   <input
                     type="checkbox"
                     checked={selectedItems.size === (changeRequests?.length || 0) && (changeRequests?.length || 0) > 0}
                     onChange={handleSelectAll}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
                   />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                   Change Request
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                   Type & Priority
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                   Impact
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                   Progress
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
               {filteredChangeRequests.map((cr) => (
-                <tr key={cr.id} className="hover:bg-gray-50">
+                <tr key={cr.id} className="hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
                   <td className="px-6 py-4">
                     <input
                       type="checkbox"
                       checked={selectedItems.has(cr.id)}
                       onChange={() => handleSelectItem(cr.id)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
                     />
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-gray-900 dark:text-slate-100">
                         {cr.change_number}
                       </div>
-                      <div className="text-sm text-gray-900 font-medium">
+                      <div className="text-sm text-gray-900 dark:text-slate-100 font-medium">
                         {cr.title}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 dark:text-slate-400">
                         {cr.project_name}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 dark:text-slate-400">
                         Requested by {cr.requested_by} on {new Date(cr.requested_date).toLocaleDateString()}
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 capitalize">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200 capitalize">
                         {cr.change_type}
                       </span>
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getPriorityColor(cr.priority)}`}>
@@ -421,18 +421,18 @@ export default function ChangeRequestManager() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       {getStatusIcon(cr.status)}
-                      <span className="text-sm text-gray-900 capitalize">
+                      <span className="text-sm text-gray-900 dark:text-slate-100 capitalize">
                         {cr.status.replace('_', ' ')}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900">
+                    <div className="text-sm text-gray-900 dark:text-slate-100">
                       {cr.estimated_cost_impact && (
                         <div>${cr.estimated_cost_impact.toLocaleString()}</div>
                       )}
                       {cr.estimated_schedule_impact_days && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-gray-500 dark:text-slate-400">
                           {cr.estimated_schedule_impact_days} days
                         </div>
                       )}
@@ -447,7 +447,7 @@ export default function ChangeRequestManager() {
                             style={{ width: `${cr.implementation_progress}%` }}
                           ></div>
                         </div>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500 dark:text-slate-400">
                           {cr.implementation_progress}%
                         </span>
                       </div>
@@ -457,28 +457,28 @@ export default function ChangeRequestManager() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleViewDetails(cr.id)}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                         title="View Details"
                       >
                         <Eye className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleEdit(cr.id)}
-                        className="text-gray-600 hover:text-gray-800"
+                        className="text-gray-600 hover:text-gray-800 dark:text-slate-200"
                         title="Edit"
                       >
                         <Edit className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => console.log('Delete', cr.id)}
-                        className="text-red-600 hover:text-red-800"
+                        className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                         title="Delete"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => console.log('More actions', cr.id)}
-                        className="text-gray-600 hover:text-gray-800"
+                        className="text-gray-600 hover:text-gray-800 dark:text-slate-200"
                         title="More Actions"
                       >
                         <MoreVertical className="h-4 w-4" />
@@ -493,9 +493,9 @@ export default function ChangeRequestManager() {
 
         {filteredChangeRequests.length === 0 && (
           <div className="text-center py-12">
-            <FileText className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No change requests</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <FileText className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-slate-100">No change requests</h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
               Get started by creating a new change request.
             </p>
             <div className="mt-6">
@@ -514,15 +514,15 @@ export default function ChangeRequestManager() {
       {/* Pagination */}
       {filteredChangeRequests.length > 0 && (
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-700">
+          <div className="text-sm text-gray-700 dark:text-slate-300">
             Showing {filteredChangeRequests.length} of {changeRequests?.length || 0} change requests
           </div>
           <div className="flex items-center gap-2">
-            <button className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50">
+            <button className="px-3 py-1 border border-gray-300 dark:border-slate-600 rounded hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 disabled:opacity-50">
               Previous
             </button>
             <span className="px-3 py-1 bg-blue-600 text-white rounded">1</span>
-            <button className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50">
+            <button className="px-3 py-1 border border-gray-300 dark:border-slate-600 rounded hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 disabled:opacity-50">
               Next
             </button>
           </div>

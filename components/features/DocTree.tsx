@@ -67,7 +67,7 @@ function DocTreeNodeComp({ node, selectedId, onSelect, highlightIds, depth }: Do
       <div
         className={`
           flex items-center gap-2 py-2 px-3 rounded-lg cursor-pointer transition-colors
-          ${isSelected ? 'bg-blue-100 text-blue-900' : 'hover:bg-gray-100'}
+          ${isSelected ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-200' : 'hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700'}
           ${isHighlighted ? 'ring-1 ring-blue-300' : ''}
         `}
         style={{ paddingLeft: `${12 + depth * 16}px` }}
@@ -86,7 +86,7 @@ function DocTreeNodeComp({ node, selectedId, onSelect, highlightIds, depth }: Do
       >
         <button
           type="button"
-          className="p-0.5 rounded hover:bg-gray-200"
+          className="p-0.5 rounded hover:bg-gray-200 dark:hover:bg-slate-600"
           onClick={(e) => {
             e.stopPropagation()
             if (hasChildren) setOpen((o) => !o)
@@ -95,19 +95,19 @@ function DocTreeNodeComp({ node, selectedId, onSelect, highlightIds, depth }: Do
         >
           {hasChildren ? (
             open ? (
-              <ChevronDown className="w-4 h-4 text-gray-500" />
+              <ChevronDown className="w-4 h-4 text-gray-500 dark:text-slate-400" />
             ) : (
-              <ChevronRight className="w-4 h-4 text-gray-500" />
+              <ChevronRight className="w-4 h-4 text-gray-500 dark:text-slate-400" />
             )
           ) : (
             <span className="w-4 h-4 inline-block" />
           )}
         </button>
-        <Icon className="w-4 h-4 text-gray-600 flex-shrink-0" />
+        <Icon className="w-4 h-4 text-gray-600 dark:text-slate-400 flex-shrink-0" />
         <span className="truncate font-medium text-sm">{node.name}</span>
       </div>
       {hasChildren && open && (
-        <div className="border-l border-gray-200 ml-4">
+        <div className="border-l border-gray-200 dark:border-slate-700 ml-4">
           {node.children.map((child) => (
             <DocTreeNodeComp
               key={child.id}

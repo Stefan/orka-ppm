@@ -53,8 +53,12 @@ export default function MonteCarloVisualization({
     setError(null)
 
     try {
+      // #region agent log
+      const vizUrl = getApiUrl(`/api/v1/monte-carlo/simulations/${simulationId}/visualizations/generate`)
+      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'MonteCarloVisualization.tsx:generateCharts',message:'Monte Carlo viz request',data:{url:vizUrl,simulationId,chartTypes:config.chart_types},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{})
+      // #endregion
       const response = await fetch(
-        getApiUrl(`/api/v1/monte-carlo/simulations/${simulationId}/visualizations/generate`),
+        vizUrl,
         {
           method: 'POST',
           headers: {
@@ -67,6 +71,9 @@ export default function MonteCarloVisualization({
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'MonteCarloVisualization.tsx:generateCharts',message:'Monte Carlo viz error response',data:{status:response.status,errorData,hasDetail:!!(errorData&&errorData.detail)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H4'})}).catch(()=>{})
+        // #endregion
         console.error('Monte Carlo visualization error:', response.status, errorData)
 
         const detail = errorData.detail
@@ -169,22 +176,22 @@ export default function MonteCarloVisualization({
       {/* Header with Controls */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
         <div>
-          <h3 className="text-xl font-semibold text-gray-900">Monte Carlo Risk Analysis</h3>
-          <p className="text-sm text-gray-600 mt-1">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100">Monte Carlo Risk Analysis</h3>
+          <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
             Statistical visualization of simulation results
           </p>
         </div>
         
         <div className="flex flex-wrap gap-2">
           <div className="flex items-center space-x-2">
-            <label className="text-sm font-medium text-gray-700">Outcome:</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Outcome:</label>
             <select
               value={config.outcome_type}
               onChange={(e) => setConfig(prev => ({ 
                 ...prev, 
                 outcome_type: e.target.value as 'cost' | 'schedule' 
               }))}
-              className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="px-3 py-1 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="cost">Cost Analysis</option>
               <option value="schedule">Schedule Analysis</option>
@@ -193,7 +200,7 @@ export default function MonteCarloVisualization({
           
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className="flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            className="flex items-center px-3 py-2 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
           >
             <Settings className="h-4 w-4 mr-2" />
             Settings
@@ -212,12 +219,12 @@ export default function MonteCarloVisualization({
 
       {/* Settings Panel */}
       {showSettings && (
-        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-          <h4 className="text-lg font-medium text-gray-900 mb-4">Chart Configuration</h4>
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm">
+          <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Chart Configuration</h4>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Chart Types</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Chart Types</label>
               <div className="space-y-2">
                 {Object.entries(chartTypeLabels).map(([type, label]) => (
                   <label key={type} className="flex items-center">
@@ -237,23 +244,23 @@ export default function MonteCarloVisualization({
                           }))
                         }
                       }}
-                      className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-slate-600 rounded"
                     />
-                    <span className="text-sm text-gray-700">{label}</span>
+                    <span className="text-sm text-gray-700 dark:text-slate-300">{label}</span>
                   </label>
                 ))}
               </div>
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Format</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Format</label>
               <select
                 value={config.format}
                 onChange={(e) => setConfig(prev => ({ 
                   ...prev, 
                   format: e.target.value as any 
                 }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="png">PNG (Web)</option>
                 <option value="pdf">PDF (Print)</option>
@@ -263,14 +270,14 @@ export default function MonteCarloVisualization({
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Theme</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Theme</label>
               <select
                 value={config.theme}
                 onChange={(e) => setConfig(prev => ({ 
                   ...prev, 
                   theme: e.target.value as any 
                 }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="professional">Professional</option>
                 <option value="presentation">Presentation</option>
@@ -280,7 +287,7 @@ export default function MonteCarloVisualization({
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Options</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Options</label>
               <label className="flex items-center">
                 <input
                   type="checkbox"
@@ -289,9 +296,9 @@ export default function MonteCarloVisualization({
                     ...prev,
                     include_risk_heat_map: e.target.checked
                   }))}
-                  className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-slate-600 rounded"
                 />
-                <span className="text-sm text-gray-700">Include Risk Heat Map</span>
+                <span className="text-sm text-gray-700 dark:text-slate-300">Include Risk Heat Map</span>
               </label>
             </div>
           </div>
@@ -310,10 +317,10 @@ export default function MonteCarloVisualization({
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
+        <div className="bg-red-50 border border-red-200 dark:border-red-800 rounded-md p-4">
           <div className="flex items-start">
             <AlertTriangle className="h-5 w-5 text-red-400 mr-2 flex-shrink-0 mt-0.5" />
-            <span className="text-sm text-red-800">{error}</span>
+            <span className="text-sm text-red-800 dark:text-red-300">{error}</span>
           </div>
         </div>
       )}
@@ -326,21 +333,21 @@ export default function MonteCarloVisualization({
             const isError = chartName.includes('_error') || (typeof chart === 'string')
 
             return (
-              <div key={chartName} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200">
+              <div key={chartName} className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-lg font-medium text-gray-900">
+                      <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100">
                         {isError ? `Chart Generation Issue` : chart.title}
                       </h4>
                       {chart.subtitle && !isError && (
-                        <p className="text-sm text-gray-600 mt-1">{chart.subtitle}</p>
+                        <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">{chart.subtitle}</p>
                       )}
                     </div>
                     {!isError && (
                       <button
                         onClick={() => downloadChart(chartName, chart)}
-                        className="flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                        className="flex items-center px-3 py-2 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
                         disabled={!chart.base64_image}
                       >
                         <Download className="h-4 w-4 mr-2" />
@@ -352,10 +359,10 @@ export default function MonteCarloVisualization({
 
                 <div className="p-6">
                   {isError ? (
-                    <div className="flex items-center justify-center h-64 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="flex items-center justify-center h-64 bg-yellow-50 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                       <div className="text-center">
                         <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-                        <h5 className="text-lg font-medium text-yellow-800 mb-2">Chart Unavailable</h5>
+                        <h5 className="text-lg font-medium text-yellow-800 dark:text-yellow-300 mb-2">Chart Unavailable</h5>
                         <p className="text-sm text-yellow-700">
                           {typeof chart === 'string' ? chart : 'This chart type is temporarily unavailable for the current simulation data.'}
                         </p>
@@ -376,9 +383,9 @@ export default function MonteCarloVisualization({
 
                       {/* Chart Metadata */}
                       {chart.metadata && Object.keys(chart.metadata).length > 0 && (
-                        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                          <h5 className="text-sm font-medium text-gray-700 mb-2">Chart Statistics</h5>
-                          <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                        <div className="mt-4 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
+                          <h5 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Chart Statistics</h5>
+                          <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-slate-400">
                             {Object.entries(chart.metadata).map(([key, value]) => (
                               <div key={key} className="flex justify-between">
                                 <span className="capitalize">{key.replace(/_/g, ' ')}:</span>
@@ -402,8 +409,8 @@ export default function MonteCarloVisualization({
       {/* Empty State */}
       {!loading && Object.keys(charts).length === 0 && !error && (
         <div className="text-center py-12">
-          <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500 mb-4">No charts generated yet</p>
+          <BarChart3 className="h-12 w-12 text-gray-400 dark:text-slate-500 mx-auto mb-4" />
+          <p className="text-gray-500 dark:text-slate-400 mb-4">No charts generated yet</p>
           <button
             onClick={generateCharts}
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"

@@ -142,23 +142,23 @@ export default function AIResourceOptimizerComponent({
   }) || []
 
   const getConfidenceColor = (score: number) => {
-    if (score >= 0.8) return 'text-green-600 bg-green-50'
-    if (score >= 0.6) return 'text-yellow-600 bg-yellow-50'
-    return 'text-red-600 bg-red-50'
+    if (score >= 0.8) return 'text-green-600 dark:text-green-400 bg-green-50'
+    if (score >= 0.6) return 'text-yellow-600 dark:text-yellow-400 bg-yellow-50'
+    return 'text-red-600 dark:text-red-400 bg-red-50'
   }
 
   const getImpactColor = (score: number) => {
-    if (score >= 0.7) return 'text-purple-600 bg-purple-50'
-    if (score >= 0.4) return 'text-blue-600 bg-blue-50'
-    return 'text-gray-600 bg-gray-50'
+    if (score >= 0.7) return 'text-purple-600 dark:text-purple-400 bg-purple-50'
+    if (score >= 0.4) return 'text-blue-600 dark:text-blue-400 bg-blue-50'
+    return 'text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-800/50'
   }
 
   const getPriorityColor = (effort: string) => {
     switch (effort) {
-      case 'low': return 'text-green-600 bg-green-50'
-      case 'medium': return 'text-yellow-600 bg-yellow-50'
-      case 'high': return 'text-red-600 bg-red-50'
-      default: return 'text-gray-600 bg-gray-50'
+      case 'low': return 'text-green-600 dark:text-green-400 bg-green-50'
+      case 'medium': return 'text-yellow-600 dark:text-yellow-400 bg-yellow-50'
+      case 'high': return 'text-red-600 dark:text-red-400 bg-red-50'
+      default: return 'text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-800/50'
     }
   }
 
@@ -168,18 +168,18 @@ export default function AIResourceOptimizerComponent({
       <div className="p-6 border-b border-purple-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Zap className="h-6 w-6 text-purple-600" />
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+              <Zap className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">AI Resource Optimizer</h2>
-              <p className="text-sm text-gray-600">ML-powered resource allocation analysis</p>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100">AI Resource Optimizer</h2>
+              <p className="text-sm text-gray-600 dark:text-slate-400">ML-powered resource allocation analysis</p>
             </div>
           </div>
           
           <div className="flex items-center space-x-2">
             {analysis && (
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-slate-400">
                 Analysis: {(analysis.analysis_duration_ms / 1000).toFixed(1)}s
               </div>
             )}
@@ -189,7 +189,7 @@ export default function AIResourceOptimizerComponent({
                 setShowMetrics(!showMetrics)
                 if (!showMetrics && !metrics) loadMetrics()
               }}
-              className="flex items-center px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="flex items-center px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700"
             >
               <BarChart3 className="h-4 w-4 mr-2" />
               Metrics
@@ -209,43 +209,43 @@ export default function AIResourceOptimizerComponent({
 
       {/* Metrics Panel */}
       {showMetrics && metrics && (
-        <div className="p-6 bg-white border-b border-purple-200">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Performance Metrics (7 days)</h3>
+        <div className="p-6 bg-white dark:bg-slate-800 border-b border-purple-200">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Performance Metrics (7 days)</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-green-50 p-4 rounded-lg">
+            <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-green-600">Optimizations Applied</p>
+                  <p className="text-sm text-green-600 dark:text-green-400">Optimizations Applied</p>
                   <p className="text-2xl font-bold text-green-700">{metrics.total_optimizations_applied}</p>
                 </div>
-                <CheckCircle className="h-8 w-8 text-green-500" />
+                <CheckCircle className="h-8 w-8 text-green-500 dark:text-green-400" />
               </div>
             </div>
             
-            <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-blue-600">Avg. Improvement</p>
+                  <p className="text-sm text-blue-600 dark:text-blue-400">Avg. Improvement</p>
                   <p className="text-2xl font-bold text-blue-700">{metrics.average_utilization_improvement.toFixed(1)}%</p>
                 </div>
-                <TrendingUp className="h-8 w-8 text-blue-500" />
+                <TrendingUp className="h-8 w-8 text-blue-500 dark:text-blue-400" />
               </div>
             </div>
             
-            <div className="bg-yellow-50 p-4 rounded-lg">
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-yellow-600">Conflicts Resolved</p>
+                  <p className="text-sm text-yellow-600 dark:text-yellow-400">Conflicts Resolved</p>
                   <p className="text-2xl font-bold text-yellow-700">{metrics.conflicts_resolved}</p>
                 </div>
-                <Target className="h-8 w-8 text-yellow-500" />
+                <Target className="h-8 w-8 text-yellow-500 dark:text-yellow-400" />
               </div>
             </div>
             
             <div className="bg-purple-50 p-4 rounded-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-purple-600">Satisfaction Score</p>
+                  <p className="text-sm text-purple-600 dark:text-purple-400">Satisfaction Score</p>
                   <p className="text-2xl font-bold text-purple-700">{(metrics.user_satisfaction_score * 100).toFixed(0)}%</p>
                 </div>
                 <Users className="h-8 w-8 text-purple-500" />
@@ -258,13 +258,24 @@ export default function AIResourceOptimizerComponent({
       {/* Error State */}
       {error && (
         <div className="p-6">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="flex items-center">
-              <AlertTriangle className="h-5 w-5 text-red-400 mr-3" />
-              <div>
-                <h3 className="text-sm font-medium text-red-800">Analysis Failed</h3>
-                <p className="text-sm text-red-700 mt-1">{error}</p>
+          <div className="bg-red-50 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center">
+                <AlertTriangle className="h-5 w-5 text-red-400 mr-3 flex-shrink-0" />
+                <div>
+                  <h3 className="text-sm font-medium text-red-800 dark:text-red-300">Analysis Failed</h3>
+                  <p className="text-sm text-red-700 mt-1">{error}</p>
+                </div>
               </div>
+              <button
+                type="button"
+                onClick={() => { setError(null); runAnalysis() }}
+                disabled={loading}
+                className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 text-sm font-medium"
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Try Again
+              </button>
             </div>
           </div>
         </div>
@@ -275,41 +286,41 @@ export default function AIResourceOptimizerComponent({
         <div className="p-6">
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white p-4 rounded-lg border border-gray-200">
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Opportunities</p>
-                  <p className="text-2xl font-bold text-blue-600">{analysis.optimization_opportunities}</p>
+                  <p className="text-sm text-gray-600 dark:text-slate-400">Opportunities</p>
+                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{analysis.optimization_opportunities}</p>
                 </div>
                 <Target className="h-6 w-6 text-blue-500" />
               </div>
             </div>
             
-            <div className="bg-white p-4 rounded-lg border border-gray-200">
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Potential Improvement</p>
-                  <p className="text-2xl font-bold text-green-600">{analysis.potential_utilization_improvement.toFixed(1)}%</p>
+                  <p className="text-sm text-gray-600 dark:text-slate-400">Potential Improvement</p>
+                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">{analysis.potential_utilization_improvement.toFixed(1)}%</p>
                 </div>
                 <TrendingUp className="h-6 w-6 text-green-500" />
               </div>
             </div>
             
-            <div className="bg-white p-4 rounded-lg border border-gray-200">
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Est. Cost Savings</p>
-                  <p className="text-2xl font-bold text-purple-600">${analysis.estimated_cost_savings.toLocaleString()}</p>
+                  <p className="text-sm text-gray-600 dark:text-slate-400">Est. Cost Savings</p>
+                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">${analysis.estimated_cost_savings.toLocaleString()}</p>
                 </div>
                 <BarChart3 className="h-6 w-6 text-purple-500" />
               </div>
             </div>
             
-            <div className="bg-white p-4 rounded-lg border border-gray-200">
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Confidence</p>
-                  <p className="text-2xl font-bold text-indigo-600">{(analysis.overall_confidence * 100).toFixed(0)}%</p>
+                  <p className="text-sm text-gray-600 dark:text-slate-400">Confidence</p>
+                  <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{(analysis.overall_confidence * 100).toFixed(0)}%</p>
                 </div>
                 <CheckCircle className="h-6 w-6 text-indigo-500" />
               </div>
@@ -317,14 +328,14 @@ export default function AIResourceOptimizerComponent({
           </div>
 
           {/* Filters */}
-          <div className="bg-white p-4 rounded-lg border border-gray-200 mb-6">
+          <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700 mb-6">
             <div className="flex flex-wrap items-center gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Type</label>
                 <select
                   value={selectedFilters.type}
                   onChange={(e) => setSelectedFilters(prev => ({ ...prev, type: e.target.value }))}
-                  className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm"
                 >
                   <option value="all">All Types</option>
                   <option value="resource_reallocation">Resource Reallocation</option>
@@ -335,7 +346,7 @@ export default function AIResourceOptimizerComponent({
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Min Confidence</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Min Confidence</label>
                 <input
                   type="range"
                   min="0"
@@ -345,13 +356,13 @@ export default function AIResourceOptimizerComponent({
                   onChange={(e) => setSelectedFilters(prev => ({ ...prev, confidence: parseFloat(e.target.value) }))}
                   className="w-24"
                 />
-                <span className="text-sm text-gray-600 ml-2">{(selectedFilters.confidence * 100).toFixed(0)}%</span>
+                <span className="text-sm text-gray-600 dark:text-slate-400 ml-2">{(selectedFilters.confidence * 100).toFixed(0)}%</span>
               </div>
               
               <div className="flex items-end">
                 <button
                   onClick={() => setSelectedFilters({ type: 'all', priority: 'all', confidence: 0.0 })}
-                  className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800"
+                  className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 dark:text-slate-200"
                 >
                   Clear Filters
                 </button>
@@ -362,44 +373,44 @@ export default function AIResourceOptimizerComponent({
           {/* Optimization Suggestions */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium text-gray-900">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">
                 Optimization Suggestions ({filteredSuggestions.length})
               </h3>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-slate-400">
                 Reliability: <span className="font-medium capitalize">{analysis.recommendation_reliability}</span>
               </div>
             </div>
 
             {filteredSuggestions.length === 0 ? (
-              <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
-                <Zap className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">No optimization suggestions match your current filters.</p>
+              <div className="text-center py-8 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
+                <Zap className="h-12 w-12 text-gray-400 dark:text-slate-500 mx-auto mb-4" />
+                <p className="text-gray-600 dark:text-slate-400">No optimization suggestions match your current filters.</p>
                 <button
                   onClick={() => setSelectedFilters({ type: 'all', priority: 'all', confidence: 0.0 })}
-                  className="mt-2 text-purple-600 hover:text-purple-800"
+                  className="mt-2 text-purple-600 dark:text-purple-400 hover:text-purple-800"
                 >
                   Clear filters to see all suggestions
                 </button>
               </div>
             ) : (
               filteredSuggestions.map((suggestion) => (
-                <div key={suggestion.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <div key={suggestion.id} className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 overflow-hidden">
                   <div className="p-6">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-3">
-                          <h4 className="text-lg font-medium text-gray-900">{suggestion.resource_name}</h4>
-                          <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full capitalize">
+                          <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100">{suggestion.resource_name}</h4>
+                          <span className="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full capitalize">
                             {suggestion.type.replace('_', ' ')}
                           </span>
                           {suggestion.conflicts_detected.length > 0 && (
-                            <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">
+                            <span className="px-2 py-1 text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 rounded-full">
                               {suggestion.conflicts_detected.length} Conflict(s)
                             </span>
                           )}
                         </div>
                         
-                        <p className="text-gray-700 mb-4">{suggestion.reasoning}</p>
+                        <p className="text-gray-700 dark:text-slate-300 mb-4">{suggestion.reasoning}</p>
                         
                         {/* Metrics Grid */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -418,7 +429,7 @@ export default function AIResourceOptimizerComponent({
                             <div className="text-lg font-bold capitalize">{suggestion.effort_required}</div>
                           </div>
                           
-                          <div className="p-3 rounded-lg bg-gray-50 text-gray-600">
+                          <div className="p-3 rounded-lg bg-gray-50 dark:bg-slate-800/50 text-gray-600 dark:text-slate-400">
                             <div className="text-sm font-medium">Utilization Δ</div>
                             <div className="text-lg font-bold">
                               {suggestion.utilization_improvement > 0 ? '+' : ''}{suggestion.utilization_improvement.toFixed(1)}%
@@ -430,7 +441,7 @@ export default function AIResourceOptimizerComponent({
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                           <div>
                             <h5 className="text-sm font-medium text-green-700 mb-2">Benefits</h5>
-                            <ul className="text-sm text-green-600 space-y-1">
+                            <ul className="text-sm text-green-600 dark:text-green-400 space-y-1">
                               {suggestion.benefits.map((benefit, index) => (
                                 <li key={index} className="flex items-start">
                                   <CheckCircle className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
@@ -442,7 +453,7 @@ export default function AIResourceOptimizerComponent({
                           
                           <div>
                             <h5 className="text-sm font-medium text-red-700 mb-2">Risks</h5>
-                            <ul className="text-sm text-red-600 space-y-1">
+                            <ul className="text-sm text-red-600 dark:text-red-400 space-y-1">
                               {suggestion.risks.map((risk, index) => (
                                 <li key={index} className="flex items-start">
                                   <AlertTriangle className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
@@ -465,7 +476,7 @@ export default function AIResourceOptimizerComponent({
                         
                         <button
                           onClick={() => toggleSuggestionExpansion(suggestion.id)}
-                          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium flex items-center"
+                          className="px-4 py-2 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 text-sm font-medium flex items-center"
                         >
                           {expandedSuggestions.has(suggestion.id) ? (
                             <>
@@ -484,15 +495,15 @@ export default function AIResourceOptimizerComponent({
 
                     {/* Expanded Details */}
                     {expandedSuggestions.has(suggestion.id) && (
-                      <div className="mt-6 pt-6 border-t border-gray-200">
+                      <div className="mt-6 pt-6 border-t border-gray-200 dark:border-slate-700">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                           {/* Implementation Steps */}
                           <div>
-                            <h5 className="text-sm font-medium text-gray-900 mb-3">Implementation Steps</h5>
-                            <ol className="text-sm text-gray-600 space-y-2">
+                            <h5 className="text-sm font-medium text-gray-900 dark:text-slate-100 mb-3">Implementation Steps</h5>
+                            <ol className="text-sm text-gray-600 dark:text-slate-400 space-y-2">
                               {suggestion.implementation_steps.map((step, index) => (
                                 <li key={index} className="flex items-start">
-                                  <span className="flex-shrink-0 w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-medium mr-3">
+                                  <span className="flex-shrink-0 w-6 h-6 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full flex items-center justify-center text-xs font-medium mr-3">
                                     {index + 1}
                                   </span>
                                   {step}
@@ -504,16 +515,16 @@ export default function AIResourceOptimizerComponent({
                           {/* Alternative Strategies */}
                           {suggestion.alternative_strategies.length > 0 && (
                             <div>
-                              <h5 className="text-sm font-medium text-gray-900 mb-3">Alternative Strategies</h5>
+                              <h5 className="text-sm font-medium text-gray-900 dark:text-slate-100 mb-3">Alternative Strategies</h5>
                               <div className="space-y-3">
                                 {suggestion.alternative_strategies.map((strategy) => (
-                                  <div key={strategy.strategy_id} className="p-3 bg-gray-50 rounded-lg">
+                                  <div key={strategy.strategy_id} className="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
                                     <div className="flex items-center justify-between mb-2">
-                                      <h6 className="text-sm font-medium text-gray-900">{strategy.name}</h6>
-                                      <span className="text-xs text-gray-500">{(strategy.confidence_score * 100).toFixed(0)}% confidence</span>
+                                      <h6 className="text-sm font-medium text-gray-900 dark:text-slate-100">{strategy.name}</h6>
+                                      <span className="text-xs text-gray-500 dark:text-slate-400">{(strategy.confidence_score * 100).toFixed(0)}% confidence</span>
                                     </div>
-                                    <p className="text-sm text-gray-600 mb-2">{strategy.description}</p>
-                                    <div className="flex items-center space-x-4 text-xs text-gray-500">
+                                    <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{strategy.description}</p>
+                                    <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-slate-400">
                                       <span>Complexity: {strategy.implementation_complexity}</span>
                                       <span>Timeline: {strategy.estimated_timeline}</span>
                                     </div>
@@ -530,22 +541,22 @@ export default function AIResourceOptimizerComponent({
                             <h5 className="text-sm font-medium text-red-700 mb-3">Detected Conflicts</h5>
                             <div className="space-y-2">
                               {suggestion.conflicts_detected.map((conflict, index) => (
-                                <div key={index} className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                                <div key={index} className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                                   <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm font-medium text-red-800 capitalize">
+                                    <span className="text-sm font-medium text-red-800 dark:text-red-300 capitalize">
                                       {conflict.type.replace('_', ' ')}
                                     </span>
                                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                                      conflict.severity === 'critical' ? 'bg-red-200 text-red-800' :
-                                      conflict.severity === 'high' ? 'bg-orange-200 text-orange-800' :
-                                      'bg-yellow-200 text-yellow-800'
+                                      conflict.severity === 'critical' ? 'bg-red-200 text-red-800 dark:text-red-300' :
+                                      conflict.severity === 'high' ? 'bg-orange-200 text-orange-800 dark:text-orange-300' :
+                                      'bg-yellow-200 text-yellow-800 dark:text-yellow-300'
                                     }`}>
                                       {conflict.severity}
                                     </span>
                                   </div>
                                   <p className="text-sm text-red-700">{conflict.description}</p>
                                   {conflict.affected_projects.length > 0 && (
-                                    <div className="mt-2 text-xs text-red-600">
+                                    <div className="mt-2 text-xs text-red-600 dark:text-red-400">
                                       Affected projects: {conflict.affected_projects.join(', ')}
                                     </div>
                                   )}
@@ -564,8 +575,8 @@ export default function AIResourceOptimizerComponent({
 
           {/* Recommended Actions */}
           {analysis.recommended_actions.length > 0 && (
-            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-blue-800 mb-2">Recommended Next Actions</h4>
+            <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <h4 className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">Recommended Next Actions</h4>
               <ul className="text-sm text-blue-700 space-y-1">
                 {analysis.recommended_actions.map((action, index) => (
                   <li key={index} className="flex items-start">
@@ -583,8 +594,8 @@ export default function AIResourceOptimizerComponent({
       {!analysis && !loading && !error && (
         <div className="p-12 text-center">
           <Zap className="h-16 w-16 text-purple-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">AI Resource Optimization</h3>
-          <p className="text-gray-600 mb-6">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-2">AI Resource Optimization</h3>
+          <p className="text-gray-600 dark:text-slate-400 mb-6">
             Run an analysis to get ML-powered resource allocation recommendations with confidence scores.
           </p>
           <button

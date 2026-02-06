@@ -463,6 +463,25 @@ class RedisCacheService:
         key = f"audit:dashboard:{tenant_id}"
         return self.get(key)
     
+    def set_audit_system_metric(self, name: str, value_ms: int, ttl: int = 86400) -> bool:
+        """
+        Store a system health metric for audit dashboard (Requirement 10.9).
+        Used for anomaly_detection_latency_ms and search_response_time_ms.
+        """
+        key = f"audit:metrics:{name}"
+        return self.set(key, value_ms, ttl=ttl)
+    
+    def get_audit_system_metric(self, name: str) -> Optional[int]:
+        """Read a system health metric (returns milliseconds or None)."""
+        key = f"audit:metrics:{name}"
+        val = self.get(key)
+        if val is None:
+            return None
+        try:
+            return int(val)
+        except (TypeError, ValueError):
+            return None
+    
     def invalidate_audit_cache(self, tenant_id: str) -> int:
         """
         Invalidate all audit-related cache entries for a tenant

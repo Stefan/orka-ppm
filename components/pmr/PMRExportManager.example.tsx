@@ -413,7 +413,7 @@ export function ExportWithAPIExample() {
         PMR Export Manager - API Integration
       </h1>
       {isLoading && (
-        <div className="mb-4 p-4 bg-blue-50 text-blue-700 rounded-lg">
+        <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 text-blue-700 rounded-lg">
           Initiating export...
         </div>
       )}

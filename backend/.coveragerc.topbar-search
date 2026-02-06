@@ -1,0 +1,14 @@
+# Coverage for Topbar Unified Search only.
+# Run: coverage run --rcfile=.coveragerc.topbar-search -m pytest tests/test_unified_search_service.py tests/test_search_router.py -v -o addopts="-v --tb=short"
+# Then: coverage report --rcfile=.coveragerc.topbar-search (nur die beiden Module)
+
+[run]
+source = services, routers
+omit = */tests/*, */__pycache__/*
+
+[report]
+# Nur diese beiden Dateien im Report ausweisen (Skript filtert)
+include = *unified_search*, routers/search.py
+omit = */tests/*
+show_missing = True
+fail_under = 80

@@ -141,11 +141,11 @@ export const ViewerIndicator: React.FC<ViewerIndicatorProps> = ({
   if (variant === 'badge') {
     return (
       <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 ${className}`}
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200 ${className}`}
         title={indicators.ui_message || 'Read-only access'}
       >
         <svg
-          className="mr-1 h-3 w-3 text-gray-500"
+          className="mr-1 h-3 w-3 text-gray-500 dark:text-slate-400"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -172,7 +172,7 @@ export const ViewerIndicator: React.FC<ViewerIndicatorProps> = ({
   // Banner variant
   return (
     <div
-      className={`rounded-md bg-blue-50 border border-blue-200 p-4 ${className}`}
+      className={`rounded-md bg-blue-50 border border-blue-200 dark:border-blue-800 p-4 ${className}`}
       role="alert"
     >
       <div className="flex">
@@ -193,7 +193,7 @@ export const ViewerIndicator: React.FC<ViewerIndicatorProps> = ({
           </svg>
         </div>
         <div className="ml-3">
-          <h3 className="text-sm font-medium text-blue-800">
+          <h3 className="text-sm font-medium text-blue-800 dark:text-blue-300">
             Read-only Access
           </h3>
           <div className="mt-2 text-sm text-blue-700">

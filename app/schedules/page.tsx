@@ -97,7 +97,7 @@ export default function SchedulesPage() {
   if (authLoading || !session) {
     return (
       <AppLayout>
-        <div className="p-8 text-gray-500">Loading...</div>
+        <div className="p-8 text-gray-500 dark:text-slate-400">Loading...</div>
       </AppLayout>
     )
   }
@@ -105,12 +105,12 @@ export default function SchedulesPage() {
   return (
     <AppLayout>
       <div className="p-6 max-w-4xl mx-auto">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-2">Schedules</h1>
-        <p className="text-sm text-gray-500 mb-6">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100 mb-2">Schedules</h1>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
           Manage project schedules, tasks, and dependencies.
         </p>
         {error && (
-          <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+          <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200 rounded-lg text-sm">
             {error}
           </div>
         )}

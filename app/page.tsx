@@ -14,7 +14,7 @@ export default function HomePage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-gray-50"
+      className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-800/50"
       style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f9fafb' }}
     >
       <div className="text-center" style={{ textAlign: 'center' }}>
@@ -22,7 +22,7 @@ export default function HomePage() {
           className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"
           style={{ width: 48, height: 48, borderWidth: 2, borderColor: '#2563eb', borderRadius: '50%', borderTopColor: 'transparent' }}
         />
-        <p className="mt-4 text-gray-600" style={{ marginTop: 16, color: '#4b5563' }}>
+        <p className="mt-4 text-gray-600 dark:text-slate-400" style={{ marginTop: 16, color: '#4b5563' }}>
           Redirecting...
         </p>
       </div>

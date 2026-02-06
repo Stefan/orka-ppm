@@ -336,7 +336,7 @@ export function ComplexPermissionExample({
           <PermissionGuard 
             permission="financial_update"
             context={{ project_id: projectId }}
-            fallback={<p className="text-sm text-gray-500">Read-only access</p>}
+            fallback={<p className="text-sm text-gray-500 dark:text-slate-400">Read-only access</p>}
           >
             <Button>Edit Budget</Button>
           </PermissionGuard>

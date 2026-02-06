@@ -96,7 +96,7 @@ export default function ProjectDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-800/50 p-8">
         <div className="max-w-7xl mx-auto">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
@@ -109,13 +109,13 @@ export default function ProjectDetailPage() {
 
   if (error || !project) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-800/50 p-8">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-800">{error || 'Project not found'}</p>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <p className="text-red-800 dark:text-red-300">{error || 'Project not found'}</p>
             <button
               onClick={() => router.push('/projects')}
-              className="mt-2 text-red-600 hover:text-red-800 underline"
+              className="mt-2 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
             >
               Back to Projects
             </button>
@@ -126,7 +126,7 @@ export default function ProjectDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-800/50 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -142,14 +142,14 @@ export default function ProjectDetailPage() {
 
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
-              <p className="text-gray-600 mt-2">{project.description}</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">{project.name}</h1>
+              <p className="text-gray-600 dark:text-slate-400 mt-2">{project.description}</p>
             </div>
             <span className={`px-3 py-1 text-sm font-medium rounded-full ${
-              project.status === 'active' ? 'bg-green-100 text-green-800' :
-              project.status === 'completed' ? 'bg-blue-100 text-blue-800' :
-              project.status === 'planning' ? 'bg-yellow-100 text-yellow-800' :
-              'bg-gray-100 text-gray-800'
+              project.status === 'active' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' :
+              project.status === 'completed' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' :
+              project.status === 'planning' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' :
+              'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200'
             }`}>
               {project.status}
             </span>
@@ -157,14 +157,14 @@ export default function ProjectDetailPage() {
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-gray-200 mb-6">
+        <div className="border-b border-gray-200 dark:border-slate-700 mb-6">
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => setActiveTab('overview')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'overview'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300 hover:border-gray-300 dark:border-slate-600'
               }`}
             >
               Overview
@@ -173,8 +173,8 @@ export default function ProjectDetailPage() {
               onClick={() => setActiveTab('shares')}
               className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
                 activeTab === 'shares'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300 hover:border-gray-300 dark:border-slate-600'
               }`}
             >
               <Share2 className="h-4 w-4" />
@@ -194,26 +194,26 @@ export default function ProjectDetailPage() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                       Start Date
                     </label>
-                    <p className="text-gray-900">{project.start_date}</p>
+                    <p className="text-gray-900 dark:text-slate-100">{project.start_date}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                       End Date
                     </label>
-                    <p className="text-gray-900">{project.end_date}</p>
+                    <p className="text-gray-900 dark:text-slate-100">{project.end_date}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                       Budget
                     </label>
-                    <p className="text-gray-900">${project.budget.toLocaleString()}</p>
+                    <p className="text-gray-900 dark:text-slate-100">${project.budget.toLocaleString()}</p>
                   </div>
                   {project.progress_percentage !== undefined && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                         Progress
                       </label>
                       <div className="flex items-center gap-2">
@@ -223,7 +223,7 @@ export default function ProjectDetailPage() {
                             style={{ width: `${project.progress_percentage}%` }}
                           />
                         </div>
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-gray-600 dark:text-slate-400">
                           {project.progress_percentage}%
                         </span>
                       </div>

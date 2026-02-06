@@ -41,8 +41,8 @@ export function ColumnCustomizer({
   }
 
   return (
-    <div className={`rounded-lg border border-gray-200 bg-white p-4 ${className}`}>
-      <h3 className="mb-3 text-sm font-medium text-gray-700">Spalten: {entity}</h3>
+    <div className={`rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 ${className}`}>
+      <h3 className="mb-3 text-sm font-medium text-gray-700 dark:text-slate-300">Spalten: {entity}</h3>
       <div className="space-y-2">
         {availableColumns.map((col) => (
           <label key={col.id} className="flex cursor-pointer items-center gap-2">
@@ -50,22 +50,22 @@ export function ColumnCustomizer({
               type="checkbox"
               checked={selectedColumns.includes(col.id)}
               onChange={() => toggleColumn(col.id)}
-              className="rounded border-gray-300"
+              className="rounded border-gray-300 dark:border-slate-600"
             />
             <span className="text-sm">{col.label}</span>
           </label>
         ))}
       </div>
       {savedViews.length > 0 && (
-        <div className="mt-4 border-t border-gray-100 pt-3">
-          <p className="mb-2 text-xs font-medium text-gray-500">Gespeicherte Ansichten</p>
+        <div className="mt-4 border-t border-gray-100 dark:border-slate-700 pt-3">
+          <p className="mb-2 text-xs font-medium text-gray-500 dark:text-slate-400">Gespeicherte Ansichten</p>
           <div className="flex flex-wrap gap-2">
             {savedViews.map((v) => (
               <button
                 key={v.id}
                 type="button"
                 onClick={() => onLoadView?.(v)}
-                className="rounded bg-gray-100 px-2 py-1 text-xs hover:bg-gray-200"
+                className="rounded bg-gray-100 dark:bg-slate-700 px-2 py-1 text-xs hover:bg-gray-200 dark:hover:bg-slate-600"
               >
                 {v.name}
               </button>
@@ -74,12 +74,12 @@ export function ColumnCustomizer({
         </div>
       )}
       {onSaveView && (
-        <div className="mt-4 border-t border-gray-100 pt-3">
+        <div className="mt-4 border-t border-gray-100 dark:border-slate-700 pt-3">
           {!showSave ? (
             <button
               type="button"
               onClick={() => setShowSave(true)}
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
             >
               Als Ansicht speichern
             </button>
@@ -90,7 +90,7 @@ export function ColumnCustomizer({
                 value={viewName}
                 onChange={(e) => setViewName(e.target.value)}
                 placeholder="Ansichtsname"
-                className="flex-1 rounded border border-gray-300 px-2 py-1 text-sm"
+                className="flex-1 rounded border border-gray-300 dark:border-slate-600 px-2 py-1 text-sm"
               />
               <button
                 type="button"

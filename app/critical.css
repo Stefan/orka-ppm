@@ -1,393 +1,83 @@
 /**
  * Critical CSS for Admin Performance Page
  * 
- * This file contains minimal CSS required for above-the-fold content rendering.
- * It includes styles for:
- * - Layout structure (header, containers)
- * - Metric cards (4 cards in grid)
- * - Health status card
- * - Skeleton loaders
- * - Loading spinner
- * 
- * All other styles are loaded asynchronously to avoid blocking First Contentful Paint.
+ * IMPORTANT: All class definitions MUST be inside @layer base so they
+ * don't override Tailwind v4 utilities. In Tailwind v4, all utilities are
+ * inside @layer utilities, and UNLAYERED CSS always beats layered CSS.
+ * Putting these in @layer base ensures proper cascade order:
+ *   theme < base < components < utilities
  * 
  * Requirements: 10.1, 10.5
  */
 
 /* ========================================
-   CRITICAL LAYOUT STYLES
+   ALL RESETS inside @layer base
+   
+   In Tailwind v4, unlayered CSS ALWAYS overrides @layer utilities.
+   Even element resets like `button { border: none }` or
+   `body { color: ... }` must be layered to not break Tailwind classes.
    ======================================== */
 
-/* Ensure body and html have proper height and background */
-html {
-  height: 100%;
-  overflow-x: hidden;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  color: var(--foreground, #111827);
-  background-color: var(--background, #ffffff);
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Basic box-sizing for all elements */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-/* ========================================
-   CRITICAL CONTAINER STYLES
-   ======================================== */
-
-/* Main container padding and spacing */
-.p-8 {
-  padding: 2rem;
-}
-
-.space-y-6 > * + * {
-  margin-top: 1.5rem;
-}
-
-/* ========================================
-   CRITICAL HEADER STYLES
-   ======================================== */
-
-/* Header layout */
-.flex {
-  display: flex;
-}
-
-.justify-between {
-  justify-content: space-between;
-}
-
-.items-start {
-  align-items: flex-start;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.space-x-2 > * + * {
-  margin-left: 0.5rem;
-}
-
-/* Typography for header */
-.text-3xl {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-}
-
-.font-bold {
-  font-weight: 700;
-}
-
-.text-gray-900 {
-  color: #111827;
-}
-
-.text-gray-600 {
-  color: #4b5563;
-}
-
-.mt-1 {
-  margin-top: 0.25rem;
-}
-
-/* ========================================
-   CRITICAL BUTTON STYLES
-   ======================================== */
-
-/* Button base styles */
-button {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  transition: background-color 0.2s ease-in-out;
-}
-
-.bg-blue-600 {
-  background-color: #2563eb;
-}
-
-.bg-red-600 {
-  background-color: #dc2626;
-}
-
-.text-white {
-  color: #ffffff;
-}
-
-.px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-.py-2 {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-
-.rounded-lg {
-  border-radius: 0.5rem;
-}
-
-/* ========================================
-   CRITICAL HEALTH STATUS CARD
-   ======================================== */
-
-.p-6 {
-  padding: 1.5rem;
-}
-
-.border {
-  border-width: 1px;
-}
-
-.bg-green-100 {
-  background-color: #d1fae5;
-}
-
-.bg-yellow-100 {
-  background-color: #fef3c7;
-}
-
-.bg-red-100 {
-  background-color: #fee2e2;
-}
-
-.bg-gray-100 {
-  background-color: #f3f4f6;
-}
-
-/* ========================================
-   CRITICAL METRIC CARDS GRID
-   ======================================== */
-
-.grid {
-  display: grid;
-}
-
-.grid-cols-1 {
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-}
-
-.gap-4 {
-  gap: 1rem;
-}
-
-/* Responsive grid for metric cards */
-@media (min-width: 768px) {
-  .md\:grid-cols-2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+@layer base {
+  html {
+    height: 100%;
+    overflow-x: hidden;
   }
-}
 
-@media (min-width: 1024px) {
-  .lg\:grid-cols-4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--foreground, #111827);
+    background-color: var(--background, #ffffff);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-}
 
-/* Metric card styles */
-.bg-white {
-  background-color: #ffffff;
-}
-
-.shadow-sm {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-
-.border-gray-200 {
-  border-color: #e5e7eb;
-}
-
-.text-sm {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-
-.font-medium {
-  font-weight: 500;
-}
-
-.text-2xl {
-  font-size: 1.5rem;
-  line-height: 2rem;
-}
-
-.text-blue-600 {
-  color: #2563eb;
-}
-
-.text-red-600 {
-  color: #dc2626;
-}
-
-.text-yellow-600 {
-  color: #d97706;
-}
-
-.text-green-600 {
-  color: #059669;
-}
-
-/* ========================================
-   CRITICAL SKELETON LOADER STYLES
-   ======================================== */
-
-/* Skeleton container */
-.bg-gray-200 {
-  background-color: #e5e7eb;
-}
-
-.bg-gray-100 {
-  background-color: #f3f4f6;
-}
-
-.rounded {
-  border-radius: 0.25rem;
-}
-
-/* Skeleton dimensions */
-.h-6 {
-  height: 1.5rem;
-}
-
-.h-\[300px\] {
-  height: 300px;
-}
-
-.w-48 {
-  width: 12rem;
-}
-
-.w-full {
-  width: 100%;
-}
-
-.mb-4 {
-  margin-bottom: 1rem;
-}
-
-/* GPU-accelerated pulse animation for skeletons */
-@keyframes pulse-transform {
-  0%, 100% {
-    opacity: 1;
+  *, *::before, *::after {
+    box-sizing: border-box;
   }
-  50% {
-    opacity: 0.5;
+
+  button {
+    cursor: pointer;
+    border: none;
   }
-}
-
-.animate-pulse-transform {
-  animation: pulse-transform 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  transform: translateZ(0);
-  will-change: opacity;
-}
-
-/* ========================================
-   CRITICAL LOADING SPINNER
-   ======================================== */
-
-/* Loading spinner container */
-.h-64 {
-  height: 16rem;
-}
-
-/* Spinner animation */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
+  /* Loading spinner animation */
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
-  to {
-    transform: rotate(360deg);
+
+  @keyframes pulse-transform {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
   }
-}
 
-.animate-spin {
-  animation: spin 1s linear infinite;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
-
-.rounded-full {
-  border-radius: 9999px;
-}
-
-.h-12 {
-  height: 3rem;
-}
-
-.w-12 {
-  width: 3rem;
-}
-
-.border-b-2 {
-  border-bottom-width: 2px;
-}
-
-.border-blue-600 {
-  border-color: #2563eb;
-}
-
-/* ========================================
-   CRITICAL UTILITY CLASSES
-   ======================================== */
-
-.hidden {
-  display: none;
-}
-
-.block {
-  display: block;
-}
-
-.inline-flex {
-  display: inline-flex;
-}
-
-.relative {
-  position: relative;
-}
-
-.absolute {
-  position: absolute;
-}
-
-.overflow-hidden {
-  overflow: hidden;
-}
-
-.overflow-x-hidden {
-  overflow-x: hidden;
-}
-
-/* ========================================
-   CRITICAL RESPONSIVE UTILITIES
-   ======================================== */
-
-@media (max-width: 768px) {
-  .p-8 {
-    padding: 1rem;
+  .animate-spin {
+    animation: spin 1s linear infinite;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
-  
-  .text-3xl {
-    font-size: 1.5rem;
-    line-height: 2rem;
+
+  .animate-pulse-transform {
+    animation: pulse-transform 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    transform: translateZ(0);
+    will-change: opacity;
+  }
+
+  /* Responsive overrides */
+  @media (max-width: 768px) {
+    .p-8 {
+      padding: 1rem;
+    }
+    
+    .text-3xl {
+      font-size: 1.5rem;
+      line-height: 2rem;
+    }
   }
 }

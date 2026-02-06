@@ -73,6 +73,7 @@ export interface CostbookProps {
 }
 
 import { DistributionSettingsDialog } from './DistributionSettingsDialog'
+import { GuidedTour, useGuidedTour, TourTriggerButton, costbookTourSteps } from '@/components/guided-tour'
 const DistributionRulesPanelStub: React.FC<{
   rules: DistributionRule[]
   onCreateRule: (rule: Omit<DistributionRule, 'id' | 'created_at' | 'last_applied' | 'application_count'>) => void
@@ -111,6 +112,7 @@ function CostbookInner({
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({})
   const [parseResult, setParseResult] = useState<ParseResult | null>(null)
   const [isMobile, setIsMobile] = useState(false)
+  const { isOpen, startTour, closeTour, completeTour, resetAndStartTour, hasCompletedTour } = useGuidedTour('costbook-v1')
 
   // Dialog states
   const [showPerformanceDialog, setShowPerformanceDialog] = useState(false)
@@ -629,7 +631,7 @@ function CostbookInner({
           )}
 
           {/* Projects Section - First on mobile */}
-          <section className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <section className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100">
                 Projects ({filteredProjects.length})
@@ -656,7 +658,7 @@ function CostbookInner({
           </section>
 
           {/* Compact Visualization - Second on mobile */}
-          <section className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <section className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
             <CompactVisualizationPanel
               projects={filteredProjects}
               kpis={kpis}
@@ -685,7 +687,7 @@ function CostbookInner({
       style={{ minHeight: 'calc(100vh - 8rem)' }}
     >
       {/* Row 1: Header (auto) */}
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <CostbookHeader
           kpis={kpis}
           selectedCurrency={selectedCurrency}
@@ -697,7 +699,11 @@ function CostbookInner({
           searchTerm={searchTerm}
           isLoading={isLoading}
           lastRefreshTime={lastRefreshTime || undefined}
-          className="mb-4"
+          className="mb-0"
+        />
+        <TourTriggerButton
+          onStart={hasCompletedTour ? resetAndStartTour : startTour}
+          hasCompletedTour={hasCompletedTour}
         />
         {error && (
           <ErrorDisplay
@@ -712,7 +718,7 @@ function CostbookInner({
       {/* Row 2: Main content – Overview / Forecast / List (1fr, scroll inside only) */}
       <main className="min-h-0 overflow-auto flex flex-col gap-4">
         {/* NL Search */}
-        <section className="flex-shrink-0 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
+        <section data-tour="costbook-nl-search" className="flex-shrink-0 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
           <NLSearchInput
             value={searchTerm}
             onChange={handleSearch}
@@ -720,10 +726,10 @@ function CostbookInner({
             className="max-w-2xl"
           />
           {parseResult && searchTerm && (
-            <p className="mt-2 text-sm text-gray-500 dark:text-slate-400">
+            <p className="mt-2 text-sm text-gray-700 dark:text-slate-300">
               {parseResult.interpretation}
               {filteredProjects.length !== convertedProjects.length && (
-                <span className="ml-2 text-blue-600">
+                <span className="ml-2 text-blue-600 dark:text-blue-400">
                   ({filteredProjects.length} of {convertedProjects.length} projects)
                 </span>
               )}
@@ -735,9 +741,9 @@ function CostbookInner({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
           {/* Overview: Projects Grid (left, 2 cols on lg) */}
           <section className="lg:col-span-2 flex flex-col min-h-0">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-2 p-2 bg-white rounded-lg shadow-sm border border-gray-200">
-              <h2 className="text-lg font-bold text-gray-900 whitespace-nowrap">Overview – Projects ({filteredProjects.length})</h2>
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-2 p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100 whitespace-nowrap">Overview – Projects ({filteredProjects.length})</h2>
+              <div className="flex items-center gap-2" data-tour="costbook-ai-optimize">
                 <button
                   type="button"
                   onClick={handleOptimizeCostbook}
@@ -775,13 +781,13 @@ function CostbookInner({
           </section>
 
           {/* Forecast: Gantt + Distribution Rules (right, 1 col on lg) */}
-          <section className="lg:col-span-1 flex flex-col min-h-0">
-            <div className="flex justify-between items-center mb-2 p-2 bg-white rounded-lg shadow-sm border border-gray-200">
-              <h2 className="text-lg font-bold text-gray-900">Forecast</h2>
+          <section data-tour="costbook-distribution" className="lg:col-span-1 flex flex-col min-h-0">
+            <div className="flex justify-between items-center mb-2 p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100">Forecast</h2>
               <button
                 type="button"
                 onClick={() => setShowDistributionRules(true)}
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
               >
                 Distribution Rules
               </button>
@@ -800,25 +806,27 @@ function CostbookInner({
                 onProjectClick={handleProjectClick}
                 isLoading={isLoading}
               />
-              <RecommendationsPanel
-                recommendations={recommendations}
-                onView={handleRecommendationView}
-                onAccept={handleRecommendationAccept}
-                onReject={handleRecommendationReject}
-                onDefer={handleRecommendationDefer}
-                collapsible={true}
-                defaultCollapsed={true}
-                initialLimit={2}
-              />
+              <div data-tour="costbook-recommendations">
+                <RecommendationsPanel
+                  recommendations={recommendations}
+                  onView={handleRecommendationView}
+                  onAccept={handleRecommendationAccept}
+                  onReject={handleRecommendationReject}
+                  onDefer={handleRecommendationDefer}
+                  collapsible={true}
+                  defaultCollapsed={true}
+                  initialLimit={2}
+                />
+              </div>
             </div>
           </section>
         </div>
 
         {/* Panel: List (CES/WBS Tree) */}
-        <section className="flex-shrink-0">
+        <section data-tour="costbook-hierarchy" className="flex-shrink-0">
           <CollapsiblePanel
             title="List – Cost Structure (CES/WBS)"
-            icon={<Layers className="w-5 h-5 text-blue-600" />}
+            icon={<Layers className="w-5 h-5 text-blue-600 dark:text-blue-400" />}
             defaultOpen={false}
             className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
           >
@@ -856,7 +864,7 @@ function CostbookInner({
                 />
               </div>
               {hierarchyData.length === 0 && (
-                <div className="text-center py-6 text-gray-500 dark:text-slate-400 text-sm">
+                <div className="text-center py-6 text-gray-700 dark:text-slate-300 text-sm">
                   No {hierarchyViewType === 'ces' ? 'CES' : 'WBS'} data for current filters
                 </div>
               )}
@@ -962,9 +970,9 @@ function CostbookInner({
             </div>
             <div className="p-4 overflow-y-auto flex-1">
               {optimizeLoading ? (
-                <p className="text-sm text-gray-500">Loading suggestions…</p>
+                <p className="text-sm text-gray-600 dark:text-slate-400">Loading suggestions…</p>
               ) : optimizeSuggestions.length === 0 ? (
-                <p className="text-sm text-gray-500">No optimization suggestions right now.</p>
+                <p className="text-sm text-gray-600 dark:text-slate-400">No optimization suggestions right now.</p>
               ) : (
                 <ul className="space-y-3">
                   {optimizeSuggestions.map((s) => (
@@ -972,8 +980,8 @@ function CostbookInner({
                       <p className="text-sm font-medium text-gray-900 dark:text-slate-100">{s.description}</p>
                       <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">{s.impact}</p>
                       <div className="mt-2 flex gap-2">
-                        <button type="button" className="text-xs text-blue-600 hover:text-blue-800 font-medium">Simulate</button>
-                        <button type="button" className="text-xs text-green-600 hover:text-green-800 font-medium">Apply</button>
+                        <button type="button" className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium">Simulate</button>
+                        <button type="button" className="text-xs text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 font-medium">Apply</button>
                       </div>
                     </li>
                   ))}
@@ -1003,6 +1011,7 @@ function CostbookInner({
             currentSpend={project.total_commitments + project.total_actuals}
             currency={selectedCurrency}
             initialSettings={distributionSettings.get(selectedProjectId)}
+            projectId={selectedProjectId}
             data-testid="distribution-settings-dialog"
           />
         )
@@ -1011,12 +1020,12 @@ function CostbookInner({
       {/* Distribution Rules Panel (Phase 2) */}
       {costbookPhase2Enabled && showDistributionRules && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900">Distribution Rules Manager</h2>
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-slate-700">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100">Distribution Rules Manager</h2>
               <button
                 onClick={() => setShowDistributionRules(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-400 hover:text-gray-600 dark:text-slate-400 transition-colors"
                 aria-label="Close"
               >
                 ×
@@ -1034,6 +1043,13 @@ function CostbookInner({
           </div>
         </div>
       )}
+      <GuidedTour
+        steps={costbookTourSteps}
+        isOpen={isOpen}
+        onClose={closeTour}
+        onComplete={completeTour}
+        tourId="costbook-v1"
+      />
     </div>
   )
 }

@@ -180,6 +180,11 @@ export function sortProjects(
         return 0;
     }
 
+    // Use localeCompare for strings so order matches locale and is consistent with tests
+    if (sortBy === 'name' && typeof aValue === 'string' && typeof bValue === 'string') {
+      const cmp = aValue.localeCompare(bValue);
+      return sortOrder === 'asc' ? cmp : -cmp;
+    }
     if (aValue < bValue) {
       return sortOrder === 'asc' ? -1 : 1;
     }

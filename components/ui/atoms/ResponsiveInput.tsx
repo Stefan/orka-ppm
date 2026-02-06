@@ -81,7 +81,7 @@ export const ResponsiveInput = forwardRef<HTMLInputElement, InputProps>(({
           htmlFor={inputId}
           className={cn(
             'block text-sm font-medium mb-2',
-            error ? 'text-error-700' : 'text-gray-700',
+            error ? 'text-error-700' : 'text-gray-700 dark:text-slate-300',
             disabled && 'opacity-50'
           )}
         >
@@ -98,7 +98,7 @@ export const ResponsiveInput = forwardRef<HTMLInputElement, InputProps>(({
         {leftIcon && (
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <span className={cn(
-              'text-gray-400',
+              'text-gray-400 dark:text-slate-500',
               focused && 'text-primary-500',
               error && 'text-error-500'
             )}>
@@ -127,8 +127,8 @@ export const ResponsiveInput = forwardRef<HTMLInputElement, InputProps>(({
             componentVariants.input[variant],
             leftIcon ? 'pl-10' : '',
             rightIcon ? 'pr-10' : '',
-            disabled && 'opacity-50 cursor-not-allowed bg-gray-50',
-            readOnly && 'bg-gray-50 cursor-default',
+            disabled && 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-slate-800/50',
+            readOnly && 'bg-gray-50 dark:bg-slate-800/50 cursor-default',
             className
           )}
           autoComplete={autoComplete}
@@ -146,7 +146,7 @@ export const ResponsiveInput = forwardRef<HTMLInputElement, InputProps>(({
         {rightIcon && (
           <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
             <span className={cn(
-              'text-gray-400',
+              'text-gray-400 dark:text-slate-500',
               focused && 'text-primary-500',
               error && 'text-error-500'
             )}>
@@ -163,7 +163,7 @@ export const ResponsiveInput = forwardRef<HTMLInputElement, InputProps>(({
       )}
       
       {helperText && !error && (
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-2 text-sm text-gray-500 dark:text-slate-400">
           {helperText}
         </p>
       )}

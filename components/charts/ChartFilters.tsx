@@ -77,15 +77,15 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
   }
 
   return (
-    <div className={`bg-gray-50 border-b border-gray-200 ${className}`}>
+    <div className={`bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700 ${className}`}>
       {/* Filter Header */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-2">
-          <Filter className="h-4 w-4 text-gray-600" />
-          <span className="font-medium text-gray-900">Filters</span>
+          <Filter className="h-4 w-4 text-gray-600 dark:text-slate-400" />
+          <span className="font-medium text-gray-900 dark:text-slate-100">Filters</span>
           {(filters.searchTerm || filters.categories.length > 0 || 
             filters.dateRange.start || filters.dateRange.end) && (
-            <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+            <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs px-2 py-1 rounded-full">
               Active
             </span>
           )}
@@ -94,13 +94,13 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
         <div className="flex items-center space-x-2">
           <button
             onClick={resetFilters}
-            className="text-sm text-gray-600 hover:text-gray-900"
+            className="text-sm text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100"
           >
             Reset
           </button>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1 text-gray-600 hover:text-gray-900"
+            className="p-1 text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100"
           >
             {isExpanded ? <X className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
           </button>
@@ -112,17 +112,17 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
         <div className="px-4 pb-4 space-y-4">
           {/* Search */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Search
             </label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
               <input
                 type="text"
                 value={filters.searchTerm}
                 onChange={(e) => updateFilter('searchTerm', e.target.value)}
                 placeholder="Search data points..."
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
@@ -130,7 +130,7 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Date Range */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Date Range
               </label>
               <div className="space-y-2">
@@ -143,7 +143,7 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
                   })}
                   min={formatDate(dataRange.minDate)}
                   max={formatDate(dataRange.maxDate)}
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
                 />
                 <input
                   type="date"
@@ -154,14 +154,14 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
                   })}
                   min={formatDate(dataRange.minDate)}
                   max={formatDate(dataRange.maxDate)}
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
 
             {/* Value Range */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Value Range
               </label>
               <div className="space-y-2">
@@ -175,7 +175,7 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
                   min={dataRange.minValue}
                   max={dataRange.maxValue}
                   step="0.01"
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
                 />
                 <input
                   type="number"
@@ -187,17 +187,17 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
                   min={dataRange.minValue}
                   max={dataRange.maxValue}
                   step="0.01"
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
 
             {/* Categories */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Categories
               </label>
-              <div className="max-h-32 overflow-y-auto border border-gray-300 rounded-md p-2 space-y-1">
+              <div className="max-h-32 overflow-y-auto border border-gray-300 dark:border-slate-600 rounded-md p-2 space-y-1">
                 {availableCategories.map((category) => (
                   <label key={category} className="flex items-center text-sm">
                     <input
@@ -222,14 +222,14 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Sort Options */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Sort By
               </label>
               <div className="flex space-x-2">
                 <select
                   value={filters.sortBy}
                   onChange={(e) => updateFilter('sortBy', e.target.value)}
-                  className="flex-1 p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 p-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="name">Name</option>
                   <option value="value">Value</option>
@@ -237,8 +237,8 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
                 </select>
                 <button
                   onClick={() => updateFilter('sortOrder', filters.sortOrder === 'asc' ? 'desc' : 'asc')}
-                  className={`p-2 border border-gray-300 rounded-md transition-colors ${
-                    filters.sortOrder === 'desc' ? 'bg-blue-100 text-blue-700' : 'bg-white text-gray-700'
+                  className={`p-2 border border-gray-300 dark:border-slate-600 rounded-md transition-colors ${
+                    filters.sortOrder === 'desc' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300'
                   }`}
                   title={`Sort ${filters.sortOrder === 'asc' ? 'Descending' : 'Ascending'}`}
                 >
@@ -249,13 +249,13 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
 
             {/* Aggregation */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Aggregation
               </label>
               <select
                 value={filters.aggregation}
                 onChange={(e) => updateFilter('aggregation', e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
               >
                 <option value="none">None</option>
                 <option value="hourly">Hourly</option>
@@ -267,7 +267,7 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
 
             {/* Options */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Options
               </label>
               <label className="flex items-center text-sm">
@@ -284,7 +284,7 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
 
           {/* Quick Filters */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               Quick Filters
             </label>
             <div className="flex flex-wrap gap-2">
@@ -293,7 +293,7 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
                   start: new Date(Date.now() - 24 * 60 * 60 * 1000),
                   end: new Date()
                 })}
-                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200"
+                className="px-3 py-1 text-xs bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-full hover:bg-gray-200 dark:hover:bg-slate-600"
               >
                 Last 24h
               </button>
@@ -302,7 +302,7 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
                   start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
                   end: new Date()
                 })}
-                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200"
+                className="px-3 py-1 text-xs bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-full hover:bg-gray-200 dark:hover:bg-slate-600"
               >
                 Last 7 days
               </button>
@@ -311,7 +311,7 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
                   start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
                   end: new Date()
                 })}
-                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200"
+                className="px-3 py-1 text-xs bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-full hover:bg-gray-200 dark:hover:bg-slate-600"
               >
                 Last 30 days
               </button>
@@ -325,7 +325,7 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
                     updateFilter('valueRange', [q1, q3])
                   }
                 }}
-                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200"
+                className="px-3 py-1 text-xs bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-full hover:bg-gray-200 dark:hover:bg-slate-600"
               >
                 Middle 50%
               </button>
@@ -334,7 +334,7 @@ const ChartFilters: React.FC<ChartFiltersProps> = ({
                   dataRange.maxValue * 0.9,
                   dataRange.maxValue
                 ])}
-                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200"
+                className="px-3 py-1 text-xs bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-full hover:bg-gray-200 dark:hover:bg-slate-600"
               >
                 Top 10%
               </button>

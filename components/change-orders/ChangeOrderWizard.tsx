@@ -158,23 +158,23 @@ export default function ChangeOrderWizard({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b">
           <h2 className="text-xl font-bold">Create Change Order</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
             Step {step} of 2: {step === 1 ? 'Basic Information' : 'Line Items'}
           </p>
         </div>
 
         <div className="p-6 space-y-4">
           {error && (
-            <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm">{error}</div>
+            <div className="p-3 bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200 rounded-lg text-sm">{error}</div>
           )}
 
           {step === 1 && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Title *</label>
                 <input
                   type="text"
                   value={form.title ?? ''}
@@ -184,7 +184,7 @@ export default function ChangeOrderWizard({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Description *
                 </label>
                 <textarea
@@ -195,7 +195,7 @@ export default function ChangeOrderWizard({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Justification *
                 </label>
                 <textarea
@@ -207,7 +207,7 @@ export default function ChangeOrderWizard({
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Category</label>
                   <select
                     value={form.change_category ?? 'owner_directed'}
                     onChange={(e) => setForm((f) => ({ ...f, change_category: e.target.value }))}
@@ -221,7 +221,7 @@ export default function ChangeOrderWizard({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Source</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Source</label>
                   <select
                     value={form.change_source ?? 'owner'}
                     onChange={(e) => setForm((f) => ({ ...f, change_source: e.target.value }))}
@@ -237,7 +237,7 @@ export default function ChangeOrderWizard({
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                     Original Contract Value *
                   </label>
                   <input
@@ -255,7 +255,7 @@ export default function ChangeOrderWizard({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                     Schedule Impact (days)
                   </label>
                   <input
@@ -282,7 +282,7 @@ export default function ChangeOrderWizard({
                 <button
                   type="button"
                   onClick={addLineItem}
-                  className="text-sm text-indigo-600 hover:underline"
+                  className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
                 >
                   + Add Line
                 </button>
@@ -296,7 +296,7 @@ export default function ChangeOrderWizard({
                         <button
                           type="button"
                           onClick={() => removeLineItem(idx)}
-                          className="text-red-600 text-sm"
+                          className="text-red-600 dark:text-red-400 text-sm"
                         >
                           Remove
                         </button>
@@ -370,7 +370,7 @@ export default function ChangeOrderWizard({
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                className="px-4 py-2 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg"
               >
                 Cancel
               </button>
@@ -388,7 +388,7 @@ export default function ChangeOrderWizard({
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                className="px-4 py-2 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg"
               >
                 Back
               </button>

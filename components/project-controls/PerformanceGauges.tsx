@@ -10,8 +10,8 @@ function Gauge({ label, value, color }: { label: string; value: number; color: s
   const pct = Math.min(150, Math.max(0, value * 50))
   return (
     <div className="text-center">
-      <p className="text-xs text-gray-500">{label}</p>
-      <div className="mt-1 h-2 bg-gray-100 rounded overflow-hidden">
+      <p className="text-xs text-gray-500 dark:text-slate-400">{label}</p>
+      <div className="mt-1 h-2 bg-gray-100 dark:bg-slate-700 rounded overflow-hidden">
         <div className={`h-full rounded ${color}`} style={{ width: `${pct}%` }} />
       </div>
       <p className="text-sm font-bold mt-1">{value.toFixed(2)}</p>

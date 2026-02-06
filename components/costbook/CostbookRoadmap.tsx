@@ -118,7 +118,7 @@ function CostbookRoadmapInner({
 
   if (isLoading) {
     return (
-      <div className="h-full min-h-[400px] overflow-hidden w-full px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-center bg-gray-50" data-testid={testId}>
+      <div className="h-full min-h-[400px] overflow-hidden w-full px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-center bg-gray-50 dark:bg-slate-800/50" data-testid={testId}>
         <LoadingSpinner message="Loading Costbook..." />
       </div>
     )
@@ -126,7 +126,7 @@ function CostbookRoadmapInner({
 
   if (error) {
     return (
-      <div className="h-full min-h-[400px] overflow-hidden w-full px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-center bg-gray-50" data-testid={testId}>
+      <div className="h-full min-h-[400px] overflow-hidden w-full px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-center bg-gray-50 dark:bg-slate-800/50" data-testid={testId}>
         <ErrorDisplay error={error} onRetry={handleRefresh} />
       </div>
     )
@@ -135,7 +135,7 @@ function CostbookRoadmapInner({
   // Wireframe: fill parent (h-full) when embedded in Financials; grid grid-rows-[auto_1fr_auto] gap-3
   return (
     <div
-      className={`h-full min-h-0 overflow-hidden w-full px-4 sm:px-6 lg:px-8 py-4 grid grid-rows-[auto_1fr_auto] gap-3 bg-gray-50 ${className}`}
+      className={`h-full min-h-0 overflow-hidden w-full px-4 sm:px-6 lg:px-8 py-4 grid grid-rows-[auto_1fr_auto] gap-3 bg-gray-50 dark:bg-slate-800/50 ${className}`}
       data-testid={testId}
     >
       {/* Row 1 (Header): flex justify-between – Costbook title, KPI-Badge-Row, Refresh/Perf/Help */}

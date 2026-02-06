@@ -151,7 +151,7 @@ export function CardReservoir({
   return (
     <ContentReservoir
       reserveHeight={minHeight}
-      className={cn('bg-white border border-gray-200 rounded-lg p-4', className)}
+      className={cn('bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-4', className)}
     >
       {children}
     </ContentReservoir>

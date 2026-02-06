@@ -66,7 +66,7 @@ export default function ApprovalWorkflowTracker({
 
   if (!workflow) {
     return (
-      <div className="p-4 text-gray-500 text-sm rounded-lg border">
+      <div className="p-4 text-gray-500 dark:text-slate-400 text-sm rounded-lg border">
         No workflow active. Submit the change order to initiate approval workflow.
       </div>
     )

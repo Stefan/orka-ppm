@@ -42,7 +42,7 @@ export const SmartIcon: React.FC<SmartIconProps> = ({
         onClick={onClick}
         className={cn(
           'inline-flex items-center justify-center rounded-md p-1',
-          'hover:bg-gray-100',
+          'hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700',
           'touch-target'
         )}
         data-testid={testId ? `${testId}-button` : undefined}

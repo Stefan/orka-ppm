@@ -103,30 +103,30 @@ export default function CollaborationPanel({
   }
 
   return (
-    <div className={`flex flex-col h-full bg-white ${className}`}>
+    <div className={`flex flex-col h-full bg-white dark:bg-slate-800 ${className}`}>
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-          <Users className="h-5 w-5 mr-2 text-blue-600" />
+      <div className="p-4 border-b border-gray-200 dark:border-slate-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 flex items-center">
+          <Users className="h-5 w-5 mr-2 text-blue-600 dark:text-blue-400" />
           {t('pmr.collaboration.title')}
         </h3>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-gray-200">
+      <div className="flex border-b border-gray-200 dark:border-slate-700">
         <button
           onClick={() => setActiveTab('users')}
           className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
             activeTab === 'users'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600'
+              : 'text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100'
           }`}
         >
           <div className="flex items-center justify-center space-x-1">
             <Users className="h-4 w-4" />
             <span>{t('pmr.collaboration.tabs.users')}</span>
             {activeUsers.length > 0 && (
-              <span className="ml-1 px-1.5 py-0.5 text-xs bg-blue-100 text-blue-600 rounded-full">
+              <span className="ml-1 px-1.5 py-0.5 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full">
                 {activeUsers.length}
               </span>
             )}
@@ -137,15 +137,15 @@ export default function CollaborationPanel({
           onClick={() => setActiveTab('comments')}
           className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
             activeTab === 'comments'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600'
+              : 'text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100'
           }`}
         >
           <div className="flex items-center justify-center space-x-1">
             <MessageSquare className="h-4 w-4" />
             <span>{t('pmr.collaboration.tabs.comments')}</span>
             {unresolvedComments.length > 0 && (
-              <span className="ml-1 px-1.5 py-0.5 text-xs bg-yellow-100 text-yellow-600 rounded-full">
+              <span className="ml-1 px-1.5 py-0.5 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 rounded-full">
                 {unresolvedComments.length}
               </span>
             )}
@@ -156,15 +156,15 @@ export default function CollaborationPanel({
           onClick={() => setActiveTab('conflicts')}
           className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
             activeTab === 'conflicts'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600'
+              : 'text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100'
           }`}
         >
           <div className="flex items-center justify-center space-x-1">
             <AlertTriangle className="h-4 w-4" />
             <span>{t('pmr.collaboration.tabs.conflicts')}</span>
             {unresolvedConflicts.length > 0 && (
-              <span className="ml-1 px-1.5 py-0.5 text-xs bg-red-100 text-red-600 rounded-full">
+              <span className="ml-1 px-1.5 py-0.5 text-xs bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 rounded-full">
                 {unresolvedConflicts.length}
               </span>
             )}
@@ -181,7 +181,7 @@ export default function CollaborationPanel({
               activeUsers.map(user => (
                 <div 
                   key={user.id} 
-                  className="flex items-center space-x-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                  className="flex items-center space-x-3 p-3 rounded-lg bg-gray-50 dark:bg-slate-800/50 hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors"
                 >
                   <div 
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
@@ -190,16 +190,16 @@ export default function CollaborationPanel({
                     {user.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
+                    <p className="text-sm font-medium text-gray-900 dark:text-slate-100 truncate">
                       {user.name}
                       {user.id === currentUserId && (
-                        <span className="ml-2 text-xs text-gray-500">{t('pmr.collaboration.users.you')}</span>
+                        <span className="ml-2 text-xs text-gray-500 dark:text-slate-400">{t('pmr.collaboration.users.you')}</span>
                       )}
                     </p>
                     {user.email && (
-                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      <p className="text-xs text-gray-500 dark:text-slate-400 truncate">{user.email}</p>
                     )}
-                    <p className="text-xs text-gray-400 flex items-center mt-1">
+                    <p className="text-xs text-gray-400 dark:text-slate-500 flex items-center mt-1">
                       <Clock className="h-3 w-3 mr-1" />
                       {t('pmr.collaboration.users.active', { time: formatTimestamp(user.lastActivity) })}
                     </p>
@@ -212,7 +212,7 @@ export default function CollaborationPanel({
             ) : (
               <div className="text-center py-8">
                 <Users className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">{t('pmr.collaboration.users.noUsers')}</p>
+                <p className="text-sm text-gray-500 dark:text-slate-400">{t('pmr.collaboration.users.noUsers')}</p>
               </div>
             )}
           </div>
@@ -222,13 +222,13 @@ export default function CollaborationPanel({
         {activeTab === 'comments' && (
           <div className="space-y-4">
             {/* Add Comment Form */}
-            <div className="bg-gray-50 rounded-lg p-3 space-y-2">
+            <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-3 space-y-2">
               <input
                 type="text"
                 placeholder={t('pmr.collaboration.comments.sectionPlaceholder')}
                 value={selectedSection}
                 onChange={(e) => setSelectedSection(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <textarea
                 placeholder={t('pmr.collaboration.comments.addPlaceholder')}
@@ -239,7 +239,7 @@ export default function CollaborationPanel({
                     handleSubmitComment()
                   }
                 }}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                 rows={3}
               />
               <button
@@ -258,25 +258,25 @@ export default function CollaborationPanel({
                 {unresolvedComments.map(comment => (
                   <div 
                     key={comment.id}
-                    className="bg-white border border-gray-200 rounded-lg p-3 space-y-2"
+                    className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-3 space-y-2"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-gray-900 dark:text-slate-100">
                           {comment.user_name}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 dark:text-slate-400">
                           {comment.section_id && t('pmr.collaboration.comments.on', { section: comment.section_id })}
                         </p>
                       </div>
                       <div className="flex items-center space-x-1">
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-gray-400 dark:text-slate-500">
                           {formatTimestamp(comment.created_at)}
                         </span>
                         {comment.user_id === currentUserId && (
                           <button
                             onClick={() => onResolveComment(comment.id)}
-                            className="p-1 text-gray-400 hover:text-green-600 transition-colors"
+                            className="p-1 text-gray-400 dark:text-slate-500 hover:text-green-600 transition-colors"
                             title={t('pmr.collaboration.comments.resolveComment')}
                           >
                             <CheckCircle className="h-4 w-4" />
@@ -284,14 +284,14 @@ export default function CollaborationPanel({
                         )}
                       </div>
                     </div>
-                    <p className="text-sm text-gray-700">{comment.content}</p>
+                    <p className="text-sm text-gray-700 dark:text-slate-300">{comment.content}</p>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="text-center py-8">
                 <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">{t('pmr.collaboration.comments.noComments')}</p>
+                <p className="text-sm text-gray-500 dark:text-slate-400">{t('pmr.collaboration.comments.noComments')}</p>
               </div>
             )}
           </div>
@@ -304,11 +304,11 @@ export default function CollaborationPanel({
               unresolvedConflicts.map(conflict => (
                 <div 
                   key={conflict.id}
-                  className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-3"
+                  className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 space-y-3"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-2">
-                      <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                      <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
                       <div>
                         <p className="text-sm font-medium text-red-900">
                           {conflict.conflict_type === 'simultaneous_edit' && t('pmr.collaboration.conflicts.types.simultaneousEdit')}
@@ -318,7 +318,7 @@ export default function CollaborationPanel({
                         <p className="text-xs text-red-700 mt-1">
                           {t('pmr.collaboration.conflicts.section', { section: conflict.section_id })}
                         </p>
-                        <p className="text-xs text-red-600 mt-1">
+                        <p className="text-xs text-red-600 dark:text-red-400 mt-1">
                           {t('pmr.collaboration.conflicts.usersConflicting', { count: conflict.conflicting_users.length })}
                         </p>
                       </div>
@@ -327,21 +327,21 @@ export default function CollaborationPanel({
                       onClick={() => setExpandedConflict(
                         expandedConflict === conflict.id ? null : conflict.id
                       )}
-                      className="p-1 text-red-600 hover:text-red-800"
+                      className="p-1 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                     >
                       <MoreVertical className="h-4 w-4" />
                     </button>
                   </div>
 
                   {expandedConflict === conflict.id && (
-                    <div className="space-y-3 pt-3 border-t border-red-200">
+                    <div className="space-y-3 pt-3 border-t border-red-200 dark:border-red-800">
                       {/* Show conflicting changes */}
                       <div className="space-y-2">
                         <p className="text-xs font-medium text-red-900">{t('pmr.collaboration.conflicts.conflictingChanges')}</p>
                         {conflict.conflicting_changes.map((change, idx) => (
-                          <div key={idx} className="bg-white rounded p-2 text-xs">
-                            <p className="font-medium text-gray-900">{t('pmr.collaboration.conflicts.user', { userId: change.user_id })}</p>
-                            <p className="text-gray-600 mt-1">
+                          <div key={idx} className="bg-white dark:bg-slate-800 rounded p-2 text-xs">
+                            <p className="font-medium text-gray-900 dark:text-slate-100">{t('pmr.collaboration.conflicts.user', { userId: change.user_id })}</p>
+                            <p className="text-gray-600 dark:text-slate-400 mt-1">
                               {formatTimestamp(change.timestamp)}
                             </p>
                           </div>
@@ -354,13 +354,13 @@ export default function CollaborationPanel({
                         <div className="grid grid-cols-2 gap-2">
                           <button
                             onClick={() => handleResolveConflict(conflict.id, 'overwrite')}
-                            className="px-3 py-2 bg-white text-red-700 border border-red-300 rounded hover:bg-red-50 text-xs font-medium"
+                            className="px-3 py-2 bg-white dark:bg-slate-800 text-red-700 border border-red-300 dark:border-red-700 rounded hover:bg-red-50 text-xs font-medium"
                           >
                             {t('pmr.collaboration.conflicts.useLatest')}
                           </button>
                           <button
                             onClick={() => handleResolveConflict(conflict.id, 'merge')}
-                            className="px-3 py-2 bg-white text-red-700 border border-red-300 rounded hover:bg-red-50 text-xs font-medium"
+                            className="px-3 py-2 bg-white dark:bg-slate-800 text-red-700 border border-red-300 dark:border-red-700 rounded hover:bg-red-50 text-xs font-medium"
                           >
                             {t('pmr.collaboration.conflicts.mergeChanges')}
                           </button>
@@ -379,7 +379,7 @@ export default function CollaborationPanel({
             ) : (
               <div className="text-center py-8">
                 <CheckCircle className="h-12 w-12 text-green-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">{t('pmr.collaboration.conflicts.noConflicts')}</p>
+                <p className="text-sm text-gray-500 dark:text-slate-400">{t('pmr.collaboration.conflicts.noConflicts')}</p>
               </div>
             )}
           </div>
@@ -387,8 +387,8 @@ export default function CollaborationPanel({
       </div>
 
       {/* Footer with stats */}
-      <div className="p-3 border-t border-gray-200 bg-gray-50">
-        <div className="flex items-center justify-between text-xs text-gray-600">
+      <div className="p-3 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+        <div className="flex items-center justify-between text-xs text-gray-600 dark:text-slate-400">
           <div className="flex items-center space-x-4">
             <span className="flex items-center">
               <Users className="h-3 w-3 mr-1" />
@@ -400,7 +400,7 @@ export default function CollaborationPanel({
             </span>
           </div>
           {unresolvedConflicts.length > 0 && (
-            <span className="flex items-center text-red-600">
+            <span className="flex items-center text-red-600 dark:text-red-400">
               <AlertTriangle className="h-3 w-3 mr-1" />
               {t('pmr.collaboration.footer.conflicts', { count: unresolvedConflicts.length })}
             </span>

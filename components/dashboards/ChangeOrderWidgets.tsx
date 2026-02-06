@@ -41,13 +41,13 @@ export default function ChangeOrderWidgets({ projectIds = [] }: ChangeOrderWidge
   return (
     <Link
       href="/changes/orders"
-      className="block p-4 bg-white rounded-lg border hover:shadow-md transition-shadow"
+      className="block p-4 bg-white dark:bg-slate-800 rounded-lg border hover:shadow-md transition-shadow"
     >
-      <div className="flex items-center gap-2 text-gray-700">
+      <div className="flex items-center gap-2 text-gray-700 dark:text-slate-300">
         <FileText className="w-5 h-5" />
         <span className="font-medium">Change Orders</span>
         {summary.pending > 0 && (
-          <span className="flex items-center gap-1 text-amber-600 text-sm">
+          <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 text-sm">
             <AlertCircle className="w-4 h-4" />
             {summary.pending} pending
           </span>

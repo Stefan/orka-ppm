@@ -396,16 +396,16 @@ export default function Feedback() {
         {/* Header */}
         <div data-testid="feedback-header" className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
           <div>
-            <h1 data-testid="feedback-title" className="text-2xl sm:text-3xl font-bold text-gray-900">{t('feedback.title')}</h1>
-            <p className="text-gray-600 mt-2">{t('feedback.subtitle')}</p>
+            <h1 data-testid="feedback-title" className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-slate-100">{t('feedback.title')}</h1>
+            <p className="text-gray-600 dark:text-slate-400 mt-2">{t('feedback.subtitle')}</p>
           </div>
           
           <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
             {/* Notifications */}
             {notifications.length > 0 && (
               <div className="relative">
-                <Bell className="h-6 w-6 text-gray-600" />
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <Bell className="h-6 w-6 text-gray-600 dark:text-slate-400" />
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {notifications.length}
                 </span>
               </div>
@@ -434,7 +434,7 @@ export default function Feedback() {
 
         {/* Error Display */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
             <div className="flex">
               <AlertCircle className="h-5 w-5 text-red-400" />
               <div className="ml-3">
@@ -442,7 +442,7 @@ export default function Feedback() {
               </div>
               <button
                 onClick={() => setError(null)}
-                className="ml-auto text-red-400 hover:text-red-600"
+                className="ml-auto text-red-400 hover:text-red-600 dark:text-red-400"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -451,14 +451,14 @@ export default function Feedback() {
         )}
 
         {/* Tabs */}
-        <div className="border-b border-gray-200">
+        <div className="border-b border-gray-200 dark:border-slate-700">
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => setActiveTab('features')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'features'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300 hover:border-gray-300 dark:border-slate-600'
               }`}
             >
               <Lightbulb className="h-4 w-4 inline mr-2" />
@@ -468,8 +468,8 @@ export default function Feedback() {
               onClick={() => setActiveTab('bugs')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'bugs'
-                  ? 'border-red-500 text-red-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-red-500 text-red-600 dark:text-red-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300 hover:border-gray-300 dark:border-slate-600'
               }`}
             >
               <Bug className="h-4 w-4 inline mr-2" />
@@ -576,13 +576,13 @@ export default function Feedback() {
                     <div className="flex items-center space-x-2 ml-6">
                       <button
                         onClick={() => voteOnFeature(feature.id, 'upvote')}
-                        className="flex items-center space-x-2 px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="flex items-center space-x-2 px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
                       >
                         <ThumbsUp className="h-4 w-4" />
                         <span className="font-medium">Vote</span>
                       </button>
                       
-                      <div className="flex items-center space-x-2 px-4 py-2 text-gray-600 bg-gray-50 rounded-lg">
+                      <div className="flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
                         <TrendingUp className="h-4 w-4" />
                         <span className="font-medium">{feature.votes_count} votes</span>
                       </div>
@@ -598,9 +598,9 @@ export default function Feedback() {
         {activeTab === 'bugs' && (
           <div className="space-y-6">
             {/* Filters */}
-            <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <Filter className="h-5 w-5 mr-2 text-red-600" />
+            <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4 flex items-center">
+                <Filter className="h-5 w-5 mr-2 text-red-600 dark:text-red-400" />
                 {t('feedback.filters.bugTitle')}
               </h3>
               <AdaptiveGrid 
@@ -608,7 +608,7 @@ export default function Feedback() {
                 gap="md"
               >
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">{t('feedback.filters.status')}</label>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3">{t('feedback.filters.status')}</label>
                   <select
                     value={bugFilters.status}
                     onChange={(e) => setBugFilters(prev => ({ ...prev, status: e.target.value }))}
@@ -623,7 +623,7 @@ export default function Feedback() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">{t('feedback.filters.priority')}</label>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3">{t('feedback.filters.priority')}</label>
                   <select
                     value={bugFilters.priority}
                     onChange={(e) => setBugFilters(prev => ({ ...prev, priority: e.target.value }))}
@@ -654,25 +654,25 @@ export default function Feedback() {
             {/* Bug List */}
             <div className="space-y-4">
               {bugs.map((bug) => (
-                <div key={bug.id} className="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-all duration-200 hover:border-gray-300">
+                <div key={bug.id} className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-gray-200 dark:border-slate-700 hover:shadow-lg transition-all duration-200 hover:border-gray-300">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-3">
-                        <h3 className="text-lg font-semibold text-gray-900">{bug.title}</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{bug.title}</h3>
                         <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(bug.status)}`}>
                           {bug.status.replace('_', ' ')}
                         </span>
                         <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getPriorityColor(bug.priority)}`}>
                           {bug.priority}
                         </span>
-                        <span className="px-3 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                        <span className="px-3 py-1 text-xs font-semibold rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300">
                           {bug.category}
                         </span>
                       </div>
                       
-                      <p className="text-gray-700 mb-4 leading-relaxed">{bug.description}</p>
+                      <p className="text-gray-700 dark:text-slate-300 mb-4 leading-relaxed">{bug.description}</p>
                       
-                      <div className="flex items-center space-x-6 text-sm text-gray-500">
+                      <div className="flex items-center space-x-6 text-sm text-gray-500 dark:text-slate-400">
                         <span className="flex items-center">
                           <User className="h-4 w-4 mr-2" />
                           {bug.submitted_by}
@@ -696,15 +696,15 @@ export default function Feedback() {
         {/* Feature Request Form Modal */}
         {showFeatureForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-8 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">{t('feedback.featureForm.title')}</h2>
-                  <p className="text-gray-600 mt-1">{t('feedback.featureForm.subtitle')}</p>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">{t('feedback.featureForm.title')}</h2>
+                  <p className="text-gray-600 dark:text-slate-400 mt-1">{t('feedback.featureForm.subtitle')}</p>
                 </div>
                 <button
                   onClick={() => setShowFeatureForm(false)}
-                  className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="text-gray-400 hover:text-gray-600 dark:text-slate-300 p-2 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors"
                 >
                   <X className="h-6 w-6" />
                 </button>
@@ -712,7 +712,7 @@ export default function Feedback() {
               
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3 required">{t('feedback.featureForm.titleLabel')}</label>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3 required">{t('feedback.featureForm.titleLabel')}</label>
                   <input
                     type="text"
                     value={featureForm.title}
@@ -724,7 +724,7 @@ export default function Feedback() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3 required">{t('feedback.featureForm.descriptionLabel')}</label>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3 required">{t('feedback.featureForm.descriptionLabel')}</label>
                   <textarea
                     value={featureForm.description}
                     onChange={(e) => setFeatureForm(prev => ({ ...prev, description: e.target.value }))}
@@ -733,11 +733,11 @@ export default function Feedback() {
                     placeholder={t('feedback.featureForm.descriptionPlaceholder')}
                     required
                   />
-                  <p className="text-sm text-gray-500 mt-2">{t('feedback.featureForm.descriptionHelp')}</p>
+                  <p className="text-sm text-gray-500 dark:text-slate-400 mt-2">{t('feedback.featureForm.descriptionHelp')}</p>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">{t('feedback.featureForm.priorityLabel')}</label>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3">{t('feedback.featureForm.priorityLabel')}</label>
                   <select
                     value={featureForm.priority}
                     onChange={(e) => setFeatureForm(prev => ({ ...prev, priority: e.target.value }))}
@@ -747,13 +747,13 @@ export default function Feedback() {
                     <option value="medium">{t('feedback.featureForm.priorityMedium')}</option>
                     <option value="high">{t('feedback.featureForm.priorityHigh')}</option>
                   </select>
-                  <p className="text-sm text-gray-500 mt-2">{t('feedback.featureForm.priorityHelp')}</p>
+                  <p className="text-sm text-gray-500 dark:text-slate-400 mt-2">{t('feedback.featureForm.priorityHelp')}</p>
                 </div>
                 
-                <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200">
+                <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-slate-700">
                   <button
                     onClick={() => setShowFeatureForm(false)}
-                    className="px-6 py-3 text-gray-900 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 font-medium transition-colors"
+                    className="px-6 py-3 text-gray-900 dark:text-slate-100 bg-gray-100 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 font-medium transition-colors"
                   >
                     {t('feedback.featureForm.cancel')}
                   </button>
@@ -773,15 +773,15 @@ export default function Feedback() {
         {/* Bug Report Form Modal */}
         {showBugForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-8 w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">{t('feedback.bugForm.title')}</h2>
-                  <p className="text-gray-600 mt-1">{t('feedback.bugForm.subtitle')}</p>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">{t('feedback.bugForm.title')}</h2>
+                  <p className="text-gray-600 dark:text-slate-400 mt-1">{t('feedback.bugForm.subtitle')}</p>
                 </div>
                 <button
                   onClick={() => setShowBugForm(false)}
-                  className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="text-gray-400 hover:text-gray-600 dark:text-slate-300 p-2 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors"
                 >
                   <X className="h-6 w-6" />
                 </button>
@@ -789,7 +789,7 @@ export default function Feedback() {
               
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3 required">{t('feedback.bugForm.titleLabel')}</label>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3 required">{t('feedback.bugForm.titleLabel')}</label>
                   <input
                     type="text"
                     value={bugForm.title}
@@ -801,7 +801,7 @@ export default function Feedback() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3 required">{t('feedback.bugForm.descriptionLabel')}</label>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3 required">{t('feedback.bugForm.descriptionLabel')}</label>
                   <textarea
                     value={bugForm.description}
                     onChange={(e) => setBugForm(prev => ({ ...prev, description: e.target.value }))}
@@ -810,11 +810,11 @@ export default function Feedback() {
                     placeholder={t('feedback.bugForm.descriptionPlaceholder')}
                     required
                   />
-                  <p className="text-sm text-gray-500 mt-2">{t('feedback.bugForm.descriptionHelp')}</p>
+                  <p className="text-sm text-gray-500 dark:text-slate-400 mt-2">{t('feedback.bugForm.descriptionHelp')}</p>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">{t('feedback.bugForm.stepsLabel')}</label>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3">{t('feedback.bugForm.stepsLabel')}</label>
                   <textarea
                     value={bugForm.steps_to_reproduce}
                     onChange={(e) => setBugForm(prev => ({ ...prev, steps_to_reproduce: e.target.value }))}
@@ -822,12 +822,12 @@ export default function Feedback() {
                     className="textarea-field w-full"
                     placeholder={t('feedback.bugForm.stepsPlaceholder')}
                   />
-                  <p className="text-sm text-gray-500 mt-2">{t('feedback.bugForm.stepsHelp')}</p>
+                  <p className="text-sm text-gray-500 dark:text-slate-400 mt-2">{t('feedback.bugForm.stepsHelp')}</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">{t('feedback.bugForm.priorityLabel')}</label>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3">{t('feedback.bugForm.priorityLabel')}</label>
                     <select
                       value={bugForm.priority}
                       onChange={(e) => setBugForm(prev => ({ ...prev, priority: e.target.value }))}
@@ -841,7 +841,7 @@ export default function Feedback() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">{t('feedback.bugForm.severityLabel')}</label>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3">{t('feedback.bugForm.severityLabel')}</label>
                     <select
                       value={bugForm.severity}
                       onChange={(e) => setBugForm(prev => ({ ...prev, severity: e.target.value }))}
@@ -855,7 +855,7 @@ export default function Feedback() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">{t('feedback.bugForm.categoryLabel')}</label>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3">{t('feedback.bugForm.categoryLabel')}</label>
                     <select
                       value={bugForm.category}
                       onChange={(e) => setBugForm(prev => ({ ...prev, category: e.target.value }))}
@@ -871,10 +871,10 @@ export default function Feedback() {
                   </div>
                 </div>
                 
-                <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-slate-700">
                   <button
                     onClick={() => setShowBugForm(false)}
-                    className="px-6 py-3 text-gray-900 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 font-medium transition-colors"
+                    className="px-6 py-3 text-gray-900 dark:text-slate-100 bg-gray-100 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 font-medium transition-colors"
                   >
                     {t('feedback.bugForm.cancel')}
                   </button>

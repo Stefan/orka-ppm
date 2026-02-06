@@ -65,7 +65,7 @@ export function CommentIndicator({
         onClick={handleClick}
         className={`
           inline-flex items-center ${sizeClasses[size]} ${paddingClasses[size]}
-          text-gray-400 hover:text-gray-600 hover:bg-gray-100
+          text-gray-400 hover:text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700
           rounded-full transition-colors
           ${onClick ? 'cursor-pointer' : 'cursor-default'}
           ${className}
@@ -80,10 +80,10 @@ export function CommentIndicator({
   }
   
   const baseColor = hasImportant 
-    ? 'text-orange-600 bg-orange-50 hover:bg-orange-100 border-orange-200' 
+    ? 'text-orange-600 dark:text-orange-400 bg-orange-50 hover:bg-orange-100 dark:bg-orange-900/30 border-orange-200' 
     : recentCount > 0
-      ? 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-200'
-      : 'text-gray-600 bg-gray-50 hover:bg-gray-100 border-gray-200'
+      ? 'text-blue-600 dark:text-blue-400 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800'
+      : 'text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-800/50 hover:bg-gray-100 dark:hover:bg-slate-600 border-gray-200 dark:border-slate-700'
   
   return (
     <button
@@ -136,7 +136,7 @@ export function CommentCountBadge({ count, className = '' }: CommentCountBadgePr
         inline-flex items-center justify-center
         min-w-[1.25rem] h-5 px-1
         text-xs font-medium
-        bg-gray-100 text-gray-600
+        bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300
         rounded-full
         ${className}
       `}
@@ -178,7 +178,7 @@ export function CommentActivity({
         onClick={onClick}
         className={`
           flex items-center gap-1.5 px-2 py-1
-          text-xs text-gray-400 hover:text-gray-600 hover:bg-gray-50
+          text-xs text-gray-400 hover:text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50
           rounded-lg transition-colors
           ${className}
         `}
@@ -196,10 +196,10 @@ export function CommentActivity({
         flex items-center gap-2 px-2 py-1
         text-xs rounded-lg transition-colors
         ${hasImportant 
-          ? 'text-orange-600 bg-orange-50 hover:bg-orange-100' 
+          ? 'text-orange-600 dark:text-orange-400 bg-orange-50 hover:bg-orange-100 dark:bg-orange-900/30' 
           : recentCount > 0 
-            ? 'text-blue-600 bg-blue-50 hover:bg-blue-100'
-            : 'text-gray-600 bg-gray-50 hover:bg-gray-100'
+            ? 'text-blue-800 dark:text-blue-400 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30'
+            : 'text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-800/50 hover:bg-gray-100 dark:hover:bg-slate-600'
         }
         ${className}
       `}

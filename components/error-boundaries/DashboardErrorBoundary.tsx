@@ -66,24 +66,24 @@ function ErrorFallback({ error, onReset }: { error: Error | null; onReset: () =>
   return (
     <div className="flex items-center justify-center min-h-[400px] p-8">
       <div className="text-center max-w-md">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
-          <AlertTriangle className="w-8 h-8 text-red-600" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 mb-4">
+          <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
         </div>
         
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-2">
           {t('errors.somethingWentWrong')}
         </h3>
         
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 dark:text-slate-400 mb-6">
           {t('errors.componentLoadError')}
         </p>
         
         {error && (
-          <details className="text-left mb-6 p-4 bg-gray-50 rounded-lg text-sm">
-            <summary className="cursor-pointer font-medium text-gray-700 mb-2">
+          <details className="text-left mb-6 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg text-sm">
+            <summary className="cursor-pointer font-medium text-gray-700 dark:text-slate-300 mb-2">
               {t('errors.technicalDetails')}
             </summary>
-            <pre className="text-xs text-gray-600 overflow-auto">
+            <pre className="text-xs text-gray-600 dark:text-slate-400 overflow-auto">
               {error.message}
             </pre>
           </details>
@@ -116,14 +116,14 @@ export function WidgetErrorBoundary({
   return (
     <DashboardErrorBoundary
       fallback={
-        <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="p-6 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-200 dark:border-slate-700">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-medium text-gray-900 mb-1">
+              <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-1">
                 {t('errors.widgetNotAvailable', { widget: widgetName })}
               </h4>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-slate-400">
                 {t('errors.widgetLoadError')}
               </p>
             </div>

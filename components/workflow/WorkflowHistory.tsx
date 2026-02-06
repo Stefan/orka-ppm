@@ -90,21 +90,21 @@ export default function WorkflowHistory({ workflowInstance }: WorkflowHistoryPro
   const getEventIcon = (event: HistoryEvent) => {
     switch (event.type) {
       case 'created':
-        return <Clock className="text-blue-600" size={20} />
+        return <Clock className="text-blue-600 dark:text-blue-400" size={20} />
       case 'approval':
         return event.status === 'approved' ? (
-          <CheckCircle className="text-green-600" size={20} />
+          <CheckCircle className="text-green-600 dark:text-green-400" size={20} />
         ) : (
-          <XCircle className="text-red-600" size={20} />
+          <XCircle className="text-red-600 dark:text-red-400" size={20} />
         )
       case 'step_change':
-        return <ArrowRight className="text-blue-600" size={20} />
+        return <ArrowRight className="text-blue-600 dark:text-blue-400" size={20} />
       case 'completed':
-        return <CheckCircle className="text-green-600" size={20} />
+        return <CheckCircle className="text-green-600 dark:text-green-400" size={20} />
       case 'rejected':
-        return <XCircle className="text-red-600" size={20} />
+        return <XCircle className="text-red-600 dark:text-red-400" size={20} />
       default:
-        return <Clock className="text-gray-600" size={20} />
+        return <Clock className="text-gray-600 dark:text-slate-400" size={20} />
     }
   }
 
@@ -145,19 +145,19 @@ export default function WorkflowHistory({ workflowInstance }: WorkflowHistoryPro
   const getEventColor = (event: HistoryEvent) => {
     switch (event.type) {
       case 'created':
-        return 'border-blue-200 bg-blue-50'
+        return 'border-blue-200 dark:border-blue-800 bg-blue-50'
       case 'approval':
         return event.status === 'approved' 
-          ? 'border-green-200 bg-green-50' 
-          : 'border-red-200 bg-red-50'
+          ? 'border-green-200 dark:border-green-800 bg-green-50' 
+          : 'border-red-200 dark:border-red-800 bg-red-50'
       case 'step_change':
-        return 'border-blue-200 bg-blue-50'
+        return 'border-blue-200 dark:border-blue-800 bg-blue-50'
       case 'completed':
-        return 'border-green-200 bg-green-50'
+        return 'border-green-200 dark:border-green-800 bg-green-50'
       case 'rejected':
-        return 'border-red-200 bg-red-50'
+        return 'border-red-200 dark:border-red-800 bg-red-50'
       default:
-        return 'border-gray-200 bg-gray-50'
+        return 'border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50'
     }
   }
 
@@ -165,7 +165,7 @@ export default function WorkflowHistory({ workflowInstance }: WorkflowHistoryPro
 
   return (
     <div>
-      <h3 className="font-semibold text-gray-900 mb-4">Workflow History</h3>
+      <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-4">Workflow History</h3>
       
       <div className="relative">
         {/* Timeline line */}
@@ -176,7 +176,7 @@ export default function WorkflowHistory({ workflowInstance }: WorkflowHistoryPro
           {historyEvents.map((event, index) => (
             <div key={index} className="relative pl-12">
               {/* Icon */}
-              <div className="absolute left-0 top-1 bg-white p-1 rounded-full border-2 border-gray-200">
+              <div className="absolute left-0 top-1 bg-white dark:bg-slate-800 p-1 rounded-full border-2 border-gray-200 dark:border-slate-700">
                 {getEventIcon(event)}
               </div>
               
@@ -184,14 +184,14 @@ export default function WorkflowHistory({ workflowInstance }: WorkflowHistoryPro
               <div className={`border rounded-lg p-4 ${getEventColor(event)}`}>
                 <div className="flex items-start justify-between mb-2">
                   <div>
-                    <h4 className="font-semibold text-gray-900">
+                    <h4 className="font-semibold text-gray-900 dark:text-slate-100">
                       {getEventTitle(event)}
                     </h4>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
                       {getEventDescription(event)}
                     </p>
                   </div>
-                  <div className="text-xs text-gray-500 whitespace-nowrap ml-4">
+                  <div className="text-xs text-gray-500 dark:text-slate-400 whitespace-nowrap ml-4">
                     {new Date(event.timestamp).toLocaleString()}
                   </div>
                 </div>
@@ -200,15 +200,15 @@ export default function WorkflowHistory({ workflowInstance }: WorkflowHistoryPro
                 {event.comments && (
                   <div className="mt-3 pt-3 border-t border-current/10">
                     <div className="flex items-start gap-2">
-                      <MessageSquare className="text-gray-400 flex-shrink-0 mt-0.5" size={16} />
-                      <p className="text-sm text-gray-700">{event.comments}</p>
+                      <MessageSquare className="text-gray-400 dark:text-slate-500 flex-shrink-0 mt-0.5" size={16} />
+                      <p className="text-sm text-gray-700 dark:text-slate-300">{event.comments}</p>
                     </div>
                   </div>
                 )}
                 
                 {/* User info */}
                 {event.user && event.type !== 'created' && (
-                  <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
+                  <div className="mt-2 flex items-center gap-2 text-xs text-gray-500 dark:text-slate-400">
                     <User size={14} />
                     <span>User: {event.user.slice(0, 8)}</span>
                   </div>
@@ -220,7 +220,7 @@ export default function WorkflowHistory({ workflowInstance }: WorkflowHistoryPro
       </div>
       
       {historyEvents.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-gray-500 dark:text-slate-400">
           No history events available
         </div>
       )}

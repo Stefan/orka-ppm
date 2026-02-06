@@ -30,13 +30,18 @@ import {
   Calendar,
   BookOpen,
   Upload,
-  WifiOff
+  PanelRightOpen,
+  PanelRightClose,
+  Lightbulb,
 } from 'lucide-react'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
 import { useTheme } from '@/app/providers/ThemeProvider'
+import { useHelpChat } from '@/hooks/useHelpChat'
 import { GlobalLanguageSelector } from './GlobalLanguageSelector'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useTranslations } from '@/lib/i18n/context'
+import TopbarSearch from './TopbarSearch'
+import { cn } from '@/lib/utils/design-system'
 
 export interface TopBarProps {
   onMenuToggle?: () => void
@@ -48,6 +53,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   const { session, clearSession } = useAuth()
   const { currentLanguage } = useLanguage()
   const { t } = useTranslations()
+  const { state: helpState, toggleChat, hasUnreadTips, getToggleButtonText } = useHelpChat()
   
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [moreMenuOpen, setMoreMenuOpen] = useState(false)
@@ -136,10 +142,37 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   const themeIcon = theme === 'dark' ? Moon : theme === 'system' ? Monitor : Sun
   const ThemeIcon = themeIcon
 
+  // Close all dropdown menus
+  const closeAllDropdowns = () => {
+    setProjectsMenuOpen(false)
+    setFinancialsMenuOpen(false)
+    setAnalysisMenuOpen(false)
+    setManagementMenuOpen(false)
+    setAdminMenuOpen(false)
+    setUserMenuOpen(false)
+    setMoreMenuOpen(false)
+  }
+
+  // Toggle a specific dropdown, closing all others first
+  const toggleDropdown = (setter: React.Dispatch<React.SetStateAction<boolean>>, current: boolean) => {
+    closeAllDropdowns()
+    // Use setTimeout to ensure close happens before open
+    if (!current) {
+      setter(true)
+    }
+  }
+
   // Navigation link styles (first-level menu items)
   const navLinkBase = 'px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200'
   const navLinkActive = 'bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/50'
-  const navLinkInactive = 'text-gray-700 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-700'
+  const navLinkInactive = 'text-gray-700 dark:text-slate-200 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-100/80 dark:hover:bg-slate-700/80'
+  // Style for dropdown button when menu is open but page is NOT in this group
+  const navLinkOpen = 'bg-blue-50 dark:bg-slate-700 text-blue-700 dark:text-blue-300 ring-1 ring-blue-200 dark:ring-slate-600'
+
+  // Dropdown menu item styles (second-level items inside dropdown panels)
+  const dropdownItemBase = 'flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 cursor-pointer'
+  const dropdownItemActive = 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
+  const dropdownItemInactive = 'text-gray-700 dark:text-slate-200 hover:bg-blue-100 dark:hover:bg-slate-600 hover:text-blue-700 dark:hover:text-blue-300'
 
   return (
     <header data-testid="top-bar" className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 w-full" style={{ position: 'sticky', top: 0, zIndex: 9999, flexShrink: 0, minHeight: '64px', boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06)' }}>
@@ -188,11 +221,13 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           {/* Projects Dropdown */}
           <div className="relative" ref={projectsMenuRef}>
             <button
-              onClick={() => setProjectsMenuOpen(!projectsMenuOpen)}
+              onClick={() => toggleDropdown(setProjectsMenuOpen, projectsMenuOpen)}
               className={`flex items-center space-x-1 ${navLinkBase} ${
-                projectsMenuOpen || pathname === '/projects' || pathname.startsWith('/projects/') || pathname === '/resources'
+                pathname === '/projects' || pathname.startsWith('/projects/') || pathname === '/resources'
                   ? navLinkActive
-                  : navLinkInactive
+                  : projectsMenuOpen
+                    ? navLinkOpen
+                    : navLinkInactive
               }`}
             >
               <span className="text-inherit">Projects</span>
@@ -210,10 +245,10 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </div>
                 <Link
                   href="/projects"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
+                  className={`${dropdownItemBase} ${
                     pathname === '/projects' || pathname.startsWith('/projects/')
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-600 hover:text-blue-700 dark:hover:text-blue-300'
+                      ? dropdownItemActive
+                      : dropdownItemInactive
                   }`}
                   onClick={() => setProjectsMenuOpen(false)}
                 >
@@ -222,10 +257,10 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </Link>
                 <Link
                   href="/resources"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
+                  className={`${dropdownItemBase} ${
                     pathname === '/resources'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
+                      ? dropdownItemActive
+                      : dropdownItemInactive
                   }`}
                   onClick={() => setProjectsMenuOpen(false)}
                 >
@@ -233,11 +268,11 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   <span className="font-medium">Resource Management</span>
                 </Link>
                 <Link
-                  href="/import"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
-                    pathname === '/import'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
+                  href="/projects/import"
+                  className={`${dropdownItemBase} ${
+                    pathname === '/projects/import'
+                      ? dropdownItemActive
+                      : dropdownItemInactive
                   }`}
                   onClick={() => setProjectsMenuOpen(false)}
                 >
@@ -251,11 +286,13 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           {/* Financials Dropdown */}
           <div className="relative" ref={financialsMenuRef}>
             <button
-              onClick={() => setFinancialsMenuOpen(!financialsMenuOpen)}
+              onClick={() => toggleDropdown(setFinancialsMenuOpen, financialsMenuOpen)}
               className={`flex items-center space-x-1 ${navLinkBase} ${
-                financialsMenuOpen || pathname === '/financials' || pathname.startsWith('/financials/') || pathname === '/reports' || pathname.startsWith('/reports/') || pathname === '/project-controls'
+                pathname === '/financials' || pathname.startsWith('/financials/') || pathname === '/reports' || pathname.startsWith('/reports/') || pathname === '/project-controls'
                   ? navLinkActive
-                  : navLinkInactive
+                  : financialsMenuOpen
+                    ? navLinkOpen
+                    : navLinkInactive
               }`}
             >
               <span className="text-inherit">Financials</span>
@@ -271,10 +308,10 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </div>
                 <Link
                   href="/financials"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
+                  className={`${dropdownItemBase} ${
                     pathname === '/financials' || pathname.startsWith('/financials/')
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-700 dark:hover:to-slate-600 hover:text-blue-700 dark:hover:text-blue-400'
+                      ? dropdownItemActive
+                      : dropdownItemInactive
                   }`}
                   onClick={() => setFinancialsMenuOpen(false)}
                 >
@@ -283,10 +320,10 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </Link>
                 <Link
                   href="/reports"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
-                    pathname === '/reports' || pathname.startsWith('/reports/')
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
+                  className={`${dropdownItemBase} ${
+                    (pathname === '/reports' || pathname.startsWith('/reports/')) && !pathname.startsWith('/reports/pmr')
+                      ? dropdownItemActive
+                      : dropdownItemInactive
                   }`}
                   onClick={() => setFinancialsMenuOpen(false)}
                 >
@@ -295,10 +332,10 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </Link>
                 <Link
                   href="/project-controls"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
+                  className={`${dropdownItemBase} ${
                     pathname === '/project-controls'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
+                      ? dropdownItemActive
+                      : dropdownItemInactive
                   }`}
                   onClick={() => setFinancialsMenuOpen(false)}
                 >
@@ -307,15 +344,15 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </Link>
                 <Link
                   href="/reports/pmr"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
+                  className={`${dropdownItemBase} ${
                     pathname === '/reports/pmr'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
+                      ? dropdownItemActive
+                      : dropdownItemInactive
                   }`}
                   onClick={() => setFinancialsMenuOpen(false)}
                 >
                   <BookOpen className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">PMR Report</span>
+                  <span className="font-medium">Project Monthly Report</span>
                 </Link>
               </div>
             )}
@@ -324,11 +361,13 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           {/* Analysis Dropdown */}
           <div className="relative" ref={analysisMenuRef}>
             <button
-              onClick={() => setAnalysisMenuOpen(!analysisMenuOpen)}
+              onClick={() => toggleDropdown(setAnalysisMenuOpen, analysisMenuOpen)}
               className={`flex items-center space-x-1 ${navLinkBase} ${
-                analysisMenuOpen || ['/risks', '/scenarios', '/monte-carlo', '/audit', '/schedules'].includes(pathname) || pathname.startsWith('/schedules/')
+                ['/risks', '/scenarios', '/monte-carlo', '/audit', '/schedules'].includes(pathname) || pathname.startsWith('/schedules/')
                   ? navLinkActive
-                  : navLinkInactive
+                  : analysisMenuOpen
+                    ? navLinkOpen
+                    : navLinkInactive
               }`}
             >
               <span className="text-inherit">Analysis</span>
@@ -344,11 +383,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </div>
                 <Link
                   href="/risks"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
-                    pathname === '/risks'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
-                  }`}
+                  className={`${dropdownItemBase} ${pathname === '/risks' ? dropdownItemActive : dropdownItemInactive}`}
                   onClick={() => setAnalysisMenuOpen(false)}
                 >
                   <AlertTriangle className="h-5 w-5 mr-3 flex-shrink-0" />
@@ -356,11 +391,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </Link>
                 <Link
                   href="/scenarios"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
-                    pathname === '/scenarios'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
-                  }`}
+                  className={`${dropdownItemBase} ${pathname === '/scenarios' ? dropdownItemActive : dropdownItemInactive}`}
                   onClick={() => setAnalysisMenuOpen(false)}
                 >
                   <Layers className="h-5 w-5 mr-3 flex-shrink-0" />
@@ -368,11 +399,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </Link>
                 <Link
                   href="/monte-carlo"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
-                    pathname === '/monte-carlo'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
-                  }`}
+                  className={`${dropdownItemBase} ${pathname === '/monte-carlo' ? dropdownItemActive : dropdownItemInactive}`}
                   onClick={() => setAnalysisMenuOpen(false)}
                 >
                   <BarChart3 className="h-5 w-5 mr-3 flex-shrink-0" />
@@ -380,11 +407,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </Link>
                 <Link
                   href="/audit"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
-                    pathname === '/audit'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
-                  }`}
+                  className={`${dropdownItemBase} ${pathname === '/audit' ? dropdownItemActive : dropdownItemInactive}`}
                   onClick={() => setAnalysisMenuOpen(false)}
                 >
                   <FileText className="h-5 w-5 mr-3 flex-shrink-0" />
@@ -392,11 +415,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </Link>
                 <Link
                   href="/schedules"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
-                    pathname === '/schedules' || pathname.startsWith('/schedules/')
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
-                  }`}
+                  className={`${dropdownItemBase} ${pathname === '/schedules' || pathname.startsWith('/schedules/') ? dropdownItemActive : dropdownItemInactive}`}
                   onClick={() => setAnalysisMenuOpen(false)}
                 >
                   <Calendar className="h-5 w-5 mr-3 flex-shrink-0" />
@@ -409,11 +428,13 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           {/* Management Dropdown */}
           <div className="relative" ref={managementMenuRef}>
             <button
-              onClick={() => setManagementMenuOpen(!managementMenuOpen)}
+              onClick={() => toggleDropdown(setManagementMenuOpen, managementMenuOpen)}
               className={`flex items-center space-x-1 ${navLinkBase} ${
-                managementMenuOpen || ['/changes', '/feedback', '/features', '/offline'].includes(pathname)
+                ['/changes', '/feedback', '/features'].includes(pathname)
                   ? navLinkActive
-                  : navLinkInactive
+                  : managementMenuOpen
+                    ? navLinkOpen
+                    : navLinkInactive
               }`}
             >
               <span className="text-inherit">Management</span>
@@ -429,11 +450,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </div>
                 <Link
                   href="/changes"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
-                    pathname === '/changes'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
-                  }`}
+                  className={`${dropdownItemBase} ${pathname === '/changes' ? dropdownItemActive : dropdownItemInactive}`}
                   onClick={() => setManagementMenuOpen(false)}
                 >
                   <GitPullRequest className="h-5 w-5 mr-3 flex-shrink-0" />
@@ -441,11 +458,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </Link>
                 <Link
                   href="/feedback"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
-                    pathname === '/feedback'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
-                  }`}
+                  className={`${dropdownItemBase} ${pathname === '/feedback' ? dropdownItemActive : dropdownItemInactive}`}
                   onClick={() => setManagementMenuOpen(false)}
                 >
                   <MessageSquare className="h-5 w-5 mr-3 flex-shrink-0" />
@@ -453,27 +466,11 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </Link>
                 <Link
                   href="/features"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
-                    pathname === '/features'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
-                  }`}
+                  className={`${dropdownItemBase} ${pathname === '/features' ? dropdownItemActive : dropdownItemInactive}`}
                   onClick={() => setManagementMenuOpen(false)}
                 >
                   <Layers className="h-5 w-5 mr-3 flex-shrink-0" />
                   <span className="font-medium">Features Overview</span>
-                </Link>
-                <Link
-                  href="/offline"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
-                    pathname === '/offline'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
-                  }`}
-                  onClick={() => setManagementMenuOpen(false)}
-                >
-                  <WifiOff className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">Offline Status</span>
                 </Link>
               </div>
             )}
@@ -482,11 +479,13 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           {/* Admin Dropdown */}
           <div className="relative" ref={adminMenuRef}>
             <button
-              onClick={() => setAdminMenuOpen(!adminMenuOpen)}
+              onClick={() => toggleDropdown(setAdminMenuOpen, adminMenuOpen)}
               className={`flex items-center space-x-1 ${navLinkBase} ${
-                adminMenuOpen || ['/admin', '/admin/performance', '/admin/users'].includes(pathname) || pathname.startsWith('/admin/')
+                ['/admin', '/admin/performance', '/admin/users'].includes(pathname) || pathname.startsWith('/admin/')
                   ? navLinkActive
-                  : navLinkInactive
+                  : adminMenuOpen
+                    ? navLinkOpen
+                    : navLinkInactive
               }`}
             >
               <Shield className="h-4 w-4" />
@@ -503,11 +502,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </div>
                 <Link
                   href="/admin"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
-                    pathname === '/admin'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
-                  }`}
+                  className={`${dropdownItemBase} ${pathname === '/admin' ? dropdownItemActive : dropdownItemInactive}`}
                   onClick={() => setAdminMenuOpen(false)}
                 >
                   <Shield className="h-5 w-5 mr-3 flex-shrink-0" />
@@ -515,11 +510,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </Link>
                 <Link
                   href="/admin/performance"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
-                    pathname === '/admin/performance'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
-                  }`}
+                  className={`${dropdownItemBase} ${pathname === '/admin/performance' ? dropdownItemActive : dropdownItemInactive}`}
                   onClick={() => setAdminMenuOpen(false)}
                 >
                   <Activity className="h-5 w-5 mr-3 flex-shrink-0" />
@@ -527,11 +518,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </Link>
                 <Link
                   href="/admin/users"
-                  className={`flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm transition-all duration-200 ${
-                    pathname === '/admin/users'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
-                      : 'text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300'
-                  }`}
+                  className={`${dropdownItemBase} ${pathname === '/admin/users' ? dropdownItemActive : dropdownItemInactive}`}
                   onClick={() => setAdminMenuOpen(false)}
                 >
                   <Users className="h-5 w-5 mr-3 flex-shrink-0" />
@@ -541,6 +528,9 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             )}
           </div>
         </nav>
+
+        {/* Topbar Unified Search */}
+        <TopbarSearch />
 
         {/* Right Section: Theme, Language, Notifications, User Menu */}
         <div data-testid="top-bar-actions" className="flex items-center space-x-3 flex-shrink-0">
@@ -568,12 +558,38 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             <span className="absolute top-2 right-2 w-2 h-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full shadow-sm animate-pulse"></span>
           </button>
 
+          {/* AI Help Chat */}
+          <button
+            data-testid="top-bar-help-chat"
+            type="button"
+            onClick={toggleChat}
+            className={cn(
+              'p-2.5 rounded-lg transition-all duration-200 relative group',
+              'hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-700 dark:hover:to-slate-600',
+              helpState.isOpen && 'bg-blue-50 dark:bg-slate-700 text-blue-600 dark:text-blue-400',
+              hasUnreadTips && !helpState.isOpen && 'ring-2 ring-amber-400/60'
+            )}
+            aria-label={getToggleButtonText()}
+            title={getToggleButtonText()}
+          >
+            {helpState.isOpen ? (
+              <PanelRightClose className="h-5 w-5 text-gray-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+            ) : hasUnreadTips ? (
+              <Lightbulb className="h-5 w-5 text-amber-500 dark:text-amber-400" />
+            ) : (
+              <MessageSquare className="h-5 w-5 text-gray-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+            )}
+            {hasUnreadTips && !helpState.isOpen && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full border border-white dark:border-slate-800" aria-hidden />
+            )}
+          </button>
+
           {/* User Menu */}
           <div className="relative" ref={userMenuRef}>
             <button
               data-testid="top-bar-user-menu"
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-200 group"
+              className="flex items-center space-x-2 p-1.5 rounded-xl transition-all duration-200 group"
               aria-label="User menu"
             >
               <div className="w-9 h-9 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 rounded-lg flex items-center justify-center shadow-md shadow-blue-200 dark:shadow-blue-900/30 group-hover:shadow-lg group-hover:shadow-blue-300 dark:group-hover:shadow-blue-900/50 transition-all duration-200 group-hover:scale-105">
@@ -605,7 +621,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 <div className="py-2">
                   <Link
                     href="/admin/users"
-                    className="flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-200"
+                    className={`${dropdownItemBase} ${dropdownItemInactive}`}
                     onClick={() => setUserMenuOpen(false)}
                   >
                     <User className="h-5 w-5 mr-3 flex-shrink-0" />
@@ -614,7 +630,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   
                   <Link
                     href="/settings"
-                    className="flex items-center px-4 py-2.5 mx-2 rounded-lg text-sm text-gray-700 dark:text-slate-100 hover:bg-blue-50 dark:hover:bg-slate-500 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-200"
+                    className={`${dropdownItemBase} ${dropdownItemInactive}`}
                     onClick={() => setUserMenuOpen(false)}
                   >
                     <Settings className="h-5 w-5 mr-3 flex-shrink-0" />
@@ -630,7 +646,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   <button
                     data-testid="top-bar-logout"
                     onClick={handleLogout}
-                    className="flex items-center w-full px-4 py-2.5 mx-2 rounded-lg text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-700 dark:hover:text-red-300 transition-all duration-200"
+                    className="flex items-center w-full px-4 py-2.5 mx-2 rounded-lg text-sm text-red-800 dark:text-red-400 hover:bg-red-100/80 dark:hover:bg-red-900/40 hover:text-red-700 dark:hover:text-red-300 transition-all duration-200"
                   >
                     <LogOut className="h-5 w-5 mr-3 flex-shrink-0" />
                     <span className="font-medium">Logout</span>

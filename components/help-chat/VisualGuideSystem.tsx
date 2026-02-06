@@ -190,7 +190,7 @@ export function VisualGuideSystem({
 
   if (!guide) {
     return (
-      <div className="flex items-center justify-center p-8 text-gray-500">
+      <div className="flex items-center justify-center p-8 text-gray-500 dark:text-slate-400">
         <div className="text-center">
           <Camera className="h-12 w-12 mx-auto mb-4 text-gray-300" />
           <p>No visual guide available</p>
@@ -203,16 +203,16 @@ export function VisualGuideSystem({
     <div 
       ref={containerRef}
       className={cn(
-        'bg-white rounded-lg border border-gray-200 overflow-hidden',
+        'bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 overflow-hidden',
         isFullscreen && 'fixed inset-0 z-50 rounded-none border-none',
         className
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900">{guide.title}</h3>
-          <p className="text-sm text-gray-600 mt-1">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{guide.title}</h3>
+          <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
             Step {currentStepIndex + 1} of {guide.steps.length}
             {guide.estimatedTime && (
               <span className="ml-2">• ~{guide.estimatedTime} min</span>
@@ -222,7 +222,7 @@ export function VisualGuideSystem({
         
         <div className="flex items-center space-x-2">
           {guide.isOutdated && (
-            <div className="flex items-center text-amber-600 text-sm">
+            <div className="flex items-center text-amber-600 dark:text-amber-400 text-sm">
               <AlertTriangle className="h-4 w-4 mr-1" />
               <span>May be outdated</span>
             </div>
@@ -233,8 +233,8 @@ export function VisualGuideSystem({
             className={cn(
               'p-2 rounded-md transition-colors',
               showAnnotations 
-                ? 'bg-blue-100 text-blue-600' 
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
+                : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-600'
             )}
             title="Toggle annotations"
           >
@@ -244,7 +244,7 @@ export function VisualGuideSystem({
           {isInteractive && (
             <button
               onClick={togglePlayback}
-              className="p-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors"
+              className="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-md hover:bg-blue-200 transition-colors"
               title={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
@@ -253,7 +253,7 @@ export function VisualGuideSystem({
           
           <button
             onClick={toggleFullscreen}
-            className="p-2 bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors"
+            className="p-2 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
             title="Toggle fullscreen"
           >
             {isFullscreen ? <X className="h-4 w-4" /> : <Camera className="h-4 w-4" />}
@@ -272,7 +272,7 @@ export function VisualGuideSystem({
       {/* Main content */}
       <div className="flex flex-col lg:flex-row h-full">
         {/* Screenshot area */}
-        <div className="flex-1 relative bg-gray-100 min-h-[400px]">
+        <div className="flex-1 relative bg-gray-100 dark:bg-slate-700 min-h-[400px]">
           {currentStep?.screenshot ? (
             <div className="relative w-full h-full">
               <img
@@ -296,7 +296,7 @@ export function VisualGuideSystem({
               )}
             </div>
           ) : (
-            <div className="flex items-center justify-center h-full text-gray-500">
+            <div className="flex items-center justify-center h-full text-gray-500 dark:text-slate-400">
               <div className="text-center">
                 <Camera className="h-16 w-16 mx-auto mb-4 text-gray-300" />
                 <p>Screenshot not available</p>
@@ -306,28 +306,28 @@ export function VisualGuideSystem({
         </div>
 
         {/* Step details sidebar */}
-        <div className="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-gray-200 bg-white">
+        <div className="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
           <div className="p-4 h-full flex flex-col">
             {/* Current step info */}
             <div className="flex-1">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-lg font-medium text-gray-900">
+                <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100">
                   {currentStep?.title}
                 </h4>
                 {currentStep?.isOptional && (
-                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                  <span className="text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 px-2 py-1 rounded">
                     Optional
                   </span>
                 )}
               </div>
               
-              <p className="text-gray-700 mb-4 leading-relaxed">
+              <p className="text-gray-700 dark:text-slate-300 mb-4 leading-relaxed">
                 {currentStep?.description}
               </p>
 
               {/* Action indicator */}
               {currentStep?.action && (
-                <div className="flex items-center text-sm text-blue-600 mb-4">
+                <div className="flex items-center text-sm text-blue-600 dark:text-blue-400 mb-4">
                   <ActionIcon action={currentStep.action} />
                   <span className="ml-2 capitalize">
                     {currentStep.action} {currentStep.actionData?.text && `"${currentStep.actionData.text}"`}
@@ -337,7 +337,7 @@ export function VisualGuideSystem({
 
               {/* Step list */}
               <div className="space-y-2">
-                <h5 className="text-sm font-medium text-gray-900 mb-2">All Steps</h5>
+                <h5 className="text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">All Steps</h5>
                 {guide.steps.map((step, index) => (
                   <button
                     key={step.id}
@@ -345,10 +345,10 @@ export function VisualGuideSystem({
                     className={cn(
                       'w-full text-left p-2 rounded-md text-sm transition-colors',
                       index === currentStepIndex
-                        ? 'bg-blue-100 text-blue-900 border border-blue-200'
+                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-900 border border-blue-200 dark:border-blue-800'
                         : completedSteps.has(index)
-                        ? 'bg-green-50 text-green-800 hover:bg-green-100'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-green-50 text-green-800 dark:text-green-300 hover:bg-green-100 dark:bg-green-900/30'
+                        : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700'
                     )}
                   >
                     <div className="flex items-center">
@@ -361,7 +361,7 @@ export function VisualGuideSystem({
                       </span>
                       <span className="flex-1 truncate">{step.title}</span>
                       {step.isOptional && (
-                        <span className="text-xs text-gray-400 ml-2">opt</span>
+                        <span className="text-xs text-gray-400 dark:text-slate-500 ml-2">opt</span>
                       )}
                     </div>
                   </button>
@@ -370,7 +370,7 @@ export function VisualGuideSystem({
             </div>
 
             {/* Navigation controls */}
-            <div className="border-t border-gray-200 pt-4 mt-4">
+            <div className="border-t border-gray-200 dark:border-slate-700 pt-4 mt-4">
               <div className="flex items-center justify-between">
                 <button
                   onClick={previousStep}
@@ -378,8 +378,8 @@ export function VisualGuideSystem({
                   className={cn(
                     'flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors',
                     currentStepIndex === 0
-                      ? 'text-gray-400 cursor-not-allowed'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed'
+                      : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700'
                   )}
                 >
                   <SkipBack className="h-4 w-4 mr-1" />
@@ -405,7 +405,7 @@ export function VisualGuideSystem({
               </div>
 
               {/* Keyboard shortcuts hint */}
-              <div className="text-xs text-gray-500 mt-3 text-center">
+              <div className="text-xs text-gray-500 dark:text-slate-400 mt-3 text-center">
                 Use ← → arrow keys or spacebar to navigate
                 {isInteractive && ' • P to play/pause'}
               </div>
@@ -464,7 +464,7 @@ function AnnotationElement({ annotation }: { annotation: ScreenshotAnnotation })
     case 'callout':
       return (
         <div
-          className={cn(baseClasses, "bg-white border-2 rounded-lg p-3 shadow-lg max-w-xs")}
+          className={cn(baseClasses, "bg-white dark:bg-slate-800 border-2 rounded-lg p-3 shadow-lg max-w-xs")}
           style={{
             left: `${position.x}%`,
             top: `${position.y}%`,
@@ -473,7 +473,7 @@ function AnnotationElement({ annotation }: { annotation: ScreenshotAnnotation })
             borderStyle: style
           }}
         >
-          <div className="text-sm font-medium text-gray-900">{content}</div>
+          <div className="text-sm font-medium text-gray-900 dark:text-slate-100">{content}</div>
           {/* Callout pointer */}
           <div
             className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0"

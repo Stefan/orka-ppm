@@ -1,9 +1,11 @@
 /**
  * Session State Sync API Endpoint
  * Handles session state synchronization across devices
+ * Requires Authorization: Bearer <token>. UserId in body/query must match token sub.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { enforceSyncAuth } from '@/lib/auth/verify-jwt'
 
 export interface SessionState {
   userId: string
@@ -40,12 +42,19 @@ function getDefaultSessionState(userId: string): SessionState {
 
 export async function PUT(request: NextRequest) {
   try {
-    const sessionState: SessionState = await request.json()
-    
+    const sessionState: SessionState = await request.json().catch(() => ({}))
     if (!sessionState.userId || !sessionState.deviceId) {
       return NextResponse.json({
         error: 'Missing required fields: userId and deviceId'
       }, { status: 400 })
+    }
+
+    const auth = await enforceSyncAuth(request.headers.get('Authorization'), sessionState.userId)
+    if (auth instanceof Response) {
+      return NextResponse.json(
+        (await auth.json().catch(() => ({ error: 'Unauthorized' }))) as { error: string },
+        { status: auth.status }
+      )
     }
 
     // Update session state with current timestamp
@@ -74,14 +83,16 @@ export async function PUT(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const userId = searchParams.get('userId')
-    
-    if (!userId) {
-      return NextResponse.json({
-        error: 'Missing required parameter: userId'
-      }, { status: 400 })
+    const queryUserId = searchParams.get('userId')
+    const auth = await enforceSyncAuth(request.headers.get('Authorization'), queryUserId)
+    if (auth instanceof Response) {
+      return NextResponse.json(
+        (await auth.json().catch(() => ({ error: 'Unauthorized' }))) as { error: string },
+        { status: auth.status }
+      )
     }
-    
+    const userId = auth.userId
+
     const sessionState = sessionStates.get(userId)
     
     if (!sessionState) {

@@ -55,10 +55,10 @@ const customJestConfig = {
     '<rootDir>/__tests__/admin-performance-api-integration.test.ts',
     // Flaky property tests for permission controls
     '<rootDir>/components/auth/__tests__/frontend-permission-controls.property.test.tsx',
+    // usePermissions - fetch in hook not reliably mocked in Jest env; see hooks/__tests__/usePermissions.unit.test.ts
+    '<rootDir>/hooks/__tests__/usePermissions.test.ts',
     // HelpChat test - MessageRenderer ESM/export not transformed by Jest
     '<rootDir>/__tests__/components/HelpChat.test.tsx',
-    // usePermissions - fetch mock not applied in env; hook uses relative /api URL
-    '<rootDir>/hooks/__tests__/usePermissions.test.ts',
     // Admin critical content - property tests depend on real timer behavior in Jest
     '<rootDir>/__tests__/admin-critical-content-render-time.property.test.tsx',
     // Share link manager - getProjectShareLinks mock not applied in env, loading never completes
@@ -67,7 +67,7 @@ const customJestConfig = {
     '<rootDir>/components/admin/__tests__/RoleManagement.test.tsx',
     // Admin API prioritization - property tests depend on strict call order/timing
     '<rootDir>/__tests__/admin-api-call-prioritization.property.test.ts',
-    // Guest project access - fetch/API mock not applied, loading never completes
+    // Guest project access - fetch mock not applied in JSDOM (client component uses different fetch ref)
     '<rootDir>/__tests__/guest-project-access-page.test.tsx',
     // EnhancedAuthProvider - roles/permissions API mock not applied in env
     '<rootDir>/app/providers/__tests__/EnhancedAuthProvider.test.tsx',
@@ -89,6 +89,7 @@ const customJestConfig = {
     '<rootDir>/components/admin/__tests__/UserRoleManagement.test.tsx',
     '<rootDir>/__tests__/pmr-export-pipeline.test.tsx',
     '<rootDir>/__tests__/enhanced-pmr.integration.test.tsx',
+    // FeatureFlagContext - act() warnings and async fetch timing in Jest
     '<rootDir>/__tests__/contexts/FeatureFlagContext.test.tsx',
     '<rootDir>/__tests__/admin-lazy-loading-timing.property.test.tsx',
     '<rootDir>/__tests__/admin-critical-content-timing.property.test.tsx',
@@ -105,11 +106,9 @@ const customJestConfig = {
     '<rootDir>/__tests__/admin-skeleton-dimensions.property.test.ts',
     '<rootDir>/__tests__/admin-total-blocking-time.property.test.ts',
     '<rootDir>/__tests__/ai-result-visualizations.test.tsx',
-    '<rootDir>/__tests__/api-routes/projects-import.route.test.ts',
     '<rootDir>/__tests__/audit-ui-components.test.tsx',
     '<rootDir>/__tests__/authentication-state-handling.property.test.tsx',
     '<rootDir>/__tests__/bundle-size-limit.property.test.ts',
-    '<rootDir>/__tests__/card-border.property.test.tsx',
     '<rootDir>/__tests__/card-header.property.test.tsx',
     '<rootDir>/__tests__/card-shadow.property.test.tsx',
     '<rootDir>/__tests__/chrome-css-validation.test.ts',
@@ -125,7 +124,6 @@ const customJestConfig = {
     '<rootDir>/__tests__/component-structure/variance-kpis.structure.test.tsx',
     '<rootDir>/__tests__/core-web-vitals-performance.property.test.ts',
     '<rootDir>/__tests__/css-fcp-blocking.property.test.ts',
-    '<rootDir>/__tests__/currency-utils.property.test.ts',
     '<rootDir>/__tests__/dashboard-page-validation.test.tsx',
     '<rootDir>/__tests__/e2e/anomaly-feedback.test.tsx',
     '<rootDir>/__tests__/error-boundary-environment.property.test.tsx',
@@ -228,6 +226,10 @@ const customJestConfig = {
       lines: 30,
       statements: 29
     },
+    // Critical areas – enforce minimum coverage (auth/API, costbook/financial)
+    './lib/api/client.ts': { branches: 70, functions: 80, lines: 80, statements: 80 },
+    './lib/costbook/distribution-engine.ts': { branches: 53, functions: 65, lines: 67, statements: 67 },
+    './lib/rbac/permission-utils.ts': { branches: 80, functions: 80, lines: 80, statements: 80 },
     // Path-based 80% (Enterprise) – raise as tests are added; see docs/ENTERPRISE_TEST_PLAN.md
     './lib/currency-utils.ts': { branches: 80, functions: 80, lines: 80, statements: 80 },
     './lib/design-system.ts': { branches: 70, functions: 80, lines: 80, statements: 80 },
@@ -236,7 +238,10 @@ const customJestConfig = {
     './lib/monitoring/logger.ts': { branches: 80, functions: 80, lines: 80, statements: 80 },
     './lib/costbook/import-templates.ts': { branches: 80, functions: 80, lines: 80, statements: 80 },
     './lib/costbook/costbook-keys.ts': { branches: 80, functions: 80, lines: 80, statements: 80 },
-    './lib/sync/storage.ts': { branches: 80, functions: 80, lines: 80, statements: 80 }
+    './lib/sync/storage.ts': { branches: 80, functions: 80, lines: 80, statements: 80 },
+    // Help Chat (AI Help Chat Enhancement) – 80% target
+    './lib/help-chat/api.ts': { branches: 67, functions: 90, lines: 77, statements: 77 },
+    './lib/help-chat/contextFromPath.ts': { branches: 80, functions: 80, lines: 80, statements: 80 }
   },
   
   // Test categorization - simplified for now

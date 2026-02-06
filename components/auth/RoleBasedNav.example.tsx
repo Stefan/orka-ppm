@@ -48,7 +48,7 @@ export function BasicNavExample() {
       renderItem={(item) => (
         <Link 
           href={item.path}
-          className="block py-2 px-4 hover:bg-gray-100 rounded"
+          className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded"
         >
           {item.label}
         </Link>
@@ -107,7 +107,7 @@ export function NavWithIconsExample() {
       renderItem={(item) => (
         <Link 
           href={item.path}
-          className="flex items-center gap-3 py-2 px-4 hover:bg-gray-100 rounded transition-colors"
+          className="flex items-center gap-3 py-2 px-4 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded transition-colors"
         >
           {item.icon}
           <span>{item.label}</span>
@@ -166,7 +166,7 @@ export function NestedNavExample() {
         <div>
           <Link 
             href={item.path}
-            className="flex items-center gap-3 py-2 px-4 hover:bg-gray-100 rounded font-medium"
+            className="flex items-center gap-3 py-2 px-4 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded font-medium"
           >
             {item.icon}
             <span>{item.label}</span>
@@ -221,7 +221,7 @@ export function ContextAwareNavExample({ projectId }: { projectId: string }) {
       renderItem={(item) => (
         <Link 
           href={item.path}
-          className="block py-2 px-4 hover:bg-blue-50 rounded"
+          className="block py-2 px-4 hover:bg-blue-50 dark:hover:bg-slate-700 rounded"
         >
           {item.label}
         </Link>
@@ -266,7 +266,7 @@ export function MultiplePermissionsNavExample() {
       renderItem={(item) => (
         <Link 
           href={item.path}
-          className="block py-2 px-4 hover:bg-gray-100 rounded"
+          className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded"
         >
           {item.label}
         </Link>
@@ -359,7 +359,7 @@ export function SidebarNavExample() {
         )}
         className="space-y-1 px-2"
         loadingFallback={
-          <div className="py-3 px-4 text-gray-400">
+          <div className="py-3 px-4 text-gray-400 dark:text-slate-500">
             Loading...
           </div>
         }
@@ -422,7 +422,7 @@ export function TabNavExample({ projectId }: { projectId: string }) {
           {item.label}
         </Link>
       )}
-      className="flex gap-4 border-b border-gray-200"
+      className="flex gap-4 border-b border-gray-200 dark:border-slate-700"
     />
   )
 }

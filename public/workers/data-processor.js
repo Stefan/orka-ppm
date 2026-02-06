@@ -1,6 +1,16 @@
 /**
- * Data processing worker for CPU-intensive operations
+ * Data processing worker for CPU-intensive operations.
+ * predicate/compareFn/transformFn strings must come from app code only (function.toString());
+ * do not pass user or API-supplied expressions (code injection risk).
  */
+
+var DANGEROUS = /\.(constructor|__proto__|prototype)\b|require\s*\(|import\s*\(|eval\s*\(|Function\s*\(|process\.|globalThis\.|window\.|document\.|fetch\s*\(|XMLHttpRequest|\.cookie\b/i
+
+function assertSafeFnStr(str) {
+  if (typeof str !== 'string' || DANGEROUS.test(str)) {
+    throw new Error('Invalid or disallowed expression')
+  }
+}
 
 // Worker message handler
 self.onmessage = function(event) {
@@ -11,10 +21,12 @@ self.onmessage = function(event) {
 
     switch (type) {
       case 'filter':
+        assertSafeFnStr(data.predicate)
         result = filterData(data.items, data.predicate)
         break
       
       case 'sort':
+        assertSafeFnStr(data.compareFn)
         result = sortData(data.items, data.compareFn, data.direction)
         break
       
@@ -23,6 +35,7 @@ self.onmessage = function(event) {
         break
       
       case 'transform':
+        assertSafeFnStr(data.transformFn)
         result = transformData(data.items, data.transformFn)
         break
       

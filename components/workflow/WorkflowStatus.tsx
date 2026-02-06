@@ -40,50 +40,50 @@ export default function WorkflowStatus({
       case 'pending':
         return {
           icon: Clock,
-          bgColor: 'bg-yellow-50',
-          borderColor: 'border-yellow-200',
-          textColor: 'text-yellow-800',
-          iconColor: 'text-yellow-600',
+          bgColor: 'bg-yellow-50 dark:bg-yellow-900/20',
+          borderColor: 'border-yellow-200 dark:border-yellow-800',
+          textColor: 'text-yellow-800 dark:text-yellow-300',
+          iconColor: 'text-yellow-600 dark:text-yellow-400',
           label: 'Pending Approval',
           description: 'Waiting for approvers to review'
         }
       case 'in_progress':
         return {
           icon: Clock,
-          bgColor: 'bg-blue-50',
-          borderColor: 'border-blue-200',
-          textColor: 'text-blue-800',
-          iconColor: 'text-blue-600',
+          bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+          borderColor: 'border-blue-200 dark:border-blue-800',
+          textColor: 'text-blue-800 dark:text-blue-300',
+          iconColor: 'text-blue-600 dark:text-blue-400',
           label: 'In Progress',
           description: 'Approval process is ongoing'
         }
       case 'completed':
         return {
           icon: CheckCircle,
-          bgColor: 'bg-green-50',
-          borderColor: 'border-green-200',
-          textColor: 'text-green-800',
-          iconColor: 'text-green-600',
+          bgColor: 'bg-green-50 dark:bg-green-900/20',
+          borderColor: 'border-green-200 dark:border-green-800',
+          textColor: 'text-green-800 dark:text-green-300',
+          iconColor: 'text-green-600 dark:text-green-400',
           label: 'Approved',
           description: 'All approvals completed successfully'
         }
       case 'rejected':
         return {
           icon: XCircle,
-          bgColor: 'bg-red-50',
-          borderColor: 'border-red-200',
-          textColor: 'text-red-800',
-          iconColor: 'text-red-600',
+          bgColor: 'bg-red-50 dark:bg-red-900/20',
+          borderColor: 'border-red-200 dark:border-red-800',
+          textColor: 'text-red-800 dark:text-red-300',
+          iconColor: 'text-red-600 dark:text-red-400',
           label: 'Rejected',
           description: 'Workflow was rejected'
         }
       default:
         return {
           icon: AlertCircle,
-          bgColor: 'bg-gray-50',
-          borderColor: 'border-gray-200',
-          textColor: 'text-gray-800',
-          iconColor: 'text-gray-600',
+          bgColor: 'bg-gray-50 dark:bg-slate-800/50',
+          borderColor: 'border-gray-200 dark:border-slate-700',
+          textColor: 'text-gray-800 dark:text-slate-200',
+          iconColor: 'text-gray-600 dark:text-slate-400',
           label: 'Unknown',
           description: 'Status unknown'
         }
@@ -116,13 +116,13 @@ export default function WorkflowStatus({
     
     switch (status) {
       case 'approved':
-        return <CheckCircle className="text-green-600" size={20} />
+        return <CheckCircle className="text-green-600 dark:text-green-400" size={20} />
       case 'rejected':
-        return <XCircle className="text-red-600" size={20} />
+        return <XCircle className="text-red-600 dark:text-red-400" size={20} />
       case 'in_progress':
-        return <Clock className="text-blue-600" size={20} />
+        return <Clock className="text-blue-600 dark:text-blue-400" size={20} />
       default:
-        return <Clock className="text-gray-400" size={20} />
+        return <Clock className="text-gray-400 dark:text-slate-500" size={20} />
     }
   }
 
@@ -131,13 +131,13 @@ export default function WorkflowStatus({
     
     switch (status) {
       case 'approved':
-        return 'border-green-300 bg-green-50'
+        return 'border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20'
       case 'rejected':
-        return 'border-red-300 bg-red-50'
+        return 'border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20'
       case 'in_progress':
-        return 'border-blue-300 bg-blue-50'
+        return 'border-blue-300 bg-blue-50 dark:bg-blue-900/20'
       default:
-        return 'border-gray-200 bg-gray-50'
+        return 'border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50'
     }
   }
 
@@ -237,7 +237,7 @@ export default function WorkflowStatus({
                           </span>
                         )}
                       </h5>
-                      <span className="text-xs text-gray-600">
+                      <span className="text-xs text-gray-600 dark:text-slate-400">
                         {approvals.length} approver{approvals.length !== 1 ? 's' : ''}
                       </span>
                     </div>
@@ -248,30 +248,30 @@ export default function WorkflowStatus({
                         {approvals.map((approval) => (
                           <div
                             key={approval.id}
-                            className="flex items-center justify-between text-xs bg-white/50 rounded px-2 py-1.5"
+                            className="flex items-center justify-between text-xs bg-white dark:bg-slate-800/50 rounded px-2 py-1.5"
                           >
                             <div className="flex items-center gap-2">
-                              <User size={14} className="text-gray-400" />
-                              <span className="text-gray-700">
+                              <User size={14} className="text-gray-400 dark:text-slate-500" />
+                              <span className="text-gray-700 dark:text-slate-300">
                                 {approval.approver_id.slice(0, 8)}...
                               </span>
                             </div>
                             <div className="flex items-center gap-1">
                               {approval.status === 'approved' && (
                                 <>
-                                  <CheckCircle size={14} className="text-green-600" />
+                                  <CheckCircle size={14} className="text-green-600 dark:text-green-400" />
                                   <span className="text-green-700 font-medium">Approved</span>
                                 </>
                               )}
                               {approval.status === 'rejected' && (
                                 <>
-                                  <XCircle size={14} className="text-red-600" />
+                                  <XCircle size={14} className="text-red-600 dark:text-red-400" />
                                   <span className="text-red-700 font-medium">Rejected</span>
                                 </>
                               )}
                               {approval.status === 'pending' && (
                                 <>
-                                  <Clock size={14} className="text-yellow-600" />
+                                  <Clock size={14} className="text-yellow-600 dark:text-yellow-400" />
                                   <span className="text-yellow-700 font-medium">Pending</span>
                                 </>
                               )}

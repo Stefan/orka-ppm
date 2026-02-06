@@ -103,13 +103,174 @@ class TipSchedule:
 
 class ProactiveTipsEngine:
     """Main engine for generating and managing proactive tips"""
-    
+
+    # Cooldown per (rule_key, user_id) to avoid spamming; key -> last_trigger datetime
+    _cooldown: Dict[str, datetime]
+    _cooldown_minutes: int = 30
+
     def __init__(self, supabase_client: Client):
         self.supabase = supabase_client
+        self._cooldown = {}
         self.tip_templates = self._load_tip_templates()
+        self.tip_rules = self._load_tip_rules()
         self.max_tips_per_session = 3
         self.tip_cooldown_minutes = 30
-        
+
+    def _load_tip_rules(self) -> Dict[str, Dict[str, Any]]:
+        """Load rules for data-change triggered tips (variance, overdue, budget). Filter by organization_id in use."""
+        return {
+            "variance_threshold": {
+                "table": "variance_alerts",
+                "condition": "new",
+                "title": "New variance alert",
+                "content": "A variance alert was created. Check your dashboard for details.",
+                "priority": TipPriority.HIGH,
+                "learn_more_query": "What causes variance alerts and how can I fix them?",
+            },
+            "overdue": {
+                "table": "projects",
+                "condition": "end_date_passed",
+                "title": "Overdue project",
+                "content": "A project is past its end date. Consider updating the timeline or closing it.",
+                "priority": TipPriority.MEDIUM,
+                "learn_more_query": "How do I update project end dates?",
+            },
+            "budget_threshold": {
+                "table": "projects",
+                "condition": "budget_utilization_high",
+                "title": "Budget utilization high",
+                "content": "A project has high budget utilization. Review spend and forecasts.",
+                "priority": TipPriority.MEDIUM,
+                "learn_more_query": "How do I reduce budget variance?",
+            },
+        }
+
+    def _is_in_cooldown(self, rule_key: str, user_id: str) -> bool:
+        """Return True if this (rule, user) was triggered recently."""
+        key = f"{rule_key}:{user_id}"
+        last = self._cooldown.get(key)
+        if last is None:
+            return False
+        return datetime.now() - last < timedelta(minutes=self._cooldown_minutes)
+
+    def _set_cooldown(self, rule_key: str, user_id: str) -> None:
+        """Record that this (rule, user) was just triggered."""
+        self._cooldown[f"{rule_key}:{user_id}"] = datetime.now()
+
+    def _trigger_tip(
+        self,
+        rule_key: str,
+        organization_id: str,
+        user_ids: List[str],
+        message: Dict[str, Any],
+    ) -> None:
+        """Send tip notification to users (broadcast to Realtime channel) and log to help_logs. Sync for use from Realtime callback."""
+        for user_id in user_ids:
+            if self._is_in_cooldown(rule_key, user_id):
+                continue
+            self._set_cooldown(rule_key, user_id)
+        try:
+            channel_name = f"proactive_tips_{organization_id}"
+            payload = {
+                "event": "proactive_tip",
+                "rule_key": rule_key,
+                "message": message,
+                "user_ids": user_ids,
+            }
+            if hasattr(self.supabase, "realtime") and self.supabase.realtime:
+                channel = self.supabase.realtime.channel(channel_name)
+                channel.send_broadcast(payload)
+            self._log_tip_event_sync(
+                user_ids[0] if user_ids else "",
+                "proactive_tip_triggered",
+                {"rule_key": rule_key, "organization_id": organization_id, "message": message},
+            )
+        except Exception as e:
+            logger.warning("Proactive tip trigger failed (realtime/log): %s", e)
+
+    def _handle_change(self, organization_id: str, payload: Dict[str, Any]) -> None:
+        """Evaluate tip rules on data change (e.g. new variance alert, project update). Sync for Realtime callback."""
+        table = payload.get("table") or payload.get("table_name")
+        if not table:
+            return
+        for rule_key, rule in self.tip_rules.items():
+            if rule.get("table") != table:
+                continue
+            condition = rule.get("condition")
+            if condition == "new" and payload.get("event_type") in ("INSERT", "insert"):
+                pass
+            elif condition in ("end_date_passed", "budget_utilization_high"):
+                record = payload.get("record") or payload.get("new_record") or {}
+                if condition == "end_date_passed" and record.get("end_date"):
+                    try:
+                        from datetime import datetime as dt
+                        end = dt.fromisoformat(str(record["end_date"]).replace("Z", "+00:00"))
+                        if end.date() < datetime.now().date():
+                            pass
+                    except Exception:
+                        continue
+                elif condition == "budget_utilization_high":
+                    b = record.get("budget") or 0
+                    s = record.get("spent") or record.get("actual_cost") or 0
+                    if b and (s / float(b)) >= 0.8:
+                        pass
+                    else:
+                        continue
+            else:
+                continue
+            try:
+                user_ids = self._get_org_user_ids_sync(organization_id)
+            except Exception:
+                user_ids = []
+            if user_ids:
+                self._trigger_tip(
+                    rule_key,
+                    organization_id,
+                    user_ids,
+                    {"title": rule["title"], "content": rule["content"], "learn_more_query": rule.get("learn_more_query")},
+                )
+
+    def _get_org_user_ids_sync(self, organization_id: str) -> List[str]:
+        """Return user IDs for organization (for proactive tip delivery). Sync."""
+        try:
+            r = self.supabase.table("organization_members").select("user_id").eq("organization_id", organization_id).limit(100).execute()
+            return [row["user_id"] for row in (r.data or []) if row.get("user_id")]
+        except Exception:
+            try:
+                r = self.supabase.table("user_profiles").select("user_id").eq("organization_id", organization_id).limit(100).execute()
+                return [row["user_id"] for row in (r.data or []) if row.get("user_id")]
+            except Exception:
+                return []
+
+    def _log_tip_event_sync(self, user_id: str, event_type: str, event_data: Dict[str, Any]) -> None:
+        """Log tip event (sync). Used by _trigger_tip from Realtime callback."""
+        try:
+            self.supabase.table("help_analytics").insert({
+                "user_id": user_id,
+                "event_type": event_type,
+                "event_data": event_data,
+                "timestamp": datetime.now().isoformat(),
+            }).execute()
+        except Exception as e:
+            logger.debug("Tip event log failed: %s", e)
+
+    def start_monitoring(self, organization_id: str, on_change_callback: Optional[Any] = None) -> None:
+        """Start Realtime monitoring for data changes that may trigger tips. Filter by organization_id.
+        When a relevant change is received, _handle_change is invoked. Requires Supabase Realtime enabled."""
+        try:
+            if on_change_callback:
+                self._realtime_callback = on_change_callback
+            channel = self.supabase.realtime.channel(f"proactive_tips_db_{organization_id}")
+            channel.on_postgres_changes(
+                event="INSERT",
+                schema="public",
+                table="variance_alerts",
+                callback=lambda p: self._handle_change(organization_id, {"table": "variance_alerts", "event_type": "INSERT", "record": (p or {}).get("new", (p or {}).get("record", {}))}),
+            )
+            channel.subscribe()
+        except Exception as e:
+            logger.info("Realtime monitoring not started (optional): %s", e)
+
     def _load_tip_templates(self) -> Dict[str, Dict]:
         """Load tip templates from configuration"""
         return {

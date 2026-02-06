@@ -18,7 +18,7 @@ interface ProjectCardProps {
 
 function ProjectCard({ project }: ProjectCardProps) {
   return (
-    <div className="px-6 py-4 hover:bg-gray-50">
+    <div className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3 min-w-0 flex-1">
           <div 
@@ -28,21 +28,21 @@ function ProjectCard({ project }: ProjectCardProps) {
             }`}
           />
           <div className="min-w-0 flex-1">
-            <h4 className="text-sm font-medium text-gray-900 truncate">
+            <h4 className="text-sm font-medium text-gray-900 dark:text-slate-100 truncate">
               {project.name || 'Unknown Project'}
             </h4>
-            <p className="text-sm text-gray-500 capitalize">
+            <p className="text-sm text-gray-500 dark:text-slate-400 capitalize">
               {project.status?.replace('-', ' ') || 'Unknown Status'}
             </p>
           </div>
         </div>
         <div className="text-right flex-shrink-0">
           {project.budget && (
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-sm font-medium text-gray-900 dark:text-slate-100">
               ${project.budget.toLocaleString()}
             </p>
           )}
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-slate-400">
             {project.created_at ? new Date(project.created_at).toLocaleDateString() : 'Unknown Date'}
           </p>
         </div>

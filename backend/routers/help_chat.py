@@ -8,7 +8,7 @@ from fastapi import APIRouter, HTTPException, Depends, status, Request, Body
 from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any, List
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 
 from auth.dependencies import get_current_user
@@ -21,6 +21,9 @@ from services.visual_guide_service import visual_guide_service
 from services.analytics_tracker import get_analytics_tracker, EventType
 from services.help_chat_performance import get_help_chat_performance
 from services.help_chat_cache import get_cached_response, set_cached_response  # Neues Caching
+from services.help_logger import get_help_logger
+from services.natural_language_actions_service import NaturalLanguageActionsService
+from services.help_chat_security import sanitize_input, filter_pii, is_likely_malicious
 
 # Import rate limiting
 from services.rate_limiter import check_user_rate_limit, RateLimitExceeded
@@ -56,6 +59,7 @@ class HelpContextRequest(BaseModel):
 
 class HelpFeedbackRequest(BaseModel):
     message_id: Optional[str] = Field(None, description="ID of the message being rated")
+    query_id: Optional[str] = Field(None, description="ID of the help_logs entry (for help_query_feedback)")
     session_id: Optional[str] = Field(None, description="Session ID")
     rating: Optional[int] = Field(None, description="Rating from 1-5")
     feedback_text: Optional[str] = Field(None, description="Optional feedback text")
@@ -103,6 +107,7 @@ class HelpQueryResponse(BaseModel):
     sources: List[SourceReference]
     confidence: float
     response_time_ms: int
+    query_id: Optional[str] = None  # For feedback (help_query_feedback)
     proactive_tips: Optional[List[ProactiveTipResponse]] = None
     suggested_actions: Optional[List[QuickAction]] = None
     related_guides: Optional[List[GuideReference]] = None
@@ -196,10 +201,18 @@ async def process_help_query(
     """Process user help query and return AI-generated response with Supabase caching"""
     start_time = time.time()
     performance_service = get_help_chat_performance()
+    query_id = None
 
     try:
         if supabase is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
+
+        # Task 18: Input sanitization and block malicious queries
+        if is_likely_malicious(help_request.query):
+            logger.warning("Help chat: rejected likely malicious query")
+            raise HTTPException(status_code=400, detail="Invalid request")
+        sanitized_query, _ = sanitize_input(help_request.query)
+        help_request.query = sanitized_query
 
         # Check rate limiting
         user_role = current_user.get("role", "user")
@@ -213,6 +226,20 @@ async def process_help_query(
 
         # Log incoming request language for debugging
         logger.info(f"Help query received - language: {help_request.language}, query: {help_request.query[:50]}...")
+
+        # HelpLogger: log query to help_logs (enhancement)
+        try:
+            help_logger = get_help_logger()
+            org_id = current_user.get("organization_id")
+            query_id = help_logger.log_query(
+                user_id=current_user["user_id"],
+                organization_id=org_id,
+                query=help_request.query,
+                page_context=help_request.context,
+                user_role=help_request.context.get("userRole") or user_role,
+            )
+        except Exception as e:
+            logger.debug("HelpLogger.log_query skipped: %s", e)
 
         # 1. Check Supabase cache first (NEW) - include language in cache key
         cached_response = await get_cached_response(
@@ -228,11 +255,25 @@ async def process_help_query(
                 'help_query_cached', start_time, True
             )
             
-            # Add cache indicator to response
+            # Add cache indicator and query_id for feedback
             cached_response['is_cached'] = True
             cached_response['response_time_ms'] = int((time.time() - start_time) * 1000)
+            cached_response['query_id'] = query_id
+            if query_id:
+                try:
+                    help_logger = get_help_logger()
+                    help_logger.log_response(
+                        query_id=query_id,
+                        response=cached_response.get("response", ""),
+                        confidence_score=cached_response.get("confidence", 0),
+                        sources_used=cached_response.get("sources", []),
+                        response_time_ms=cached_response['response_time_ms'],
+                        success=True,
+                    )
+                except Exception as e:
+                    logger.debug("HelpLogger.log_response (cached) skipped: %s", e)
             logger.info(f"Returning cached response for lang={help_request.language} (took {cached_response['response_time_ms']}ms)")
-            return HelpQueryResponse(**cached_response)
+            return HelpQueryResponse(**{**cached_response, "response": filter_pii(cached_response.get("response", ""))})
         
         # 2. Check if we should use fallback due to performance issues
         # TEMPORARILY DISABLED: Always try AI first
@@ -247,11 +288,12 @@ async def process_help_query(
             )
             
             return HelpQueryResponse(
-                response=fallback_response['response'],
+                response=filter_pii(fallback_response['response']),
                 session_id=f"fallback_{int(time.time())}",
                 sources=fallback_response['sources'],
                 confidence=fallback_response['confidence'],
                 response_time_ms=int((time.time() - start_time) * 1000),
+                query_id=query_id,
                 suggested_actions=fallback_response['suggested_actions'],
                 is_fallback=True
             )
@@ -276,11 +318,68 @@ async def process_help_query(
             user_id=current_user["user_id"],
             language=help_request.language
         )
+
+        # 3b. Natural language action: if query is actionable, add suggested_actions (Task 10.3)
+        nl_actions: List[QuickAction] = []
+        try:
+            nl_service = NaturalLanguageActionsService(supabase)
+            ctx_dict = {
+                "route": help_request.context.get("route", ""),
+                "pageTitle": help_request.context.get("pageTitle", ""),
+                "userRole": help_request.context.get("userRole", "user"),
+            }
+            action_result = await nl_service.parse_and_execute(
+                query=help_request.query,
+                context=ctx_dict,
+                user_id=current_user.get("user_id") or current_user.get("id", ""),
+                organization_id=current_user.get("organization_id") or "",
+            )
+            if action_result.get("action_type") and action_result["action_type"] != "none" and action_result.get("confidence", 0) > 0.5:
+                ad = action_result.get("action_data") or {}
+                if action_result["action_type"] == "navigate" and ad.get("path"):
+                    nl_actions.append(QuickAction(id="nl-navigate", label="Go there", action="navigate", target=ad["path"]))
+                elif action_result["action_type"] == "open_modal" and ad.get("modal"):
+                    nl_actions.append(QuickAction(id="nl-modal", label="Open", action="open_modal", target=ad["modal"]))
+                elif action_result["action_type"] == "fetch_data":
+                    data_type = ad.get("type") or "eac"
+                    label = "View costbook" if data_type == "costbook" else "View data"
+                    nl_actions.append(QuickAction(id="nl-fetch", label=label, action="show_data", target=data_type))
+        except Exception as e:
+            logger.debug("NL action parse skipped: %s", e)
+
+        # Merge NL actions with RAG suggested_actions
+        existing_actions = [{"id": a["id"], "label": a["label"], "action": a["action"], "target": a.get("target")} for a in (help_response.suggested_actions or [])]
+        for a in nl_actions:
+            existing_actions.append({"id": a.id, "label": a.label, "action": a.action, "target": a.target})
         
-        # 4. Prepare response data for caching
+        # Task 17: Performance warning when response exceeds 5s
+        if help_response.response_time_ms > 5000:
+            logger.warning(
+                "Help chat slow response",
+                extra={"response_time_ms": help_response.response_time_ms, "query_id": query_id},
+            )
+
+        # 4. HelpLogger: log response to help_logs
+        if query_id:
+            try:
+                help_logger = get_help_logger()
+                sources_used = [{"type": s.get("type"), "id": s.get("id"), "title": s.get("title")} for s in help_response.sources]
+                help_logger.log_response(
+                    query_id=query_id,
+                    response=help_response.response,
+                    confidence_score=help_response.confidence,
+                    sources_used=sources_used,
+                    response_time_ms=help_response.response_time_ms,
+                    success=True,
+                )
+            except Exception as e:
+                logger.debug("HelpLogger.log_response skipped: %s", e)
+
+        # 5. Prepare response data for caching (Task 18: PII filter on response)
         response_data = {
-            'response': help_response.response,
+            'response': filter_pii(help_response.response),
             'session_id': help_response.session_id,
+            'query_id': query_id,
             'sources': [
                 {
                     'type': source["type"],
@@ -292,10 +391,7 @@ async def process_help_query(
             ],
             'confidence': help_response.confidence,
             'response_time_ms': help_response.response_time_ms,
-            'suggested_actions': [
-                {'id': action['id'], 'label': action['label'], 'action': action['action'], 'target': action.get('target')}
-                for action in help_response.suggested_actions
-            ] if help_response.suggested_actions else None,
+            'suggested_actions': existing_actions if existing_actions else None,
             'related_guides': [
                 {
                     'id': guide["id"],
@@ -308,7 +404,7 @@ async def process_help_query(
             ] if help_response.related_guides else None
         }
         
-        # 5. Cache response in Supabase with TTL based on confidence (NEW)
+        # 6. Cache response in Supabase with TTL based on confidence (NEW)
         cache_ttl = 600 if help_response.confidence > 0.8 else 300  # 10 min for high confidence, 5 min for lower
         await set_cached_response(
             query=help_request.query,
@@ -319,12 +415,12 @@ async def process_help_query(
             language=help_request.language
         )
         
-        # 6. Record performance metrics
+        # 7. Record performance metrics
         await performance_service.record_operation_performance(
             'help_query_ai', start_time, True
         )
         
-        # 7. Track analytics for the query
+        # 8. Track analytics for the query
         analytics_tracker = get_analytics_tracker()
         await analytics_tracker.track_query(
             user_id=current_user["user_id"],
@@ -362,9 +458,9 @@ async def process_help_query(
                 ) for tip in tips
             ]
         
-        # Convert response to API format
+        # Convert response to API format (Task 18: PII filtered)
         return HelpQueryResponse(
-            response=help_response.response,
+            response=filter_pii(help_response.response),
             session_id=help_response.session_id,
             sources=[
                 SourceReference(
@@ -377,10 +473,12 @@ async def process_help_query(
             ],
             confidence=help_response.confidence,
             response_time_ms=help_response.response_time_ms,
+            query_id=query_id,
             proactive_tips=proactive_tips if proactive_tips else None,
             suggested_actions=[
-                QuickAction(**action) for action in help_response.suggested_actions
-            ] if help_response.suggested_actions else None,
+                QuickAction(id=a["id"], label=a["label"], action=a["action"], target=a.get("target"))
+                for a in existing_actions
+            ] if existing_actions else None,
             related_guides=[
                 GuideReference(
                     id=guide["id"],
@@ -405,32 +503,39 @@ async def process_help_query(
         await performance_service.record_operation_performance(
             'help_query_error', start_time, False, 'general_exception'
         )
-        
+        if query_id:
+            try:
+                help_logger = get_help_logger()
+                help_logger.log_error(
+                    query_id=query_id,
+                    error_type=type(e).__name__,
+                    error_message=str(e),
+                )
+            except Exception as le:
+                logger.debug("HelpLogger.log_error skipped: %s", le)
         logger.error(f"Help query processing failed: {e}")
         logger.error(f"Exception type: {type(e).__name__}")
         import traceback
         logger.error(f"Traceback: {traceback.format_exc()}")
-        
         # Return fallback response on error
         try:
             fallback_response = await performance_service.get_fallback_response(
                 help_request.query, help_request.context
             )
-            
             return HelpQueryResponse(
-                response=fallback_response['response'],
+                response=filter_pii(fallback_response['response']),
                 session_id=f"error_fallback_{int(time.time())}",
                 sources=fallback_response['sources'],
                 confidence=fallback_response['confidence'],
                 response_time_ms=int((time.time() - start_time) * 1000),
+                query_id=query_id,
                 suggested_actions=fallback_response['suggested_actions'],
                 is_fallback=True
             )
-        except:
-            # Last resort fallback
+        except Exception:
             raise HTTPException(
-                status_code=500, 
-                detail=f"Help service temporarily unavailable. Please try again later."
+                status_code=500,
+                detail="Help service temporarily unavailable. Please try again later."
             )
 
 @router.get("/context", response_model=HelpContextResponse)
@@ -504,21 +609,42 @@ async def submit_help_feedback(
                 detail="Rating must be between 1 and 5"
             )
         
-        # Store feedback in database
-        feedback_data = {
-            "message_id": feedback_request.message_id,
-            "user_id": current_user["user_id"],
-            "rating": feedback_request.rating,
-            "feedback_text": feedback_request.feedback_text,
-            "feedback_type": feedback_request.feedback_type,
-            "created_at": datetime.now().isoformat()
-        }
+        # Store feedback: help_query_feedback when query_id provided (enhancement)
+        if feedback_request.query_id:
+            try:
+                help_logger = get_help_logger()
+                rating = feedback_request.rating or 3
+                help_logger.log_feedback(
+                    query_id=feedback_request.query_id,
+                    user_id=current_user["user_id"],
+                    organization_id=current_user.get("organization_id"),
+                    rating=rating,
+                    comments=feedback_request.feedback_text,
+                )
+            except Exception as e:
+                logger.debug("HelpLogger.log_feedback skipped: %s", e)
+
+        # Legacy: store in help_feedback when message_id provided
+        response = None
+        if feedback_request.message_id:
+            feedback_data = {
+                "message_id": feedback_request.message_id,
+                "user_id": current_user["user_id"],
+                "rating": feedback_request.rating,
+                "feedback_text": feedback_request.feedback_text,
+                "feedback_type": feedback_request.feedback_type,
+                "created_at": datetime.now().isoformat()
+            }
+            response = supabase.table("help_feedback").insert(feedback_data).execute()
         
-        response = supabase.table("help_feedback").insert(feedback_data).execute()
-        
-        if not response.data:
+        if feedback_request.query_id:
+            return FeedbackResponse(
+                message="Feedback submitted successfully",
+                feedback_id=feedback_request.query_id
+            )
+        if response and not response.data:
             raise HTTPException(
-                status_code=400, 
+                status_code=400,
                 detail="Failed to submit feedback"
             )
         
@@ -554,7 +680,7 @@ async def submit_help_feedback(
         
         return FeedbackResponse(
             message="Feedback submitted successfully",
-            feedback_id=response.data[0]["id"]
+            feedback_id=response.data[0]["id"] if response and response.data else None
         )
         
     except HTTPException:

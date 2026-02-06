@@ -65,7 +65,7 @@ export default function LineItemEditor({ items, onChange }: LineItemEditorProps)
     <div className="space-y-3">
       <div className="flex justify-between items-center">
         <h4 className="font-medium">Line Items</h4>
-        <button type="button" onClick={addRow} className="text-sm text-indigo-600 hover:underline">
+        <button type="button" onClick={addRow} className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
           + Add Line
         </button>
       </div>
@@ -75,7 +75,7 @@ export default function LineItemEditor({ items, onChange }: LineItemEditorProps)
             <div className="flex justify-between">
               <span className="text-sm font-medium">Line {idx + 1}</span>
               {items.length > 1 && (
-                <button type="button" onClick={() => removeRow(idx)} className="text-red-600 text-sm">
+                <button type="button" onClick={() => removeRow(idx)} className="text-red-600 dark:text-red-400 text-sm">
                   Remove
                 </button>
               )}

@@ -74,22 +74,22 @@ export default function ApiDebugger() {
   const getStatusIcon = () => {
     switch (apiStatus.status) {
       case 'checking':
-        return <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+        return <Loader2 className="h-4 w-4 animate-spin text-blue-500 dark:text-blue-400" />
       case 'success':
-        return <CheckCircle className="h-4 w-4 text-green-500" />
+        return <CheckCircle className="h-4 w-4 text-green-500 dark:text-green-400" />
       case 'error':
-        return <AlertCircle className="h-4 w-4 text-red-500" />
+        return <AlertCircle className="h-4 w-4 text-red-500 dark:text-red-400" />
     }
   }
 
   const getStatusColor = () => {
     switch (apiStatus.status) {
       case 'checking':
-        return 'border-blue-200 bg-blue-50'
+        return 'border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20'
       case 'success':
-        return 'border-green-200 bg-green-50'
+        return 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20'
       case 'error':
-        return 'border-red-200 bg-red-50'
+        return 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20'
     }
   }
 
@@ -97,10 +97,10 @@ export default function ApiDebugger() {
     <div className={`p-4 rounded-lg border ${getStatusColor()}`}>
       <div className="flex items-center space-x-2 mb-2">
         {getStatusIcon()}
-        <h3 className="font-medium text-gray-900">{t('shared.apiDebugger.title')}</h3>
+        <h3 className="font-medium text-gray-900 dark:text-slate-100">{t('shared.apiDebugger.title')}</h3>
         <button
           onClick={checkApiConnection}
-          className="text-sm text-blue-600 hover:text-blue-800"
+          className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
         >
           {t('shared.apiDebugger.retry')}
         </button>
@@ -121,8 +121,8 @@ export default function ApiDebugger() {
       </div>
 
       {apiStatus.status === 'error' && (
-        <div className="mt-3 p-3 bg-red-100 rounded border border-red-200">
-          <h4 className="font-medium text-red-800 mb-2">{t('shared.apiDebugger.troubleshooting.title')}</h4>
+        <div className="mt-3 p-3 bg-red-100 dark:bg-red-900/30 rounded border border-red-200 dark:border-red-800">
+          <h4 className="font-medium text-red-800 dark:text-red-300 mb-2">{t('shared.apiDebugger.troubleshooting.title')}</h4>
           <ul className="text-sm text-red-700 space-y-1">
             <li>• {t('shared.apiDebugger.troubleshooting.checkBackend')}</li>
             <li>• {t('shared.apiDebugger.troubleshooting.verifyEnvVar')}</li>

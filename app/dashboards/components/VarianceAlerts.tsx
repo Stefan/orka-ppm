@@ -183,11 +183,11 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'bg-red-100 border-red-200 text-red-800'
-      case 'high': return 'bg-orange-100 border-orange-200 text-orange-800'
-      case 'medium': return 'bg-yellow-100 border-yellow-200 text-yellow-800'
-      case 'low': return 'bg-blue-100 border-blue-200 text-blue-800'
-      default: return 'bg-gray-100 border-gray-200 text-gray-800'
+      case 'critical': return 'bg-red-100 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300'
+      case 'high': return 'bg-orange-100 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800 text-orange-800 dark:text-orange-300'
+      case 'medium': return 'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-300'
+      case 'low': return 'bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300'
+      default: return 'bg-gray-100 dark:bg-slate-700 border-gray-200 dark:border-slate-700 text-gray-800 dark:text-slate-300'
     }
   }
 
@@ -207,12 +207,12 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
 
   if (loading || permissionsLoading) {
     return (
-      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
+          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-4"></div>
           <div className="space-y-2">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-12 bg-gray-200 rounded"></div>
+              <div key={i} className="h-12 bg-gray-200 dark:bg-slate-700 rounded"></div>
             ))}
           </div>
         </div>
@@ -231,10 +231,10 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
 
   if ((activeAlerts?.length || 0) === 0) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4" style={containerStyle}>
+      <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg p-4" style={containerStyle}>
         <div className="flex items-center">
-          <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-          <span className="text-sm text-green-800">
+          <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 mr-2" />
+          <span className="text-sm text-green-800 dark:text-green-300">
             No active variance alerts. All projects are within budget thresholds.
           </span>
         </div>
@@ -243,9 +243,9 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
   }
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200" style={containerStyle}>
+    <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700" style={containerStyle}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
           Variance Alerts ({activeAlerts?.length || 0})
         </h3>
         <div className="flex items-center gap-2">
@@ -254,7 +254,7 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
               type="button"
               onClick={requestPushPermission}
               className={`text-xs px-2 py-1 rounded border ${
-                pushEnabled ? 'bg-blue-100 border-blue-300 text-blue-800' : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                pushEnabled ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-800 text-blue-800 dark:text-blue-300' : 'border-gray-300 dark:border-slate-600 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700'
               }`}
               title="Get browser push for new alerts"
             >
@@ -264,7 +264,7 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
           {(alerts?.length || 0) > 3 && (
             <button
               onClick={() => setShowAll(!showAll)}
-              className="text-sm text-blue-600 hover:text-blue-800"
+              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
             >
               {showAll ? 'Show Less' : `Show All (${alerts?.length || 0})`}
             </button>
@@ -309,7 +309,7 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
               {!alert.resolved && canManageAlerts && (
                 <button
                   onClick={() => resolveAlert(alert.id)}
-                  className="ml-2 p-1 hover:bg-white hover:bg-opacity-50 rounded"
+                  className="ml-2 p-1 hover:bg-white dark:bg-slate-800 hover:bg-opacity-50 dark:hover:bg-slate-700 rounded"
                   title="Resolve alert"
                 >
                   <X className="h-4 w-4" />
@@ -317,7 +317,7 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
               )}
 
               {!alert.resolved && !canManageAlerts && (
-                <div className="ml-2 text-xs text-gray-500 italic">
+                <div className="ml-2 text-xs text-gray-600 dark:text-slate-400 italic">
                   Admin only
                 </div>
               )}
@@ -328,7 +328,7 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
                 <button
                   type="button"
                   onClick={() => toggleRootCause(alert.id)}
-                  className="flex items-center gap-1 text-xs font-medium text-gray-700 hover:text-gray-900"
+                  className="flex items-center gap-1 text-xs font-medium text-gray-700 dark:text-slate-300 hover:text-gray-900 dark:hover:text-slate-100"
                 >
                   {expandedRootCause === alert.id ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
                   Root cause
@@ -336,7 +336,7 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
                 <button
                   type="button"
                   onClick={() => openSuggestions(alert.id)}
-                  className="flex items-center gap-1 text-xs font-medium text-blue-700 hover:text-blue-900"
+                  className="flex items-center gap-1 text-xs font-medium text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
                 >
                   <Lightbulb className="h-3 w-3" />
                   Suggestions
@@ -345,24 +345,24 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
             )}
 
             {expandedRootCause === alert.id && (
-              <div className="mt-2 pt-2 border-t border-gray-200/80">
-                <p className="text-xs font-medium text-gray-600 mb-1">AI Root Cause</p>
+              <div className="mt-2 pt-2 border-t border-gray-200/80 dark:border-slate-700">
+                <p className="text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">AI Root Cause</p>
                 {rootCauseCache[alert.id]?.length ? (
                   <ul className="text-xs space-y-1">
                     {rootCauseCache[alert.id].map((c, i) => (
                       <li key={i}>
-                        {c.cause} <span className="text-gray-500">({c.confidence_pct}%)</span>
+                        {c.cause} <span className="text-gray-600 dark:text-slate-400">({c.confidence_pct}%)</span>
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-xs text-gray-500">Loading…</p>
+                  <p className="text-xs text-gray-600 dark:text-slate-400">Loading…</p>
                 )}
               </div>
             )}
 
             {alert.resolved && (
-              <div className="mt-2 flex items-center text-xs text-gray-600">
+              <div className="mt-2 flex items-center text-xs text-gray-700 dark:text-slate-300">
                 <CheckCircle className="h-3 w-3 mr-1" />
                 Resolved
               </div>
@@ -378,16 +378,16 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
           aria-modal="true"
           aria-labelledby="suggestions-title"
         >
-          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col">
-            <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-              <h4 id="suggestions-title" className="font-semibold text-gray-900 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
+              <h4 id="suggestions-title" className="font-semibold text-gray-900 dark:text-slate-100 flex items-center gap-2">
                 <Zap className="h-4 w-4 text-amber-500" />
                 Auto-fix suggestions
               </h4>
               <button
                 type="button"
                 onClick={() => { setSuggestionsAlertId(null); setSuggestions([]) }}
-                className="p-1 rounded hover:bg-gray-100"
+                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-slate-700"
                 aria-label="Close"
               >
                 <X className="h-5 w-5" />
@@ -395,18 +395,18 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
             </div>
             <div className="p-4 overflow-y-auto flex-1">
               {suggestionsLoading ? (
-                <p className="text-sm text-gray-500">Loading suggestions…</p>
+                <p className="text-sm text-gray-600 dark:text-slate-400">Loading suggestions…</p>
               ) : suggestions.length === 0 ? (
-                <p className="text-sm text-gray-500">No suggestions for this alert.</p>
+                <p className="text-sm text-gray-600 dark:text-slate-400">No suggestions for this alert.</p>
               ) : (
                 <ul className="space-y-3">
                   {suggestions.map((s) => (
-                    <li key={s.id} className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                      <p className="text-sm font-medium text-gray-900">{s.description}</p>
-                      <p className="text-xs text-gray-600 mt-1">{s.impact}</p>
+                    <li key={s.id} className="p-3 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-100 dark:border-slate-600">
+                      <p className="text-sm font-medium text-gray-900 dark:text-slate-100">{s.description}</p>
+                      <p className="text-xs text-gray-700 dark:text-slate-300 mt-1">{s.impact}</p>
                       <button
                         type="button"
-                        className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium"
+                        className="mt-2 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
                       >
                         Simulate impact
                       </button>
@@ -420,7 +420,7 @@ function VarianceAlerts({ session, onAlertCount, showAdminActions }: VarianceAle
       )}
 
       {error && (
-        <div className="mt-3 text-xs text-gray-500">
+        <div className="mt-3 text-xs text-gray-600 dark:text-slate-400">
           Note: Using demo data - {error}
         </div>
       )}

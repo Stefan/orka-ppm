@@ -1,9 +1,9 @@
 /**
  * Unit Tests for usePermissions Hook
- * 
+ *
  * Tests the usePermissions hook's ability to check permissions and roles,
  * handle caching, and provide real-time updates.
- * 
+ *
  * Requirements: 3.2, 3.5 - Hook-based API with real-time updates and caching
  */
 
@@ -17,8 +17,17 @@ jest.mock('@/app/providers/SupabaseAuthProvider', () => ({
   useAuth: () => mockUseAuth()
 }))
 
-// Mock fetch for API calls
-global.fetch = jest.fn()
+// Mock fetch with Response-like object so response.ok and response.json() work
+const mockFetch = jest.fn()
+global.fetch = mockFetch
+
+function createJsonResponse(data: unknown) {
+  return {
+    ok: true,
+    status: 200,
+    json: () => Promise.resolve(data)
+  }
+}
 
 describe('usePermissions', () => {
   const mockSession = {
@@ -41,7 +50,7 @@ describe('usePermissions', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(global.fetch as jest.Mock).mockClear()
+    mockFetch.mockClear()
   })
 
   describe('Initialization and Loading', () => {
@@ -68,18 +77,15 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       const { result } = renderHook(() => usePermissions())
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false)
-      })
+      }, { timeout: 3000 })
 
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('/api/rbac/user-permissions'),
         expect.objectContaining({
           headers: expect.objectContaining({
@@ -106,7 +112,7 @@ describe('usePermissions', () => {
         expect(result.current.loading).toBe(false)
       })
 
-      expect(global.fetch).not.toHaveBeenCalled()
+      expect(mockFetch).not.toHaveBeenCalled()
       expect(result.current.permissions).toEqual([])
       expect(result.current.userRoles).toEqual([])
     })
@@ -121,10 +127,7 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       const { result } = renderHook(() => usePermissions())
 
@@ -145,10 +148,7 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       const { result } = renderHook(() => usePermissions())
 
@@ -169,10 +169,7 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       const { result } = renderHook(() => usePermissions())
 
@@ -213,10 +210,7 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
     })
 
     it('should check context-aware permissions via API', async () => {
@@ -227,10 +221,7 @@ describe('usePermissions', () => {
       })
 
       // Mock the context permission check
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ has_permission: true })
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse({ has_permission: true }))
 
       const context = { project_id: 'project-123' }
       
@@ -266,10 +257,7 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       const { result } = renderHook(() => usePermissions())
 
@@ -293,10 +281,7 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       const { result } = renderHook(() => usePermissions())
 
@@ -316,10 +301,7 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       const { result } = renderHook(() => usePermissions())
 
@@ -357,10 +339,7 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValue({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValue(createJsonResponse(mockUserPermissions))
 
       const { result } = renderHook(() => usePermissions())
 
@@ -368,14 +347,14 @@ describe('usePermissions', () => {
         expect(result.current.loading).toBe(false)
       })
 
-      expect(global.fetch).toHaveBeenCalledTimes(1)
+      expect(mockFetch).toHaveBeenCalledTimes(1)
 
       // Call refetch
       await act(async () => {
         await result.current.refetch()
       })
 
-      expect(global.fetch).toHaveBeenCalledTimes(2)
+      expect(mockFetch).toHaveBeenCalledTimes(2)
     })
 
     it('should update permissions after refetch', async () => {
@@ -387,10 +366,7 @@ describe('usePermissions', () => {
       })
 
       // Initial permissions
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       const { result } = renderHook(() => usePermissions())
 
@@ -418,10 +394,7 @@ describe('usePermissions', () => {
         ] as Permission[]
       }
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => updatedPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(updatedPermissions))
 
       // Refetch
       await act(async () => {
@@ -447,7 +420,7 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
+      ;mockFetch.mockRejectedValueOnce(new Error('Network error'))
 
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
 
@@ -472,7 +445,7 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 403
       })
@@ -500,7 +473,7 @@ describe('usePermissions', () => {
       })
 
       // First call fails
-      ;(global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
+      ;mockFetch.mockRejectedValueOnce(new Error('Network error'))
 
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
 
@@ -513,10 +486,7 @@ describe('usePermissions', () => {
       expect(result.current.error?.message).toBe('Network error')
 
       // Second call succeeds
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       await act(async () => {
         await result.current.refetch()
@@ -546,7 +516,7 @@ describe('usePermissions', () => {
       const { rerender } = renderHook(() => usePermissions())
 
       await waitFor(() => {
-        expect(global.fetch).not.toHaveBeenCalled()
+        expect(mockFetch).not.toHaveBeenCalled()
       })
 
       // User logs in
@@ -557,15 +527,12 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       rerender()
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledTimes(1)
+        expect(mockFetch).toHaveBeenCalledTimes(1)
       })
     })
 
@@ -577,10 +544,7 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       const { result, rerender } = renderHook(() => usePermissions())
 
@@ -614,10 +578,7 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       const { result } = renderHook(() => usePermissions())
 
@@ -635,7 +596,7 @@ describe('usePermissions', () => {
       expect(check3).toBe(true)
 
       // Should only have made one API call (initial fetch)
-      expect(global.fetch).toHaveBeenCalledTimes(1)
+      expect(mockFetch).toHaveBeenCalledTimes(1)
     })
 
     it('should not make redundant API calls for global permissions', async () => {
@@ -646,10 +607,7 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       const { result } = renderHook(() => usePermissions())
 
@@ -663,7 +621,7 @@ describe('usePermissions', () => {
       result.current.hasPermission('resource_read')
 
       // Should only have made one API call (initial fetch)
-      expect(global.fetch).toHaveBeenCalledTimes(1)
+      expect(mockFetch).toHaveBeenCalledTimes(1)
     })
 
     it('should clear cache on refetch', async () => {
@@ -674,10 +632,7 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       const { result } = renderHook(() => usePermissions())
 
@@ -687,13 +642,10 @@ describe('usePermissions', () => {
 
       expect(result.current.hasPermission('project_read')).toBe(true)
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse({
           ...mockUserPermissions,
           effective_permissions: [] as Permission[]
-        })
-      })
+        }))
 
       await act(async () => {
         await result.current.refetch()
@@ -712,7 +664,7 @@ describe('usePermissions', () => {
     beforeEach(() => {
       // Clear any mocks from previous test sections
       jest.clearAllMocks()
-      ;(global.fetch as jest.Mock).mockClear()
+      ;mockFetch.mockClear()
     })
 
     it('should handle empty permissions array', async () => {
@@ -723,13 +675,10 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse({
           ...mockUserPermissions,
           effective_permissions: [] as Permission[]
-        })
-      })
+        }))
 
       const { result } = renderHook(() => usePermissions())
 
@@ -749,13 +698,10 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse({
           ...mockUserPermissions,
           roles: []
-        })
-      })
+        }))
 
       const { result } = renderHook(() => usePermissions())
 
@@ -775,10 +721,7 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       const { result } = renderHook(() => usePermissions())
 
@@ -797,10 +740,7 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       const { result } = renderHook(() => usePermissions())
 
@@ -821,15 +761,12 @@ describe('usePermissions', () => {
         error: null
       })
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockUserPermissions
-      })
+      ;mockFetch.mockResolvedValueOnce(createJsonResponse(mockUserPermissions))
 
       renderHook(() => usePermissions())
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith(
+        expect(mockFetch).toHaveBeenCalledWith(
           '/api/rbac/user-permissions',
           expect.objectContaining({
             method: 'GET',

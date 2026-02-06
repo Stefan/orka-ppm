@@ -74,12 +74,11 @@ function checkCSSSupport(property: string, value: string): boolean {
 }
 
 /**
- * Check if async/await is supported
+ * Check if async/await is supported (without eval)
  */
 function checkAsyncAwaitSupport(): boolean {
   try {
-    eval('(async () => {})')
-    return true
+    return typeof Promise !== 'undefined' && typeof (async () => {}) === 'function'
   } catch {
     return false
   }

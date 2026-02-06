@@ -20,6 +20,7 @@ import {
   DollarSign,
   Activity
 } from 'lucide-react'
+import { GuidedTour, useGuidedTour, TourTriggerButton, monteCarloTourSteps } from '@/components/guided-tour'
 
 interface Risk {
   id: string
@@ -71,6 +72,7 @@ export default function MonteCarloPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showConfig, setShowConfig] = useState(false)
+  const { isOpen, startTour, closeTour, completeTour, resetAndStartTour, hasCompletedTour } = useGuidedTour('montecarlo-v1')
   const [config, setConfig] = useState<SimulationConfig>({
     risks: [],
     iterations: 10000
@@ -208,12 +210,12 @@ export default function MonteCarloPage() {
       {
         id: 'risk_003',
         name: 'Budget Overrun',
-        category: 'financial',
+        category: 'cost',
         impact_type: 'cost',
         distribution_type: 'lognormal',
         distribution_parameters: {
-          mean: 0.15,
-          std: 0.3
+          mu: 0.15,
+          sigma: 0.3
         },
         baseline_impact: 200000,
         correlation_dependencies: ['risk_001']
@@ -247,15 +249,19 @@ export default function MonteCarloPage() {
       <ResponsiveContainer padding="md" className="space-y-6">
         <div data-testid="monte-carlo-page">
         {/* Header */}
-        <div data-testid="monte-carlo-header" className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
+        <div data-testid="monte-carlo-header" data-tour="montecarlo-voice" className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
           <div>
-            <h1 data-testid="monte-carlo-title" className="text-2xl sm:text-3xl font-bold text-gray-900">{t('monteCarlo.title')}</h1>
-            <p className="mt-2 text-gray-600">
+            <h1 data-testid="monte-carlo-title" className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-slate-100">{t('monteCarlo.title')}</h1>
+            <p className="mt-2 text-gray-700 dark:text-slate-300">
               {t('monteCarlo.subtitle')}
             </p>
           </div>
           
-          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+          <div data-tour="montecarlo-ai-scenarios" className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 items-start sm:items-center">
+            <TourTriggerButton
+              onStart={hasCompletedTour ? resetAndStartTour : startTour}
+              hasCompletedTour={hasCompletedTour}
+            />
             <TouchButton
               onClick={() => setShowConfig(!showConfig)}
               variant="secondary"
@@ -280,47 +286,47 @@ export default function MonteCarloPage() {
 
         {/* Error Banner */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
             <div className="flex items-start">
-              <AlertTriangle className="h-5 w-5 text-red-400 mr-2 flex-shrink-0 mt-0.5" />
-              <span className="text-sm text-red-800">{error}</span>
+              <AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400 mr-2 flex-shrink-0 mt-0.5" />
+              <span className="text-sm text-red-800 dark:text-red-300">{error}</span>
             </div>
           </div>
         )}
 
         {/* Configuration Panel */}
         {showConfig && (
-          <div data-testid="monte-carlo-controls" className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">{t('monteCarlo.simulationConfiguration')}</h3>
+          <div data-testid="monte-carlo-controls" data-tour="montecarlo-parameters" className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{t('monteCarlo.simulationConfiguration')}</h3>
             </div>
             <div className="p-6 space-y-6">
               {/* Risk Configuration */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-md font-medium text-gray-900">{t('monteCarlo.riskConfiguration')}</h4>
+                  <h4 className="text-md font-medium text-gray-900 dark:text-slate-100">{t('monteCarlo.riskConfiguration')}</h4>
                   <button
                     onClick={loadRisksFromProject}
-                    className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                    className="px-3 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
                   >
                     {t('monteCarlo.loadSampleRisks')}
                   </button>
                 </div>
                 
                 {config.risks.length === 0 ? (
-                  <div className="text-center py-8 bg-gray-50 rounded-lg">
-                    <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 mb-4">{t('monteCarlo.noRisksConfigured')}</p>
-                    <p className="text-sm text-gray-400">{t('monteCarlo.loadRisksMessage')}</p>
+                  <div className="text-center py-8 bg-gray-50 dark:bg-slate-700 rounded-lg">
+                    <Target className="h-12 w-12 text-gray-400 dark:text-slate-500 mx-auto mb-4" />
+                    <p className="text-gray-700 dark:text-slate-300 mb-4">{t('monteCarlo.noRisksConfigured')}</p>
+                    <p className="text-sm text-gray-600 dark:text-slate-300">{t('monteCarlo.loadRisksMessage')}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {config.risks.map((risk, index) => (
-                      <div key={risk.id} className="p-4 bg-gray-50 rounded-lg">
+                      <div key={risk.id} className="p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
                         <div className="flex items-center justify-between">
                           <div>
-                            <h5 className="font-medium text-gray-900">{risk.name}</h5>
-                            <div className="flex items-center space-x-4 mt-1 text-sm text-gray-600">
+                            <h5 className="font-medium text-gray-900 dark:text-slate-100">{risk.name}</h5>
+                            <div className="flex items-center space-x-4 mt-1 text-sm text-gray-700 dark:text-slate-300">
                               <span className="capitalize">{risk.category}</span>
                               <span className="capitalize">{risk.impact_type}</span>
                               <span className="capitalize">{risk.distribution_type}</span>
@@ -339,7 +345,7 @@ export default function MonteCarloPage() {
                                 risks: prev.risks.filter((_, i) => i !== index)
                               }))
                             }}
-                            className="text-red-600 hover:text-red-800"
+                            className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                           >
                             Remove
                           </button>
@@ -352,10 +358,10 @@ export default function MonteCarloPage() {
 
               {/* Simulation Parameters */}
               <div>
-                <h4 className="text-md font-medium text-gray-900 mb-4">Simulation Parameters</h4>
+                <h4 className="text-md font-medium text-gray-900 dark:text-slate-100 mb-4">Simulation Parameters</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                       Iterations
                     </label>
                     <input
@@ -368,13 +374,13 @@ export default function MonteCarloPage() {
                       min="1000"
                       max="1000000"
                       step="1000"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Minimum: 1,000 | Recommended: 10,000+</p>
+                    <p className="text-xs text-gray-700 dark:text-slate-300 mt-1">Minimum: 1,000 | Recommended: 10,000+</p>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                       Random Seed (Optional)
                     </label>
                     <input
@@ -385,19 +391,19 @@ export default function MonteCarloPage() {
                         random_seed: e.target.value ? parseInt(e.target.value) : 0
                       }))}
                       placeholder="Leave empty for random"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
-                    <p className="text-xs text-gray-500 mt-1">For reproducible results</p>
+                    <p className="text-xs text-gray-700 dark:text-slate-300 mt-1">For reproducible results</p>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                       Estimated Runtime
                     </label>
-                    <div className="px-3 py-2 bg-gray-100 rounded-md text-sm text-gray-700">
+                    <div className="px-3 py-2 bg-gray-100 dark:bg-slate-700 rounded-md text-sm text-gray-700 dark:text-slate-300">
                       {Math.ceil((config.risks.length * config.iterations) / 10000)} seconds
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">Approximate execution time</p>
+                    <p className="text-xs text-gray-700 dark:text-slate-300 mt-1">Approximate execution time</p>
                   </div>
                 </div>
               </div>
@@ -411,75 +417,77 @@ export default function MonteCarloPage() {
             columns={{ mobile: 1, tablet: 2, desktop: 4 }}
             gap="md"
           >
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Mean Cost Impact</p>
-                  <p className="text-2xl font-bold text-blue-600">
+                  <p className="text-sm font-medium text-gray-700 dark:text-slate-300">Mean Cost Impact</p>
+                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                     {formatCurrency(activeSimulation.summary.cost_statistics.mean)}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-700 dark:text-slate-300 mt-1">
                     ±{formatCurrency(activeSimulation.summary.cost_statistics.std)}
                   </p>
                 </div>
-                <DollarSign className="h-8 w-8 text-blue-600" />
+                <DollarSign className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Mean Schedule Impact</p>
-                  <p className="text-2xl font-bold text-green-600">
+                  <p className="text-sm font-medium text-gray-700 dark:text-slate-300">Mean Schedule Impact</p>
+                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                     {formatDuration(activeSimulation.summary.schedule_statistics.mean)}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-700 dark:text-slate-300 mt-1">
                     ±{formatDuration(activeSimulation.summary.schedule_statistics.std)}
                   </p>
                 </div>
-                <Clock className="h-8 w-8 text-green-600" />
+                <Clock className="h-8 w-8 text-green-600 dark:text-green-400" />
               </div>
             </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Iterations</p>
-                  <p className="text-2xl font-bold text-purple-600">
+                  <p className="text-sm font-medium text-gray-700 dark:text-slate-300">Iterations</p>
+                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                     {activeSimulation.iteration_count.toLocaleString()}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-700 dark:text-slate-300 mt-1">
                     {activeSimulation.convergence_status ? 'Converged' : 'Not converged'}
                   </p>
                 </div>
-                <Activity className="h-8 w-8 text-purple-600" />
+                <Activity className="h-8 w-8 text-purple-600 dark:text-purple-400" />
               </div>
             </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Execution Time</p>
-                  <p className="text-2xl font-bold text-orange-600">
+                  <p className="text-sm font-medium text-gray-700 dark:text-slate-300">Execution Time</p>
+                  <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                     {activeSimulation.execution_time.toFixed(1)}s
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-700 dark:text-slate-300 mt-1">
                     {new Date(activeSimulation.timestamp).toLocaleDateString()}
                   </p>
                 </div>
-                <TrendingUp className="h-8 w-8 text-orange-600" />
+                <TrendingUp className="h-8 w-8 text-orange-600 dark:text-orange-400" />
               </div>
             </div>
           </AdaptiveGrid>
         )}
 
-        {/* Monte Carlo Visualization Component */}
+        {/* Monte Carlo Visualization Component (Charts / Heatmap) */}
         {activeSimulation && (
-          <MonteCarloVisualization
-            simulationId={activeSimulation.simulation_id}
-            session={session}
-            onError={setError}
-          />
+          <div data-tour="montecarlo-heatmap">
+            <MonteCarloVisualization
+              simulationId={activeSimulation.simulation_id}
+              session={session}
+              onError={setError}
+            />
+          </div>
         )}
 
         {/* Simulation History */}
@@ -492,25 +500,25 @@ export default function MonteCarloPage() {
               <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
                 <thead className="bg-gray-50 dark:bg-slate-700">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wider">
                       Simulation ID
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wider">
                       Date
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wider">
                       Iterations
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wider">
                       Mean Cost
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wider">
                       Mean Schedule
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -519,7 +527,7 @@ export default function MonteCarloPage() {
                   {simulationHistory.map((simulation) => (
                     <tr 
                       key={simulation.simulation_id}
-                      className={`hover:bg-gray-50 dark:hover:bg-slate-600 cursor-pointer transition-colors ${
+                      className={`hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-600 cursor-pointer transition-colors ${
                         activeSimulation?.simulation_id === simulation.simulation_id ? 'bg-blue-50 dark:bg-blue-900/30' : ''
                       }`}
                       onClick={() => setActiveSimulation(simulation)}
@@ -527,16 +535,16 @@ export default function MonteCarloPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-slate-100">
                         {simulation.simulation_id}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-slate-300">
                         {new Date(simulation.timestamp).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-slate-300">
                         {simulation.iteration_count.toLocaleString()}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-slate-300">
                         {formatCurrency(simulation.summary.cost_statistics.mean)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-slate-300">
                         {formatDuration(simulation.summary.schedule_statistics.mean)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -548,7 +556,7 @@ export default function MonteCarloPage() {
                           {simulation.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-slate-300">
                         <button
                           onClick={(e) => {
                             e.stopPropagation()
@@ -570,9 +578,9 @@ export default function MonteCarloPage() {
         {/* Empty State */}
         {!activeSimulation && simulationHistory.length === 0 && !loading && (
           <div className="text-center py-12">
-            <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 mb-4">No Monte Carlo simulations yet</p>
-            <p className="text-sm text-gray-400 mb-6">
+            <BarChart3 className="h-12 w-12 text-gray-400 dark:text-slate-500 mx-auto mb-4" />
+            <p className="text-gray-700 dark:text-slate-300 mb-4">No Monte Carlo simulations yet</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
               Configure risks and run your first simulation to see statistical analysis
             </p>
             <button
@@ -586,6 +594,13 @@ export default function MonteCarloPage() {
         )}
         </div>
       </ResponsiveContainer>
+      <GuidedTour
+        steps={monteCarloTourSteps}
+        isOpen={isOpen}
+        onClose={closeTour}
+        onComplete={completeTour}
+        tourId="montecarlo-v1"
+      />
     </AppLayout>
   )
 }

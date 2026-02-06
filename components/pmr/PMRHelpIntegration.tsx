@@ -150,7 +150,7 @@ export const PMRHelpIntegration: React.FC<PMRHelpIntegrationProps> = ({
                   resetTour()
                   trackInteraction('onboarding-tour', 'restarted')
                 }}
-                className="flex items-center space-x-2 px-3 py-2 bg-white text-gray-700 rounded-lg shadow-md hover:bg-gray-50 transition-colors text-sm whitespace-nowrap"
+                className="flex items-center space-x-2 px-3 py-2 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 rounded-lg shadow-md hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors text-sm whitespace-nowrap"
               >
                 <span>🎯</span>
                 <span>Restart Tour</span>

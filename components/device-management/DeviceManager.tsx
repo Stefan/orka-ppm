@@ -37,7 +37,7 @@ export const DeviceManager: React.FC<DeviceManagerProps> = ({
   }, [isOpen, refreshDevices])
 
   const getDeviceIcon = (deviceType: string, isActive: boolean = true) => {
-    const iconClass = `h-5 w-5 ${isActive ? 'text-green-500' : 'text-gray-400'}`
+    const iconClass = `h-5 w-5 ${isActive ? 'text-green-500 dark:text-green-400' : 'text-gray-400 dark:text-slate-500'}`
     
     switch (deviceType) {
       case 'mobile':
@@ -89,22 +89,22 @@ export const DeviceManager: React.FC<DeviceManagerProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-slate-700">
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
               {isOnline ? (
-                <Wifi className="h-5 w-5 text-green-500" />
+                <Wifi className="h-5 w-5 text-green-500 dark:text-green-400" />
               ) : (
-                <WifiOff className="h-5 w-5 text-red-500" />
+                <WifiOff className="h-5 w-5 text-red-500 dark:text-red-400" />
               )}
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100">
                 Device Manager
               </h2>
             </div>
             {isSyncing && (
-              <div className="flex items-center space-x-2 text-sm text-blue-600">
+              <div className="flex items-center space-x-2 text-sm text-blue-600 dark:text-blue-400">
                 <RefreshCw className="h-4 w-4 animate-spin" />
                 <span>Syncing...</span>
               </div>
@@ -114,13 +114,13 @@ export const DeviceManager: React.FC<DeviceManagerProps> = ({
             <button
               onClick={handleRefreshDevices}
               disabled={isLoading}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors disabled:opacity-50"
             >
-              <RefreshCw className={`h-4 w-4 text-gray-500 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-4 w-4 text-gray-500 dark:text-slate-400 ${isLoading ? 'animate-spin' : ''}`} />
             </button>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors"
             >
               ×
             </button>
@@ -130,20 +130,20 @@ export const DeviceManager: React.FC<DeviceManagerProps> = ({
         <div className="overflow-y-auto max-h-[calc(80vh-120px)]">
           {/* Current Session */}
           {sessionState && (
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="font-medium text-gray-900 mb-3">Current Session</h3>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="p-6 border-b border-gray-200 dark:border-slate-700">
+              <h3 className="font-medium text-gray-900 dark:text-slate-100 mb-3">Current Session</h3>
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     {getDeviceIcon('desktop')}
                     <div>
-                      <div className="font-medium text-gray-900">This Device</div>
-                      <div className="text-sm text-gray-600">
+                      <div className="font-medium text-gray-900 dark:text-slate-100">This Device</div>
+                      <div className="text-sm text-gray-600 dark:text-slate-400">
                         Active on {sessionState.currentWorkspace}
                       </div>
                     </div>
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-gray-500 dark:text-slate-400">
                     {formatLastSeen(sessionState.lastActivity)}
                   </div>
                 </div>
@@ -153,19 +153,19 @@ export const DeviceManager: React.FC<DeviceManagerProps> = ({
 
           {/* Recent Devices for Session Continuity */}
           {recentDevices.length > 0 && (
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="font-medium text-gray-900 mb-3">Continue From Other Device</h3>
+            <div className="p-6 border-b border-gray-200 dark:border-slate-700">
+              <h3 className="font-medium text-gray-900 dark:text-slate-100 mb-3">Continue From Other Device</h3>
               <div className="space-y-3">
                 {recentDevices.map((device) => (
                   <div
                     key={device.id}
-                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+                    className="flex items-center justify-between p-4 border border-gray-200 dark:border-slate-700 rounded-lg hover:border-gray-300 transition-colors"
                   >
                     <div className="flex items-center space-x-3">
                       {getDeviceIcon(device.type, device.isActive)}
                       <div>
-                        <div className="font-medium text-gray-900">{device.name}</div>
-                        <div className="text-sm text-gray-600 flex items-center space-x-2">
+                        <div className="font-medium text-gray-900 dark:text-slate-100">{device.name}</div>
+                        <div className="text-sm text-gray-600 dark:text-slate-400 flex items-center space-x-2">
                           <Clock className="h-3 w-3" />
                           <span>Last seen {formatLastSeen(device.lastSeen)}</span>
                         </div>
@@ -187,14 +187,14 @@ export const DeviceManager: React.FC<DeviceManagerProps> = ({
 
           {/* All Connected Devices */}
           <div className="p-6">
-            <h3 className="font-medium text-gray-900 mb-3">All Connected Devices</h3>
+            <h3 className="font-medium text-gray-900 dark:text-slate-100 mb-3">All Connected Devices</h3>
             {availableDevices.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-500 dark:text-slate-400">
                 <Monitor className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                 <p>No devices found</p>
                 <button
                   onClick={handleRefreshDevices}
-                  className="mt-2 text-blue-600 hover:text-blue-700 text-sm"
+                  className="mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 text-sm"
                 >
                   Refresh to check for devices
                 </button>
@@ -206,22 +206,22 @@ export const DeviceManager: React.FC<DeviceManagerProps> = ({
                     key={device.id}
                     className={`flex items-center justify-between p-4 border rounded-lg transition-colors ${
                       device.isActive 
-                        ? 'border-green-200 bg-green-50' 
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20' 
+                        : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'
                     }`}
                   >
                     <div className="flex items-center space-x-3">
                       {getDeviceIcon(device.type, device.isActive)}
                       <div>
                         <div className="flex items-center space-x-2">
-                          <span className="font-medium text-gray-900">{device.name}</span>
+                          <span className="font-medium text-gray-900 dark:text-slate-100">{device.name}</span>
                           {device.isActive && (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
                               Active
                             </span>
                           )}
                         </div>
-                        <div className="text-sm text-gray-600 flex items-center space-x-4">
+                        <div className="text-sm text-gray-600 dark:text-slate-400 flex items-center space-x-4">
                           <span>{device.platform}</span>
                           <span className="flex items-center space-x-1">
                             <Clock className="h-3 w-3" />
@@ -250,23 +250,23 @@ export const DeviceManager: React.FC<DeviceManagerProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
-          <div className="text-sm text-gray-600">
+        <div className="flex items-center justify-between p-6 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+          <div className="text-sm text-gray-600 dark:text-slate-400">
             {isOnline ? (
               <span className="flex items-center space-x-2">
-                <Wifi className="h-4 w-4 text-green-500" />
+                <Wifi className="h-4 w-4 text-green-500 dark:text-green-400" />
                 <span>Connected - Auto-sync enabled</span>
               </span>
             ) : (
               <span className="flex items-center space-x-2">
-                <WifiOff className="h-4 w-4 text-red-500" />
+                <WifiOff className="h-4 w-4 text-red-500 dark:text-red-400" />
                 <span>Offline - Changes will sync when connected</span>
               </span>
             )}
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
           >
             Close
           </button>

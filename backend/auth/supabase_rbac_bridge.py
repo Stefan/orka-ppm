@@ -484,18 +484,19 @@ class SupabaseRBACBridge:
     # Requirements: 2.1 - User role retrieval during authentication
     # =========================================================================
     
-    async def get_user_from_jwt(self, token: str) -> Optional[Dict[str, Any]]:
+    async def get_user_from_jwt(self, token: str, secret_key: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """
         Extract user and role information from JWT token.
         
         This method:
-        1. Decodes the JWT token
+        1. Verifies and decodes the JWT token (signature verified when secret_key is set)
         2. Extracts user ID and basic info
         3. Retrieves enhanced user info with roles from database
         4. Returns complete user object with role information
         
         Args:
             token: JWT token string
+            secret_key: Optional JWT secret for signature verification (e.g. SUPABASE_JWT_SECRET)
             
         Returns:
             Dictionary with user information including roles, or None if invalid
@@ -503,8 +504,10 @@ class SupabaseRBACBridge:
         Requirements: 2.1 - User authentication and role retrieval
         """
         try:
-            # Decode JWT token (without signature verification for now)
-            payload = jwt.decode(token, options={"verify_signature": False})
+            if secret_key:
+                payload = jwt.decode(token, secret_key, algorithms=["HS256"])
+            else:
+                payload = jwt.decode(token, options={"verify_signature": False})
             
             # Extract user ID
             user_id = payload.get("sub")

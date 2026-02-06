@@ -233,24 +233,24 @@ const PMRChartExample: React.FC = () => {
   const reportData = formatForPMRReport(getCurrentChartType(), getCurrentData())
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-800/50 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">PMR Chart Examples</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-2">PMR Chart Examples</h1>
+          <p className="text-gray-600 dark:text-slate-400">
             Interactive charts with AI insights for Project Monthly Reports
           </p>
         </div>
 
         {/* Chart Type Selector */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4 mb-6">
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setSelectedChart('budget')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 selectedChart === 'budget'
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               Budget Variance
@@ -260,7 +260,7 @@ const PMRChartExample: React.FC = () => {
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 selectedChart === 'schedule'
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               Schedule Performance
@@ -270,7 +270,7 @@ const PMRChartExample: React.FC = () => {
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 selectedChart === 'risk'
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               Risk Heatmap
@@ -280,7 +280,7 @@ const PMRChartExample: React.FC = () => {
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 selectedChart === 'resource'
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               Resource Utilization
@@ -290,7 +290,7 @@ const PMRChartExample: React.FC = () => {
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 selectedChart === 'cost'
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               Cost Performance
@@ -299,28 +299,28 @@ const PMRChartExample: React.FC = () => {
         </div>
 
         {/* Chart Display */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6 mb-6">
           {renderChart()}
         </div>
 
         {/* Report Summary */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Report Summary</h2>
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100 mb-4">Report Summary</h2>
           
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Executive Summary</h3>
-            <p className="text-gray-600">{reportData.summary}</p>
+            <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Executive Summary</h3>
+            <p className="text-gray-600 dark:text-slate-400">{reportData.summary}</p>
           </div>
 
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Key Metrics</h3>
+            <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Key Metrics</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {Object.entries(reportData.keyMetrics).map(([key, value]) => (
-                <div key={key} className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-xs text-gray-600 mb-1">
+                <div key={key} className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-3">
+                  <p className="text-xs text-gray-600 dark:text-slate-400 mb-1">
                     {key.replace(/([A-Z])/g, ' $1').trim()}
                   </p>
-                  <p className="text-lg font-semibold text-gray-900">{value}</p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-slate-100">{value}</p>
                 </div>
               ))}
             </div>
@@ -328,10 +328,10 @@ const PMRChartExample: React.FC = () => {
 
           {reportData.recommendations.length > 0 && (
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Recommendations</h3>
+              <h3 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Recommendations</h3>
               <ul className="list-disc list-inside space-y-1">
                 {reportData.recommendations.map((rec, idx) => (
-                  <li key={idx} className="text-gray-600">{rec}</li>
+                  <li key={idx} className="text-gray-600 dark:text-slate-400">{rec}</li>
                 ))}
               </ul>
             </div>

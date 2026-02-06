@@ -143,16 +143,16 @@ export default function CreateScenarioModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-slate-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">{t('scenarios.modal.createNew')}</h3>
-            <p className="text-sm text-gray-600">{t('scenarios.modal.projectLabel')} {project.name}</p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{t('scenarios.modal.createNew')}</h3>
+            <p className="text-sm text-gray-600 dark:text-slate-400">{t('scenarios.modal.projectLabel')} {project.name}</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-600 dark:text-slate-400 transition-colors"
             aria-label={t('common.close')}
           >
             <X className="h-5 w-5" />
@@ -162,24 +162,24 @@ export default function CreateScenarioModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Error Banner */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
               <div className="flex items-start">
                 <AlertTriangle className="h-5 w-5 text-red-400 mr-2 flex-shrink-0 mt-0.5" />
-                <span className="text-sm text-red-800">{error}</span>
+                <span className="text-sm text-red-800 dark:text-red-300">{error}</span>
               </div>
             </div>
           )}
 
           {/* Basic Information */}
           <div className="space-y-4">
-            <h4 className="text-md font-semibold text-gray-900 flex items-center">
+            <h4 className="text-md font-semibold text-gray-900 dark:text-slate-100 flex items-center">
               <Target className="h-5 w-5 mr-2" />
               {t('scenarios.modal.basicInformation')}
             </h4>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   {t('scenarios.modal.scenarioName')} *
                 </label>
                 <input
@@ -193,7 +193,7 @@ export default function CreateScenarioModal({
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   {t('scenarios.modal.description')}
                 </label>
                 <input
@@ -209,17 +209,17 @@ export default function CreateScenarioModal({
 
           {/* Parameter Changes */}
           <div className="space-y-4">
-            <h4 className="text-md font-semibold text-gray-900">{t('scenarios.modal.parameterChanges')}</h4>
+            <h4 className="text-md font-semibold text-gray-900 dark:text-slate-100">{t('scenarios.modal.parameterChanges')}</h4>
             
             {/* Timeline Changes */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h5 className="text-sm font-semibold text-gray-800 mb-3 flex items-center">
+            <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg">
+              <h5 className="text-sm font-semibold text-gray-800 dark:text-slate-200 mb-3 flex items-center">
                 <Calendar className="h-4 w-4 mr-2" />
                 {t('scenarios.modal.timelineChanges')}
               </h5>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     {t('scenarios.modal.newStartDate')}
                   </label>
                   <input
@@ -229,14 +229,14 @@ export default function CreateScenarioModal({
                     className="input-field"
                   />
                   {project.start_date && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                       {t('scenarios.modal.current')} {new Date(project.start_date).toLocaleDateString()}
                     </p>
                   )}
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     {t('scenarios.modal.newEndDate')}
                   </label>
                   <input
@@ -246,7 +246,7 @@ export default function CreateScenarioModal({
                     className="input-field"
                   />
                   {project.end_date && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                       {t('scenarios.modal.current')} {new Date(project.end_date).toLocaleDateString()}
                     </p>
                   )}
@@ -255,13 +255,13 @@ export default function CreateScenarioModal({
             </div>
 
             {/* Budget Changes */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h5 className="text-sm font-semibold text-gray-800 mb-3 flex items-center">
+            <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg">
+              <h5 className="text-sm font-semibold text-gray-800 dark:text-slate-200 mb-3 flex items-center">
                 <DollarSign className="h-4 w-4 mr-2" />
                 {t('scenarios.modal.budgetChanges')}
               </h5>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   {t('scenarios.modal.newBudget')}
                 </label>
                 <input
@@ -274,7 +274,7 @@ export default function CreateScenarioModal({
                   className="input-field"
                 />
                 {project.budget && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                     {t('scenarios.modal.current')} ${project.budget.toLocaleString()}
                   </p>
                 )}
@@ -282,8 +282,8 @@ export default function CreateScenarioModal({
             </div>
 
             {/* Resource Allocation Changes */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h5 className="text-sm font-semibold text-gray-800 mb-3 flex items-center">
+            <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg">
+              <h5 className="text-sm font-semibold text-gray-800 dark:text-slate-200 mb-3 flex items-center">
                 <Users className="h-4 w-4 mr-2" />
                 {t('scenarios.modal.resourceAllocationChanges')}
               </h5>
@@ -295,7 +295,7 @@ export default function CreateScenarioModal({
                   { key: 'Project Manager', label: t('scenarios.modal.projectManager') }
                 ].map(({ key, label }) => (
                   <div key={key} className="flex items-center space-x-4">
-                    <label className="w-32 text-sm font-medium text-gray-700">
+                    <label className="w-32 text-sm font-medium text-gray-700 dark:text-slate-300">
                       {label}
                     </label>
                     <input
@@ -307,7 +307,7 @@ export default function CreateScenarioModal({
                       onChange={(e) => handleResourceAllocationChange(key, parseInt(e.target.value))}
                       className="flex-1"
                     />
-                    <span className="w-12 text-sm text-gray-600">
+                    <span className="w-12 text-sm text-gray-600 dark:text-slate-400">
                       {Math.round((formData.parameter_changes.resource_allocations?.[key] || 0) * 100)}%
                     </span>
                   </div>
@@ -318,7 +318,7 @@ export default function CreateScenarioModal({
 
           {/* Analysis Scope */}
           <div className="space-y-4">
-            <h4 className="text-md font-semibold text-gray-900">{t('scenarios.modal.analysisScope')}</h4>
+            <h4 className="text-md font-semibold text-gray-900 dark:text-slate-100">{t('scenarios.modal.analysisScope')}</h4>
             <div className="flex flex-wrap gap-3">
               {[
                 { key: 'timeline', label: t('scenarios.modal.timelineImpactLabel'), icon: Calendar },
@@ -330,22 +330,22 @@ export default function CreateScenarioModal({
                     type="checkbox"
                     checked={formData.analysis_scope.includes(key)}
                     onChange={() => toggleAnalysisScope(key)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-slate-600 rounded"
                   />
-                  <Icon className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm font-medium text-gray-700">{label}</span>
+                  <Icon className="h-4 w-4 text-gray-500 dark:text-slate-400" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{label}</span>
                 </label>
               ))}
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-slate-700">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-gray-900 dark:text-slate-100 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors disabled:opacity-50"
             >
               {t('scenarios.modal.cancel')}
             </button>

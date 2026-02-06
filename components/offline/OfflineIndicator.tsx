@@ -173,13 +173,13 @@ export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({
 
       {/* Detailed network info */}
       {showDetails && showNetworkInfo && (
-        <div className="absolute top-12 right-0 bg-white border border-gray-200 rounded-lg shadow-xl p-4 w-64 text-sm">
-          <h3 className="font-semibold text-gray-900 mb-3">Network Information</h3>
+        <div className="absolute top-12 right-0 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-xl p-4 w-64 text-sm">
+          <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-3">Network Information</h3>
           
-          <div className="space-y-2 text-gray-600">
+          <div className="space-y-2 text-gray-600 dark:text-slate-400">
             <div className="flex justify-between">
               <span>Status:</span>
-              <span className={`font-medium ${isOnline ? 'text-green-600' : 'text-red-600'}`}>
+              <span className={`font-medium ${isOnline ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                 {isOnline ? 'Online' : 'Offline'}
               </span>
             </div>
@@ -203,7 +203,7 @@ export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({
                 
                 <div className="flex justify-between">
                   <span>Save Data:</span>
-                  <span className={`font-medium ${networkInfo.saveData ? 'text-yellow-600' : 'text-gray-600'}`}>
+                  <span className={`font-medium ${networkInfo.saveData ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-600 dark:text-slate-400'}`}>
                     {networkInfo.saveData ? 'Enabled' : 'Disabled'}
                   </span>
                 </div>
@@ -212,13 +212,13 @@ export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({
           </div>
 
           {!isOnline && (
-            <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-xs">
+            <div className="mt-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-yellow-800 dark:text-yellow-300 text-xs">
               Some features may be limited while offline. Changes will sync when connection is restored.
             </div>
           )}
 
           {networkInfo.saveData && (
-            <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-blue-800 text-xs">
+            <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded text-blue-800 dark:text-blue-300 text-xs">
               Save Data mode is enabled. Some images and features may be reduced to save bandwidth.
             </div>
           )}

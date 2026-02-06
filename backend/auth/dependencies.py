@@ -3,6 +3,7 @@ Authentication dependencies for FastAPI endpoints
 
 This module provides authentication dependencies that integrate with the
 SupabaseRBACBridge for enhanced JWT token handling with role information.
+JWT signature is verified when SUPABASE_JWT_SECRET is set.
 """
 
 import jwt
@@ -10,44 +11,44 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Optional, Dict, Any
 
+from config.settings import settings
+
 # Security scheme
 security = HTTPBearer(auto_error=False)
 
+def _allow_dev_default_user() -> bool:
+    """Only allow unauthenticated default admin when explicitly enabled (e.g. local dev)."""
+    return settings.ALLOW_DEV_DEFAULT_USER and settings.environment == "development"
+
 async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)) -> Dict[str, Any]:
     """
-    Extract user from JWT token with development mode fallback.
-    
-    This function integrates with SupabaseRBACBridge to extract enhanced
-    user information including roles and permissions from JWT tokens.
+    Extract user from JWT token. Verifies signature when SUPABASE_JWT_SECRET is set.
+    Default admin fallback only when ALLOW_DEV_DEFAULT_USER=true and environment is development.
     """
-    try:
-        # Handle missing credentials in development mode
-        if not credentials:
+    if not credentials:
+        if _allow_dev_default_user():
             default_user_id = "00000000-0000-0000-0000-000000000001"
-            print("🔧 Development mode: No credentials provided, using default admin user")
+            print("🔧 Development mode: No credentials provided, using default admin user (ALLOW_DEV_DEFAULT_USER=true)")
             return {
                 "user_id": default_user_id,
                 "email": "dev@example.com",
                 "tenant_id": default_user_id,
-                "role": "admin",  # Add admin role for development
+                "role": "admin",
                 "roles": ["admin"],
-                "permissions": ["user_manage"]  # Add user_manage permission
+                "permissions": ["user_manage"],
             }
-        
-        token = credentials.credentials
-        
-        # Try to use SupabaseRBACBridge for enhanced token extraction
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authorization required")
+
+    token = credentials.credentials
+    secret_key = settings.SUPABASE_JWT_SECRET if settings.SUPABASE_JWT_SECRET else None
+
+    try:
         try:
             from .supabase_rbac_bridge import get_supabase_rbac_bridge
             bridge = get_supabase_rbac_bridge()
-            
-            # Extract user info from token using the bridge
-            user_info = await bridge.get_user_from_jwt(token)
-            
+            user_info = await bridge.get_user_from_jwt(token, secret_key=secret_key)
             if user_info:
                 user_id = user_info.get("user_id")
-                # Return enhanced user info with roles and permissions
-                # tenant_id: use from user_info or fallback to user_id (single-tenant)
                 return {
                     "user_id": user_id,
                     "email": user_info.get("email", "dev@example.com"),
@@ -57,20 +58,26 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
                     "tenant_id": user_info.get("tenant_id") or user_id,
                 }
         except ImportError:
-            print("🔧 SupabaseRBACBridge not available, using basic JWT decode")
+            pass
         except Exception as bridge_error:
+            if secret_key:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
             print(f"🔧 Bridge error: {bridge_error}, falling back to basic decode")
-        
-        # Fallback to basic JWT decode
-        payload = jwt.decode(token, options={"verify_signature": False})
-        
-        # Development fix: If no user_id in token, provide a default one
+
+        # Fallback: verify with secret if set, otherwise decode only (legacy)
+        if secret_key:
+            payload = jwt.decode(token, secret_key, algorithms=["HS256"])
+        else:
+            payload = jwt.decode(token, options={"verify_signature": False})
+
         user_id = payload.get("sub")
         if not user_id or user_id == "anon":
-            # Use a default development user ID
-            user_id = "00000000-0000-0000-0000-000000000001"
-            print(f"🔧 Development mode: Using default user ID {user_id}")
-        
+            if _allow_dev_default_user():
+                user_id = "00000000-0000-0000-0000-000000000001"
+                print(f"🔧 Development mode: Using default user ID {user_id}")
+            else:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
         return {
             "user_id": user_id,
             "email": payload.get("email", "dev@example.com"),
@@ -78,18 +85,25 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
             "permissions": payload.get("permissions", []),
             "tenant_id": payload.get("tenant_id") or payload.get("app_metadata", {}).get("tenant_id") or user_id,
         }
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+    except HTTPException:
+        raise
     except Exception as e:
-        default_user_id = "00000000-0000-0000-0000-000000000001"
-        print(f"🔧 Development mode: Auth error ({e}), using default admin user")
-        # In development mode, fall back to default user instead of failing
-        return {
-            "user_id": default_user_id,
-            "email": "dev@example.com",
-            "tenant_id": default_user_id,
-            "role": "admin",  # Add admin role for development
-            "roles": ["admin"],
-            "permissions": ["user_manage"]  # Add user_manage permission
-        }
+        if _allow_dev_default_user():
+            default_user_id = "00000000-0000-0000-0000-000000000001"
+            print(f"🔧 Development mode: Auth error ({e}), using default admin user")
+            return {
+                "user_id": default_user_id,
+                "email": "dev@example.com",
+                "tenant_id": default_user_id,
+                "role": "admin",
+                "roles": ["admin"],
+                "permissions": ["user_manage"],
+            }
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication failed")
 
 def get_current_user_id(current_user: Dict[str, Any] = Depends(get_current_user)) -> str:
     """Extract user ID from current user"""

@@ -32,10 +32,21 @@ jest.mock('next/navigation', () => ({
   })
 }))
 
-// Mock fetch
-global.fetch = jest.fn()
-
 describe('GuestProjectAccessPage - Unit Tests', () => {
+  const mockFetch = jest.fn()
+
+  beforeAll(() => {
+    global.fetch = mockFetch
+    globalThis.fetch = mockFetch
+  })
+
+  afterAll(() => {
+    const g = global as unknown as { fetch?: typeof global.fetch }
+    const gt = globalThis as unknown as { fetch?: typeof global.fetch }
+    delete g.fetch
+    delete gt.fetch
+  })
+
   const mockProjectData: FilteredProjectData = {
     id: 'project-123',
     name: 'Test Project',
@@ -48,7 +59,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(global.fetch as jest.Mock).mockClear()
+    mockFetch.mockClear()
   })
 
   afterEach(() => {
@@ -57,7 +68,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
 
   describe('Loading State - Req 5.4', () => {
     test('should display loading state initially', async () => {
-      ;(global.fetch as jest.Mock).mockImplementation(() =>
+      mockFetch.mockImplementation(() =>
         new Promise(() => {}) // Never resolves to keep loading state
       )
 
@@ -68,7 +79,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
     })
 
     test('should show loading spinner', async () => {
-      ;(global.fetch as jest.Mock).mockImplementation(() =>
+      mockFetch.mockImplementation(() =>
         new Promise(() => {})
       )
 
@@ -82,28 +93,28 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
 
   describe('Successful Data Loading - Req 5.1', () => {
     test('should display project data when fetch succeeds', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      const body = {
+        success: true,
+        project: mockProjectData,
+        permission_level: 'view_only'
+      }
+      mockFetch.mockResolvedValue({
         ok: true,
-        json: async () => ({
-          success: true,
-          project: mockProjectData,
-          permission_level: 'view_only'
-        })
+        json: () => Promise.resolve(body)
       })
 
       render(<GuestProjectAccessPage />)
 
       await waitFor(() => {
         expect(screen.getByText('Test Project')).toBeInTheDocument()
-      })
+      }, { timeout: 5000 })
 
       expect(screen.getByText('Test project description')).toBeInTheDocument()
     })
 
     test('should pass custom message to GuestProjectView', async () => {
       const customMessage = 'Welcome to the project!'
-      
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValue({
         ok: true,
         json: async () => ({
           success: true,
@@ -121,7 +132,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
     })
 
     test('should call correct API endpoint', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValue({
         ok: true,
         json: async () => ({
           success: true,
@@ -133,7 +144,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
       render(<GuestProjectAccessPage />)
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith(
+        expect(mockFetch).toHaveBeenCalledWith(
           expect.stringContaining('/api/projects/project-123/share/test-token-abc123'),
           expect.objectContaining({
             method: 'GET',
@@ -148,7 +159,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
 
   describe('Error Handling - Req 5.3', () => {
     test('should display expired link error', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({
           success: false,
@@ -168,7 +179,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
     })
 
     test('should display revoked access error', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({
           success: false,
@@ -187,7 +198,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
     })
 
     test('should display invalid token error', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({
           success: false,
@@ -206,7 +217,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
     })
 
     test('should display not found error', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({
           success: false,
@@ -223,7 +234,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
     })
 
     test('should display server error', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({
           success: false,
@@ -242,7 +253,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
     })
 
     test('should handle network errors gracefully', async () => {
-      ;(global.fetch as jest.Mock).mockRejectedValueOnce(
+      ;mockFetch.mockRejectedValueOnce(
         new Error('Network error')
       )
 
@@ -256,7 +267,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
     })
 
     test('should display Try Again button on error', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({
           success: false,
@@ -275,7 +286,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
 
   describe('Error Icons and Visual Feedback - Req 5.3', () => {
     test('should display clock icon for expired links', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({
           success: false,
@@ -295,7 +306,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
     })
 
     test('should display X icon for revoked access', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({
           success: false,
@@ -314,7 +325,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
     })
 
     test('should display alert icon for invalid tokens', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({
           success: false,
@@ -335,7 +346,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
 
   describe('Error Guidance Messages - Req 5.3', () => {
     test('should provide guidance for expired links', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({
           success: false,
@@ -352,7 +363,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
     })
 
     test('should provide guidance for revoked access', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({
           success: false,
@@ -369,7 +380,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
     })
 
     test('should provide guidance for invalid tokens', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({
           success: false,
@@ -386,7 +397,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
     })
 
     test('should provide guidance for server errors', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({
           success: false,
@@ -405,7 +416,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
 
   describe('Contact Information - Req 5.3', () => {
     test('should display contact information on error pages', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({
           success: false,
@@ -427,7 +438,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
       const originalEnv = process.env.NEXT_PUBLIC_API_URL
       delete process.env.NEXT_PUBLIC_API_URL
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           success: true,
@@ -439,7 +450,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
       render(<GuestProjectAccessPage />)
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalled()
+        expect(mockFetch).toHaveBeenCalled()
       })
 
       // Restore environment variable
@@ -449,7 +460,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
     })
 
     test('should handle malformed API responses', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           // Missing required fields
@@ -468,7 +479,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
 
   describe('Accessibility', () => {
     test('should have accessible error messages', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({
           success: false,
@@ -486,7 +497,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
     })
 
     test('should have accessible loading state', async () => {
-      ;(global.fetch as jest.Mock).mockImplementation(() =>
+      ;mockFetch.mockImplementation(() =>
         new Promise(() => {})
       )
 
@@ -497,7 +508,7 @@ describe('GuestProjectAccessPage - Unit Tests', () => {
     })
 
     test('should have accessible buttons', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      ;mockFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({
           success: false,

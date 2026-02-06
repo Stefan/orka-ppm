@@ -58,15 +58,19 @@ const apiErrorGen = fc.record({
 })
 
 describe('Comprehensive Error Logging Property Tests', () => {
+  let consoleErrorSpy: jest.SpyInstance
+
   beforeEach(() => {
     // Clear diagnostic data before each test
     diagnosticCollector.clearDiagnosticData()
     jest.clearAllMocks()
+    // Suppress console.error during tests – this suite intentionally logs many errors to assert behaviour
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
   })
 
   afterEach(() => {
-    // Clean up after each test
     diagnosticCollector.clearDiagnosticData()
+    consoleErrorSpy?.mockRestore?.()
   })
 
   test('Property 1: Comprehensive Error Logging - All errors are captured with required fields', () => {

@@ -157,7 +157,7 @@ export const VirtualizedTable = <T,>({
 }: VirtualizedTableProps<T>) => {
   const renderRow = useCallback((item: T, index: number, style: React.CSSProperties) => {
     return (
-      <div className="flex border-b border-gray-200" style={style}>
+      <div className="flex border-b border-gray-200 dark:border-slate-700" style={style}>
         {columns.map((column) => (
           <div
             key={column.key}
@@ -172,13 +172,13 @@ export const VirtualizedTable = <T,>({
   }, [columns])
 
   return (
-    <div className={`border border-gray-200 rounded-lg ${className}`}>
+    <div className={`border border-gray-200 dark:border-slate-700 rounded-lg ${className}`}>
       {/* Header */}
-      <div className="flex bg-gray-50 border-b border-gray-200">
+      <div className="flex bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700">
         {columns.map((column) => (
           <div
             key={column.key}
-            className="px-4 py-3 font-medium text-gray-900 flex-shrink-0"
+            className="px-4 py-3 font-medium text-gray-900 dark:text-slate-100 flex-shrink-0"
             style={{ width: column.width || `${100 / columns.length}%` }}
           >
             {column.header}

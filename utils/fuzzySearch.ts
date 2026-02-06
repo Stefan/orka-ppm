@@ -197,20 +197,33 @@ function escapeRegExp(string: string): string {
 }
 
 /**
- * Highlight matching text in search results
+ * Escape HTML to prevent XSS when rendering search result text with dangerouslySetInnerHTML.
+ */
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+/**
+ * Highlight matching text in search results.
+ * Escapes HTML in text so that result is safe for dangerouslySetInnerHTML.
  */
 export function highlightMatch(text: string, query: string): string {
-  if (!query.trim()) return text
-  
+  if (!query.trim()) return escapeHtml(text)
+
+  const safe = escapeHtml(text)
   const normalizedQuery = query.toLowerCase().trim()
   const escapedQuery = escapeRegExp(normalizedQuery)
-  
+
   try {
     const regex = new RegExp(`(${escapedQuery})`, 'gi')
-    return text.replace(regex, '<mark class="bg-yellow-200 text-yellow-900 px-1 rounded">$1</mark>')
+    return safe.replace(regex, '<mark class="bg-yellow-200 text-yellow-900 px-1 rounded dark:bg-yellow-600/40 dark:text-yellow-100">$1</mark>')
   } catch (error) {
-    // If regex still fails, return original text
     console.warn('Failed to create regex for highlighting:', error)
-    return text
+    return safe
   }
 }

@@ -189,3 +189,27 @@ This document specifies the requirements for implementing advanced AI-empowered 
 8. THE Timeline_Visualizer SHALL use WebSocket connections for real-time updates
 9. THE Timeline_Visualizer SHALL display system health metrics including anomaly detection latency and search response time
 10. WHEN a user clicks on a dashboard metric, THE Timeline_Visualizer SHALL navigate to the filtered timeline view
+
+## Implementation References
+
+The following files implement or support the AI-Empowered Audit Trail:
+
+- **Backend services:** `backend/services/audit_anomaly_service.py`, `backend/services/audit_feature_extractor.py`, `backend/services/audit_rag_agent.py`, `backend/services/audit_ml_service.py`, `backend/services/audit_export_service.py`, `backend/services/audit_integration_hub.py`, `backend/services/audit_bias_detection_service.py`, `backend/services/audit_embedding_service.py`, `backend/services/audit_scheduled_jobs.py`, `backend/services/audit_encryption_service.py`, `backend/services/audit_compliance_service.py`, `backend/services/audit_service.py`
+- **API:** `backend/routers/audit.py`
+- **Migrations:** `backend/migrations/023_ai_empowered_audit_trail.sql`, `backend/migrations/028_audit_logs_embeddings.sql`, `backend/migrations/029_audit_embedding_trigger.sql`, `backend/migrations/049_enable_audit_bias_metrics_rls.sql`; see `backend/migrations/AI_AUDIT_TRAIL_MIGRATION_GUIDE.md` and `backend/migrations/apply_ai_audit_trail_migration.py`
+- **Tasks:** `.kiro/specs/ai-empowered-audit-trail/tasks.md` (Phases 1–12)
+
+## Traceability
+
+| Requirement | Design section / focus | Main tasks (tasks.md) |
+|-------------|------------------------|------------------------|
+| Req 1: Anomaly Detection | Architecture, Anomaly Detection Service, Data Flow (Anomaly) | Phase 2 (Anomaly), Phase 1 (schema) |
+| Req 2: Visual Timeline with AI Insights | Timeline Component, API /audit/timeline | Phase 9 (Frontend Timeline) |
+| Req 3: RAG / Semantic Search | Audit RAG Agent, Data Flow (Semantic Search) | Phase 3 (RAG), Phase 1 (embeddings) |
+| Req 4: Auto-Tagging / ML | ML Classification Service | Phase 4 (ML Service) |
+| Req 5: Export & Integration | Export Service, Integration Hub | Phase 5 (Export), Phase 6 (Integration Hub) |
+| Req 6: Compliance and Security | Data Models (hash, encryption), Compliance | Phase 1 (schema), audit_encryption_service |
+| Req 7: Performance and Scalability | Architecture, Redis/queuing, indexes | Phase 1 (indexes), Phase 7 (caching) |
+| Req 8: AI Bias and Fairness | Bias Detection (optional subsection) | Phase 11 (Bias), audit_bias_detection_service |
+| Req 9: Multi-Tenant | Data Models (tenant_id), Architecture | Phase 1 (tenant_id), all services filter by tenant |
+| Req 10: Real-Time Dashboard | Real-Time Dashboard subsection, API /audit/dashboard/stats | Phase 9 (Dashboard), WebSocket |

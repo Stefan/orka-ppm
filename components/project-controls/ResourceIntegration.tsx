@@ -15,8 +15,8 @@ export default function ResourceIntegration({
   estimatedCost = 0,
 }: ResourceIntegrationProps) {
   return (
-    <div className="p-3 bg-white rounded-lg border">
-      <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+    <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border">
+      <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 flex items-center gap-2">
         <Users className="w-4 h-4" />
         Resource Forecast
       </h4>
@@ -28,7 +28,7 @@ export default function ResourceIntegration({
       )}
       <Link
         href={`/resources?project=${projectId}`}
-        className="text-xs text-indigo-600 hover:underline mt-2 inline-block"
+        className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline mt-2 inline-block"
       >
         Manage resources →
       </Link>

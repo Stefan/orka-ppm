@@ -43,7 +43,7 @@ const TestPageComponent = ({
           <div key={uniqueId} data-testid={`feature-${uniqueId}`}>
             <button 
               data-testid={`${uniqueId}-button`}
-              className="p-2 bg-blue-500 text-white rounded min-h-[44px]"
+              className="p-2 bg-blue-600 text-white rounded min-h-[44px]"
             >
               {feature.name}
             </button>

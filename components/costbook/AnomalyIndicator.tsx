@@ -53,31 +53,31 @@ function getSeverityColors(severity: 'low' | 'medium' | 'high' | 'critical') {
   switch (severity) {
     case 'critical':
       return {
-        bg: 'bg-red-100',
-        border: 'border-red-300',
-        text: 'text-red-800',
-        icon: 'text-red-600'
+        bg: 'bg-red-100 dark:bg-red-900/30',
+        border: 'border-red-300 dark:border-red-700',
+        text: 'text-red-800 dark:text-red-300',
+        icon: 'text-red-600 dark:text-red-400'
       }
     case 'high':
       return {
-        bg: 'bg-orange-100',
+        bg: 'bg-orange-100 dark:bg-orange-900/30',
         border: 'border-orange-300',
-        text: 'text-orange-800',
-        icon: 'text-orange-600'
+        text: 'text-orange-800 dark:text-orange-300',
+        icon: 'text-orange-600 dark:text-orange-400'
       }
     case 'medium':
       return {
-        bg: 'bg-yellow-100',
+        bg: 'bg-yellow-100 dark:bg-yellow-900/30',
         border: 'border-yellow-300',
-        text: 'text-yellow-800',
-        icon: 'text-yellow-600'
+        text: 'text-yellow-800 dark:text-yellow-300',
+        icon: 'text-yellow-600 dark:text-yellow-400'
       }
     case 'low':
       return {
-        bg: 'bg-blue-100',
+        bg: 'bg-blue-100 dark:bg-blue-900/30',
         border: 'border-blue-300',
-        text: 'text-blue-800',
-        icon: 'text-blue-600'
+        text: 'text-blue-800 dark:text-blue-300',
+        icon: 'text-blue-600 dark:text-blue-400'
       }
   }
 }
@@ -241,7 +241,7 @@ export function ProjectAnomalyStatus({
         data-testid="project-anomaly-status"
       />
       {anomalies.length > 1 && (
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-gray-500 dark:text-slate-400">
           +{anomalies.length - 1} more
         </span>
       )}

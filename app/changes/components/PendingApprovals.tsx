@@ -265,34 +265,34 @@ export default function PendingApprovals() {
   const getPriorityIcon = (priority: string) => {
     switch (priority) {
       case 'emergency':
-        return <AlertTriangle className="h-4 w-4 text-red-600" />
+        return <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
       case 'critical':
-        return <AlertTriangle className="h-4 w-4 text-orange-600" />
+        return <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
       case 'high':
-        return <ArrowUp className="h-4 w-4 text-yellow-600" />
+        return <ArrowUp className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
       case 'medium':
-        return <Minus className="h-4 w-4 text-blue-600" />
+        return <Minus className="h-4 w-4 text-blue-600 dark:text-blue-400" />
       case 'low':
-        return <ArrowDown className="h-4 w-4 text-gray-600" />
+        return <ArrowDown className="h-4 w-4 text-gray-600 dark:text-slate-400" />
       default:
-        return <Minus className="h-4 w-4 text-gray-600" />
+        return <Minus className="h-4 w-4 text-gray-600 dark:text-slate-400" />
     }
   }
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'emergency':
-        return 'bg-red-100 text-red-800 border-red-200'
+        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800'
       case 'critical':
-        return 'bg-orange-100 text-orange-800 border-orange-200'
+        return 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border-orange-200'
       case 'high':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+        return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800'
       case 'medium':
-        return 'bg-blue-100 text-blue-800 border-blue-200'
+        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-800'
       case 'low':
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+        return 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200 border-gray-200 dark:border-slate-700'
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+        return 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200 border-gray-200 dark:border-slate-700'
     }
   }
 
@@ -364,29 +364,29 @@ export default function PendingApprovals() {
   return (
     <div className="space-y-6">
       {/* Header with Summary Stats */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{t('pendingApprovals.title')}</h2>
-            <p className="text-gray-600">{t('pendingApprovals.subtitle')}</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">{t('pendingApprovals.title')}</h2>
+            <p className="text-gray-600 dark:text-slate-400">{t('pendingApprovals.subtitle')}</p>
           </div>
           
           <div className="flex items-center gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{pendingApprovals.length}</div>
-              <div className="text-sm text-gray-600">{t('pendingApprovals.totalPending')}</div>
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{pendingApprovals.length}</div>
+              <div className="text-sm text-gray-600 dark:text-slate-400">{t('pendingApprovals.totalPending')}</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-red-600">
+              <div className="text-2xl font-bold text-red-600 dark:text-red-400">
                 {pendingApprovals.filter(a => a.is_overdue).length}
               </div>
-              <div className="text-sm text-gray-600">{t('pendingApprovals.overdue')}</div>
+              <div className="text-sm text-gray-600 dark:text-slate-400">{t('pendingApprovals.overdue')}</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">
+              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                 {pendingApprovals.filter(a => a.is_escalated).length}
               </div>
-              <div className="text-sm text-gray-600">{t('pendingApprovals.escalated')}</div>
+              <div className="text-sm text-gray-600 dark:text-slate-400">{t('pendingApprovals.escalated')}</div>
             </div>
           </div>
         </div>
@@ -397,8 +397,8 @@ export default function PendingApprovals() {
             onClick={() => handleFilterChange('overdue_only', !filters.overdue_only)}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${
               filters.overdue_only 
-                ? 'bg-red-50 border-red-200 text-red-700' 
-                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700' 
+                : 'border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50'
             }`}
           >
             <AlertTriangle className="h-4 w-4" />
@@ -410,7 +410,7 @@ export default function PendingApprovals() {
             className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${
               filters.escalated_only 
                 ? 'bg-orange-50 border-orange-200 text-orange-700' 
-                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                : 'border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50'
             }`}
           >
             <Bell className="h-4 w-4" />
@@ -419,7 +419,7 @@ export default function PendingApprovals() {
           
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+            className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
           >
             <Filter className="h-4 w-4" />
             {t('pendingApprovals.moreFilters')}
@@ -429,28 +429,28 @@ export default function PendingApprovals() {
 
       {/* Advanced Filters */}
       {showFilters && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t('pendingApprovals.search')}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('pendingApprovals.search')}</label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
                 <input
                   type="text"
                   value={filters.search}
                   onChange={(e) => handleFilterChange('search', e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder={t('pendingApprovals.searchPlaceholder')}
                 />
               </div>
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t('pendingApprovals.priority')}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('pendingApprovals.priority')}</label>
               <select
                 value={filters.priority}
                 onChange={(e) => handleFilterChange('priority', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">{t('pendingApprovals.allPriorities')}</option>
                 <option value="emergency">Emergency</option>
@@ -462,11 +462,11 @@ export default function PendingApprovals() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t('pendingApprovals.changeType')}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('pendingApprovals.changeType')}</label>
               <select
                 value={filters.change_type}
                 onChange={(e) => handleFilterChange('change_type', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">{t('pendingApprovals.allTypes')}</option>
                 <option value="scope">Scope</option>
@@ -479,12 +479,12 @@ export default function PendingApprovals() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t('pendingApprovals.sortBy')}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('pendingApprovals.sortBy')}</label>
               <div className="flex gap-2">
                 <select
                   value={filters.sort_by}
                   onChange={(e) => handleFilterChange('sort_by', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="due_date">{t('pendingApprovals.dueDate')}</option>
                   <option value="priority">Priority</option>
@@ -493,7 +493,7 @@ export default function PendingApprovals() {
                 </select>
                 <button
                   onClick={() => handleFilterChange('sort_order', filters.sort_order === 'asc' ? 'desc' : 'asc')}
-                  className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
                 >
                   {filters.sort_order === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
                 </button>
@@ -505,7 +505,7 @@ export default function PendingApprovals() {
 
       {/* Bulk Actions */}
       {selectedApprovals.size > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium text-blue-900">
@@ -514,7 +514,7 @@ export default function PendingApprovals() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleBulkAction('approve')}
-                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
+                  className="bg-green-700 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
                 >
                   {t('pendingApprovals.bulkActions.bulkApprove')}
                 </button>
@@ -526,7 +526,7 @@ export default function PendingApprovals() {
                 </button>
                 <button
                   onClick={() => handleBulkAction('request_info')}
-                  className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded text-sm"
+                  className="bg-yellow-700 hover:bg-yellow-800 text-white px-3 py-1 rounded text-sm"
                 >
                   {t('pendingApprovals.bulkActions.requestInfo')}
                 </button>
@@ -540,7 +540,7 @@ export default function PendingApprovals() {
             </div>
             <button
               onClick={() => setSelectedApprovals(new Set())}
-              className="text-blue-600 hover:text-blue-800 text-sm"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm"
             >
               {t('pendingApprovals.bulkActions.clearSelection')}
             </button>
@@ -549,50 +549,50 @@ export default function PendingApprovals() {
       )}
 
       {/* Approvals List */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
         {filteredApprovals.length === 0 ? (
           <div className="text-center py-12">
-            <CheckCircle className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">{t('pendingApprovals.noApprovals')}</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <CheckCircle className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-slate-100">{t('pendingApprovals.noApprovals')}</h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
               {filters.search || filters.priority || filters.change_type || filters.overdue_only || filters.escalated_only
                 ? t('pendingApprovals.noMatchingApprovals')
                 : t('pendingApprovals.noApprovalsMessage')}
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-gray-200 dark:divide-slate-700">
             {/* Header */}
-            <div className="px-6 py-3 bg-gray-50">
+            <div className="px-6 py-3 bg-gray-50 dark:bg-slate-800/50">
               <div className="flex items-center">
                 <div className="flex items-center">
                   <input
                     type="checkbox"
                     checked={selectedApprovals.size === filteredApprovals.length && filteredApprovals.length > 0}
                     onChange={handleSelectAll}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
                   />
-                  <span className="ml-3 text-sm font-medium text-gray-700">{t('pendingApprovals.selectAll')}</span>
+                  <span className="ml-3 text-sm font-medium text-gray-700 dark:text-slate-300">{t('pendingApprovals.selectAll')}</span>
                 </div>
               </div>
             </div>
 
             {/* Approval Items */}
             {filteredApprovals.map((approval) => (
-              <div key={approval.id} className="px-6 py-4 hover:bg-gray-50">
+              <div key={approval.id} className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
                 <div className="flex items-start gap-4">
                   <input
                     type="checkbox"
                     checked={selectedApprovals.has(approval.id)}
                     onChange={() => handleSelectApproval(approval.id)}
-                    className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="mt-1 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
                   />
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-medium text-gray-900">
+                          <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">
                             {approval.change_number}: {approval.title}
                           </h3>
                           
@@ -602,19 +602,19 @@ export default function PendingApprovals() {
                               <span className="ml-1 capitalize">{approval.priority}</span>
                             </span>
                             
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 capitalize">
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200 capitalize">
                               {approval.change_type}
                             </span>
                             
                             {approval.is_overdue && (
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
                                 <AlertTriangle className="h-3 w-3 mr-1" />
                                 Overdue
                               </span>
                             )}
                             
                             {approval.is_escalated && (
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300">
                                 <Bell className="h-3 w-3 mr-1" />
                                 Escalated
                               </span>
@@ -622,28 +622,28 @@ export default function PendingApprovals() {
                           </div>
                         </div>
                         
-                        <p className="text-gray-600 mb-3 line-clamp-2">{approval.description}</p>
+                        <p className="text-gray-600 dark:text-slate-400 mb-3 line-clamp-2">{approval.description}</p>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-3">
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
                             <User className="h-4 w-4" />
                             <span>{t('pendingApprovals.approvalCard.by')}: {approval.requested_by}</span>
                           </div>
                           
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
                             <Calendar className="h-4 w-4" />
                             <span>{t('pendingApprovals.approvalCard.project')}: {approval.project_name}</span>
                           </div>
                           
                           {approval.estimated_cost_impact && approval.estimated_cost_impact > 0 && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
                               <DollarSign className="h-4 w-4" />
                               <span>${approval.estimated_cost_impact.toLocaleString()}</span>
                             </div>
                           )}
                           
                           {approval.estimated_schedule_impact_days && approval.estimated_schedule_impact_days > 0 && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
                               <Clock className="h-4 w-4" />
                               <span>{approval.estimated_schedule_impact_days} days</span>
                             </div>
@@ -652,15 +652,15 @@ export default function PendingApprovals() {
                         
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4 text-sm">
-                            <span className="text-gray-600">
+                            <span className="text-gray-600 dark:text-slate-400">
                               {t('pendingApprovals.approvalCard.step')} {approval.step_number} - {approval.approver_role}
                             </span>
                             
                             {approval.due_date && (
                               <span className={`flex items-center gap-1 ${
-                                approval.is_overdue ? 'text-red-600' : 
-                                approval.days_until_due && approval.days_until_due <= 1 ? 'text-orange-600' : 
-                                'text-gray-600'
+                                approval.is_overdue ? 'text-red-600 dark:text-red-400' : 
+                                approval.days_until_due && approval.days_until_due <= 1 ? 'text-orange-600 dark:text-orange-400' : 
+                                'text-gray-600 dark:text-slate-400'
                               }`}>
                                 <Clock className="h-3 w-3" />
                                 {t('pendingApprovals.approvalCard.due')}: {formatDate(approval.due_date)}
@@ -678,7 +678,7 @@ export default function PendingApprovals() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleViewDetails(approval.change_request_id)}
-                              className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1"
+                              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium flex items-center gap-1"
                             >
                               <Eye className="h-4 w-4" />
                               {t('pendingApprovals.approvalCard.viewDetails')}
@@ -705,46 +705,46 @@ export default function PendingApprovals() {
       {/* Bulk Actions Modal */}
       {showBulkActions && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">{t('pendingApprovals.bulkActions.moreActions')}</h3>
-              <p className="text-sm text-gray-600 mt-1">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{t('pendingApprovals.bulkActions.moreActions')}</h3>
+              <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
                 {t('pendingApprovals.bulkActions.selected', { count: selectedApprovals.size })}
               </p>
             </div>
             
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   {t('pendingApprovals.bulkActions.bulkComments')}
                 </label>
                 <textarea
                   value={bulkActionOptions.bulk_comments || ''}
                   onChange={(e) => setBulkActionOptions(prev => ({ ...prev, bulk_comments: e.target.value }))}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder={t('pendingApprovals.bulkActions.bulkCommentsPlaceholder')}
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   {t('pendingApprovals.bulkActions.delegateTo')}
                 </label>
                 <input
                   type="text"
                   value={bulkActionOptions.delegate_to || ''}
                   onChange={(e) => setBulkActionOptions(prev => ({ ...prev, delegate_to: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder={t('pendingApprovals.bulkActions.delegateToPlaceholder')}
                 />
               </div>
             </div>
             
-            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between">
               <button
                 onClick={() => setShowBulkActions(false)}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
               >
                 {t('pendingApprovals.bulkActions.cancel')}
               </button>

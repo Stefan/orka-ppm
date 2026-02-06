@@ -39,46 +39,46 @@ function CacheStatsCard({ cacheStats, translations }: CacheStatsCardProps) {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+    <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
         {translations.cacheStatistics}
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="text-center">
-          <div className="text-2xl font-bold text-blue-600">
+          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
             {cacheStats?.type?.toUpperCase() || 'UNKNOWN'}
           </div>
-          <div className="text-sm text-gray-600">{translations.cacheType}</div>
+          <div className="text-sm text-gray-600 dark:text-slate-400">{translations.cacheType}</div>
         </div>
         
         {cacheStats?.type === 'redis' ? (
           <>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                 {cacheStats?.hit_rate || 0}%
               </div>
-              <div className="text-sm text-gray-600">{translations.hitRate}</div>
+              <div className="text-sm text-gray-600 dark:text-slate-400">{translations.hitRate}</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">
+              <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                 {cacheStats?.used_memory || 'N/A'}
               </div>
-              <div className="text-sm text-gray-600">{translations.memoryUsed}</div>
+              <div className="text-sm text-gray-600 dark:text-slate-400">{translations.memoryUsed}</div>
             </div>
           </>
         ) : (
           <>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                 {cacheStats?.entries || 0}
               </div>
-              <div className="text-sm text-gray-600">{translations.cacheEntries}</div>
+              <div className="text-sm text-gray-600 dark:text-slate-400">{translations.cacheEntries}</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">
+              <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                 {cacheStats?.timestamps || 0}
               </div>
-              <div className="text-sm text-gray-600">{translations.timestamps}</div>
+              <div className="text-sm text-gray-600 dark:text-slate-400">{translations.timestamps}</div>
             </div>
           </>
         )}

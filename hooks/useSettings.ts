@@ -86,7 +86,8 @@ export function useSettings(): UseSettingsReturn {
     } catch (err) {
       console.error(`Failed to update setting ${key}:`, err)
       setError(`Failed to save ${key}`)
-      throw err
+      // Don't re-throw: the error state is sufficient for the UI,
+      // and re-throwing causes unhandled rejections when sync is down
     } finally {
       setSaving(false)
     }
@@ -103,7 +104,7 @@ export function useSettings(): UseSettingsReturn {
     } catch (err) {
       console.error('Failed to update settings:', err)
       setError('Failed to save settings')
-      throw err
+      // Don't re-throw: the error state is sufficient for the UI
     } finally {
       setSaving(false)
     }

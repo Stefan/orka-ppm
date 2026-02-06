@@ -18,8 +18,8 @@ export default function CostBreakdownChart({ directCosts, indirectCosts = {}, to
     <div className="space-y-2">
       {entries.map(({ label, value, type }) => (
         <div key={`${type}-${label}`} className="flex items-center gap-3">
-          <div className="w-24 text-sm text-gray-600 capitalize truncate">{label.replace(/_/g, ' ')}</div>
-          <div className="flex-1 h-6 bg-gray-100 rounded overflow-hidden">
+          <div className="w-24 text-sm text-gray-600 dark:text-slate-400 capitalize truncate">{label.replace(/_/g, ' ')}</div>
+          <div className="flex-1 h-6 bg-gray-100 dark:bg-slate-700 rounded overflow-hidden">
             <div
               className={`h-full rounded ${type === 'direct' ? 'bg-indigo-500' : 'bg-amber-500'}`}
               style={{ width: `${(value / maxVal) * 100}%` }}

@@ -98,11 +98,11 @@ export default function ImportForm({ onComplete }: ImportFormProps) {
       <div
         {...getRootProps()}
         className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-          isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+          isDragActive ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-slate-600 hover:border-gray-400'
         }`}
       >
         <input {...getInputProps()} />
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-slate-400">
           {isDragActive
             ? 'Drop file here...'
             : 'Drag & drop CSV or Excel file, or click to select'}
@@ -112,7 +112,7 @@ export default function ImportForm({ onComplete }: ImportFormProps) {
       {/* Preview und Mapping */}
       {data.length > 0 && (
         <>
-          <div className="bg-white p-6 rounded-lg shadow-sm">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm">
             <h3 className="text-lg font-semibold mb-4">
               Column Mapping ({data.length} rows)
             </h3>

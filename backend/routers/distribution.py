@@ -8,13 +8,13 @@ from typing import List, Optional
 from datetime import datetime
 from enum import Enum
 
-from backend.services.distribution_rules_engine import (
+from services.distribution_rules_engine import (
     DistributionRulesEngine,
     DistributionProfile,
     DistributionRuleType,
     Granularity
 )
-from backend.auth.dependencies import get_current_user
+from auth.dependencies import get_current_user
 
 router = APIRouter(prefix="/api/v1/distribution", tags=["distribution"])
 
@@ -95,7 +95,58 @@ class ApplyRuleRequest(BaseModel):
     project_ids: List[str] = Field(default_factory=list, description="Project IDs to apply rule to (empty = all)")
 
 
+class DistributionSuggestionResponse(BaseModel):
+    """Response for profile suggestion (based on project timeline / history)"""
+    profile: str = Field(..., description="Recommended profile: linear, custom, or ai_generated")
+    reason: str = Field(..., description="Short reason for the recommendation")
+
+
 # Endpoints
+@router.get("/suggestion", response_model=DistributionSuggestionResponse)
+async def get_distribution_suggestion(
+    duration_start: str,
+    duration_end: str,
+    project_id: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Get a distribution profile suggestion based on project timeline (and optionally history).
+    FEATURE_AI_GAPS_SPEC: Auto-Vorschläge (Profil/Duration) – „Basierend auf Project-Historie: Custom für Q3 empfohlen“.
+    When no history is stored, recommendation is derived from project dates (remaining horizon).
+    """
+    try:
+        start = datetime.fromisoformat(duration_start.replace("Z", "+00:00"))
+        end = datetime.fromisoformat(duration_end.replace("Z", "+00:00"))
+        if start >= end:
+            raise HTTPException(status_code=400, detail="duration_start must be before duration_end")
+        now = datetime.now(start.tzinfo) if start.tzinfo else datetime.now()
+        if now > end:
+            return DistributionSuggestionResponse(
+                profile="linear",
+                reason="Project end has passed; linear is a neutral default."
+            )
+        if now < start:
+            months_left = (end.year - start.year) * 12 + (end.month - start.month)
+        else:
+            months_left = (end.year - now.year) * 12 + (end.month - now.month)
+        if months_left <= 3:
+            return DistributionSuggestionResponse(
+                profile="custom",
+                reason="Based on project timeline: Custom distribution recommended for the remaining period."
+            )
+        if months_left > 6:
+            return DistributionSuggestionResponse(
+                profile="linear",
+                reason="Based on project timeline: Linear is a good default for long horizons."
+            )
+        return DistributionSuggestionResponse(
+            profile="linear",
+            reason="Based on project timeline: Linear is a good default."
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid date format: {str(e)}")
+
+
 @router.post("/calculate", response_model=DistributionResponse)
 async def calculate_distribution(
     request: DistributionSettingsRequest,

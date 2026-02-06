@@ -424,7 +424,7 @@ async def get_audit_events(
     risk_levels: Optional[str] = None,  # Comma-separated list
     limit: int = 100,
     offset: int = 0,
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: Dict[str, Any] = Depends(require_permission(Permission.AUDIT_READ))
 ):
     """
     Get filtered audit events with pagination.
@@ -811,13 +811,21 @@ async def semantic_search(
                 detail="User must have a tenant_id"
             )
         
-        # Perform semantic search
+        # Perform semantic search (timed for dashboard system health metric, Requirement 10.9)
+        import time
+        t0 = time.perf_counter()
         search_results = await rag_agent.semantic_search(
             query=search_request.query,
             tenant_id=tenant_id,
             filters=search_request.filters.dict() if search_request.filters else None,
             limit=search_request.limit
         )
+        elapsed_ms = int((time.perf_counter() - t0) * 1000)
+        try:
+            from services.redis_cache_service import get_cache_service
+            get_cache_service().set_audit_system_metric("search_response_time_ms", elapsed_ms, ttl=86400)
+        except Exception:
+            pass
         
         # Convert results to response format
         results = []
@@ -1021,7 +1029,7 @@ async def explain_event(
 async def export_pdf(
     request: Request,
     export_request: ExportRequest,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: Dict[str, Any] = Depends(require_permission(Permission.AUDIT_EXPORT)),
     export_service: AuditExportService = Depends(get_export_service)
 ):
     """
@@ -1088,7 +1096,7 @@ async def export_pdf(
 async def export_csv(
     request: Request,
     export_request: ExportRequest,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: Dict[str, Any] = Depends(require_permission(Permission.AUDIT_EXPORT)),
     export_service: AuditExportService = Depends(get_export_service)
 ):
     """
@@ -1153,7 +1161,7 @@ async def export_csv(
 @limiter.limit("100/minute")
 async def get_dashboard_stats(
     request: Request,
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: Dict[str, Any] = Depends(require_permission(Permission.AUDIT_READ))
 ):
     """
     Get real-time statistics for audit dashboard.
@@ -1278,10 +1286,12 @@ async def get_dashboard_stats(
                 if category:
                     category_breakdown[category] = category_breakdown.get(category, 0) + 1
         
-        # System health metrics
+        # System health metrics (Requirement 10.9: real values from Redis when available)
+        anomaly_latency = cache_service.get_audit_system_metric("anomaly_detection_latency_ms")
+        search_latency = cache_service.get_audit_system_metric("search_response_time_ms")
         system_health = {
-            "anomaly_detection_latency_ms": 0,  # Placeholder
-            "search_response_time_ms": 0,  # Placeholder
+            "anomaly_detection_latency_ms": anomaly_latency if anomaly_latency is not None else 0,
+            "search_response_time_ms": search_latency if search_latency is not None else 0,
             "database_connection_status": "healthy"
         }
         
@@ -1678,7 +1688,7 @@ async def get_audit_logs(
     anomalies_only: Optional[str] = None,
     limit: int = 100,
     offset: int = 0,
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: Dict[str, Any] = Depends(require_permission(Permission.AUDIT_READ))
 ):
     """
     Get filtered audit logs with pagination.
@@ -1988,7 +1998,7 @@ async def add_tag_to_audit_log(
 async def export_audit_logs(
     request: Request,
     export_request: ExportRequest,
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: Dict[str, Any] = Depends(require_permission(Permission.AUDIT_EXPORT))
 ):
     """
     Export filtered audit logs in CSV or JSON format.

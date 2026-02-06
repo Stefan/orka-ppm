@@ -198,8 +198,8 @@ export function CompactHelpChatToggle({ className }: HelpChatToggleProps) {
       <button
         onClick={toggleChat}
         className={cn(
-          'relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors',
-          hasUnreadTips && 'text-yellow-600 hover:text-yellow-700',
+          'relative p-2 text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors',
+          hasUnreadTips && 'text-yellow-600 dark:text-yellow-400 hover:text-yellow-700',
           className
         )}
         title={getToggleButtonText()}

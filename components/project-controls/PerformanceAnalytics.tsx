@@ -43,7 +43,7 @@ export default function PerformanceAnalytics({ projectId }: PerformanceAnalytics
   const pred = prediction as { cost_forecast?: number; completion_date_forecast?: string; confidence_interval?: { lower: number; upper: number }; performance_trend?: string } | null
 
   return (
-    <div className="p-4 bg-white rounded-lg border space-y-4">
+    <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border space-y-4">
       <h3 className="font-semibold">Performance Analytics</h3>
       <PerformancePredictions
         costForecast={pred?.cost_forecast}
@@ -54,7 +54,7 @@ export default function PerformanceAnalytics({ projectId }: PerformanceAnalytics
       <TrendAnalysis trends={trends} />
       {dashboard?.variance_analysis && (
         <div>
-          <h4 className="text-sm text-gray-600 mb-1">Variance Analysis</h4>
+          <h4 className="text-sm text-gray-600 dark:text-slate-400 mb-1">Variance Analysis</h4>
           <pre className="text-xs overflow-auto max-h-40">{JSON.stringify(dashboard.variance_analysis, null, 2)}</pre>
         </div>
       )}

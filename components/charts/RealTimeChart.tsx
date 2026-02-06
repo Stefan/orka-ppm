@@ -238,8 +238,8 @@ const RealTimeChart: React.FC<RealTimeChartProps> = ({
     if (active && payload && payload.length) {
       const data = payload[0].payload
       return (
-        <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200 text-sm">
-          <p className="font-medium text-gray-900">
+        <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 text-sm">
+          <p className="font-medium text-gray-900 dark:text-slate-100">
             Time: {new Date(data.timestamp).toLocaleTimeString()}
           </p>
           <p style={{ color: payload[0].color }} className="font-medium">
@@ -262,13 +262,13 @@ const RealTimeChart: React.FC<RealTimeChartProps> = ({
   }
 
   return (
-    <div className={`relative bg-white rounded-lg border border-gray-200 ${className}`}>
+    <div className={`relative bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
         <div className="flex items-center space-x-2">
-          {title && <h3 className="text-lg font-semibold text-gray-900">{title}</h3>}
+          {title && <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{title}</h3>}
           {enableWebSocket && (
-            <div className={`flex items-center text-sm ${isConnected ? 'text-green-600' : 'text-red-600'}`}>
+            <div className={`flex items-center text-sm ${isConnected ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {isConnected ? <Wifi className="h-4 w-4 mr-1" /> : <WifiOff className="h-4 w-4 mr-1" />}
               {isConnected ? 'Connected' : 'Disconnected'}
             </div>
@@ -277,7 +277,7 @@ const RealTimeChart: React.FC<RealTimeChartProps> = ({
         
         <div className="flex items-center space-x-2">
           {/* Performance Metrics */}
-          <div className="hidden sm:flex items-center text-xs text-gray-500 space-x-2">
+          <div className="hidden sm:flex items-center text-xs text-gray-500 dark:text-slate-400 space-x-2">
             <span>FPS: {performanceMetrics.fps}</span>
             <span>Points: {performanceMetrics.dataPoints}</span>
             <span>Render: {performanceMetrics.renderTime.toFixed(1)}ms</span>
@@ -288,8 +288,8 @@ const RealTimeChart: React.FC<RealTimeChartProps> = ({
             onClick={isPlaying ? stopUpdates : startUpdates}
             className={`p-2 rounded-lg transition-colors ${
               isPlaying 
-                ? 'bg-red-100 text-red-600 hover:bg-red-200' 
-                : 'bg-green-100 text-green-600 hover:bg-green-200'
+                ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 hover:bg-red-200' 
+                : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200'
             }`}
             title={isPlaying ? 'Stop' : 'Start'}
           >
@@ -298,7 +298,7 @@ const RealTimeChart: React.FC<RealTimeChartProps> = ({
           
           <button
             onClick={clearData}
-            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors"
             title="Clear Data"
           >
             <Square className="h-4 w-4" />
@@ -306,7 +306,7 @@ const RealTimeChart: React.FC<RealTimeChartProps> = ({
           
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors"
             title="Settings"
           >
             <Settings className="h-4 w-4" />
@@ -316,10 +316,10 @@ const RealTimeChart: React.FC<RealTimeChartProps> = ({
 
       {/* Settings Panel */}
       {showSettings && (
-        <div className="p-4 border-b border-gray-200 bg-gray-50">
+        <div className="p-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Update Interval (ms)
               </label>
               <input
@@ -329,12 +329,12 @@ const RealTimeChart: React.FC<RealTimeChartProps> = ({
                 min="100"
                 max="10000"
                 step="100"
-                className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Max Data Points
               </label>
               <input
@@ -344,12 +344,12 @@ const RealTimeChart: React.FC<RealTimeChartProps> = ({
                 min="10"
                 max="1000"
                 step="10"
-                className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm"
               />
             </div>
             
             <div>
-              <label className="flex items-center text-sm font-medium text-gray-700">
+              <label className="flex items-center text-sm font-medium text-gray-700 dark:text-slate-300">
                 <input
                   type="checkbox"
                   checked={settings.animationEnabled}
@@ -361,7 +361,7 @@ const RealTimeChart: React.FC<RealTimeChartProps> = ({
             </div>
             
             <div>
-              <label className="flex items-center text-sm font-medium text-gray-700">
+              <label className="flex items-center text-sm font-medium text-gray-700 dark:text-slate-300">
                 <input
                   type="checkbox"
                   checked={settings.smoothTransitions}
@@ -433,7 +433,7 @@ const RealTimeChart: React.FC<RealTimeChartProps> = ({
       </div>
 
       {/* Status Bar */}
-      <div className="px-4 py-2 border-t border-gray-200 bg-gray-50 text-xs text-gray-500">
+      <div className="px-4 py-2 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 text-xs text-gray-500 dark:text-slate-400">
         <div className="flex justify-between items-center">
           <span>
             {(() => {

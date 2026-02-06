@@ -2,21 +2,22 @@
  * User Preferences Sync API Endpoint
  * Handles user preferences synchronization across devices
  * Persists to Supabase user_profiles.preferences (JSONB)
+ * Requires Authorization: Bearer <token>. UserId in body/query must match token sub (IDOR protection).
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { enforceSyncAuth } from '@/lib/auth/verify-jwt'
 
-// Create Supabase admin client for server-side operations
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
-  }
-})
+/** Lazy Supabase client so build (no env) does not throw "supabaseUrl is required" at module load */
+function getSupabase(): SupabaseClient | null {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  if (!supabaseUrl || !supabaseServiceKey) return null
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    auth: { autoRefreshToken: false, persistSession: false }
+  })
+}
 
 // Default preferences structure (matches cross-device-sync.ts)
 function getDefaultPreferences(userId: string) {
@@ -65,12 +66,29 @@ function getDefaultPreferences(userId: string) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const preferences = await request.json()
-    
+    const authHeader = request.headers.get('Authorization')
+    const preferences = await request.json().catch(() => ({}))
+    const auth = await enforceSyncAuth(authHeader, preferences.userId ?? null)
+    if (auth instanceof Response) {
+      return NextResponse.json(
+        (await auth.json().catch(() => ({ error: 'Unauthorized' }))) as { error: string },
+        { status: auth.status }
+      )
+    }
+    const userId = auth.userId
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      return NextResponse.json({ error: 'Preferences sync not configured' }, { status: 503 })
+    }
+
     if (!preferences.userId) {
       return NextResponse.json({
         error: 'Missing required field: userId'
       }, { status: 400 })
+    }
+    if (preferences.userId !== userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     // Merge with current timestamp
@@ -145,13 +163,21 @@ export async function PUT(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    const authHeader = request.headers.get('Authorization')
     const { searchParams } = new URL(request.url)
-    const userId = searchParams.get('userId')
-    
-    if (!userId) {
-      return NextResponse.json({
-        error: 'Missing required parameter: userId'
-      }, { status: 400 })
+    const queryUserId = searchParams.get('userId')
+    const auth = await enforceSyncAuth(authHeader, queryUserId)
+    if (auth instanceof Response) {
+      return NextResponse.json(
+        (await auth.json().catch(() => ({ error: 'Unauthorized' }))) as { error: string },
+        { status: auth.status }
+      )
+    }
+    const userId = auth.userId
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      return NextResponse.json({ error: 'Preferences sync not configured' }, { status: 503 })
     }
 
     // Fetch preferences from Supabase

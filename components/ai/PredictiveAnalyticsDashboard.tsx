@@ -122,24 +122,24 @@ export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboard
   const getTrendIcon = (trend: 'increasing' | 'stable' | 'decreasing') => {
     switch (trend) {
       case 'increasing':
-        return <TrendingUp className="h-5 w-5 text-green-500" />
+        return <TrendingUp className="h-5 w-5 text-green-500 dark:text-green-400" />
       case 'decreasing':
-        return <TrendingDown className="h-5 w-5 text-red-500" />
+        return <TrendingDown className="h-5 w-5 text-red-500 dark:text-red-400" />
       default:
-        return <BarChart3 className="h-5 w-5 text-blue-500" />
+        return <BarChart3 className="h-5 w-5 text-blue-500 dark:text-blue-400" />
     }
   }
 
   const getSeverityColor = (severity: 'low' | 'medium' | 'high' | 'critical') => {
     switch (severity) {
       case 'critical':
-        return 'bg-red-100 text-red-800 border-red-200'
+        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800'
       case 'high':
-        return 'bg-orange-100 text-orange-800 border-orange-200'
+        return 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border-orange-200'
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+        return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800'
       default:
-        return 'bg-blue-100 text-blue-800 border-blue-200'
+        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-800'
     }
   }
 
@@ -160,7 +160,7 @@ export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboard
       <div className={`space-y-6 ${className}`}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div key={i} className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
               <div className="animate-pulse">
                 <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
                 <div className="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
@@ -175,10 +175,10 @@ export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboard
 
   if (error) {
     return (
-      <div className={`bg-red-50 border border-red-200 rounded-lg p-6 ${className}`}>
+      <div className={`bg-red-50 border border-red-200 dark:border-red-800 rounded-lg p-6 ${className}`}>
         <div className="flex items-center">
-          <XCircle className="h-5 w-5 text-red-500 mr-2" />
-          <h3 className="text-lg font-medium text-red-800">Error Loading Analytics</h3>
+          <XCircle className="h-5 w-5 text-red-500 dark:text-red-400 mr-2" />
+          <h3 className="text-lg font-medium text-red-800 dark:text-red-300">Error Loading Analytics</h3>
         </div>
         <p className="text-red-700 mt-2">{error}</p>
         <button
@@ -200,15 +200,15 @@ export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboard
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Predictive Analytics</h1>
-          <p className="text-gray-600">AI-powered capacity planning and performance insights</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Predictive Analytics</h1>
+          <p className="text-gray-600 dark:text-slate-400">AI-powered capacity planning and performance insights</p>
         </div>
         
         <div className="flex items-center space-x-4">
           <select
             value={selectedTimeHorizon}
             onChange={(e) => setSelectedTimeHorizon(e.target.value as any)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="1_month">1 Month</option>
             <option value="3_months">3 Months</option>
@@ -228,37 +228,37 @@ export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboard
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Current Utilization */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Current Utilization</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Current Utilization</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                 {dashboardData.capacity_overview.current_utilization.toFixed(1)}%
               </p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <Users className="h-6 w-6 text-blue-600" />
+            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+              <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
           <div className="mt-4 flex items-center">
             {getTrendIcon(dashboardData.capacity_overview.capacity_trend)}
-            <span className="ml-2 text-sm text-gray-600">
+            <span className="ml-2 text-sm text-gray-600 dark:text-slate-400">
               {dashboardData.capacity_overview.capacity_trend} trend
             </span>
           </div>
         </div>
 
         {/* Predicted Utilization */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Predicted Next Month</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Predicted Next Month</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                 {dashboardData.capacity_overview.predicted_utilization_next_month.toFixed(1)}%
               </p>
             </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <Target className="h-6 w-6 text-green-600" />
+            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full">
+              <Target className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
           </div>
           <div className="mt-4">
@@ -271,7 +271,7 @@ export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboard
                   }}
                 />
               </div>
-              <span className="ml-2 text-sm text-gray-600">
+              <span className="ml-2 text-sm text-gray-600 dark:text-slate-400">
                 {assessCapacityRisk(
                   dashboardData.capacity_overview.predicted_utilization_next_month,
                   dashboardData.capacity_overview.capacity_trend
@@ -282,47 +282,47 @@ export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboard
         </div>
 
         {/* Active Patterns */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Active Patterns</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Active Patterns</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                 {dashboardData.performance_patterns.active_patterns}
               </p>
             </div>
-            <div className="p-3 bg-purple-100 rounded-full">
-              <BarChart3 className="h-6 w-6 text-purple-600" />
+            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full">
+              <BarChart3 className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
           </div>
           <div className="mt-4">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-slate-400">
               {dashboardData.performance_patterns.high_impact_patterns} high impact
             </p>
           </div>
         </div>
 
         {/* Model Accuracy */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Model Accuracy</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Model Accuracy</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                 {(dashboardData.learning_metrics.model_accuracy * 100).toFixed(1)}%
               </p>
             </div>
-            <div className="p-3 bg-indigo-100 rounded-full">
-              <Brain className="h-6 w-6 text-indigo-600" />
+            <div className="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-full">
+              <Brain className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             </div>
           </div>
           <div className="mt-4 flex items-center">
             {dashboardData.learning_metrics.improvement_trend === 'improving' ? (
-              <TrendingUp className="h-4 w-4 text-green-500" />
+              <TrendingUp className="h-4 w-4 text-green-500 dark:text-green-400" />
             ) : dashboardData.learning_metrics.improvement_trend === 'declining' ? (
-              <TrendingDown className="h-4 w-4 text-red-500" />
+              <TrendingDown className="h-4 w-4 text-red-500 dark:text-red-400" />
             ) : (
-              <BarChart3 className="h-4 w-4 text-blue-500" />
+              <BarChart3 className="h-4 w-4 text-blue-500 dark:text-blue-400" />
             )}
-            <span className="ml-2 text-sm text-gray-600">
+            <span className="ml-2 text-sm text-gray-600 dark:text-slate-400">
               {dashboardData.learning_metrics.improvement_trend}
             </span>
           </div>
@@ -331,10 +331,10 @@ export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboard
 
       {/* Critical Alerts */}
       {dashboardData.capacity_overview.critical_alerts.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
           <div className="flex items-center mb-4">
             <AlertTriangle className="h-5 w-5 text-orange-500 mr-2" />
-            <h2 className="text-lg font-semibold text-gray-900">Critical Alerts</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Critical Alerts</h2>
           </div>
           
           <div className="space-y-3">
@@ -362,20 +362,20 @@ export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboard
 
       {/* Capacity Predictions */}
       {capacityPredictions.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">Capacity Predictions</h2>
-            <span className="text-sm text-gray-500">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Capacity Predictions</h2>
+            <span className="text-sm text-gray-500 dark:text-slate-400">
               {selectedTimeHorizon.replace('_', ' ')} forecast
             </span>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {capacityPredictions.slice(0, 4).map((prediction) => (
-              <div key={prediction.prediction_id} className="border border-gray-200 rounded-lg p-4">
+              <div key={prediction.prediction_id} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-medium text-gray-900">{prediction.resource_name}</h3>
-                  <span className="text-sm text-gray-500">
+                  <h3 className="font-medium text-gray-900 dark:text-slate-100">{prediction.resource_name}</h3>
+                  <span className="text-sm text-gray-500 dark:text-slate-400">
                     {(prediction.confidence_score * 100).toFixed(0)}% confidence
                   </span>
                 </div>
@@ -396,7 +396,7 @@ export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboard
                         />
                       </div>
                     </div>
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400 mt-1">
                       <span>Pessimistic: {prediction.predicted_utilization.pessimistic.toFixed(1)}%</span>
                       <span>Optimistic: {prediction.predicted_utilization.optimistic.toFixed(1)}%</span>
                     </div>
@@ -404,10 +404,10 @@ export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboard
                   
                   {prediction.capacity_gaps.length > 0 && (
                     <div>
-                      <p className="text-sm font-medium text-gray-700 mb-2">Capacity Gaps:</p>
+                      <p className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Capacity Gaps:</p>
                       <div className="space-y-1">
                         {prediction.capacity_gaps.slice(0, 2).map((gap, index) => (
-                          <div key={index} className="text-xs text-gray-600">
+                          <div key={index} className="text-xs text-gray-600 dark:text-slate-400">
                             <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
                               gap.severity === 'critical' ? 'bg-red-500' :
                               gap.severity === 'high' ? 'bg-orange-500' :
@@ -428,30 +428,30 @@ export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboard
 
       {/* Performance Patterns */}
       {performancePatterns.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">Performance Patterns</h2>
-            <span className="text-sm text-gray-500">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Performance Patterns</h2>
+            <span className="text-sm text-gray-500 dark:text-slate-400">
               {performancePatterns.length} patterns identified
             </span>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {performancePatterns.slice(0, 4).map((pattern) => (
-              <div key={pattern.pattern_id} className="border border-gray-200 rounded-lg p-4">
+              <div key={pattern.pattern_id} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-medium text-gray-900">{pattern.pattern_name}</h3>
+                  <h3 className="font-medium text-gray-900 dark:text-slate-100">{pattern.pattern_name}</h3>
                   <span className={`px-2 py-1 rounded-full text-xs ${
-                    pattern.pattern_type === 'seasonal' ? 'bg-green-100 text-green-800' :
-                    pattern.pattern_type === 'cyclical' ? 'bg-blue-100 text-blue-800' :
-                    pattern.pattern_type === 'trending' ? 'bg-purple-100 text-purple-800' :
-                    'bg-orange-100 text-orange-800'
+                    pattern.pattern_type === 'seasonal' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' :
+                    pattern.pattern_type === 'cyclical' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' :
+                    pattern.pattern_type === 'trending' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300' :
+                    'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
                   }`}>
                     {pattern.pattern_type}
                   </span>
                 </div>
                 
-                <p className="text-sm text-gray-600 mb-3">{pattern.description}</p>
+                <p className="text-sm text-gray-600 dark:text-slate-400 mb-3">{pattern.description}</p>
                 
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
@@ -476,10 +476,10 @@ export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboard
       )}
 
       {/* Recommendations */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center mb-6">
-          <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-          <h2 className="text-lg font-semibold text-gray-900">AI Recommendations</h2>
+          <CheckCircle className="h-5 w-5 text-green-500 dark:text-green-400 mr-2" />
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">AI Recommendations</h2>
         </div>
         
         <div className="space-y-4">
@@ -490,31 +490,31 @@ export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboard
             <div
               key={index}
               className={`p-4 rounded-lg border-l-4 ${
-                recommendation.priority === 1 ? 'border-red-500 bg-red-50' :
+                recommendation.priority === 1 ? 'border-red-500 bg-red-50 dark:bg-red-900/20' :
                 recommendation.priority === 2 ? 'border-orange-500 bg-orange-50' :
-                'border-blue-500 bg-blue-50'
+                'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
               }`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center">
-                    <h3 className="font-medium text-gray-900">{recommendation.title}</h3>
+                    <h3 className="font-medium text-gray-900 dark:text-slate-100">{recommendation.title}</h3>
                     {recommendation.action_required && (
-                      <span className="ml-2 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                      <span className="ml-2 px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 text-xs rounded-full">
                         Action Required
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">{recommendation.description}</p>
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">{recommendation.description}</p>
+                  <p className="text-sm text-gray-500 dark:text-slate-400 mt-2">
                     <strong>Expected Impact:</strong> {recommendation.estimated_impact}
                   </p>
                 </div>
                 <div className="flex-shrink-0 ml-4">
                   <span className={`px-2 py-1 rounded-full text-xs ${
-                    recommendation.type === 'capacity' ? 'bg-blue-100 text-blue-800' :
-                    recommendation.type === 'pattern' ? 'bg-purple-100 text-purple-800' :
-                    'bg-green-100 text-green-800'
+                    recommendation.type === 'capacity' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' :
+                    recommendation.type === 'pattern' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300' :
+                    'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
                   }`}>
                     {recommendation.type}
                   </span>
@@ -527,35 +527,35 @@ export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboard
 
       {/* Next Predicted Event */}
       {dashboardData.performance_patterns.next_predicted_event && (
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-6">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 dark:border-blue-800 p-6">
           <div className="flex items-center mb-4">
-            <Calendar className="h-5 w-5 text-blue-600 mr-2" />
-            <h2 className="text-lg font-semibold text-gray-900">Next Predicted Event</h2>
+            <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Next Predicted Event</h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <p className="text-sm font-medium text-gray-600">Pattern</p>
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Pattern</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                 {dashboardData.performance_patterns.next_predicted_event.pattern_name}
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Predicted Date</p>
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Predicted Date</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                 {new Date(dashboardData.performance_patterns.next_predicted_event.predicted_date).toLocaleDateString()}
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Confidence</p>
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Confidence</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                 {(dashboardData.performance_patterns.next_predicted_event.confidence * 100).toFixed(0)}%
               </p>
             </div>
           </div>
           
-          <div className="mt-4 p-3 bg-blue-100 rounded-lg">
-            <p className="text-sm text-blue-800">
+          <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+            <p className="text-sm text-blue-800 dark:text-blue-300">
               <strong>Preparation Time:</strong> {dashboardData.performance_patterns.next_predicted_event.preparation_time}
             </p>
           </div>

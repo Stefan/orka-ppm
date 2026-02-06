@@ -87,24 +87,24 @@ export function ErrorDisplay({
   const typeStyles = {
     error: {
       bg: 'bg-red-50',
-      border: 'border-red-200',
+      border: 'border-red-200 dark:border-red-800',
       icon: 'text-red-500',
       title: 'text-red-700',
-      text: 'text-red-600'
+      text: 'text-red-600 dark:text-red-400'
     },
     warning: {
       bg: 'bg-yellow-50',
-      border: 'border-yellow-200',
+      border: 'border-yellow-200 dark:border-yellow-800',
       icon: 'text-yellow-500',
       title: 'text-yellow-700',
-      text: 'text-yellow-600'
+      text: 'text-yellow-600 dark:text-yellow-400'
     },
     info: {
       bg: 'bg-blue-50',
-      border: 'border-blue-200',
+      border: 'border-blue-200 dark:border-blue-800',
       icon: 'text-blue-500',
       title: 'text-blue-700',
-      text: 'text-blue-600'
+      text: 'text-blue-600 dark:text-blue-400'
     }
   }
 
@@ -158,7 +158,7 @@ export function ErrorDisplay({
         {showRetry && onRetry && (
           <button
             onClick={onRetry}
-            className={`p-1 rounded hover:bg-white/50 ${styles.icon}`}
+            className={`p-1 rounded hover:bg-white dark:bg-slate-800/50 ${styles.icon}`}
             title="Retry"
           >
             <RefreshCw className="w-4 h-4" />
@@ -168,7 +168,7 @@ export function ErrorDisplay({
         {showDismiss && onDismiss && (
           <button
             onClick={onDismiss}
-            className={`p-1 rounded hover:bg-white/50 ${styles.icon}`}
+            className={`p-1 rounded hover:bg-white dark:bg-slate-800/50 ${styles.icon}`}
             title="Dismiss"
           >
             <X className="w-4 h-4" />
@@ -212,11 +212,11 @@ export function ErrorDisplay({
                     flex items-center gap-1
                     px-3 py-1.5
                     text-sm font-medium
-                    bg-white
+                    bg-white dark:bg-slate-800
                     border ${styles.border}
                     rounded-md
                     ${styles.text}
-                    hover:bg-gray-50
+                    hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50
                     transition-colors
                   `}
                   data-testid={`${testId}-retry`}
@@ -248,7 +248,7 @@ export function ErrorDisplay({
         {showDismiss && onDismiss && (
           <button
             onClick={onDismiss}
-            className={`p-1 rounded hover:bg-white/50 ${styles.icon}`}
+            className={`p-1 rounded hover:bg-white dark:bg-slate-800/50 ${styles.icon}`}
             title="Dismiss"
           >
             <X className="w-4 h-4" />

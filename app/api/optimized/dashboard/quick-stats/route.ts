@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-import { jwtDecode } from 'jwt-decode'
+import { getUserIdFromAuthHeader } from '@/lib/auth/verify-jwt'
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
@@ -32,24 +32,6 @@ const DEFAULT_KPI_SETTINGS: DashboardKPIs = {
   budgetMethod: 'spent',
   resourceMethod: 'auto',
   resourceFixedValue: 85
-}
-
-/**
- * Extract user ID from JWT token
- */
-function getUserIdFromAuth(authHeader: string | null): string | null {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null
-  }
-  
-  try {
-    const token = authHeader.substring(7)
-    const decoded = jwtDecode<{ sub?: string }>(token)
-    return decoded.sub || null
-  } catch (error) {
-    console.error('Failed to decode JWT:', error)
-    return null
-  }
 }
 
 /**
@@ -159,7 +141,7 @@ export async function GET(request: NextRequest) {
     const authHeader = request.headers.get('authorization')
     
     // Get user ID and their KPI preferences
-    const userId = getUserIdFromAuth(authHeader)
+    const userId = await getUserIdFromAuthHeader(authHeader)
     const kpiSettings = await getUserKPISettings(userId)
     
     // Fetch projects from backend

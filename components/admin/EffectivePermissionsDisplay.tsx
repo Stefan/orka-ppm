@@ -361,7 +361,7 @@ export function EffectivePermissionsDisplay({
                               key={perm}
                               className="flex items-center gap-2 text-sm p-2 rounded-md bg-muted/50"
                             >
-                              <CheckCircle2 className="h-3 w-3 text-green-600 flex-shrink-0" />
+                              <CheckCircle2 className="h-3 w-3 text-green-600 dark:text-green-400 flex-shrink-0" />
                               <span className="truncate">{formatPermissionName(perm)}</span>
                             </div>
                           ))}

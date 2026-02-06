@@ -117,7 +117,7 @@ export const ProgressiveImage: React.FC<ProgressiveImageProps> = ({
   }
 
   const renderErrorState = () => (
-    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400">
+    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300">
       <svg
         className="w-8 h-8"
         fill="none"

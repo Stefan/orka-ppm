@@ -60,6 +60,8 @@ from routers.project_controls import router as project_controls_router
 from routers.forecasts import router as forecasts_router
 from routers.earned_value import router as earned_value_router
 from routers.performance_analytics import router as performance_analytics_router
+from routers.search import router as search_router
+from routers.distribution import router as distribution_router
 
 # Import performance tracking middleware
 from middleware.performance_tracker import PerformanceMiddleware, performance_tracker
@@ -240,6 +242,8 @@ app.include_router(project_controls_router)
 app.include_router(forecasts_router)
 app.include_router(earned_value_router)
 app.include_router(performance_analytics_router)
+app.include_router(search_router)
+app.include_router(distribution_router)
 
 # Add performance tracking middleware
 app.add_middleware(PerformanceMiddleware, tracker=performance_tracker)

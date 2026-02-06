@@ -42,7 +42,7 @@ function getAnomalyDetails(type: AnomalyType) {
     [AnomalyType.VARIANCE_OUTLIER]: {
       title: 'Budget Variance Outlier',
       icon: <TrendingUp className="w-6 h-6" />,
-      color: 'text-orange-600',
+      color: 'text-orange-600 dark:text-orange-400',
       bgColor: 'bg-orange-50',
       borderColor: 'border-orange-200',
       description: 'This project shows unusual budget variance compared to similar projects.',
@@ -57,9 +57,9 @@ function getAnomalyDetails(type: AnomalyType) {
     [AnomalyType.SPEND_VELOCITY]: {
       title: 'High Spend Velocity',
       icon: <Zap className="w-6 h-6" />,
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-50',
-      borderColor: 'border-yellow-200',
+      color: 'text-yellow-600 dark:text-yellow-400',
+      bgColor: 'bg-yellow-50 dark:bg-yellow-900/20',
+      borderColor: 'border-yellow-200 dark:border-yellow-800',
       description: 'This project is utilizing budget at an unusually high rate.',
       impact: 'Medium',
       causes: [
@@ -72,9 +72,9 @@ function getAnomalyDetails(type: AnomalyType) {
     [AnomalyType.BUDGET_UTILIZATION_SPIKE]: {
       title: 'Budget Utilization Spike',
       icon: <BarChart3 className="w-6 h-6" />,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200',
+      color: 'text-blue-600 dark:text-blue-400',
+      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+      borderColor: 'border-blue-200 dark:border-blue-800',
       description: 'Sudden increase in budget utilization compared to active projects.',
       impact: 'Medium',
       causes: [
@@ -87,7 +87,7 @@ function getAnomalyDetails(type: AnomalyType) {
     [AnomalyType.VENDOR_CONCENTRATION]: {
       title: 'Vendor Concentration Risk',
       icon: <Users className="w-6 h-6" />,
-      color: 'text-purple-600',
+      color: 'text-purple-600 dark:text-purple-400',
       bgColor: 'bg-purple-50',
       borderColor: 'border-purple-200',
       description: 'High transaction volume may indicate vendor concentration risk.',
@@ -102,9 +102,9 @@ function getAnomalyDetails(type: AnomalyType) {
     [AnomalyType.UNUSUAL_COMMITMENT_PATTERN]: {
       title: 'Unusual Commitment Pattern',
       icon: <FileText className="w-6 h-6" />,
-      color: 'text-gray-600',
-      bgColor: 'bg-gray-50',
-      borderColor: 'border-gray-200',
+      color: 'text-gray-600 dark:text-slate-400',
+      bgColor: 'bg-gray-50 dark:bg-slate-800/50',
+      borderColor: 'border-gray-200 dark:border-slate-700',
       description: 'Commitment pattern deviates from typical project behavior.',
       impact: 'Low',
       causes: [
@@ -126,25 +126,25 @@ function getSeverityInfo(severity: 'low' | 'medium' | 'high' | 'critical') {
   const info = {
     critical: {
       label: 'Critical',
-      color: 'text-red-700 bg-red-100',
+      color: 'text-red-700 bg-red-100 dark:bg-red-900/30',
       icon: <XCircle className="w-4 h-4" />,
       description: 'Immediate attention required'
     },
     high: {
       label: 'High',
-      color: 'text-orange-700 bg-orange-100',
+      color: 'text-orange-700 bg-orange-100 dark:bg-orange-900/30',
       icon: <AlertTriangle className="w-4 h-4" />,
       description: 'Close monitoring recommended'
     },
     medium: {
       label: 'Medium',
-      color: 'text-yellow-700 bg-yellow-100',
+      color: 'text-yellow-700 bg-yellow-100 dark:bg-yellow-900/30',
       icon: <Clock className="w-4 h-4" />,
       description: 'Monitor periodically'
     },
     low: {
       label: 'Low',
-      color: 'text-blue-700 bg-blue-100',
+      color: 'text-blue-700 bg-blue-100 dark:bg-blue-900/30',
       icon: <Info className="w-4 h-4" />,
       description: 'Track for trends'
     }
@@ -196,7 +196,7 @@ export function AnomalyDetailDialog({
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
       data-testid={testId}
     >
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className={`p-6 ${anomalyDetails.bgColor} border-b ${anomalyDetails.borderColor}`}>
           <div className="flex items-start justify-between">
@@ -207,11 +207,11 @@ export function AnomalyDetailDialog({
                 </span>
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100">
                   {anomalyDetails.title}
                 </h2>
                 {projectName && (
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
                     Project: {projectName}
                   </p>
                 )}
@@ -220,7 +220,7 @@ export function AnomalyDetailDialog({
 
             <button
               onClick={handleClose}
-              className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+              className="p-1 text-gray-400 hover:text-gray-600 dark:text-slate-400 transition-colors"
               aria-label="Close dialog"
             >
               <X className="w-5 h-5" />
@@ -233,7 +233,7 @@ export function AnomalyDetailDialog({
               {severityInfo.icon}
               {severityInfo.label} Priority
             </div>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 dark:text-slate-400">
               {severityInfo.description}
             </span>
           </div>
@@ -243,9 +243,9 @@ export function AnomalyDetailDialog({
         <div className="p-6 overflow-y-auto max-h-[60vh]">
           {/* Description */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Description</h3>
-            <p className="text-gray-700">{anomaly.description}</p>
-            <div className="mt-2 text-sm text-gray-600">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">Description</h3>
+            <p className="text-gray-700 dark:text-slate-300">{anomaly.description}</p>
+            <div className="mt-2 text-sm text-gray-600 dark:text-slate-400">
               <strong>Confidence:</strong> {(anomaly.confidence * 100).toFixed(1)}%
             </div>
           </div>
@@ -253,12 +253,12 @@ export function AnomalyDetailDialog({
           {/* Details */}
           {anomaly.details && (
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Details</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-3">Details</h3>
               <div className="grid grid-cols-2 gap-4">
                 {anomaly.details.actualValue !== undefined && (
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <div className="text-sm text-gray-600">Actual Value</div>
-                    <div className="text-lg font-semibold text-gray-900">
+                  <div className="bg-gray-50 dark:bg-slate-800/50 p-3 rounded-lg">
+                    <div className="text-sm text-gray-600 dark:text-slate-400">Actual Value</div>
+                    <div className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                       {typeof anomaly.details.actualValue === 'number'
                         ? formatCurrency(anomaly.details.actualValue)
                         : anomaly.details.actualValue
@@ -268,27 +268,27 @@ export function AnomalyDetailDialog({
                 )}
 
                 {anomaly.details.expectedValue !== undefined && (
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <div className="text-sm text-gray-600">Expected Value</div>
-                    <div className="text-lg font-semibold text-gray-900">
+                  <div className="bg-gray-50 dark:bg-slate-800/50 p-3 rounded-lg">
+                    <div className="text-sm text-gray-600 dark:text-slate-400">Expected Value</div>
+                    <div className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                       {formatCurrency(anomaly.details.expectedValue)}
                     </div>
                   </div>
                 )}
 
                 {anomaly.details.deviation !== undefined && (
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <div className="text-sm text-gray-600">Deviation</div>
-                    <div className={`text-lg font-semibold ${anomaly.details.deviation > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                  <div className="bg-gray-50 dark:bg-slate-800/50 p-3 rounded-lg">
+                    <div className="text-sm text-gray-600 dark:text-slate-400">Deviation</div>
+                    <div className={`text-lg font-semibold ${anomaly.details.deviation > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
                       {formatCurrency(Math.abs(anomaly.details.deviation))}
                     </div>
                   </div>
                 )}
 
                 {anomaly.details.zScore !== undefined && (
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <div className="text-sm text-gray-600">Z-Score</div>
-                    <div className="text-lg font-semibold text-gray-900">
+                  <div className="bg-gray-50 dark:bg-slate-800/50 p-3 rounded-lg">
+                    <div className="text-sm text-gray-600 dark:text-slate-400">Z-Score</div>
+                    <div className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                       {anomaly.details.zScore.toFixed(2)}
                     </div>
                   </div>
@@ -299,25 +299,25 @@ export function AnomalyDetailDialog({
 
           {/* Impact & Causes */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Analysis</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-3">Analysis</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-2">Impact Level</div>
+                <div className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Impact Level</div>
                 <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                  anomalyDetails.impact === 'High' ? 'bg-red-100 text-red-800' :
-                  anomalyDetails.impact === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-blue-100 text-blue-800'
+                  anomalyDetails.impact === 'High' ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' :
+                  anomalyDetails.impact === 'Medium' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' :
+                  'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
                 }`}>
                   {anomalyDetails.impact}
                 </div>
               </div>
 
               <div>
-                <div className="text-sm font-medium text-gray-700 mb-2">Possible Causes</div>
-                <ul className="text-sm text-gray-600 space-y-1">
+                <div className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Possible Causes</div>
+                <ul className="text-sm text-gray-600 dark:text-slate-400 space-y-1">
                   {anomalyDetails.causes.slice(0, 3).map((cause, index) => (
                     <li key={index} className="flex items-center gap-2">
-                      <ArrowRight className="w-3 h-3 text-gray-400" />
+                      <ArrowRight className="w-3 h-3 text-gray-400 dark:text-slate-500" />
                       {cause}
                     </li>
                   ))}
@@ -329,17 +329,17 @@ export function AnomalyDetailDialog({
           {/* Recommendation */}
           {anomaly.recommendation && (
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Recommendation</h3>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-blue-800">{anomaly.recommendation}</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">Recommendation</h3>
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <p className="text-blue-800 dark:text-blue-300">{anomaly.recommendation}</p>
               </div>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
-          <div className="text-sm text-gray-600">
+        <div className="px-6 py-4 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700 flex justify-between items-center">
+          <div className="text-sm text-gray-600 dark:text-slate-400">
             Detected: {new Date().toLocaleDateString()}
           </div>
 
@@ -348,7 +348,7 @@ export function AnomalyDetailDialog({
               {onDismiss && (
                 <button
                   onClick={handleDismiss}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                   data-testid={`${testId}-dismiss`}
                 >
                   Dismiss
@@ -369,7 +369,7 @@ export function AnomalyDetailDialog({
           )}
 
           {actionTaken && (
-            <div className="flex items-center gap-2 text-sm text-green-600">
+            <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
               <CheckCircle className="w-4 h-4" />
               Action recorded
             </div>

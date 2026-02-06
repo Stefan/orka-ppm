@@ -13,7 +13,7 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({
 }) => {
   if (variant === 'stat') {
     return (
-      <div className={`bg-white p-6 rounded-lg shadow-sm border border-gray-200 ${className}`}>
+      <div className={`bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 ${className}`}>
         <div className="animate-pulse">
           <div className="flex items-center justify-between">
             <div className="flex-1">
@@ -29,7 +29,7 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({
 
   if (variant === 'project') {
     return (
-      <div className={`bg-white p-6 rounded-lg shadow-sm border border-gray-200 ${className}`}>
+      <div className={`bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 ${className}`}>
         <div className="animate-pulse">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3 flex-1">
@@ -52,7 +52,7 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({
 
   if (variant === 'resource') {
     return (
-      <div className={`bg-white p-6 rounded-lg shadow-sm border border-gray-200 ${className}`}>
+      <div className={`bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 ${className}`}>
         <div className="animate-pulse">
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
@@ -83,7 +83,7 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({
 
   if (variant === 'risk') {
     return (
-      <div className={`bg-white p-6 rounded-lg shadow-sm border border-gray-200 ${className}`}>
+      <div className={`bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 ${className}`}>
         <div className="animate-pulse">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center space-x-3 flex-1">

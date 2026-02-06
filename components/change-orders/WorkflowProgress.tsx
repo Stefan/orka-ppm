@@ -16,19 +16,19 @@ export default function WorkflowProgress({ approvalLevels, isComplete }: Workflo
 
   return (
     <div className="space-y-2">
-      <h4 className="text-sm font-medium text-gray-700">Approval Progress</h4>
+      <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300">Approval Progress</h4>
       <div className="flex flex-wrap gap-2">
         {approvalLevels.map((lvl) => (
           <div
             key={lvl.level}
             className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm ${
               lvl.status === 'approved'
-                ? 'bg-green-100 text-green-800'
+                ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
                 : lvl.status === 'rejected'
-                ? 'bg-red-100 text-red-800'
+                ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                 : lvl.status === 'pending'
                 ? 'bg-amber-100 text-amber-800'
-                : 'bg-gray-100 text-gray-800'
+                : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200'
             }`}
           >
             <span className="font-medium">L{lvl.level}</span>
@@ -38,7 +38,7 @@ export default function WorkflowProgress({ approvalLevels, isComplete }: Workflo
         ))}
       </div>
       {isComplete && (
-        <p className="text-sm text-green-600 font-medium">✓ Workflow complete</p>
+        <p className="text-sm text-green-600 dark:text-green-400 font-medium">✓ Workflow complete</p>
       )}
     </div>
   )

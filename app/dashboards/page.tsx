@@ -23,13 +23,14 @@ import {
 } from 'lucide-react'
 import ProjectImportModal from '@/components/projects/ProjectImportModal'
 import { ChartSkeleton } from '../../components/ui/Skeleton'
+import { GuidedTour, useGuidedTour, TourTriggerButton, dashboardTourSteps } from '@/components/guided-tour'
 // Charts werden nicht auf der Dashboard-Hauptseite verwendet, daher entfernen
 // import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 // Dynamic imports for code splitting with stable dimensions to prevent CLS
 const VarianceKPIs = dynamic(() => import('./components/VarianceKPIs'), {
   ssr: false,
-  loading: () => <div className="h-32 bg-gray-100 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
+  loading: () => <div className="h-32 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
 })
 const VarianceTrends = dynamic(() => import('./components/VarianceTrends'), {
   ssr: false,
@@ -37,41 +38,54 @@ const VarianceTrends = dynamic(() => import('./components/VarianceTrends'), {
 })
 const VarianceAlerts = dynamic(() => import('./components/VarianceAlerts'), {
   ssr: false,
-  loading: () => <div className="h-40 bg-gray-100 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
+  loading: () => <div className="h-40 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
 })
 const WorkflowDashboard = dynamic(() => import('@/components/workflow/WorkflowDashboard'), {
   ssr: false,
-  loading: () => <div className="h-48 bg-gray-100 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
+  loading: () => <div className="h-48 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
 })
 const ScheduleDashboardWidgets = dynamic(() => import('./components/ScheduleDashboardWidgets'), {
   ssr: false,
-  loading: () => <div className="h-32 bg-gray-100 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
+  loading: () => <div className="h-32 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
 })
 const ChangeOrderWidgets = dynamic(() => import('./components/ChangeOrderWidgets'), {
   ssr: false,
-  loading: () => <div className="h-24 bg-gray-100 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
+  loading: () => <div className="h-24 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
 })
 const ProjectControlsWidgets = dynamic(() => import('./components/ProjectControlsWidgets'), {
   ssr: false,
-  loading: () => <div className="h-24 bg-gray-100 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
+  loading: () => <div className="h-24 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
 })
 
 // KPI Card Component - balanced sizing with design tokens
+// Map light-mode color classes to their dark-mode equivalents
+const kpiColorMap: Record<string, string> = {
+  'text-green-600 dark:text-green-400': 'text-green-600 dark:text-green-400',
+  'text-blue-600 dark:text-blue-400': 'text-blue-600 dark:text-blue-400',
+  'text-purple-600 dark:text-purple-400': 'text-purple-600 dark:text-purple-400',
+  'text-indigo-600 dark:text-indigo-400': 'text-indigo-600 dark:text-indigo-400',
+  'text-teal-600': 'text-teal-600 dark:text-teal-400',
+  'text-red-600 dark:text-red-400': 'text-red-600 dark:text-red-400',
+  'text-orange-600 dark:text-orange-400': 'text-orange-600 dark:text-orange-400',
+  'text-amber-600': 'text-amber-600 dark:text-amber-400',
+}
+
 function KPICard({ label, value, change, icon: Icon, color, testId }: any) {
   const isPositive = change >= 0
+  const colorWithDark = kpiColorMap[color] || color
   return (
-    <div data-testid={testId} className="bg-white rounded-lg border border-gray-200 px-4 py-3 hover:shadow-md transition-all duration-200 cursor-pointer group">
+    <div data-testid={testId} className="bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 px-4 py-3 hover:shadow-md transition-all duration-200 cursor-pointer group">
       <div className="flex items-center justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate mb-1">{label}</p>
+          <p className="text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wide truncate mb-1">{label}</p>
           <div className="flex items-baseline gap-2">
-            <p className={`text-2xl font-bold leading-none ${color}`}>{value}%</p>
-            <span className={`text-xs font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+            <p className={`text-2xl font-bold leading-none ${colorWithDark}`}>{value}%</p>
+            <span className={`text-xs font-medium ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {isPositive ? '↑' : '↓'}{Math.abs(change)}%
             </span>
           </div>
         </div>
-        <Icon className={`${color} opacity-20 group-hover:opacity-40 transition-opacity flex-shrink-0`} size={28} />
+        <Icon className={`${colorWithDark} opacity-20 group-hover:opacity-40 transition-opacity flex-shrink-0`} size={28} />
       </div>
     </div>
   )
@@ -86,10 +100,10 @@ function ProjectCard({ project }: { project: Project }) {
   }
   
   return (
-    <div data-testid="project-card" className="bg-white rounded-lg border border-gray-200 px-3 py-2.5 hover:shadow-md hover:border-blue-400 transition-all duration-200 cursor-pointer group">
+    <div data-testid="project-card" className="bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-slate-700 px-3 py-2.5 hover:shadow-md hover:border-blue-400 transition-all duration-200 cursor-pointer group">
       <div className="flex items-center justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-sm text-gray-900 truncate group-hover:text-blue-600 transition-colors">
+          <h3 className="font-medium text-sm text-gray-900 dark:text-slate-100 truncate group-hover:text-blue-600 transition-colors">
             {project.name}
           </h3>
         </div>
@@ -104,79 +118,74 @@ function QuickActionButton({ icon: Icon, label, onClick }: any) {
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center justify-center p-3 md:p-4 bg-white rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 hover:shadow-md transition-all duration-200 group"
+      className="flex flex-col items-center justify-center p-3 md:p-4 bg-white dark:bg-slate-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:shadow-md transition-all duration-200 group"
     >
-      <Icon className="text-gray-400 group-hover:text-blue-600 mb-2 transition-colors" size={20} />
-      <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">{label}</span>
+      <Icon className="text-gray-400 dark:text-slate-500 group-hover:text-blue-600 mb-2 transition-colors" size={20} />
+      <span className="text-sm font-medium text-gray-700 dark:text-slate-300 group-hover:text-gray-900 dark:hover:text-slate-100 dark:group-hover:text-slate-100 transition-colors">{label}</span>
     </button>
   )
 }
 
-// Ultra-Compact Alert Chip Component - standardized font sizes using design tokens
+// Alert chip – colored bg with left accent bar, icon, high-contrast text
 function AlertChip({ alert, onDismiss }: { alert: any, onDismiss: (id: string) => void }) {
-  const [showTooltip, setShowTooltip] = useState(false)
-  
   const severityConfig = {
     critical: {
-      bg: 'bg-red-100 dark:bg-red-950/60',
-      border: 'border-red-300 dark:border-red-800',
-      text: 'text-red-900 dark:text-red-100',
-      textMuted: 'text-red-800 dark:text-red-100',
-      dot: 'bg-red-600 dark:bg-red-400'
+      bg: 'bg-red-50 dark:bg-red-900/30',
+      border: 'border-red-200 dark:border-red-800',
+      accent: 'bg-red-500',
+      icon: 'text-red-600 dark:text-red-400',
+      title: 'text-red-900 dark:text-red-100',
+      desc: 'text-red-700 dark:text-red-200',
     },
     high: {
-      bg: 'bg-red-100 dark:bg-red-950/60',
-      border: 'border-red-300 dark:border-red-800',
-      text: 'text-red-900 dark:text-red-100',
-      textMuted: 'text-red-800 dark:text-red-100',
-      dot: 'bg-red-600 dark:bg-red-400'
+      bg: 'bg-red-50 dark:bg-red-900/30',
+      border: 'border-red-200 dark:border-red-800',
+      accent: 'bg-red-500',
+      icon: 'text-red-600 dark:text-red-400',
+      title: 'text-red-900 dark:text-red-100',
+      desc: 'text-red-700 dark:text-red-200',
     },
     warning: {
-      bg: 'bg-orange-100 dark:bg-orange-950/60',
-      border: 'border-orange-300 dark:border-orange-800',
-      text: 'text-orange-900 dark:text-orange-100',
-      textMuted: 'text-orange-800 dark:text-orange-100',
-      dot: 'bg-orange-600 dark:bg-orange-400'
+      bg: 'bg-amber-50 dark:bg-amber-900/30',
+      border: 'border-amber-200 dark:border-amber-800',
+      accent: 'bg-amber-500',
+      icon: 'text-amber-600 dark:text-amber-400',
+      title: 'text-amber-900 dark:text-amber-100',
+      desc: 'text-amber-700 dark:text-amber-200',
     },
     info: {
-      bg: 'bg-blue-100 dark:bg-blue-950/60',
-      border: 'border-blue-300 dark:border-blue-800',
-      text: 'text-blue-900 dark:text-blue-100',
-      textMuted: 'text-blue-800 dark:text-blue-100',
-      dot: 'bg-blue-600 dark:bg-blue-400'
-    }
+      bg: 'bg-blue-50 dark:bg-blue-900/30',
+      border: 'border-blue-200 dark:border-blue-800',
+      accent: 'bg-blue-500',
+      icon: 'text-blue-600 dark:text-blue-400',
+      title: 'text-blue-900 dark:text-blue-100',
+      desc: 'text-blue-700 dark:text-blue-200',
+    },
   }
-  
+
   const severity = alert.severity || 'warning'
   const config = severityConfig[severity as keyof typeof severityConfig]
-  
+
   return (
-    <div 
+    <div
       data-testid="alert-chip"
-      className={`${config.bg} border ${config.border} rounded-md px-2.5 py-1.5 flex items-center gap-2 group hover:shadow-md transition-all relative`}
-      onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
+      className={`relative ${config.bg} border ${config.border} rounded-lg pl-4 pr-2 py-1.5 flex items-center gap-2 min-w-0 max-w-sm group hover:shadow-sm transition-all overflow-hidden`}
     >
-      <div className={`w-2 h-2 rounded-full ${config.dot} flex-shrink-0`} aria-hidden></div>
+      {/* Color accent bar on the left edge */}
+      <div className={`absolute left-0 top-0 bottom-0 w-1 ${config.accent} rounded-l-lg`} aria-hidden />
+
+      <AlertTriangle className={`h-3.5 w-3.5 flex-shrink-0 ${config.icon}`} aria-hidden />
       <div className="flex flex-col min-w-0 flex-1">
-        <span className={`text-sm font-semibold ${config.text}`}>{alert.title}</span>
-        <span className={`text-xs sm:text-sm ${(config as any).textMuted || config.text} truncate leading-snug`}>{alert.description}</span>
+        <span className={`text-sm font-medium ${config.title} truncate`}>{alert.title}</span>
+        <span className={`text-xs ${config.desc} truncate`}>{alert.description}</span>
       </div>
       <button
         onClick={() => onDismiss(alert.id)}
-        className={`p-0.5 rounded hover:bg-black/10 dark:hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ${config.text}`}
+        className="p-1 rounded hover:bg-black/10 dark:hover:bg-white dark:bg-slate-800/10 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 text-inherit"
         aria-label="Dismiss alert"
       >
         <X size={14} aria-hidden />
       </button>
-      
-      {/* Tooltip on hover */}
-      {showTooltip && (
-        <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 dark:bg-slate-800 text-white dark:text-slate-100 text-sm rounded-lg shadow-lg z-20 whitespace-nowrap">
-          {alert.description}
-          <div className="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-slate-800"></div>
-        </div>
-      )}
     </div>
   )
 }
@@ -206,7 +215,7 @@ function FilterDropdown({ value, onChange }: { value: string, onChange: (val: st
                 onChange(option)
                 setIsOpen(false)
               }}
-              className={`w-full text-left px-4 py-2 text-xs hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors first:rounded-t-lg last:rounded-b-lg ${
+              className={`w-full text-left px-4 py-2 text-xs hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700 transition-colors first:rounded-t-lg last:rounded-b-lg ${
                 value === option ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 font-medium' : 'text-gray-700 dark:text-slate-200'
               }`}
             >
@@ -237,6 +246,7 @@ export default function CompactDashboard() {
     { id: '3', title: 'Resource Conflict', description: 'Team member assigned to multiple projects', severity: 'warning' },
   ])
   const [showImportModal, setShowImportModal] = useState(false)
+  const { isOpen, startTour, closeTour, completeTour, resetAndStartTour, hasCompletedTour } = useGuidedTour('dashboard-v1')
 
   const loadOptimizedData = useCallback(async () => {
     if (!session?.access_token) return
@@ -307,15 +317,15 @@ export default function CompactDashboard() {
       <AppLayout>
         <div className="max-w-[1600px] mx-auto p-3 sm:p-4 md:p-6">
           <div className="animate-pulse space-y-3 md:space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+            <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-1/3"></div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-20 md:h-24 bg-gray-200 rounded"></div>
+                <div key={i} className="h-20 md:h-24 bg-gray-200 dark:bg-slate-700 rounded"></div>
               ))}
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
-              <div className="lg:col-span-2 h-48 md:h-64 bg-gray-200 rounded"></div>
-              <div className="h-48 md:h-64 bg-gray-200 rounded"></div>
+              <div className="lg:col-span-2 h-48 md:h-64 bg-gray-200 dark:bg-slate-700 rounded"></div>
+              <div className="h-48 md:h-64 bg-gray-200 dark:bg-slate-700 rounded"></div>
             </div>
           </div>
         </div>
@@ -328,41 +338,49 @@ export default function CompactDashboard() {
       {/* Compact container with reduced spacing */}
       <div className="max-w-[1600px] mx-auto p-3 sm:p-4 md:p-6 space-y-2 md:space-y-3">
         
-        {/* Header - with proper typography hierarchy */}
-        <div data-testid="dashboard-header" className="flex items-center justify-between gap-3 flex-wrap">
+        {/* Header - Row 1: Title + stats + actions */}
+        <div data-testid="dashboard-header" data-tour="dashboard-header" className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 data-testid="dashboard-title" className="text-xl font-bold text-gray-900 whitespace-nowrap">{t('dashboard.title')}</h1>
-            <span data-testid="dashboard-project-count" className="text-sm text-gray-500 whitespace-nowrap">
+            <h1 data-testid="dashboard-title" className="text-xl font-bold text-gray-900 dark:text-slate-100 whitespace-nowrap">{t('dashboard.title')}</h1>
+            <span data-testid="dashboard-project-count" className="text-sm font-medium text-gray-700 dark:text-slate-300 whitespace-nowrap">
               {quickStats?.total_projects || 0} {t('dashboard.projects')} • {quickStats?.active_projects || 0} {t('stats.activeProjects')}
             </span>
-            {/* Alert Chips - Inline with header */}
-            {alerts.map((alert) => (
-              <AlertChip key={alert.id} alert={alert} onDismiss={handleDismissAlert} />
-            ))}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" data-tour="dashboard-filter">
+            <TourTriggerButton
+              onStart={hasCompletedTour ? resetAndStartTour : startTour}
+              hasCompletedTour={hasCompletedTour}
+            />
             <FilterDropdown value={timeFilter} onChange={handleFilterChange} />
             <button
               data-testid="dashboard-refresh-button"
               onClick={quickRefresh}
-              className="p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="p-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
               title={t('dashboard.refresh')}
             >
-              <RefreshCw size={16} className="text-gray-600" />
+              <RefreshCw size={16} className="text-gray-700 dark:text-slate-300" />
             </button>
           </div>
         </div>
+        {/* Row 2: Alert Chips */}
+        {alerts.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            {alerts.map((alert) => (
+              <AlertChip key={alert.id} alert={alert} onDismiss={handleDismissAlert} />
+            ))}
+          </div>
+        )}
 
         {/* TOP: KPI Cards - Responsive Grid (2→3→5 columns) */}
         {kpis && (
-          <div data-testid="dashboard-kpi-section" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-3">
+          <div data-testid="dashboard-kpi-section" data-tour="dashboard-kpis" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-3">
             <KPICard
               testId="kpi-card-success-rate"
               label={t('kpi.successRate')}
               value={kpis.project_success_rate || 0}
               change={5.2}
               icon={TrendingUp}
-              color="text-green-600"
+              color="text-green-600 dark:text-green-400"
             />
             <KPICard
               testId="kpi-card-budget-performance"
@@ -370,7 +388,7 @@ export default function CompactDashboard() {
               value={kpis.budget_performance || 0}
               change={-2.1}
               icon={DollarSign}
-              color="text-blue-600"
+              color="text-blue-600 dark:text-blue-400"
             />
             <KPICard
               testId="kpi-card-timeline-performance"
@@ -378,7 +396,7 @@ export default function CompactDashboard() {
               value={kpis.timeline_performance || 0}
               change={3.7}
               icon={Clock}
-              color="text-purple-600"
+              color="text-purple-600 dark:text-purple-400"
             />
             <KPICard
               testId="kpi-card-active-projects"
@@ -386,7 +404,7 @@ export default function CompactDashboard() {
               value={kpis.active_projects_ratio || 0}
               change={1.2}
               icon={BarChart3}
-              color="text-indigo-600"
+              color="text-indigo-600 dark:text-indigo-400"
             />
             <KPICard
               testId="kpi-card-resources"
@@ -394,14 +412,14 @@ export default function CompactDashboard() {
               value={kpis.resource_efficiency || 0}
               change={0.8}
               icon={Users}
-              color="text-teal-600"
+              color="text-teal-600 dark:text-teal-400"
             />
           </div>
         )}
 
         {/* Workflow Approvals - Compact View */}
         {session?.user?.id && (
-          <Suspense fallback={<div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>}>
+          <Suspense fallback={<div className="h-20 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse"></div>}>
             <WorkflowDashboard 
               userId={session.user.id} 
               userRole={session.user.role || 'viewer'}
@@ -411,17 +429,17 @@ export default function CompactDashboard() {
         )}
 
         {/* Budget Variance and Variance Trends side by side */}
-        <div data-testid="dashboard-variance-section" className="flex flex-col sm:flex-row gap-4">
+        <div data-testid="dashboard-variance-section" data-tour="dashboard-variance" className="flex flex-col sm:flex-row gap-4">
           {/* Budget Variance - compact fixed width */}
           <div className="w-full sm:w-auto sm:max-w-xs flex-shrink-0">
-            <Suspense fallback={<div className="h-full bg-white rounded-lg border border-gray-200 animate-pulse" style={{ minHeight: '240px' }}></div>}>
+            <Suspense fallback={<div className="h-full bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 animate-pulse" style={{ minHeight: '240px' }}></div>}>
               <VarianceKPIs session={session} selectedCurrency="USD" />
             </Suspense>
           </div>
           
           {/* Variance Trends - takes remaining space */}
           <div className="w-full sm:flex-1 min-w-0">
-            <Suspense fallback={<div className="h-full bg-white rounded-lg border border-gray-200 animate-pulse" style={{ minHeight: '240px' }}></div>}>
+            <Suspense fallback={<div className="h-full bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 animate-pulse" style={{ minHeight: '240px' }}></div>}>
               <VarianceTrends session={session} selectedCurrency="USD" />
             </Suspense>
           </div>
@@ -429,21 +447,21 @@ export default function CompactDashboard() {
 
         {/* Schedule widgets (Task 15) */}
         {session?.access_token && (
-          <Suspense fallback={<div className="h-32 bg-gray-100 rounded-lg animate-pulse" />}>
+          <Suspense fallback={<div className="h-32 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" />}>
             <ScheduleDashboardWidgets accessToken={session.access_token} />
           </Suspense>
         )}
 
         {/* Change Orders widget */}
         {recentProjects.length > 0 && (
-          <Suspense fallback={<div className="h-24 bg-gray-100 rounded-lg animate-pulse" />}>
+          <Suspense fallback={<div className="h-24 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" />}>
             <ChangeOrderWidgets projectIds={recentProjects.map((p) => p.id)} />
           </Suspense>
         )}
 
         {/* Project Controls widget */}
         {recentProjects.length > 0 && (
-          <Suspense fallback={<div className="h-24 bg-gray-100 rounded-lg animate-pulse" />}>
+          <Suspense fallback={<div className="h-24 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" />}>
             <ProjectControlsWidgets projectIds={recentProjects.map((p) => p.id)} />
           </Suspense>
         )}
@@ -452,29 +470,29 @@ export default function CompactDashboard() {
         <div data-testid="dashboard-health-section" className="space-y-2 md:space-y-3">
           {/* Project Health Summary - Compact - standardized font sizes using design tokens */}
           {quickStats && (
-            <div data-testid="health-summary" className="bg-white rounded-lg border border-gray-200 p-4">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">{t('health.projectHealth')}</h3>
+            <div data-testid="health-summary" className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100 mb-3 uppercase tracking-wide">{t('health.projectHealth')}</h3>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
-                    <span className="text-sm text-gray-600">{t('health.healthy')}</span>
+                    <span className="text-sm text-gray-700 dark:text-slate-300">{t('health.healthy')}</span>
                   </div>
-                  <span data-testid="health-healthy-count" className="font-semibold text-gray-900 text-base">{quickStats.health_distribution?.green || 0}</span>
+                  <span data-testid="health-healthy-count" className="font-semibold text-gray-900 dark:text-slate-100 text-base">{quickStats.health_distribution?.green || 0}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
-                    <span className="text-sm text-gray-600">{t('health.atRisk')}</span>
+                    <span className="text-sm text-gray-700 dark:text-slate-300">{t('health.atRisk')}</span>
                   </div>
-                  <span data-testid="health-at-risk-count" className="font-semibold text-gray-900 text-base">{quickStats.health_distribution?.yellow || 0}</span>
+                  <span data-testid="health-at-risk-count" className="font-semibold text-gray-900 dark:text-slate-100 text-base">{quickStats.health_distribution?.yellow || 0}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
-                    <span className="text-sm text-gray-600">{t('health.critical')}</span>
+                    <span className="text-sm text-gray-700 dark:text-slate-300">{t('health.critical')}</span>
                   </div>
-                  <span data-testid="health-critical-count" className="font-semibold text-gray-900 text-base">{quickStats.health_distribution?.red || 0}</span>
+                  <span data-testid="health-critical-count" className="font-semibold text-gray-900 dark:text-slate-100 text-base">{quickStats.health_distribution?.red || 0}</span>
                 </div>
               </div>
             </div>
@@ -482,15 +500,15 @@ export default function CompactDashboard() {
         </div>
 
         {/* Recent Projects Grid - balanced sizing */}
-        <div data-testid="dashboard-projects-section" className="bg-white rounded-lg border border-gray-200 p-4 mb-20">
-          <h2 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">{t('projects.recentProjects')}</h2>
+        <div data-testid="dashboard-projects-section" data-tour="dashboard-projects" className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4 mb-20">
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-slate-100 mb-3 uppercase tracking-wide">{t('projects.recentProjects')}</h2>
           <div data-testid="recent-projects-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
             {recentProjects.slice(0, 8).map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}
           </div>
           {recentProjects.length === 0 && (
-            <p className="text-sm text-gray-500 text-center py-4">{t('scenarios.noScenarios')}</p>
+            <p className="text-sm text-gray-700 dark:text-slate-300 text-center py-4">{t('scenarios.noScenarios')}</p>
           )}
         </div>
       </div>
@@ -504,27 +522,27 @@ export default function CompactDashboard() {
         <div className="relative z-10 max-w-[1600px] mx-auto">
           <div className="flex items-center gap-2 overflow-x-auto pb-1">
             <span className="text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap mr-1">{t('actions.quickActions')}:</span>
-            <button data-testid="action-scenarios" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-blue-500 dark:bg-blue-700 dark:border dark:border-blue-600 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-600 transition-all whitespace-nowrap shadow-md hover:shadow-lg text-white [&_svg]:text-white [&_span]:text-white">
+            <button data-testid="action-scenarios" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-700 dark:border dark:border-blue-600 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-600 transition-all whitespace-nowrap shadow-md hover:shadow-lg text-white [&_svg]:text-white [&_span]:text-white">
               <BarChart3 size={18} className="shrink-0" aria-hidden />
               <span className="text-sm font-medium">{t('actions.scenarios')}</span>
             </button>
-            <button data-testid="action-resources" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-700 border-2 border-gray-300 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-700 dark:text-white [&_svg]:text-inherit">
+            <button data-testid="action-resources" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
               <Users size={18} className="shrink-0" aria-hidden />
               <span className="text-sm font-medium">{t('actions.resources')}</span>
             </button>
-            <button data-testid="action-financials" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-700 border-2 border-gray-300 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-700 dark:text-white [&_svg]:text-inherit">
+            <button data-testid="action-financials" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
               <DollarSign size={18} className="shrink-0" aria-hidden />
               <span className="text-sm font-medium">{t('actions.financials')}</span>
             </button>
-            <button data-testid="action-reports" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-700 border-2 border-gray-300 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-700 dark:text-white [&_svg]:text-inherit">
+            <button data-testid="action-reports" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
               <FileText size={18} className="shrink-0" aria-hidden />
               <span className="text-sm font-medium">{t('actions.reports')}</span>
             </button>
-            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-700 border-2 border-gray-300 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-700 dark:text-white [&_svg]:text-inherit">
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
               <Clock size={18} className="shrink-0" aria-hidden />
               <span className="text-sm font-medium">Timeline</span>
             </button>
-            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-700 border-2 border-gray-300 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-700 dark:text-white [&_svg]:text-inherit">
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
               <TrendingUp size={18} className="shrink-0" aria-hidden />
               <span className="text-sm font-medium">Analytics</span>
             </button>
@@ -536,6 +554,13 @@ export default function CompactDashboard() {
         </div>
       </div>
 
+      <GuidedTour
+        steps={dashboardTourSteps}
+        isOpen={isOpen}
+        onClose={closeTour}
+        onComplete={completeTour}
+        tourId="dashboard-v1"
+      />
       {/* Project Import Modal */}
       <ProjectImportModal 
         isOpen={showImportModal} 

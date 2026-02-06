@@ -229,23 +229,23 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
   // Render sort icon
   const renderSortIcon = (field: keyof Actual) => {
     if (sortField !== field) {
-      return <ArrowUpDown className="h-3 w-3 text-gray-400" />
+      return <ArrowUpDown className="h-3 w-3 text-gray-400 dark:text-slate-500" />
     }
     if (sortDirection === 'asc') {
-      return <ArrowUp className="h-3 w-3 text-blue-600" />
+      return <ArrowUp className="h-3 w-3 text-blue-600 dark:text-blue-400" />
     }
     if (sortDirection === 'desc') {
-      return <ArrowDown className="h-3 w-3 text-blue-600" />
+      return <ArrowDown className="h-3 w-3 text-blue-600 dark:text-blue-400" />
     }
-    return <ArrowUpDown className="h-3 w-3 text-gray-400" />
+    return <ArrowUpDown className="h-3 w-3 text-gray-400 dark:text-slate-500" />
   }
 
   if (loading && actuals.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-8">
         <div className="flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span className="ml-3 text-gray-600">Loading actuals...</span>
+          <span className="ml-3 text-gray-600 dark:text-slate-400">Loading actuals...</span>
         </div>
       </div>
     )
@@ -253,8 +253,8 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-        <div className="text-center text-red-600">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-8">
+        <div className="text-center text-red-600 dark:text-red-400">
           <p className="font-medium">Error loading actuals</p>
           <p className="text-sm mt-1">{error}</p>
           <button
@@ -270,11 +270,11 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
 
   if (total === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-8">
         <div className="text-center">
-          <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Actuals Data</h3>
-          <p className="text-gray-600 mb-4">
+          <FileText className="h-12 w-12 text-gray-400 dark:text-slate-500 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-2">No Actuals Data</h3>
+          <p className="text-gray-600 dark:text-slate-400 mb-4">
             No actual records have been imported yet.
           </p>
           <a
@@ -291,14 +291,14 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
   return (
     <div className="space-y-4">
       {/* Header with actions */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Actuals Data</h3>
-            <p className="text-sm text-gray-600 mt-1">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Actuals Data</h3>
+            <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
               Showing {startRecord}-{endRecord} of {total} records
               {Object.keys(filters).some(k => filters[k]) && (
-                <span className="ml-2 text-blue-600">
+                <span className="ml-2 text-blue-600 dark:text-blue-400">
                   ({filteredAndSortedActuals.length} filtered)
                 </span>
               )}
@@ -310,8 +310,8 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 showFilters 
-                  ? 'bg-blue-100 text-blue-700' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700' 
+                  : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               <Filter className="h-4 w-4 mr-1" />
@@ -320,7 +320,7 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
             
             <button
               onClick={exportToCSV}
-              className="flex items-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
+              className="flex items-center px-3 py-2 bg-green-700 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
             >
               <Download className="h-4 w-4 mr-1" />
               Export
@@ -330,19 +330,19 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+            <thead className="bg-gray-50 dark:bg-slate-800/50">
               <tr>
                 {columns.map((column) => (
                   <th
                     key={String(column.key)}
-                    className={`px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${column.width || ''}`}
+                    className={`px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider ${column.width || ''}`}
                   >
                     <button
                       onClick={() => handleSort(column.key)}
-                      className="flex items-center space-x-1 hover:text-gray-700"
+                      className="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300"
                     >
                       <span>{column.label}</span>
                       {renderSortIcon(column.key)}
@@ -353,7 +353,7 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
               
               {/* Filter row */}
               {showFilters && (
-                <tr className="bg-gray-100">
+                <tr className="bg-gray-100 dark:bg-slate-700">
                   {columns.map((column) => (
                     <th key={`filter-${String(column.key)}`} className="px-4 py-2">
                       <input
@@ -361,7 +361,7 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
                         placeholder={`Filter ${column.label}...`}
                         value={filters[String(column.key)] || ''}
                         onChange={(e) => handleFilterChange(String(column.key), e.target.value)}
-                        className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-slate-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />
                     </th>
                   ))}
@@ -369,18 +369,18 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
               )}
             </thead>
             
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
               {filteredAndSortedActuals.map((actual) => (
-                <tr key={actual.id} className="hover:bg-gray-50">
+                <tr key={actual.id} className="hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
                   {columns.map((column) => (
                     <td
                       key={`${actual.id}-${String(column.key)}`}
-                      className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap"
+                      className="px-4 py-3 text-sm text-gray-900 dark:text-slate-100 whitespace-nowrap"
                     >
                       {column.key === 'project_nr' && onProjectClick ? (
                         <button
                           onClick={() => onProjectClick(actual.project_nr)}
-                          className="text-blue-600 hover:text-blue-800 hover:underline"
+                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline"
                         >
                           {actual[column.key] || '-'}
                         </button>
@@ -402,17 +402,17 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
       </div>
 
       {/* Pagination */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-700">Rows per page:</span>
+            <span className="text-sm text-gray-700 dark:text-slate-300">Rows per page:</span>
             <select
               value={pageSize}
               onChange={(e) => {
                 setPageSize(Number(e.target.value))
                 setCurrentPage(1)
               }}
-              className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-1 border border-gray-300 dark:border-slate-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value={25}>25</option>
               <option value={50}>50</option>
@@ -424,7 +424,7 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
             <button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 rounded-lg border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -449,7 +449,7 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
                     className={`px-3 py-1 rounded-lg text-sm font-medium ${
                       currentPage === pageNum
                         ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
                     }`}
                   >
                     {pageNum}
@@ -461,7 +461,7 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
             <button
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
-              className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 rounded-lg border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronRight className="h-4 w-4" />
             </button>

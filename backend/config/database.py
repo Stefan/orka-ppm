@@ -95,12 +95,19 @@ service_supabase: Optional[Client] = create_service_supabase_client()
 
 def get_db() -> Optional[Client]:
     """
-    Get the Supabase database client.
+    Get the database client (provider-agnostic entry point).
+    Currently returns the Supabase client; can be swapped for another provider later.
     
     Returns:
-        Optional[Client]: Supabase client instance or None if not available
+        Optional[Client]: Database client instance or None if not available
     """
     return supabase
+
+
+# Backward compatibility: use get_db() in new code. This alias exists so callers
+# that still reference get_supabase_client (e.g. legacy imports or other modules)
+# do not raise NameError. Prefer get_db for provider-agnostic naming.
+get_supabase_client = get_db
 
 # Database connection pool configuration (Task 18.4)
 # These settings optimize database performance for high-load scenarios

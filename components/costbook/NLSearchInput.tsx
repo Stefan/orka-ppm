@@ -260,7 +260,7 @@ export function NLSearchInput({
             type="button"
             onClick={startVoiceSearch}
             disabled={isListening}
-            className={`p-1.5 mr-1 rounded-full transition-colors ${isListening ? 'bg-red-100 text-red-600' : 'text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
+            className={`p-1.5 mr-1 rounded-full transition-colors ${isListening ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400' : 'text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
             aria-label={isListening ? 'Listening...' : 'Voice search'}
             title={voiceError || (isListening ? 'Listening...' : 'Search by voice')}
           >
@@ -312,10 +312,10 @@ export function NLSearchInput({
         />
       )}
 
-      {/* Similar searches (Ähnliche Suchen) */}
+      {/* AI-Vorschläge Ähnliche Suchen */}
       {hasValue && similarSearches.length > 0 && (
         <div className="mt-2 px-1">
-          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Similar searches</p>
+          <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Ähnliche Suchen</p>
           <div className="flex flex-wrap gap-1">
             {similarSearches.map((s) => (
               <button
@@ -353,7 +353,7 @@ export function CompactNLSearchInput({
       <button
         onClick={() => setIsExpanded(true)}
         className={`
-          p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200
+          p-2 text-gray-600 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200
           hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg
           transition-colors
           ${className}
@@ -384,7 +384,7 @@ export function CompactNLSearchInput({
           setIsExpanded(false)
           onChange('')
         }}
-        className="p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+        className="p-2 text-gray-600 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
         aria-label="Close search"
       >
         <X className="w-4 h-4" />

@@ -56,15 +56,15 @@ export function NestedGrid<T extends { id: string; children?: T[] }>({
     return (
       <React.Fragment key={id}>
         <tr
-          className={isChild ? 'bg-gray-50' : 'bg-white'}
+          className={isChild ? 'bg-gray-50 dark:bg-slate-800/50' : 'bg-white dark:bg-slate-800'}
           style={depth > 0 ? { paddingLeft: `${depth * 20}px` } : undefined}
         >
-          <td className="w-8 border-b border-gray-100 p-1">
+          <td className="w-8 border-b border-gray-100 dark:border-slate-700 p-1">
             {hasChildren && (
               <button
                 type="button"
                 onClick={() => toggle(id)}
-                className="rounded p-0.5 hover:bg-gray-200"
+                className="rounded p-0.5 hover:bg-gray-200 dark:hover:bg-slate-600"
                 aria-expanded={isExpanded}
               >
                 {isExpanded ? '−' : '+'}
@@ -74,7 +74,7 @@ export function NestedGrid<T extends { id: string; children?: T[] }>({
           {columns.map((col) => (
             <td
               key={col.id}
-              className="border-b border-gray-100 px-2 py-1.5 text-sm"
+              className="border-b border-gray-100 dark:border-slate-700 px-2 py-1.5 text-sm"
               style={col.width ? { width: col.width } : undefined}
             >
               {col.render(row, isChild)}
@@ -88,15 +88,15 @@ export function NestedGrid<T extends { id: string; children?: T[] }>({
   }
 
   return (
-    <div className={`overflow-auto rounded-lg border border-gray-200 ${className}`}>
+    <div className={`overflow-auto rounded-lg border border-gray-200 dark:border-slate-700 ${className}`}>
       <table className="min-w-full border-collapse">
-        <thead className="bg-gray-100">
+        <thead className="bg-gray-100 dark:bg-slate-700">
           <tr>
-            <th className="w-8 border-b border-gray-200 p-1" />
+            <th className="w-8 border-b border-gray-200 dark:border-slate-700 p-1" />
             {columns.map((col) => (
               <th
                 key={col.id}
-                className="border-b border-gray-200 px-2 py-2 text-left text-xs font-medium uppercase text-gray-600"
+                className="border-b border-gray-200 dark:border-slate-700 px-2 py-2 text-left text-xs font-medium uppercase text-gray-600 dark:text-slate-400"
                 style={col.width ? { width: col.width } : undefined}
               >
                 {col.label}

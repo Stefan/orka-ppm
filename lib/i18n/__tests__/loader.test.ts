@@ -21,12 +21,19 @@ import {
 // Mock fetch globally
 global.fetch = jest.fn();
 
+// Loader passes { cache: 'no-store' } to fetch
+const FETCH_OPTIONS = { cache: 'no-store' as RequestCache };
+
+const originalNodeEnv = process.env.NODE_ENV;
 describe('Translation Loader', () => {
   beforeEach(() => {
-    // Clear cache before each test
+    // Use production so loader caches (useCache === true) and tests can assert cache behavior
+    process.env.NODE_ENV = 'production';
     clearTranslationCache();
-    // Clear all mocks
     jest.clearAllMocks();
+  });
+  afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnv;
   });
 
   describe('loadTranslations', () => {
@@ -43,7 +50,7 @@ describe('Translation Loader', () => {
 
       const result = await loadTranslations('en');
 
-      expect(global.fetch).toHaveBeenCalledWith('/locales/en.json');
+      expect(global.fetch).toHaveBeenCalledWith('/locales/en.json', FETCH_OPTIONS);
       expect(result).toEqual(mockTranslations);
     });
 
@@ -125,8 +132,8 @@ describe('Translation Loader', () => {
 
       const result = await loadTranslations('pl');
 
-      expect(global.fetch).toHaveBeenCalledWith('/locales/pl.json');
-      expect(global.fetch).toHaveBeenCalledWith('/locales/en.json');
+      expect(global.fetch).toHaveBeenCalledWith('/locales/pl.json', FETCH_OPTIONS);
+      expect(global.fetch).toHaveBeenCalledWith('/locales/en.json', FETCH_OPTIONS);
       expect(result).toEqual(englishTranslations);
     });
 
@@ -233,7 +240,7 @@ describe('Translation Loader', () => {
       preloadTranslations('pl');
 
       // Verify fetch was called
-      expect(global.fetch).toHaveBeenCalledWith('/locales/pl.json');
+      expect(global.fetch).toHaveBeenCalledWith('/locales/pl.json', FETCH_OPTIONS);
     });
 
     it('should not preload if already cached', async () => {

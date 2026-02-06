@@ -38,7 +38,7 @@ const selectBaseStyles = [
   'text-gray-900 dark:text-slate-100',
   'transition-all duration-150 ease-in-out',
   'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
-  'disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed dark:disabled:bg-slate-700 dark:disabled:text-slate-400',
+  'disabled:bg-gray-50 dark:bg-slate-800/50 disabled:text-gray-500 dark:text-slate-400 disabled:cursor-not-allowed dark:disabled:bg-slate-700 dark:disabled:text-slate-400',
 ].join(' ')
 
 export const Select: React.FC<SelectProps> = ({
@@ -157,8 +157,8 @@ export const Select: React.FC<SelectProps> = ({
                   'transition-colors duration-100',
                   option.disabled
                     ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed'
-                    : 'text-gray-900 dark:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-700',
-                  selectedValues.includes(option.value) && 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
+                    : 'text-gray-900 dark:text-slate-100 hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700',
+                  selectedValues.includes(option.value) && 'bg-blue-50 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300'
                 )}
                 onClick={() => !option.disabled && handleSelect(option.value)}
               >
@@ -173,7 +173,7 @@ export const Select: React.FC<SelectProps> = ({
       )}
 
       {error && (
-        <p className="mt-1.5 text-sm text-red-600 flex items-center gap-1">
+        <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>

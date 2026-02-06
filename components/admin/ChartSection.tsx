@@ -47,8 +47,8 @@ export const ChartSection = React.memo(function ChartSection({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Endpoint Performance */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
           {translations.endpointPerformance}
         </h3>
         <ResponsiveContainer width="100%" height={300}>
@@ -75,8 +75,8 @@ export const ChartSection = React.memo(function ChartSection({
       </div>
 
       {/* Request Volume */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
           {translations.requestVolume}
         </h3>
         <ResponsiveContainer width="100%" height={300}>

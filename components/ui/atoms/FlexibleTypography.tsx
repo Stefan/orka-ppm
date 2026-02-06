@@ -34,7 +34,7 @@ export const FlexibleTypography: React.FC<TypographyProps> = ({
     display: responsive ? 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold' : 'text-3xl sm:text-4xl lg:text-5xl font-bold',
     heading: responsive ? 'text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold' : 'text-xl sm:text-2xl lg:text-3xl font-semibold',
     body: responsive ? 'text-sm sm:text-base leading-relaxed' : 'text-base leading-relaxed',
-    caption: 'text-sm text-gray-500',
+    caption: 'text-sm text-gray-500 dark:text-slate-400',
     label: 'text-sm font-medium',
   }
 
@@ -60,11 +60,11 @@ export const FlexibleTypography: React.FC<TypographyProps> = ({
 
   const colorClasses = {
     primary: 'text-primary-600',
-    secondary: 'text-gray-600',
+    secondary: 'text-gray-600 dark:text-slate-400',
     success: 'text-success-600',
     warning: 'text-warning-600',
     error: 'text-error-600',
-    gray: 'text-gray-900',
+    gray: 'text-gray-900 dark:text-slate-100',
   }
 
   const alignClasses = {

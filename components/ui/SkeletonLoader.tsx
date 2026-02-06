@@ -66,7 +66,7 @@ export const TextSkeleton: React.FC<{ lines?: number; className?: string }> = ({
 )
 
 export const CardSkeleton: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <div className={`p-4 border border-gray-200 rounded-lg ${className}`}>
+  <div className={`p-4 border border-gray-200 dark:border-slate-700 rounded-lg ${className}`}>
     <div className="flex items-center space-x-4 mb-4">
       <Skeleton variant="circular" width={40} height={40} />
       <div className="flex-1">
@@ -133,7 +133,7 @@ export const DashboardSkeleton: React.FC<{ className?: string }> = ({ className 
     {/* Stats Cards */}
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {Array.from({ length: 4 }).map((_, index) => (
-        <div key={index} className="p-4 border border-gray-200 rounded-lg">
+        <div key={index} className="p-4 border border-gray-200 dark:border-slate-700 rounded-lg">
           <Skeleton variant="text" height={14} width="60%" className="mb-2" />
           <Skeleton variant="text" height={24} width="40%" className="mb-1" />
           <Skeleton variant="text" height={12} width="80%" />
@@ -148,7 +148,7 @@ export const DashboardSkeleton: React.FC<{ className?: string }> = ({ className 
     </div>
     
     {/* Table */}
-    <div className="border border-gray-200 rounded-lg p-4">
+    <div className="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
       <Skeleton variant="text" height={20} width="30%" className="mb-4" />
       <TableSkeleton />
     </div>

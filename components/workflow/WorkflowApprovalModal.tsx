@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { X, CheckCircle, XCircle, Clock, User, Calendar } from 'lucide-react'
 import WorkflowHistory from './WorkflowHistory'
 import { useWorkflowRealtime } from '@/hooks/useWorkflowRealtime'
+import { useAuth } from '@/app/providers/SupabaseAuthProvider'
 
 interface WorkflowApproval {
   id: string
@@ -48,12 +49,13 @@ export default function WorkflowApprovalModal({
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [comments, setComments] = useState('')
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  const { session } = useAuth()
+  const currentUserId = session?.user?.id ?? null
+  const accessToken = session?.access_token ?? null
 
   useEffect(() => {
     fetchWorkflowDetails()
-    fetchCurrentUser()
-  }, [workflowInstanceId])
+  }, [workflowInstanceId, accessToken])
 
   // Setup realtime subscriptions
   useWorkflowRealtime(workflowInstanceId, {
@@ -69,39 +71,18 @@ export default function WorkflowApprovalModal({
     }
   })
 
-  const fetchCurrentUser = async () => {
-    try {
-      const token = localStorage.getItem('token')
-      if (!token) return
-
-      const response = await fetch('/api/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setCurrentUserId(data.user_id)
-      }
-    } catch (err) {
-      console.error('Failed to fetch current user:', err)
-    }
-  }
-
   const fetchWorkflowDetails = async () => {
     try {
       setLoading(true)
       setError(null)
 
-      const token = localStorage.getItem('token')
-      if (!token) {
+      if (!accessToken) {
         throw new Error('Not authenticated')
       }
 
       const response = await fetch(`/api/workflows/instances/${workflowInstanceId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
         }
       })
@@ -126,15 +107,14 @@ export default function WorkflowApprovalModal({
       setSubmitting(true)
       setError(null)
 
-      const token = localStorage.getItem('token')
-      if (!token) {
+      if (!accessToken) {
         throw new Error('Not authenticated')
       }
 
       const response = await fetch(`/api/workflows/instances/${workflowInstanceId}/approve`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -375,7 +355,7 @@ export default function WorkflowApprovalModal({
                 <button
                   onClick={() => handleApproval('approved')}
                   disabled={submitting}
-                  className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                 >
                   <CheckCircle size={18} />
                   {submitting ? 'Submitting...' : 'Approve'}

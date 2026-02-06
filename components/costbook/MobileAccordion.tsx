@@ -117,7 +117,7 @@ export function MobileAccordion({
                 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
                 ${section.disabled 
                   ? 'opacity-50 cursor-not-allowed' 
-                  : 'hover:bg-gray-50 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-700'
+                  : 'hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-700'
                 }
               `}
               aria-expanded={expanded}
@@ -128,9 +128,9 @@ export function MobileAccordion({
                 {Icon && (
                   <Icon className={`w-5 h-5 flex-shrink-0 ${
                     section.disabled 
-                      ? 'text-gray-400' 
+                      ? 'text-gray-400 dark:text-slate-500' 
                       : expanded 
-                        ? 'text-blue-500' 
+                        ? 'text-blue-500 dark:text-blue-400' 
                         : 'text-gray-500 dark:text-gray-400'
                   }`} />
                 )}
@@ -154,8 +154,8 @@ export function MobileAccordion({
                 {/* Chevron with minimum 44x44 touch area */}
                 <span className="w-6 h-6 flex items-center justify-center">
                   {expanded 
-                    ? <ChevronDown className="w-5 h-5 text-gray-400" />
-                    : <ChevronRight className="w-5 h-5 text-gray-400" />
+                    ? <ChevronDown className="w-5 h-5 text-gray-400 dark:text-slate-500" />
+                    : <ChevronRight className="w-5 h-5 text-gray-400 dark:text-slate-500" />
                   }
                 </span>
               </div>
@@ -247,7 +247,7 @@ export function AccordionItem({
           focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset
           ${disabled 
             ? 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-800' 
-            : 'hover:bg-gray-50 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-700'
+            : 'hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-700'
           }
         `}
         aria-expanded={isExpanded}
@@ -256,9 +256,9 @@ export function AccordionItem({
           {Icon && (
             <Icon className={`w-5 h-5 flex-shrink-0 ${
               disabled 
-                ? 'text-gray-400' 
+                ? 'text-gray-400 dark:text-slate-500' 
                 : isExpanded 
-                  ? 'text-blue-500' 
+                  ? 'text-blue-500 dark:text-blue-400' 
                   : 'text-gray-500 dark:text-gray-400'
             }`} />
           )}
@@ -280,8 +280,8 @@ export function AccordionItem({
           
           <span className="w-6 h-6 flex items-center justify-center">
             {isExpanded 
-              ? <ChevronDown className="w-5 h-5 text-gray-400" />
-              : <ChevronRight className="w-5 h-5 text-gray-400" />
+              ? <ChevronDown className="w-5 h-5 text-gray-400 dark:text-slate-500" />
+              : <ChevronRight className="w-5 h-5 text-gray-400 dark:text-slate-500" />
             }
           </span>
         </div>

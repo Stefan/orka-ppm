@@ -86,7 +86,7 @@ export function MultiplePermissionsButtonExample() {
       // User needs EITHER financial_read OR financial_update
       permission={["financial_read", "financial_update"]}
       onClick={handleManageBudget}
-      className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+      className="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-700"
     >
       Manage Budget
     </PermissionButton>
@@ -220,11 +220,11 @@ export function LoadingStateButtonExample() {
       permission="pmr_export"
       onClick={handleExport}
       forceDisabled={isLoading}
-      className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-300"
+      className="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-700 disabled:bg-gray-300"
       loadingContent={
         <button 
           disabled 
-          className="px-4 py-2 bg-gray-300 text-gray-600 rounded cursor-not-allowed"
+          className="px-4 py-2 bg-gray-300 text-gray-600 dark:text-slate-400 rounded cursor-not-allowed"
         >
           Checking permissions...
         </button>
@@ -251,7 +251,7 @@ export function LoadingStateButtonExample() {
 
 export function ToolbarExample({ projectId }: { projectId: string }) {
   return (
-    <div className="flex items-center justify-between p-4 bg-gray-100 rounded">
+    <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-slate-700 rounded">
       <h2 className="text-lg font-semibold">Project Actions</h2>
       
       <div className="flex gap-2">
@@ -277,7 +277,7 @@ export function ToolbarExample({ projectId }: { projectId: string }) {
         <PermissionButton 
           permission="data_import"
           onClick={() => console.log('Importing data...')}
-          className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+          className="px-3 py-2 bg-green-700 text-white rounded hover:bg-green-700 text-sm"
         >
           <Upload className="h-4 w-4 inline mr-1" />
           Import
@@ -311,7 +311,7 @@ export function ProjectCardExample({
   return (
     <div className="border rounded-lg p-4 shadow-sm">
       <h3 className="text-lg font-semibold mb-2">{projectName}</h3>
-      <p className="text-gray-600 mb-4">Project details and description...</p>
+      <p className="text-gray-600 dark:text-slate-400 mb-4">Project details and description...</p>
       
       <div className="flex gap-2">
         <PermissionButton 

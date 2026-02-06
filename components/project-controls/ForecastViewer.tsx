@@ -35,7 +35,7 @@ export default function ForecastViewer({ projectId }: ForecastViewerProps) {
   }, [projectId])
 
   if (loading) return <div className="p-4">Loading...</div>
-  if (!forecast.length) return <div className="p-4 text-gray-500">No forecast data</div>
+  if (!forecast.length) return <div className="p-4 text-gray-500 dark:text-slate-400">No forecast data</div>
 
   const chartData = forecast.map((m) => ({
     forecast_date: String(m.forecast_date ?? ''),
@@ -47,12 +47,12 @@ export default function ForecastViewer({ projectId }: ForecastViewerProps) {
   }))
 
   return (
-    <div className="p-4 bg-white rounded-lg border space-y-4">
+    <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border space-y-4">
       <h3 className="font-semibold">Monthly Forecast</h3>
       <ForecastChart data={chartData} />
       {scenarioItems.length > 0 && (
         <>
-          <h4 className="text-sm font-medium text-gray-700">Scenario Comparison</h4>
+          <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300">Scenario Comparison</h4>
           <ScenarioComparison scenarios={scenarioItems} />
         </>
       )}

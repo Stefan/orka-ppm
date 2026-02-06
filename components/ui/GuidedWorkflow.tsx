@@ -97,7 +97,7 @@ export const GuidedWorkflow: React.FC<GuidedWorkflowProps> = ({
     >
       <div className="flex flex-col h-full">
         {/* Progress Steps */}
-        <div className="flex items-center justify-between mb-6 pb-6 border-b border-gray-200">
+        <div className="flex items-center justify-between mb-6 pb-6 border-b border-gray-200 dark:border-slate-700">
           {steps.map((step, index) => {
             const isCompleted = completedSteps.has(index)
             const isCurrent = index === currentStepIndex
@@ -118,7 +118,7 @@ export const GuidedWorkflow: React.FC<GuidedWorkflowProps> = ({
                       'w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all',
                       isCompleted && 'bg-green-500 border-green-500',
                       isCurrent && !isCompleted && 'bg-blue-500 border-blue-500',
-                      !isCompleted && !isCurrent && 'bg-white border-gray-300'
+                      !isCompleted && !isCurrent && 'bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600'
                     )}
                   >
                     {isCompleted ? (
@@ -127,7 +127,7 @@ export const GuidedWorkflow: React.FC<GuidedWorkflowProps> = ({
                       <span
                         className={cn(
                           'text-sm font-medium',
-                          isCurrent ? 'text-white' : 'text-gray-500'
+                          isCurrent ? 'text-white' : 'text-gray-500 dark:text-slate-400'
                         )}
                       >
                         {index + 1}
@@ -137,9 +137,9 @@ export const GuidedWorkflow: React.FC<GuidedWorkflowProps> = ({
                   <span
                     className={cn(
                       'text-xs font-medium text-center max-w-[100px]',
-                      isCurrent && 'text-blue-600',
-                      isCompleted && 'text-green-600',
-                      !isCurrent && !isCompleted && 'text-gray-500'
+                      isCurrent && 'text-blue-600 dark:text-blue-400',
+                      isCompleted && 'text-green-600 dark:text-green-400',
+                      !isCurrent && !isCompleted && 'text-gray-500 dark:text-slate-400'
                     )}
                   >
                     {step.title}
@@ -161,10 +161,10 @@ export const GuidedWorkflow: React.FC<GuidedWorkflowProps> = ({
 
         {/* Step Content */}
         <div className="flex-1 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">
             {currentStep.title}
           </h3>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">
             {currentStep.description}
           </p>
 
@@ -173,8 +173,8 @@ export const GuidedWorkflow: React.FC<GuidedWorkflowProps> = ({
           </div>
 
           {currentStep.helpText && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-800">
+            <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <p className="text-sm text-blue-800 dark:text-blue-300">
                 <strong>Tip:</strong> {currentStep.helpText}
               </p>
             </div>
@@ -182,7 +182,7 @@ export const GuidedWorkflow: React.FC<GuidedWorkflowProps> = ({
         </div>
 
         {/* Navigation */}
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+        <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-slate-700">
           <Button
             variant="secondary"
             onClick={handleBack}
@@ -192,7 +192,7 @@ export const GuidedWorkflow: React.FC<GuidedWorkflowProps> = ({
             Back
           </Button>
 
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-600 dark:text-slate-400">
             Step {currentStepIndex + 1} of {steps.length}
           </div>
 
@@ -244,7 +244,7 @@ export const HelpPanel: React.FC<HelpPanelProps> = ({
       {/* Panel */}
       <div
         className={cn(
-          'fixed top-0 bottom-0 w-96 bg-white shadow-xl z-50 transform transition-transform duration-300',
+          'fixed top-0 bottom-0 w-96 bg-white dark:bg-slate-800 shadow-xl z-50 transform transition-transform duration-300',
           position === 'right' ? 'right-0' : 'left-0',
           isOpen ? 'translate-x-0' : position === 'right' ? 'translate-x-full' : '-translate-x-full',
           className
@@ -252,11 +252,11 @@ export const HelpPanel: React.FC<HelpPanelProps> = ({
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-slate-700">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{title}</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 dark:text-slate-400 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>

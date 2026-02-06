@@ -242,9 +242,9 @@ export default function ScenariosPage() {
   }
 
   const getImpactColor = (value: number) => {
-    if (value > 0) return 'text-red-600'
-    if (value < 0) return 'text-green-600'
-    return 'text-gray-600'
+    if (value > 0) return 'text-red-600 dark:text-red-400'
+    if (value < 0) return 'text-green-600 dark:text-green-400'
+    return 'text-gray-600 dark:text-slate-400'
   }
 
   const getImpactIcon = (value: number) => {
@@ -275,8 +275,8 @@ export default function ScenariosPage() {
         {/* Header */}
         <div data-testid="scenarios-header" className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-2 sm:space-y-0">
           <div>
-            <h1 data-testid="scenarios-title" className="text-xl sm:text-2xl font-bold text-gray-900">{t('scenarios.title')}</h1>
-            <p className="mt-1 text-sm text-gray-600">
+            <h1 data-testid="scenarios-title" className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-slate-100">{t('scenarios.title')}</h1>
+            <p className="mt-1 text-sm text-gray-600 dark:text-slate-400">
               {t('scenarios.subtitle')}
             </p>
           </div>
@@ -293,7 +293,7 @@ export default function ScenariosPage() {
                 {t('scenarios.compareScenarios')} ({selectedScenarios.length})
               </TouchButton>
             ) : selectedScenarios.length === 1 ? (
-              <div className="text-xs text-gray-500 flex items-center">
+              <div className="text-xs text-gray-500 dark:text-slate-400 flex items-center">
                 <AlertTriangle className="h-3 w-3 mr-1" />
                 {t('scenarios.selectAtLeast2')}
               </div>
@@ -314,10 +314,10 @@ export default function ScenariosPage() {
 
         {/* Error Banner */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-2">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-2">
             <div className="flex items-start">
               <AlertTriangle className="h-4 w-4 text-red-400 mr-2 flex-shrink-0 mt-0.5" />
-              <span className="text-xs text-red-800">{error}</span>
+              <span className="text-xs text-red-800 dark:text-red-300">{error}</span>
             </div>
           </div>
         )}
@@ -327,15 +327,15 @@ export default function ScenariosPage() {
           gap="sm"
         >
           {/* Project Selection */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="px-3 py-2 border-b border-gray-200">
-              <h3 className="text-sm font-semibold text-gray-900">{t('scenarios.selectProject')}</h3>
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+            <div className="px-3 py-2 border-b border-gray-200 dark:border-slate-700">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100">{t('scenarios.selectProject')}</h3>
             </div>
             <div className="p-3">
               {!Array.isArray(projects) || projects.length === 0 ? (
                 <div className="text-center py-6">
-                  <GitBranch className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500">{t('scenarios.errorLoading')}</p>
+                  <GitBranch className="h-10 w-10 text-gray-400 dark:text-slate-500 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500 dark:text-slate-400">{t('scenarios.errorLoading')}</p>
                 </div>
               ) : (
                 <VirtualizedProjectSelector
@@ -351,16 +351,16 @@ export default function ScenariosPage() {
           </div>
 
           {/* Scenarios List */}
-          <div className="lg:col-span-3 bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="px-3 py-2 border-b border-gray-200">
+          <div className="lg:col-span-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+            <div className="px-3 py-2 border-b border-gray-200 dark:border-slate-700">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-gray-900">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100">
                   {selectedProject ? t('scenarios.scenariosFor', { projectName: selectedProject.name }) : t('scenarios.scenariosTitle')}
                 </h3>
                 {scenarios.length > 0 && (
                   <button
                     onClick={() => selectedProject && loadProjectScenarios(selectedProject.id)}
-                    className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="p-1 text-gray-400 hover:text-gray-600 dark:text-slate-400 transition-colors"
                     aria-label={t('common.refresh')}
                   >
                     <RefreshCw className="h-3 w-3" />
@@ -372,13 +372,13 @@ export default function ScenariosPage() {
             <div className="p-3">
               {!selectedProject ? (
                 <div className="text-center py-8">
-                  <Target className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500">{t('scenarios.selectProject')}</p>
+                  <Target className="h-10 w-10 text-gray-400 dark:text-slate-500 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500 dark:text-slate-400">{t('scenarios.selectProject')}</p>
                 </div>
               ) : !Array.isArray(scenarios) || scenarios.length === 0 ? (
                 <div className="text-center py-8">
-                  <Zap className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500 mb-3">{t('scenarios.noScenarios')}</p>
+                  <Zap className="h-10 w-10 text-gray-400 dark:text-slate-500 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500 dark:text-slate-400 mb-3">{t('scenarios.noScenarios')}</p>
                   <button
                     onClick={() => setShowCreateModal(true)}
                     className="inline-flex items-center px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
@@ -394,8 +394,8 @@ export default function ScenariosPage() {
                       key={scenario.id}
                       className={`p-3 rounded-lg border-2 transition-colors ${
                         selectedScenarios.includes(scenario.id)
-                          ? 'border-blue-400 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-blue-400 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/20'
+                          : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -410,27 +410,27 @@ export default function ScenariosPage() {
                                 setSelectedScenarios(selectedScenarios.filter(id => id !== scenario.id))
                               }
                             }}
-                            className="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded flex-shrink-0"
+                            className="mt-0.5 h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-slate-600 rounded flex-shrink-0"
                           />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2 mb-2">
                               <div className="flex-1 min-w-0">
-                                <h4 className="text-sm font-semibold text-gray-900">{scenario.name}</h4>
+                                <h4 className="text-sm font-semibold text-gray-900 dark:text-slate-100">{scenario.name}</h4>
                                 {scenario.description && (
-                                  <p className="text-sm text-gray-600 mt-0.5">{scenario.description}</p>
+                                  <p className="text-sm text-gray-600 dark:text-slate-400 mt-0.5">{scenario.description}</p>
                                 )}
                               </div>
                               <div className="flex items-center gap-2 flex-shrink-0">
                                 <button
                                   onClick={() => {/* TODO: Edit scenario */}}
-                                  className="p-1.5 text-gray-600 hover:text-gray-900 rounded transition-colors"
+                                  className="p-1.5 text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100 rounded transition-colors"
                                   title="Edit scenario"
                                 >
                                   <Edit3 className="h-4 w-4" />
                                 </button>
                                 <button
                                   onClick={() => deleteScenario(scenario.id)}
-                                  className="p-1.5 text-gray-600 hover:text-red-600 rounded transition-colors"
+                                  className="p-1.5 text-gray-600 dark:text-slate-400 hover:text-red-600 rounded transition-colors"
                                   title="Delete scenario"
                                 >
                                   <Trash2 className="h-4 w-4" />
@@ -443,8 +443,8 @@ export default function ScenariosPage() {
                               {/* Timeline Impact */}
                               {scenario.timeline_impact && (
                                 <div className="flex items-center gap-1.5">
-                                  <Clock className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                                  <span className="text-xs text-gray-500">Timeline:</span>
+                                  <Clock className="h-4 w-4 text-gray-400 dark:text-slate-500 flex-shrink-0" />
+                                  <span className="text-xs text-gray-500 dark:text-slate-400">Timeline:</span>
                                   <span className={`text-sm font-medium ${getImpactColor(scenario.timeline_impact.duration_change)}`}>
                                     {formatDuration(scenario.timeline_impact.duration_change)}
                                   </span>
@@ -454,8 +454,8 @@ export default function ScenariosPage() {
                               {/* Cost Impact */}
                               {scenario.cost_impact && (
                                 <div className="flex items-center gap-1.5">
-                                  <DollarSign className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                                  <span className="text-xs text-gray-500">Budget:</span>
+                                  <DollarSign className="h-4 w-4 text-gray-400 dark:text-slate-500 flex-shrink-0" />
+                                  <span className="text-xs text-gray-500 dark:text-slate-400">Budget:</span>
                                   <span className={`text-sm font-medium ${getImpactColor(scenario.cost_impact.cost_change)}`}>
                                     {scenario.cost_impact.cost_change_percentage.toFixed(1)}%
                                   </span>
@@ -465,16 +465,16 @@ export default function ScenariosPage() {
                               {/* Resource Impact */}
                               {scenario.resource_impact && (
                                 <div className="flex items-center gap-1.5">
-                                  <Users className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                                  <span className="text-xs text-gray-500">Resources:</span>
-                                  <span className="text-sm font-medium text-gray-700">
+                                  <Users className="h-4 w-4 text-gray-400 dark:text-slate-500 flex-shrink-0" />
+                                  <span className="text-xs text-gray-500 dark:text-slate-400">Resources:</span>
+                                  <span className="text-sm font-medium text-gray-700 dark:text-slate-300">
                                     {Object.keys(scenario.resource_impact.utilization_changes).length}
                                   </span>
                                 </div>
                               )}
                               
                               {/* Created Date */}
-                              <div className="text-xs text-gray-500 ml-auto">
+                              <div className="text-xs text-gray-500 dark:text-slate-400 ml-auto">
                                 {new Date(scenario.created_at).toLocaleDateString()}
                               </div>
                             </div>
@@ -491,13 +491,13 @@ export default function ScenariosPage() {
 
         {/* Comparison View */}
         {showComparisonView && comparison && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="px-3 py-2 border-b border-gray-200">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+            <div className="px-3 py-2 border-b border-gray-200 dark:border-slate-700">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-gray-900">{t('scenarios.scenarioComparison')}</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100">{t('scenarios.scenarioComparison')}</h3>
                 <button
                   onClick={() => setShowComparisonView(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors text-xl"
+                  className="text-gray-400 hover:text-gray-600 dark:text-slate-400 transition-colors text-xl"
                   aria-label={t('common.close')}
                 >
                   ×
@@ -507,30 +507,30 @@ export default function ScenariosPage() {
             
             <div className="p-3">
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+                  <thead className="bg-gray-50 dark:bg-slate-800/50">
                     <tr>
-                      <th className="px-3 py-2 text-left text-[10px] font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-3 py-2 text-left text-[10px] font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                         {t('scenarios.scenario')}
                       </th>
-                      <th className="px-3 py-2 text-left text-[10px] font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-3 py-2 text-left text-[10px] font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                         {t('scenarios.timelineImpact')}
                       </th>
-                      <th className="px-3 py-2 text-left text-[10px] font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-3 py-2 text-left text-[10px] font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                         {t('scenarios.costImpact')}
                       </th>
-                      <th className="px-3 py-2 text-left text-[10px] font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-3 py-2 text-left text-[10px] font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                         {t('scenarios.resourceChanges')}
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                     {(comparison?.scenarios || []).map((scenario) => (
                       <tr key={scenario.id}>
                         <td className="px-3 py-2 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{scenario.name}</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-slate-100">{scenario.name}</div>
                           {scenario.description && (
-                            <div className="text-xs text-gray-500">{scenario.description}</div>
+                            <div className="text-xs text-gray-500 dark:text-slate-400">{scenario.description}</div>
                           )}
                         </td>
                         <td className="px-3 py-2 whitespace-nowrap">
@@ -539,19 +539,19 @@ export default function ScenariosPage() {
                               {formatDuration(scenario.timeline_impact.duration_change)}
                             </div>
                           ) : (
-                            <span className="text-xs text-gray-400">{t('scenarios.noChange')}</span>
+                            <span className="text-xs text-gray-400 dark:text-slate-500">{t('scenarios.noChange')}</span>
                           )}
                         </td>
                         <td className="px-3 py-2 whitespace-nowrap">
                           {scenario.cost_impact ? (
                             <div className={`text-xs font-medium ${getImpactColor(scenario.cost_impact.cost_change)}`}>
                               {scenario.cost_impact.cost_change_percentage.toFixed(1)}%
-                              <div className="text-[10px] text-gray-500">
+                              <div className="text-[10px] text-gray-500 dark:text-slate-400">
                                 {formatCurrency(scenario.cost_impact.cost_change)}
                               </div>
                             </div>
                           ) : (
-                            <span className="text-xs text-gray-400">{t('scenarios.noChange')}</span>
+                            <span className="text-xs text-gray-400 dark:text-slate-500">{t('scenarios.noChange')}</span>
                           )}
                         </td>
                         <td className="px-3 py-2 whitespace-nowrap">
@@ -560,7 +560,7 @@ export default function ScenariosPage() {
                               {t('scenarios.resourcesAffected', { count: Object.keys(scenario.resource_impact.utilization_changes).length })}
                             </div>
                           ) : (
-                            <span className="text-xs text-gray-400">{t('scenarios.noChange')}</span>
+                            <span className="text-xs text-gray-400 dark:text-slate-500">{t('scenarios.noChange')}</span>
                           )}
                         </td>
                       </tr>
@@ -570,11 +570,11 @@ export default function ScenariosPage() {
               </div>
               
               {(comparison?.recommendations || []).length > 0 && (
-                <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                   <h4 className="text-sm font-medium text-blue-900 mb-1">{t('scenarios.recommendations')}</h4>
                   <ul className="space-y-0.5">
                     {(comparison?.recommendations || []).map((rec, index) => (
-                      <li key={index} className="text-xs text-blue-800">• {rec}</li>
+                      <li key={index} className="text-xs text-blue-800 dark:text-blue-300">• {rec}</li>
                     ))}
                   </ul>
                 </div>

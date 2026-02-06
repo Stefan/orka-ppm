@@ -196,17 +196,17 @@ export function CSVImportDialog({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
-            <FileSpreadsheet className="w-6 h-6 text-blue-500" />
+            <FileSpreadsheet className="w-6 h-6 text-blue-500 dark:text-blue-400" />
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               Import CSV
             </h2>
           </div>
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:bg-slate-700 dark:hover:bg-gray-800 rounded-lg transition-colors"
             aria-label="Close"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-gray-500 dark:text-slate-400" />
           </button>
         </div>
 
@@ -262,13 +262,13 @@ export function CSVImportDialog({
                 
                 {isProcessing ? (
                   <div className="flex flex-col items-center gap-3">
-                    <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+                    <Loader2 className="w-10 h-10 text-blue-500 dark:text-blue-400 animate-spin" />
                     <p className="text-gray-600 dark:text-gray-400">Processing file...</p>
                   </div>
                 ) : (
                   <>
                     <Upload className={`w-10 h-10 mx-auto mb-4 ${
-                      isDragActive ? 'text-blue-500' : 'text-gray-400'
+                      isDragActive ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-slate-500'
                     }`} />
                     <p className="text-gray-600 dark:text-gray-400 mb-2">
                       {isDragActive 
@@ -287,7 +287,7 @@ export function CSVImportDialog({
               {validationErrors.length > 0 && (
                 <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
                   <div className="flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                    <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <h4 className="text-sm font-medium text-red-800 dark:text-red-300">
                         Validation Errors
@@ -324,7 +324,7 @@ export function CSVImportDialog({
             <div className="space-y-6">
               {/* File info */}
               <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <FileSpreadsheet className="w-8 h-8 text-green-500" />
+                <FileSpreadsheet className="w-8 h-8 text-green-500 dark:text-green-400" />
                 <div>
                   <p className="font-medium text-gray-900 dark:text-gray-100">{file?.name}</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -338,7 +338,7 @@ export function CSVImportDialog({
               {parseErrors.length > 0 && (
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
                   <div className="flex items-start gap-3">
-                    <AlertTriangle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+                    <AlertTriangle className="w-5 h-5 text-yellow-500 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
                         {parseErrors.length} rows have errors and will be skipped
@@ -403,7 +403,7 @@ export function CSVImportDialog({
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                       {parsedData.slice(0, 5).map((row, i) => (
-                        <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                        <tr key={i} className="hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-gray-800/50">
                           <td className="px-3 py-2 text-gray-900 dark:text-gray-100">{row.po_number || '-'}</td>
                           <td className="px-3 py-2 text-gray-900 dark:text-gray-100">{row.vendor_name}</td>
                           <td className="px-3 py-2 text-gray-600 dark:text-gray-400 truncate max-w-[200px]">{row.description}</td>
@@ -422,7 +422,7 @@ export function CSVImportDialog({
           {/* Step: Importing */}
           {step === 'importing' && (
             <div className="flex flex-col items-center justify-center py-12">
-              <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
+              <Loader2 className="w-12 h-12 text-blue-500 dark:text-blue-400 animate-spin mb-4" />
               <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
                 Importing {parsedData.length} records...
               </p>
@@ -443,9 +443,9 @@ export function CSVImportDialog({
               }`}>
                 <div className="flex items-center gap-4">
                   {importResult.success ? (
-                    <CheckCircle className="w-12 h-12 text-green-500" />
+                    <CheckCircle className="w-12 h-12 text-green-500 dark:text-green-400" />
                   ) : (
-                    <AlertCircle className="w-12 h-12 text-red-500" />
+                    <AlertCircle className="w-12 h-12 text-red-500 dark:text-red-400" />
                   )}
                   <div>
                     <h3 className={`text-lg font-semibold ${
@@ -476,7 +476,7 @@ export function CSVImportDialog({
                     <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
                       {importResult.errors.map((error, i) => (
                         <li key={i} className="flex items-start gap-2">
-                          <span className="text-gray-400">Row {error.row}:</span>
+                          <span className="text-gray-400 dark:text-slate-500">Row {error.row}:</span>
                           <span>{error.error}</span>
                         </li>
                       ))}
@@ -493,7 +493,7 @@ export function CSVImportDialog({
           {step === 'select' && (
             <button
               onClick={handleClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-slate-700 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
               Cancel
             </button>
@@ -503,7 +503,7 @@ export function CSVImportDialog({
             <>
               <button
                 onClick={resetState}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-slate-700 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
                 Back
               </button>
@@ -521,7 +521,7 @@ export function CSVImportDialog({
             <>
               <button
                 onClick={resetState}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-slate-700 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
                 Import Another
               </button>

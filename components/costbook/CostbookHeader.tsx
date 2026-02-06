@@ -73,8 +73,8 @@ function IconButton({
       className={`
         p-2
         rounded-md
-        text-gray-500 dark:text-slate-400
-        hover:text-gray-700 dark:hover:text-slate-200
+        text-gray-600 dark:text-slate-400
+        hover:text-gray-700 dark:text-slate-300 dark:hover:text-slate-200
         hover:bg-gray-100 dark:hover:bg-slate-700
         disabled:opacity-50
         disabled:cursor-not-allowed
@@ -119,7 +119,7 @@ function SearchInput({
           focus:ring-2
           focus:ring-blue-500
           focus:border-blue-500
-          placeholder:text-gray-400 dark:placeholder:text-slate-500
+          placeholder:text-gray-400 dark:text-slate-500 dark:placeholder:text-slate-500
         "
       />
     </div>
@@ -206,7 +206,7 @@ export function CostbookHeader({
           
           {onRegenerateProfiles && (
             <IconButton
-              icon={<LineChart className={`w-5 h-5 ${isRegeneratingProfiles ? 'animate-pulse text-blue-500' : ''}`} />}
+              icon={<LineChart className={`w-5 h-5 ${isRegeneratingProfiles ? 'animate-pulse text-blue-500 dark:text-blue-400' : ''}`} />}
               label="Regenerate rundown profiles"
               onClick={onRegenerateProfiles}
               disabled={isRegeneratingProfiles}
@@ -267,7 +267,7 @@ export function CompactCostbookHeader({
           <button
             onClick={onRefresh}
             disabled={isLoading}
-            className="p-2 rounded-md text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700"
+            className="p-2 rounded-md text-gray-600 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700"
           >
             <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
           </button>

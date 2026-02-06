@@ -86,11 +86,11 @@ export const SessionRestoration: React.FC<SessionRestorationProps> = ({
   const getDeviceIcon = (deviceType: string) => {
     switch (deviceType) {
       case 'mobile':
-        return <Smartphone className="h-5 w-5 text-blue-500" />
+        return <Smartphone className="h-5 w-5 text-blue-500 dark:text-blue-400" />
       case 'tablet':
-        return <Tablet className="h-5 w-5 text-blue-500" />
+        return <Tablet className="h-5 w-5 text-blue-500 dark:text-blue-400" />
       default:
-        return <Monitor className="h-5 w-5 text-blue-500" />
+        return <Monitor className="h-5 w-5 text-blue-500 dark:text-blue-400" />
     }
   }
 
@@ -136,14 +136,14 @@ export const SessionRestoration: React.FC<SessionRestorationProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-slate-700">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100">
               Continue Where You Left Off
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
               Restore your session from another device
             </p>
           </div>
@@ -151,22 +151,22 @@ export const SessionRestoration: React.FC<SessionRestorationProps> = ({
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors disabled:opacity-50"
             >
-              <RefreshCw className={`h-4 w-4 text-gray-500 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-4 w-4 text-gray-500 dark:text-slate-400 ${isRefreshing ? 'animate-spin' : ''}`} />
             </button>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors"
             >
-              <X className="h-5 w-5 text-gray-500" />
+              <X className="h-5 w-5 text-gray-500 dark:text-slate-400" />
             </button>
           </div>
         </div>
 
         <div className="flex h-[calc(90vh-120px)]">
           {/* Snapshots List */}
-          <div className="w-1/2 border-r border-gray-200 overflow-y-auto">
+          <div className="w-1/2 border-r border-gray-200 dark:border-slate-700 overflow-y-auto">
             <div className="p-4">
               {/* Quick Restore Latest */}
               {availableSnapshots.length > 0 && (
@@ -182,10 +182,10 @@ export const SessionRestoration: React.FC<SessionRestorationProps> = ({
                 </div>
               )}
 
-              <h3 className="font-medium text-gray-900 mb-3">Available Sessions</h3>
+              <h3 className="font-medium text-gray-900 dark:text-slate-100 mb-3">Available Sessions</h3>
               
               {availableSnapshots.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-gray-500 dark:text-slate-400">
                   <Clock className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                   <p>No sessions found</p>
                   <p className="text-sm mt-1">Sessions from other devices will appear here</p>
@@ -198,8 +198,8 @@ export const SessionRestoration: React.FC<SessionRestorationProps> = ({
                       onClick={() => setSelectedSnapshot(snapshot)}
                       className={`w-full text-left p-4 border rounded-lg transition-colors ${
                         selectedSnapshot?.id === snapshot.id
-                          ? 'border-blue-200 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20'
+                          : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
@@ -209,16 +209,16 @@ export const SessionRestoration: React.FC<SessionRestorationProps> = ({
                             {snapshot.metadata.deviceName}
                           </span>
                         </div>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500 dark:text-slate-400">
                           {formatTimestamp(snapshot.timestamp)}
                         </span>
                       </div>
                       
-                      <div className="text-xs text-gray-600 mb-2">
+                      <div className="text-xs text-gray-600 dark:text-slate-400 mb-2">
                         {formatUrl(snapshot.browserState.url)}
                       </div>
                       
-                      <div className="flex items-center space-x-4 text-xs text-gray-500">
+                      <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-slate-400">
                         {snapshot.activeTasks.length > 0 && (
                           <span>{snapshot.activeTasks.length} active task{snapshot.activeTasks.length !== 1 ? 's' : ''}</span>
                         )}
@@ -242,10 +242,10 @@ export const SessionRestoration: React.FC<SessionRestorationProps> = ({
                     <div className="flex items-center space-x-3">
                       {getDeviceIcon(selectedSnapshot.metadata.deviceType)}
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                           {selectedSnapshot.metadata.deviceName}
                         </h3>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-600 dark:text-slate-400">
                           {formatTimestamp(selectedSnapshot.timestamp)}
                         </p>
                       </div>
@@ -263,13 +263,13 @@ export const SessionRestoration: React.FC<SessionRestorationProps> = ({
                   {/* Session Details */}
                   <div className="space-y-4">
                     {/* Current Page */}
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h4 className="font-medium text-gray-900 mb-2">Current Page</h4>
-                      <p className="text-sm text-gray-600">
+                    <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4">
+                      <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-2">Current Page</h4>
+                      <p className="text-sm text-gray-600 dark:text-slate-400">
                         {formatUrl(selectedSnapshot.browserState.url)}
                       </p>
                       {selectedSnapshot.browserState.scrollPosition > 0 && (
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                           Scrolled to position {selectedSnapshot.browserState.scrollPosition}px
                         </p>
                       )}
@@ -277,17 +277,17 @@ export const SessionRestoration: React.FC<SessionRestorationProps> = ({
 
                     {/* Active Tasks */}
                     {selectedSnapshot.activeTasks.length > 0 && (
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <h4 className="font-medium text-gray-900 mb-3">Active Tasks</h4>
+                      <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4">
+                        <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-3">Active Tasks</h4>
                         <div className="space-y-2">
                           {selectedSnapshot.activeTasks.map((task) => (
                             <div key={task.taskId} className="flex items-center justify-between">
                               <div className="flex items-center space-x-2">
                                 {getTaskIcon(task.taskType)}
-                                <span className="text-sm text-gray-700">{task.taskId}</span>
-                                <span className="text-xs text-gray-500 capitalize">({task.taskType})</span>
+                                <span className="text-sm text-gray-700 dark:text-slate-300">{task.taskId}</span>
+                                <span className="text-xs text-gray-500 dark:text-slate-400 capitalize">({task.taskType})</span>
                               </div>
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs text-gray-500 dark:text-slate-400">
                                 Step {task.currentStep} of {task.totalSteps}
                               </div>
                             </div>
@@ -297,22 +297,22 @@ export const SessionRestoration: React.FC<SessionRestorationProps> = ({
                     )}
 
                     {/* Workspace Configuration */}
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h4 className="font-medium text-gray-900 mb-3">Workspace</h4>
+                    <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4">
+                      <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-3">Workspace</h4>
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-600">Layout:</span>
+                          <span className="text-gray-600 dark:text-slate-400">Layout:</span>
                           <span className="ml-2 capitalize">{selectedSnapshot.workspaceState.layout}</span>
                         </div>
                         <div>
-                          <span className="text-gray-600">Sidebar:</span>
+                          <span className="text-gray-600 dark:text-slate-400">Sidebar:</span>
                           <span className="ml-2">
                             {selectedSnapshot.workspaceState.sidebarCollapsed ? 'Collapsed' : 'Expanded'}
                           </span>
                         </div>
                         {selectedSnapshot.workspaceState.activeWidgets.length > 0 && (
                           <div className="col-span-2">
-                            <span className="text-gray-600">Active Widgets:</span>
+                            <span className="text-gray-600 dark:text-slate-400">Active Widgets:</span>
                             <span className="ml-2">{selectedSnapshot.workspaceState.activeWidgets.length}</span>
                           </div>
                         )}
@@ -321,13 +321,13 @@ export const SessionRestoration: React.FC<SessionRestorationProps> = ({
 
                     {/* Form Data */}
                     {Object.keys(selectedSnapshot.browserState.formData).length > 0 && (
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <h4 className="font-medium text-gray-900 mb-3">Unsaved Form Data</h4>
+                      <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4">
+                        <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-3">Unsaved Form Data</h4>
                         <div className="space-y-2">
                           {Object.entries(selectedSnapshot.browserState.formData).map(([formId, data]) => (
                             <div key={formId} className="text-sm">
-                              <span className="text-gray-600">Form {formId}:</span>
-                              <span className="ml-2 text-gray-700">
+                              <span className="text-gray-600 dark:text-slate-400">Form {formId}:</span>
+                              <span className="ml-2 text-gray-700 dark:text-slate-300">
                                 {Object.keys(data as any).length} field{Object.keys(data as any).length !== 1 ? 's' : ''}
                               </span>
                             </div>
@@ -339,7 +339,7 @@ export const SessionRestoration: React.FC<SessionRestorationProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-center h-full text-gray-500">
+              <div className="flex items-center justify-center h-full text-gray-500 dark:text-slate-400">
                 <div className="text-center">
                   <Clock className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                   <p>Select a session to view details</p>
@@ -350,13 +350,13 @@ export const SessionRestoration: React.FC<SessionRestorationProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
-          <div className="text-sm text-gray-600">
+        <div className="flex items-center justify-between p-6 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+          <div className="text-sm text-gray-600 dark:text-slate-400">
             Sessions are automatically saved when you switch devices or close the app.
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
           >
             Close
           </button>

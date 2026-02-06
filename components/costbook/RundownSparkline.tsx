@@ -56,31 +56,31 @@ function RundownTooltip({ active, payload, label }: any) {
   const variance = calculateVariance(data.actual, data.planned)
   
   return (
-    <div className="bg-white p-2 rounded-lg shadow-lg border border-gray-200 text-xs">
-      <div className="font-medium text-gray-900 mb-1">{data.label}</div>
+    <div className="bg-white dark:bg-slate-800 p-2 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 text-xs">
+      <div className="font-medium text-gray-900 dark:text-slate-100 mb-1">{data.label}</div>
       <div className="space-y-0.5">
         <div className="flex justify-between gap-3">
-          <span className="text-gray-500">Planned:</span>
+          <span className="text-gray-500 dark:text-slate-400">Planned:</span>
           <span className="font-medium">${(data.planned / 1000).toFixed(0)}K</span>
         </div>
         <div className="flex justify-between gap-3">
-          <span className="text-gray-500">Actual:</span>
-          <span className={`font-medium ${variance.isOver ? 'text-red-600' : 'text-green-600'}`}>
+          <span className="text-gray-500 dark:text-slate-400">Actual:</span>
+          <span className={`font-medium ${variance.isOver ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
             ${(data.actual / 1000).toFixed(0)}K
           </span>
         </div>
         {data.predicted !== null && data.isFuture && (
-          <div className="flex justify-between gap-3 border-t border-gray-100 pt-1 mt-1">
-            <span className="text-gray-500">Predicted:</span>
-            <span className="font-medium text-purple-600">
+          <div className="flex justify-between gap-3 border-t border-gray-100 dark:border-slate-700 pt-1 mt-1">
+            <span className="text-gray-500 dark:text-slate-400">Predicted:</span>
+            <span className="font-medium text-purple-600 dark:text-purple-400">
               ${(data.predicted / 1000).toFixed(0)}K
             </span>
           </div>
         )}
         {!data.isFuture && (
-          <div className="flex justify-between gap-3 border-t border-gray-100 pt-1 mt-1">
-            <span className="text-gray-500">Variance:</span>
-            <span className={`font-medium ${variance.isOver ? 'text-red-600' : 'text-green-600'}`}>
+          <div className="flex justify-between gap-3 border-t border-gray-100 dark:border-slate-700 pt-1 mt-1">
+            <span className="text-gray-500 dark:text-slate-400">Variance:</span>
+            <span className={`font-medium ${variance.isOver ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
               {variance.isOver ? '+' : ''}{variance.percentage.toFixed(1)}%
             </span>
           </div>
@@ -152,7 +152,7 @@ export function RundownSparkline({
   if (chartData.length === 0) {
     return (
       <div 
-        className={`flex items-center justify-center h-[${height}px] text-gray-400 text-xs ${className}`}
+        className={`flex items-center justify-center h-[${height}px] text-gray-400 dark:text-slate-500 text-xs ${className}`}
         data-testid={testId}
       >
         No data
@@ -276,13 +276,13 @@ export function RundownSparklineWithLabel({
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-500">{label}</span>
+        <span className="text-xs text-gray-500 dark:text-slate-400">{label}</span>
         {showVariance && variance && (
           <span className={`
             text-xs font-medium px-1.5 py-0.5 rounded
             ${variance.isOver 
-              ? 'bg-red-100 text-red-700' 
-              : 'bg-green-100 text-green-700'
+              ? 'bg-red-100 dark:bg-red-900/30 text-red-700' 
+              : 'bg-green-100 dark:bg-green-900/30 text-green-700'
             }
           `}>
             {variance.isOver ? '+' : ''}{variance.percentage.toFixed(1)}%
@@ -322,15 +322,15 @@ export function RundownLegend({ className = '' }: { className?: string }) {
     <div className={`flex items-center gap-4 text-xs ${className}`}>
       <div className="flex items-center gap-1">
         <span className="w-4 h-0.5 bg-gray-400" style={{ borderStyle: 'dashed' }} />
-        <span className="text-gray-500">Planned</span>
+        <span className="text-gray-500 dark:text-slate-400">Planned</span>
       </div>
       <div className="flex items-center gap-1">
         <span className="w-4 h-0.5 bg-green-500" />
-        <span className="text-gray-500">Actual</span>
+        <span className="text-gray-500 dark:text-slate-400">Actual</span>
       </div>
       <div className="flex items-center gap-1">
         <span className="w-4 h-0.5 bg-purple-500" style={{ borderStyle: 'dotted' }} />
-        <span className="text-gray-500">Predicted</span>
+        <span className="text-gray-500 dark:text-slate-400">Predicted</span>
       </div>
     </div>
   )

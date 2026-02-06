@@ -77,11 +77,13 @@ export function optionalPropGenerator<T extends Record<string, any>>(
   propGenerators: { [K in keyof T]: fc.Arbitrary<T[K]> },
   undefinedProbability: number = 0.3
 ): fc.Arbitrary<Partial<T>> {
+  // In fast-check, fc.option(arb, { freq }) gives nil with probability 1/freq (not freq/100).
+  const freq = Math.max(1, Math.round(1 / undefinedProbability));
   const optionalGenerators = Object.entries(propGenerators).reduce(
     (acc, [key, generator]) => {
       acc[key as keyof T] = fc.option(generator as fc.Arbitrary<any>, {
         nil: undefined,
-        freq: Math.floor(undefinedProbability * 100),
+        freq,
       });
       return acc;
     },

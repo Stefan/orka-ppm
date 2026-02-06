@@ -73,53 +73,42 @@ export function GlobalLanguageSelector({ variant = 'sidebar' }: GlobalLanguageSe
         <button
           onClick={() => setIsOpen(!isOpen)}
           onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-          className="flex items-center space-x-1.5 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+          className="flex items-center space-x-1.5 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
           title="Change Language"
           disabled={isLoadingState}
         >
           {isLoadingState ? (
-            <Loader2 className="h-4 w-4 text-gray-600 animate-spin" />
+            <Loader2 className="h-4 w-4 text-gray-600 dark:text-slate-300 animate-spin" />
           ) : (
-            <Globe className="h-4 w-4 text-gray-600" />
+            <Globe className="h-4 w-4 text-gray-700 dark:text-slate-300" />
           )}
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-gray-900 dark:text-slate-200">
             {selectedLanguage.code.toUpperCase()}
           </span>
         </button>
         
         {isOpen && (
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
-            {LANGUAGES.map((lang) => (
-              <button
-                key={lang.code}
-                onClick={() => handleLanguageChange(lang.code)}
-                disabled={isLoadingState}
-                className={`
-                  flex items-center w-full px-3 py-2 mx-2 rounded-lg text-sm text-left transition-all duration-200
-                  ${locale === lang.code
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'text-gray-900'
-                  }
-                  ${isLoadingState ? 'opacity-50 cursor-not-allowed' : ''}
-                `}
-                style={{
-                  backgroundColor: locale === lang.code ? undefined : 'transparent'
-                }}
-                onMouseEnter={(e) => {
-                  if (locale !== lang.code) {
-                    e.currentTarget.style.backgroundColor = '#f3f4f6';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (locale !== lang.code) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }
-                }}
-              >
-                <span className="mr-2">{lang.flag}</span>
-                <span>{lang.label}</span>
-              </button>
-            ))}
+          <div className="absolute right-0 mt-2 w-48 min-w-0 overflow-hidden rounded-xl shadow-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 py-2 z-50">
+            <div className="px-2">
+              {LANGUAGES.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => handleLanguageChange(lang.code)}
+                  disabled={isLoadingState}
+                  className={`
+                    flex items-center w-full min-w-0 px-3 py-2 rounded-lg text-sm text-left transition-colors
+                    ${locale === lang.code
+                      ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+                      : 'text-gray-700 dark:text-slate-200 hover:bg-blue-100/70 dark:hover:bg-slate-600/70'
+                    }
+                    ${isLoadingState ? 'opacity-50 cursor-not-allowed' : ''}
+                  `}
+                >
+                  <span className="mr-2 shrink-0">{lang.flag}</span>
+                  <span className="truncate">{lang.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -130,7 +119,7 @@ export function GlobalLanguageSelector({ variant = 'sidebar' }: GlobalLanguageSe
   if (variant === 'dropdown') {
     return (
       <div className="space-y-1">
-        <div className="text-xs font-medium text-gray-500 px-2 mb-1 flex items-center">
+        <div className="text-xs font-medium text-gray-500 dark:text-slate-400 px-2 mb-1 flex items-center">
           Language
           {isLoadingState && <Loader2 className="h-3 w-3 ml-2 animate-spin" />}
         </div>
@@ -140,29 +129,16 @@ export function GlobalLanguageSelector({ variant = 'sidebar' }: GlobalLanguageSe
             onClick={() => handleLanguageChange(lang.code)}
             disabled={isLoadingState}
             className={`
-              flex items-center w-full px-2 py-1.5 text-sm text-left transition-all duration-200 rounded
+              flex items-center w-full min-w-0 px-2 py-1.5 text-sm text-left transition-colors rounded
               ${locale === lang.code
-                ? 'bg-blue-50 text-blue-700'
-                : 'text-gray-900'
+                ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+                : 'text-gray-700 dark:text-slate-200 hover:bg-blue-100/70 dark:hover:bg-slate-600/70'
               }
               ${isLoadingState ? 'opacity-50 cursor-not-allowed' : ''}
             `}
-            style={{
-              backgroundColor: locale === lang.code ? undefined : 'transparent'
-            }}
-            onMouseEnter={(e) => {
-              if (locale !== lang.code) {
-                e.currentTarget.style.backgroundColor = '#f3f4f6';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (locale !== lang.code) {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }
-            }}
           >
-            <span className="mr-2">{lang.flag}</span>
-            <span>{lang.label}</span>
+            <span className="mr-2 shrink-0">{lang.flag}</span>
+            <span className="truncate">{lang.label}</span>
           </button>
         ))}
       </div>

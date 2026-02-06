@@ -90,11 +90,11 @@ const ACTION_LABELS: Record<string, string> = {
 };
 
 const ACTION_COLORS: Record<string, string> = {
-  role_assignment_created: 'bg-green-100 text-green-800',
-  role_assignment_removed: 'bg-red-100 text-red-800',
-  custom_role_created: 'bg-blue-100 text-blue-800',
-  custom_role_updated: 'bg-yellow-100 text-yellow-800',
-  custom_role_deleted: 'bg-purple-100 text-purple-800',
+  role_assignment_created: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
+  role_assignment_removed: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300',
+  custom_role_created: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
+  custom_role_updated: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300',
+  custom_role_deleted: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300',
 };
 
 export default function AuditTrailViewer() {
@@ -197,13 +197,13 @@ export default function AuditTrailViewer() {
 
   const getActionIcon = (action: string) => {
     if (action.includes('created') || action.includes('assignment_created')) {
-      return <CheckCircle className="h-4 w-4 text-green-600" />;
+      return <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />;
     } else if (action.includes('removed') || action.includes('deleted')) {
-      return <XCircle className="h-4 w-4 text-red-600" />;
+      return <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />;
     } else if (action.includes('updated')) {
-      return <AlertCircle className="h-4 w-4 text-yellow-600" />;
+      return <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />;
     }
-    return <Shield className="h-4 w-4 text-blue-600" />;
+    return <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400" />;
   };
 
   return (
@@ -311,10 +311,10 @@ export default function AuditTrailViewer() {
           {loading ? (
             <div className="text-center py-8">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-              <p className="mt-2 text-sm text-gray-600">Loading audit logs...</p>
+              <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">Loading audit logs...</p>
             </div>
           ) : logs.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-500 dark:text-slate-400">
               <Shield className="h-12 w-12 mx-auto mb-2 opacity-50" />
               <p>No audit logs found</p>
             </div>
@@ -337,14 +337,14 @@ export default function AuditTrailViewer() {
                       <TableRow key={log.id}>
                         <TableCell className="font-mono text-xs">
                           <div className="flex items-center gap-2">
-                            <Calendar className="h-3 w-3 text-gray-400" />
+                            <Calendar className="h-3 w-3 text-gray-400 dark:text-slate-500" />
                             {formatDate(log.created_at)}
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             {getActionIcon(log.action)}
-                            <Badge className={ACTION_COLORS[log.action] || 'bg-gray-100 text-gray-800'}>
+                            <Badge className={ACTION_COLORS[log.action] || 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200'}>
                               {ACTION_LABELS[log.action] || log.action}
                             </Badge>
                           </div>
@@ -359,16 +359,16 @@ export default function AuditTrailViewer() {
                         </TableCell>
                         <TableCell>
                           {log.success ? (
-                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                            <Badge variant="outline" className="bg-green-50 dark:bg-green-900/20 text-green-700 border-green-200 dark:border-green-800">
                               Success
                             </Badge>
                           ) : (
-                            <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                            <Badge variant="outline" className="bg-red-50 dark:bg-red-900/20 text-red-700 border-red-200 dark:border-red-800">
                               Failed
                             </Badge>
                           )}
                         </TableCell>
-                        <TableCell className="text-sm text-gray-600">
+                        <TableCell className="text-sm text-gray-600 dark:text-slate-400">
                           {log.details.target_user_id && (
                             <div className="flex items-center gap-1">
                               <User className="h-3 w-3" />
@@ -395,7 +395,7 @@ export default function AuditTrailViewer() {
 
               {/* Pagination */}
               <div className="flex items-center justify-between mt-4">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-gray-600 dark:text-slate-400">
                   Showing {((currentPage - 1) * perPage) + 1} to {Math.min(currentPage * perPage, totalCount)} of {totalCount} entries
                 </div>
                 <div className="flex items-center gap-2">
@@ -441,11 +441,11 @@ export default function AuditTrailViewer() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-xs text-gray-500">Timestamp</Label>
+                  <Label className="text-xs text-gray-500 dark:text-slate-400">Timestamp</Label>
                   <p className="text-sm font-mono">{formatDate(selectedLog.created_at)}</p>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-500">Action</Label>
+                  <Label className="text-xs text-gray-500 dark:text-slate-400">Action</Label>
                   <p className="text-sm">
                     <Badge className={ACTION_COLORS[selectedLog.action]}>
                       {ACTION_LABELS[selectedLog.action] || selectedLog.action}
@@ -453,7 +453,7 @@ export default function AuditTrailViewer() {
                   </p>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-500">Status</Label>
+                  <Label className="text-xs text-gray-500 dark:text-slate-400">Status</Label>
                   <p className="text-sm">
                     {selectedLog.success ? (
                       <Badge variant="outline" className="bg-green-50 text-green-700">Success</Badge>
@@ -463,14 +463,14 @@ export default function AuditTrailViewer() {
                   </p>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-500">Entity Type</Label>
+                  <Label className="text-xs text-gray-500 dark:text-slate-400">Entity Type</Label>
                   <p className="text-sm font-medium">{selectedLog.entity_type}</p>
                 </div>
               </div>
 
               <div className="border-t pt-4">
-                <Label className="text-xs text-gray-500 mb-2 block">Event Details</Label>
-                <div className="space-y-2 bg-gray-50 p-4 rounded-md">
+                <Label className="text-xs text-gray-500 dark:text-slate-400 mb-2 block">Event Details</Label>
+                <div className="space-y-2 bg-gray-50 dark:bg-slate-800/50 p-4 rounded-md">
                   {selectedLog.details.role_name && (
                     <div>
                       <span className="text-xs font-medium">Role Name:</span>
@@ -533,15 +533,15 @@ export default function AuditTrailViewer() {
                   )}
                   {selectedLog.details.error_message && (
                     <div>
-                      <span className="text-xs font-medium text-red-600">Error:</span>
-                      <p className="text-sm ml-2 text-red-600">{selectedLog.details.error_message}</p>
+                      <span className="text-xs font-medium text-red-600 dark:text-red-400">Error:</span>
+                      <p className="text-sm ml-2 text-red-600 dark:text-red-400">{selectedLog.details.error_message}</p>
                     </div>
                   )}
                 </div>
               </div>
 
               <div className="border-t pt-4">
-                <Label className="text-xs text-gray-500 mb-2 block">Raw Data</Label>
+                <Label className="text-xs text-gray-500 dark:text-slate-400 mb-2 block">Raw Data</Label>
                 <pre className="text-xs bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto">
                   {JSON.stringify(selectedLog, null, 2)}
                 </pre>

@@ -15,10 +15,10 @@ export default function ChangesPage() {
           <div data-testid="changes-header" className="mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h1 data-testid="changes-title" className="text-2xl sm:text-3xl font-bold text-gray-900">
+                <h1 data-testid="changes-title" className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-slate-100">
                   Change Management
                 </h1>
-                <p className="text-gray-600 mt-2">
+                <p className="text-gray-600 dark:text-slate-400 mt-2">
                   Manage project change requests, approvals, and implementation tracking
                 </p>
               </div>

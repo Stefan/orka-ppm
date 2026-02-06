@@ -63,7 +63,7 @@ export function WorkflowBuilder({
   }, [nodes, edges, onSave])
 
   return (
-    <div className={`h-[400px] w-full rounded-lg border border-gray-200 bg-white ${className}`}>
+    <div className={`h-[400px] w-full rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 ${className}`}>
       <ReactFlow
         nodes={nodes}
         edges={edges}

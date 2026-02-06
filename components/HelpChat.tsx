@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   X,
   Send,
@@ -41,6 +42,8 @@ const ARIA_LABELS = {
 
 interface HelpChatProps {
   className?: string
+  /** Called when the backend returns an open_modal action (modalType, data?). App can open the appropriate modal. */
+  onOpenModal?: (modalType: string, data?: Record<string, unknown>) => void
 }
 
 interface RAGMessageData {
@@ -57,7 +60,8 @@ interface RAGMessageData {
  * Implements sidebar for desktop, overlay for mobile with full accessibility support
  * Enhanced with RAG capabilities for intelligent responses
  */
-export function HelpChat({ className }: HelpChatProps) {
+export function HelpChat({ className, onOpenModal }: HelpChatProps) {
+  const router = useRouter()
   const { user } = useAuth()
   const { currentLanguage } = useLanguage()
   const { t } = useTranslations()
@@ -226,11 +230,51 @@ export function HelpChat({ className }: HelpChatProps) {
     }
   }, [handleSubmit, toggleChat])
 
-  // Handle quick action clicks with announcements
+  // Handle quick action clicks: navigate, open_modal, or call action function (Task 10.3)
   const handleQuickAction = useCallback((action: QuickAction) => {
     announceToScreenReader(`Executing action: ${action.label}`)
-    action.action()
-  }, [announceToScreenReader])
+    const actionStr = typeof action.action === 'string' ? action.action : ''
+    const target = (action as QuickAction & { target?: string }).target
+
+    if (typeof action.action === 'function') {
+      action.action()
+      return
+    }
+    // Backend returns action: "navigate" with target: "/path" or action: "navigate:/path"
+    if (actionStr === 'navigate' && target) {
+      toggleChat()
+      router.push(target)
+      return
+    }
+    if (actionStr.startsWith('navigate:')) {
+      const path = target || actionStr.slice('navigate:'.length).trim() || '/'
+      toggleChat()
+      router.push(path)
+      return
+    }
+    // open_modal: call optional app callback or fallback
+    if (actionStr === 'open_modal' || actionStr.startsWith('open_modal:')) {
+      const modalType = target || actionStr.slice('open_modal:'.length).trim() || 'default'
+      if (onOpenModal) {
+        onOpenModal(modalType, {})
+      } else {
+        toggleChat()
+        router.push('/')
+      }
+      return
+    }
+    // show_data: NL action "fetch_data" (e.g. EAC) -> navigate to financials/costbook (Task 10.3)
+    if (actionStr === 'show_data' && target) {
+      toggleChat()
+      router.push(target === 'eac' ? '/financials' : '/costbook')
+      return
+    }
+    // Fallback: target as path (e.g. backend sends only target)
+    if (target && target.startsWith('/')) {
+      toggleChat()
+      router.push(target)
+    }
+  }, [announceToScreenReader, router, toggleChat, onOpenModal])
 
   // Handle feedback submission with announcements
   const handleFeedback = useCallback(async (
@@ -316,17 +360,17 @@ export function HelpChat({ className }: HelpChatProps) {
           aria-labelledby="help-chat-title"
           aria-describedby="help-chat-description"
         >
-          <div className="flex flex-col h-full bg-white">
+          <div className="flex flex-col h-full bg-white dark:bg-slate-800">
             {/* Header with enhanced accessibility */}
-            <header className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+            <header className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
               <div className="flex items-center space-x-3">
                 <MessageSquare
-                  className="h-6 w-6 text-blue-600"
+                  className="h-6 w-6 text-blue-600 dark:text-blue-400"
                   aria-hidden="true"
                 />
                 <h1
                   id="help-chat-title"
-                  className="text-lg font-semibold text-gray-900"
+                  className="text-lg font-semibold text-gray-900 dark:text-slate-100"
                 >
                   {t('help.title')}
                 </h1>
@@ -335,7 +379,7 @@ export function HelpChat({ className }: HelpChatProps) {
                 {state.messages.length > 0 && (
                   <button
                     onClick={handleClearMessages}
-                    className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="p-2 text-gray-600 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-200 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     aria-label={ARIA_LABELS.clearButton}
                     title={ARIA_LABELS.clearButton}
                   >
@@ -344,7 +388,7 @@ export function HelpChat({ className }: HelpChatProps) {
                 )}
                 <button
                   onClick={toggleChat}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="p-2 text-gray-600 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-200 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   aria-label={ARIA_LABELS.closeButton}
                   title={ARIA_LABELS.closeButton}
                 >
@@ -370,11 +414,11 @@ export function HelpChat({ className }: HelpChatProps) {
               {state.messages.length === 0 ? (
                 <div className="text-center py-8" role="status">
                   <MessageSquare
-                    className="h-12 w-12 text-gray-300 mx-auto mb-4"
+                    className="h-12 w-12 text-gray-500 dark:text-slate-400 mx-auto mb-4"
                     aria-hidden="true"
                   />
-                  <p className="text-gray-500 mb-2">{t('helpChat.welcome')}</p>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-gray-700 dark:text-slate-300 mb-2">{t('helpChat.welcome')}</p>
+                  <p className="text-sm text-gray-600 dark:text-slate-400">
                     {t('helpChat.welcomeMessage')}
                   </p>
                 </div>
@@ -401,15 +445,15 @@ export function HelpChat({ className }: HelpChatProps) {
               {/* Typing indicator with accessibility */}
               {state.isTyping && (
                 <div
-                  className="flex items-center space-x-2 text-gray-500"
+                  className="flex items-center space-x-2 text-gray-700 dark:text-slate-300"
                   role="status"
                   aria-live="polite"
                   aria-label={ARIA_LABELS.typingIndicator}
                 >
                   <div className="flex space-x-1" aria-hidden="true">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 dark:bg-slate-500 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-gray-400 dark:bg-slate-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 dark:bg-slate-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
                   </div>
                   <span className="text-sm">{t('helpChat.typing')}</span>
                 </div>
@@ -418,25 +462,25 @@ export function HelpChat({ className }: HelpChatProps) {
               {/* Error state with accessibility */}
               {state.error && (
                 <div
-                  className="bg-red-50 border border-red-200 rounded-lg p-4"
+                  className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4"
                   role="alert"
                   aria-live="assertive"
                 >
                   <div className="flex items-start space-x-3">
                     <AlertCircle
-                      className="h-5 w-5 text-red-500 mt-0.5"
+                      className="h-5 w-5 text-red-500 dark:text-red-400 mt-0.5"
                       aria-hidden="true"
                     />
                     <div className="flex-1">
-                      <h3 className="text-sm font-medium text-red-800">
+                      <h3 className="text-sm font-medium text-red-800 dark:text-red-300">
                         {ARIA_LABELS.errorMessage}
                       </h3>
-                      <p className="text-sm text-red-700 mt-1">
+                      <p className="text-sm text-red-700 dark:text-red-400 mt-1">
                         {getErrorMessage() || 'An unexpected error occurred.'}
                       </p>
                       <button
                         onClick={handleRetry}
-                        className="mt-2 inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-800 bg-red-100 hover:bg-red-200 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        className="mt-2 inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-800 dark:text-red-300 bg-red-100 dark:bg-red-900/40 hover:bg-red-200 dark:hover:bg-red-900/60 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                         aria-label={ARIA_LABELS.retryButton}
                       >
                         <RefreshCw className="h-3 w-3 mr-1" aria-hidden="true" />
@@ -451,7 +495,7 @@ export function HelpChat({ className }: HelpChatProps) {
             </main>
 
             {/* Input Area with enhanced accessibility */}
-            <footer className="border-t border-gray-200 p-4 bg-white">
+            <footer className="border-t border-gray-200 dark:border-slate-700 p-4 bg-white dark:bg-slate-800">
               <form onSubmit={handleSubmit} className="flex items-end space-x-3">
                 <div className="flex-1">
                   <label htmlFor="mobile-chat-input" className="sr-only">
@@ -464,7 +508,7 @@ export function HelpChat({ className }: HelpChatProps) {
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder={t('helpChat.placeholder')}
-                    className="w-full resize-none rounded-lg border-2 border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none min-h-[40px] max-h-32"
+                    className="w-full resize-none rounded-lg border-2 border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none min-h-[40px] max-h-32 dark:placeholder-slate-400"
                     rows={1}
                     disabled={!canSendMessage}
                     aria-label={ARIA_LABELS.messageInput}
@@ -481,7 +525,7 @@ export function HelpChat({ className }: HelpChatProps) {
                     disabled={isListening || !canSendMessage}
                     className={cn(
                       'p-2 rounded-lg min-h-[40px] min-w-[40px] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
-                      isListening ? 'bg-red-100 text-red-600' : 'text-gray-500 hover:bg-gray-100'
+                      isListening ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'
                     )}
                     aria-label={isListening ? 'Listening...' : 'Voice input'}
                     title={isListening ? 'Listening...' : 'Voice input'}
@@ -496,7 +540,7 @@ export function HelpChat({ className }: HelpChatProps) {
                     'px-3 py-2 rounded-lg font-medium transition-colors min-h-[40px] min-w-[40px] focus:outline-none focus:ring-2 focus:ring-offset-2',
                     canSendMessage && inputValue.trim()
                       ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed focus:ring-gray-300'
+                      : 'bg-gray-300 dark:bg-slate-600 text-gray-700 dark:text-slate-300 cursor-not-allowed focus:ring-gray-300 dark:ring-slate-600 dark:focus:ring-slate-600'
                   )}
                   aria-label={ARIA_LABELS.sendButton}
                   title={ARIA_LABELS.sendButton}
@@ -538,9 +582,9 @@ export function HelpChat({ className }: HelpChatProps) {
       <aside
         ref={chatRegionRef}
         className={cn(
-          'fixed top-0 bg-white border-l border-gray-200 shadow-xl flex flex-col',
+          'fixed top-0 bg-white dark:bg-slate-800 border-l border-gray-200 dark:border-slate-700 shadow-xl flex flex-col',
           'transform transition-all duration-300 ease-in-out',
-          'right-0 w-96 pb-16', // Add bottom padding for quick actions
+          'right-0 w-96', // bottom offset via inline style (bottom: 4rem)
           className
         )}
         style={{
@@ -556,15 +600,15 @@ export function HelpChat({ className }: HelpChatProps) {
         aria-describedby="desktop-help-chat-description"
       >
         {/* Header */}
-        <header className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+        <header className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
           <div className="flex items-center space-x-3">
             <MessageSquare
-              className="h-6 w-6 text-blue-600"
+              className="h-6 w-6 text-blue-600 dark:text-blue-400"
               aria-hidden="true"
             />
             <h1
               id="desktop-help-chat-title"
-              className="text-lg font-semibold text-gray-900"
+              className="text-lg font-semibold text-gray-900 dark:text-slate-100"
             >
               {t('help.title')}
             </h1>
@@ -573,7 +617,7 @@ export function HelpChat({ className }: HelpChatProps) {
             {state.messages.length > 0 && (
               <button
                 onClick={handleClearMessages}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="p-2 text-gray-600 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-200 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                 aria-label={ARIA_LABELS.clearButton}
                 title={ARIA_LABELS.clearButton}
               >
@@ -582,7 +626,7 @@ export function HelpChat({ className }: HelpChatProps) {
             )}
             <button
               onClick={toggleChat}
-              className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="p-2 text-gray-600 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-200 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label={ARIA_LABELS.closeButton}
               title={ARIA_LABELS.closeButton}
             >
@@ -608,11 +652,11 @@ export function HelpChat({ className }: HelpChatProps) {
               {state.messages.length === 0 ? (
                 <div className="text-center py-8" role="status">
                   <MessageSquare
-                    className="h-12 w-12 text-gray-300 mx-auto mb-4"
+                    className="h-12 w-12 text-gray-500 dark:text-slate-400 mx-auto mb-4"
                     aria-hidden="true"
                   />
-                  <p className="text-gray-500 mb-2">{t('helpChat.welcome')}</p>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-gray-700 dark:text-slate-300 mb-2">{t('helpChat.welcome')}</p>
+                  <p className="text-sm text-gray-600 dark:text-slate-400">
                     {t('helpChat.welcomeMessage')}
                   </p>
                 </div>
@@ -639,15 +683,15 @@ export function HelpChat({ className }: HelpChatProps) {
               {/* Typing indicator */}
               {state.isTyping && (
                 <div
-                  className="flex items-center space-x-2 text-gray-500"
+                  className="flex items-center space-x-2 text-gray-700 dark:text-slate-300"
                   role="status"
                   aria-live="polite"
                   aria-label={ARIA_LABELS.typingIndicator}
                 >
                   <div className="flex space-x-1" aria-hidden="true">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 dark:bg-slate-500 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-gray-400 dark:bg-slate-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 dark:bg-slate-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
                   </div>
                   <span className="text-sm">{t('helpChat.typing')}</span>
                 </div>
@@ -656,25 +700,25 @@ export function HelpChat({ className }: HelpChatProps) {
               {/* Error state */}
               {state.error && (
                 <div
-                  className="bg-red-50 border border-red-200 rounded-lg p-4"
+                  className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4"
                   role="alert"
                   aria-live="assertive"
                 >
                   <div className="flex items-start space-x-3">
                     <AlertCircle
-                      className="h-5 w-5 text-red-500 mt-0.5"
+                      className="h-5 w-5 text-red-500 dark:text-red-400 mt-0.5"
                       aria-hidden="true"
                     />
                     <div className="flex-1">
-                      <h3 className="text-sm font-medium text-red-800">
+                      <h3 className="text-sm font-medium text-red-800 dark:text-red-300">
                         {ARIA_LABELS.errorMessage}
                       </h3>
-                      <p className="text-sm text-red-700 mt-1">
+                      <p className="text-sm text-red-700 dark:text-red-400 mt-1">
                         {getErrorMessage() || 'An unexpected error occurred.'}
                       </p>
                       <button
                         onClick={handleRetry}
-                        className="mt-2 inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-800 bg-red-100 hover:bg-red-200 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        className="mt-2 inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-800 dark:text-red-300 bg-red-100 dark:bg-red-900/40 hover:bg-red-200 dark:hover:bg-red-900/60 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                         aria-label={ARIA_LABELS.retryButton}
                       >
                         <RefreshCw className="h-3 w-3 mr-1" aria-hidden="true" />
@@ -689,8 +733,8 @@ export function HelpChat({ className }: HelpChatProps) {
             </main>
 
         {/* Input Area */}
-        <footer className="border-t border-gray-200 p-4 bg-white">
-              <form onSubmit={handleSubmit} className="space-y-3">
+        <footer className="border-t border-gray-200 dark:border-slate-700 p-4 bg-white dark:bg-slate-800">
+              <form onSubmit={handleSubmit} className="space-y-2">
                 <div>
                   <label htmlFor="desktop-chat-input" className="sr-only">
                     {ARIA_LABELS.messageInput}
@@ -702,7 +746,7 @@ export function HelpChat({ className }: HelpChatProps) {
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder={t('helpChat.placeholder')}
-                    className="w-full resize-none rounded-lg border-2 border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none min-h-[40px] max-h-32"
+                    className="w-full resize-none rounded-lg border-2 border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none min-h-[40px] max-h-32 dark:placeholder-slate-400"
                     rows={1}
                     disabled={!canSendMessage}
                     aria-label={ARIA_LABELS.messageInput}
@@ -720,7 +764,7 @@ export function HelpChat({ className }: HelpChatProps) {
                       disabled={isListening || !canSendMessage}
                       className={cn(
                         'p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
-                        isListening ? 'bg-red-100 text-red-600' : 'text-gray-500 hover:bg-gray-100'
+                        isListening ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'
                       )}
                       aria-label={isListening ? 'Listening...' : 'Voice input'}
                       title={isListening ? 'Listening...' : 'Voice input'}
@@ -735,7 +779,7 @@ export function HelpChat({ className }: HelpChatProps) {
                       'flex-1 px-3 py-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
                       canSendMessage && inputValue.trim()
                         ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed focus:ring-gray-300'
+                        : 'bg-gray-300 dark:bg-slate-600 text-gray-700 dark:text-slate-300 cursor-not-allowed focus:ring-gray-300 dark:ring-slate-600 dark:focus:ring-slate-600'
                     )}
                     aria-label={ARIA_LABELS.sendButton}
                     title={ARIA_LABELS.sendButton}

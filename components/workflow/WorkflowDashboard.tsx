@@ -141,13 +141,13 @@ export default function WorkflowDashboard({
     switch (status) {
       case 'pending':
       case 'in_progress':
-        return <Clock className="text-yellow-600" size={16} />
+        return <Clock className="text-yellow-600 dark:text-yellow-400" size={16} />
       case 'completed':
-        return <CheckCircle className="text-green-600" size={16} />
+        return <CheckCircle className="text-green-600 dark:text-green-400" size={16} />
       case 'rejected':
-        return <XCircle className="text-red-600" size={16} />
+        return <XCircle className="text-red-600 dark:text-red-400" size={16} />
       default:
-        return <AlertCircle className="text-gray-600" size={16} />
+        return <AlertCircle className="text-gray-600 dark:text-slate-400" size={16} />
     }
   }
 
@@ -192,7 +192,7 @@ export default function WorkflowDashboard({
             <AlertCircle className="text-blue-600 dark:text-blue-400" size={20} aria-hidden />
             <h3 className="font-semibold text-gray-900 dark:text-slate-100">Pending Approvals</h3>
           </div>
-          <span className="bg-blue-600 dark:bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+          <span className="bg-blue-600 dark:bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">
             {pendingCount}
           </span>
         </div>
@@ -381,7 +381,7 @@ export default function WorkflowDashboard({
 
                     <button
                       onClick={() => handleWorkflowClick(workflow.id)}
-                      className="px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors flex items-center gap-2 whitespace-nowrap"
+                      className="px-4 py-2 bg-blue-600 dark:bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors flex items-center gap-2 whitespace-nowrap"
                     >
                       View Details
                       <ChevronRight size={16} />

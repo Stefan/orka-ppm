@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { config } from 'dotenv'
 import * as path from 'path'
+import { getUserIdFromAuthHeader } from '@/lib/auth/verify-jwt'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,10 +11,15 @@ config({ path: path.join(process.cwd(), 'backend', '.env') })
 
 /**
  * Generate a short PPM-focused feature description using Grok (xAI).
- * Uses OPENAI_API_KEY and OPENAI_BASE_URL from env (same as backend).
+ * Requires Authorization: Bearer <token>. Uses OPENAI_API_KEY and OPENAI_BASE_URL from env.
  */
 export async function POST(request: NextRequest) {
   try {
+    const userId = await getUserIdFromAuthHeader(request.headers.get('Authorization'))
+    if (!userId) {
+      return NextResponse.json({ error: 'Authorization required' }, { status: 401 })
+    }
+
     const body = await request.json().catch(() => ({}))
     const name = (body as { name?: string }).name ?? ''
     const link = (body as { link?: string }).link ?? ''

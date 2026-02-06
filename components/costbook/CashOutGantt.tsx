@@ -349,13 +349,13 @@ export function CashOutGantt({
   
   return (
     <div 
-      className={`bg-white rounded-lg border border-gray-200 overflow-hidden ${className}`}
+      className={`bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 overflow-hidden ${className}`}
       data-testid={testId}
     >
       {/* Duration/Profile summary when distribution settings are provided */}
       {distributionSettingsByProject && distributionSettingsByProject.size > 0 && (
-        <div className="px-4 py-2 border-b border-gray-100 bg-gray-50 text-xs">
-          <span className="font-medium text-gray-600">Duration / Profile:</span>
+        <div className="px-4 py-2 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 text-xs">
+          <span className="font-medium text-gray-600 dark:text-slate-400">Duration / Profile:</span>
           <div className="flex flex-wrap gap-2 mt-1">
             {Array.from(distributionSettingsByProject.entries()).slice(0, 5).map(([projectId, settings]) => {
               const project = projects.find(p => p.id === projectId)
@@ -365,11 +365,11 @@ export function CashOutGantt({
                   key={projectId}
                   type="button"
                   onClick={() => onOpenDistributionSettings?.(projectId)}
-                  className="px-2 py-1 rounded bg-white border border-gray-200 hover:border-blue-300 hover:bg-blue-50 text-gray-700 truncate max-w-[140px]"
+                  className="px-2 py-1 rounded bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:border-blue-300 hover:bg-blue-50 text-gray-700 dark:text-slate-300 truncate max-w-[140px]"
                   title={`${label}: ${settings.profile}, ${settings.duration_start?.slice(0, 10)} – ${settings.duration_end?.slice(0, 10)}`}
                 >
                   <span className="truncate block">{label}</span>
-                  <span className="text-gray-500">{settings.profile}</span>
+                  <span className="text-gray-500 dark:text-slate-400">{settings.profile}</span>
                 </button>
               )
             })}
@@ -378,29 +378,29 @@ export function CashOutGantt({
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
         <div className="flex items-center gap-3">
-          <Calendar className="w-5 h-5 text-blue-500" />
-          <h3 className="font-medium text-gray-900">Cash Out Forecast</h3>
-          <span className="text-sm text-gray-500">
+          <Calendar className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+          <h3 className="font-medium text-gray-900 dark:text-slate-100">Cash Out Forecast</h3>
+          <span className="text-sm text-gray-500 dark:text-slate-400">
             Drag bars to adjust forecast dates
           </span>
         </div>
         
         <div className="flex items-center gap-2">
           {/* Zoom controls */}
-          <div className="flex items-center gap-1 border border-gray-200 rounded-lg">
+          <div className="flex items-center gap-1 border border-gray-200 dark:border-slate-700 rounded-lg">
             <button
               onClick={() => setZoom(z => Math.max(0.5, z - 0.25))}
-              className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+              className="p-1.5 text-gray-500 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
               title="Zoom out"
             >
               <ZoomOut className="w-4 h-4" />
             </button>
-            <span className="px-2 text-xs text-gray-600">{(zoom * 100).toFixed(0)}%</span>
+            <span className="px-2 text-xs text-gray-600 dark:text-slate-400">{(zoom * 100).toFixed(0)}%</span>
             <button
               onClick={() => setZoom(z => Math.min(2, z + 0.25))}
-              className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+              className="p-1.5 text-gray-500 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
               title="Zoom in"
             >
               <ZoomIn className="w-4 h-4" />
@@ -410,7 +410,7 @@ export function CashOutGantt({
           {/* Reset button */}
           <button
             onClick={handleReset}
-            className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 border border-gray-200 rounded-lg"
+            className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg"
             title="Reset to original dates"
           >
             <RotateCcw className="w-4 h-4" />
@@ -420,7 +420,7 @@ export function CashOutGantt({
       </div>
       
       {/* Scenario selector */}
-      <div className="p-4 border-b border-gray-200 bg-gray-50">
+      <div className="p-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
         <ScenarioSelector
           scenarios={scenarios}
           selectedScenarioId={selectedScenarioId}
@@ -436,15 +436,15 @@ export function CashOutGantt({
       <div className="overflow-x-auto">
         <div style={{ minWidth: `${100 * zoom}%` }}>
           {/* Month headers */}
-          <div className="flex border-b border-gray-200 bg-gray-50">
-            <div className="w-48 flex-shrink-0 p-2 text-xs font-medium text-gray-500 border-r border-gray-200">
+          <div className="flex border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+            <div className="w-48 flex-shrink-0 p-2 text-xs font-medium text-gray-500 dark:text-slate-400 border-r border-gray-200 dark:border-slate-700">
               Project
             </div>
             <div className="flex-1 flex">
               {monthLabels.map((month, i) => (
                 <div
                   key={i}
-                  className="flex-1 p-2 text-xs font-medium text-gray-500 text-center border-r border-gray-100 last:border-r-0"
+                  className="flex-1 p-2 text-xs font-medium text-gray-500 dark:text-slate-400 text-center border-r border-gray-100 dark:border-slate-700 last:border-r-0"
                 >
                   {month.label}
                 </div>
@@ -457,9 +457,9 @@ export function CashOutGantt({
             const projectItems = itemsByProject.get(project.id) || []
             
             return (
-              <div key={project.id} className="flex border-b border-gray-100 hover:bg-gray-50">
+              <div key={project.id} className="flex border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
                 {/* Project name */}
-                <div className="w-48 flex-shrink-0 p-2 text-sm font-medium text-gray-900 border-r border-gray-200 truncate">
+                <div className="w-48 flex-shrink-0 p-2 text-sm font-medium text-gray-900 dark:text-slate-100 border-r border-gray-200 dark:border-slate-700 truncate">
                   {project.name}
                 </div>
                 
@@ -470,7 +470,7 @@ export function CashOutGantt({
                     {monthLabels.map((_, i) => (
                       <div
                         key={i}
-                        className="flex-1 border-r border-gray-100 last:border-r-0"
+                        className="flex-1 border-r border-gray-100 dark:border-slate-700 last:border-r-0"
                       />
                     ))}
                   </div>
@@ -500,8 +500,8 @@ export function CashOutGantt({
           })}
           
           {/* Summary row */}
-          <div className="flex border-t-2 border-gray-300 bg-gray-50">
-            <div className="w-48 flex-shrink-0 p-2 text-sm font-bold text-gray-900 border-r border-gray-200">
+          <div className="flex border-t-2 border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-800/50">
+            <div className="w-48 flex-shrink-0 p-2 text-sm font-bold text-gray-900 dark:text-slate-100 border-r border-gray-200 dark:border-slate-700">
               Monthly Total
             </div>
             <div className="flex-1 flex">
@@ -512,7 +512,7 @@ export function CashOutGantt({
                 return (
                   <div
                     key={i}
-                    className="flex-1 p-2 text-xs font-medium text-gray-700 text-center border-r border-gray-100 last:border-r-0"
+                    className="flex-1 p-2 text-xs font-medium text-gray-700 dark:text-slate-300 text-center border-r border-gray-100 dark:border-slate-700 last:border-r-0"
                   >
                     {total > 0 ? formatCurrency(total, currency, { compact: true }) : '-'}
                   </div>
@@ -524,21 +524,21 @@ export function CashOutGantt({
       </div>
       
       {/* Legend */}
-      <div className="flex items-center gap-4 p-3 border-t border-gray-200 bg-gray-50 text-xs">
-        <span className="text-gray-500">Legend:</span>
+      <div className="flex items-center gap-4 p-3 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 text-xs">
+        <span className="text-gray-500 dark:text-slate-400">Legend:</span>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded bg-orange-500" />
-          <span className="text-gray-600">Commitments</span>
+          <span className="text-gray-600 dark:text-slate-400">Commitments</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded bg-purple-500" />
-          <span className="text-gray-600">Actuals</span>
+          <span className="text-gray-600 dark:text-slate-400">Actuals</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded bg-blue-500" />
-          <span className="text-gray-600">Predicted</span>
+          <span className="text-gray-600 dark:text-slate-400">Predicted</span>
         </div>
-        <div className="flex items-center gap-1 ml-auto text-gray-400">
+        <div className="flex items-center gap-1 ml-auto text-gray-400 dark:text-slate-500">
           <Info className="w-3 h-3" />
           <span>Drag bars to reschedule</span>
         </div>

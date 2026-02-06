@@ -27,6 +27,7 @@ __pycache__/
 .pytest_cache/
 .coverage
 .pre_startup_test_cache.json
+jest-results.json
 
 # Logs
 *.log

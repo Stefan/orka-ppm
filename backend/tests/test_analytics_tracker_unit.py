@@ -518,6 +518,98 @@ class TestReportGeneration:
         assert metrics.unique_users == 0
         assert metrics.avg_response_time == 0.0
         assert metrics.satisfaction_rate == 0.0
+
+    @pytest.mark.asyncio
+    async def test_helpfulness_calculation_satisfaction_rate(self, analytics_tracker, mock_db):
+        """Property 7.4: Analytics Helpfulness Calculation.
+        satisfaction_rate = 100 * (count of ratings >= 4) / (count of ratings).
+        """
+        def make_feedback_events(ratings):
+            return [
+                {
+                    "user_id": f"user_{i}",
+                    "event_type": "feedback",
+                    "event_data": {"rating": r, "effectiveness": "neutral"},
+                    "timestamp": datetime.now().isoformat(),
+                }
+                for i, r in enumerate(ratings)
+            ]
+
+        # 2 out of 5 ratings >= 4 -> 40%
+        mock_db.table.return_value.execute.return_value = Mock(
+            data=make_feedback_events([5, 4, 3, 2, 1])
+        )
+        start_date = datetime.now() - timedelta(days=7)
+        end_date = datetime.now()
+        metrics = await analytics_tracker.get_usage_metrics(start_date, end_date)
+        assert metrics.satisfaction_rate == 40.0
+
+        # 3 out of 3 >= 4 -> 100%
+        mock_db.table.return_value.execute.return_value = Mock(
+            data=make_feedback_events([4, 4, 5])
+        )
+        metrics = await analytics_tracker.get_usage_metrics(start_date, end_date)
+        assert metrics.satisfaction_rate == 100.0
+
+        # 0 ratings -> 0%
+        mock_db.table.return_value.execute.return_value = Mock(data=[])
+        metrics = await analytics_tracker.get_usage_metrics(start_date, end_date)
+        assert metrics.satisfaction_rate == 0.0
+
+    @pytest.mark.asyncio
+    async def test_common_issues_low_confidence_filtering(self, analytics_tracker, mock_db):
+        """Property 7.5: Analytics Negative Feedback / Low-Confidence Filtering.
+        common_issues contains only query events with confidence < 0.6, max 5.
+        """
+        def make_query_events(confidences):
+            return [
+                {
+                    "user_id": f"user_{i}",
+                    "event_type": "query",
+                    "event_data": {
+                        "query": f"query {i}",
+                        "response_time_ms": 100,
+                        "confidence": c,
+                        "category": "general",
+                    },
+                    "timestamp": datetime.now().isoformat(),
+                }
+                for i, c in enumerate(confidences)
+            ]
+
+        # 4 events: 0.9, 0.5, 0.4, 0.3 -> common_issues should have 3 (confidence < 0.6)
+        mock_db.table.return_value.execute.return_value = Mock(
+            data=make_query_events([0.9, 0.5, 0.4, 0.3])
+        )
+        start_date = datetime.now() - timedelta(days=7)
+        end_date = datetime.now()
+        metrics = await analytics_tracker.get_usage_metrics(start_date, end_date)
+        assert len(metrics.common_issues) == 3
+        assert all(issue["confidence"] < 0.6 for issue in metrics.common_issues)
+        assert all(issue["category"] == "general" for issue in metrics.common_issues)
+
+    @pytest.mark.asyncio
+    async def test_data_aggregation_top_queries_limit_and_sort(self, analytics_tracker, mock_db):
+        """Property 7.6: Analytics Data Aggregation.
+        top_queries limited to 10, sorted by count descending.
+        """
+        # Many query events so we get multiple "top" entries; backend groups by query prefix
+        events = []
+        for i in range(15):
+            events.append({
+                "user_id": f"user_{i % 3}",
+                "event_type": "query",
+                "event_data": {"query": f"query number {i % 5}", "response_time_ms": 100},
+                "timestamp": datetime.now().isoformat(),
+            })
+        mock_db.table.return_value.execute.return_value = Mock(data=events)
+        start_date = datetime.now() - timedelta(days=7)
+        end_date = datetime.now()
+        metrics = await analytics_tracker.get_usage_metrics(start_date, end_date)
+        assert len(metrics.top_queries) <= 10
+        if len(metrics.top_queries) >= 2:
+            counts = [q["count"] for q in metrics.top_queries]
+            assert counts == sorted(counts, reverse=True)
     
     @pytest.mark.asyncio
     async def test_generate_weekly_report(self, analytics_tracker, mock_db, mock_analytics_data):

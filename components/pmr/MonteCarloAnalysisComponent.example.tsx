@@ -132,15 +132,15 @@ export default function MonteCarloAnalysisExample({
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Monte Carlo Risk Analysis</h1>
-        <p className="text-gray-600 mt-2">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Monte Carlo Risk Analysis</h1>
+        <p className="text-gray-600 dark:text-slate-400 mt-2">
           Project: {projectId} | Report: {reportId}
         </p>
       </div>
 
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">{error}</p>
+        <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <p className="text-red-800 dark:text-red-300">{error}</p>
         </div>
       )}
 
@@ -156,9 +156,9 @@ export default function MonteCarloAnalysisExample({
       />
 
       {/* Additional context or help */}
-      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+      <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
         <h3 className="text-lg font-medium text-blue-900 mb-2">About Monte Carlo Analysis</h3>
-        <p className="text-blue-800 text-sm">
+        <p className="text-blue-800 dark:text-blue-300 text-sm">
           Monte Carlo simulation uses random sampling to model the probability of different outcomes
           in a process that cannot easily be predicted due to the intervention of random variables.
           This analysis helps quantify project risks and provides probabilistic forecasts for budget,
@@ -274,13 +274,13 @@ export function AdvancedMonteCarloExample({
       />
 
       {/* Additional analysis tools */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Scenario History</h3>
+      <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-6">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Scenario History</h3>
         <div className="space-y-2">
           {savedScenarios.map((scenario, idx) => (
-            <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-              <span className="text-sm text-gray-700">{scenario.name}</span>
-              <span className="text-xs text-gray-500">
+            <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-800/50 rounded">
+              <span className="text-sm text-gray-700 dark:text-slate-300">{scenario.name}</span>
+              <span className="text-xs text-gray-500 dark:text-slate-400">
                 {new Date(scenario.created_at).toLocaleDateString()}
               </span>
             </div>

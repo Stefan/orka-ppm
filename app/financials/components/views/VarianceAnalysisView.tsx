@@ -202,15 +202,15 @@ const VarianceAnalysisView = forwardRef<{ refresh: () => void }, VarianceAnalysi
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-md p-4">
+      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
         <div className="flex">
           <AlertTriangle className="h-5 w-5 text-red-400" />
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">Error loading variance data</h3>
+            <h3 className="text-sm font-medium text-red-800 dark:text-red-300">Error loading variance data</h3>
             <p className="mt-1 text-sm text-red-700">{error}</p>
             <button
               onClick={fetchVarianceData}
-              className="mt-2 text-sm text-red-600 hover:text-red-500"
+              className="mt-2 text-sm text-red-600 dark:text-red-400 hover:text-red-500"
             >
               Try again
             </button>
@@ -225,8 +225,8 @@ const VarianceAnalysisView = forwardRef<{ refresh: () => void }, VarianceAnalysi
       {/* Header with Controls */}
       <div className="flex justify-between items-start">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Commitments vs Actuals Analysis</h2>
-          <p className="text-sm text-gray-600 mt-1">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Commitments vs Actuals Analysis</h2>
+          <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
             Variance analysis between planned commitments and actual expenditures
           </p>
         </div>
@@ -234,7 +234,7 @@ const VarianceAnalysisView = forwardRef<{ refresh: () => void }, VarianceAnalysi
         <div className="flex items-center space-x-2">
           <button
             onClick={exportVarianceData}
-            className="flex items-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            className="flex items-center px-3 py-2 bg-green-700 text-white rounded-lg hover:bg-green-700"
           >
             <Download className="h-4 w-4 mr-2" />
             Export
@@ -245,54 +245,54 @@ const VarianceAnalysisView = forwardRef<{ refresh: () => void }, VarianceAnalysi
       {/* Summary KPIs */}
       {analyticsData && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Commitments</p>
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Total Commitments</p>
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {analyticsData.totalCommitments.toLocaleString()} {selectedCurrency}
                 </p>
               </div>
-              <Target className="h-8 w-8 text-blue-600" />
+              <Target className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Actuals</p>
-                <p className="text-2xl font-bold text-purple-600">
+                <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Total Actuals</p>
+                <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                   {analyticsData.totalActuals.toLocaleString()} {selectedCurrency}
                 </p>
               </div>
-              <DollarSign className="h-8 w-8 text-purple-600" />
+              <DollarSign className="h-8 w-8 text-purple-600 dark:text-purple-400" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Variance</p>
-                <p className={`text-2xl font-bold ${analyticsData.totalVariance >= 0 ? 'text-red-600' : 'text-green-600'}`}>
+                <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Total Variance</p>
+                <p className={`text-2xl font-bold ${analyticsData.totalVariance >= 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
                   {analyticsData.totalVariance >= 0 ? '+' : ''}{analyticsData.totalVariance.toLocaleString()} {selectedCurrency}
                 </p>
               </div>
               {analyticsData.totalVariance >= 0 ? 
-                <TrendingUp className="h-8 w-8 text-red-600" /> : 
-                <TrendingDown className="h-8 w-8 text-green-600" />
+                <TrendingUp className="h-8 w-8 text-red-600 dark:text-red-400" /> : 
+                <TrendingDown className="h-8 w-8 text-green-600 dark:text-green-400" />
               }
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Variance %</p>
-                <p className={`text-2xl font-bold ${analyticsData.variancePercentage >= 0 ? 'text-red-600' : 'text-green-600'}`}>
+                <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Variance %</p>
+                <p className={`text-2xl font-bold ${analyticsData.variancePercentage >= 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
                   {analyticsData.variancePercentage >= 0 ? '+' : ''}{analyticsData.variancePercentage.toFixed(1)}%
                 </p>
               </div>
-              <PieChart className="h-8 w-8 text-gray-600" />
+              <PieChart className="h-8 w-8 text-gray-600 dark:text-slate-400" />
             </div>
           </div>
         </div>
@@ -300,55 +300,55 @@ const VarianceAnalysisView = forwardRef<{ refresh: () => void }, VarianceAnalysi
 
       {/* Status Distribution */}
       {analyticsData && (
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Project Status Distribution</h3>
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Project Status Distribution</h3>
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-              <div className="text-2xl font-bold text-green-600">
+            <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                 {analyticsData.statusCounts.under}
               </div>
-              <div className="text-sm text-green-800">Under Budget</div>
-              <div className="text-xs text-green-600 mt-1">Spending less than committed</div>
+              <div className="text-sm text-green-800 dark:text-green-300">Under Budget</div>
+              <div className="text-xs text-green-600 dark:text-green-400 mt-1">Spending less than committed</div>
             </div>
             
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-              <div className="text-2xl font-bold text-blue-600">
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {analyticsData.statusCounts.on}
               </div>
-              <div className="text-sm text-blue-800">On Budget</div>
-              <div className="text-xs text-blue-600 mt-1">Within ±5% of commitments</div>
+              <div className="text-sm text-blue-800 dark:text-blue-300">On Budget</div>
+              <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">Within ±5% of commitments</div>
             </div>
             
-            <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-              <div className="text-2xl font-bold text-red-600">
+            <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+              <div className="text-2xl font-bold text-red-600 dark:text-red-400">
                 {analyticsData.statusCounts.over}
               </div>
-              <div className="text-sm text-red-800">Over Budget</div>
-              <div className="text-xs text-red-600 mt-1">Spending more than committed</div>
+              <div className="text-sm text-red-800 dark:text-red-300">Over Budget</div>
+              <div className="text-xs text-red-600 dark:text-red-400 mt-1">Spending more than committed</div>
             </div>
           </div>
         </div>
       )}
 
       {/* Filters */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Filters & Sorting</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Filters & Sorting</h3>
           <button
             onClick={() => {
               setFilters({ project: '', wbs: '', vendor: '', status: 'all' })
               onClearProjectFilter?.()
             }}
-            className="text-sm text-gray-600 hover:text-gray-800"
+            className="text-sm text-gray-600 hover:text-gray-800 dark:text-slate-200"
           >
             Clear All
           </button>
         </div>
         
         {projectFilter && (
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+          <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg flex items-center justify-between">
             <div className="flex items-center">
-              <span className="text-sm text-blue-800">
+              <span className="text-sm text-blue-800 dark:text-blue-300">
                 <strong>Filtered by project:</strong> {projectFilter}
               </span>
             </div>
@@ -357,7 +357,7 @@ const VarianceAnalysisView = forwardRef<{ refresh: () => void }, VarianceAnalysi
                 setFilters(prev => ({ ...prev, project: '' }))
                 onClearProjectFilter?.()
               }}
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
             >
               Clear Filter
             </button>
@@ -366,33 +366,33 @@ const VarianceAnalysisView = forwardRef<{ refresh: () => void }, VarianceAnalysi
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Project</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Project</label>
             <input
               type="text"
               value={filters.project}
               onChange={(e) => setFilters(prev => ({ ...prev, project: e.target.value }))}
               placeholder="Filter by project..."
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">WBS Element</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">WBS Element</label>
             <input
               type="text"
               value={filters.wbs}
               onChange={(e) => setFilters(prev => ({ ...prev, wbs: e.target.value }))}
               placeholder="Filter by WBS..."
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Status</label>
             <select
               value={filters.status}
               onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="all">All Status</option>
               <option value="under">Under Budget</option>
@@ -402,11 +402,11 @@ const VarianceAnalysisView = forwardRef<{ refresh: () => void }, VarianceAnalysi
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Sort By</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="variance_percentage">Variance %</option>
               <option value="variance">Variance Amount</option>
@@ -415,11 +415,11 @@ const VarianceAnalysisView = forwardRef<{ refresh: () => void }, VarianceAnalysi
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Order</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Order</label>
             <select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value as any)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="desc">Highest First</option>
               <option value="asc">Lowest First</option>
@@ -430,8 +430,8 @@ const VarianceAnalysisView = forwardRef<{ refresh: () => void }, VarianceAnalysi
 
       {/* Variance Visualization */}
       {analyticsData && analyticsData.chartData.length > 0 && (
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
             Top 10 Variance Analysis (by {sortBy.replace('_', ' ')})
           </h3>
           <ResponsiveContainer width="100%" height={400}>
@@ -508,7 +508,7 @@ const VarianceAnalysisView = forwardRef<{ refresh: () => void }, VarianceAnalysi
                 </tr>
               ) : (
                 filteredAndSortedVariances.map((variance) => (
-                  <tr key={variance.id} className="hover:bg-gray-50 dark:hover:bg-slate-700">
+                  <tr key={variance.id} className="hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-gray-900 dark:text-slate-100">

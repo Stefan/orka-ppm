@@ -29,16 +29,16 @@ export default function GlobalError({
 
   return (
     <html lang="de">
-      <body className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
+      <body className="min-h-screen bg-gray-50 dark:bg-slate-800/50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 text-center">
           <AlertTriangle className="mx-auto h-12 w-12 text-red-500 mb-4" />
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-2">
             Etwas ist schiefgelaufen
           </h1>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-600 dark:text-slate-400 mb-4">
             Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.
           </p>
-          <p className="text-xs text-gray-400 mb-4 font-mono">
+          <p className="text-xs text-gray-400 dark:text-slate-500 mb-4 font-mono">
             Referenz: {correlationId}
           </p>
           <button

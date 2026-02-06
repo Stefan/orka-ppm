@@ -407,7 +407,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
 
       const data: HelpQueryResponse = await apiResponse.json()
 
-      // Create assistant message
+      // Create assistant message (include queryId for help_query_feedback)
       const assistantMessage: ChatMessage = {
         id: `msg-${Date.now()}-assistant`,
         type: 'assistant',
@@ -415,7 +415,8 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
         timestamp: new Date(),
         sources: data.sources,
         confidence: data.confidence,
-        actions: data.suggestedActions || []
+        actions: data.suggestedActions || [],
+        queryId: (data as HelpQueryResponse & { query_id?: string }).query_id ?? data.queryId
       }
 
       setState(prevState => ({
@@ -573,14 +574,18 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
   // Submit feedback
   const submitFeedback = useCallback(async (messageId: string, feedback: HelpFeedbackRequest) => {
     try {
-      // Find the message to get its content and context
+      // Find the message to get its content, context, and optional queryId (for help_query_feedback)
       const message = state.messages.find(msg => msg.id === messageId)
       const messageContent = message?.content || ''
-      
+      const feedbackWithQueryId: HelpFeedbackRequest = {
+        ...feedback,
+        messageId: feedback.messageId ?? messageId,
+        queryId: message?.queryId ?? feedback.queryId
+      }
       // Use integrated feedback service
       const result = await helpChatFeedbackIntegration.submitIntegratedFeedback(
         messageId,
-        feedback,
+        feedbackWithQueryId,
         messageContent,
         state.currentContext,
         {

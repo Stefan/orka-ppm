@@ -12,8 +12,8 @@ export default function ForecastChart({ data }: ForecastChartProps) {
     <div className="space-y-2">
       {data.slice(0, 12).map((d, i) => (
         <div key={i} className="flex items-center gap-3">
-          <div className="w-24 text-sm text-gray-600 truncate">{d.forecast_date}</div>
-          <div className="flex-1 h-5 bg-gray-100 rounded overflow-hidden">
+          <div className="w-24 text-sm text-gray-600 dark:text-slate-400 truncate">{d.forecast_date}</div>
+          <div className="flex-1 h-5 bg-gray-100 dark:bg-slate-700 rounded overflow-hidden">
             <div
               className="h-full bg-indigo-500 rounded"
               style={{ width: `${(d.forecasted_cost / maxVal) * 100}%` }}

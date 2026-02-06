@@ -188,23 +188,23 @@ const Timeline: React.FC<TimelineProps> = ({
     const event = events[data.index]
 
     return (
-      <div className="bg-white p-4 rounded-lg shadow-xl border border-gray-200 max-w-md">
+      <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-xl border border-gray-200 dark:border-slate-700 max-w-md">
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center space-x-2">
             {getCategoryIcon(event.category)}
             <div>
-              <p className="font-semibold text-gray-900">{event.event_type}</p>
-              <p className="text-xs text-gray-500">
+              <p className="font-semibold text-gray-900 dark:text-slate-100">{event.event_type}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400">
                 {new Date(event.timestamp).toLocaleString()}
               </p>
             </div>
           </div>
           <span className={`px-2 py-1 text-xs rounded-full ${
-            event.severity === 'critical' ? 'bg-red-100 text-red-700' :
-            event.severity === 'error' ? 'bg-orange-100 text-orange-700' :
-            event.severity === 'warning' ? 'bg-yellow-100 text-yellow-700' :
-            'bg-blue-100 text-blue-700'
+            event.severity === 'critical' ? 'bg-red-100 dark:bg-red-900/30 text-red-700' :
+            event.severity === 'error' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700' :
+            event.severity === 'warning' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700' :
+            'bg-blue-100 dark:bg-blue-900/30 text-blue-700'
           }`}>
             {event.severity}
           </span>
@@ -213,20 +213,20 @@ const Timeline: React.FC<TimelineProps> = ({
         {/* User and Entity */}
         <div className="space-y-1 mb-3">
           {event.user_name && (
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-gray-700 dark:text-slate-300">
               <span className="font-medium">User:</span> {event.user_name}
             </p>
           )}
-          <p className="text-sm text-gray-700">
+          <p className="text-sm text-gray-700 dark:text-slate-300">
             <span className="font-medium">Entity:</span> {event.entity_type}
           </p>
         </div>
 
         {/* AI Insights */}
         {event.is_anomaly && event.anomaly_score && (
-          <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded">
+          <div className="mb-3 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded">
             <div className="flex items-center space-x-2">
-              <AlertTriangle className="h-4 w-4 text-red-600" />
+              <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
               <span className="text-sm font-medium text-red-900">
                 Anomaly Detected
               </span>
@@ -235,7 +235,7 @@ const Timeline: React.FC<TimelineProps> = ({
               Score: {(event.anomaly_score * 100).toFixed(1)}%
             </p>
             {event.ai_insights?.explanation && (
-              <p className="text-xs text-red-600 mt-1">
+              <p className="text-xs text-red-600 dark:text-red-400 mt-1">
                 {event.ai_insights.explanation}
               </p>
             )}
@@ -244,9 +244,9 @@ const Timeline: React.FC<TimelineProps> = ({
 
         {/* AI Generated Insights */}
         {event.ai_insights && !event.is_anomaly && (
-          <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded">
+          <div className="mb-3 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
             <div className="flex items-center space-x-2 mb-1">
-              <Info className="h-4 w-4 text-blue-600" />
+              <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
               <span className="text-xs font-medium text-blue-900">AI Insights</span>
             </div>
             {event.ai_insights.summary && (
@@ -255,7 +255,7 @@ const Timeline: React.FC<TimelineProps> = ({
               </p>
             )}
             {event.ai_insights.impact && (
-              <p className="text-xs text-blue-600 mt-1">
+              <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
                 Impact: {event.ai_insights.impact}
               </p>
             )}
@@ -265,18 +265,18 @@ const Timeline: React.FC<TimelineProps> = ({
         {/* Tags */}
         {event.tags && Object.keys(event.tags).length > 0 && (
           <div className="mb-3">
-            <p className="text-xs font-medium text-gray-700 mb-1">AI Tags:</p>
+            <p className="text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">AI Tags:</p>
             <div className="flex flex-wrap gap-1">
               {Object.entries(event.tags).slice(0, 3).map(([key, value]) => (
                 <span
                   key={key}
-                  className="px-2 py-0.5 text-xs bg-blue-50 text-blue-700 rounded-full"
+                  className="px-2 py-0.5 text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 rounded-full"
                 >
                   {key}: {String(value)}
                 </span>
               ))}
               {Object.keys(event.tags).length > 3 && (
-                <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded-full">
+                <span className="px-2 py-0.5 text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 rounded-full">
                   +{Object.keys(event.tags).length - 3} more
                 </span>
               )}
@@ -285,7 +285,7 @@ const Timeline: React.FC<TimelineProps> = ({
         )}
 
         {/* Category and Risk Level */}
-        <div className="flex items-center justify-between text-xs text-gray-600">
+        <div className="flex items-center justify-between text-xs text-gray-600 dark:text-slate-400">
           {event.category && (
             <span className="flex items-center space-x-1">
               <Tag className="h-3 w-3" />
@@ -294,10 +294,10 @@ const Timeline: React.FC<TimelineProps> = ({
           )}
           {event.risk_level && (
             <span className={`px-2 py-0.5 rounded-full ${
-              event.risk_level === 'Critical' ? 'bg-red-100 text-red-700' :
-              event.risk_level === 'High' ? 'bg-orange-100 text-orange-700' :
-              event.risk_level === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-              'bg-green-100 text-green-700'
+              event.risk_level === 'Critical' ? 'bg-red-100 dark:bg-red-900/30 text-red-700' :
+              event.risk_level === 'High' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700' :
+              event.risk_level === 'Medium' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700' :
+              'bg-green-100 dark:bg-green-900/30 text-green-700'
             }`}>
               {event.risk_level} Risk
             </span>
@@ -305,8 +305,8 @@ const Timeline: React.FC<TimelineProps> = ({
         </div>
 
         {/* Click hint */}
-        <div className="mt-3 pt-2 border-t border-gray-200">
-          <p className="text-xs text-gray-500 flex items-center">
+        <div className="mt-3 pt-2 border-t border-gray-200 dark:border-slate-700">
+          <p className="text-xs text-gray-500 dark:text-slate-400 flex items-center">
             <ChevronRight className="h-3 w-3 mr-1" />
             Click for details
           </p>
@@ -340,8 +340,8 @@ const Timeline: React.FC<TimelineProps> = ({
     return (
       <div className={`flex items-center justify-center ${className}`} style={{ height }}>
         <div className="text-center">
-          <Clock className="h-8 w-8 text-gray-400 animate-spin mx-auto mb-2" />
-          <p className="text-sm text-gray-600">Loading timeline...</p>
+          <Clock className="h-8 w-8 text-gray-400 dark:text-slate-500 animate-spin mx-auto mb-2" />
+          <p className="text-sm text-gray-600 dark:text-slate-400">Loading timeline...</p>
         </div>
       </div>
     )
@@ -351,23 +351,23 @@ const Timeline: React.FC<TimelineProps> = ({
     return (
       <div className={`flex items-center justify-center ${className}`} style={{ height }}>
         <div className="text-center">
-          <Info className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-          <p className="text-sm text-gray-600">No events to display</p>
+          <Info className="h-8 w-8 text-gray-400 dark:text-slate-500 mx-auto mb-2" />
+          <p className="text-sm text-gray-600 dark:text-slate-400">No events to display</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className={`relative bg-white rounded-lg border border-gray-200 ${className}`} data-testid="audit-timeline">
+    <div className={`relative bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 ${className}`} data-testid="audit-timeline">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Audit Timeline</h3>
-          <p className="text-sm text-gray-600">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Audit Timeline</h3>
+          <p className="text-sm text-gray-600 dark:text-slate-400">
             {events.length} event{events.length !== 1 ? 's' : ''}
             {events.filter(e => e.is_anomaly).length > 0 && (
-              <span className="ml-2 text-red-600">
+              <span className="ml-2 text-red-600 dark:text-red-400">
                 • {events.filter(e => e.is_anomaly).length} anomal{events.filter(e => e.is_anomaly).length !== 1 ? 'ies' : 'y'}
               </span>
             )}
@@ -377,7 +377,7 @@ const Timeline: React.FC<TimelineProps> = ({
         <button
           onClick={() => setShowFilters(!showFilters)}
           className={`p-2 rounded-lg transition-colors ${
-            showFilters ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-100'
+            showFilters ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' : 'text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700'
           }`}
           title="Toggle Filters"
         >
@@ -387,11 +387,11 @@ const Timeline: React.FC<TimelineProps> = ({
 
       {/* Filters Panel */}
       {showFilters && (
-        <div className="p-4 border-b border-gray-200 bg-gray-50">
+        <div className="p-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Date Range Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 <Calendar className="h-4 w-4 inline mr-1" />
                 Date Range
               </label>
@@ -409,7 +409,7 @@ const Timeline: React.FC<TimelineProps> = ({
                     }
                     onFilterChange?.(newFilters)
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm"
                   placeholder="Start date"
                 />
                 <input
@@ -425,7 +425,7 @@ const Timeline: React.FC<TimelineProps> = ({
                     }
                     onFilterChange?.(newFilters)
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm"
                   placeholder="End date"
                 />
               </div>
@@ -433,7 +433,7 @@ const Timeline: React.FC<TimelineProps> = ({
 
             {/* Severity Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 Severity
               </label>
               <div className="space-y-2">
@@ -449,9 +449,9 @@ const Timeline: React.FC<TimelineProps> = ({
                           : currentSeverity.filter(s => s !== severity)
                         onFilterChange?.({ ...filters, severity: newSeverity })
                       }}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 capitalize">{severity}</span>
+                    <span className="text-sm text-gray-700 dark:text-slate-300 capitalize">{severity}</span>
                   </label>
                 ))}
               </div>
@@ -459,7 +459,7 @@ const Timeline: React.FC<TimelineProps> = ({
 
             {/* Category Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 <Tag className="h-4 w-4 inline mr-1" />
                 Category
               </label>
@@ -482,9 +482,9 @@ const Timeline: React.FC<TimelineProps> = ({
                           : currentCategories.filter(c => c !== category)
                         onFilterChange?.({ ...filters, categories: newCategories })
                       }}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">{category}</span>
+                    <span className="text-sm text-gray-700 dark:text-slate-300">{category}</span>
                   </label>
                 ))}
               </div>
@@ -492,7 +492,7 @@ const Timeline: React.FC<TimelineProps> = ({
 
             {/* Risk Level Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 Risk Level
               </label>
               <div className="space-y-2">
@@ -508,9 +508,9 @@ const Timeline: React.FC<TimelineProps> = ({
                           : currentLevels.filter(l => l !== level)
                         onFilterChange?.({ ...filters, riskLevels: newLevels })
                       }}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">{level}</span>
+                    <span className="text-sm text-gray-700 dark:text-slate-300">{level}</span>
                   </label>
                 ))}
               </div>
@@ -518,7 +518,7 @@ const Timeline: React.FC<TimelineProps> = ({
 
             {/* Anomalies Only Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 Special Filters
               </label>
               <label className="flex items-center space-x-2">
@@ -528,10 +528,10 @@ const Timeline: React.FC<TimelineProps> = ({
                   onChange={(e) => {
                     onFilterChange?.({ ...filters, showAnomaliesOnly: e.target.checked })
                   }}
-                  className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                  className="rounded border-gray-300 dark:border-slate-600 text-red-600 dark:text-red-400 focus:ring-red-500"
                 />
-                <span className="text-sm text-gray-700 flex items-center">
-                  <AlertTriangle className="h-4 w-4 text-red-600 mr-1" />
+                <span className="text-sm text-gray-700 dark:text-slate-300 flex items-center">
+                  <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400 mr-1" />
                   Show Anomalies Only
                 </span>
               </label>
@@ -550,7 +550,7 @@ const Timeline: React.FC<TimelineProps> = ({
                     showAnomaliesOnly: false
                   })
                 }}
-                className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm font-medium"
+                className="w-full px-4 py-2 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 text-sm font-medium"
               >
                 Clear All Filters
               </button>
@@ -609,48 +609,48 @@ const Timeline: React.FC<TimelineProps> = ({
       <div className="px-4 pb-4 flex flex-wrap gap-4 text-sm">
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-          <span className="text-gray-600">Info</span>
+          <span className="text-gray-600 dark:text-slate-400">Info</span>
         </div>
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-          <span className="text-gray-600">Warning</span>
+          <span className="text-gray-600 dark:text-slate-400">Warning</span>
         </div>
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-          <span className="text-gray-600">Error</span>
+          <span className="text-gray-600 dark:text-slate-400">Error</span>
         </div>
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 rounded-full bg-red-500"></div>
-          <span className="text-gray-600">Critical</span>
+          <span className="text-gray-600 dark:text-slate-400">Critical</span>
         </div>
         <div className="flex items-center space-x-2">
-          <AlertTriangle className="h-3 w-3 text-red-600" />
-          <span className="text-gray-600">Larger bubbles = Higher anomaly score</span>
+          <AlertTriangle className="h-3 w-3 text-red-600 dark:text-red-400" />
+          <span className="text-gray-600 dark:text-slate-400">Larger bubbles = Higher anomaly score</span>
         </div>
       </div>
 
       {/* Event Detail Modal */}
       {selectedEvent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-start justify-between">
+            <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 p-6 flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center space-x-3 mb-2">
                   {getCategoryIcon(selectedEvent.category)}
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                     {selectedEvent.event_type}
                   </h2>
                   <span className={`px-3 py-1 text-sm rounded-full ${
-                    selectedEvent.severity === 'critical' ? 'bg-red-100 text-red-700' :
-                    selectedEvent.severity === 'error' ? 'bg-orange-100 text-orange-700' :
-                    selectedEvent.severity === 'warning' ? 'bg-yellow-100 text-yellow-700' :
-                    'bg-blue-100 text-blue-700'
+                    selectedEvent.severity === 'critical' ? 'bg-red-100 dark:bg-red-900/30 text-red-700' :
+                    selectedEvent.severity === 'error' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700' :
+                    selectedEvent.severity === 'warning' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700' :
+                    'bg-blue-100 dark:bg-blue-900/30 text-blue-700'
                   }`}>
                     {selectedEvent.severity}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-slate-400">
                   {new Date(selectedEvent.timestamp).toLocaleString('en-US', {
                     dateStyle: 'full',
                     timeStyle: 'long'
@@ -659,7 +659,7 @@ const Timeline: React.FC<TimelineProps> = ({
               </div>
               <button
                 onClick={() => setSelectedEvent(null)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                className="p-2 text-gray-400 hover:text-gray-600 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700"
               >
                 <X className="h-6 w-6" />
               </button>
@@ -669,49 +669,49 @@ const Timeline: React.FC<TimelineProps> = ({
             <div className="p-6 space-y-6">
               {/* Event Metadata */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <h3 className="text-sm font-semibold text-gray-700 mb-3">Event Information</h3>
+                <div className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3">Event Information</h3>
                   <dl className="space-y-2">
                     <div>
-                      <dt className="text-xs text-gray-600">Event ID</dt>
-                      <dd className="text-sm font-mono text-gray-900">{selectedEvent.id}</dd>
+                      <dt className="text-xs text-gray-600 dark:text-slate-400">Event ID</dt>
+                      <dd className="text-sm font-mono text-gray-900 dark:text-slate-100">{selectedEvent.id}</dd>
                     </div>
                     {selectedEvent.user_name && (
                       <div>
-                        <dt className="text-xs text-gray-600">User</dt>
-                        <dd className="text-sm text-gray-900">{selectedEvent.user_name}</dd>
+                        <dt className="text-xs text-gray-600 dark:text-slate-400">User</dt>
+                        <dd className="text-sm text-gray-900 dark:text-slate-100">{selectedEvent.user_name}</dd>
                       </div>
                     )}
                     <div>
-                      <dt className="text-xs text-gray-600">Entity Type</dt>
-                      <dd className="text-sm text-gray-900">{selectedEvent.entity_type}</dd>
+                      <dt className="text-xs text-gray-600 dark:text-slate-400">Entity Type</dt>
+                      <dd className="text-sm text-gray-900 dark:text-slate-100">{selectedEvent.entity_type}</dd>
                     </div>
                     {selectedEvent.entity_id && (
                       <div>
-                        <dt className="text-xs text-gray-600">Entity ID</dt>
-                        <dd className="text-sm font-mono text-gray-900">{selectedEvent.entity_id}</dd>
+                        <dt className="text-xs text-gray-600 dark:text-slate-400">Entity ID</dt>
+                        <dd className="text-sm font-mono text-gray-900 dark:text-slate-100">{selectedEvent.entity_id}</dd>
                       </div>
                     )}
                   </dl>
                 </div>
 
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <h3 className="text-sm font-semibold text-gray-700 mb-3">Classification</h3>
+                <div className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3">Classification</h3>
                   <dl className="space-y-2">
                     {selectedEvent.category && (
                       <div>
-                        <dt className="text-xs text-gray-600">Category</dt>
-                        <dd className="text-sm text-gray-900">{selectedEvent.category}</dd>
+                        <dt className="text-xs text-gray-600 dark:text-slate-400">Category</dt>
+                        <dd className="text-sm text-gray-900 dark:text-slate-100">{selectedEvent.category}</dd>
                       </div>
                     )}
                     {selectedEvent.risk_level && (
                       <div>
-                        <dt className="text-xs text-gray-600">Risk Level</dt>
+                        <dt className="text-xs text-gray-600 dark:text-slate-400">Risk Level</dt>
                         <dd className={`text-sm font-semibold ${
-                          selectedEvent.risk_level === 'Critical' ? 'text-red-600' :
-                          selectedEvent.risk_level === 'High' ? 'text-orange-600' :
-                          selectedEvent.risk_level === 'Medium' ? 'text-yellow-600' :
-                          'text-green-600'
+                          selectedEvent.risk_level === 'Critical' ? 'text-red-600 dark:text-red-400' :
+                          selectedEvent.risk_level === 'High' ? 'text-orange-600 dark:text-orange-400' :
+                          selectedEvent.risk_level === 'Medium' ? 'text-yellow-600 dark:text-yellow-400' :
+                          'text-green-600 dark:text-green-400'
                         }`}>
                           {selectedEvent.risk_level}
                         </dd>
@@ -719,8 +719,8 @@ const Timeline: React.FC<TimelineProps> = ({
                     )}
                     {selectedEvent.is_anomaly && selectedEvent.anomaly_score && (
                       <div>
-                        <dt className="text-xs text-gray-600">Anomaly Score</dt>
-                        <dd className="text-sm font-semibold text-red-600">
+                        <dt className="text-xs text-gray-600 dark:text-slate-400">Anomaly Score</dt>
+                        <dd className="text-sm font-semibold text-red-600 dark:text-red-400">
                           {(selectedEvent.anomaly_score * 100).toFixed(2)}%
                         </dd>
                       </div>
@@ -731,9 +731,9 @@ const Timeline: React.FC<TimelineProps> = ({
 
               {/* Anomaly Alert */}
               {selectedEvent.is_anomaly && (
-                <div className="p-4 bg-red-50 border-2 border-red-200 rounded-lg">
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg">
                   <div className="flex items-start space-x-3">
-                    <AlertTriangle className="h-6 w-6 text-red-600 flex-shrink-0 mt-0.5" />
+                    <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-red-900 mb-2">
                         Anomaly Detected
@@ -745,7 +745,7 @@ const Timeline: React.FC<TimelineProps> = ({
                         </span>
                       </p>
                       {selectedEvent.ai_insights?.explanation && (
-                        <p className="text-sm text-red-600">
+                        <p className="text-sm text-red-600 dark:text-red-400">
                           {selectedEvent.ai_insights.explanation}
                         </p>
                       )}
@@ -756,7 +756,7 @@ const Timeline: React.FC<TimelineProps> = ({
 
               {/* AI Insights */}
               {selectedEvent.ai_insights && Object.keys(selectedEvent.ai_insights).length > 0 && (
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                   <h3 className="text-sm font-semibold text-blue-900 mb-3 flex items-center">
                     <Info className="h-5 w-5 mr-2" />
                     AI-Generated Insights
@@ -779,7 +779,7 @@ const Timeline: React.FC<TimelineProps> = ({
               {/* Tags */}
               {selectedEvent.tags && Object.keys(selectedEvent.tags).length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3 flex items-center">
                     <Tag className="h-5 w-5 mr-2" />
                     AI-Generated Tags
                   </h3>
@@ -787,7 +787,7 @@ const Timeline: React.FC<TimelineProps> = ({
                     {Object.entries(selectedEvent.tags).map(([key, value]) => (
                       <span
                         key={key}
-                        className="px-3 py-1.5 text-sm bg-blue-100 text-blue-700 rounded-full"
+                        className="px-3 py-1.5 text-sm bg-blue-100 dark:bg-blue-900/30 text-blue-700 rounded-full"
                       >
                         {key}: {String(value)}
                       </span>
@@ -798,7 +798,7 @@ const Timeline: React.FC<TimelineProps> = ({
 
               {/* Action Details */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Action Details</h3>
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3">Action Details</h3>
                 <div className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
                   <pre className="text-xs font-mono">
                     {JSON.stringify(selectedEvent.action_details, null, 2)}
@@ -808,10 +808,10 @@ const Timeline: React.FC<TimelineProps> = ({
 
               {/* Navigation to Related Entities */}
               {selectedEvent.entity_id && (
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-700">Related Entity</h3>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300">Related Entity</h3>
+                    <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
                       View details for this {selectedEvent.entity_type}
                     </p>
                   </div>
@@ -831,10 +831,10 @@ const Timeline: React.FC<TimelineProps> = ({
             </div>
 
             {/* Modal Footer */}
-            <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 p-4 flex justify-end space-x-3">
+            <div className="sticky bottom-0 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700 p-4 flex justify-end space-x-3">
               <button
                 onClick={() => setSelectedEvent(null)}
-                className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 text-sm text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700"
               >
                 Close
               </button>

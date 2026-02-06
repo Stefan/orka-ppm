@@ -22,8 +22,8 @@ export default function MetricsDashboard({ metrics }: MetricsDashboardProps) {
         const val = metrics[key]
         const display = format && typeof val === 'number' ? format(val) : String(val ?? '-')
         return (
-          <div key={key} className="p-4 bg-white rounded-lg border">
-            <p className="text-xs text-gray-500">{label}</p>
+          <div key={key} className="p-4 bg-white dark:bg-slate-800 rounded-lg border">
+            <p className="text-xs text-gray-500 dark:text-slate-400">{label}</p>
             <p className="text-xl font-bold mt-1">{display}</p>
           </div>
         )

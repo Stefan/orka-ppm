@@ -220,7 +220,7 @@ export const PinchZoomContainer: React.FC<PinchZoomContainerProps> = ({
       ref={setRefs}
       className={cn(
         'relative overflow-hidden touch-none select-none',
-        'bg-gray-50 rounded-lg',
+        'bg-gray-50 dark:bg-slate-800/50 rounded-lg',
         className
       )}
       data-testid={dataTestId || 'pinch-zoom-container'}
@@ -233,10 +233,10 @@ export const PinchZoomContainer: React.FC<PinchZoomContainerProps> = ({
             setScale(newScale)
             onZoomChange?.(newScale)
           }}
-          className="w-10 h-10 bg-white bg-opacity-90 rounded-full shadow-md flex items-center justify-center hover:bg-opacity-100 transition-all"
+          className="w-10 h-10 bg-white dark:bg-slate-800 bg-opacity-90 rounded-full shadow-md flex items-center justify-center hover:bg-opacity-100 transition-all"
           aria-label="Zoom in"
         >
-          <span className="text-lg font-bold text-gray-700">+</span>
+          <span className="text-lg font-bold text-gray-700 dark:text-slate-300">+</span>
         </button>
         <button
           onClick={() => {
@@ -244,18 +244,18 @@ export const PinchZoomContainer: React.FC<PinchZoomContainerProps> = ({
             setScale(newScale)
             onZoomChange?.(newScale)
           }}
-          className="w-10 h-10 bg-white bg-opacity-90 rounded-full shadow-md flex items-center justify-center hover:bg-opacity-100 transition-all"
+          className="w-10 h-10 bg-white dark:bg-slate-800 bg-opacity-90 rounded-full shadow-md flex items-center justify-center hover:bg-opacity-100 transition-all"
           aria-label="Zoom out"
         >
-          <span className="text-lg font-bold text-gray-700">−</span>
+          <span className="text-lg font-bold text-gray-700 dark:text-slate-300">−</span>
         </button>
         {(scale !== initialScale || translateX !== 0 || translateY !== 0) && (
           <button
             onClick={resetZoom}
-            className="w-10 h-10 bg-white bg-opacity-90 rounded-full shadow-md flex items-center justify-center hover:bg-opacity-100 transition-all"
+            className="w-10 h-10 bg-white dark:bg-slate-800 bg-opacity-90 rounded-full shadow-md flex items-center justify-center hover:bg-opacity-100 transition-all"
             aria-label="Reset zoom"
           >
-            <span className="text-xs font-bold text-gray-700">⌂</span>
+            <span className="text-xs font-bold text-gray-700 dark:text-slate-300">⌂</span>
           </button>
         )}
       </div>

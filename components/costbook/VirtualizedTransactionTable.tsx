@@ -133,7 +133,7 @@ const DEFAULT_COLUMNS: TransactionColumn[] = [
         [ActualStatus.REJECTED]: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
         [ActualStatus.CANCELLED]: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
       }
-      const colorClass = statusColors[t.status] || 'bg-gray-100 text-gray-800'
+      const colorClass = statusColors[t.status] || 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200'
       return (
         <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium capitalize ${colorClass}`}>
           {t.status}
@@ -191,11 +191,11 @@ export function VirtualizedTransactionTable({
   // Get sort icon
   const getSortIcon = (columnId: string) => {
     if (sortColumn !== columnId) {
-      return <ArrowUpDown className="w-3 h-3 text-gray-400" />
+      return <ArrowUpDown className="w-3 h-3 text-gray-400 dark:text-slate-500" />
     }
     return sortDirection === 'asc' 
-      ? <ArrowUp className="w-3 h-3 text-blue-500" />
-      : <ArrowDown className="w-3 h-3 text-blue-500" />
+      ? <ArrowUp className="w-3 h-3 text-blue-500 dark:text-blue-400" />
+      : <ArrowDown className="w-3 h-3 text-blue-500 dark:text-blue-400" />
   }
 
   // Row renderer for react-window
@@ -205,7 +205,7 @@ export function VirtualizedTransactionTable({
     return (
       <div
         style={style}
-        className={`flex items-center border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${
+        className={`flex items-center border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-gray-800/50 transition-colors ${
           onRowClick ? 'cursor-pointer' : ''
         }`}
         onClick={() => onRowClick?.(transaction)}
@@ -234,7 +234,7 @@ export function VirtualizedTransactionTable({
         className={`flex flex-col items-center justify-center h-64 bg-gray-50 dark:bg-gray-900 rounded-lg ${className}`}
         data-testid={testId}
       >
-        <Receipt className="w-12 h-12 text-gray-400 mb-4" />
+        <Receipt className="w-12 h-12 text-gray-400 dark:text-slate-500 mb-4" />
         <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">No transactions found</p>
         <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">
           Try adjusting your filters or adding new transactions
@@ -258,7 +258,7 @@ export function VirtualizedTransactionTable({
             key={column.id}
             style={{ width: column.width }}
             className={`px-3 py-3 flex items-center gap-1 text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider ${
-              column.sortable ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 select-none' : ''
+              column.sortable ? 'cursor-pointer hover:bg-gray-100 dark:bg-slate-700 dark:hover:bg-gray-700 select-none' : ''
             }`}
             onClick={() => column.sortable && handleSortClick(column.id)}
           >

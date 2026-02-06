@@ -98,22 +98,22 @@ const TreeNode: React.FC<TreeNodeProps> = ({
   const getStatusColor = (status?: string) => {
     switch (status) {
       case 'critical':
-        return 'text-red-600 bg-red-50'
+        return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20'
       case 'at-risk':
-        return 'text-orange-600 bg-orange-50'
+        return 'text-orange-600 dark:text-orange-400 bg-orange-50'
       case 'on-track':
-        return 'text-green-600 bg-green-50'
+        return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20'
       default:
-        return 'text-gray-600 bg-gray-50'
+        return 'text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-800/50'
     }
   }
 
   const getVarianceColor = (variance?: number) => {
-    if (!variance) return 'text-gray-600'
-    if (variance > 10) return 'text-red-600'
-    if (variance > 5) return 'text-orange-600'
-    if (variance < -5) return 'text-green-600'
-    return 'text-gray-600'
+    if (!variance) return 'text-gray-600 dark:text-slate-400'
+    if (variance > 10) return 'text-red-600 dark:text-red-400'
+    if (variance > 5) return 'text-orange-600 dark:text-orange-400'
+    if (variance < -5) return 'text-green-600 dark:text-green-400'
+    return 'text-gray-600 dark:text-slate-400'
   }
 
   return (
@@ -121,7 +121,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
       className={cn(
         'group relative',
         isDragging && 'opacity-50',
-        isDropTarget && 'bg-blue-50 border-l-4 border-blue-500'
+        isDropTarget && 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500'
       )}
       draggable={enableDragDrop}
       onDragStart={() => enableDragDrop && onDragStart?.(item)}
@@ -136,15 +136,15 @@ const TreeNode: React.FC<TreeNodeProps> = ({
     >
       <div
         className={cn(
-          'flex items-center py-2 px-3 hover:bg-gray-50 cursor-pointer transition-colors',
-          'border-b border-gray-100'
+          'flex items-center py-2 px-3 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 cursor-pointer transition-colors',
+          'border-b border-gray-100 dark:border-slate-700'
         )}
         style={{ paddingLeft: `${indent + 12}px` }}
       >
         {/* Drag Handle */}
         {enableDragDrop && (
           <div className="mr-2 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity">
-            <GripVertical className="h-4 w-4 text-gray-400" />
+            <GripVertical className="h-4 w-4 text-gray-400 dark:text-slate-500" />
           </div>
         )}
 
@@ -155,14 +155,14 @@ const TreeNode: React.FC<TreeNodeProps> = ({
             onToggle()
           }}
           className={cn(
-            'mr-2 p-0.5 rounded hover:bg-gray-200 transition-colors',
+            'mr-2 p-0.5 rounded hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors',
             !hasChildren && 'invisible'
           )}
         >
           {isExpanded ? (
-            <ChevronDown className="h-4 w-4 text-gray-600" />
+            <ChevronDown className="h-4 w-4 text-gray-600 dark:text-slate-400" />
           ) : (
-            <ChevronRight className="h-4 w-4 text-gray-600" />
+            <ChevronRight className="h-4 w-4 text-gray-600 dark:text-slate-400" />
           )}
         </button>
 
@@ -170,12 +170,12 @@ const TreeNode: React.FC<TreeNodeProps> = ({
         <div className="mr-2">
           {hasChildren ? (
             isExpanded ? (
-              <FolderOpen className="h-4 w-4 text-blue-500" />
+              <FolderOpen className="h-4 w-4 text-blue-500 dark:text-blue-400" />
             ) : (
-              <Folder className="h-4 w-4 text-blue-500" />
+              <Folder className="h-4 w-4 text-blue-500 dark:text-blue-400" />
             )
           ) : (
-            <FileText className="h-4 w-4 text-gray-400" />
+            <FileText className="h-4 w-4 text-gray-400 dark:text-slate-500" />
           )}
         </div>
 
@@ -186,11 +186,11 @@ const TreeNode: React.FC<TreeNodeProps> = ({
         >
           <div className="flex-1 min-w-0 mr-4">
             <div className="flex items-center gap-2">
-              <span className="font-medium text-gray-900 truncate">
+              <span className="font-medium text-gray-900 dark:text-slate-100 truncate">
                 {item.name}
               </span>
               {item.code && (
-                <span className="text-xs text-gray-500 font-mono">
+                <span className="text-xs text-gray-500 dark:text-slate-400 font-mono">
                   {item.code}
                 </span>
               )}
@@ -204,7 +204,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
               )}
             </div>
             {item.sap_po_number && (
-              <div className="text-xs text-gray-500 mt-0.5">
+              <div className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                 SAP PO: {item.sap_po_number}
               </div>
             )}
@@ -213,16 +213,16 @@ const TreeNode: React.FC<TreeNodeProps> = ({
           {/* Financial Summary */}
           <div className="flex items-center gap-4 text-sm">
             <div className="text-right">
-              <div className="text-gray-600">
+              <div className="text-gray-600 dark:text-slate-400">
                 {item.currency} {item.planned_amount.toLocaleString()}
               </div>
-              <div className="text-xs text-gray-500">Planned</div>
+              <div className="text-xs text-gray-500 dark:text-slate-400">Planned</div>
             </div>
             <div className="text-right">
-              <div className="text-gray-900 font-medium">
+              <div className="text-gray-900 dark:text-slate-100 font-medium">
                 {item.currency} {item.actual_amount.toLocaleString()}
               </div>
-              <div className="text-xs text-gray-500">Actual</div>
+              <div className="text-xs text-gray-500 dark:text-slate-400">Actual</div>
             </div>
             <div className="text-right">
               <div className={cn('font-medium', getVarianceColor(item.variance_percentage))}>
@@ -233,7 +233,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
                   </>
                 )}
               </div>
-              <div className="text-xs text-gray-500">Variance</div>
+              <div className="text-xs text-gray-500 dark:text-slate-400">Variance</div>
             </div>
           </div>
 
@@ -245,7 +245,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
                   e.stopPropagation()
                   onItemAdd?.(item)
                 }}
-                className="p-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                className="p-1.5 text-gray-600 dark:text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 rounded transition-colors"
                 title="Add child item"
               >
                 <Plus className="h-4 w-4" />
@@ -255,7 +255,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
                   e.stopPropagation()
                   onItemEdit?.(item)
                 }}
-                className="p-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                className="p-1.5 text-gray-600 dark:text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 rounded transition-colors"
                 title="Edit item"
               >
                 <Edit className="h-4 w-4" />
@@ -265,7 +265,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
                   e.stopPropagation()
                   onItemDelete?.(item)
                 }}
-                className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                className="p-1.5 text-gray-600 dark:text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
                 title="Delete item"
               >
                 <Trash2 className="h-4 w-4" />
@@ -460,8 +460,8 @@ export const POBreakdownTreeView: React.FC<POBreakdownTreeViewProps> = ({
 
   if (data.length === 0) {
     return (
-      <div className={cn('flex flex-col items-center justify-center py-12 text-gray-500', className)}>
-        <AlertCircle className="h-12 w-12 mb-3 text-gray-400" />
+      <div className={cn('flex flex-col items-center justify-center py-12 text-gray-500 dark:text-slate-400', className)}>
+        <AlertCircle className="h-12 w-12 mb-3 text-gray-400 dark:text-slate-500" />
         <p className="text-lg font-medium">No PO breakdown items</p>
         <p className="text-sm">Import SAP data or create items manually to get started</p>
       </div>
@@ -469,22 +469,22 @@ export const POBreakdownTreeView: React.FC<POBreakdownTreeViewProps> = ({
   }
 
   return (
-    <div className={cn('bg-white rounded-lg border border-gray-200', className)}>
+    <div className={cn('bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700', className)}>
       {/* Header with controls */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
         <div className="flex items-center gap-4">
-          <h3 className="text-sm font-semibold text-gray-900">PO Breakdown Structure</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100">PO Breakdown Structure</h3>
           <div className="flex items-center gap-2">
             <button
               onClick={expandAll}
-              className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+              className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium"
             >
               Expand All
             </button>
             <span className="text-gray-300">|</span>
             <button
               onClick={collapseAll}
-              className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+              className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium"
             >
               Collapse All
             </button>
@@ -494,21 +494,21 @@ export const POBreakdownTreeView: React.FC<POBreakdownTreeViewProps> = ({
         {/* Totals Summary */}
         <div className="flex items-center gap-6 text-sm">
           <div className="text-right">
-            <div className="text-gray-600">{data[0]?.currency || 'USD'} {totals.planned.toLocaleString()}</div>
-            <div className="text-xs text-gray-500">Total Planned</div>
+            <div className="text-gray-600 dark:text-slate-400">{data[0]?.currency || 'USD'} {totals.planned.toLocaleString()}</div>
+            <div className="text-xs text-gray-500 dark:text-slate-400">Total Planned</div>
           </div>
           <div className="text-right">
-            <div className="text-gray-900 font-medium">{data[0]?.currency || 'USD'} {totals.actual.toLocaleString()}</div>
-            <div className="text-xs text-gray-500">Total Actual</div>
+            <div className="text-gray-900 dark:text-slate-100 font-medium">{data[0]?.currency || 'USD'} {totals.actual.toLocaleString()}</div>
+            <div className="text-xs text-gray-500 dark:text-slate-400">Total Actual</div>
           </div>
           <div className="text-right">
             <div className={cn(
               'font-medium',
-              totals.actual > totals.planned ? 'text-red-600' : 'text-green-600'
+              totals.actual > totals.planned ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
             )}>
               {data[0]?.currency || 'USD'} {(totals.planned - totals.actual).toLocaleString()}
             </div>
-            <div className="text-xs text-gray-500">Remaining</div>
+            <div className="text-xs text-gray-500 dark:text-slate-400">Remaining</div>
           </div>
         </div>
       </div>
@@ -520,7 +520,7 @@ export const POBreakdownTreeView: React.FC<POBreakdownTreeViewProps> = ({
 
       {/* Drag hint */}
       {enableDragDrop && (
-        <div className="px-4 py-2 border-t border-gray-200 bg-gray-50 text-xs text-gray-500">
+        <div className="px-4 py-2 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 text-xs text-gray-500 dark:text-slate-400">
           <span className="flex items-center gap-1">
             <GripVertical className="h-3 w-3" />
             Drag items to reorder or move them in the hierarchy

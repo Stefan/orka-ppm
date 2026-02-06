@@ -164,7 +164,7 @@ export const ActionButtonGroup: React.FC<ActionButtonGroupProps> = ({
       secondary: 'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500 disabled:bg-gray-300 disabled:cursor-not-allowed',
       danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 disabled:bg-gray-300 disabled:cursor-not-allowed',
       success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 disabled:bg-gray-300 disabled:cursor-not-allowed',
-      outline: 'bg-transparent border-2 border-gray-600 text-gray-700 hover:bg-gray-50 focus:ring-gray-500 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed'
+      outline: 'bg-transparent border-2 border-gray-600 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 focus:ring-gray-500 disabled:border-gray-300 dark:border-slate-600 disabled:text-gray-400 disabled:cursor-not-allowed'
     }
     
     return `${baseClasses} ${variantClasses[variant || 'primary']}`

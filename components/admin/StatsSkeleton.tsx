@@ -12,7 +12,7 @@
 
 export default function StatsSkeleton() {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+    <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
       {/* Section title skeleton */}
       <div className="h-6 w-40 bg-gray-200 rounded mb-4 animate-pulse-transform" />
       
@@ -24,7 +24,7 @@ export default function StatsSkeleton() {
             <div className="h-8 w-24 bg-gray-200 rounded mx-auto mb-2 animate-pulse-transform" />
             
             {/* Stat label skeleton */}
-            <div className="h-4 w-20 bg-gray-100 rounded mx-auto animate-pulse-transform" />
+            <div className="h-4 w-20 bg-gray-100 dark:bg-slate-700 rounded mx-auto animate-pulse-transform" />
           </div>
         ))}
       </div>

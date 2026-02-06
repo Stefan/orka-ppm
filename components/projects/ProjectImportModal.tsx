@@ -213,7 +213,7 @@ export default function ProjectImportModal({
     >
       <div className="space-y-6 pt-4">
         {/* Method Selection Tabs - Req 6.2 */}
-        <div className="flex border-b border-gray-200">
+        <div className="flex border-b border-gray-200 dark:border-slate-700">
           <button
             onClick={() => {
               setMethod('json')
@@ -222,8 +222,8 @@ export default function ProjectImportModal({
             className={cn(
               'flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors',
               method === 'json'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-blue-600 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300 hover:border-gray-300 dark:border-slate-600'
             )}
           >
             <FileText className="w-4 h-4" />
@@ -237,8 +237,8 @@ export default function ProjectImportModal({
             className={cn(
               'flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors',
               method === 'csv'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-blue-600 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300 hover:border-gray-300 dark:border-slate-600'
             )}
           >
             <Upload className="w-4 h-4" />
@@ -249,7 +249,7 @@ export default function ProjectImportModal({
         {/* JSON Input - Req 6.3 */}
         {method === 'json' && (
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
               Paste JSON Array
             </label>
             <textarea
@@ -272,7 +272,7 @@ export default function ProjectImportModal({
               className="font-mono text-sm w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-neutral-900 resize-vertical"
               disabled={loading}
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-slate-400">
               Required fields: name, budget, status. Optional: start_date, end_date, description
             </p>
           </div>
@@ -281,7 +281,7 @@ export default function ProjectImportModal({
         {/* CSV Upload - Req 6.4 */}
         {method === 'csv' && (
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
               Upload CSV File
             </label>
             <div
@@ -289,20 +289,20 @@ export default function ProjectImportModal({
               className={cn(
                 'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
                 isDragActive 
-                  ? 'border-blue-500 bg-blue-50' 
-                  : 'border-gray-300 hover:border-gray-400',
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+                  : 'border-gray-300 dark:border-slate-600 hover:border-gray-400',
                 loading && 'opacity-50 cursor-not-allowed'
               )}
             >
               <input {...getInputProps()} disabled={loading} />
               <Upload className={cn(
                 'w-10 h-10 mx-auto mb-3',
-                isDragActive ? 'text-blue-500' : 'text-gray-400'
+                isDragActive ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-slate-500'
               )} />
               {csvFile ? (
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-gray-900">{csvFile.name}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-sm font-medium text-gray-900 dark:text-slate-100">{csvFile.name}</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400">
                     {(csvFile.size / 1024).toFixed(1)} KB
                   </p>
                   <button
@@ -311,25 +311,25 @@ export default function ProjectImportModal({
                       setCsvFile(null)
                       setResult(null)
                     }}
-                    className="text-xs text-red-600 hover:text-red-700"
+                    className="text-xs text-red-600 dark:text-red-400 hover:text-red-700"
                   >
                     Remove file
                   </button>
                 </div>
               ) : (
                 <div>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 dark:text-slate-400">
                     {isDragActive
                       ? 'Drop the CSV file here...'
                       : 'Drag & drop a CSV file here, or click to select'}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                     Only .csv files are accepted
                   </p>
                 </div>
               )}
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-slate-400">
               Required columns: name, budget, status. Optional: start_date, end_date, description
             </p>
           </div>
@@ -338,15 +338,15 @@ export default function ProjectImportModal({
         {/* Loading State - Req 6.5 */}
         {loading && (
           <div className="flex items-center justify-center py-4">
-            <Loader2 className="w-6 h-6 text-blue-600 animate-spin mr-2" />
-            <span className="text-sm text-gray-600">Processing import...</span>
+            <Loader2 className="w-6 h-6 text-blue-600 dark:text-blue-400 animate-spin mr-2" />
+            <span className="text-sm text-gray-600 dark:text-slate-400">Processing import...</span>
           </div>
         )}
 
         {/* Success Message - Req 6.6 */}
         {result?.success && (
-          <Alert variant="default" className="bg-green-50 border-green-200 text-green-800">
-            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+          <Alert variant="default" className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-300">
+            <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
             <AlertDescription>
               <span className="font-medium">Import successful!</span>
               <br />
@@ -368,14 +368,14 @@ export default function ProjectImportModal({
             </Alert>
 
             {/* Error Details */}
-            <div className="border border-red-200 rounded-lg overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-2 bg-red-50 border-b border-red-200">
-                <span className="text-sm font-medium text-red-800">
+            <div className="border border-red-200 dark:border-red-800 rounded-lg overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-2 bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800">
+                <span className="text-sm font-medium text-red-800 dark:text-red-300">
                   {result.errors.length} error{result.errors.length !== 1 ? 's' : ''} found
                 </span>
                 <button
                   onClick={handleCopyErrors}
-                  className="flex items-center gap-1 text-xs text-red-700 hover:text-red-800 transition-colors"
+                  className="flex items-center gap-1 text-xs text-red-700 hover:text-red-800 dark:hover:text-red-300 dark:text-red-300 transition-colors"
                 >
                   {copied ? (
                     <>
@@ -392,28 +392,28 @@ export default function ProjectImportModal({
               </div>
               <div className="max-h-48 overflow-y-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 sticky top-0">
+                  <thead className="bg-gray-50 dark:bg-slate-800/50 sticky top-0">
                     <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Record</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Field</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Error</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Record</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Field</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase">Error</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
                     {result.errors.map((error, idx) => (
-                      <tr key={idx} className="hover:bg-gray-50">
-                        <td className="px-4 py-2 text-gray-900 font-medium">
+                      <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
+                        <td className="px-4 py-2 text-gray-900 dark:text-slate-100 font-medium">
                           #{error.index + 1}
                         </td>
-                        <td className="px-4 py-2 text-gray-600">
+                        <td className="px-4 py-2 text-gray-600 dark:text-slate-400">
                           {error.field}
                           {error.value !== null && error.value !== undefined && (
-                            <span className="block text-xs text-gray-400 truncate max-w-[150px]">
+                            <span className="block text-xs text-gray-400 dark:text-slate-500 truncate max-w-[150px]">
                               Value: {JSON.stringify(error.value)}
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-2 text-red-600">
+                        <td className="px-4 py-2 text-red-600 dark:text-red-400">
                           {error.error}
                         </td>
                       </tr>

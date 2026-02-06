@@ -585,12 +585,12 @@ export default function Risks() {
         </div>
         
         {/* Top Risks Skeleton */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
           <div className="animate-pulse">
             <div className="h-5 bg-gray-200 rounded w-1/4 mb-4"></div>
             <div className="space-y-3">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div key={i} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
                   <div className="flex items-center space-x-4 flex-1">
                     <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
                     <div className="flex-1">
@@ -614,11 +614,11 @@ export default function Risks() {
   if (error) return (
     <AppLayout>
       <div className="p-8">
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
+        <div className="bg-red-50 border border-red-200 dark:border-red-800 rounded-md p-4">
           <div className="flex">
             <AlertTriangle className="h-5 w-5 text-red-400" />
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error loading risks</h3>
+              <h3 className="text-sm font-medium text-red-800 dark:text-red-300">Error loading risks</h3>
               <p className="mt-1 text-sm text-red-700">{error}</p>
             </div>
           </div>
@@ -675,7 +675,7 @@ export default function Risks() {
                   className={`inline-flex items-center justify-center h-8 px-3 rounded-md text-sm font-medium transition-colors ${
                     viewMode === 'overview' 
                       ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-slate-100 shadow-sm' 
-                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-600'
+                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-600'
                   }`}
                 >
                   <BarChart3 className="h-4 w-4" />
@@ -686,7 +686,7 @@ export default function Risks() {
                   className={`inline-flex items-center justify-center h-8 px-3 rounded-md text-sm font-medium transition-colors ${
                     viewMode === 'matrix' 
                       ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-slate-100 shadow-sm' 
-                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-600'
+                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-600'
                   }`}
                 >
                   <Target className="h-4 w-4" />
@@ -697,7 +697,7 @@ export default function Risks() {
                   className={`inline-flex items-center justify-center h-8 px-3 rounded-md text-sm font-medium transition-colors ${
                     viewMode === 'trends' 
                       ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-slate-100 shadow-sm' 
-                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-600'
+                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-600'
                   }`}
                 >
                   <TrendingUp className="h-4 w-4" />
@@ -708,7 +708,7 @@ export default function Risks() {
                   className={`inline-flex items-center justify-center h-8 px-3 rounded-md text-sm font-medium transition-colors ${
                     viewMode === 'detailed' 
                       ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-slate-100 shadow-sm' 
-                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-600'
+                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-600'
                   }`}
                 >
                   <Activity className="h-4 w-4" />
@@ -878,7 +878,7 @@ export default function Risks() {
                   </select>
                   <button
                     onClick={() => dispatchFilterSort({ type: 'TOGGLE_SORT_ORDER' })}
-                    className="min-h-[44px] px-3 py-2 border border-gray-300 dark:border-slate-600 dark:text-slate-300 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 active:bg-gray-100"
+                    className="min-h-[44px] px-3 py-2 border border-gray-300 dark:border-slate-600 dark:text-slate-300 rounded-md hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700 active:bg-gray-100"
                   >
                     {sortOrder === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
                   </button>
@@ -1175,7 +1175,7 @@ export default function Risks() {
               </thead>
               <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                 {filteredRisks.map((risk) => (
-                  <tr key={risk.id} className="hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors">
+                  <tr key={risk.id} className="hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-600 transition-colors">
                     <td className="px-4 sm:px-6 py-4">
                       <div>
                         <div className="text-sm font-medium text-gray-900 dark:text-slate-100">{risk.title}</div>
@@ -1233,13 +1233,13 @@ export default function Risks() {
         {/* Monte Carlo Analysis Modal */}
         {showMonteCarloModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Monte Carlo Risk Analysis</h3>
+            <div className="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Monte Carlo Risk Analysis</h3>
               
               <div className="space-y-4">
-                <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                   <h4 className="font-medium text-blue-900 mb-2">Analysis Overview</h4>
-                  <p className="text-sm text-blue-800">
+                  <p className="text-sm text-blue-800 dark:text-blue-300">
                     Run statistical simulation on {filteredRisks.length} selected risks to analyze 
                     probability distributions and potential cost/schedule impacts.
                   </p>
@@ -1247,10 +1247,10 @@ export default function Risks() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                       Simulation Iterations
                     </label>
-                    <select className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <select className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                       <option value="10000">10,000 (Recommended)</option>
                       <option value="50000">50,000 (High Precision)</option>
                       <option value="100000">100,000 (Maximum Precision)</option>
@@ -1258,10 +1258,10 @@ export default function Risks() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                       Analysis Type
                     </label>
-                    <select className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <select className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                       <option value="cost">Cost Impact Analysis</option>
                       <option value="schedule">Schedule Impact Analysis</option>
                       <option value="both">Combined Analysis</option>
@@ -1270,19 +1270,19 @@ export default function Risks() {
                 </div>
                 
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Risk Selection</h4>
-                  <div className="max-h-40 overflow-y-auto border border-gray-200 rounded-md p-3">
+                  <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-2">Risk Selection</h4>
+                  <div className="max-h-40 overflow-y-auto border border-gray-200 dark:border-slate-700 rounded-md p-3">
                     {filteredRisks.slice(0, 10).map((risk) => (
                       <div key={risk.id} className="flex items-center justify-between py-2">
                         <div className="flex items-center">
                           <input
                             type="checkbox"
                             defaultChecked
-                            className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            className="mr-3 h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-slate-600 rounded"
                           />
                           <div>
-                            <span className="text-sm font-medium text-gray-900">{risk.title}</span>
-                            <div className="text-xs text-gray-500">
+                            <span className="text-sm font-medium text-gray-900 dark:text-slate-100">{risk.title}</span>
+                            <div className="text-xs text-gray-500 dark:text-slate-400">
                               Risk Score: {(risk.risk_score * 100).toFixed(0)}%
                             </div>
                           </div>
@@ -1293,25 +1293,25 @@ export default function Risks() {
                       </div>
                     ))}
                     {filteredRisks.length > 10 && (
-                      <div className="text-sm text-gray-500 text-center py-2">
+                      <div className="text-sm text-gray-500 dark:text-slate-400 text-center py-2">
                         ... and {filteredRisks.length - 10} more risks
                       </div>
                     )}
                   </div>
                 </div>
                 
-                <div className="bg-yellow-50 p-4 rounded-lg">
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
                   <h4 className="font-medium text-yellow-900 mb-2">Estimated Analysis Time</h4>
-                  <p className="text-sm text-yellow-800">
+                  <p className="text-sm text-yellow-800 dark:text-yellow-300">
                     Approximately {Math.ceil(filteredRisks.length * 0.5)} seconds for {filteredRisks.length} risks
                   </p>
                 </div>
               </div>
               
-              <div className="flex justify-end space-x-3 pt-6 mt-6 border-t border-gray-200">
+              <div className="flex justify-end space-x-3 pt-6 mt-6 border-t border-gray-200 dark:border-slate-700">
                 <button
                   onClick={() => setShowMonteCarloModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                  className="px-4 py-2 text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600"
                 >
                   Cancel
                 </button>
@@ -1334,9 +1334,9 @@ export default function Risks() {
         {/* Enhanced Mobile-First Add Risk Modal */}
         {showAddModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6">
-                <h3 className="text-lg font-semibold text-gray-900">Add New Risk</h3>
+            <div className="bg-white dark:bg-slate-800 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 p-4 sm:p-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Add New Risk</h3>
               </div>
               <form onSubmit={async (e) => {
                 e.preventDefault()
@@ -1365,32 +1365,32 @@ export default function Risks() {
               }} className="p-4 sm:p-6 space-y-4"
               >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Title *</label>
                   <input
                     type="text"
                     name="title"
                     required
-                    className="w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    className="w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                     placeholder="Enter risk title"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Description</label>
                   <textarea
                     name="description"
                     rows={3}
-                    className="w-full min-h-[88px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base resize-none"
+                    className="w-full min-h-[88px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base resize-none"
                     placeholder="Describe the risk in detail"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Project *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Project *</label>
                   <select
                     name="project_id"
                     required
-                    className="w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    className="w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   >
                     <option value="">Select a project</option>
                     <option value="1">Sample Project</option>
@@ -1400,11 +1400,11 @@ export default function Risks() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Category *</label>
                   <select
                     name="category"
                     required
-                    className="w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    className="w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   >
                     <option value="">Select category</option>
                     <option value="technical">Technical</option>
@@ -1417,7 +1417,7 @@ export default function Risks() {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Probability (%)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Probability (%)</label>
                     <input
                       type="number"
                       name="probability"
@@ -1425,12 +1425,12 @@ export default function Risks() {
                       min="0"
                       max="100"
                       defaultValue="50"
-                      className="input-field w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                      className="input-field w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Impact (%)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Impact (%)</label>
                     <input
                       type="number"
                       name="impact"
@@ -1438,45 +1438,45 @@ export default function Risks() {
                       min="0"
                       max="100"
                       defaultValue="50"
-                      className="input-field w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                      className="input-field w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                     />
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Mitigation Strategy</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Mitigation Strategy</label>
                   <textarea
                     name="mitigation"
                     rows={2}
                     placeholder="Describe how this risk will be mitigated..."
-                    className="textarea-field w-full min-h-[66px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base resize-none"
+                    className="textarea-field w-full min-h-[66px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base resize-none"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Owner</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Owner</label>
                   <input
                     type="text"
                     name="owner"
                     placeholder="Risk owner name"
-                    className="input-field w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    className="input-field w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Due Date</label>
                   <input
                     type="date"
                     name="due_date"
-                    className="w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    className="w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   />
                 </div>
                 
-                <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4 border-t border-gray-200">
+                <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4 border-t border-gray-200 dark:border-slate-700">
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="w-full sm:w-auto min-h-[44px] px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 active:bg-gray-300 font-medium"
+                    className="w-full sm:w-auto min-h-[44px] px-4 py-2 text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 active:bg-gray-300 font-medium"
                   >
                     Cancel
                   </button>

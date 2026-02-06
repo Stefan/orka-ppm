@@ -44,16 +44,33 @@ export function GeneralSettings() {
   }, [settings])
 
   const handleThemeChange = async (newTheme: Theme) => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GeneralSettings.tsx:handleThemeChange:before',message:'handleThemeChange BEFORE setGlobalTheme',data:{newTheme,currentTheme:currentTheme,htmlClass:document.documentElement.className,dataTheme:document.documentElement.getAttribute('data-theme')},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1,H5'})}).catch(()=>{});
+    // #endregion
     // Apply theme immediately via ThemeProvider
     setGlobalTheme(newTheme)
-    // Also save to preferences
-    await updateSetting('theme', newTheme)
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GeneralSettings.tsx:handleThemeChange:after',message:'handleThemeChange AFTER setGlobalTheme',data:{newTheme,htmlClass:document.documentElement.className,dataTheme:document.documentElement.getAttribute('data-theme'),bodyBg:document.body.style.backgroundColor},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1,H4,H5'})}).catch(()=>{});
+    // #endregion
+    // Also save to preferences (non-blocking)
+    try {
+      await updateSetting('theme', newTheme)
+    } catch {
+      console.warn('Theme preference sync failed, using local setting')
+    }
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GeneralSettings.tsx:handleThemeChange:done',message:'handleThemeChange COMPLETED (after sync attempt)',data:{htmlClass:document.documentElement.className,dataTheme:document.documentElement.getAttribute('data-theme'),bodyBg:document.body.style.backgroundColor,hasDarkClass:document.documentElement.classList.contains('dark')},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H5'})}).catch(()=>{});
+    // #endregion
   }
 
   const handleSave = async () => {
-    await updateSetting('timezone', timezone)
-    await updateSetting('currency', currency)
-    setHasChanges(false)
+    try {
+      await updateSetting('timezone', timezone)
+      await updateSetting('currency', currency)
+      setHasChanges(false)
+    } catch {
+      console.warn('Settings sync failed, changes saved locally')
+    }
   }
 
   if (loading) {

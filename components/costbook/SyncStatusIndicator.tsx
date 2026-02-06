@@ -108,7 +108,7 @@ export function SyncStatusIndicator({
   
   if (loading) {
     return (
-      <div className={`flex items-center gap-2 text-gray-400 ${className}`}>
+      <div className={`flex items-center gap-2 text-gray-400 dark:text-slate-500 ${className}`}>
         <Loader2 className="w-4 h-4 animate-spin" />
         {!compact && <span className="text-xs">Loading...</span>}
       </div>
@@ -157,7 +157,7 @@ export function SyncStatusIndicator({
         {getStatusIcon(status.overallStatus)}
         <span className="text-sm font-medium">{config.label}</span>
         {status.pendingChanges > 0 && (
-          <span className="px-1.5 py-0.5 bg-white/50 rounded text-xs font-medium">
+          <span className="px-1.5 py-0.5 bg-white dark:bg-slate-800/50 rounded text-xs font-medium">
             {status.pendingChanges}
           </span>
         )}
@@ -170,16 +170,16 @@ export function SyncStatusIndicator({
       
       {/* Expanded panel */}
       {expanded && (
-        <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+        <div className="absolute top-full right-0 mt-2 w-80 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-gray-200 dark:border-slate-700 z-50">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-slate-700">
             <div className="flex items-center gap-2">
-              <Database className="w-4 h-4 text-gray-400" />
-              <span className="font-medium text-gray-900">System Integrations</span>
+              <Database className="w-4 h-4 text-gray-400 dark:text-slate-500" />
+              <span className="font-medium text-gray-900 dark:text-slate-100">System Integrations</span>
             </div>
             <button
               onClick={() => setExpanded(false)}
-              className="p-1 text-gray-400 hover:text-gray-600 rounded"
+              className="p-1 text-gray-400 hover:text-gray-600 dark:text-slate-400 rounded"
             >
               <X className="w-4 h-4" />
             </button>
@@ -188,7 +188,7 @@ export function SyncStatusIndicator({
           {/* Systems list */}
           <div className="max-h-64 overflow-y-auto">
             {enabledSystems.length === 0 ? (
-              <div className="p-4 text-center text-gray-400 text-sm">
+              <div className="p-4 text-center text-gray-400 dark:text-slate-500 text-sm">
                 No integrations configured
               </div>
             ) : (
@@ -199,12 +199,12 @@ export function SyncStatusIndicator({
                 return (
                   <div
                     key={system.id}
-                    className="px-4 py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50"
+                    className="px-4 py-3 border-b border-gray-100 dark:border-slate-700 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900 text-sm">
+                          <span className="font-medium text-gray-900 dark:text-slate-100 text-sm">
                             {system.name}
                           </span>
                           <span className={`
@@ -214,7 +214,7 @@ export function SyncStatusIndicator({
                             {systemConfig.label}
                           </span>
                         </div>
-                        <div className="text-xs text-gray-500 mt-0.5">
+                        <div className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                           {SYSTEM_TYPE_LABELS[system.type]} • {system.syncSchedule}
                         </div>
                       </div>
@@ -222,7 +222,7 @@ export function SyncStatusIndicator({
                       <button
                         onClick={() => handleSync(system.id)}
                         disabled={isSyncing}
-                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors disabled:opacity-50"
+                        className="p-1.5 text-gray-400 dark:text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 rounded transition-colors disabled:opacity-50"
                         title="Sync now"
                       >
                         <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
@@ -231,7 +231,7 @@ export function SyncStatusIndicator({
                     
                     {/* Last sync info */}
                     {system.lastSync && (
-                      <div className="text-xs text-gray-500 space-y-1">
+                      <div className="text-xs text-gray-500 dark:text-slate-400 space-y-1">
                         <div className="flex justify-between">
                           <span>Last sync:</span>
                           <span>{formatRelativeSyncTime(system.lastSync.timestamp)}</span>
@@ -241,7 +241,7 @@ export function SyncStatusIndicator({
                           <span>
                             {system.lastSync.recordsSucceeded}/{system.lastSync.recordsProcessed}
                             {system.lastSync.recordsFailed > 0 && (
-                              <span className="text-red-500 ml-1">
+                              <span className="text-red-500 dark:text-red-400 ml-1">
                                 ({system.lastSync.recordsFailed} failed)
                               </span>
                             )}
@@ -254,7 +254,7 @@ export function SyncStatusIndicator({
                         
                         {/* Errors */}
                         {system.lastSync.errors.length > 0 && (
-                          <div className="mt-2 p-2 bg-red-50 rounded text-red-600">
+                          <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/30 rounded text-red-800 dark:text-red-200">
                             <div className="font-medium mb-1">Errors:</div>
                             {system.lastSync.errors.slice(0, 2).map((error, idx) => (
                               <div key={idx} className="truncate">
@@ -277,13 +277,13 @@ export function SyncStatusIndicator({
           </div>
           
           {/* Footer */}
-          <div className="px-4 py-2 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+          <div className="px-4 py-2 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 flex items-center justify-between">
             {status.pendingChanges > 0 && (
-              <span className="text-xs text-orange-600">
+              <span className="text-xs text-orange-600 dark:text-orange-400">
                 {status.pendingChanges} change{status.pendingChanges !== 1 ? 's' : ''} pending
               </span>
             )}
-            <button className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1">
+            <button className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center gap-1">
               <Settings className="w-3 h-3" />
               Configure
             </button>

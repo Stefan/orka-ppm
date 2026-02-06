@@ -21,40 +21,40 @@ export interface AlertProps {
 
 const alertVariants: Record<AlertVariant, { bg: string; border: string; icon: string; title: string }> = {
   info: {
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
-    icon: 'text-blue-500',
-    title: 'text-blue-800',
+    bg: 'bg-blue-50 dark:bg-blue-900/20',
+    border: 'border-blue-200 dark:border-blue-800',
+    icon: 'text-blue-500 dark:text-blue-400',
+    title: 'text-blue-800 dark:text-blue-300',
   },
   success: {
-    bg: 'bg-green-50',
-    border: 'border-green-200',
-    icon: 'text-green-500',
-    title: 'text-green-800',
+    bg: 'bg-green-50 dark:bg-green-900/20',
+    border: 'border-green-200 dark:border-green-800',
+    icon: 'text-green-500 dark:text-green-400',
+    title: 'text-green-800 dark:text-green-300',
   },
   warning: {
-    bg: 'bg-yellow-50',
-    border: 'border-yellow-200',
-    icon: 'text-yellow-500',
-    title: 'text-yellow-800',
+    bg: 'bg-yellow-50 dark:bg-yellow-900/20',
+    border: 'border-yellow-200 dark:border-yellow-800',
+    icon: 'text-yellow-500 dark:text-yellow-400',
+    title: 'text-yellow-800 dark:text-yellow-300',
   },
   error: {
-    bg: 'bg-red-50',
-    border: 'border-red-200',
-    icon: 'text-red-500',
-    title: 'text-red-800',
+    bg: 'bg-red-50 dark:bg-red-900/20',
+    border: 'border-red-200 dark:border-red-800',
+    icon: 'text-red-500 dark:text-red-400',
+    title: 'text-red-800 dark:text-red-300',
   },
   default: {
-    bg: 'bg-gray-50',
-    border: 'border-gray-200',
-    icon: 'text-gray-500',
-    title: 'text-gray-800',
+    bg: 'bg-gray-50 dark:bg-slate-800/50',
+    border: 'border-gray-200 dark:border-slate-700',
+    icon: 'text-gray-500 dark:text-slate-400',
+    title: 'text-gray-800 dark:text-slate-200',
   },
   destructive: {
-    bg: 'bg-red-50',
-    border: 'border-red-200',
-    icon: 'text-red-500',
-    title: 'text-red-800',
+    bg: 'bg-red-50 dark:bg-red-900/20',
+    border: 'border-red-200 dark:border-red-800',
+    icon: 'text-red-500 dark:text-red-400',
+    title: 'text-red-800 dark:text-red-300',
   },
 }
 
@@ -96,7 +96,7 @@ export function Alert({
               {title}
             </h5>
           )}
-          <div className="text-sm text-gray-700">
+          <div className="text-sm text-gray-700 dark:text-slate-300">
             {children}
           </div>
         </div>
@@ -105,7 +105,7 @@ export function Alert({
             onClick={onDismiss}
             className="flex-shrink-0 p-1 rounded hover:bg-black/5 transition-colors"
           >
-            <X className="h-4 w-4 text-gray-500" />
+            <X className="h-4 w-4 text-gray-500 dark:text-slate-400" />
           </button>
         )}
       </div>

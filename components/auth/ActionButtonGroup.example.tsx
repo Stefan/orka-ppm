@@ -181,10 +181,10 @@ export function CardFooterActionsExample({
     <div className="border rounded-lg overflow-hidden">
       <div className="p-4">
         <h3 className="text-lg font-semibold">{projectName}</h3>
-        <p className="text-gray-600 mt-2">Project details and description...</p>
+        <p className="text-gray-600 dark:text-slate-400 mt-2">Project details and description...</p>
       </div>
       
-      <div className="bg-gray-50 px-4 py-3 border-t">
+      <div className="bg-gray-50 dark:bg-slate-800/50 px-4 py-3 border-t">
         <ActionButtonGroup
           actions={actions}
           context={{ project_id: projectId }}
@@ -237,7 +237,7 @@ export function ModalActionsExample({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full">
+      <div className="bg-white dark:bg-slate-800 rounded-lg p-6 max-w-md w-full">
         <h2 className="text-xl font-semibold mb-4">Edit Project</h2>
         
         <div className="mb-6">
@@ -335,7 +335,7 @@ export function FinancialActionsExample({ projectId }: { projectId: string }) {
   ]
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
       <h3 className="text-lg font-semibold mb-4">Financial Management</h3>
       
       <ActionButtonGroup
@@ -385,7 +385,7 @@ export function AdminPanelActionsExample() {
   ]
 
   return (
-    <div className="bg-gray-50 rounded-lg p-6">
+    <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-6">
       <h2 className="text-xl font-semibold mb-4">Administration</h2>
       
       <ActionButtonGroup

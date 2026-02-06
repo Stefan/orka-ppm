@@ -50,8 +50,8 @@ function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   
   return (
-    <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
-      <p className="text-sm font-medium text-gray-900 mb-2">
+    <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700">
+      <p className="text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">
         {formatDate(label)}
       </p>
       <div className="space-y-1">
@@ -121,18 +121,18 @@ export function EVMTrendChart({
   }, [history])
   
   const getTrendIcon = (trend: string) => {
-    if (trend === 'up') return <TrendingUp className="w-4 h-4 text-green-500" />
-    if (trend === 'down') return <TrendingDown className="w-4 h-4 text-red-500" />
-    return <Minus className="w-4 h-4 text-gray-400" />
+    if (trend === 'up') return <TrendingUp className="w-4 h-4 text-green-500 dark:text-green-400" />
+    if (trend === 'down') return <TrendingDown className="w-4 h-4 text-red-500 dark:text-red-400" />
+    return <Minus className="w-4 h-4 text-gray-400 dark:text-slate-500" />
   }
   
   if (history.length === 0) {
     return (
       <div 
-        className={`bg-white rounded-lg border border-gray-200 p-6 ${className}`}
+        className={`bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-6 ${className}`}
         data-testid={testId}
       >
-        <div className="flex items-center justify-center h-[200px] text-gray-400">
+        <div className="flex items-center justify-center h-[200px] text-gray-400 dark:text-slate-500">
           <div className="text-center">
             <Activity className="w-12 h-12 mx-auto mb-2" />
             <p>No EVM history data available</p>
@@ -144,21 +144,21 @@ export function EVMTrendChart({
   
   return (
     <div 
-      className={`bg-white rounded-lg border border-gray-200 overflow-hidden ${className}`}
+      className={`bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 overflow-hidden ${className}`}
       data-testid={testId}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
         <div className="flex items-center gap-2">
-          <Activity className="w-5 h-5 text-blue-500" />
-          <h3 className="font-medium text-gray-900">{title}</h3>
+          <Activity className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+          <h3 className="font-medium text-gray-900 dark:text-slate-100">{title}</h3>
         </div>
         
         {currentValues && (
           <div className="flex items-center gap-4 text-sm">
             {showCPI && (
               <div className="flex items-center gap-1">
-                <span className="text-gray-500">CPI:</span>
+                <span className="text-gray-500 dark:text-slate-400">CPI:</span>
                 <span className={`font-medium ${getIndexColorClass(currentValues.cpi)}`}>
                   {formatIndex(currentValues.cpi)}
                 </span>
@@ -167,7 +167,7 @@ export function EVMTrendChart({
             )}
             {showSPI && (
               <div className="flex items-center gap-1">
-                <span className="text-gray-500">SPI:</span>
+                <span className="text-gray-500 dark:text-slate-400">SPI:</span>
                 <span className={`font-medium ${getIndexColorClass(currentValues.spi)}`}>
                   {formatIndex(currentValues.spi)}
                 </span>
@@ -250,7 +250,7 @@ export function EVMTrendChart({
       
       {/* Legend explanation */}
       <div className="px-4 pb-4">
-        <div className="flex items-center gap-4 text-xs text-gray-500">
+        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-slate-400">
           <span>
             <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-1" />
             Above 1.0 = Good
@@ -307,7 +307,7 @@ export function EVMIndicator({
   return (
     <div className={`flex items-center ${sizeClasses[size]} ${className}`}>
       <div className="flex items-center gap-1">
-        {showLabels && <span className="text-gray-500">CPI:</span>}
+        {showLabels && <span className="text-gray-500 dark:text-slate-400">CPI:</span>}
         <span className={`
           font-medium rounded-full border
           ${badgeClasses[size]}
@@ -318,7 +318,7 @@ export function EVMIndicator({
         </span>
       </div>
       <div className="flex items-center gap-1">
-        {showLabels && <span className="text-gray-500">SPI:</span>}
+        {showLabels && <span className="text-gray-500 dark:text-slate-400">SPI:</span>}
         <span className={`
           font-medium rounded-full border
           ${badgeClasses[size]}
@@ -357,22 +357,22 @@ export function EVMSummaryCard({
   className = ''
 }: EVMSummaryCardProps) {
   return (
-    <div className={`bg-white rounded-lg border border-gray-200 p-4 ${className}`}>
-      <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-        <Activity className="w-4 h-4 text-blue-500" />
+    <div className={`bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4 ${className}`}>
+      <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3 flex items-center gap-2">
+        <Activity className="w-4 h-4 text-blue-500 dark:text-blue-400" />
         EVM Summary
       </h4>
       
       <div className="grid grid-cols-2 gap-3 text-sm">
         {/* Performance Indices */}
         <div>
-          <div className="text-gray-500 mb-1">Cost Performance</div>
+          <div className="text-gray-500 dark:text-slate-400 mb-1">Cost Performance</div>
           <div className={`font-semibold ${getIndexColorClass(cpi)}`}>
             CPI: {formatIndex(cpi)}
           </div>
         </div>
         <div>
-          <div className="text-gray-500 mb-1">Schedule Performance</div>
+          <div className="text-gray-500 dark:text-slate-400 mb-1">Schedule Performance</div>
           <div className={`font-semibold ${getIndexColorClass(spi)}`}>
             SPI: {formatIndex(spi)}
           </div>
@@ -380,28 +380,28 @@ export function EVMSummaryCard({
         
         {/* Variances */}
         <div>
-          <div className="text-gray-500 mb-1">Cost Variance</div>
-          <div className={`font-semibold ${cv >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <div className="text-gray-500 dark:text-slate-400 mb-1">Cost Variance</div>
+          <div className={`font-semibold ${cv >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
             {cv >= 0 ? '+' : ''}{formatEVMCurrency(cv)}
           </div>
         </div>
         <div>
-          <div className="text-gray-500 mb-1">Schedule Variance</div>
-          <div className={`font-semibold ${sv >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <div className="text-gray-500 dark:text-slate-400 mb-1">Schedule Variance</div>
+          <div className={`font-semibold ${sv >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
             {sv >= 0 ? '+' : ''}{formatEVMCurrency(sv)}
           </div>
         </div>
         
         {/* Forecasts */}
         <div>
-          <div className="text-gray-500 mb-1">Est. at Completion</div>
-          <div className="font-semibold text-gray-900">
+          <div className="text-gray-500 dark:text-slate-400 mb-1">Est. at Completion</div>
+          <div className="font-semibold text-gray-900 dark:text-slate-100">
             {formatEVMCurrency(eac)}
           </div>
         </div>
         <div>
-          <div className="text-gray-500 mb-1">Variance at Completion</div>
-          <div className={`font-semibold ${vac >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <div className="text-gray-500 dark:text-slate-400 mb-1">Variance at Completion</div>
+          <div className={`font-semibold ${vac >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
             {vac >= 0 ? '+' : ''}{formatEVMCurrency(vac)}
           </div>
         </div>

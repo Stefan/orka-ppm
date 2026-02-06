@@ -227,9 +227,9 @@ function VarianceKPIs({ session, selectedCurrency = 'USD', showDetailedMetrics, 
       <div data-testid="variance-kpis-header" className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100 uppercase tracking-wide">{t('variance.kpis')}</h3>
         {varianceData.projects_over_budget > 0 && (
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-full">
-            <AlertTriangle className="h-3.5 w-3.5 text-red-600 dark:text-red-400" />
-            <span className="text-xs font-medium text-red-800 dark:text-red-300">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-red-50 dark:bg-red-900/30 border border-red-300 dark:border-red-800 rounded-full">
+            <AlertTriangle className="h-3.5 w-3.5 text-red-700 dark:text-red-400" />
+            <span className="text-xs font-medium text-gray-900 dark:text-red-300">
               {varianceData.projects_over_budget} {t('financials.overBudget')}
             </span>
           </div>
@@ -240,9 +240,9 @@ function VarianceKPIs({ session, selectedCurrency = 'USD', showDetailedMetrics, 
       <div data-testid="variance-kpis-grid" className="grid grid-cols-2 gap-2 flex-1">
         {canViewFinancials ? (
           <>
-            <div data-testid="variance-kpis-net-variance" className="bg-gray-50 dark:bg-slate-800 dark:border dark:border-slate-600 p-2 rounded-lg flex flex-col justify-between">
+            <div data-testid="variance-kpis-net-variance" className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 p-2 rounded-lg flex flex-col justify-between">
               <div className="flex items-center justify-between mb-1">
-                <p className="text-xs font-medium text-gray-600 dark:text-slate-300">{t('variance.netVariance')}</p>
+                <p className="text-xs font-medium text-gray-700 dark:text-slate-200">{t('variance.netVariance')}</p>
                 {varianceData.total_variance >= 0 ?
                   <TrendingUp className="h-3.5 w-3.5 text-red-600 dark:text-red-400" /> :
                   <TrendingDown className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
@@ -256,10 +256,10 @@ function VarianceKPIs({ session, selectedCurrency = 'USD', showDetailedMetrics, 
               </p>
             </div>
             
-            <div data-testid="variance-kpis-variance-percent" className="bg-gray-50 dark:bg-slate-800 dark:border dark:border-slate-600 p-2 rounded-lg flex flex-col justify-between">
+            <div data-testid="variance-kpis-variance-percent" className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 p-2 rounded-lg flex flex-col justify-between">
               <div className="flex items-center justify-between mb-1">
-                <p className="text-xs font-medium text-gray-600 dark:text-slate-300">{t('financials.variance')} %</p>
-                <Target className="h-3.5 w-3.5 text-gray-500 dark:text-slate-400" />
+                <p className="text-xs font-medium text-gray-700 dark:text-slate-200">{t('financials.variance')} %</p>
+                <Target className="h-3.5 w-3.5 text-gray-700 dark:text-slate-300" />
               </div>
               <p className={`text-lg font-bold ${
                 varianceData.variance_percentage >= 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
@@ -269,9 +269,9 @@ function VarianceKPIs({ session, selectedCurrency = 'USD', showDetailedMetrics, 
               </p>
             </div>
             
-            <div data-testid="variance-kpis-over-budget" className="bg-gray-50 dark:bg-slate-800 dark:border dark:border-slate-600 p-2 rounded-lg flex flex-col justify-between">
+            <div data-testid="variance-kpis-over-budget" className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 p-2 rounded-lg flex flex-col justify-between">
               <div className="flex items-center justify-between mb-1">
-                <p className="text-xs font-medium text-gray-600 dark:text-slate-300">{t('financials.overBudget')}</p>
+                <p className="text-xs font-medium text-gray-700 dark:text-slate-200">{t('financials.overBudget')}</p>
                 <AlertTriangle className="h-3.5 w-3.5 text-red-600 dark:text-red-400" />
               </div>
               <p className="text-lg font-bold text-red-600 dark:text-red-400">
@@ -279,9 +279,9 @@ function VarianceKPIs({ session, selectedCurrency = 'USD', showDetailedMetrics, 
               </p>
             </div>
             
-            <div data-testid="variance-kpis-under-budget" className="bg-gray-50 dark:bg-slate-800 dark:border dark:border-slate-600 p-2 rounded-lg flex flex-col justify-between">
+            <div data-testid="variance-kpis-under-budget" className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 p-2 rounded-lg flex flex-col justify-between">
               <div className="flex items-center justify-between mb-1">
-                <p className="text-xs font-medium text-gray-600 dark:text-slate-300">{t('financials.underBudget')}</p>
+                <p className="text-xs font-medium text-gray-700 dark:text-slate-200">{t('financials.underBudget')}</p>
                 <TrendingDown className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
               </div>
               <p className="text-lg font-bold text-green-600 dark:text-green-400">
@@ -290,8 +290,8 @@ function VarianceKPIs({ session, selectedCurrency = 'USD', showDetailedMetrics, 
             </div>
           </>
         ) : (
-          <div className="col-span-2 bg-gray-50 dark:bg-slate-800 dark:border dark:border-slate-600 p-4 rounded-lg flex items-center justify-center">
-            <p className="text-sm text-gray-500 dark:text-slate-300">Financial details restricted</p>
+          <div className="col-span-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 p-4 rounded-lg flex items-center justify-center">
+            <p className="text-sm text-gray-700 dark:text-slate-300">Financial details restricted</p>
           </div>
         )}
       </div>
@@ -300,8 +300,8 @@ function VarianceKPIs({ session, selectedCurrency = 'USD', showDetailedMetrics, 
       {canViewFinancials && (
         <div data-testid="variance-kpis-commitments-actuals" className="mt-3 pt-3 border-t border-gray-200 dark:border-slate-700">
           <div className="flex justify-between text-xs mb-2">
-            <span className="text-gray-600 dark:text-slate-300">{t('variance.totalCommitments')}: <span className="font-semibold text-blue-600 dark:text-blue-400">{formatCompactCurrency(varianceData.total_commitments)}</span></span>
-            <span className="text-gray-600 dark:text-slate-300">{t('variance.totalActuals')}: <span className="font-semibold text-purple-600 dark:text-purple-400">{formatCompactCurrency(varianceData.total_actuals)}</span></span>
+            <span className="text-gray-700 dark:text-slate-200">{t('variance.totalCommitments')}: <span className="font-semibold text-blue-600 dark:text-blue-400">{formatCompactCurrency(varianceData.total_commitments)}</span></span>
+            <span className="text-gray-700 dark:text-slate-200">{t('variance.totalActuals')}: <span className="font-semibold text-purple-600 dark:text-purple-400">{formatCompactCurrency(varianceData.total_actuals)}</span></span>
           </div>
           <div className="w-full bg-gray-200 dark:bg-slate-600 rounded-full h-1.5">
             <div 
@@ -314,7 +314,7 @@ function VarianceKPIs({ session, selectedCurrency = 'USD', showDetailedMetrics, 
             />
           </div>
           <div className="text-right mt-1">
-            <span className="text-xs text-gray-500 dark:text-slate-300">
+            <span className="text-xs text-gray-700 dark:text-slate-300">
               {((varianceData.total_actuals / Math.max(varianceData.total_commitments, 1)) * 100).toFixed(0)}% spent
             </span>
           </div>

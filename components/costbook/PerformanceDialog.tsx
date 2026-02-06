@@ -214,7 +214,7 @@ export function PerformanceDialog({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
-            <Activity className="w-6 h-6 text-blue-500" />
+            <Activity className="w-6 h-6 text-blue-500 dark:text-blue-400" />
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 Performance Metrics
@@ -234,18 +234,18 @@ export function PerformanceDialog({
             {onRefresh && (
               <button
                 onClick={onRefresh}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 dark:bg-slate-700 dark:hover:bg-gray-800 rounded-lg transition-colors"
                 aria-label="Refresh metrics"
               >
-                <RefreshCw className="w-5 h-5 text-gray-500" />
+                <RefreshCw className="w-5 h-5 text-gray-500 dark:text-slate-400" />
               </button>
             )}
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:bg-slate-700 dark:hover:bg-gray-800 rounded-lg transition-colors"
               aria-label="Close"
             >
-              <X className="w-5 h-5 text-gray-500" />
+              <X className="w-5 h-5 text-gray-500 dark:text-slate-400" />
             </button>
           </div>
         </div>
@@ -374,7 +374,7 @@ export function PerformanceDialog({
           {overallStatus === 'yellow' || overallStatus === 'red' && (
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                <Info className="w-5 h-5 text-blue-500 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <h4 className="text-sm font-medium text-blue-800 dark:text-blue-300">
                     Performance Tips

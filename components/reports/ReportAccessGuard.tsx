@@ -173,7 +173,7 @@ export const ReportAccessGuard: React.FC<ReportAccessGuardProps> = ({
     }
 
     return (
-      <div className={`p-4 bg-yellow-50 border border-yellow-200 rounded-md ${className}`}>
+      <div className={`p-4 bg-yellow-50 border border-yellow-200 dark:border-yellow-800 rounded-md ${className}`}>
         <div className="flex">
           <div className="flex-shrink-0">
             <svg
@@ -191,7 +191,7 @@ export const ReportAccessGuard: React.FC<ReportAccessGuardProps> = ({
             </svg>
           </div>
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-yellow-800">
+            <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
               Report Access Denied
             </h3>
             <div className="mt-2 text-sm text-yellow-700">
@@ -206,7 +206,7 @@ export const ReportAccessGuard: React.FC<ReportAccessGuardProps> = ({
   return (
     <div className={className}>
       {accessLevel === 'organizational' && (
-        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
           <div className="flex items-center">
             <svg
               className="h-5 w-5 text-blue-400 mr-2"
@@ -221,7 +221,7 @@ export const ReportAccessGuard: React.FC<ReportAccessGuardProps> = ({
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <span className="text-sm text-blue-800">
+            <span className="text-sm text-blue-800 dark:text-blue-300">
               Viewing report within your organizational scope
             </span>
           </div>

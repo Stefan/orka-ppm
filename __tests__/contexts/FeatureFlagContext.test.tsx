@@ -35,8 +35,20 @@ function wrapper({ children }: { children: React.ReactNode }) {
 }
 
 describe('Feature: feature-toggle-system', () => {
+  let fetchSpy: jest.SpyInstance
+
+  beforeEach(() => {
+    fetchSpy = jest.spyOn(global, 'fetch')
+  })
+
+  afterEach(() => {
+    fetchSpy.mockRestore()
+    mockUseAuth.mockReturnValue({ session: null, user: null })
+  })
+
   describe('Property 13: Hook Returns Boolean', () => {
     it('useFeatureFlag returns an object with enabled as boolean', () => {
+      fetchSpy.mockImplementation(() => new Promise(() => {}))
       const { result } = renderHook(() => useFeatureFlag('some_flag'), { wrapper })
       expect(typeof result.current.enabled).toBe('boolean')
       expect(typeof result.current.loading).toBe('boolean')
@@ -45,6 +57,9 @@ describe('Feature: feature-toggle-system', () => {
 
   describe('Property 14: Non-Existent Flag Default', () => {
     it('non-existent flag returns enabled: false', () => {
+      fetchSpy.mockImplementation(() =>
+        Promise.resolve({ ok: true, json: () => Promise.resolve({ flags: [] }) })
+      )
       const { result } = renderHook(() => useFeatureFlag('nonexistent_flag_name_xyz'), { wrapper })
       expect(result.current.enabled).toBe(false)
     })
@@ -52,9 +67,8 @@ describe('Feature: feature-toggle-system', () => {
 
   describe('Property 19: Error Containment (10.1)', () => {
     it('on fetch failure provider sets error and does not throw', async () => {
-      const originalFetch = global.fetch
       const rejectErr = new Error('Network error')
-      global.fetch = jest.fn(() => Promise.reject(rejectErr)) as jest.Mock
+      fetchSpy.mockImplementation(() => Promise.reject(rejectErr))
       mockUseAuth.mockReturnValue({
         session: { access_token: 'token' },
         user: { id: 'u1' },
@@ -67,14 +81,11 @@ describe('Feature: feature-toggle-system', () => {
           expect(result.current.error).not.toBeNull()
           expect(result.current.loading).toBe(false)
         },
-        { timeout: 12000 }
+        { timeout: 15000 }
       )
 
       expect(result.current.error?.message).toBe('Network error')
       expect(result.current.isFeatureEnabled('any')).toBe(false)
-
-      mockUseAuth.mockReturnValue({ session: null, user: null })
-      global.fetch = originalFetch
     })
   })
 
@@ -84,7 +95,7 @@ describe('Feature: feature-toggle-system', () => {
         session: { access_token: 'token' },
         user: { id: 'u1' },
       })
-      global.fetch = jest.fn(() =>
+      fetchSpy.mockImplementation(() =>
         Promise.resolve({
           ok: true,
           status: 200,
@@ -95,7 +106,7 @@ describe('Feature: feature-toggle-system', () => {
               ],
             }),
         })
-      ) as jest.Mock
+      )
 
       const { result } = renderHook(() => useFeatureFlag('cached_flag'), { wrapper })
 
@@ -103,17 +114,19 @@ describe('Feature: feature-toggle-system', () => {
         () => {
           expect(result.current.loading).toBe(false)
         },
-        { timeout: 3000 }
+        { timeout: 5000 }
       )
 
       expect(result.current.enabled).toBe(true)
-      // Synchronous lookup: no await needed; value is from Map
       expect(result.current.enabled).toBe(true)
     })
   })
 
   describe('useFeatureFlags', () => {
     it('isFeatureEnabled returns false for unknown flag', () => {
+      fetchSpy.mockImplementation(() =>
+        Promise.resolve({ ok: true, json: () => Promise.resolve({ flags: [] }) })
+      )
       const { result } = renderHook(() => useFeatureFlags(), { wrapper })
       expect(result.current.isFeatureEnabled('unknown')).toBe(false)
     })

@@ -33,7 +33,8 @@ async function apiRequest<T = any>(endpoint: string, options: RequestInit = {}):
 
     return response.json()
   } catch (error) {
-    console.error('Cross-device sync API error:', error)
+    // Log as warning, not error — sync failures are expected when backend is down
+    console.warn('Cross-device sync API:', error instanceof Error ? error.message : error)
     throw error
   }
 }

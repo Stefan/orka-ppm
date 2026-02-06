@@ -190,7 +190,7 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
     return (
       <div key={node.id} className="border-b border-gray-100 dark:border-slate-700 last:border-b-0">
         <div 
-          className="flex items-center py-3 px-4 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer"
+          className="flex items-center py-3 px-4 hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700 cursor-pointer"
           style={{ paddingLeft: `${indent + 16}px` }}
         >
           {/* Expand/Collapse Button */}
@@ -211,7 +211,7 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
             <div className="flex items-center space-x-2">
               <span className="font-medium text-gray-900 dark:text-slate-100 truncate">{node.name}</span>
               {node.code && (
-                <span className="text-xs text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded">
+                <span className="text-xs text-gray-600 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded">
                   {node.code}
                 </span>
               )}
@@ -367,7 +367,7 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
               />
             </div>
             
-            <button className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center space-x-2 text-gray-700 dark:text-slate-300">
+            <button className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700 flex items-center space-x-2 text-gray-700 dark:text-slate-300">
               <Filter className="h-4 w-4" />
               <span>Filter</span>
             </button>
@@ -376,13 +376,13 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
           <div className="flex items-center space-x-2">
             <button 
               onClick={fetchBreakdowns}
-              className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center space-x-2 text-gray-700 dark:text-slate-300"
+              className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700 flex items-center space-x-2 text-gray-700 dark:text-slate-300"
             >
               <RefreshCw className="h-4 w-4" />
               <span>Refresh</span>
             </button>
             
-            <button className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center space-x-2 text-gray-700 dark:text-slate-300">
+            <button className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700 flex items-center space-x-2 text-gray-700 dark:text-slate-300">
               <Download className="h-4 w-4" />
               <span>Export</span>
             </button>
@@ -395,7 +395,7 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
               <span>Import CSV</span>
             </button>
             
-            <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center space-x-2">
+            <button className="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-700 flex items-center space-x-2">
               <Plus className="h-4 w-4" />
               <span>Add Breakdown</span>
             </button>
@@ -516,7 +516,7 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
               <div>
                 {importResult.success ? (
                   <div className="text-center">
-                    <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                    <CheckCircle className="h-16 w-16 text-green-500 dark:text-green-400 mx-auto mb-4" />
                     <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-2">Import Successful!</h4>
                     <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">
                       {importResult.successful_imports} of {importResult.total_rows} records imported
@@ -534,7 +534,7 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
                   </div>
                 ) : (
                   <div className="text-center">
-                    <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+                    <AlertCircle className="h-16 w-16 text-red-500 dark:text-red-400 mx-auto mb-4" />
                     <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-2">Import Failed</h4>
                     <div className="text-left bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded p-3 mb-4">
                       <p className="text-sm font-medium text-red-900 dark:text-red-300 mb-1">Errors:</p>
@@ -556,7 +556,7 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
                   setImportResult(null)
                   setUploadProgress(0)
                 }}
-                className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300"
+                className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300"
               >
                 Close
               </button>

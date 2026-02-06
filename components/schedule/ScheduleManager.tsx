@@ -77,19 +77,19 @@ export function ScheduleManager({
     <div className={`flex flex-col gap-4 ${className}`} data-testid={testId}>
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500" />
           <input
             type="text"
             placeholder="Search schedules..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm"
+            className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm"
           title="Filter by status"
         >
           <option value="">All statuses</option>
@@ -101,7 +101,7 @@ export function ScheduleManager({
           <select
             value={projectFilter}
             onChange={(e) => setProjectFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm"
             title="Filter by project"
           >
             <option value="">All projects</option>
@@ -118,29 +118,29 @@ export function ScheduleManager({
       </div>
 
       {loading ? (
-        <div className="py-8 text-center text-gray-500" data-testid={`${testId}-loading`}>Loading schedules...</div>
+        <div className="py-8 text-center text-gray-500 dark:text-slate-400" data-testid={`${testId}-loading`}>Loading schedules...</div>
       ) : filtered.length === 0 ? (
-        <div className="py-8 text-center text-gray-500 border border-dashed border-gray-200 rounded-lg" data-testid={`${testId}-empty`}>
+        <div className="py-8 text-center text-gray-500 dark:text-slate-400 border border-dashed border-gray-200 dark:border-slate-700 rounded-lg" data-testid={`${testId}-empty`}>
           No schedules found. {onCreateSchedule && 'Create one to get started.'}
         </div>
       ) : (
-        <ul className="border border-gray-200 rounded-lg divide-y divide-gray-100">
+        <ul className="border border-gray-200 dark:border-slate-700 rounded-lg divide-y divide-gray-100">
           {filtered.map((s) => (
-            <li key={s.id} className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-gray-50">
+            <li key={s.id} className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
               <div className="flex items-center gap-3 min-w-0">
-                <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                <Calendar className="w-4 h-4 text-gray-400 dark:text-slate-500 flex-shrink-0" />
                 <div className="min-w-0">
                   <button
                     type="button"
                     onClick={() => onScheduleClick?.(s)}
-                    className="text-sm font-medium text-blue-600 hover:underline truncate block text-left"
+                    className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline truncate block text-left"
                   >
                     {s.name}
                   </button>
                   {s.description && (
-                    <p className="text-xs text-gray-500 truncate mt-0.5">{s.description}</p>
+                    <p className="text-xs text-gray-500 dark:text-slate-400 truncate mt-0.5">{s.description}</p>
                   )}
-                  <p className="text-xs text-gray-400 mt-0.5">
+                  <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
                     {s.start_date} – {s.end_date} · {s.status}
                   </p>
                 </div>
@@ -165,11 +165,11 @@ export function ScheduleManager({
           <DialogBody className="space-y-4">
             {projects.length > 0 && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Project</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Project</label>
                 <select
                   value={createProjectId}
                   onChange={(e) => setCreateProjectId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm"
                 >
                   <option value="">Select project</option>
                   {projects.map((p) => (
@@ -179,20 +179,20 @@ export function ScheduleManager({
               </div>
             )}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Name</label>
               <Input value={createName} onChange={(e) => setCreateName(e.target.value)} placeholder="Schedule name" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description (optional)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Description (optional)</label>
               <Input value={createDescription} onChange={(e) => setCreateDescription(e.target.value)} placeholder="Description" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Start date</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Start date</label>
                 <Input type="date" value={createStart} onChange={(e) => setCreateStart(e.target.value)} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">End date</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">End date</label>
                 <Input type="date" value={createEnd} onChange={(e) => setCreateEnd(e.target.value)} />
               </div>
             </div>

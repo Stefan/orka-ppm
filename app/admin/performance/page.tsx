@@ -296,19 +296,19 @@ export default function PerformanceDashboard() {
 
   const getHealthColor = (status: string) => {
     switch (status) {
-      case 'healthy': return 'text-green-600'
-      case 'degraded': return 'text-yellow-600'
-      case 'unhealthy': return 'text-red-600'
-      default: return 'text-gray-600'
+      case 'healthy': return 'text-green-600 dark:text-green-400'
+      case 'degraded': return 'text-yellow-600 dark:text-yellow-400'
+      case 'unhealthy': return 'text-red-600 dark:text-red-400'
+      default: return 'text-gray-600 dark:text-slate-400'
     }
   }
 
   const getHealthBg = (status: string) => {
     switch (status) {
-      case 'healthy': return 'bg-green-100'
-      case 'degraded': return 'bg-yellow-100'
-      case 'unhealthy': return 'bg-red-100'
-      default: return 'bg-gray-100'
+      case 'healthy': return 'bg-green-100 dark:bg-green-900/30'
+      case 'degraded': return 'bg-yellow-100 dark:bg-yellow-900/30'
+      case 'unhealthy': return 'bg-red-100 dark:bg-red-900/30'
+      default: return 'bg-gray-100 dark:bg-slate-800'
     }
   }
 
@@ -330,8 +330,8 @@ export default function PerformanceDashboard() {
         {/* Header */}
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
-            <p className="text-gray-600 mt-1">{t('subtitle')}</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">{t('title')}</h1>
+            <p className="text-gray-600 dark:text-slate-400 mt-1">{t('subtitle')}</p>
           </div>
           
           <div className="flex items-center space-x-2">
@@ -357,11 +357,11 @@ export default function PerformanceDashboard() {
 
         {/* Success Message */}
         {successMessage && (
-          <div className="bg-green-50 border border-green-200 rounded-md p-4">
+          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md p-4">
             <div className="flex">
               <CheckCircle className="h-5 w-5 text-green-400" />
               <div className="ml-3">
-                <p className="text-sm text-green-700">{successMessage}</p>
+                <p className="text-sm text-green-700 dark:text-green-300">{successMessage}</p>
               </div>
             </div>
           </div>
@@ -369,15 +369,15 @@ export default function PerformanceDashboard() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
             <div className="flex">
               <AlertTriangle className="h-5 w-5 text-red-400" />
               <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
+                <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
               </div>
               <button
                 onClick={() => setError(null)}
-                className="ml-auto text-red-400 hover:text-red-600"
+                className="ml-auto text-red-400 hover:text-red-600 dark:text-red-400"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -391,17 +391,17 @@ export default function PerformanceDashboard() {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 {health?.status === 'healthy' ? (
-                  <CheckCircle className="h-8 w-8 text-green-600" />
+                  <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
                 ) : health?.status === 'degraded' ? (
-                  <AlertTriangle className="h-8 w-8 text-yellow-600" />
+                  <AlertTriangle className="h-8 w-8 text-yellow-600 dark:text-yellow-400" />
                 ) : (
-                  <AlertTriangle className="h-8 w-8 text-red-600" />
+                  <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
                 )}
                 <div>
                   <h3 className={`text-lg font-semibold ${getHealthColor(health?.status || 'unknown')}`}>
                     {t('systemStatus')}: {getStatusText(health?.status || 'unknown')}
                   </h3>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 dark:text-slate-400">
                     {t('lastUpdated')}: {health?.timestamp ? new Date(health.timestamp).toLocaleString() : 'Never'}
                   </p>
                 </div>
@@ -409,20 +409,20 @@ export default function PerformanceDashboard() {
               
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-600">{t('totalRequests')}:</span>
-                  <span className="ml-2 font-medium">{health?.metrics?.total_requests?.toLocaleString() || '0'}</span>
+                  <span className="text-gray-600 dark:text-slate-400">{t('totalRequests')}:</span>
+                  <span className="ml-2 font-medium dark:text-slate-200">{health?.metrics?.total_requests?.toLocaleString() || '0'}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">{t('errorRate')}:</span>
-                  <span className="ml-2 font-medium">{health?.metrics?.error_rate || '0'}%</span>
+                  <span className="text-gray-600 dark:text-slate-400">{t('errorRate')}:</span>
+                  <span className="ml-2 font-medium dark:text-slate-200">{health?.metrics?.error_rate || '0'}%</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">{t('slowQueries')}:</span>
-                  <span className="ml-2 font-medium">{health?.metrics?.slow_queries || '0'}</span>
+                  <span className="text-gray-600 dark:text-slate-400">{t('slowQueries')}:</span>
+                  <span className="ml-2 font-medium dark:text-slate-200">{health?.metrics?.slow_queries || '0'}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">{t('cache')}:</span>
-                  <span className="ml-2 font-medium">{health?.cache_status || 'Unknown'}</span>
+                  <span className="text-gray-600 dark:text-slate-400">{t('cache')}:</span>
+                  <span className="ml-2 font-medium dark:text-slate-200">{health?.cache_status || 'Unknown'}</span>
                 </div>
               </div>
             </div>
@@ -431,51 +431,51 @@ export default function PerformanceDashboard() {
 
         {/* Performance Metrics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">{t('totalRequests')}</p>
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-sm font-medium text-gray-600 dark:text-slate-400">{t('totalRequests')}</p>
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {stats?.total_requests?.toLocaleString() || '0'}
                 </p>
               </div>
-              <Globe className="h-8 w-8 text-blue-600" />
+              <Globe className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">{t('totalErrors')}</p>
-                <p className="text-2xl font-bold text-red-600">
+                <p className="text-sm font-medium text-gray-600 dark:text-slate-400">{t('totalErrors')}</p>
+                <p className="text-2xl font-bold text-red-600 dark:text-red-400">
                   {stats?.total_errors || 0}
                 </p>
               </div>
-              <AlertTriangle className="h-8 w-8 text-red-600" />
+              <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">{t('slowQueries')}</p>
-                <p className="text-2xl font-bold text-yellow-600">
+                <p className="text-sm font-medium text-gray-600 dark:text-slate-400">{t('slowQueries')}</p>
+                <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
                   {stats?.slow_queries_count || 0}
                 </p>
               </div>
-              <Clock className="h-8 w-8 text-yellow-600" />
+              <Clock className="h-8 w-8 text-yellow-600 dark:text-yellow-400" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">{t('cacheHitRate')}</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-sm font-medium text-gray-600 dark:text-slate-400">{t('cacheHitRate')}</p>
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {cacheStats?.hit_rate ? `${cacheStats.hit_rate}%` : 'N/A'}
                 </p>
               </div>
-              <Database className="h-8 w-8 text-green-600" />
+              <Database className="h-8 w-8 text-green-600 dark:text-green-400" />
             </div>
           </div>
         </div>

@@ -32,7 +32,7 @@ export function BasicFilterExample() {
       />
       
       {/* Display current filters */}
-      <div className="mt-4 p-4 bg-gray-100 rounded">
+      <div className="mt-4 p-4 bg-gray-100 dark:bg-slate-700 rounded">
         <h3 className="font-semibold mb-2">Current Filters:</h3>
         <pre className="text-xs">{JSON.stringify(filters, null, 2)}</pre>
       </div>
@@ -176,7 +176,7 @@ export function CompleteExample() {
       />
       
       {/* Display current filters */}
-      <div className="mt-4 p-4 bg-gray-100 rounded">
+      <div className="mt-4 p-4 bg-gray-100 dark:bg-slate-700 rounded">
         <h3 className="font-semibold mb-2">Current Filters:</h3>
         <pre className="text-xs overflow-auto">{JSON.stringify(filters, null, 2)}</pre>
       </div>
@@ -251,9 +251,9 @@ export function TimelineIntegrationExample() {
       />
       
       {/* Timeline would go here */}
-      <div className="p-4 border border-gray-300 rounded-lg">
-        <p className="text-gray-600">Timeline component would be rendered here with filtered events</p>
-        <p className="text-sm text-gray-500 mt-2">
+      <div className="p-4 border border-gray-300 dark:border-slate-600 rounded-lg">
+        <p className="text-gray-600 dark:text-slate-400">Timeline component would be rendered here with filtered events</p>
+        <p className="text-sm text-gray-500 dark:text-slate-400 mt-2">
           Events count: {auditEvents.length}
         </p>
       </div>

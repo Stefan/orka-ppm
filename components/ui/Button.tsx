@@ -29,22 +29,22 @@ const buttonVariants: Record<ButtonVariant, string> = {
   ].join(' '),
   
   secondary: [
-    'bg-gray-100 text-gray-900',
-    'hover:bg-gray-200',
+    'bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-slate-100',
+    'hover:bg-gray-200 dark:hover:bg-slate-600',
     'active:bg-gray-300',
-    'border border-gray-200',
+    'border border-gray-200 dark:border-slate-700',
   ].join(' '),
   
   outline: [
-    'bg-transparent text-blue-600',
+    'bg-transparent text-blue-600 dark:text-blue-400',
     'border-2 border-blue-600',
     'hover:bg-blue-50',
-    'active:bg-blue-100',
+    'active:bg-blue-100 dark:bg-blue-900/30',
   ].join(' '),
   
   ghost: [
-    'bg-transparent text-gray-700',
-    'hover:bg-gray-100',
+    'bg-transparent text-gray-700 dark:text-slate-300',
+    'hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700',
     'active:bg-gray-200',
   ].join(' '),
   

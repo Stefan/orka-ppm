@@ -121,10 +121,10 @@ function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsPro
 
   if (loading) {
     return (
-      <div data-testid="variance-trends-skeleton" className="bg-white p-4 rounded-lg border border-gray-200 h-full flex flex-col" style={{ minHeight: '240px' }}>
+      <div data-testid="variance-trends-skeleton" className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700 h-full flex flex-col" style={{ minHeight: '240px' }}>
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="flex-1 bg-gray-200 rounded" style={{ minHeight: '180px' }}></div>
+          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/4 mb-4"></div>
+          <div className="flex-1 bg-gray-200 dark:bg-slate-700 rounded" style={{ minHeight: '180px' }}></div>
         </div>
       </div>
     )
@@ -132,12 +132,12 @@ function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsPro
 
   if (error || (trendData?.length || 0) === 0) {
     return (
-      <div data-testid="variance-trends-error" className="bg-white p-4 rounded-lg border border-gray-200 h-full flex flex-col" style={{ minHeight: '240px' }}>
-        <h3 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">{t('variance.trends')}</h3>
+      <div data-testid="variance-trends-error" className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700 h-full flex flex-col" style={{ minHeight: '240px' }}>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100 mb-4 uppercase tracking-wide">{t('variance.trends')}</h3>
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <Calendar className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-            <p className="text-sm text-gray-500">
+            <Calendar className="h-10 w-10 text-gray-400 dark:text-slate-500 mx-auto mb-3" />
+            <p className="text-sm text-gray-600 dark:text-slate-400">
               {error ? `${t('common.error')}: ${error}` : t('scenarios.noScenarios')}
             </p>
           </div>
@@ -147,15 +147,15 @@ function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsPro
   }
 
   return (
-    <div data-testid="variance-trends" className="bg-white p-4 rounded-lg border border-gray-200 h-full flex flex-col" style={{ minHeight: '240px' }}>
+    <div data-testid="variance-trends" className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700 h-full flex flex-col" style={{ minHeight: '240px' }}>
       <div data-testid="variance-trends-header" className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">{t('variance.trends')}</h3>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100 uppercase tracking-wide">{t('variance.trends')}</h3>
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-gray-500" />
+          <Filter className="h-4 w-4 text-gray-600 dark:text-slate-400" />
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value as any)}
-            className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 border border-gray-300 dark:border-slate-600 rounded-md px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="7d">7 days</option>
             <option value="30d">30 days</option>

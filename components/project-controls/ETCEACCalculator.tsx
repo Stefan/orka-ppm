@@ -49,7 +49,7 @@ export default function ETCEACCalculator({ projectId }: ETCEACCalculatorProps) {
   }, [projectId, etcMethod, eacMethod])
 
   return (
-    <div className="space-y-4 p-4 bg-white rounded-lg border">
+    <div className="space-y-4 p-4 bg-white dark:bg-slate-800 rounded-lg border">
       <h3 className="font-semibold">ETC / EAC Calculator</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -61,14 +61,14 @@ export default function ETCEACCalculator({ projectId }: ETCEACCalculatorProps) {
             disabled={loading}
           />
           {loading ? (
-            <div className="mt-2 text-sm text-gray-500">Loading...</div>
+            <div className="mt-2 text-sm text-gray-500 dark:text-slate-400">Loading...</div>
           ) : etc ? (
-            <div className="mt-2 p-2 bg-gray-50 rounded">
+            <div className="mt-2 p-2 bg-gray-50 dark:bg-slate-800/50 rounded">
               <p className="font-medium">ETC: ${(etc.result_value as number)?.toLocaleString() ?? '-'}</p>
-              <p className="text-xs text-gray-500">Confidence: {((etc.confidence_level as number) ?? 0) * 100}%</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400">Confidence: {((etc.confidence_level as number) ?? 0) * 100}%</p>
             </div>
           ) : (
-            <p className="mt-2 text-sm text-amber-600">No data</p>
+            <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">No data</p>
           )}
         </div>
         <div>
@@ -80,14 +80,14 @@ export default function ETCEACCalculator({ projectId }: ETCEACCalculatorProps) {
             disabled={loading}
           />
           {loading ? (
-            <div className="mt-2 text-sm text-gray-500">Loading...</div>
+            <div className="mt-2 text-sm text-gray-500 dark:text-slate-400">Loading...</div>
           ) : eac ? (
-            <div className="mt-2 p-2 bg-gray-50 rounded">
+            <div className="mt-2 p-2 bg-gray-50 dark:bg-slate-800/50 rounded">
               <p className="font-medium">EAC: ${(eac.result_value as number)?.toLocaleString() ?? '-'}</p>
-              <p className="text-xs text-gray-500">Confidence: {((eac.confidence_level as number) ?? 0) * 100}%</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400">Confidence: {((eac.confidence_level as number) ?? 0) * 100}%</p>
             </div>
           ) : (
-            <p className="mt-2 text-sm text-amber-600">No data</p>
+            <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">No data</p>
           )}
         </div>
       </div>

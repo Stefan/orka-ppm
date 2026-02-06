@@ -40,7 +40,7 @@ export interface ProjectsGridProps {
  */
 function EmptyState({ searchTerm }: { searchTerm?: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+    <div className="flex flex-col items-center justify-center py-12 text-gray-500 dark:text-slate-400">
       <Search className="w-12 h-12 mb-4 opacity-50" />
       <h3 className="text-lg font-medium mb-1">No projects found</h3>
       <p className="text-sm">
@@ -65,7 +65,7 @@ function LoadingSkeleton({ viewMode }: { viewMode: 'grid' | 'list' }) {
         {Array.from({ length: skeletonCount }).map((_, i) => (
           <div 
             key={i} 
-            className="h-14 bg-gray-100 rounded animate-pulse"
+            className="h-14 bg-gray-100 dark:bg-slate-700 rounded animate-pulse"
           />
         ))}
       </div>
@@ -77,7 +77,7 @@ function LoadingSkeleton({ viewMode }: { viewMode: 'grid' | 'list' }) {
       {Array.from({ length: skeletonCount }).map((_, i) => (
         <div 
           key={i} 
-          className="h-48 bg-gray-100 rounded-lg animate-pulse"
+          className="h-48 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse"
         />
       ))}
     </div>
@@ -89,7 +89,7 @@ function LoadingSkeleton({ viewMode }: { viewMode: 'grid' | 'list' }) {
  */
 function ListHeader({ showEac = false }: { showEac?: boolean }) {
   return (
-    <div className="flex items-center justify-between px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-medium text-gray-500 uppercase tracking-wider">
+    <div className="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700 text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
       <div className="flex-1">Project</div>
       <div className="flex items-center gap-4">
         <span className="w-24 text-right">Budget</span>
@@ -121,13 +121,13 @@ export function ViewModeToggle({
         className={`
           flex items-center justify-center
           px-3 py-2
-          border border-gray-300
+          border border-gray-300 dark:border-slate-600
           rounded-l-md
           text-sm font-medium
           transition-colors
           ${viewMode === 'grid' 
-            ? 'bg-blue-50 text-blue-600 border-blue-300' 
-            : 'bg-white text-gray-700 hover:bg-gray-50'
+            ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-300' 
+            : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700'
           }
         `}
         title="Grid view"
@@ -140,13 +140,13 @@ export function ViewModeToggle({
         className={`
           flex items-center justify-center
           px-3 py-2
-          border border-l-0 border-gray-300
+          border border-l-0 border-gray-300 dark:border-slate-600
           rounded-r-md
           text-sm font-medium
           transition-colors
           ${viewMode === 'list' 
-            ? 'bg-blue-50 text-blue-600 border-blue-300' 
-            : 'bg-white text-gray-700 hover:bg-gray-50'
+            ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-300' 
+            : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700'
           }
         `}
         title="List view"
@@ -207,7 +207,7 @@ export function ProjectsGrid({
     return (
       <div
         className={`
-          bg-white
+          bg-white dark:bg-slate-800
           rounded-lg
           shadow-md
           overflow-hidden

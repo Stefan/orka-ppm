@@ -10,6 +10,7 @@ import { getApiUrl } from '../../lib/api/client'
 import { SkeletonCard, SkeletonChart } from '../../components/ui/skeletons'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useTranslations } from '@/lib/i18n/context'
+import { GuidedTour, useGuidedTour, TourTriggerButton, resourcesTourSteps } from '@/components/guided-tour'
 
 // Lazy load heavy components for better code splitting
 const AIResourceOptimizer = lazy(() => import('../../components/ai/AIResourceOptimizer'))
@@ -85,6 +86,7 @@ export default function Resources() {
   const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null)
   const [autoRefresh, setAutoRefresh] = useState(false)
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
+  const { isOpen, startTour, closeTour, completeTour, resetAndStartTour, hasCompletedTour } = useGuidedTour('resources-v1')
 
   // Auto-refresh functionality for real-time updates
   useEffect(() => {
@@ -335,12 +337,12 @@ export default function Resources() {
   if (error) return (
     <AppLayout>
       <div className="p-8">
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
           <div className="flex">
-            <AlertCircle className="h-5 w-5 text-red-400" />
+            <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400" />
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">{t('resources.errorLoading')}</h3>
-              <p className="mt-1 text-sm text-red-700">{error}</p>
+              <h3 className="text-sm font-medium text-red-800 dark:text-red-300">{t('resources.errorLoading')}</h3>
+                <p className="mt-1 text-sm text-red-700 dark:text-red-400">{error}</p>
             </div>
           </div>
         </div>
@@ -356,23 +358,23 @@ export default function Resources() {
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
             <div className="min-w-0 flex-1">
               <div className="flex flex-col space-y-2">
-                <h1 data-testid="resources-title" className="text-2xl sm:text-3xl font-bold text-gray-900">{t('resources.title')}</h1>
+                <h1 data-testid="resources-title" className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-slate-100">{t('resources.title')}</h1>
                 <div className="flex flex-wrap items-center gap-2">
                   {analyticsData.overallocatedResources > 0 && (
-                    <div className="flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                    <div className="flex items-center px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 rounded-full text-sm font-medium">
                       <AlertCircle className="h-4 w-4 mr-1 flex-shrink-0" />
                       <span>{analyticsData.overallocatedResources} {t('resources.overallocated')}</span>
                     </div>
                   )}
                   {autoRefresh && (
-                    <div className="flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                    <div className="flex items-center px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full text-sm font-medium">
                       <RefreshCw className="h-4 w-4 mr-1 animate-spin flex-shrink-0" />
                       <span>{t('resources.live')}</span>
                     </div>
                   )}
                 </div>
               </div>
-              <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-sm text-gray-600">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-sm text-gray-700 dark:text-slate-300">
                 <span>{filteredResources.length} {t('resources.of')} {resources.length} {t('nav.resources').toLowerCase()}</span>
                 <span>{t('resources.avg')}: {analyticsData.averageUtilization.toFixed(1)}%</span>
                 <span>{analyticsData.availableResources} {t('resources.available')}</span>
@@ -382,154 +384,146 @@ export default function Resources() {
               </div>
             </div>
             
-            {/* Mobile-Optimized Action Buttons */}
+            {/* Toolbar: klare Kontraste – Light: graue Flächen, Dark: sichtbare Flächen */}
             <div className="flex flex-wrap items-center gap-2 mb-4">
-              {/* Resource Action Buttons with RBAC */}
-              <ResourceActionButtons
-                onAssignResource={() => {/* Handle assign */}}
-                onScheduleResource={() => {/* Handle schedule */}}
-                variant="compact"
+              <TourTriggerButton
+                onStart={hasCompletedTour ? resetAndStartTour : startTour}
+                hasCompletedTour={hasCompletedTour}
               />
-              
-              {/* Combined Refresh Controls */}
-              <div className="flex items-center bg-white border border-gray-200 rounded-lg p-1 gap-1">
-                {/* Manual Refresh Button */}
-                <button
-                  onClick={() => {
-                    fetchResources()
-                  }}
-                  className="flex items-center justify-center min-h-[44px] min-w-[44px] px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors text-sm font-medium"
-                  title="Daten jetzt aktualisieren"
-                  aria-label="Daten jetzt aktualisieren"
-                >
-                  <RotateCcw className="h-5 w-5" />
-                  <span className="hidden sm:inline ml-2">Refresh</span>
-                </button>
+              {(() => {
+                const btnSecondary = 'inline-flex items-center gap-2 min-h-[44px] px-4 py-2.5 text-sm font-medium rounded-xl border transition-[background-color,border-color,box-shadow] duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 bg-slate-200 text-slate-900 border-slate-300 hover:bg-slate-300 hover:border-slate-400 active:bg-slate-400 focus:ring-slate-500 focus:ring-offset-white dark:bg-slate-700 dark:text-slate-100 dark:border-slate-600 dark:hover:bg-slate-600 dark:hover:border-slate-500 dark:active:bg-slate-500 dark:focus:ring-slate-400 dark:focus:ring-offset-slate-900'
+                const btnPrimary = 'inline-flex items-center gap-2 min-h-[44px] px-4 py-2.5 text-sm font-semibold rounded-xl bg-indigo-600 text-white border border-indigo-700 hover:bg-indigo-500 hover:border-indigo-600 active:bg-indigo-700 shadow-sm hover:shadow transition-[background-color,box-shadow,border-color] duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:bg-indigo-500 dark:border-indigo-600 dark:hover:bg-indigo-400 dark:active:bg-indigo-600 dark:focus:ring-offset-slate-900'
+                const btnToggle = (active: boolean) => active ? btnPrimary : btnSecondary
+                return (
+                  <>
+                    {/* Gruppe 1: Ressourcen – Add (Hot), Assign/Schedule einheitlich grau */}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setShowAddModal(true)}
+                        className={btnPrimary}
+                        title="Ressource hinzufügen"
+                        aria-label="Ressource hinzufügen"
+                      >
+                        <Plus className="h-4 w-4 shrink-0" />
+                        <span className="hidden sm:inline">Add Resource</span>
+                        <span className="sm:hidden">Add</span>
+                      </button>
+                      <ResourceActionButtons
+                        onAssignResource={() => {/* Handle assign */}}
+                        onScheduleResource={() => {/* Handle schedule */}}
+                        variant="compact"
+                      />
+                    </div>
 
-                {/* Auto-Refresh Toggle */}
-                <button
-                  onClick={() => setAutoRefresh(!autoRefresh)}
-                  className={`flex items-center justify-center min-h-[44px] min-w-[44px] px-4 py-2 rounded-md transition-colors text-sm font-medium ${
-                    autoRefresh
-                      ? 'bg-green-600 text-white hover:bg-green-700 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
-                  title={autoRefresh ? 'Auto-Aktualisierung deaktivieren' : 'Auto-Aktualisierung aktivieren (30s)'}
-                  aria-label={autoRefresh ? 'Auto-Aktualisierung deaktivieren' : 'Auto-Aktualisierung aktivieren (30s)'}
-                >
-                  <RefreshCw className={`h-5 w-5 ${autoRefresh ? 'animate-spin' : ''}`} />
-                  <span className="hidden sm:inline ml-2">Auto</span>
-                </button>
-              </div>
-              
-              <button
-                onClick={() => setViewMode(viewMode === 'cards' ? 'table' : viewMode === 'table' ? 'heatmap' : 'cards')}
-                className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 active:bg-gray-300 text-sm font-medium"
-                title={viewMode === 'cards' ? 'Zur Tabellenansicht wechseln' : viewMode === 'table' ? 'Zur Heatmap-Ansicht wechseln' : 'Zur Kartenansicht wechseln'}
-                aria-label={viewMode === 'cards' ? 'Zur Tabellenansicht wechseln' : viewMode === 'table' ? 'Zur Heatmap-Ansicht wechseln' : 'Zur Kartenansicht wechseln'}
-              >
-                {viewMode === 'cards' ? <BarChart3 className="h-4 w-4 mr-2 flex-shrink-0" /> : 
-                 viewMode === 'table' ? <PieChartIcon className="h-4 w-4 mr-2 flex-shrink-0" /> : 
-                 <Users className="h-4 w-4 mr-2 flex-shrink-0" />}
-                <span className="hidden sm:inline">
-                  {viewMode === 'cards' ? 'Table' : viewMode === 'table' ? 'Heatmap' : 'Cards'}
-                </span>
-              </button>
-              
-              <button
-                onClick={() => {
-                  setShowOptimization(!showOptimization)
-                }}
-                className={`flex items-center justify-center min-h-[44px] px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
-                  showOptimization
-                    ? 'bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800'
-                    : 'bg-purple-100 text-purple-700 hover:bg-purple-200 active:bg-purple-300'
-                }`}
-                title={showOptimization ? 'KI-Optimierung ausblenden' : 'KI-Optimierung anzeigen'}
-                aria-label={showOptimization ? 'KI-Optimierung ausblenden' : 'KI-Optimierung anzeigen'}
-              >
-                <Zap className="h-4 w-4 mr-2 flex-shrink-0" />
-                <span className="hidden sm:inline">AI Optimize</span>
-                <span className="sm:hidden">AI</span>
-              </button>
-              
-              <button
-                onClick={exportResourceData}
-                className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 active:bg-green-300 text-sm font-medium"
-                  title="Ressourcendaten exportieren"
-                aria-label="Ressourcendaten exportieren"
-              >
-                <Download className="h-4 w-4 mr-2 flex-shrink-0" />
-                <span className="hidden sm:inline">Export</span>
-              </button>
-              
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center justify-center min-h-[44px] px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
-                  showFilters
-                    ? 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
-                    : 'bg-blue-100 text-blue-700 hover:bg-blue-200 active:bg-blue-300'
-                }`}
-                title={showFilters ? 'Filter-Optionen ausblenden' : 'Filter-Optionen anzeigen'}
-                aria-label={showFilters ? 'Filter-Optionen ausblenden' : 'Filter-Optionen anzeigen'}
-              >
-                <Filter className="h-4 w-4 mr-2 flex-shrink-0" />
-                <span className="hidden sm:inline">Filters</span>
-              </button>
-              
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="flex items-center justify-center min-h-[44px] px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 text-sm font-medium"
-                title="Ressource hinzufügen"
-                aria-label="Ressource hinzufügen"
-              >
-                <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
-                <span className="hidden sm:inline">Add Resource</span>
-                <span className="sm:hidden">Add</span>
-              </button>
+                    <div className="w-px self-stretch min-h-[32px] bg-slate-200/80 dark:bg-slate-600/70 rounded-full" aria-hidden />
+
+                    {/* Gruppe 2: Ansicht & Aktualisierung – alle einheitlich Secondary, Auto grün wenn an */}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setViewMode(viewMode === 'cards' ? 'table' : viewMode === 'table' ? 'heatmap' : 'cards')}
+                        className={btnSecondary}
+                        title={viewMode === 'cards' ? 'Zur Tabellenansicht wechseln' : viewMode === 'table' ? 'Zur Heatmap-Ansicht wechseln' : 'Zur Kartenansicht wechseln'}
+                        aria-label={viewMode === 'cards' ? 'Zur Tabellenansicht wechseln' : viewMode === 'table' ? 'Zur Heatmap-Ansicht wechseln' : 'Zur Kartenansicht wechseln'}
+                      >
+                        {viewMode === 'cards' ? <BarChart3 className="h-4 w-4 shrink-0" /> : viewMode === 'table' ? <PieChartIcon className="h-4 w-4 shrink-0" /> : <Users className="h-4 w-4 shrink-0" />}
+                        <span className="hidden sm:inline">{viewMode === 'cards' ? 'Table' : viewMode === 'table' ? 'Heatmap' : 'Cards'}</span>
+                      </button>
+                      <button onClick={() => fetchResources()} className={btnSecondary} title="Daten jetzt aktualisieren" aria-label="Daten jetzt aktualisieren">
+                        <RotateCcw className="h-4 w-4 shrink-0" />
+                        <span className="hidden sm:inline">Refresh</span>
+                      </button>
+                      <button
+                        onClick={() => setAutoRefresh(!autoRefresh)}
+                        className={autoRefresh ? 'inline-flex items-center gap-2 min-h-[44px] px-4 py-2.5 text-sm font-medium rounded-xl bg-emerald-600 text-white border border-emerald-700 hover:bg-emerald-500 active:bg-emerald-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-white dark:bg-emerald-500 dark:border-emerald-600 dark:hover:bg-emerald-400 dark:focus:ring-offset-slate-900' : btnSecondary}
+                        title={autoRefresh ? 'Auto-Aktualisierung deaktivieren' : 'Auto-Aktualisierung aktivieren (30s)'}
+                        aria-label={autoRefresh ? 'Auto-Aktualisierung deaktivieren' : 'Auto-Aktualisierung aktivieren (30s)'}
+                      >
+                        <RefreshCw className={`h-4 w-4 shrink-0 ${autoRefresh ? 'animate-spin' : ''}`} />
+                        <span className="hidden sm:inline">Auto</span>
+                      </button>
+                    </div>
+
+                    <div className="w-px self-stretch min-h-[32px] bg-slate-200/80 dark:bg-slate-600/70 rounded-full" aria-hidden />
+
+                    {/* Gruppe 3: Filter (einheitlich Toggle) + AI Optimize (Hot Feature – auch inaktiv sichtbar hervorgehoben) */}
+                    <div className="flex items-center gap-2" data-tour="resources-ai-optimizer">
+                      <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className={btnToggle(showFilters)}
+                        title={showFilters ? 'Filter-Optionen ausblenden' : 'Filter-Optionen anzeigen'}
+                        aria-label={showFilters ? 'Filter-Optionen ausblenden' : 'Filter-Optionen anzeigen'}
+                      >
+                        <Filter className="h-4 w-4 shrink-0" />
+                        <span className="hidden sm:inline">Filters</span>
+                      </button>
+                      <button
+                        onClick={() => setShowOptimization(!showOptimization)}
+                        className={showOptimization
+                          ? btnPrimary
+                          : 'inline-flex items-center gap-2 min-h-[44px] px-4 py-2.5 text-sm font-medium rounded-xl border transition-[background-color,border-color] duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900 bg-indigo-100 text-indigo-900 border-indigo-300 hover:bg-indigo-200 hover:border-indigo-400 active:bg-indigo-300 dark:bg-indigo-950/60 dark:text-indigo-200 dark:border-indigo-800 dark:hover:bg-indigo-900/70 dark:active:bg-indigo-900'
+                        }
+                        title={showOptimization ? 'KI-Optimierung ausblenden' : 'KI-Optimierung anzeigen'}
+                        aria-label={showOptimization ? 'KI-Optimierung ausblenden' : 'KI-Optimierung anzeigen'}
+                      >
+                        <Zap className="h-4 w-4 shrink-0" />
+                        <span className="hidden sm:inline">AI Optimize</span>
+                        <span className="sm:hidden">AI</span>
+                      </button>
+                    </div>
+
+                    <div className="w-px self-stretch min-h-[32px] bg-slate-200/80 dark:bg-slate-600/70 rounded-full" aria-hidden />
+
+                    {/* Gruppe 4: Export – einheitlich Secondary */}
+                    <button onClick={exportResourceData} className={btnSecondary} title="Ressourcendaten exportieren" aria-label="Ressourcendaten exportieren">
+                      <Download className="h-4 w-4 shrink-0" />
+                      <span className="hidden sm:inline">Export</span>
+                    </button>
+                  </>
+                )
+              })()}
             </div>
           </div>
         </div>
 
         {/* Mobile-First Analytics Dashboard */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200">
+        <div data-tour="resources-overview" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="bg-white dark:bg-slate-800 p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-700 truncate">Total Resources</p>
-                <p className="text-lg sm:text-2xl font-bold text-blue-600">{analyticsData.totalResources}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 truncate">Total Resources</p>
+                <p className="text-lg sm:text-2xl font-bold text-blue-600 dark:text-blue-400">{analyticsData.totalResources}</p>
               </div>
-              <Users className="h-5 w-5 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
+              <Users className="h-5 w-5 sm:h-8 sm:w-8 text-blue-600 dark:text-blue-400 flex-shrink-0" />
             </div>
           </div>
           
-          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-700 truncate">Avg. Utilization</p>
-                <p className="text-lg sm:text-2xl font-bold text-green-600">{analyticsData.averageUtilization.toFixed(1)}%</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 truncate">Avg. Utilization</p>
+                <p className="text-lg sm:text-2xl font-bold text-green-600 dark:text-green-400">{analyticsData.averageUtilization.toFixed(1)}%</p>
               </div>
-              <TrendingUp className="h-5 w-5 sm:h-8 sm:w-8 text-green-600 flex-shrink-0" />
+              <TrendingUp className="h-5 w-5 sm:h-8 sm:w-8 text-green-600 dark:text-green-400 flex-shrink-0" />
             </div>
           </div>
           
-          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-700 truncate">Available</p>
-                <p className="text-lg sm:text-2xl font-bold text-purple-600">{analyticsData.availableResources}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 truncate">Available</p>
+                <p className="text-lg sm:text-2xl font-bold text-purple-600 dark:text-purple-400">{analyticsData.availableResources}</p>
               </div>
-              <Target className="h-5 w-5 sm:h-8 sm:w-8 text-purple-600 flex-shrink-0" />
+              <Target className="h-5 w-5 sm:h-8 sm:w-8 text-purple-600 dark:text-purple-400 flex-shrink-0" />
             </div>
           </div>
           
-          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-700 truncate">Overallocated</p>
-                <p className="text-lg sm:text-2xl font-bold text-red-600">{analyticsData.overallocatedResources}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 truncate">Overallocated</p>
+                <p className="text-lg sm:text-2xl font-bold text-red-600 dark:text-red-400">{analyticsData.overallocatedResources}</p>
               </div>
-              <AlertCircle className="h-5 w-5 sm:h-8 sm:w-8 text-red-600 flex-shrink-0" />
+              <AlertCircle className="h-5 w-5 sm:h-8 sm:w-8 text-red-600 dark:text-red-400 flex-shrink-0" />
             </div>
           </div>
         </div>
@@ -552,28 +546,28 @@ export default function Resources() {
 
         {/* Enhanced Mobile-First Filter Panel */}
         {showFilters && (
-          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
               <div className="sm:col-span-2 lg:col-span-1">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Search</label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
                   <input
                     type="text"
                     value={filters.search}
                     onChange={(e) => handleFilterChange('search', e.target.value)}
                     placeholder="Name or email..."
-                    className="input-field w-full min-h-[44px] pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="input-field w-full min-h-[44px] pl-10 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Role</label>
                 <select
                   value={filters.role}
                   onChange={(e) => handleFilterChange('role', e.target.value)}
-                  className="w-full min-h-[44px] p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full min-h-[44px] p-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="all">All Roles</option>
                   {Array.from(new Set(resources.map(r => r.role).filter(Boolean))).map(role => (
@@ -583,11 +577,11 @@ export default function Resources() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Availability</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Availability</label>
                 <select
                   value={filters.availability_status}
                   onChange={(e) => handleFilterChange('availability_status', e.target.value)}
-                  className="w-full min-h-[44px] p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full min-h-[44px] p-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="all">All Status</option>
                   <option value="available">Available</option>
@@ -598,11 +592,11 @@ export default function Resources() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Location</label>
                 <select
                   value={filters.location}
                   onChange={(e) => handleFilterChange('location', e.target.value)}
-                  className="w-full min-h-[44px] p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full min-h-[44px] p-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="all">All Locations</option>
                   {Array.from(new Set(resources.map(r => r.location).filter(Boolean))).map(location => (
@@ -612,13 +606,13 @@ export default function Resources() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Utilization Range</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Utilization Range</label>
                 <div className="flex space-x-2">
                   <input
                     type="number"
                     value={filters.utilization_range[0]}
                     onChange={(e) => handleFilterChange('utilization_range', [parseInt(e.target.value), filters.utilization_range[1]])}
-                    className="input-field w-full min-h-[44px] p-2 border border-gray-300 rounded-md text-sm"
+                    className="input-field w-full min-h-[44px] p-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm"
                     min="0"
                     max="200"
                     placeholder="Min"
@@ -627,7 +621,7 @@ export default function Resources() {
                     type="number"
                     value={filters.utilization_range[1]}
                     onChange={(e) => handleFilterChange('utilization_range', [filters.utilization_range[0], parseInt(e.target.value)])}
-                    className="input-field w-full min-h-[44px] p-2 border border-gray-300 rounded-md text-sm"
+                    className="input-field w-full min-h-[44px] p-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm"
                     min="0"
                     max="200"
                     placeholder="Max"
@@ -638,7 +632,7 @@ export default function Resources() {
               <div className="flex items-end">
                 <button
                   onClick={clearFilters}
-                  className="w-full min-h-[44px] px-4 py-2 bg-gray-100 text-gray-900 rounded-md hover:bg-gray-200 active:bg-gray-300 font-medium"
+                  className="w-full min-h-[44px] px-4 py-2 bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-slate-100 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 active:bg-gray-300 font-medium"
                   title="Alle Filter zurücksetzen"
                   aria-label="Alle Filter zurücksetzen"
                 >
@@ -670,7 +664,7 @@ export default function Resources() {
               enablePan={true}
               enableExport={true}
               showLegend={true}
-              className="bg-white shadow-sm"
+              className="bg-white dark:bg-slate-800 shadow-sm"
               onDataPointClick={(data) => {
                 // Filter resources based on clicked utilization category
                 const utilizationRanges = {
@@ -699,7 +693,7 @@ export default function Resources() {
               enablePan={true}
               enableExport={true}
               showLegend={false}
-              className="bg-white shadow-sm"
+              className="bg-white dark:bg-slate-800 shadow-sm"
               onDataPointClick={(data) => {
                 // Filter resources by clicked skill
                 handleFilterChange('skills', [data.name])
@@ -719,7 +713,7 @@ export default function Resources() {
               enablePan={true}
               enableExport={true}
               showLegend={true}
-              className="bg-white shadow-sm"
+              className="bg-white dark:bg-slate-800 shadow-sm"
               onDataPointClick={(data) => {
                 // Filter resources by clicked role
                 handleFilterChange('role', data.name === 'Unassigned' ? 'all' : data.name)
@@ -769,10 +763,10 @@ export default function Resources() {
                   resource.utilization_percentage <= 100 ? 'high' : 'over'
                 
                 const colorClasses = {
-                  under: 'bg-green-100 border-green-300 hover:bg-green-200 active:bg-green-300',
-                  optimal: 'bg-blue-100 border-blue-300 hover:bg-blue-200 active:bg-blue-300',
-                  high: 'bg-yellow-100 border-yellow-300 hover:bg-yellow-200 active:bg-yellow-300',
-                  over: 'bg-red-100 border-red-300 hover:bg-red-200 active:bg-red-300'
+                  under: 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700 hover:bg-green-200 active:bg-green-300',
+                  optimal: 'bg-blue-100 dark:bg-blue-900/30 border-blue-300 hover:bg-blue-200 active:bg-blue-300',
+                  high: 'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-300 hover:bg-yellow-200 active:bg-yellow-300',
+                  over: 'bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-700 hover:bg-red-200 active:bg-red-300'
                 }
                 
                 return (
@@ -793,8 +787,8 @@ export default function Resources() {
                   >
                     <div className="text-center h-full flex flex-col justify-between">
                       <div>
-                        <div className="text-sm font-medium text-gray-900 truncate">{resource.name}</div>
-                        <div className="text-xs text-gray-700 truncate">{resource.role || 'Unassigned'}</div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-slate-100 truncate">{resource.name}</div>
+                        <div className="text-xs text-gray-600 dark:text-slate-400 truncate">{resource.role || 'Unassigned'}</div>
                       </div>
                       
                       {/* Enhanced utilization display */}
@@ -814,7 +808,7 @@ export default function Resources() {
                         </div>
                       </div>
                       
-                      <div className="text-xs text-gray-500 space-y-1">
+                      <div className="text-xs text-gray-600 dark:text-slate-400 space-y-1">
                         <div>{resource.available_hours.toFixed(1)}h available</div>
                         <div>{resource.current_projects.length} projects</div>
                       </div>
@@ -824,12 +818,12 @@ export default function Resources() {
                         <div className="mt-2">
                           <div className="flex flex-wrap gap-1 justify-center">
                             {resource.skills.slice(0, 2).map((skill, index) => (
-                              <span key={index} className="px-1 py-0.5 bg-white bg-opacity-60 text-xs rounded truncate max-w-full">
+                              <span key={index} className="px-1 py-0.5 bg-white dark:bg-slate-800 bg-opacity-60 text-xs rounded truncate max-w-full">
                                 {skill}
                               </span>
                             ))}
                             {resource.skills.length > 2 && (
-                              <span className="px-1 py-0.5 bg-white bg-opacity-60 text-xs rounded">
+                              <span className="px-1 py-0.5 bg-white dark:bg-slate-800 bg-opacity-60 text-xs rounded">
                                 +{resource.skills.length - 2}
                               </span>
                             )}
@@ -892,13 +886,13 @@ export default function Resources() {
               <div className="bg-gray-50 dark:bg-slate-700 p-3 sm:p-4 rounded-lg border border-gray-200 dark:border-slate-600">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-medium text-gray-900 dark:text-slate-100">Utilization Insights</h4>
-                  <div className="text-xs text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-600 px-2 py-1 rounded border border-gray-200 dark:border-slate-500">
+                  <div className="text-xs text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-600 px-2 py-1 rounded border border-gray-200 dark:border-slate-500">
                     Tap cards for details
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-sm">
                   <div>
-                    <span className="text-gray-600 dark:text-slate-400">Most Utilized:</span>
+                    <span className="text-gray-700 dark:text-slate-300">Most Utilized:</span>
                     <div className="font-medium text-gray-900 dark:text-slate-100 truncate">
                       {filteredResources.reduce((max, resource) =>
                         resource.utilization_percentage > max.utilization_percentage ? resource : max,
@@ -908,7 +902,7 @@ export default function Resources() {
                     </div>
                   </div>
                   <div>
-                    <span className="text-gray-600 dark:text-slate-400">Least Utilized:</span>
+                    <span className="text-gray-700 dark:text-slate-300">Least Utilized:</span>
                     <div className="font-medium text-gray-900 dark:text-slate-100 truncate">
                       {filteredResources.reduce((min, resource) =>
                         resource.utilization_percentage < min.utilization_percentage ? resource : min,
@@ -918,7 +912,7 @@ export default function Resources() {
                     </div>
                   </div>
                   <div>
-                    <span className="text-gray-600 dark:text-slate-400">Available Capacity:</span>
+                    <span className="text-gray-700 dark:text-slate-300">Available Capacity:</span>
                     <div className="font-medium text-gray-900 dark:text-slate-100">
                       {filteredResources.reduce((sum, r) => sum + r.available_hours, 0).toFixed(1)}h total
                     </div>
@@ -933,9 +927,9 @@ export default function Resources() {
         {/* Enhanced Mobile-First Add Resource Modal */}
         {showAddModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6">
-                <h3 className="text-lg font-semibold text-gray-900">Add New Resource</h3>
+            <div className="bg-white dark:bg-slate-800 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 p-4 sm:p-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Add New Resource</h3>
               </div>
               <form onSubmit={async (e) => {
                 e.preventDefault()
@@ -964,100 +958,100 @@ export default function Resources() {
               }} className="p-4 sm:p-6 space-y-4"
               >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Name *</label>
                   <input
                     type="text"
                     name="name"
                     required
-                    className="w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    className="w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                     placeholder="Enter full name"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Email *</label>
                   <input
                     type="email"
                     name="email"
                     required
-                    className="w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    className="w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                     placeholder="Enter email address"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Role</label>
                   <input
                     type="text"
                     name="role"
                     placeholder="e.g. Developer, Designer, Manager"
-                    className="input-field w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    className="input-field w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Capacity (hrs/week)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Capacity (hrs/week)</label>
                     <input
                       type="number"
                       name="capacity"
                       defaultValue="40"
                       min="1"
                       max="80"
-                      className="input-field w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                      className="input-field w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Availability (%)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Availability (%)</label>
                     <input
                       type="number"
                       name="availability"
                       defaultValue="100"
                       min="0"
                       max="100"
-                      className="input-field w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                      className="input-field w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                     />
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Hourly Rate ($)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Hourly Rate ($)</label>
                   <input
                     type="number"
                     name="hourly_rate"
                     step="0.01"
                     min="0"
                     placeholder="Optional"
-                    className="input-field w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    className="input-field w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Skills</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Skills</label>
                   <input
                     type="text"
                     name="skills"
                     placeholder="e.g. React, Python, Design (comma-separated)"
-                    className="input-field w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    className="input-field w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Location</label>
                   <input
                     type="text"
                     name="location"
                     placeholder="e.g. Berlin, Remote"
-                    className="input-field w-full min-h-[44px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    className="input-field w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                   />
                 </div>
                 
-                <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4 border-t border-gray-200">
+                <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4 border-t border-gray-200 dark:border-slate-700">
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="w-full sm:w-auto min-h-[44px] px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 active:bg-gray-300 font-medium"
+                    className="w-full sm:w-auto min-h-[44px] px-4 py-2 text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 active:bg-gray-300 font-medium"
                   >
                     Cancel
                   </button>
@@ -1073,6 +1067,13 @@ export default function Resources() {
           </div>
         )}
       </div>
+      <GuidedTour
+        steps={resourcesTourSteps}
+        isOpen={isOpen}
+        onClose={closeTour}
+        onComplete={completeTour}
+        tourId="resources-v1"
+      />
     </AppLayout>
   )
 }

@@ -90,6 +90,7 @@ describe('Property 9: Animations Use Only Compositable Properties', () => {
     // Read CSS files
     const cssFiles = [
       path.join(process.cwd(), 'app/globals.css'),
+      path.join(process.cwd(), 'app/critical.css'),
     ]
 
     const violations: Array<{ file: string; keyframe: string; property: string }> = []
@@ -134,6 +135,7 @@ describe('Property 9: Animations Use Only Compositable Properties', () => {
   it('should verify all keyframe animations use GPU-compositable properties', () => {
     const cssFiles = [
       path.join(process.cwd(), 'app/globals.css'),
+      path.join(process.cwd(), 'app/critical.css'),
     ]
 
     const keyframeData: Array<{ name: string; properties: string[] }> = []
@@ -216,6 +218,7 @@ describe('Property 9: Animations Use Only Compositable Properties', () => {
   it('should verify all animations include translateZ(0) for GPU compositing', () => {
     const cssFiles = [
       path.join(process.cwd(), 'app/globals.css'),
+      path.join(process.cwd(), 'app/critical.css'),
     ]
 
     const keyframesWithoutGPU: string[] = []

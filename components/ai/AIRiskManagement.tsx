@@ -248,8 +248,8 @@ export default function AIRiskManagement({
               onClick={() => setAutoRefresh(!autoRefresh)}
               className={`p-2 rounded-md transition-colors ${
                 autoRefresh 
-                  ? 'bg-white bg-opacity-20 text-white' 
-                  : 'bg-white bg-opacity-10 text-purple-100 hover:bg-white hover:bg-opacity-20'
+                  ? 'bg-white dark:bg-slate-800 bg-opacity-20 text-white' 
+                  : 'bg-white dark:bg-slate-800 bg-opacity-10 text-purple-100 hover:bg-white dark:bg-slate-800 hover:bg-opacity-20'
               }`}
               title={autoRefresh ? 'Disable auto-refresh' : 'Enable auto-refresh'}
             >
@@ -259,7 +259,7 @@ export default function AIRiskManagement({
             <button
               onClick={loadAIData}
               disabled={loading}
-              className="p-2 bg-white bg-opacity-10 text-purple-100 rounded-md hover:bg-white hover:bg-opacity-20 disabled:opacity-50"
+              className="p-2 bg-white dark:bg-slate-800 bg-opacity-10 text-purple-100 rounded-md hover:bg-white dark:bg-slate-800 hover:bg-opacity-20 disabled:opacity-50"
             >
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
@@ -339,7 +339,7 @@ export default function AIRiskManagement({
                 className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab.id
                     ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 hover:border-gray-300 dark:hover:border-slate-600'
+                    : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 hover:border-gray-300 dark:border-slate-600 dark:hover:border-slate-600'
                 }`}
               >
                 <tab.icon className="h-4 w-4" />
@@ -437,7 +437,7 @@ export default function AIRiskManagement({
                           <div className="space-y-1">
                             {pattern.successful_mitigations.slice(0, 2).map((mitigation, index) => (
                               <div key={index} className="text-xs text-gray-600 dark:text-slate-400 flex items-center space-x-2">
-                                <CheckCircle className="h-3 w-3 text-green-500" />
+                                <CheckCircle className="h-3 w-3 text-green-500 dark:text-green-400" />
                                 <span>{mitigation.strategy}</span>
                                 <span className="text-green-600 dark:text-green-400">
                                   ({(mitigation.success_rate * 100).toFixed(0)}% success)
@@ -564,7 +564,7 @@ export default function AIRiskManagement({
                       
                       {alert.acknowledged && (
                         <div className="mt-3 text-xs text-gray-500 dark:text-slate-500 flex items-center space-x-2">
-                          <CheckCircle className="h-3 w-3 text-green-500" />
+                          <CheckCircle className="h-3 w-3 text-green-500 dark:text-green-400" />
                           <span>
                             Acknowledged {alert.acknowledged_at ? new Date(alert.acknowledged_at).toLocaleString() : ''}
                           </span>

@@ -74,8 +74,8 @@ export function CurrencySelector({
           focus:ring-2
           focus:ring-blue-500
           focus:border-blue-500
-          disabled:bg-gray-100 dark:disabled:bg-slate-700
-          disabled:text-gray-500 dark:disabled:text-slate-400
+          disabled:bg-gray-100 dark:bg-slate-700 dark:disabled:bg-slate-700
+          disabled:text-gray-600 dark:text-slate-300 dark:disabled:text-slate-400
           disabled:cursor-not-allowed
           cursor-pointer
           transition-colors

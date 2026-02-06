@@ -288,16 +288,16 @@ export function GanttChart({
 
   return (
     <div
-      className={`flex flex-col border border-gray-200 rounded-lg bg-white overflow-hidden touch-manipulation ${className}`}
+      className={`flex flex-col border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 overflow-hidden touch-manipulation ${className}`}
       data-testid={testId}
     >
       {/* Toolbar - touch-friendly (Task 14.1) */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 bg-gray-50 min-h-[44px]">
+      <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 min-h-[44px]">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={zoomOut}
-            className="p-2 min-w-[44px] min-h-[44px] rounded hover:bg-gray-200 active:bg-gray-300 touch-manipulation"
+            className="p-2 min-w-[44px] min-h-[44px] rounded hover:bg-gray-200 dark:hover:bg-slate-600 active:bg-gray-300 touch-manipulation"
             aria-label="Zoom out"
           >
             <ZoomOut className="w-4 h-4" />
@@ -306,19 +306,19 @@ export function GanttChart({
           <button
             type="button"
             onClick={zoomIn}
-            className="p-2 min-w-[44px] min-h-[44px] rounded hover:bg-gray-200 active:bg-gray-300 touch-manipulation"
+            className="p-2 min-w-[44px] min-h-[44px] rounded hover:bg-gray-200 dark:hover:bg-slate-600 active:bg-gray-300 touch-manipulation"
             aria-label="Zoom in"
           >
             <ZoomIn className="w-4 h-4" />
           </button>
         </div>
-        <div className="flex items-center gap-4 text-xs text-gray-500">
+        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-slate-400">
           {onDependencyCreate && (
             <button
               type="button"
               onClick={() => setDependencyFromTaskId((prev) => (prev ? null : 'active'))}
               className={`flex items-center gap-1.5 px-2 py-1 rounded border ${
-                dependencyFromTaskId ? 'bg-blue-100 border-blue-400 text-blue-800' : 'border-gray-300 hover:bg-gray-100'
+                dependencyFromTaskId ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-400 dark:border-blue-600 text-blue-800 dark:text-blue-300' : 'border-gray-300 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700'
               }`}
               title="Click predecessor task, then successor task"
             >
@@ -343,7 +343,7 @@ export function GanttChart({
         </div>
       </div>
       {dependencyFromTaskId && (
-        <p className="px-3 py-1.5 text-xs bg-blue-50 text-blue-800 border-b border-blue-100">
+        <p className="px-3 py-1.5 text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 border-b border-blue-100">
           Click the predecessor task, then the successor task to create a dependency.
         </p>
       )}
@@ -355,12 +355,12 @@ export function GanttChart({
       >
         <div style={{ width: LABEL_WIDTH + timelineWidth, minHeight: tasks.length * ROW_HEIGHT + TICK_HEIGHT }}>
           {/* Timeline header */}
-          <div className="flex sticky top-0 z-10 bg-white border-b border-gray-200">
+          <div className="flex sticky top-0 z-10 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700">
             <div
-              className="flex-shrink-0 border-r border-gray-200 flex items-end px-2 pb-1"
+              className="flex-shrink-0 border-r border-gray-200 dark:border-slate-700 flex items-end px-2 pb-1"
               style={{ width: LABEL_WIDTH, height: TICK_HEIGHT }}
             >
-              <span className="text-xs font-medium text-gray-500 flex items-center gap-1">
+              <span className="text-xs font-medium text-gray-500 dark:text-slate-400 flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5" /> Task
               </span>
             </div>
@@ -372,14 +372,14 @@ export function GanttChart({
                 <div
                   key={i}
                   className={`absolute top-0 bottom-0 flex items-end pb-1 ${
-                    tick.isMajor ? 'border-l border-gray-300' : 'border-l border-gray-100'
+                    tick.isMajor ? 'border-l border-gray-300 dark:border-slate-600' : 'border-l border-gray-100'
                   }`}
                   style={{
                     left: (i / Math.max(1, ticks.length - 1)) * timelineWidth,
                     width: 1,
                   }}
                 >
-                  <span className="text-xs text-gray-500 whitespace-nowrap -translate-x-1/2 ml-0.5">
+                  <span className="text-xs text-gray-500 dark:text-slate-400 whitespace-nowrap -translate-x-1/2 ml-0.5">
                     {tick.label}
                   </span>
                 </div>
@@ -413,17 +413,17 @@ export function GanttChart({
             {taskPositions.map(({ task, index, left, width, progress, baselineLeft, baselineWidth, floatWidth, top }) => (
               <div
                 key={task.id}
-                className={`flex items-center border-b border-gray-100 hover:bg-gray-50/80 ${
-                  dependencyFromTaskId === task.id ? 'bg-blue-50 ring-1 ring-blue-200' : ''
+                className={`flex items-center border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50/80 ${
+                  dependencyFromTaskId === task.id ? 'bg-blue-50 dark:bg-blue-900/20 ring-1 ring-blue-200' : ''
                 }`}
                 style={{ height: ROW_HEIGHT }}
               >
                 <div
-                  className="flex-shrink-0 flex items-center gap-2 px-2 border-r border-gray-200 cursor-pointer"
+                  className="flex-shrink-0 flex items-center gap-2 px-2 border-r border-gray-200 dark:border-slate-700 cursor-pointer"
                   style={{ width: LABEL_WIDTH }}
                   onClick={() => handleTaskClick(task)}
                 >
-                  <span className="text-xs text-gray-500 font-mono">{task.wbs_code}</span>
+                  <span className="text-xs text-gray-500 dark:text-slate-400 font-mono">{task.wbs_code}</span>
                   <span className="text-sm truncate" title={task.name}>
                     {task.name}
                   </span>
@@ -438,7 +438,7 @@ export function GanttChart({
                   {/* Baseline bar (dashed) */}
                   {showBaseline && baselineWidth > 0 && (
                     <div
-                      className="absolute top-1/2 -translate-y-1/2 h-5 border border-dashed border-gray-400 rounded bg-gray-100/50"
+                      className="absolute top-1/2 -translate-y-1/2 h-5 border border-dashed border-gray-400 rounded bg-gray-100 dark:bg-slate-700/50"
                       style={{
                         left: `${baselineLeft * 100}%`,
                         width: `${baselineWidth * 100}%`,

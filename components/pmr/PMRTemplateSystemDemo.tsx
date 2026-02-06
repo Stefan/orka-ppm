@@ -120,20 +120,20 @@ export default function PMRTemplateSystemDemo() {
   if (error) {
     return (
       <div className="p-8 text-center">
-        <div className="text-red-600 mb-2">Error loading templates</div>
-        <div className="text-sm text-gray-600">{error.message}</div>
+        <div className="text-red-600 dark:text-red-400 mb-2">Error loading templates</div>
+        <div className="text-sm text-gray-600 dark:text-slate-400">{error.message}</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-800/50 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-2">
             PMR Template System Demo
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-slate-400">
             Select, preview, and customize templates for your Project Monthly Reports
           </p>
         </div>
@@ -157,11 +157,11 @@ export default function PMRTemplateSystemDemo() {
 
         {/* Selected Template Info */}
         {selectedTemplateId && (
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">
               Selected Template
             </h2>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-slate-400">
               Template ID: {selectedTemplateId}
             </p>
             <div className="mt-4">

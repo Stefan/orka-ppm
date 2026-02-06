@@ -60,15 +60,15 @@ export const AIAssistanceTooltip: React.FC<AIAssistanceTooltipProps> = ({
   const getIcon = () => {
     switch (content.type) {
       case 'suggestion':
-        return <Sparkles className="h-5 w-5 text-purple-600" />
+        return <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
       case 'tip':
-        return <Lightbulb className="h-5 w-5 text-yellow-600" />
+        return <Lightbulb className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
       case 'insight':
-        return <TrendingUp className="h-5 w-5 text-blue-600" />
+        return <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
       case 'warning':
-        return <AlertTriangle className="h-5 w-5 text-orange-600" />
+        return <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
       case 'success':
-        return <CheckCircle className="h-5 w-5 text-green-600" />
+        return <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
     }
   }
 
@@ -77,13 +77,13 @@ export const AIAssistanceTooltip: React.FC<AIAssistanceTooltipProps> = ({
       case 'suggestion':
         return 'bg-purple-50 border-purple-200'
       case 'tip':
-        return 'bg-yellow-50 border-yellow-200'
+        return 'bg-yellow-50 border-yellow-200 dark:border-yellow-800'
       case 'insight':
-        return 'bg-blue-50 border-blue-200'
+        return 'bg-blue-50 border-blue-200 dark:border-blue-800'
       case 'warning':
         return 'bg-orange-50 border-orange-200'
       case 'success':
-        return 'bg-green-50 border-green-200'
+        return 'bg-green-50 border-green-200 dark:border-green-800'
     }
   }
 
@@ -133,7 +133,7 @@ export const AIAssistanceTooltip: React.FC<AIAssistanceTooltipProps> = ({
       {content.dismissible !== false && (
         <button
           onClick={handleDismiss}
-          className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 dark:text-slate-400 transition-colors"
           aria-label="Dismiss"
         >
           <X className="h-4 w-4" />

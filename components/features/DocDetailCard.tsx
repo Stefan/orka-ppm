@@ -26,7 +26,7 @@ export function DocDetailCard({ item, className = '' }: DocDetailCardProps) {
   if (!item) {
     return (
       <div
-        className={`rounded-xl border border-gray-200 bg-gray-50 p-8 text-center text-gray-500 ${className}`}
+        className={`rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 p-8 text-center text-gray-500 dark:text-slate-400 ${className}`}
         data-testid="doc-detail-placeholder"
       >
         <p className="text-sm">Select a spec or doc to see its description</p>
@@ -41,7 +41,7 @@ export function DocDetailCard({ item, className = '' }: DocDetailCardProps) {
 
   return (
     <div
-      className={`rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden ${className}`}
+      className={`rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow overflow-hidden ${className}`}
       data-testid="doc-detail-card"
     >
       <div className="p-6">
@@ -51,19 +51,19 @@ export function DocDetailCard({ item, className = '' }: DocDetailCardProps) {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-semibold text-gray-900">{item.name}</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100">{item.name}</h2>
               <span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
                 {item.source}
               </span>
             </div>
             {item.description && (
-              <p className="mt-2 text-sm text-gray-600 leading-relaxed">{item.description}</p>
+              <p className="mt-2 text-sm text-gray-600 dark:text-slate-400 leading-relaxed">{item.description}</p>
             )}
           </div>
         </div>
 
         {!isSection && item.sourcePath && (
-          <p className="mt-3 text-xs font-mono text-gray-500 truncate" title={item.sourcePath}>
+          <p className="mt-3 text-xs font-mono text-gray-500 dark:text-slate-400 truncate" title={item.sourcePath}>
             {item.sourcePath}
           </p>
         )}
@@ -74,7 +74,7 @@ export function DocDetailCard({ item, className = '' }: DocDetailCardProps) {
               {isInternal ? (
                 <Link
                   href={href}
-                  className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                   data-testid="doc-detail-link"
                 >
                   <ExternalLink className="h-4 w-4" />
@@ -85,7 +85,7 @@ export function DocDetailCard({ item, className = '' }: DocDetailCardProps) {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                   data-testid="doc-detail-link"
                 >
                   <ExternalLink className="h-4 w-4" />

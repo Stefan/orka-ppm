@@ -63,17 +63,17 @@ interface ImplementationMonitoringDashboardProps {
 }
 
 const ALERT_SEVERITIES = [
-  { value: 'low', label: 'Low', color: 'bg-gray-100 text-gray-800', bgColor: 'bg-gray-50' },
-  { value: 'medium', label: 'Medium', color: 'bg-yellow-100 text-yellow-800', bgColor: 'bg-yellow-50' },
-  { value: 'high', label: 'High', color: 'bg-orange-100 text-orange-800', bgColor: 'bg-orange-50' },
-  { value: 'critical', label: 'Critical', color: 'bg-red-100 text-red-800', bgColor: 'bg-red-50' }
+  { value: 'low', label: 'Low', color: 'bg-gray-100 text-gray-800 dark:text-slate-200', bgColor: 'bg-gray-50 dark:bg-slate-800/50' },
+  { value: 'medium', label: 'Medium', color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300', bgColor: 'bg-yellow-50' },
+  { value: 'high', label: 'High', color: 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300', bgColor: 'bg-orange-50' },
+  { value: 'critical', label: 'Critical', color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300', bgColor: 'bg-red-50' }
 ]
 
 const DEVIATION_TYPES = [
-  { value: 'schedule', label: 'Schedule', icon: Clock, color: 'text-blue-600' },
-  { value: 'cost', label: 'Cost', icon: DollarSign, color: 'text-green-600' },
-  { value: 'scope', label: 'Scope', icon: Target, color: 'text-purple-600' },
-  { value: 'quality', label: 'Quality', icon: CheckCircle, color: 'text-orange-600' }
+  { value: 'schedule', label: 'Schedule', icon: Clock, color: 'text-blue-600 dark:text-blue-400' },
+  { value: 'cost', label: 'Cost', icon: DollarSign, color: 'text-green-600 dark:text-green-400' },
+  { value: 'scope', label: 'Scope', icon: Target, color: 'text-purple-600 dark:text-purple-400' },
+  { value: 'quality', label: 'Quality', icon: CheckCircle, color: 'text-orange-600 dark:text-orange-400' }
 ]
 
 export default function ImplementationMonitoringDashboard({ 
@@ -293,19 +293,19 @@ export default function ImplementationMonitoringDashboard({
       {/* Header with Refresh */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">{t('implementationMonitoring.title')}</h2>
-          <p className="text-sm text-gray-600 mt-1">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100">{t('implementationMonitoring.title')}</h2>
+          <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
             {t('implementationMonitoring.subtitle')}
           </p>
         </div>
         
         <div className="flex items-center gap-3">
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-500 dark:text-slate-400">
             {t('implementationMonitoring.lastUpdated')}: {lastRefresh.toLocaleTimeString()}
           </div>
           <button
             onClick={handleRefresh}
-            className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
           >
             <RefreshCw className="h-4 w-4" />
             {t('implementationMonitoring.refresh')}
@@ -315,10 +315,10 @@ export default function ImplementationMonitoringDashboard({
 
       {/* Critical Alerts Banner */}
       {criticalAlerts.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
           <div className="flex items-center">
-            <AlertTriangle className="h-5 w-5 text-red-600" />
-            <h3 className="ml-2 text-sm font-medium text-red-800">
+            <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+            <h3 className="ml-2 text-sm font-medium text-red-800 dark:text-red-300">
               {t('implementationMonitoring.criticalAlerts', { count: criticalAlerts.length })}
             </h3>
           </div>
@@ -329,7 +329,7 @@ export default function ImplementationMonitoringDashboard({
               </div>
             ))}
             {criticalAlerts.length > 2 && (
-              <div className="text-sm text-red-600 font-medium">
+              <div className="text-sm text-red-600 dark:text-red-400 font-medium">
                 {t('implementationMonitoring.moreCriticalAlerts', { count: criticalAlerts.length - 2 })}
               </div>
             )}
@@ -340,46 +340,46 @@ export default function ImplementationMonitoringDashboard({
       {/* Key Metrics Cards */}
       {metrics && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
             <div className="flex items-center">
-              <Activity className="h-8 w-8 text-blue-600" />
+              <Activity className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">{t('implementationMonitoring.metrics.activeImplementations')}</p>
-                <p className="text-2xl font-semibold text-gray-900">{metrics.active_implementations}</p>
-                <p className="text-xs text-gray-500">{t('implementationMonitoring.metrics.of')} {metrics.total_implementations} {t('implementationMonitoring.metrics.total')}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('implementationMonitoring.metrics.activeImplementations')}</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-slate-100">{metrics.active_implementations}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400">{t('implementationMonitoring.metrics.of')} {metrics.total_implementations} {t('implementationMonitoring.metrics.total')}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
             <div className="flex items-center">
-              <AlertCircle className="h-8 w-8 text-red-600" />
+              <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">{t('implementationMonitoring.metrics.overdue')}</p>
-                <p className="text-2xl font-semibold text-gray-900">{metrics.overdue_implementations}</p>
-                <p className="text-xs text-gray-500">{t('implementationMonitoring.metrics.implementationsBehindSchedule')}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('implementationMonitoring.metrics.overdue')}</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-slate-100">{metrics.overdue_implementations}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400">{t('implementationMonitoring.metrics.implementationsBehindSchedule')}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
             <div className="flex items-center">
-              <CheckCircle className="h-8 w-8 text-green-600" />
+              <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">{t('implementationMonitoring.metrics.successRate')}</p>
-                <p className="text-2xl font-semibold text-gray-900">{metrics.success_rate_percentage}%</p>
-                <p className="text-xs text-gray-500">{t('implementationMonitoring.metrics.completedOnTimeAndBudget')}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('implementationMonitoring.metrics.successRate')}</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-slate-100">{metrics.success_rate_percentage}%</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400">{t('implementationMonitoring.metrics.completedOnTimeAndBudget')}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
             <div className="flex items-center">
-              <Clock className="h-8 w-8 text-purple-600" />
+              <Clock className="h-8 w-8 text-purple-600 dark:text-purple-400" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">{t('implementationMonitoring.metrics.avgCompletion')}</p>
-                <p className="text-2xl font-semibold text-gray-900">{metrics.average_completion_time_days}</p>
-                <p className="text-xs text-gray-500">{t('implementationMonitoring.metrics.daysAverage')}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">{t('implementationMonitoring.metrics.avgCompletion')}</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-slate-100">{metrics.average_completion_time_days}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400">{t('implementationMonitoring.metrics.daysAverage')}</p>
               </div>
             </div>
           </div>
@@ -387,8 +387,8 @@ export default function ImplementationMonitoringDashboard({
       )}
 
       {/* Navigation Tabs */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="border-b border-gray-200">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow">
+        <div className="border-b border-gray-200 dark:border-slate-700">
           <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
             {[
               { id: 'overview', label: t('implementationMonitoring.tabs.overview'), icon: BarChart3, count: null },
@@ -403,14 +403,14 @@ export default function ImplementationMonitoringDashboard({
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300 hover:border-gray-300 dark:border-slate-600'
                   } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
                 >
                   <Icon className="h-4 w-4" />
                   {tab.label}
                   {tab.count !== null && tab.count > 0 && (
-                    <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-0.5 rounded-full">
+                    <span className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 text-xs font-medium px-2 py-0.5 rounded-full">
                       {tab.count}
                     </span>
                   )}
@@ -426,40 +426,40 @@ export default function ImplementationMonitoringDashboard({
             <div className="space-y-6">
               {/* Performance Metrics */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Schedule Performance</h3>
+                <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Schedule Performance</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Average Schedule Variance</span>
+                      <span className="text-sm text-gray-600 dark:text-slate-400">Average Schedule Variance</span>
                       <span className={`text-sm font-medium ${
-                        metrics && metrics.total_schedule_variance_days <= 0 ? 'text-green-600' : 'text-red-600'
+                        metrics && metrics.total_schedule_variance_days <= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                       }`}>
                         {metrics && metrics.total_schedule_variance_days > 0 ? '+' : ''}{metrics?.total_schedule_variance_days} days
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">On-Time Completion Rate</span>
-                      <span className="text-sm font-medium text-green-600">
+                      <span className="text-sm text-gray-600 dark:text-slate-400">On-Time Completion Rate</span>
+                      <span className="text-sm font-medium text-green-600 dark:text-green-400">
                         {metrics && Math.round((metrics.completed_implementations - metrics.overdue_implementations) / metrics.completed_implementations * 100)}%
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Cost Performance</h3>
+                <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Cost Performance</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Average Cost Variance</span>
+                      <span className="text-sm text-gray-600 dark:text-slate-400">Average Cost Variance</span>
                       <span className={`text-sm font-medium ${
-                        metrics && metrics.total_cost_variance_percentage <= 0 ? 'text-green-600' : 'text-red-600'
+                        metrics && metrics.total_cost_variance_percentage <= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                       }`}>
                         {metrics && metrics.total_cost_variance_percentage > 0 ? '+' : ''}{metrics?.total_cost_variance_percentage}%
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Budget Adherence Rate</span>
-                      <span className="text-sm font-medium text-green-600">
+                      <span className="text-sm text-gray-600 dark:text-slate-400">Budget Adherence Rate</span>
+                      <span className="text-sm font-medium text-green-600 dark:text-green-400">
                         {metrics && Math.round(100 - Math.abs(metrics.total_cost_variance_percentage))}%
                       </span>
                     </div>
@@ -468,8 +468,8 @@ export default function ImplementationMonitoringDashboard({
               </div>
 
               {/* Recent Activity */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h3>
+              <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Recent Activity</h3>
                 <div className="space-y-3">
                   {alerts.slice(0, 3).map((alert) => (
                     <div key={alert.id} className="flex items-center gap-3 text-sm">
@@ -478,8 +478,8 @@ export default function ImplementationMonitoringDashboard({
                         alert.severity === 'high' ? 'bg-orange-500' :
                         alert.severity === 'medium' ? 'bg-yellow-500' : 'bg-gray-500'
                       }`}></div>
-                      <span className="text-gray-600">{formatDateTime(alert.detected_at)}</span>
-                      <span className="text-gray-900">{alert.title}</span>
+                      <span className="text-gray-600 dark:text-slate-400">{formatDateTime(alert.detected_at)}</span>
+                      <span className="text-gray-900 dark:text-slate-100">{alert.title}</span>
                     </div>
                   ))}
                 </div>
@@ -491,14 +491,14 @@ export default function ImplementationMonitoringDashboard({
           {activeTab === 'alerts' && (
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <h3 className="text-lg font-medium text-gray-900">Implementation Alerts</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Implementation Alerts</h3>
                 
                 {/* Alert Filters */}
                 <div className="flex items-center gap-3">
                   <select
                     value={alertFilters.severity}
                     onChange={(e) => setAlertFilters(prev => ({ ...prev, severity: e.target.value }))}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">All Severities</option>
                     {ALERT_SEVERITIES.map(severity => (
@@ -511,7 +511,7 @@ export default function ImplementationMonitoringDashboard({
                   <select
                     value={alertFilters.acknowledged}
                     onChange={(e) => setAlertFilters(prev => ({ ...prev, acknowledged: e.target.value }))}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="all">All Alerts</option>
                     <option value="unacknowledged">Unacknowledged</option>
@@ -531,32 +531,32 @@ export default function ImplementationMonitoringDashboard({
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${severityConfig.color}`}>
                               {severityConfig.label}
                             </span>
-                            <h4 className="text-lg font-medium text-gray-900">{alert.title}</h4>
+                            <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100">{alert.title}</h4>
                             {alert.acknowledged && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
                                 Acknowledged
                               </span>
                             )}
                             {alert.resolved && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
                                 Resolved
                               </span>
                             )}
                           </div>
                           
-                          <p className="text-gray-700 mb-3">{alert.description}</p>
+                          <p className="text-gray-700 dark:text-slate-300 mb-3">{alert.description}</p>
                           
                           <div className="bg-blue-50 rounded-lg p-3 mb-3">
                             <div className="flex items-start gap-2">
-                              <Lightbulb className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                              <Lightbulb className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                               <div>
                                 <p className="text-sm font-medium text-blue-900">Recommended Action:</p>
-                                <p className="text-sm text-blue-800">{alert.recommended_action}</p>
+                                <p className="text-sm text-blue-800 dark:text-blue-300">{alert.recommended_action}</p>
                               </div>
                             </div>
                           </div>
 
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-500 dark:text-slate-400">
                             Detected: {formatDateTime(alert.detected_at)}
                           </div>
                         </div>
@@ -573,7 +573,7 @@ export default function ImplementationMonitoringDashboard({
                           {!alert.resolved && (
                             <button
                               onClick={() => handleAlertAction(alert.id, 'resolve')}
-                              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
+                              className="bg-green-700 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
                             >
                               Resolve
                             </button>
@@ -587,9 +587,9 @@ export default function ImplementationMonitoringDashboard({
 
               {filteredAlerts.length === 0 && (
                 <div className="text-center py-12">
-                  <Bell className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No alerts found</h3>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <Bell className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500" />
+                  <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-slate-100">No alerts found</h3>
+                  <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
                     All implementations are running smoothly.
                   </p>
                 </div>
@@ -601,7 +601,7 @@ export default function ImplementationMonitoringDashboard({
           {activeTab === 'deviations' && (
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium text-gray-900">Implementation Deviations</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Implementation Deviations</h3>
                 <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
                   Report Deviation
                 </button>
@@ -614,7 +614,7 @@ export default function ImplementationMonitoringDashboard({
                   const Icon = typeConfig.icon
 
                   return (
-                    <div key={deviation.id} className="border border-gray-200 rounded-lg p-4">
+                    <div key={deviation.id} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
@@ -622,49 +622,49 @@ export default function ImplementationMonitoringDashboard({
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${severityConfig.color}`}>
                               {severityConfig.label}
                             </span>
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 capitalize">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200 capitalize">
                               {typeConfig.label}
                             </span>
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              deviation.status === 'resolved' ? 'bg-green-100 text-green-800' :
-                              deviation.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                              'bg-yellow-100 text-yellow-800'
+                              deviation.status === 'resolved' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' :
+                              deviation.status === 'in_progress' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' :
+                              'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
                             }`}>
                               {deviation.status.replace('_', ' ')}
                             </span>
                           </div>
                           
-                          <p className="text-gray-900 font-medium mb-2">{deviation.description}</p>
+                          <p className="text-gray-900 dark:text-slate-100 font-medium mb-2">{deviation.description}</p>
                           
                           {deviation.root_cause && (
                             <div className="mb-3">
-                              <p className="text-sm font-medium text-gray-700">Root Cause:</p>
-                              <p className="text-sm text-gray-600">{deviation.root_cause}</p>
+                              <p className="text-sm font-medium text-gray-700 dark:text-slate-300">Root Cause:</p>
+                              <p className="text-sm text-gray-600 dark:text-slate-400">{deviation.root_cause}</p>
                             </div>
                           )}
 
                           {deviation.corrective_action && (
                             <div className="mb-3">
-                              <p className="text-sm font-medium text-gray-700">Corrective Action:</p>
-                              <p className="text-sm text-gray-600">{deviation.corrective_action}</p>
+                              <p className="text-sm font-medium text-gray-700 dark:text-slate-300">Corrective Action:</p>
+                              <p className="text-sm text-gray-600 dark:text-slate-400">{deviation.corrective_action}</p>
                             </div>
                           )}
 
                           {deviation.impact_assessment && (
                             <div className="mb-3">
-                              <p className="text-sm font-medium text-gray-700">Impact Assessment:</p>
-                              <p className="text-sm text-gray-600">{deviation.impact_assessment}</p>
+                              <p className="text-sm font-medium text-gray-700 dark:text-slate-300">Impact Assessment:</p>
+                              <p className="text-sm text-gray-600 dark:text-slate-400">{deviation.impact_assessment}</p>
                             </div>
                           )}
 
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-500 dark:text-slate-400">
                             Detected: {formatDate(deviation.detected_date)}
                             {deviation.resolved_date && ` • Resolved: ${formatDate(deviation.resolved_date)}`}
                           </div>
                         </div>
 
                         <div className="flex items-center gap-2 ml-4">
-                          <button className="text-blue-600 hover:text-blue-800 text-sm">
+                          <button className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm">
                             Update Status
                           </button>
                         </div>
@@ -676,9 +676,9 @@ export default function ImplementationMonitoringDashboard({
 
               {deviations.length === 0 && (
                 <div className="text-center py-12">
-                  <AlertTriangle className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No deviations reported</h3>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <AlertTriangle className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500" />
+                  <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-slate-100">No deviations reported</h3>
+                  <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
                     All implementations are proceeding as planned.
                   </p>
                 </div>
@@ -690,7 +690,7 @@ export default function ImplementationMonitoringDashboard({
           {activeTab === 'lessons' && (
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium text-gray-900">Lessons Learned</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Lessons Learned</h3>
                 <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
                   Add Lesson
                 </button>
@@ -698,25 +698,25 @@ export default function ImplementationMonitoringDashboard({
 
               <div className="space-y-4">
                 {lessonsLearned.map((lesson) => (
-                  <div key={lesson.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div key={lesson.id} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <Lightbulb className="h-5 w-5 text-yellow-600" />
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
+                          <Lightbulb className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 capitalize">
                             {lesson.category}
                           </span>
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm text-gray-500 dark:text-slate-400">
                             by {lesson.created_by_name} • {formatDateTime(lesson.created_at)}
                           </span>
                         </div>
                         
-                        <p className="text-gray-900 mb-3">{lesson.lessons_learned}</p>
+                        <p className="text-gray-900 dark:text-slate-100 mb-3">{lesson.lessons_learned}</p>
                         
                         {lesson.impact_on_future_changes && (
-                          <div className="bg-green-50 rounded-lg p-3">
+                          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
                             <p className="text-sm font-medium text-green-900">Impact on Future Changes:</p>
-                            <p className="text-sm text-green-800">{lesson.impact_on_future_changes}</p>
+                            <p className="text-sm text-green-800 dark:text-green-300">{lesson.impact_on_future_changes}</p>
                           </div>
                         )}
                       </div>
@@ -727,7 +727,7 @@ export default function ImplementationMonitoringDashboard({
                             setSelectedLesson(lesson)
                             setShowLessonsModal(true)
                           }}
-                          className="text-blue-600 hover:text-blue-800 text-sm"
+                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm"
                         >
                           View Details
                         </button>
@@ -739,9 +739,9 @@ export default function ImplementationMonitoringDashboard({
 
               {lessonsLearned.length === 0 && (
                 <div className="text-center py-12">
-                  <Lightbulb className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No lessons learned yet</h3>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <Lightbulb className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500" />
+                  <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-slate-100">No lessons learned yet</h3>
+                  <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
                     Start capturing insights from implementation experiences.
                   </p>
                 </div>
@@ -754,13 +754,13 @@ export default function ImplementationMonitoringDashboard({
       {/* Lessons Learned Detail Modal */}
       {showLessonsModal && selectedLesson && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-3/4 max-w-2xl shadow-lg rounded-md bg-white">
+          <div className="relative top-20 mx-auto p-5 border w-3/4 max-w-2xl shadow-lg rounded-md bg-white dark:bg-slate-800">
             <div className="mt-3">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-medium text-gray-900">Lesson Learned Details</h3>
+                <h3 className="text-xl font-medium text-gray-900 dark:text-slate-100">Lesson Learned Details</h3>
                 <button
                   onClick={() => setShowLessonsModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 dark:text-slate-400"
                 >
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -770,32 +770,32 @@ export default function ImplementationMonitoringDashboard({
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 capitalize">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Category</label>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 capitalize">
                     {selectedLesson.category}
                   </span>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Lesson Learned</label>
-                  <p className="text-gray-900 bg-gray-50 rounded-lg p-3">{selectedLesson.lessons_learned}</p>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Lesson Learned</label>
+                  <p className="text-gray-900 dark:text-slate-100 bg-gray-50 dark:bg-slate-800/50 rounded-lg p-3">{selectedLesson.lessons_learned}</p>
                 </div>
 
                 {selectedLesson.impact_on_future_changes && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Impact on Future Changes</label>
-                    <p className="text-gray-900 bg-green-50 rounded-lg p-3">{selectedLesson.impact_on_future_changes}</p>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Impact on Future Changes</label>
+                    <p className="text-gray-900 dark:text-slate-100 bg-green-50 dark:bg-green-900/20 rounded-lg p-3">{selectedLesson.impact_on_future_changes}</p>
                   </div>
                 )}
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Created By</label>
-                    <p className="text-gray-900">{selectedLesson.created_by_name}</p>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Created By</label>
+                    <p className="text-gray-900 dark:text-slate-100">{selectedLesson.created_by_name}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Created Date</label>
-                    <p className="text-gray-900">{formatDateTime(selectedLesson.created_at)}</p>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Created Date</label>
+                    <p className="text-gray-900 dark:text-slate-100">{formatDateTime(selectedLesson.created_at)}</p>
                   </div>
                 </div>
               </div>
@@ -803,7 +803,7 @@ export default function ImplementationMonitoringDashboard({
               <div className="flex justify-end gap-3 mt-6">
                 <button
                   onClick={() => setShowLessonsModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-md"
                 >
                   Close
                 </button>

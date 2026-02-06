@@ -24,22 +24,22 @@ import { useTranslations } from '../../lib/i18n/context'
 
 // Dynamic imports for heavy components
 const VarianceKPIs = dynamic(() => import('./components/VarianceKPIs'), {
-  loading: () => <div className="h-24 bg-gray-100 animate-pulse rounded-lg"></div>,
+  loading: () => <div className="h-24 bg-gray-100 dark:bg-slate-700 animate-pulse rounded-lg"></div>,
   ssr: false
 })
 
 const VarianceTrends = dynamic(() => import('./components/VarianceTrends'), {
-  loading: () => <div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>,
+  loading: () => <div className="h-64 bg-gray-100 dark:bg-slate-700 animate-pulse rounded-lg"></div>,
   ssr: false
 })
 
 const VarianceAlerts = dynamic(() => import('./components/VarianceAlerts'), {
-  loading: () => <div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>,
+  loading: () => <div className="h-64 bg-gray-100 dark:bg-slate-700 animate-pulse rounded-lg"></div>,
   ssr: false
 })
 
 const VirtualizedProjectList = dynamic(() => import('../../components/ui/VirtualizedProjectList'), {
-  loading: () => <div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>,
+  loading: () => <div className="h-64 bg-gray-100 dark:bg-slate-700 animate-pulse rounded-lg"></div>,
   ssr: false
 })
 
@@ -71,15 +71,15 @@ export default function ModernDashboard() {
 
   // Error component
   const ErrorFallback = ({ error, onRetry }: { error: Error; onRetry: () => void }) => (
-    <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
       <div className="flex items-start">
         <AlertTriangle className="h-4 w-4 text-red-400 mr-2 flex-shrink-0" />
         <div className="flex-1">
-          <h3 className="text-xs font-medium text-red-800">Error</h3>
+          <h3 className="text-xs font-medium text-red-800 dark:text-red-300">Error</h3>
           <p className="text-xs text-red-700 mt-0.5">{error.message}</p>
           <button
             onClick={onRetry}
-            className="mt-1 text-xs text-red-600 hover:text-red-800 underline"
+            className="mt-1 text-xs text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
           >
             Retry
           </button>
@@ -191,18 +191,18 @@ export default function ModernDashboard() {
         {/* Compact Header */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <h1 className="text-lg font-bold text-gray-900">{t('dashboard.title')}</h1>
+            <h1 className="text-lg font-bold text-gray-900 dark:text-slate-100">{t('dashboard.title')}</h1>
             {quickStats && (
-              <div className="flex items-center gap-2 text-xs text-gray-600">
+              <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-slate-400">
                 <span>{quickStats.total_projects} {t('dashboard.projects')}</span>
                 {quickStats.critical_alerts > 0 && (
-                  <span className="flex items-center px-2 py-0.5 bg-red-100 text-red-700 rounded-full font-medium">
+                  <span className="flex items-center px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 rounded-full font-medium">
                     <AlertTriangle className="h-3 w-3 mr-1" />
                     {quickStats.critical_alerts}
                   </span>
                 )}
                 {varianceAlertCount > 0 && (
-                  <span className="flex items-center px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full font-medium">
+                  <span className="flex items-center px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 rounded-full font-medium">
                     {varianceAlertCount} Budget
                   </span>
                 )}
@@ -212,7 +212,7 @@ export default function ModernDashboard() {
           
           <div className="flex items-center gap-2">
             {lastUpdated && (
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-500 dark:text-slate-400">
                 {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
             )}
@@ -228,8 +228,8 @@ export default function ModernDashboard() {
 
         {/* Error Banner */}
         {error && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded p-2 mb-3">
-            <div className="flex items-center text-xs text-yellow-800">
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded p-2 mb-3">
+            <div className="flex items-center text-xs text-yellow-800 dark:text-yellow-300">
               <AlertTriangle className="h-4 w-4 mr-2" />
               <span>Using fallback data</span>
             </div>
@@ -245,43 +245,43 @@ export default function ModernDashboard() {
             )}
           >
             <div className="grid grid-cols-4 gap-3 mb-3">
-              <div className="bg-white p-2.5 rounded-lg border border-gray-200 shadow-sm">
+              <div className="bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-xs text-gray-600 mb-0.5">Success Rate</p>
-                    <p className="text-2xl font-bold text-green-600">{kpis?.project_success_rate || 0}%</p>
+                    <p className="text-xs text-gray-600 dark:text-slate-400 mb-0.5">Success Rate</p>
+                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">{kpis?.project_success_rate || 0}%</p>
                   </div>
-                  <CheckCircle className="h-6 w-6 text-green-600" />
+                  <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
                 </div>
               </div>
               
-              <div className="bg-white p-2.5 rounded-lg border border-gray-200 shadow-sm">
+              <div className="bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-xs text-gray-600 mb-0.5">Budget</p>
-                    <p className="text-2xl font-bold text-blue-600">{kpis?.budget_performance || 0}%</p>
+                    <p className="text-xs text-gray-600 dark:text-slate-400 mb-0.5">Budget</p>
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{kpis?.budget_performance || 0}%</p>
                   </div>
-                  <DollarSign className="h-6 w-6 text-blue-600" />
+                  <DollarSign className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 </div>
               </div>
               
-              <div className="bg-white p-2.5 rounded-lg border border-gray-200 shadow-sm">
+              <div className="bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-xs text-gray-600 mb-0.5">Timeline</p>
-                    <p className="text-2xl font-bold text-purple-600">{kpis?.timeline_performance || 0}%</p>
+                    <p className="text-xs text-gray-600 dark:text-slate-400 mb-0.5">Timeline</p>
+                    <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{kpis?.timeline_performance || 0}%</p>
                   </div>
-                  <Clock className="h-6 w-6 text-purple-600" />
+                  <Clock className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                 </div>
               </div>
               
-              <div className="bg-white p-2.5 rounded-lg border border-gray-200 shadow-sm">
+              <div className="bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-xs text-gray-600 mb-0.5">Active</p>
-                    <p className="text-2xl font-bold text-indigo-600">{kpis?.active_projects_ratio || 0}%</p>
+                    <p className="text-xs text-gray-600 dark:text-slate-400 mb-0.5">Active</p>
+                    <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{kpis?.active_projects_ratio || 0}%</p>
                   </div>
-                  <TrendingUp className="h-6 w-6 text-indigo-600" />
+                  <TrendingUp className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                 </div>
               </div>
             </div>
@@ -296,7 +296,7 @@ export default function ModernDashboard() {
           )}
         >
           <div className="mb-3">
-            <Suspense fallback={<div className="h-24 bg-gray-100 animate-pulse rounded-lg"></div>}>
+            <Suspense fallback={<div className="h-24 bg-gray-100 dark:bg-slate-700 animate-pulse rounded-lg"></div>}>
               <VarianceKPIs session={session} selectedCurrency="USD" />
             </Suspense>
           </div>
@@ -312,7 +312,7 @@ export default function ModernDashboard() {
                 <ErrorFallback error={error} onRetry={resetError} />
               )}
             >
-              <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>}>
+              <Suspense fallback={<div className="h-64 bg-gray-100 dark:bg-slate-700 animate-pulse rounded-lg"></div>}>
                 <VarianceTrends session={session} selectedCurrency="USD" />
               </Suspense>
             </ComponentErrorBoundary>
@@ -328,8 +328,8 @@ export default function ModernDashboard() {
                 )}
               >
                 {/* Project Health */}
-                <div className="bg-white p-2.5 rounded-lg shadow-sm border border-gray-200">
-                  <h3 className="text-xs font-semibold text-gray-900 mb-2">Project Health</h3>
+                <div className="bg-white dark:bg-slate-800 p-2.5 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+                  <h3 className="text-xs font-semibold text-gray-900 dark:text-slate-100 mb-2">Project Health</h3>
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center">
@@ -366,24 +366,24 @@ export default function ModernDashboard() {
                 </div>
 
                 {/* Quick Stats */}
-                <div className="bg-white p-2.5 rounded-lg shadow-sm border border-gray-200">
-                  <h3 className="text-xs font-semibold text-gray-900 mb-2">Quick Stats</h3>
+                <div className="bg-white dark:bg-slate-800 p-2.5 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+                  <h3 className="text-xs font-semibold text-gray-900 dark:text-slate-100 mb-2">Quick Stats</h3>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="text-center">
-                      <div className="text-xl font-bold text-blue-600">{quickStats?.total_projects || 0}</div>
-                      <div className="text-xs text-gray-600">Total</div>
+                      <div className="text-xl font-bold text-blue-600 dark:text-blue-400">{quickStats?.total_projects || 0}</div>
+                      <div className="text-xs text-gray-600 dark:text-slate-400">Total</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-xl font-bold text-green-600">{quickStats?.active_projects || 0}</div>
-                      <div className="text-xs text-gray-600">Active</div>
+                      <div className="text-xl font-bold text-green-600 dark:text-green-400">{quickStats?.active_projects || 0}</div>
+                      <div className="text-xs text-gray-600 dark:text-slate-400">Active</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-xl font-bold text-red-600">{quickStats?.critical_alerts || 0}</div>
-                      <div className="text-xs text-gray-600">Alerts</div>
+                      <div className="text-xl font-bold text-red-600 dark:text-red-400">{quickStats?.critical_alerts || 0}</div>
+                      <div className="text-xs text-gray-600 dark:text-slate-400">Alerts</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-xl font-bold text-yellow-600">{quickStats?.at_risk_projects || 0}</div>
-                      <div className="text-xs text-gray-600">At Risk</div>
+                      <div className="text-xl font-bold text-yellow-600 dark:text-yellow-400">{quickStats?.at_risk_projects || 0}</div>
+                      <div className="text-xs text-gray-600 dark:text-slate-400">At Risk</div>
                     </div>
                   </div>
                 </div>
@@ -402,7 +402,7 @@ export default function ModernDashboard() {
                 <ErrorFallback error={error} onRetry={resetError} />
               )}
             >
-              <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>}>
+              <Suspense fallback={<div className="h-64 bg-gray-100 dark:bg-slate-700 animate-pulse rounded-lg"></div>}>
                 <VarianceAlerts session={session} onAlertCount={setVarianceAlertCount} />
               </Suspense>
             </ComponentErrorBoundary>
@@ -417,9 +417,9 @@ export default function ModernDashboard() {
                   <ErrorFallback error={error} onRetry={resetError} />
                 )}
               >
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                  <div className="px-3 py-2 border-b border-gray-200">
-                    <h3 className="text-xs font-semibold text-gray-900">Recent Projects</h3>
+                <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+                  <div className="px-3 py-2 border-b border-gray-200 dark:border-slate-700">
+                    <h3 className="text-xs font-semibold text-gray-900 dark:text-slate-100">Recent Projects</h3>
                   </div>
                   <VirtualizedProjectList 
                     projects={recentProjects} 

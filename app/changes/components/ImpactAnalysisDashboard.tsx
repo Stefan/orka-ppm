@@ -58,7 +58,7 @@ export default function ImpactAnalysisDashboard({
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <p className="text-gray-500">{error || t('impactAnalysis.noData')}</p>
+          <p className="text-gray-500 dark:text-slate-400">{error || t('impactAnalysis.noData')}</p>
         </div>
       </div>
     )
@@ -121,11 +121,11 @@ export default function ImpactAnalysisDashboard({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{t('impactAnalysis.title')}</h2>
-            <p className="text-gray-600 mt-1">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">{t('impactAnalysis.title')}</h2>
+            <p className="text-gray-600 dark:text-slate-400 mt-1">
               {t('impactAnalysis.subtitle', { changeId })}
             </p>
           </div>
@@ -133,14 +133,14 @@ export default function ImpactAnalysisDashboard({
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-slate-200 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
             >
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
               {t('impactAnalysis.refresh')}
             </button>
             <button
               onClick={handleExport}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-slate-200 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
             >
               <Download className="h-4 w-4" />
               {t('impactAnalysis.export')}
@@ -156,8 +156,8 @@ export default function ImpactAnalysisDashboard({
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+        <div className="border-b border-gray-200 dark:border-slate-700">
           <nav className="flex space-x-8 px-6">
             {[
               { id: 'overview', label: 'Overview', icon: BarChart3 },
@@ -174,8 +174,8 @@ export default function ImpactAnalysisDashboard({
                   onClick={() => setActiveView(tab.id as any)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm ${
                     activeView === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300 hover:border-gray-300 dark:border-slate-600'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -195,48 +195,48 @@ export default function ImpactAnalysisDashboard({
                 <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-blue-600 text-sm font-medium">Total Cost Impact</p>
+                      <p className="text-blue-600 dark:text-blue-400 text-sm font-medium">Total Cost Impact</p>
                       <p className="text-2xl font-bold text-blue-900">
                         ${impactData.total_cost_impact.toLocaleString()}
                       </p>
                     </div>
-                    <DollarSign className="h-8 w-8 text-blue-600" />
+                    <DollarSign className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                   </div>
                 </div>
 
                 <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-6 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-orange-600 text-sm font-medium">Schedule Impact</p>
+                      <p className="text-orange-600 dark:text-orange-400 text-sm font-medium">Schedule Impact</p>
                       <p className="text-2xl font-bold text-orange-900">
                         {impactData.schedule_impact_days} days
                       </p>
                     </div>
-                    <Calendar className="h-8 w-8 text-orange-600" />
+                    <Calendar className="h-8 w-8 text-orange-600 dark:text-orange-400" />
                   </div>
                 </div>
 
                 <div className="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-red-600 text-sm font-medium">Critical Path</p>
+                      <p className="text-red-600 dark:text-red-400 text-sm font-medium">Critical Path</p>
                       <p className="text-2xl font-bold text-red-900">
                         {impactData.critical_path_affected ? 'Affected' : 'Not Affected'}
                       </p>
                     </div>
-                    <AlertTriangle className="h-8 w-8 text-red-600" />
+                    <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
                   </div>
                 </div>
 
                 <div className="bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-green-600 text-sm font-medium">New Risks</p>
+                      <p className="text-green-600 dark:text-green-400 text-sm font-medium">New Risks</p>
                       <p className="text-2xl font-bold text-green-900">
                         {impactData.new_risks.length}
                       </p>
                     </div>
-                    <Activity className="h-8 w-8 text-green-600" />
+                    <Activity className="h-8 w-8 text-green-600 dark:text-green-400" />
                   </div>
                 </div>
               </div>
@@ -244,8 +244,8 @@ export default function ImpactAnalysisDashboard({
               {/* Overview Charts */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Cost Breakdown */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Cost Breakdown</h3>
+                <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Cost Breakdown</h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
                       <Pie
@@ -268,8 +268,8 @@ export default function ImpactAnalysisDashboard({
                 </div>
 
                 {/* Scenario Comparison */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Scenario Comparison</h3>
+                <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Scenario Comparison</h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <ComposedChart data={scenarioComparisonData}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -292,31 +292,31 @@ export default function ImpactAnalysisDashboard({
             <div className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Cost Summary */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Cost Summary</h3>
+                <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Cost Summary</h3>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Direct Costs</span>
-                      <span className="font-medium text-green-600">
+                      <span className="text-gray-600 dark:text-slate-400">Direct Costs</span>
+                      <span className="font-medium text-green-600 dark:text-green-400">
                         ${impactData.direct_costs.toLocaleString()}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Indirect Costs</span>
-                      <span className="font-medium text-orange-600">
+                      <span className="text-gray-600 dark:text-slate-400">Indirect Costs</span>
+                      <span className="font-medium text-orange-600 dark:text-orange-400">
                         ${impactData.indirect_costs.toLocaleString()}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Cost Savings</span>
-                      <span className="font-medium text-blue-600">
+                      <span className="text-gray-600 dark:text-slate-400">Cost Savings</span>
+                      <span className="font-medium text-blue-600 dark:text-blue-400">
                         ${impactData.cost_savings.toLocaleString()}
                       </span>
                     </div>
                     <div className="border-t pt-4">
                       <div className="flex justify-between items-center">
-                        <span className="font-medium text-gray-900">Total Impact</span>
-                        <span className="font-bold text-lg text-red-600">
+                        <span className="font-medium text-gray-900 dark:text-slate-100">Total Impact</span>
+                        <span className="font-bold text-lg text-red-600 dark:text-red-400">
                           ${impactData.total_cost_impact.toLocaleString()}
                         </span>
                       </div>
@@ -325,8 +325,8 @@ export default function ImpactAnalysisDashboard({
                 </div>
 
                 {/* Cost Breakdown Chart */}
-                <div className="lg:col-span-2 bg-white border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Detailed Cost Breakdown</h3>
+                <div className="lg:col-span-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Detailed Cost Breakdown</h3>
                   <ResponsiveContainer width="100%" height={400}>
                     <BarChart data={costBreakdownData}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -344,8 +344,8 @@ export default function ImpactAnalysisDashboard({
           {/* Schedule Impact Tab */}
           {activeView === 'schedule' && (
             <div className="space-y-6">
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Activity Impact Analysis</h3>
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Activity Impact Analysis</h3>
                 <ResponsiveContainer width="100%" height={400}>
                   <BarChart data={scheduleImpactData}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -359,45 +359,45 @@ export default function ImpactAnalysisDashboard({
                 </ResponsiveContainer>
               </div>
 
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Affected Activities</h3>
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Affected Activities</h3>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+                    <thead className="bg-gray-50 dark:bg-slate-800/50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Activity
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Original Duration
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           New Duration
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Delay
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Resource Impact
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                       {impactData.affected_activities.map((activity) => (
                         <tr key={activity.id}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-slate-100">
                             {activity.name}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                             {activity.original_duration} days
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                             {activity.new_duration} days
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600 dark:text-red-400">
                             +{activity.delay_days} days
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-slate-400">
                             {activity.resource_impact}
                           </td>
                         </tr>
@@ -414,23 +414,23 @@ export default function ImpactAnalysisDashboard({
             <div className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Additional Resources */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Resources Needed</h3>
+                <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Additional Resources Needed</h3>
                   <div className="space-y-4">
                     {impactData.additional_resources_needed.map((resource, index) => (
-                      <div key={index} className="border border-gray-200 rounded-lg p-4">
+                      <div key={index} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h4 className="font-medium text-gray-900">{resource.resource_type}</h4>
-                            <p className="text-sm text-gray-600">
+                            <h4 className="font-medium text-gray-900 dark:text-slate-100">{resource.resource_type}</h4>
+                            <p className="text-sm text-gray-600 dark:text-slate-400">
                               Quantity: {resource.quantity} | Duration: {resource.duration_days} days
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="font-medium text-gray-900">
+                            <p className="font-medium text-gray-900 dark:text-slate-100">
                               ${(resource.quantity * resource.cost_per_unit * resource.duration_days).toLocaleString()}
                             </p>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-gray-600 dark:text-slate-400">
                               ${resource.cost_per_unit}/day
                             </p>
                           </div>
@@ -441,24 +441,24 @@ export default function ImpactAnalysisDashboard({
                 </div>
 
                 {/* Resource Reallocation */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Resource Reallocation</h3>
+                <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Resource Reallocation</h3>
                   <div className="space-y-4">
                     {impactData.resource_reallocation.map((reallocation, index) => (
-                      <div key={index} className="border border-gray-200 rounded-lg p-4">
+                      <div key={index} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <h4 className="font-medium text-gray-900">{reallocation.resource_type}</h4>
-                            <p className="text-sm text-gray-600">
+                            <h4 className="font-medium text-gray-900 dark:text-slate-100">{reallocation.resource_type}</h4>
+                            <p className="text-sm text-gray-600 dark:text-slate-400">
                               Quantity: {reallocation.quantity}
                             </p>
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <span className="bg-red-100 text-red-800 px-2 py-1 rounded">
+                          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
+                            <span className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 px-2 py-1 rounded">
                               From: {reallocation.from_activity}
                             </span>
                             <span>→</span>
-                            <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
+                            <span className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded">
                               To: {reallocation.to_activity}
                             </span>
                           </div>
@@ -474,8 +474,8 @@ export default function ImpactAnalysisDashboard({
           {/* Risk Impact Tab */}
           {activeView === 'risks' && (
             <div className="space-y-6">
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Risk Impact Analysis</h3>
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Risk Impact Analysis</h3>
                 <ResponsiveContainer width="100%" height={400}>
                   <BarChart data={riskImpactData}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -491,23 +491,23 @@ export default function ImpactAnalysisDashboard({
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* New Risks */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">New Risks Identified</h3>
+                <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">New Risks Identified</h3>
                   <div className="space-y-4">
                     {impactData.new_risks.map((risk) => (
-                      <div key={risk.id} className="border border-gray-200 rounded-lg p-4">
-                        <h4 className="font-medium text-gray-900 mb-2">{risk.description}</h4>
+                      <div key={risk.id} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
+                        <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-2">{risk.description}</h4>
                         <div className="grid grid-cols-3 gap-4 text-sm">
                           <div>
-                            <span className="text-gray-600">Probability:</span>
+                            <span className="text-gray-600 dark:text-slate-400">Probability:</span>
                             <p className="font-medium">{(risk.probability * 100).toFixed(0)}%</p>
                           </div>
                           <div>
-                            <span className="text-gray-600">Impact:</span>
+                            <span className="text-gray-600 dark:text-slate-400">Impact:</span>
                             <p className="font-medium">${risk.impact_score.toLocaleString()}</p>
                           </div>
                           <div>
-                            <span className="text-gray-600">Mitigation:</span>
+                            <span className="text-gray-600 dark:text-slate-400">Mitigation:</span>
                             <p className="font-medium">${risk.mitigation_cost.toLocaleString()}</p>
                           </div>
                         </div>
@@ -517,27 +517,27 @@ export default function ImpactAnalysisDashboard({
                 </div>
 
                 {/* Modified Risks */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Modified Existing Risks</h3>
+                <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Modified Existing Risks</h3>
                   <div className="space-y-4">
                     {impactData.modified_risks.map((risk) => (
-                      <div key={risk.id} className="border border-gray-200 rounded-lg p-4">
-                        <h4 className="font-medium text-gray-900 mb-2">{risk.description}</h4>
+                      <div key={risk.id} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
+                        <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-2">{risk.description}</h4>
                         <div className="grid grid-cols-2 gap-4 text-sm">
                           <div>
-                            <span className="text-gray-600">Probability Change:</span>
+                            <span className="text-gray-600 dark:text-slate-400">Probability Change:</span>
                             <p className="font-medium">
                               {(risk.old_probability * 100).toFixed(0)}% → {(risk.new_probability * 100).toFixed(0)}%
-                              <span className={`ml-2 ${risk.new_probability > risk.old_probability ? 'text-red-600' : 'text-green-600'}`}>
+                              <span className={`ml-2 ${risk.new_probability > risk.old_probability ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
                                 {risk.new_probability > risk.old_probability ? '↑' : '↓'}
                               </span>
                             </p>
                           </div>
                           <div>
-                            <span className="text-gray-600">Impact Change:</span>
+                            <span className="text-gray-600 dark:text-slate-400">Impact Change:</span>
                             <p className="font-medium">
                               ${risk.old_impact.toLocaleString()} → ${risk.new_impact.toLocaleString()}
-                              <span className={`ml-2 ${risk.new_impact > risk.old_impact ? 'text-red-600' : 'text-green-600'}`}>
+                              <span className={`ml-2 ${risk.new_impact > risk.old_impact ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
                                 {risk.new_impact > risk.old_impact ? '↑' : '↓'}
                               </span>
                             </p>
@@ -554,8 +554,8 @@ export default function ImpactAnalysisDashboard({
           {/* Scenarios Tab */}
           {activeView === 'scenarios' && (
             <div className="space-y-6">
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Scenario Analysis</h3>
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Scenario Analysis</h3>
                 <ResponsiveContainer width="100%" height={400}>
                   <ComposedChart data={scenarioComparisonData}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -573,21 +573,21 @@ export default function ImpactAnalysisDashboard({
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {Object.entries(impactData.scenarios).map(([scenarioName, scenario]) => (
-                  <div key={scenarioName} className="bg-white border border-gray-200 rounded-lg p-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4 capitalize">
+                  <div key={scenarioName} className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4 capitalize">
                       {scenarioName.replace('_', ' ')} Scenario
                     </h3>
                     <div className="space-y-3">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Cost Impact:</span>
+                        <span className="text-gray-600 dark:text-slate-400">Cost Impact:</span>
                         <span className="font-medium">${scenario.cost_impact.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Schedule Impact:</span>
+                        <span className="text-gray-600 dark:text-slate-400">Schedule Impact:</span>
                         <span className="font-medium">{scenario.schedule_impact} days</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Probability:</span>
+                        <span className="text-gray-600 dark:text-slate-400">Probability:</span>
                         <span className="font-medium">{(scenario.probability * 100).toFixed(0)}%</span>
                       </div>
                     </div>
@@ -600,17 +600,17 @@ export default function ImpactAnalysisDashboard({
       </div>
 
       {/* Analysis Metadata */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Info className="h-5 w-5 text-blue-600" />
-            <span className="text-sm text-gray-600">
+            <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <span className="text-sm text-gray-600 dark:text-slate-400">
               Analysis performed by {impactData.analyzed_by} on{' '}
               {new Date(impactData.analyzed_at).toLocaleString()}
             </span>
           </div>
           {editable && (
-            <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+            <button className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium">
               Update Analysis
             </button>
           )}

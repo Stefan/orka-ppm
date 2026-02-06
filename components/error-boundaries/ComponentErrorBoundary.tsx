@@ -169,11 +169,11 @@ export class ComponentErrorBoundary extends Component<
 
       // Default component error fallback UI
       return (
-        <Card className={`border-red-200 bg-red-50 ${className}`}>
+        <Card className={`border-red-200 dark:border-red-800 bg-red-50 ${className}`}>
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-red-600" />
-              <h3 className="text-lg text-red-800">
+              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+              <h3 className="text-lg text-red-800 dark:text-red-300">
                 {componentName} Error
               </h3>
             </div>
@@ -219,18 +219,18 @@ export class ComponentErrorBoundary extends Component<
             </div>
 
             {showDetails && (
-              <div className="mt-4 p-3 bg-red-100 rounded-md border border-red-200">
+              <div className="mt-4 p-3 bg-red-100 dark:bg-red-900/30 rounded-md border border-red-200 dark:border-red-800">
                 <div className="text-sm">
-                  <div className="font-medium text-red-800 mb-1">Error ID:</div>
+                  <div className="font-medium text-red-800 dark:text-red-300 mb-1">Error ID:</div>
                   <div className="text-red-700 mb-3 font-mono text-xs">{errorId}</div>
                   
-                  <div className="font-medium text-red-800 mb-1">Error Message:</div>
+                  <div className="font-medium text-red-800 dark:text-red-300 mb-1">Error Message:</div>
                   <div className="text-red-700 mb-3">{error.message}</div>
                   
                   {process.env.NODE_ENV === 'development' && (
                     <>
-                      <div className="font-medium text-red-800 mb-1">Stack Trace:</div>
-                      <pre className="text-xs text-red-700 whitespace-pre-wrap break-words bg-red-50 p-2 rounded border">
+                      <div className="font-medium text-red-800 dark:text-red-300 mb-1">Stack Trace:</div>
+                      <pre className="text-xs text-red-700 whitespace-pre-wrap break-words bg-red-50 dark:bg-red-900/20 p-2 rounded border">
                         {error.stack}
                       </pre>
                     </>

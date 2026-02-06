@@ -14,7 +14,7 @@ export const SkeletonChart: React.FC<SkeletonChartProps> = ({
   height = 'h-64'
 }) => {
   return (
-    <div className={`bg-white p-6 rounded-lg shadow-sm border border-gray-200 ${className}`}>
+    <div className={`bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 ${className}`}>
       <div className="animate-pulse">
         {/* Chart Title */}
         <div className="h-5 bg-gray-200 rounded w-1/3 mb-6"></div>

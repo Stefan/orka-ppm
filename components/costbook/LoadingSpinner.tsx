@@ -110,7 +110,7 @@ export function LoadingSpinner({
       {variant === 'pulse' && <PulseLoader size={size} />}
       
       {message && (
-        <span className={`${messageSizes[size]} text-gray-500 font-medium`}>
+        <span className={`${messageSizes[size]} text-gray-500 dark:text-slate-400 font-medium`}>
           {message}
         </span>
       )}
@@ -122,7 +122,7 @@ export function LoadingSpinner({
   if (overlay) {
     return (
       <div 
-        className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50"
+        className="fixed inset-0 bg-white dark:bg-slate-800/80 backdrop-blur-sm flex items-center justify-center z-50"
         data-testid={`${testId}-overlay`}
       >
         {content}
@@ -190,7 +190,7 @@ export function Skeleton({
  */
 export function CardSkeleton({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-white rounded-lg shadow-md p-6 min-h-[320px] min-w-[280px] w-full ${className}`}>
+    <div className={`bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 min-h-[320px] min-w-[280px] w-full ${className}`}>
       <div className="flex justify-between mb-3">
         <Skeleton variant="text" className="w-2/3" />
         <Skeleton variant="rectangular" className="w-16 h-6 rounded-full" />
@@ -221,7 +221,7 @@ export function InlineLoader({
   className?: string
 }) {
   return (
-    <span className={`inline-flex items-center gap-2 text-gray-500 ${className}`}>
+    <span className={`inline-flex items-center gap-2 text-gray-500 dark:text-slate-400 ${className}`}>
       <RefreshCw className="w-4 h-4 animate-spin" />
       <span className="text-sm">{message}</span>
     </span>

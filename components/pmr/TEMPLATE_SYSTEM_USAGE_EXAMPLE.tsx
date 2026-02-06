@@ -38,8 +38,8 @@ export function BasicTemplateSelection() {
         isLoading={isLoading}
       />
       {selectedTemplateId && (
-        <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-800">
+        <div className="mt-4 p-4 bg-green-50 border border-green-200 dark:border-green-800 rounded-lg">
+          <p className="text-green-800 dark:text-green-300">
             Selected template: {selectedTemplateId}
           </p>
         </div>
@@ -70,7 +70,7 @@ export function AIAssistedTemplateSelection() {
     <div className="p-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-2">AI-Assisted Template Selection</h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-slate-400">
           Project Type: {projectType} | Industry: {industryFocus}
         </p>
       </div>
@@ -149,13 +149,13 @@ export function FullTemplateManagement() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-800/50 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-2">
             PMR Template Management
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-slate-400">
             Select, preview, customize, and rate templates for your reports
           </p>
         </div>
@@ -213,8 +213,8 @@ export function FullTemplateManagement() {
 
         {/* Selected Template Actions */}
         {selectedTemplateId && (
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
               Next Steps
             </h2>
             <div className="flex items-center space-x-4">
@@ -230,13 +230,13 @@ export function FullTemplateManagement() {
               </button>
               <button
                 onClick={() => handlePreviewTemplate(selectedTemplateId)}
-                className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 dark:bg-blue-900/30 rounded-lg hover:bg-blue-200 transition-colors"
               >
                 Preview Template
               </button>
               <button
                 onClick={() => handleCustomizeTemplate(selectedTemplateId)}
-                className="px-4 py-2 text-sm font-medium text-purple-700 bg-purple-100 rounded-lg hover:bg-purple-200 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-purple-700 bg-purple-100 dark:bg-purple-900/30 rounded-lg hover:bg-purple-200 transition-colors"
               >
                 Customize Template
               </button>
@@ -304,34 +304,34 @@ export function TemplateSelectionInForm() {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Other form fields */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
             Project ID
           </label>
           <input
             type="text"
             value={formData.projectId}
             onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
             Report Title
           </label>
           <input
             type="text"
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg"
             required
           />
         </div>
 
         {/* Template Selection */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
             Select Template
           </label>
           <PMRTemplateSelector
@@ -355,7 +355,7 @@ export function TemplateSelectionInForm() {
               templateId: '',
               title: ''
             })}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600"
           >
             Reset
           </button>

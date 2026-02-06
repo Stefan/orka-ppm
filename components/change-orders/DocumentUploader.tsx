@@ -40,14 +40,14 @@ export default function DocumentUploader({ changeOrderId, onUploadComplete }: Do
         disabled={uploading}
       />
       <label htmlFor="doc-upload" className="cursor-pointer flex flex-col items-center gap-2">
-        <Upload className="w-10 h-10 text-gray-400" />
-        <span className="text-sm text-gray-600">
+        <Upload className="w-10 h-10 text-gray-400 dark:text-slate-500" />
+        <span className="text-sm text-gray-600 dark:text-slate-400">
           {uploading ? 'Uploading...' : 'Click to upload drawings, specs, calculations'}
         </span>
-        <span className="text-xs text-gray-400">PDF, DOC, XLS, images</span>
+        <span className="text-xs text-gray-400 dark:text-slate-500">PDF, DOC, XLS, images</span>
       </label>
       {message && (
-        <p className="mt-2 text-sm text-amber-600">{message}</p>
+        <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">{message}</p>
       )}
     </div>
   )

@@ -2,7 +2,7 @@
 
 exports[`ProjectCard snapshot matches snapshot for red health 1`] = `
 <div
-  class="px-6 py-4 hover:bg-gray-50"
+  class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
 >
   <div
     class="flex items-center justify-between"
@@ -17,12 +17,12 @@ exports[`ProjectCard snapshot matches snapshot for red health 1`] = `
         class="min-w-0 flex-1"
       >
         <h4
-          class="text-sm font-medium text-gray-900 truncate"
+          class="text-sm font-medium text-gray-900 dark:text-slate-100 truncate"
         >
           At Risk Project
         </h4>
         <p
-          class="text-sm text-gray-500 capitalize"
+          class="text-sm text-gray-500 dark:text-slate-400 capitalize"
         >
           active
         </p>
@@ -32,13 +32,13 @@ exports[`ProjectCard snapshot matches snapshot for red health 1`] = `
       class="text-right flex-shrink-0"
     >
       <p
-        class="text-sm font-medium text-gray-900"
+        class="text-sm font-medium text-gray-900 dark:text-slate-100"
       >
         $
         80,000
       </p>
       <p
-        class="text-xs text-gray-500"
+        class="text-xs text-gray-500 dark:text-slate-400"
       >
         1/15/2024
       </p>
@@ -49,7 +49,7 @@ exports[`ProjectCard snapshot matches snapshot for red health 1`] = `
 
 exports[`ProjectCard snapshot matches snapshot for yellow health 1`] = `
 <div
-  class="px-6 py-4 hover:bg-gray-50"
+  class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
 >
   <div
     class="flex items-center justify-between"
@@ -64,12 +64,12 @@ exports[`ProjectCard snapshot matches snapshot for yellow health 1`] = `
         class="min-w-0 flex-1"
       >
         <h4
-          class="text-sm font-medium text-gray-900 truncate"
+          class="text-sm font-medium text-gray-900 dark:text-slate-100 truncate"
         >
           Residential Tower A
         </h4>
         <p
-          class="text-sm text-gray-500 capitalize"
+          class="text-sm text-gray-500 dark:text-slate-400 capitalize"
         >
           active
         </p>
@@ -79,13 +79,13 @@ exports[`ProjectCard snapshot matches snapshot for yellow health 1`] = `
       class="text-right flex-shrink-0"
     >
       <p
-        class="text-sm font-medium text-gray-900"
+        class="text-sm font-medium text-gray-900 dark:text-slate-100"
       >
         $
         200,000
       </p>
       <p
-        class="text-xs text-gray-500"
+        class="text-xs text-gray-500 dark:text-slate-400"
       >
         1/15/2024
       </p>
@@ -96,7 +96,7 @@ exports[`ProjectCard snapshot matches snapshot for yellow health 1`] = `
 
 exports[`ProjectCard snapshot matches snapshot with fixture 1`] = `
 <div
-  class="px-6 py-4 hover:bg-gray-50"
+  class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
 >
   <div
     class="flex items-center justify-between"
@@ -111,12 +111,12 @@ exports[`ProjectCard snapshot matches snapshot with fixture 1`] = `
         class="min-w-0 flex-1"
       >
         <h4
-          class="text-sm font-medium text-gray-900 truncate"
+          class="text-sm font-medium text-gray-900 dark:text-slate-100 truncate"
         >
           Office Complex Phase 1
         </h4>
         <p
-          class="text-sm text-gray-500 capitalize"
+          class="text-sm text-gray-500 dark:text-slate-400 capitalize"
         >
           active
         </p>
@@ -126,13 +126,13 @@ exports[`ProjectCard snapshot matches snapshot with fixture 1`] = `
       class="text-right flex-shrink-0"
     >
       <p
-        class="text-sm font-medium text-gray-900"
+        class="text-sm font-medium text-gray-900 dark:text-slate-100"
       >
         $
         150,000
       </p>
       <p
-        class="text-xs text-gray-500"
+        class="text-xs text-gray-500 dark:text-slate-400"
       >
         1/15/2024
       </p>

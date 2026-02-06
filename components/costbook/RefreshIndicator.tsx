@@ -59,8 +59,8 @@ export function RefreshIndicator({
           flex items-center gap-1 rounded-full transition-all
           ${buttonPadding[size]}
           ${isRefreshing 
-            ? 'bg-blue-100 text-blue-600' 
-            : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+            ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' 
+            : 'text-gray-400 hover:text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700'
           }
           ${onRefresh ? 'cursor-pointer' : 'cursor-default'}
         `}
@@ -74,7 +74,7 @@ export function RefreshIndicator({
       
       {/* Timestamp */}
       {showTimestamp && lastUpdate && !isRefreshing && (
-        <span className="text-gray-400 flex items-center gap-1">
+        <span className="text-gray-400 dark:text-slate-500 flex items-center gap-1">
           <Clock className={iconSizes[size]} />
           {formatUpdateTime(lastUpdate)}
         </span>
@@ -98,7 +98,7 @@ export function RefreshBadge({ isRefreshing, className = '' }: RefreshBadgeProps
     <span className={`
       inline-flex items-center gap-1 px-2 py-0.5
       text-xs font-medium
-      bg-blue-100 text-blue-700
+      bg-blue-100 dark:bg-blue-900/30 text-blue-700
       rounded-full
       ${className}
     `}>
@@ -123,7 +123,7 @@ export function RefreshSuccess({ show, className = '' }: RefreshSuccessProps) {
     <span className={`
       inline-flex items-center gap-1 px-2 py-0.5
       text-xs font-medium
-      bg-green-100 text-green-700
+      bg-green-100 dark:bg-green-900/30 text-green-700
       rounded-full
       animate-in fade-in duration-200
       ${className}
@@ -182,7 +182,7 @@ export function ConnectionIndicator({
         <span className={`relative inline-flex rounded-full h-2 w-2 ${config.color}`} />
       </span>
       {showLabel && (
-        <span className="text-xs text-gray-500">{config.label}</span>
+        <span className="text-xs text-gray-500 dark:text-slate-400">{config.label}</span>
       )}
     </div>
   )

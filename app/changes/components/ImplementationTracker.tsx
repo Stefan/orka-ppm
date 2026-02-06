@@ -111,18 +111,18 @@ interface ImplementationTrackerProps {
 }
 
 const TASK_STATUSES = [
-  { value: 'planned', label: 'Planned', color: 'bg-gray-100 text-gray-800' },
-  { value: 'in_progress', label: 'In Progress', color: 'bg-blue-100 text-blue-800' },
-  { value: 'completed', label: 'Completed', color: 'bg-green-100 text-green-800' },
-  { value: 'on_hold', label: 'On Hold', color: 'bg-yellow-100 text-yellow-800' },
-  { value: 'cancelled', label: 'Cancelled', color: 'bg-red-100 text-red-800' }
+  { value: 'planned', label: 'Planned', color: 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200' },
+  { value: 'in_progress', label: 'In Progress', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' },
+  { value: 'completed', label: 'Completed', color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' },
+  { value: 'on_hold', label: 'On Hold', color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' },
+  { value: 'cancelled', label: 'Cancelled', color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' }
 ]
 
 const DEVIATION_SEVERITIES = [
-  { value: 'low', label: 'Low', color: 'bg-gray-100 text-gray-800' },
-  { value: 'medium', label: 'Medium', color: 'bg-yellow-100 text-yellow-800' },
-  { value: 'high', label: 'High', color: 'bg-orange-100 text-orange-800' },
-  { value: 'critical', label: 'Critical', color: 'bg-red-100 text-red-800' }
+  { value: 'low', label: 'Low', color: 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200' },
+  { value: 'medium', label: 'Medium', color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' },
+  { value: 'high', label: 'High', color: 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300' },
+  { value: 'critical', label: 'Critical', color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' }
 ]
 
 export default function ImplementationTracker({ 
@@ -360,12 +360,12 @@ export default function ImplementationTracker({
 
   const getStatusColor = (status: string) => {
     const statusConfig = TASK_STATUSES.find(s => s.value === status)
-    return statusConfig?.color || 'bg-gray-100 text-gray-800'
+    return statusConfig?.color || 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200'
   }
 
   const getSeverityColor = (severity: string) => {
     const severityConfig = DEVIATION_SEVERITIES.find(s => s.value === severity)
-    return severityConfig?.color || 'bg-gray-100 text-gray-800'
+    return severityConfig?.color || 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200'
   }
 
   const formatDate = (dateString: string) => {
@@ -395,9 +395,9 @@ export default function ImplementationTracker({
   if (!implementationStatus) {
     return (
       <div className="text-center py-12">
-        <FileText className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-sm font-medium text-gray-900">No Implementation Plan</h3>
-        <p className="mt-1 text-sm text-gray-500">
+        <FileText className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500" />
+        <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-slate-100">No Implementation Plan</h3>
+        <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
           This change request does not have an active implementation plan.
         </p>
       </div>
@@ -409,44 +409,44 @@ export default function ImplementationTracker({
   return (
     <div className="space-y-6">
       {/* Header with Key Metrics */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Implementation Tracking</h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100">Implementation Tracking</h2>
+            <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
               Change Request: {changeRequestId} • Assigned to: {implementation_plan.assigned_to_name}
             </p>
           </div>
           
           <div className="flex items-center gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {progress_summary.overall_progress_percentage}%
               </div>
-              <div className="text-xs text-gray-500">Overall Progress</div>
+              <div className="text-xs text-gray-500 dark:text-slate-400">Overall Progress</div>
             </div>
             
             <div className="text-center">
-              <div className="text-lg font-semibold text-gray-900">
+              <div className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                 {calculateDaysRemaining(implementation_plan.planned_end_date)}
               </div>
-              <div className="text-xs text-gray-500">Days Remaining</div>
+              <div className="text-xs text-gray-500 dark:text-slate-400">Days Remaining</div>
             </div>
             
             <div className="text-center">
               <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                schedule_status.on_schedule ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                schedule_status.on_schedule ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
               }`}>
                 {schedule_status.status.replace('_', ' ')}
               </div>
-              <div className="text-xs text-gray-500 mt-1">Schedule Status</div>
+              <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">Schedule Status</div>
             </div>
           </div>
         </div>
 
         {/* Progress Bar */}
         <div className="mt-6">
-          <div className="flex justify-between text-sm text-gray-600 mb-2">
+          <div className="flex justify-between text-sm text-gray-600 dark:text-slate-400 mb-2">
             <span>Implementation Progress</span>
             <span>{progress_summary.overall_progress_percentage}% Complete</span>
           </div>
@@ -463,8 +463,8 @@ export default function ImplementationTracker({
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="border-b border-gray-200">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow">
+        <div className="border-b border-gray-200 dark:border-slate-700">
           <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
             {[
               { id: 'overview', label: 'Overview', icon: BarChart3 },
@@ -480,8 +480,8 @@ export default function ImplementationTracker({
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300 hover:border-gray-300 dark:border-slate-600'
                   } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
                 >
                   <Icon className="h-4 w-4" />
@@ -498,63 +498,63 @@ export default function ImplementationTracker({
             <div className="space-y-6">
               {/* Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-blue-50 rounded-lg p-4">
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
                   <div className="flex items-center">
-                    <CheckCircle className="h-8 w-8 text-blue-600" />
+                    <CheckCircle className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                     <div className="ml-3">
                       <p className="text-sm font-medium text-blue-900">Total Tasks</p>
-                      <p className="text-2xl font-semibold text-blue-600">{progress_summary.total_tasks}</p>
+                      <p className="text-2xl font-semibold text-blue-600 dark:text-blue-400">{progress_summary.total_tasks}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-green-50 rounded-lg p-4">
+                <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
                   <div className="flex items-center">
-                    <CheckCircle className="h-8 w-8 text-green-600" />
+                    <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
                     <div className="ml-3">
                       <p className="text-sm font-medium text-green-900">Completed</p>
-                      <p className="text-2xl font-semibold text-green-600">{progress_summary.completed_tasks}</p>
+                      <p className="text-2xl font-semibold text-green-600 dark:text-green-400">{progress_summary.completed_tasks}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-yellow-50 rounded-lg p-4">
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4">
                   <div className="flex items-center">
-                    <Clock className="h-8 w-8 text-yellow-600" />
+                    <Clock className="h-8 w-8 text-yellow-600 dark:text-yellow-400" />
                     <div className="ml-3">
                       <p className="text-sm font-medium text-yellow-900">In Progress</p>
-                      <p className="text-2xl font-semibold text-yellow-600">{progress_summary.in_progress_tasks}</p>
+                      <p className="text-2xl font-semibold text-yellow-600 dark:text-yellow-400">{progress_summary.in_progress_tasks}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4">
                   <div className="flex items-center">
-                    <PlayCircle className="h-8 w-8 text-gray-600" />
+                    <PlayCircle className="h-8 w-8 text-gray-600 dark:text-slate-400" />
                     <div className="ml-3">
-                      <p className="text-sm font-medium text-gray-900">Pending</p>
-                      <p className="text-2xl font-semibold text-gray-600">{progress_summary.pending_tasks}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-slate-100">Pending</p>
+                      <p className="text-2xl font-semibold text-gray-600 dark:text-slate-400">{progress_summary.pending_tasks}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Schedule Status */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Schedule Status</h3>
+              <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Schedule Status</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <p className="text-sm text-gray-600">Planned End Date</p>
+                    <p className="text-sm text-gray-600 dark:text-slate-400">Planned End Date</p>
                     <p className="text-lg font-semibold">{formatDate(implementation_plan.planned_end_date)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Projected End Date</p>
+                    <p className="text-sm text-gray-600 dark:text-slate-400">Projected End Date</p>
                     <p className="text-lg font-semibold">{formatDate(schedule_status.projected_end_date)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Schedule Variance</p>
+                    <p className="text-sm text-gray-600 dark:text-slate-400">Schedule Variance</p>
                     <p className={`text-lg font-semibold ${
-                      schedule_status.days_variance <= 0 ? 'text-green-600' : 'text-red-600'
+                      schedule_status.days_variance <= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                     }`}>
                       {schedule_status.days_variance > 0 ? '+' : ''}{schedule_status.days_variance} days
                     </p>
@@ -564,10 +564,10 @@ export default function ImplementationTracker({
 
               {/* Deviations Alert */}
               {deviations.length > 0 && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
                   <div className="flex items-center">
-                    <AlertTriangle className="h-5 w-5 text-yellow-600" />
-                    <h3 className="ml-2 text-sm font-medium text-yellow-800">
+                    <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                    <h3 className="ml-2 text-sm font-medium text-yellow-800 dark:text-yellow-300">
                       Active Deviations ({deviations.length})
                     </h3>
                   </div>
@@ -590,7 +590,7 @@ export default function ImplementationTracker({
           {activeTab === 'tasks' && (
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium text-gray-900">Implementation Tasks</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Implementation Tasks</h3>
                 <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
                   Add Task
                 </button>
@@ -598,22 +598,22 @@ export default function ImplementationTracker({
 
               <div className="space-y-4">
                 {tasks.map((task) => (
-                  <div key={task.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div key={task.id} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3">
-                          <span className="text-sm font-medium text-gray-500">#{task.task_number}</span>
-                          <h4 className="text-lg font-medium text-gray-900">{task.title}</h4>
+                          <span className="text-sm font-medium text-gray-500 dark:text-slate-400">#{task.task_number}</span>
+                          <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100">{task.title}</h4>
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
                             {task.status.replace('_', ' ')}
                           </span>
                         </div>
                         
                         {task.description && (
-                          <p className="text-sm text-gray-600 mt-2">{task.description}</p>
+                          <p className="text-sm text-gray-600 dark:text-slate-400 mt-2">{task.description}</p>
                         )}
 
-                        <div className="flex items-center gap-6 mt-3 text-sm text-gray-500">
+                        <div className="flex items-center gap-6 mt-3 text-sm text-gray-500 dark:text-slate-400">
                           <div className="flex items-center gap-1">
                             <Users className="h-4 w-4" />
                             {task.assigned_to_name}
@@ -631,7 +631,7 @@ export default function ImplementationTracker({
 
                         {/* Progress Bar */}
                         <div className="mt-4">
-                          <div className="flex justify-between text-sm text-gray-600 mb-1">
+                          <div className="flex justify-between text-sm text-gray-600 dark:text-slate-400 mb-1">
                             <span>Progress</span>
                             <span>{task.progress_percentage}%</span>
                           </div>
@@ -646,7 +646,7 @@ export default function ImplementationTracker({
                         {/* Dependencies */}
                         {task.dependencies.length > 0 && (
                           <div className="mt-3">
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm text-gray-500 dark:text-slate-400">
                               Dependencies: {task.dependencies.length} task(s)
                             </span>
                           </div>
@@ -655,8 +655,8 @@ export default function ImplementationTracker({
                         {/* Deliverables */}
                         {task.deliverables.length > 0 && (
                           <div className="mt-2">
-                            <span className="text-sm text-gray-500">Deliverables:</span>
-                            <ul className="list-disc list-inside text-sm text-gray-600 ml-4">
+                            <span className="text-sm text-gray-500 dark:text-slate-400">Deliverables:</span>
+                            <ul className="list-disc list-inside text-sm text-gray-600 dark:text-slate-400 ml-4">
                               {task.deliverables.map((deliverable, index) => (
                                 <li key={index}>{deliverable}</li>
                               ))}
@@ -672,7 +672,7 @@ export default function ImplementationTracker({
                         >
                           Update Progress
                         </button>
-                        <button className="text-gray-600 hover:text-gray-800">
+                        <button className="text-gray-600 hover:text-gray-800 dark:text-slate-200">
                           <Settings className="h-4 w-4" />
                         </button>
                       </div>
@@ -686,16 +686,16 @@ export default function ImplementationTracker({
           {/* Gantt Chart Tab */}
           {activeTab === 'gantt' && (
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">Gantt Chart View</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Gantt Chart View</h3>
               
               {/* Simplified Gantt Chart */}
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4">
                 <div className="overflow-x-auto">
                   <div className="min-w-full">
                     {/* Timeline Header */}
                     <div className="flex items-center mb-4">
-                      <div className="w-64 text-sm font-medium text-gray-700">Task</div>
-                      <div className="flex-1 grid grid-cols-31 gap-1 text-xs text-gray-500">
+                      <div className="w-64 text-sm font-medium text-gray-700 dark:text-slate-300">Task</div>
+                      <div className="flex-1 grid grid-cols-31 gap-1 text-xs text-gray-500 dark:text-slate-400">
                         {Array.from({ length: 31 }, (_, i) => (
                           <div key={i} className="text-center">
                             {i + 1}
@@ -713,7 +713,7 @@ export default function ImplementationTracker({
                       
                       return (
                         <div key={task.id} className="flex items-center mb-2">
-                          <div className="w-64 text-sm text-gray-900 truncate pr-4">
+                          <div className="w-64 text-sm text-gray-900 dark:text-slate-100 truncate pr-4">
                             #{task.task_number} {task.title}
                           </div>
                           <div className="flex-1 grid grid-cols-31 gap-1 h-6">
@@ -750,7 +750,7 @@ export default function ImplementationTracker({
           {activeTab === 'milestones' && (
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium text-gray-900">Implementation Milestones</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Implementation Milestones</h3>
                 <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
                   Add Milestone
                 </button>
@@ -758,15 +758,15 @@ export default function ImplementationTracker({
 
               <div className="space-y-4">
                 {milestones.map((milestone) => (
-                  <div key={milestone.id} className="border border-gray-200 rounded-lg p-4">
+                  <div key={milestone.id} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <Target className={`h-5 w-5 ${
-                          milestone.status === 'completed' ? 'text-green-600' : 'text-blue-600'
+                          milestone.status === 'completed' ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'
                         }`} />
                         <div>
-                          <h4 className="text-lg font-medium text-gray-900">{milestone.title}</h4>
-                          <p className="text-sm text-gray-600">
+                          <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100">{milestone.title}</h4>
+                          <p className="text-sm text-gray-600 dark:text-slate-400">
                             Target: {formatDate(milestone.target_date)}
                             {milestone.actual_date && ` • Actual: ${formatDate(milestone.actual_date)}`}
                           </p>
@@ -787,7 +787,7 @@ export default function ImplementationTracker({
           {activeTab === 'progress' && (
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium text-gray-900">Progress Notes</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Progress Notes</h3>
                 <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
                   Add Note
                 </button>
@@ -795,26 +795,26 @@ export default function ImplementationTracker({
 
               <div className="space-y-4">
                 {recent_progress_notes.map((note) => (
-                  <div key={note.id} className="border border-gray-200 rounded-lg p-4">
+                  <div key={note.id} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <MessageSquare className="h-4 w-4 text-blue-600" />
-                          <span className="text-sm font-medium text-gray-900">
+                          <MessageSquare className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                          <span className="text-sm font-medium text-gray-900 dark:text-slate-100">
                             {note.created_by_name}
                           </span>
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm text-gray-500 dark:text-slate-400">
                             {formatDateTime(note.created_at)}
                           </span>
                         </div>
-                        <p className="text-gray-700">{note.note}</p>
+                        <p className="text-gray-700 dark:text-slate-300">{note.note}</p>
                       </div>
                       
                       <div className="text-right ml-4">
-                        <div className="text-sm font-medium text-blue-600">
+                        <div className="text-sm font-medium text-blue-600 dark:text-blue-400">
                           {note.progress_percentage}%
                         </div>
-                        <div className="text-xs text-gray-500">Progress</div>
+                        <div className="text-xs text-gray-500 dark:text-slate-400">Progress</div>
                       </div>
                     </div>
                   </div>
@@ -828,15 +828,15 @@ export default function ImplementationTracker({
       {/* Progress Update Modal */}
       {showProgressModal && selectedTask && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-slate-800">
             <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">
                 Update Progress: {selectedTask.title}
               </h3>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     Progress Percentage
                   </label>
                   <input
@@ -850,13 +850,13 @@ export default function ImplementationTracker({
                     }))}
                     className="w-full"
                   />
-                  <div className="text-center text-sm text-gray-600 mt-1">
+                  <div className="text-center text-sm text-gray-600 dark:text-slate-400 mt-1">
                     {progressUpdate.progress_percentage}%
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     Actual Effort Hours
                   </label>
                   <input
@@ -868,12 +868,12 @@ export default function ImplementationTracker({
                       ...prev,
                       actual_effort_hours: parseFloat(e.target.value) || 0
                     }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     Progress Notes
                   </label>
                   <textarea
@@ -884,7 +884,7 @@ export default function ImplementationTracker({
                       notes: e.target.value
                     }))}
                     placeholder="Add notes about progress, issues, or achievements..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -892,7 +892,7 @@ export default function ImplementationTracker({
               <div className="flex justify-end gap-3 mt-6">
                 <button
                   onClick={() => setShowProgressModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-md"
                 >
                   Cancel
                 </button>
@@ -975,16 +975,16 @@ export function ResourceAllocationView({
   }
 
   const getUtilizationColor = (utilization: number) => {
-    if (utilization < 50) return 'text-red-600'
-    if (utilization < 80) return 'text-yellow-600'
-    if (utilization <= 100) return 'text-green-600'
-    return 'text-red-600'
+    if (utilization < 50) return 'text-red-600 dark:text-red-400'
+    if (utilization < 80) return 'text-yellow-600 dark:text-yellow-400'
+    if (utilization <= 100) return 'text-green-600 dark:text-green-400'
+    return 'text-red-600 dark:text-red-400'
   }
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium text-gray-900">Resource Allocation</h3>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Resource Allocation</h3>
         <button
           onClick={() => setShowAddResource(true)}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm"
@@ -995,22 +995,22 @@ export function ResourceAllocationView({
 
       {/* Resource Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-blue-50 rounded-lg p-4">
+        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
           <div className="flex items-center">
-            <Users className="h-8 w-8 text-blue-600" />
+            <Users className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             <div className="ml-3">
               <p className="text-sm font-medium text-blue-900">Total Resources</p>
-              <p className="text-2xl font-semibold text-blue-600">{resources.length}</p>
+              <p className="text-2xl font-semibold text-blue-600 dark:text-blue-400">{resources.length}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-green-50 rounded-lg p-4">
+        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
           <div className="flex items-center">
-            <Clock className="h-8 w-8 text-green-600" />
+            <Clock className="h-8 w-8 text-green-600 dark:text-green-400" />
             <div className="ml-3">
               <p className="text-sm font-medium text-green-900">Total Allocated Hours</p>
-              <p className="text-2xl font-semibold text-green-600">
+              <p className="text-2xl font-semibold text-green-600 dark:text-green-400">
                 {resources.reduce((sum, r) => sum + r.allocated_hours, 0)}
               </p>
             </div>
@@ -1019,10 +1019,10 @@ export function ResourceAllocationView({
 
         <div className="bg-purple-50 rounded-lg p-4">
           <div className="flex items-center">
-            <TrendingUp className="h-8 w-8 text-purple-600" />
+            <TrendingUp className="h-8 w-8 text-purple-600 dark:text-purple-400" />
             <div className="ml-3">
               <p className="text-sm font-medium text-purple-900">Total Cost</p>
-              <p className="text-2xl font-semibold text-purple-600">
+              <p className="text-2xl font-semibold text-purple-600 dark:text-purple-400">
                 ${resources.reduce((sum, r) => sum + r.total_cost, 0).toLocaleString()}
               </p>
             </div>
@@ -1031,46 +1031,46 @@ export function ResourceAllocationView({
       </div>
 
       {/* Resource List */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+          <thead className="bg-gray-50 dark:bg-slate-800/50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                 Resource
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                 Type
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                 Allocation
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                 Utilization
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                 Cost
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                 Period
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
             {resources.map((resource) => {
               const utilization = calculateUtilization(resource)
               return (
-                <tr key={resource.id} className="hover:bg-gray-50">
+                <tr key={resource.id} className="hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{resource.resource_name}</div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-slate-100">{resource.resource_name}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 capitalize">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200 capitalize">
                       {resource.resource_type}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-100">
                     {resource.allocated_hours}h allocated<br />
-                    <span className="text-gray-500">{resource.utilized_hours}h utilized</span>
+                    <span className="text-gray-500 dark:text-slate-400">{resource.utilized_hours}h utilized</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -1087,11 +1087,11 @@ export function ResourceAllocationView({
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-100">
                     ${resource.cost_per_hour}/hr<br />
                     <span className="font-medium">${resource.total_cost.toLocaleString()} total</span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                     {formatDate(resource.allocation_start_date)} -<br />
                     {formatDate(resource.allocation_end_date)}
                   </td>
@@ -1103,9 +1103,9 @@ export function ResourceAllocationView({
 
         {resources.length === 0 && (
           <div className="text-center py-12">
-            <Users className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No resources allocated</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <Users className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-slate-100">No resources allocated</h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
               Get started by adding resources to this implementation.
             </p>
           </div>
@@ -1115,13 +1115,13 @@ export function ResourceAllocationView({
       {/* Add Resource Modal */}
       {showAddResource && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-slate-800">
             <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Add Resource</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Add Resource</h3>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     Resource Type
                   </label>
                   <select
@@ -1130,7 +1130,7 @@ export function ResourceAllocationView({
                       ...prev,
                       resource_type: e.target.value
                     }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="human">Human Resource</option>
                     <option value="equipment">Equipment</option>
@@ -1140,7 +1140,7 @@ export function ResourceAllocationView({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     Resource Name
                   </label>
                   <input
@@ -1151,13 +1151,13 @@ export function ResourceAllocationView({
                       resource_name: e.target.value
                     }))}
                     placeholder="Enter resource name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                       Allocated Hours
                     </label>
                     <input
@@ -1168,12 +1168,12 @@ export function ResourceAllocationView({
                         ...prev,
                         allocated_hours: parseInt(e.target.value) || 0
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                       Cost per Hour
                     </label>
                     <input
@@ -1185,14 +1185,14 @@ export function ResourceAllocationView({
                         ...prev,
                         cost_per_hour: parseFloat(e.target.value) || 0
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                       Start Date
                     </label>
                     <input
@@ -1202,12 +1202,12 @@ export function ResourceAllocationView({
                         ...prev,
                         allocation_start_date: e.target.value
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                       End Date
                     </label>
                     <input
@@ -1217,15 +1217,15 @@ export function ResourceAllocationView({
                         ...prev,
                         allocation_end_date: e.target.value
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
 
                 {newResource.allocated_hours > 0 && newResource.cost_per_hour > 0 && (
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <div className="text-sm text-gray-600">
-                      Total Cost: <span className="font-medium text-gray-900">
+                  <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-3">
+                    <div className="text-sm text-gray-600 dark:text-slate-400">
+                      Total Cost: <span className="font-medium text-gray-900 dark:text-slate-100">
                         ${(newResource.allocated_hours * newResource.cost_per_hour).toLocaleString()}
                       </span>
                     </div>
@@ -1236,7 +1236,7 @@ export function ResourceAllocationView({
               <div className="flex justify-end gap-3 mt-6">
                 <button
                   onClick={() => setShowAddResource(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-md"
                 >
                   Cancel
                 </button>
@@ -1292,20 +1292,20 @@ export function ProgressReporting({
 
   const getVarianceColor = (variance: number, isSchedule: boolean = false) => {
     if (isSchedule) {
-      if (variance <= 0) return 'text-green-600'
-      if (variance <= 3) return 'text-yellow-600'
-      return 'text-red-600'
+      if (variance <= 0) return 'text-green-600 dark:text-green-400'
+      if (variance <= 3) return 'text-yellow-600 dark:text-yellow-400'
+      return 'text-red-600 dark:text-red-400'
     } else {
-      if (Math.abs(variance) <= 5) return 'text-green-600'
-      if (Math.abs(variance) <= 15) return 'text-yellow-600'
-      return 'text-red-600'
+      if (Math.abs(variance) <= 5) return 'text-green-600 dark:text-green-400'
+      if (Math.abs(variance) <= 15) return 'text-yellow-600 dark:text-yellow-400'
+      return 'text-red-600 dark:text-red-400'
     }
   }
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium text-gray-900">Progress Reports</h3>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Progress Reports</h3>
         <button
           onClick={onGenerateReport}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm"
@@ -1317,38 +1317,38 @@ export function ProgressReporting({
       {/* Reports List */}
       <div className="space-y-4">
         {reports.map((report) => (
-          <div key={report.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+          <div key={report.id} className="border border-gray-200 dark:border-slate-700 rounded-lg p-4 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-4">
-                  <h4 className="text-lg font-medium text-gray-900">
+                  <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100">
                     Progress Report - {formatDate(report.report_date)}
                   </h4>
                   <div className="flex items-center gap-4 text-sm">
                     <div className="flex items-center gap-1">
-                      <TrendingUp className="h-4 w-4 text-blue-600" />
+                      <TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                       <span className="font-medium">{report.overall_progress}%</span>
-                      <span className="text-gray-500">complete</span>
+                      <span className="text-gray-500 dark:text-slate-400">complete</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
                       <span className="font-medium">{report.completed_tasks}/{report.total_tasks}</span>
-                      <span className="text-gray-500">tasks</span>
+                      <span className="text-gray-500 dark:text-slate-400">tasks</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-6 mt-2 text-sm">
                   <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4 text-gray-500" />
-                    <span className="text-gray-600">Schedule Variance:</span>
+                    <Calendar className="h-4 w-4 text-gray-500 dark:text-slate-400" />
+                    <span className="text-gray-600 dark:text-slate-400">Schedule Variance:</span>
                     <span className={`font-medium ${getVarianceColor(report.schedule_variance_days, true)}`}>
                       {report.schedule_variance_days > 0 ? '+' : ''}{report.schedule_variance_days} days
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <TrendingUp className="h-4 w-4 text-gray-500" />
-                    <span className="text-gray-600">Cost Variance:</span>
+                    <TrendingUp className="h-4 w-4 text-gray-500 dark:text-slate-400" />
+                    <span className="text-gray-600 dark:text-slate-400">Cost Variance:</span>
                     <span className={`font-medium ${getVarianceColor(report.cost_variance_percentage)}`}>
                       {report.cost_variance_percentage > 0 ? '+' : ''}{report.cost_variance_percentage}%
                     </span>
@@ -1358,16 +1358,16 @@ export function ProgressReporting({
                 {/* Key Highlights */}
                 <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="font-medium text-gray-700">Key Achievements:</span>
-                    <ul className="list-disc list-inside text-gray-600 ml-2">
+                    <span className="font-medium text-gray-700 dark:text-slate-300">Key Achievements:</span>
+                    <ul className="list-disc list-inside text-gray-600 dark:text-slate-400 ml-2">
                       {report.key_achievements.slice(0, 2).map((achievement, index) => (
                         <li key={index}>{achievement}</li>
                       ))}
                     </ul>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-700">Upcoming Milestones:</span>
-                    <ul className="list-disc list-inside text-gray-600 ml-2">
+                    <span className="font-medium text-gray-700 dark:text-slate-300">Upcoming Milestones:</span>
+                    <ul className="list-disc list-inside text-gray-600 dark:text-slate-400 ml-2">
                       {report.upcoming_milestones.slice(0, 2).map((milestone, index) => (
                         <li key={index}>{milestone}</li>
                       ))}
@@ -1391,9 +1391,9 @@ export function ProgressReporting({
 
       {reports.length === 0 && (
         <div className="text-center py-12">
-          <FileText className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No progress reports</h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <FileText className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500" />
+          <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-slate-100">No progress reports</h3>
+          <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
             Generate your first progress report to track implementation status.
           </p>
         </div>
@@ -1402,15 +1402,15 @@ export function ProgressReporting({
       {/* Report Detail Modal */}
       {showReportModal && selectedReport && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-10 mx-auto p-5 border w-4/5 max-w-4xl shadow-lg rounded-md bg-white">
+          <div className="relative top-10 mx-auto p-5 border w-4/5 max-w-4xl shadow-lg rounded-md bg-white dark:bg-slate-800">
             <div className="mt-3">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-medium text-gray-900">
+                <h3 className="text-xl font-medium text-gray-900 dark:text-slate-100">
                   Progress Report - {formatDate(selectedReport.report_date)}
                 </h3>
                 <button
                   onClick={() => setShowReportModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 dark:text-slate-400"
                 >
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1421,34 +1421,34 @@ export function ProgressReporting({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Progress Summary */}
                 <div className="space-y-4">
-                  <h4 className="text-lg font-medium text-gray-900">Progress Summary</h4>
+                  <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100">Progress Summary</h4>
                   
-                  <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-2xl font-bold text-blue-600">
+                        <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                           {selectedReport.overall_progress}%
                         </div>
-                        <div className="text-sm text-gray-600">Overall Progress</div>
+                        <div className="text-sm text-gray-600 dark:text-slate-400">Overall Progress</div>
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-green-600">
+                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                           {selectedReport.completed_tasks}/{selectedReport.total_tasks}
                         </div>
-                        <div className="text-sm text-gray-600">Tasks Completed</div>
+                        <div className="text-sm text-gray-600 dark:text-slate-400">Tasks Completed</div>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Schedule Variance:</span>
+                      <span className="text-sm text-gray-600 dark:text-slate-400">Schedule Variance:</span>
                       <span className={`text-sm font-medium ${getVarianceColor(selectedReport.schedule_variance_days, true)}`}>
                         {selectedReport.schedule_variance_days > 0 ? '+' : ''}{selectedReport.schedule_variance_days} days
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Cost Variance:</span>
+                      <span className="text-sm text-gray-600 dark:text-slate-400">Cost Variance:</span>
                       <span className={`text-sm font-medium ${getVarianceColor(selectedReport.cost_variance_percentage)}`}>
                         {selectedReport.cost_variance_percentage > 0 ? '+' : ''}{selectedReport.cost_variance_percentage}%
                       </span>
@@ -1458,12 +1458,12 @@ export function ProgressReporting({
 
                 {/* Key Achievements */}
                 <div className="space-y-4">
-                  <h4 className="text-lg font-medium text-gray-900">Key Achievements</h4>
+                  <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100">Key Achievements</h4>
                   <ul className="space-y-2">
                     {selectedReport.key_achievements.map((achievement, index) => (
                       <li key={index} className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-gray-700">{achievement}</span>
+                        <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-gray-700 dark:text-slate-300">{achievement}</span>
                       </li>
                     ))}
                   </ul>
@@ -1471,12 +1471,12 @@ export function ProgressReporting({
 
                 {/* Upcoming Milestones */}
                 <div className="space-y-4">
-                  <h4 className="text-lg font-medium text-gray-900">Upcoming Milestones</h4>
+                  <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100">Upcoming Milestones</h4>
                   <ul className="space-y-2">
                     {selectedReport.upcoming_milestones.map((milestone, index) => (
                       <li key={index} className="flex items-start gap-2">
-                        <Target className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-gray-700">{milestone}</span>
+                        <Target className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-gray-700 dark:text-slate-300">{milestone}</span>
                       </li>
                     ))}
                   </ul>
@@ -1484,12 +1484,12 @@ export function ProgressReporting({
 
                 {/* Risks and Issues */}
                 <div className="space-y-4">
-                  <h4 className="text-lg font-medium text-gray-900">Risks and Issues</h4>
+                  <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100">Risks and Issues</h4>
                   <ul className="space-y-2">
                     {selectedReport.risks_and_issues.map((risk, index) => (
                       <li key={index} className="flex items-start gap-2">
-                        <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-gray-700">{risk}</span>
+                        <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-gray-700 dark:text-slate-300">{risk}</span>
                       </li>
                     ))}
                   </ul>
@@ -1497,12 +1497,12 @@ export function ProgressReporting({
 
                 {/* Next Period Focus */}
                 <div className="space-y-4 md:col-span-2">
-                  <h4 className="text-lg font-medium text-gray-900">Next Period Focus</h4>
+                  <h4 className="text-lg font-medium text-gray-900 dark:text-slate-100">Next Period Focus</h4>
                   <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {selectedReport.next_period_focus.map((focus, index) => (
                       <li key={index} className="flex items-start gap-2">
-                        <PlayCircle className="h-4 w-4 text-purple-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-gray-700">{focus}</span>
+                        <PlayCircle className="h-4 w-4 text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-gray-700 dark:text-slate-300">{focus}</span>
                       </li>
                     ))}
                   </ul>
@@ -1512,7 +1512,7 @@ export function ProgressReporting({
               <div className="flex justify-end gap-3 mt-8">
                 <button
                   onClick={() => setShowReportModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-md"
                 >
                   Close
                 </button>

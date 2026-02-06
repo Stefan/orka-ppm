@@ -42,9 +42,9 @@ export default function ProjectControlsWidgets({ projectIds }: ProjectControlsWi
   return (
     <Link
       href="/project-controls"
-      className="block p-4 bg-white rounded-lg border hover:shadow-md transition-shadow"
+      className="block p-4 bg-white dark:bg-slate-800 rounded-lg border hover:shadow-md transition-shadow"
     >
-      <div className="flex items-center gap-2 text-gray-700">
+      <div className="flex items-center gap-2 text-gray-700 dark:text-slate-300">
         <BarChart3 className="w-5 h-5" />
         <span className="font-medium">Project Controls</span>
       </div>

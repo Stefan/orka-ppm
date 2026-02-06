@@ -282,7 +282,7 @@ export const LongPressMenu: React.FC<LongPressMenuProps> = ({
         >
           <div
             ref={menuRef}
-            className="absolute bg-white rounded-lg shadow-xl border border-gray-200 py-2 min-w-[200px] z-50"
+            className="absolute bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-gray-200 dark:border-slate-700 py-2 min-w-[200px] z-50"
             style={{
               left: menuPos.x,
               top: menuPos.y,
@@ -293,9 +293,9 @@ export const LongPressMenu: React.FC<LongPressMenuProps> = ({
               <button
                 key={action.id}
                 className={cn(
-                  'w-full px-4 py-3 text-left flex items-center space-x-3 hover:bg-gray-50 transition-colors',
+                  'w-full px-4 py-3 text-left flex items-center space-x-3 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 transition-colors',
                   action.disabled && 'opacity-50 cursor-not-allowed',
-                  action.destructive && 'text-red-600 hover:bg-red-50'
+                  action.destructive && 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20'
                 )}
                 onClick={() => handleMenuAction(action)}
                 disabled={action.disabled}

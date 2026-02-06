@@ -123,7 +123,7 @@ This implementation plan breaks down the AI-Empowered Audit Trail feature into d
     - _Requirements: 3.4_
 
 
-- [-] 4. Core Backend Services - ML Classification
+- [x] 4. Core Backend Services - ML Classification
   - [x] 4.1 Implement AuditMLService class
     - Create RandomForestClassifier for category classification
     - Create GradientBoostingClassifier for risk level classification

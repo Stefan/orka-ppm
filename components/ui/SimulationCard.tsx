@@ -29,11 +29,11 @@ export const SimulationCard: React.FC<SimulationCardProps> = ({
 }) => {
   return (
     <Card variant="default" padding="md" className={cn('relative', className)}>
-      <CardHeader className="flex items-center justify-between pb-4 border-b border-gray-200">
+      <CardHeader className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-slate-700">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{title}</h3>
           {subtitle && (
-            <p className="text-sm text-gray-600 mt-1">{subtitle}</p>
+            <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">{subtitle}</p>
           )}
         </div>
         {actions && <div className="flex items-center gap-2">{actions}</div>}
@@ -47,10 +47,10 @@ export const SimulationCard: React.FC<SimulationCardProps> = ({
         )}
         
         {error && !loading && (
-          <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 dark:border-red-800 rounded-lg">
             <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-red-800">Error</p>
+              <p className="text-sm font-medium text-red-800 dark:text-red-300">Error</p>
               <p className="text-sm text-red-700 mt-1">{error}</p>
             </div>
           </div>
@@ -81,10 +81,10 @@ export const ImpactBadge: React.FC<ImpactBadgeProps> = ({
   className
 }) => {
   const typeColors = {
-    cost: trend === 'up' ? 'text-red-600 bg-red-50' : 'text-green-600 bg-green-50',
-    schedule: trend === 'up' ? 'text-orange-600 bg-orange-50' : 'text-blue-600 bg-blue-50',
-    resource: 'text-amber-600 bg-amber-50',
-    neutral: 'text-gray-600 bg-gray-50'
+    cost: trend === 'up' ? 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20' : 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20',
+    schedule: trend === 'up' ? 'text-orange-600 dark:text-orange-400 bg-orange-50' : 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20',
+    resource: 'text-amber-600 dark:text-amber-400 bg-amber-50',
+    neutral: 'text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-800/50'
   }
 
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : null
@@ -96,7 +96,7 @@ export const ImpactBadge: React.FC<ImpactBadgeProps> = ({
       className
     )}>
       {TrendIcon && <TrendIcon className="w-4 h-4" />}
-      <span className="text-xs text-gray-600">{label}:</span>
+      <span className="text-xs text-gray-600 dark:text-slate-400">{label}:</span>
       <span>{value}</span>
     </div>
   )
@@ -120,14 +120,14 @@ export const StatisticDisplay: React.FC<StatisticDisplayProps> = ({
 }) => {
   return (
     <div className={cn('flex flex-col', className)}>
-      <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+      <span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wide">
         {label}
       </span>
-      <span className="text-2xl font-bold text-gray-900 mt-1">
+      <span className="text-2xl font-bold text-gray-900 dark:text-slate-100 mt-1">
         {value}
       </span>
       {description && (
-        <span className="text-xs text-gray-600 mt-1">
+        <span className="text-xs text-gray-600 dark:text-slate-400 mt-1">
           {description}
         </span>
       )}

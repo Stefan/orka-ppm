@@ -150,7 +150,7 @@ export default function DetailedView({
             <thead className="bg-gray-50 dark:bg-slate-700">
               <tr>
                 <th 
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-600"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-700 dark:hover:bg-slate-600"
                   onClick={() => handleSort('name')}
                 >
                   <div className="flex items-center space-x-1">
@@ -161,7 +161,7 @@ export default function DetailedView({
                   </div>
                 </th>
                 <th 
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-600"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-700 dark:hover:bg-slate-600"
                   onClick={() => handleSort('commitments')}
                 >
                   <div className="flex items-center space-x-1">
@@ -172,7 +172,7 @@ export default function DetailedView({
                   </div>
                 </th>
                 <th 
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-600"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-700 dark:hover:bg-slate-600"
                   onClick={() => handleSort('actuals')}
                 >
                   <div className="flex items-center space-x-1">
@@ -183,7 +183,7 @@ export default function DetailedView({
                   </div>
                 </th>
                 <th 
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-600"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-700 dark:hover:bg-slate-600"
                   onClick={() => handleSort('variance')}
                 >
                   <div className="flex items-center space-x-1">
@@ -203,7 +203,7 @@ export default function DetailedView({
             </thead>
             <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
               {sortedData.map((project, index) => (
-                <tr key={index} className="hover:bg-gray-50 dark:hover:bg-slate-700">
+                <tr key={index} className="hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900 dark:text-slate-100">{project.name}</div>
                   </td>

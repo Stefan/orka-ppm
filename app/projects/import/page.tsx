@@ -11,7 +11,7 @@ const LazyImportForm = dynamic(
   {
     ssr: false, // Wichtig: Papa Parse funktioniert nur client-side
     loading: () => (
-      <div className="bg-white p-8 rounded-lg shadow-sm">
+      <div className="bg-white dark:bg-slate-800 p-8 rounded-lg shadow-sm">
         <div className="animate-pulse space-y-4">
           <div className="h-32 bg-gray-200 rounded"></div>
           <div className="h-10 bg-gray-200 rounded w-1/3"></div>
@@ -32,12 +32,12 @@ export default function ProjectImportPage() {
 
           {!showImportForm ? (
             // Landing Page - kein Papa Parse geladen
-            <div className="bg-white p-8 rounded-lg shadow-sm text-center">
-              <Upload className="h-16 w-16 mx-auto text-blue-600 mb-4" />
+            <div className="bg-white dark:bg-slate-800 p-8 rounded-lg shadow-sm text-center">
+              <Upload className="h-16 w-16 mx-auto text-blue-600 dark:text-blue-400 mb-4" />
               <h2 className="text-xl font-semibold mb-2">
                 Import Projects from CSV or Excel
               </h2>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 dark:text-slate-400 mb-6">
                 Upload your project data and map columns to fields
               </p>
               <button

@@ -305,6 +305,18 @@ export function applyReprofiling(
 }
 
 /**
+ * Variance metric for distribution (sum of squared deviations from equal share).
+ * Used to estimate variance impact when changing profile/duration (predictive rules).
+ * Linear = 0; higher = more uneven.
+ */
+export function getDistributionVarianceMetric(result: DistributionResult): number {
+  if (result.periods.length === 0) return 0
+  const n = result.periods.length
+  const equal = 100 / n
+  return result.periods.reduce((sum, p) => sum + (p.percentage - equal) ** 2, 0)
+}
+
+/**
  * Validate custom distribution percentages
  */
 export function validateCustomDistribution(percentages: number[]): {

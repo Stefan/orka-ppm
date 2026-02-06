@@ -50,17 +50,17 @@ export default function AnalysisView({
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case 'up': return <TrendingUp className="h-4 w-4 text-red-500" />
-      case 'down': return <TrendingDown className="h-4 w-4 text-green-500" />
-      default: return <Minus className="h-4 w-4 text-gray-500" />
+      case 'up': return <TrendingUp className="h-4 w-4 text-red-500 dark:text-red-400" />
+      case 'down': return <TrendingDown className="h-4 w-4 text-green-500 dark:text-green-400" />
+      default: return <Minus className="h-4 w-4 text-gray-500 dark:text-slate-400" />
     }
   }
 
   const getTrendColor = (trend: string) => {
     switch (trend) {
-      case 'up': return 'text-red-600'
-      case 'down': return 'text-green-600'
-      default: return 'text-gray-600'
+      case 'up': return 'text-red-600 dark:text-red-400'
+      case 'down': return 'text-green-600 dark:text-green-400'
+      default: return 'text-gray-600 dark:text-slate-400'
     }
   }
 
@@ -73,15 +73,15 @@ export default function AnalysisView({
   })) || []
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-full space-y-4">
       {/* View Toggle */}
-      <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{t('financials.analysisView')}</h3>
-          <div className="flex items-center space-x-2">
+      <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-slate-100">{t('financials.analysisView')}</h3>
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setViewMode('project-budgets')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'project-budgets'
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
@@ -91,7 +91,7 @@ export default function AnalysisView({
             </button>
             <button
               onClick={() => setViewMode('commitments-actuals')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'commitments-actuals'
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
@@ -105,62 +105,65 @@ export default function AnalysisView({
       {/* Commitments & Actuals View */}
       {viewMode === 'commitments-actuals' && summary && analytics && (
         <>
-          {/* Performance Overview - Compact */}
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{t('financials.performanceOverview')}</h3>
-              <div className="flex items-center space-x-6">
-                <div className="text-center">
-                  <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                    {(summary.totalCommitments / 1000000).toFixed(1)}M
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-slate-400">{t('financials.commitments')}</div>
+          {/* Performance Overview - Karten + Chart volle Breite */}
+          <div className="bg-white dark:bg-slate-800 p-3 xl:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-slate-100 mb-3">{t('financials.performanceOverview')}</h3>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 xl:gap-3 mb-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2.5 xl:p-3 text-center border border-blue-100 dark:border-blue-800/50">
+                <div className="text-lg xl:text-xl font-bold text-blue-600 dark:text-blue-400">
+                  {(summary.totalCommitments / 1000000).toFixed(1)}M
                 </div>
-                <div className="text-center">
-                  <div className="text-xl font-bold text-red-600 dark:text-red-400">
-                    {(summary.totalActuals / 1000000).toFixed(1)}M
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-slate-400">{t('financials.actuals')}</div>
+                <div className="text-xs text-gray-600 dark:text-slate-400 mt-0.5">{t('financials.commitments')}</div>
+              </div>
+              <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-2.5 xl:p-3 text-center border border-red-100 dark:border-red-800/50">
+                <div className="text-lg xl:text-xl font-bold text-red-600 dark:text-red-400">
+                  {(summary.totalActuals / 1000000).toFixed(1)}M
                 </div>
-                <div className="text-center">
-                  <div className="text-xl font-bold text-purple-600 dark:text-purple-400">
-                    {(summary.totalSpend / 1000000).toFixed(1)}M
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-slate-400">{t('financials.combinedTotal')}</div>
+                <div className="text-xs text-gray-600 dark:text-slate-400 mt-0.5">{t('financials.actuals')}</div>
+              </div>
+              <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-2.5 xl:p-3 text-center border border-purple-100 dark:border-purple-800/50">
+                <div className="text-lg xl:text-xl font-bold text-purple-600 dark:text-purple-400">
+                  {(summary.totalSpend / 1000000).toFixed(1)}M
                 </div>
-                <div className="text-center">
-                  <div className={`text-xl font-bold ${
-                    summary.totalActuals <= summary.totalCommitments ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                  }`}>
-                    {((summary.totalActuals / summary.totalCommitments) * 100).toFixed(1)}%
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-slate-400">{t('financials.spendRate')}</div>
+                <div className="text-xs text-gray-600 dark:text-slate-400 mt-0.5">{t('financials.combinedTotal')}</div>
+              </div>
+              <div className={`rounded-lg p-2.5 xl:p-3 text-center border ${
+                summary.totalActuals <= summary.totalCommitments
+                  ? 'bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800/50'
+                  : 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800/50'
+              }`}>
+                <div className={`text-lg xl:text-xl font-bold ${
+                  summary.totalActuals <= summary.totalCommitments ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                }`}>
+                  {((summary.totalActuals / summary.totalCommitments) * 100).toFixed(1)}%
                 </div>
+                <div className="text-xs text-gray-600 dark:text-slate-400 mt-0.5">{t('financials.spendRate')}</div>
               </div>
             </div>
 
-            {/* Variance Chart - Larger */}
-            <ResponsiveContainer width="100%" height={450}>
+            {/* Variance Chart - volle Breite, feste Höhe */}
+            <div className="min-w-0">
+            <ResponsiveContainer width="100%" height={300}>
               <BarChart data={varianceChartData.slice(0, 10)}>
-                <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
+                <XAxis dataKey="name" angle={-45} textAnchor="end" height={72} tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip contentStyle={tooltipStyle} formatter={(value: number | undefined) => `${(value || 0).toLocaleString()} ${selectedCurrency}`} />
                 <Legend />
                 <Bar dataKey="commitments" fill="#3B82F6" name={t('financials.commitments')} />
                 <Bar dataKey="actuals" fill="#EF4444" name={t('financials.actuals')} />
               </BarChart>
             </ResponsiveContainer>
+            </div>
           </div>
 
-          {/* Category Analysis - Side by Side, Larger */}
-          <div className="category-analysis-grid gap-6">
-            {/* Category Chart */}
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">{t('financials.spendingByCategory')}</h3>
-              <ResponsiveContainer width="100%" height={450}>
+          {/* Category Analysis - Chart + Tabelle nebeneinander auf xl */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <div className="bg-white dark:bg-slate-800 p-3 xl:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 min-w-0">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-slate-100 mb-2">{t('financials.spendingByCategory')}</h3>
+              <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={analytics.categoryData.slice(0, 8)}>
-                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} />
+                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={72} tick={{ fontSize: 10 }} />
+                  <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(value: number | undefined) => `${(value || 0).toLocaleString()} ${selectedCurrency}`} />
                   <Legend />
                   <Bar dataKey="commitments" fill="#3B82F6" name={t('financials.commitments')} />
@@ -170,22 +173,22 @@ export default function AnalysisView({
             </div>
 
             {/* Category Table */}
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">{t('financials.categoryPerformance')}</h3>
-              <div className="space-y-3 max-h-[450px] overflow-y-auto">
+            <div className="bg-white dark:bg-slate-800 p-3 xl:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 min-w-0">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-slate-100 mb-2">{t('financials.categoryPerformance')}</h3>
+              <div className="space-y-2 max-h-[280px] overflow-y-auto">
                 {analytics.categoryData.slice(0, 8).map((item, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors">
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-900 dark:text-slate-100 text-base">{item.name}</div>
-                      <div className="text-sm text-gray-600 dark:text-slate-300 mt-1">
+                  <div key={index} className="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-slate-700 rounded-md hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-gray-900 dark:text-slate-100 text-sm truncate">{item.name}</div>
+                      <div className="text-xs text-gray-600 dark:text-slate-300 mt-0.5">
                         {t('financials.commitments')}: {item.commitments.toLocaleString()} {selectedCurrency}
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-slate-300">
+                      <div className="text-xs text-gray-600 dark:text-slate-300">
                         {t('financials.actuals')}: {item.actuals.toLocaleString()} {selectedCurrency}
                       </div>
                     </div>
-                    <div className="text-right ml-4">
-                      <div className={`text-lg font-bold ${
+                    <div className="text-right ml-2 shrink-0">
+                      <div className={`text-sm font-bold ${
                         item.variance < 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                       }`}>
                         {item.variance >= 0 ? '+' : ''}{item.variance_percentage.toFixed(1)}%
@@ -199,17 +202,16 @@ export default function AnalysisView({
           </div>
 
           {/* Project Status Distribution */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('financials.projectStatusDistribution')}</h3>
-            
-            <div className="project-status-grid gap-4">
+          <div className="bg-white dark:bg-slate-800 p-3 xl:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-slate-100 mb-3">{t('financials.projectStatusDistribution')}</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
               {analytics.statusDistribution.map((status, index) => (
-                <div key={index} className="p-4 rounded-lg" style={{ backgroundColor: `${status.color}15` }}>
-                  <div className="text-3xl font-bold" style={{ color: status.color }}>
+                <div key={index} className="p-2.5 xl:p-3 rounded-lg border border-gray-200 dark:border-slate-600" style={{ backgroundColor: `${status.color}15` }}>
+                  <div className="text-xl xl:text-2xl font-bold" style={{ color: status.color }}>
                     {status.value}
                   </div>
-                  <div className="text-sm font-medium text-gray-700">{status.name}</div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs font-medium text-gray-700 dark:text-slate-300">{status.name}</div>
+                  <div className="text-xs text-gray-500 dark:text-slate-400">
                     {((status.value / summary.projectCount) * 100).toFixed(1)}% {t('financials.ofProjects')}
                   </div>
                 </div>
@@ -224,57 +226,53 @@ export default function AnalysisView({
         <>
           {/* Budget Performance Overview */}
           {budgetPerformance && (
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('financials.budgetPerformanceOverview')}</h3>
-              
-              <div className="budget-performance-grid gap-6 mb-6">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-green-600">{budgetPerformance.on_track_projects}</div>
-                  <div className="text-sm text-gray-600">{t('financials.onTrackProjects')}</div>
-                  <div className="text-xs text-gray-500">{t('financials.within5Variance')}</div>
+            <div className="bg-white dark:bg-slate-800 p-3 xl:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-slate-100 mb-3">{t('financials.budgetPerformanceOverview')}</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-2.5 xl:p-3 text-center border border-green-100 dark:border-green-800/50">
+                  <div className="text-xl xl:text-2xl font-bold text-green-600 dark:text-green-400">{budgetPerformance.on_track_projects}</div>
+                  <div className="text-xs text-gray-600 dark:text-slate-400">{t('financials.onTrackProjects')}</div>
+                  <div className="text-xs text-gray-500 dark:text-slate-500">{t('financials.within5Variance')}</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-yellow-600">{budgetPerformance.at_risk_projects}</div>
-                  <div className="text-sm text-gray-600">{t('financials.atRiskProjects')}</div>
-                  <div className="text-xs text-gray-500">{t('financials.fiveTo15Over')}</div>
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-2.5 xl:p-3 text-center border border-yellow-100 dark:border-yellow-800/50">
+                  <div className="text-xl xl:text-2xl font-bold text-yellow-600 dark:text-yellow-400">{budgetPerformance.at_risk_projects}</div>
+                  <div className="text-xs text-gray-600 dark:text-slate-400">{t('financials.atRiskProjects')}</div>
+                  <div className="text-xs text-gray-500 dark:text-slate-500">{t('financials.fiveTo15Over')}</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-red-600">{budgetPerformance.over_budget_projects}</div>
-                  <div className="text-sm text-gray-600">{t('financials.overBudgetProjects')}</div>
-                  <div className="text-xs text-gray-500">{t('financials.moreThan15Over')}</div>
+                <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-2.5 xl:p-3 text-center border border-red-100 dark:border-red-800/50">
+                  <div className="text-xl xl:text-2xl font-bold text-red-600 dark:text-red-400">{budgetPerformance.over_budget_projects}</div>
+                  <div className="text-xs text-gray-600 dark:text-slate-400">{t('financials.overBudgetProjects')}</div>
+                  <div className="text-xs text-gray-500 dark:text-slate-500">{t('financials.moreThan15Over')}</div>
                 </div>
               </div>
 
-              {/* Savings vs Overruns */}
-              <div className="savings-overruns-grid gap-6">
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <h4 className="text-md font-medium text-green-800 mb-2">{t('financials.totalSavings')}</h4>
-                  <div className="text-2xl font-bold text-green-600">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-100 dark:border-green-800/50">
+                  <h4 className="text-sm font-medium text-green-800 dark:text-green-300 mb-1">{t('financials.totalSavings')}</h4>
+                  <div className="text-lg xl:text-xl font-bold text-green-600 dark:text-green-400">
                     {budgetPerformance.total_savings.toLocaleString()} {selectedCurrency}
                   </div>
-                  <div className="text-sm text-green-700">{t('financials.fromUnderBudget')}</div>
+                  <div className="text-xs text-green-700 dark:text-green-500">{t('financials.fromUnderBudget')}</div>
                 </div>
-                <div className="bg-red-50 p-4 rounded-lg">
-                  <h4 className="text-md font-medium text-red-800 mb-2">{t('financials.totalOverruns')}</h4>
-                  <div className="text-2xl font-bold text-red-600">
+                <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-100 dark:border-red-800/50">
+                  <h4 className="text-sm font-medium text-red-800 dark:text-red-300 mb-1">{t('financials.totalOverruns')}</h4>
+                  <div className="text-lg xl:text-xl font-bold text-red-600 dark:text-red-400">
                     {budgetPerformance.total_overruns.toLocaleString()} {selectedCurrency}
                   </div>
-                  <div className="text-sm text-red-700">{t('financials.fromOverBudget')}</div>
+                  <div className="text-xs text-red-700 dark:text-red-500">{t('financials.fromOverBudget')}</div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Cost Analysis by Category */}
+          {/* Cost Analysis by Category - Chart + Tabelle nebeneinander auf xl */}
           {costAnalysis.length > 0 && (
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('financials.costAnalysisByCategory')}</h3>
-              
-              <div className="cost-analysis-grid gap-6">
-                {/* Cost Trends Chart */}
-                <div>
-                  <h4 className="text-md font-medium text-gray-800 mb-3">{t('financials.monthlyCostTrends')}</h4>
-                  <ResponsiveContainer width="100%" height={400}>
+            <div className="bg-white dark:bg-slate-800 p-3 xl:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-slate-100 mb-3">{t('financials.costAnalysisByCategory')}</h3>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                <div className="min-w-0">
+                  <h4 className="text-sm font-medium text-gray-800 dark:text-slate-200 mb-2">{t('financials.monthlyCostTrends')}</h4>
+                  <ResponsiveContainer width="100%" height={280}>
                     <BarChart data={costAnalysis}>
                       <XAxis dataKey="category" />
                       <YAxis />
@@ -285,19 +283,18 @@ export default function AnalysisView({
                   </ResponsiveContainer>
                 </div>
 
-                {/* Cost Analysis Table */}
-                <div>
-                  <h4 className="text-md font-medium text-gray-800 mb-3">{t('financials.categoryPerformance')}</h4>
-                  <div className="space-y-3">
+                <div className="min-w-0">
+                  <h4 className="text-sm font-medium text-gray-800 dark:text-slate-200 mb-2">{t('financials.categoryPerformance')}</h4>
+                  <div className="space-y-2 max-h-[280px] overflow-y-auto">
                     {costAnalysis.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <div className="font-medium text-gray-900">{item.category}</div>
-                          <div className="text-sm text-gray-600">
+                      <div key={index} className="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-slate-700 rounded-md">
+                        <div className="min-w-0">
+                          <div className="font-medium text-gray-900 dark:text-slate-100 text-sm truncate">{item.category}</div>
+                          <div className="text-xs text-gray-600 dark:text-slate-400">
                             {item.current_month.toLocaleString()} {selectedCurrency}
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center gap-2">
                           {getTrendIcon(item.trend)}
                           <span className={`font-medium ${getTrendColor(item.trend)}`}>
                             {item.percentage_change >= 0 ? '+' : ''}{item.percentage_change.toFixed(1)}%
@@ -312,28 +309,27 @@ export default function AnalysisView({
           )}
 
           {/* Enhanced Project Efficiency Analysis */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('financials.projectEfficiencyAnalysis')}</h3>
-            
+          <div className="bg-white dark:bg-slate-800 p-3 xl:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-slate-100 mb-3">{t('financials.projectEfficiencyAnalysis')}</h3>
             {analyticsData && (analyticsData.totalSavings > 0 || analyticsData.totalOverruns > 0 || analyticsData.avgEfficiency > 0) ? (
-              <div className="efficiency-metrics-grid gap-4 mb-6">
-                <div className="bg-blue-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-blue-600">{analyticsData.avgEfficiency.toFixed(1)}%</div>
-                  <div className="text-sm text-blue-700">{t('financials.avgEfficiency')}</div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-2.5 xl:p-3 rounded-lg text-center border border-blue-100 dark:border-blue-800/50">
+                  <div className="text-lg xl:text-xl font-bold text-blue-600 dark:text-blue-400">{analyticsData.avgEfficiency.toFixed(1)}%</div>
+                  <div className="text-xs text-blue-700 dark:text-blue-400">{t('financials.avgEfficiency')}</div>
                 </div>
-                <div className="bg-green-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-green-600">{analyticsData.totalSavings.toLocaleString()}</div>
-                  <div className="text-sm text-green-700">{t('financials.totalSavings')} ({selectedCurrency})</div>
+                <div className="bg-green-50 dark:bg-green-900/20 p-2.5 xl:p-3 rounded-lg text-center border border-green-100 dark:border-green-800/50">
+                  <div className="text-lg xl:text-xl font-bold text-green-600 dark:text-green-400">{analyticsData.totalSavings.toLocaleString()}</div>
+                  <div className="text-xs text-green-700 dark:text-green-400">{t('financials.totalSavings')} ({selectedCurrency})</div>
                 </div>
-                <div className="bg-red-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-red-600">{analyticsData.totalOverruns.toLocaleString()}</div>
-                  <div className="text-sm text-red-700">{t('financials.totalOverruns')} ({selectedCurrency})</div>
+                <div className="bg-red-50 dark:bg-red-900/20 p-2.5 xl:p-3 rounded-lg text-center border border-red-100 dark:border-red-800/50">
+                  <div className="text-lg xl:text-xl font-bold text-red-600 dark:text-red-400">{analyticsData.totalOverruns.toLocaleString()}</div>
+                  <div className="text-xs text-red-700 dark:text-red-400">{t('financials.totalOverruns')} ({selectedCurrency})</div>
                 </div>
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <p className="text-lg font-medium">{t('financials.noProjectBudgetData')}</p>
-                <p className="text-sm mt-2">{t('financials.switchToCommitmentsActuals')}</p>
+              <div className="text-center py-6 text-gray-500 dark:text-slate-400">
+                <p className="text-base font-medium">{t('financials.noProjectBudgetData')}</p>
+                <p className="text-xs mt-1">{t('financials.switchToCommitmentsActuals')}</p>
               </div>
             )}
           </div>

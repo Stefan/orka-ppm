@@ -55,7 +55,7 @@ export function CacheManagement() {
           
           <Card padding="md" className="bg-purple-50">
             <p className="text-sm text-neutral-600">Images</p>
-            <p className="text-2xl font-bold text-purple-600">
+            <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
               {cacheStats.imageCacheSize}
             </p>
             <p className="text-xs text-neutral-500">cached images</p>
@@ -105,7 +105,7 @@ export function CacheManagement() {
         <h4 className="text-sm font-semibold text-primary-900 mb-2">
           Cache Strategy
         </h4>
-        <ul className="text-sm text-blue-800 space-y-1">
+        <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
           <li>• API requests: Network-first with 5-minute cache</li>
           <li>• Static assets: Cache-first for instant loading</li>
           <li>• Images: Cache-first with 30-day expiration</li>

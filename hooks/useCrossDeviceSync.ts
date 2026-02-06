@@ -115,8 +115,10 @@ export function useCrossDeviceSync(): UseCrossDeviceSyncReturn {
       loadPreferences() // Reload from localStorage
       setLastSyncTime(new Date())
     } catch (error) {
-      console.error('Failed to update preferences:', error)
-      throw error
+      // Don't re-throw: preferences are saved locally even when remote sync fails.
+      // Re-throwing would break callers like theme switching.
+      console.warn('Preferences sync failed (saved locally):', error instanceof Error ? error.message : error)
+      loadPreferences() // Still reload local state
     } finally {
       setIsSyncing(false)
     }

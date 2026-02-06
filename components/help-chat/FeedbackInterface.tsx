@@ -165,10 +165,10 @@ export function FeedbackInterface({
   const renderRatingStep = () => (
     <div className="space-y-4">
       <div className="text-center">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">
           How helpful was this response?
         </h3>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-600 dark:text-slate-400">
           Your feedback helps us improve the AI assistant
         </p>
       </div>
@@ -181,8 +181,8 @@ export function FeedbackInterface({
             className={cn(
               'p-2 rounded-lg transition-colors',
               formData.rating === rating
-                ? 'bg-blue-100 text-blue-600'
-                : 'text-gray-400 hover:text-yellow-500 hover:bg-gray-50'
+                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                : 'text-gray-400 dark:text-slate-500 hover:text-yellow-500 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50'
             )}
 
           >
@@ -196,7 +196,7 @@ export function FeedbackInterface({
         ))}
       </div>
 
-      <div className="flex justify-center space-x-2 text-xs text-gray-500">
+      <div className="flex justify-center space-x-2 text-xs text-gray-500 dark:text-slate-400">
         <span>Not helpful</span>
         <span className="flex-1 text-center">Somewhat helpful</span>
         <span>Very helpful</span>
@@ -208,17 +208,17 @@ export function FeedbackInterface({
   const renderDetailsStep = () => (
     <div className="space-y-4">
       <div className="text-center">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">
           Tell us more (optional)
         </h3>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-600 dark:text-slate-400">
           Help us understand how to improve
         </p>
       </div>
 
       {/* Feedback type selection */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
           What type of feedback is this?
         </label>
         <div className="grid grid-cols-2 gap-2">
@@ -234,8 +234,8 @@ export function FeedbackInterface({
               className={cn(
                 'flex items-center space-x-2 p-3 rounded-lg border text-sm transition-colors',
                 formData.feedbackType === value
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700'
+                  : 'border-gray-200 dark:border-slate-700 hover:border-gray-300 text-gray-700 dark:text-slate-300'
               )}
             >
               <Icon className="h-4 w-4" />
@@ -247,14 +247,14 @@ export function FeedbackInterface({
 
       {/* Feedback text */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
           Additional comments
         </label>
         <textarea
           value={formData.feedbackText}
           onChange={(e) => handleTextChange('feedbackText', e.target.value)}
           placeholder="What could be improved? What was missing or incorrect?"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
           rows={3}
         />
       </div>
@@ -262,22 +262,22 @@ export function FeedbackInterface({
       {/* Report options for negative feedback */}
       {(formData.rating <= 3 || formData.feedbackType === 'incorrect' || formData.feedbackType === 'not_helpful') && (
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
             Would you like to report this issue?
           </label>
           <div className="flex space-x-2">
             <button
               onClick={() => handleReportTypeSelect('bug')}
-              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 text-sm"
             >
-              <Bug className="h-4 w-4 text-red-500" />
+              <Bug className="h-4 w-4 text-red-500 dark:text-red-400" />
               <span>Report Bug</span>
             </button>
             <button
               onClick={() => handleReportTypeSelect('feature_request')}
-              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 text-sm"
             >
-              <Lightbulb className="h-4 w-4 text-blue-500" />
+              <Lightbulb className="h-4 w-4 text-blue-500 dark:text-blue-400" />
               <span>Suggest Feature</span>
             </button>
           </div>
@@ -285,10 +285,10 @@ export function FeedbackInterface({
       )}
 
       {/* Action buttons */}
-      <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+      <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-slate-700">
         <button
           onClick={onClose}
-          className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          className="px-4 py-2 text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
         >
           Cancel
         </button>
@@ -317,17 +317,17 @@ export function FeedbackInterface({
   const renderReportStep = () => (
     <div className="space-y-4">
       <div className="text-center">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">
           {formData.reportType === 'bug' ? 'Report Bug' : 'Suggest Feature'}
         </h3>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-600 dark:text-slate-400">
           This will be submitted to our main feedback system
         </p>
       </div>
 
       {/* Report title */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
           {formData.reportType === 'bug' ? 'Bug Title' : 'Feature Title'} *
         </label>
         <input
@@ -338,14 +338,14 @@ export function FeedbackInterface({
             ? 'Brief description of the bug' 
             : 'Brief description of the feature request'
           }
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           required
         />
       </div>
 
       {/* Report description */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
           Detailed Description *
         </label>
         <textarea
@@ -355,17 +355,17 @@ export function FeedbackInterface({
             ? 'Describe what went wrong and what you expected to happen'
             : 'Explain the feature in detail and why it would be valuable'
           }
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
           rows={4}
           required
         />
       </div>
 
       {/* Action buttons */}
-      <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+      <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-slate-700">
         <button
           onClick={() => setStep('details')}
-          className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          className="px-4 py-2 text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
         >
           Back
         </button>
@@ -394,13 +394,13 @@ export function FeedbackInterface({
   const renderSuccessStep = () => (
     <div className="text-center space-y-4">
       <div className="flex justify-center">
-        <CheckCircle className="h-12 w-12 text-green-500" />
+        <CheckCircle className="h-12 w-12 text-green-500 dark:text-green-400" />
       </div>
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">
           Thank you for your feedback!
         </h3>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-600 dark:text-slate-400">
           Your feedback helps us improve the AI assistant.
           {formData.reportType && (
             <span className="block mt-2">
@@ -420,18 +420,18 @@ export function FeedbackInterface({
 
   return (
     <div className={cn(
-      'bg-white border border-gray-200 rounded-lg shadow-lg p-6 max-w-md mx-auto',
+      'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg p-6 max-w-md mx-auto',
       className
     )}>
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center space-x-2">
-          <MessageSquare className="h-5 w-5 text-blue-600" />
-          <span className="font-medium text-gray-900">Feedback</span>
+          <MessageSquare className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <span className="font-medium text-gray-900 dark:text-slate-100">Feedback</span>
         </div>
         <button
           onClick={onClose}
-          className="p-1 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors"
+          className="p-1 text-gray-400 hover:text-gray-600 dark:text-slate-300 rounded-md hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 transition-colors"
         >
           <X className="h-4 w-4" />
         </button>
@@ -439,14 +439,14 @@ export function FeedbackInterface({
 
       {/* Error display */}
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
           <div className="flex items-start space-x-2">
-            <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400 mt-0.5" />
             <div>
-              <p className="text-sm text-red-800">{error}</p>
+              <p className="text-sm text-red-800 dark:text-red-300">{error}</p>
               <button
                 onClick={() => setError(null)}
-                className="text-sm text-red-600 hover:text-red-800 font-medium mt-1"
+                className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 font-medium mt-1"
               >
                 Dismiss
               </button>

@@ -326,7 +326,7 @@ const ResourceUtilizationWidget: React.FC<ResourceUtilizationWidgetProps> = ({
                 {resource.utilization}%
               </span>
               {resource.conflicts > 0 && (
-                <span className="bg-red-100 text-red-600 px-2 py-1 rounded text-xs" data-testid={`conflict-${resource.resourceId}`}>
+                <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs" data-testid={`conflict-${resource.resourceId}`}>
                   {resource.conflicts} conflicts
                 </span>
               )}
@@ -454,7 +454,7 @@ const ScheduleDashboard: React.FC<ScheduleDashboardProps> = ({
         <button
           onClick={onRefresh}
           data-testid="refresh-button"
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-600"
         >
           Refresh
         </button>

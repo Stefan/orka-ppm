@@ -43,19 +43,19 @@ export const ProjectActionButtons: React.FC<ProjectActionButtonsProps> = ({
   const context: PermissionContext = { project_id: projectId }
   
   const buttonClass = variant === 'compact'
-    ? 'p-2 rounded hover:bg-gray-100 transition-colors'
+    ? 'p-2 rounded hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 transition-colors'
     : 'px-4 py-2 rounded-md font-medium transition-colors flex items-center gap-2'
   
   const primaryButtonClass = variant === 'compact'
-    ? `${buttonClass} text-blue-600 hover:bg-blue-50`
+    ? `${buttonClass} text-blue-600 dark:text-blue-400 hover:bg-blue-50`
     : `${buttonClass} bg-blue-600 text-white hover:bg-blue-700`
   
   const secondaryButtonClass = variant === 'compact'
-    ? `${buttonClass} text-gray-600 hover:bg-gray-100`
-    : `${buttonClass} bg-gray-200 text-gray-700 hover:bg-gray-300`
+    ? `${buttonClass} text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700`
+    : `${buttonClass} bg-gray-200 text-gray-700 dark:text-slate-300 hover:bg-gray-300`
   
   const dangerButtonClass = variant === 'compact'
-    ? `${buttonClass} text-red-600 hover:bg-red-50`
+    ? `${buttonClass} text-red-600 dark:text-red-400 hover:bg-red-50`
     : `${buttonClass} bg-red-600 text-white hover:bg-red-700`
 
   return (

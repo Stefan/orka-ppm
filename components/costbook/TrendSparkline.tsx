@@ -93,15 +93,15 @@ function CustomTooltip({
 }) {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-2 border border-gray-200 rounded-lg shadow-md text-xs">
-        <p className="font-medium text-gray-900 mb-1">{label}</p>
+      <div className="bg-white dark:bg-slate-800 p-2 border border-gray-200 dark:border-slate-700 rounded-lg shadow-md text-xs">
+        <p className="font-medium text-gray-900 dark:text-slate-100 mb-1">{label}</p>
         {payload.map((entry, index) => (
           <div key={index} className="flex items-center gap-2">
             <span 
               className="w-2 h-2 rounded-full" 
               style={{ backgroundColor: entry.color }}
             />
-            <span className="text-gray-600">{entry.name}:</span>
+            <span className="text-gray-600 dark:text-slate-400">{entry.name}:</span>
             <span className="font-medium">
               {formatCurrency(entry.value, currency, { compact: true })}
             </span>
@@ -138,7 +138,7 @@ export function TrendSparkline({
   if (data.length === 0) {
     return (
       <div 
-        className={`flex items-center justify-center h-[${height}px] text-gray-500 text-sm ${className}`}
+        className={`flex items-center justify-center h-[${height}px] text-gray-500 dark:text-slate-400 text-sm ${className}`}
         data-testid={testId}
       >
         No data available
@@ -155,9 +155,9 @@ export function TrendSparkline({
       className={`w-full ${className}`} 
       data-testid={testId}
     >
-      <h4 className="text-sm font-medium text-gray-700 mb-2">
+      <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
         Spending Trend
-        <span className="ml-2 text-xs text-gray-500 font-normal">
+        <span className="ml-2 text-xs text-gray-500 dark:text-slate-400 font-normal">
           (Last 6 months)
         </span>
       </h4>
@@ -232,11 +232,11 @@ export function TrendSparkline({
       <div className="flex justify-center gap-6 mt-1 text-xs">
         <div className="flex items-center gap-1.5">
           <span className="w-4 h-0.5 bg-blue-500" style={{ borderStyle: 'dashed' }} />
-          <span className="text-gray-600">Planned Budget</span>
+          <span className="text-gray-600 dark:text-slate-400">Planned Budget</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-4 h-0.5 bg-green-500" />
-          <span className="text-gray-600">Actual Spend</span>
+          <span className="text-gray-600 dark:text-slate-400">Actual Spend</span>
         </div>
       </div>
     </div>

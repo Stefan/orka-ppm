@@ -235,9 +235,9 @@ Expected output:
 ### 4. Test Basic Operations
 
 ```python
-from config.database import get_supabase_client
+from config.database import get_db
 
-supabase = get_supabase_client()
+supabase = get_db()
 
 # Test table access
 result = supabase.table('project_shares').select('*').limit(1).execute()

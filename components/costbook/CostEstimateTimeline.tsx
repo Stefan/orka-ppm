@@ -97,9 +97,9 @@ function formatChartDate(dateStr: string): string {
  */
 function TrendIndicator({ trend }: { trend: 'increasing' | 'stable' | 'decreasing' }) {
   const config = {
-    increasing: { icon: TrendingUp, color: 'text-red-600', label: 'Increasing' },
-    stable: { icon: Minus, color: 'text-gray-500', label: 'Stable' },
-    decreasing: { icon: TrendingDown, color: 'text-green-600', label: 'Decreasing' }
+    increasing: { icon: TrendingUp, color: 'text-red-600 dark:text-red-400', label: 'Increasing' },
+    stable: { icon: Minus, color: 'text-gray-500 dark:text-slate-400', label: 'Stable' },
+    decreasing: { icon: TrendingDown, color: 'text-green-600 dark:text-green-400', label: 'Decreasing' }
   }
   
   const { icon: Icon, color, label } = config[trend]
@@ -154,30 +154,30 @@ function TimelineItem({
                 {config.label}
               </span>
               {snapshot.is_baseline && (
-                <span className="px-1.5 py-0.5 text-xs bg-blue-100 text-blue-700 rounded">
+                <span className="px-1.5 py-0.5 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 rounded">
                   Baseline
                 </span>
               )}
               {snapshot.approved_by && (
-                <span className="px-1.5 py-0.5 text-xs bg-green-100 text-green-700 rounded flex items-center gap-0.5">
+                <span className="px-1.5 py-0.5 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 rounded flex items-center gap-0.5">
                   <CheckCircle className="w-3 h-3" />
                   Approved
                 </span>
               )}
             </div>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
               {formatDate(snapshot.estimate_date)}
             </p>
           </div>
           
           {/* Estimate value */}
           <div className="text-right">
-            <div className="font-semibold text-gray-900">
+            <div className="font-semibold text-gray-900 dark:text-slate-100">
               {formatEstimateCurrency(snapshot.estimate_value)}
             </div>
             {snapshot.change_amount !== 0 && (
               <div className={`text-sm ${
-                snapshot.change_amount > 0 ? 'text-red-600' : 'text-green-600'
+                snapshot.change_amount > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
               }`}>
                 {formatChange(snapshot.change_amount)}
                 <span className="text-xs ml-1">
@@ -189,50 +189,50 @@ function TimelineItem({
         </div>
         
         {/* Description */}
-        <p className="text-sm text-gray-600 mt-2">
+        <p className="text-sm text-gray-600 dark:text-slate-400 mt-2">
           {snapshot.description}
         </p>
         
         {/* Expandable details */}
         <button
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 mt-2"
+          className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:text-slate-400 mt-2"
         >
           {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           {expanded ? 'Hide' : 'Show'} details
         </button>
         
         {expanded && (
-          <div className="mt-2 p-3 bg-gray-50 rounded-lg text-xs space-y-2">
+          <div className="mt-2 p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg text-xs space-y-2">
             {snapshot.change_reason && (
               <div className="flex items-center gap-2">
-                <span className="text-gray-500">Reason:</span>
+                <span className="text-gray-500 dark:text-slate-400">Reason:</span>
                 <span className="capitalize">{snapshot.change_reason.replace('_', ' ')}</span>
               </div>
             )}
             {snapshot.confidence_level !== undefined && (
               <div className="flex items-center gap-2">
-                <span className="text-gray-500">Confidence:</span>
+                <span className="text-gray-500 dark:text-slate-400">Confidence:</span>
                 <span>{snapshot.confidence_level.toFixed(0)}%</span>
               </div>
             )}
             {snapshot.approved_by && (
               <div className="flex items-center gap-2">
-                <User className="w-3 h-3 text-gray-400" />
-                <span className="text-gray-500">Approved by:</span>
+                <User className="w-3 h-3 text-gray-400 dark:text-slate-500" />
+                <span className="text-gray-500 dark:text-slate-400">Approved by:</span>
                 <span>{snapshot.approved_by}</span>
               </div>
             )}
             {snapshot.notes && (
               <div>
-                <span className="text-gray-500">Notes:</span>
-                <p className="mt-1 text-gray-600">{snapshot.notes}</p>
+                <span className="text-gray-500 dark:text-slate-400">Notes:</span>
+                <p className="mt-1 text-gray-600 dark:text-slate-400">{snapshot.notes}</p>
               </div>
             )}
             {!snapshot.is_baseline && onSetBaseline && (
               <button
                 onClick={onSetBaseline}
-                className="flex items-center gap-1 text-blue-600 hover:text-blue-800 mt-2"
+                className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 mt-2"
               >
                 <Flag className="w-3 h-3" />
                 Set as baseline
@@ -306,9 +306,9 @@ export function CostEstimateTimeline({
   
   if (loading) {
     return (
-      <div className={`bg-white rounded-lg border border-gray-200 p-6 ${className}`}>
+      <div className={`bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-6 ${className}`}>
         <div className="flex items-center justify-center h-32">
-          <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+          <Loader2 className="w-6 h-6 text-gray-400 dark:text-slate-500 animate-spin" />
         </div>
       </div>
     )
@@ -316,8 +316,8 @@ export function CostEstimateTimeline({
   
   if (error || !history) {
     return (
-      <div className={`bg-white rounded-lg border border-gray-200 p-6 ${className}`}>
-        <div className="text-center text-gray-400 py-8">
+      <div className={`bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-6 ${className}`}>
+        <div className="text-center text-gray-400 dark:text-slate-500 py-8">
           <AlertTriangle className="w-12 h-12 mx-auto mb-2 opacity-50" />
           <p>{error || 'No estimate history available'}</p>
         </div>
@@ -326,60 +326,60 @@ export function CostEstimateTimeline({
   }
   
   return (
-    <div className={`bg-white rounded-lg border border-gray-200 overflow-hidden ${className}`}>
+    <div className={`bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-gray-200 dark:border-slate-700">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <DollarSign className="w-5 h-5 text-blue-500" />
-            <h3 className="font-medium text-gray-900">
+            <DollarSign className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+            <h3 className="font-medium text-gray-900 dark:text-slate-100">
               Cost Estimate Timeline
             </h3>
           </div>
           <TrendIndicator trend={history.trend} />
         </div>
         {projectName && (
-          <p className="text-sm text-gray-500">{projectName}</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400">{projectName}</p>
         )}
       </div>
       
       {/* Summary stats */}
       {summary && !compact && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 border-b border-gray-200">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700">
           <div className="text-center">
-            <div className="text-lg font-bold text-gray-900">
+            <div className="text-lg font-bold text-gray-900 dark:text-slate-100">
               {formatEstimateCurrency(summary.current)}
             </div>
-            <div className="text-xs text-gray-500">Current Estimate</div>
+            <div className="text-xs text-gray-500 dark:text-slate-400">Current Estimate</div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-bold text-gray-900">
+            <div className="text-lg font-bold text-gray-900 dark:text-slate-100">
               {formatEstimateCurrency(summary.original)}
             </div>
-            <div className="text-xs text-gray-500">Original Estimate</div>
+            <div className="text-xs text-gray-500 dark:text-slate-400">Original Estimate</div>
           </div>
           <div className="text-center">
             <div className={`text-lg font-bold ${
-              summary.variance_from_original > 0 ? 'text-red-600' : 
-              summary.variance_from_original < 0 ? 'text-green-600' : 'text-gray-600'
+              summary.variance_from_original > 0 ? 'text-red-600 dark:text-red-400' : 
+              summary.variance_from_original < 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-slate-400'
             }`}>
               {formatChange(summary.variance_from_original)}
             </div>
-            <div className="text-xs text-gray-500">Total Variance</div>
+            <div className="text-xs text-gray-500 dark:text-slate-400">Total Variance</div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-bold text-gray-900">
+            <div className="text-lg font-bold text-gray-900 dark:text-slate-100">
               {summary.number_of_revisions}
             </div>
-            <div className="text-xs text-gray-500">Revisions</div>
+            <div className="text-xs text-gray-500 dark:text-slate-400">Revisions</div>
           </div>
         </div>
       )}
       
       {/* Chart */}
       {showChart && !compact && chartData.length > 1 && (
-        <div className="p-4 border-b border-gray-200">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">Estimate Evolution</h4>
+        <div className="p-4 border-b border-gray-200 dark:border-slate-700">
+          <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">Estimate Evolution</h4>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
@@ -427,7 +427,7 @@ export function CostEstimateTimeline({
       
       {/* Timeline */}
       <div className="p-4">
-        <h4 className="text-sm font-medium text-gray-700 mb-4">Change History</h4>
+        <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-4">Change History</h4>
         <div className="space-y-0">
           {displayedSnapshots.map((snapshot, index) => (
             <TimelineItem
@@ -443,7 +443,7 @@ export function CostEstimateTimeline({
         {history.snapshots.length > 5 && !compact && (
           <button
             onClick={() => setShowAllSnapshots(!showAllSnapshots)}
-            className="w-full mt-4 py-2 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors flex items-center justify-center gap-1"
+            className="w-full mt-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-blue-50 rounded-lg transition-colors flex items-center justify-center gap-1"
           >
             {showAllSnapshots ? (
               <>
@@ -461,7 +461,7 @@ export function CostEstimateTimeline({
       </div>
       
       {/* Footer */}
-      <div className="px-4 py-3 border-t border-gray-200 bg-gray-50 text-xs text-gray-500 flex items-center justify-between">
+      <div className="px-4 py-3 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 text-xs text-gray-500 dark:text-slate-400 flex items-center justify-between">
         <span className="flex items-center gap-1">
           <Calendar className="w-3 h-3" />
           Last updated: {formatDate(history.last_updated)}

@@ -46,12 +46,12 @@ export default function CostImpactCalculator({ changeOrderId, onAnalysisComplete
   }
 
   if (error) {
-    return <div className="p-4 bg-red-50 text-red-700 rounded-lg text-sm">{error}</div>
+    return <div className="p-4 bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200 rounded-lg text-sm">{error}</div>
   }
 
   if (!analysis && scenarios.length === 0) {
     return (
-      <div className="p-4 text-gray-500 text-sm rounded-lg border">
+      <div className="p-4 text-gray-500 dark:text-slate-400 text-sm rounded-lg border">
         No cost analysis available. Create one via the cost analysis API.
       </div>
     )
@@ -61,13 +61,13 @@ export default function CostImpactCalculator({ changeOrderId, onAnalysisComplete
     <div className="space-y-6">
       {analysis && (
         <div>
-          <h4 className="text-sm font-medium text-gray-700 mb-3">Cost Breakdown</h4>
+          <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">Cost Breakdown</h4>
           <CostBreakdownChart
             directCosts={analysis.direct_costs || {}}
             indirectCosts={analysis.indirect_costs}
             total={analysis.total_cost_impact}
           />
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-500 dark:text-slate-400 mt-2">
             Pricing: {analysis.pricing_method} • Confidence: {(analysis.confidence_level * 100).toFixed(0)}%
           </p>
         </div>

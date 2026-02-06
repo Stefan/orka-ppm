@@ -93,10 +93,10 @@ const DEFAULT_ENTITY_TYPES = [
  * Severity levels
  */
 const SEVERITY_LEVELS = [
-  { value: 'info', label: 'Info', color: 'bg-blue-100 text-blue-700' },
-  { value: 'warning', label: 'Warning', color: 'bg-yellow-100 text-yellow-700' },
-  { value: 'error', label: 'Error', color: 'bg-orange-100 text-orange-700' },
-  { value: 'critical', label: 'Critical', color: 'bg-red-100 text-red-700' }
+  { value: 'info', label: 'Info', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700' },
+  { value: 'warning', label: 'Warning', color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700' },
+  { value: 'error', label: 'Error', color: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700' },
+  { value: 'critical', label: 'Critical', color: 'bg-red-100 dark:bg-red-900/30 text-red-700' }
 ]
 
 /**
@@ -114,10 +114,10 @@ const CATEGORIES = [
  * Risk levels
  */
 const RISK_LEVELS = [
-  { value: 'Low', label: 'Low', color: 'bg-green-100 text-green-700' },
-  { value: 'Medium', label: 'Medium', color: 'bg-yellow-100 text-yellow-700' },
-  { value: 'High', label: 'High', color: 'bg-orange-100 text-orange-700' },
-  { value: 'Critical', label: 'Critical', color: 'bg-red-100 text-red-700' }
+  { value: 'Low', label: 'Low', color: 'bg-green-100 dark:bg-green-900/30 text-green-700' },
+  { value: 'Medium', label: 'Medium', color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700' },
+  { value: 'High', label: 'High', color: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700' },
+  { value: 'Critical', label: 'Critical', color: 'bg-red-100 dark:bg-red-900/30 text-red-700' }
 ]
 
 /**
@@ -315,14 +315,14 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
   }, [filters.userIds, availableUsers])
 
   return (
-    <div className={`bg-white rounded-lg border border-gray-200 ${className}`} data-testid="audit-filters">
+    <div className={`bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 ${className}`} data-testid="audit-filters">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
         <div className="flex items-center space-x-2">
-          <Filter className="h-5 w-5 text-gray-600" />
-          <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+          <Filter className="h-5 w-5 text-gray-600 dark:text-slate-400" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Filters</h3>
           {hasActiveFilters && (
-            <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">
+            <span className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 rounded-full">
               Active
             </span>
           )}
@@ -331,7 +331,7 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
           {hasActiveFilters && (
             <button
               onClick={handleReset}
-              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors"
               title="Reset all filters"
             >
               <RotateCcw className="h-4 w-4" />
@@ -340,7 +340,7 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
           {showAdvancedFilters && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 rounded-lg transition-colors"
               title={isExpanded ? 'Collapse filters' : 'Expand filters'}
             >
               {isExpanded ? (
@@ -357,13 +357,13 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
       <div className="p-4 space-y-4">
         {/* Date Range Picker */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
             <Calendar className="h-4 w-4 inline mr-1" />
             Date Range
           </label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Start Date</label>
+              <label className="block text-xs text-gray-600 dark:text-slate-400 mb-1">Start Date</label>
               <DatePicker
                 selected={filters.dateRange?.start || null}
                 onChange={(date) => handleDateRangeChange('start', date)}
@@ -372,13 +372,13 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
                 endDate={filters.dateRange?.end || null}
                 maxDate={filters.dateRange?.end || new Date()}
                 placeholderText="Select start date"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 dateFormat="MMM d, yyyy"
                 isClearable
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">End Date</label>
+              <label className="block text-xs text-gray-600 dark:text-slate-400 mb-1">End Date</label>
               <DatePicker
                 selected={filters.dateRange?.end || null}
                 onChange={(date) => handleDateRangeChange('end', date)}
@@ -388,7 +388,7 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
                 minDate={filters.dateRange?.start || null}
                 maxDate={new Date()}
                 placeholderText="Select end date"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 dateFormat="MMM d, yyyy"
                 isClearable
               />
@@ -398,27 +398,27 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
 
         {/* Event Type Multi-Select */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
             Event Types
           </label>
-          <div className="max-h-48 overflow-y-auto border border-gray-300 rounded-md p-2 space-y-1">
+          <div className="max-h-48 overflow-y-auto border border-gray-300 dark:border-slate-600 rounded-md p-2 space-y-1">
             {availableEventTypes.map((eventType) => (
               <label
                 key={eventType}
-                className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                className="flex items-center space-x-2 p-2 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 rounded cursor-pointer"
               >
                 <input
                   type="checkbox"
                   checked={filters.eventTypes?.includes(eventType) ?? false}
                   onChange={() => handleEventTypeToggle(eventType)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">{eventType.replace(/_/g, ' ')}</span>
+                <span className="text-sm text-gray-700 dark:text-slate-300">{eventType.replace(/_/g, ' ')}</span>
               </label>
             ))}
           </div>
           {filters.eventTypes && filters.eventTypes.length > 0 && (
-            <p className="text-xs text-gray-600 mt-1">
+            <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">
               {filters.eventTypes.length} type{filters.eventTypes.length !== 1 ? 's' : ''} selected
             </p>
           )}
@@ -427,11 +427,11 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
 
       {/* Advanced Filters (Collapsible) */}
       {showAdvancedFilters && isExpanded && (
-        <div className="p-4 pt-0 space-y-4 border-t border-gray-200">
+        <div className="p-4 pt-0 space-y-4 border-t border-gray-200 dark:border-slate-700">
           {/* User Selector with Autocomplete */}
           {availableUsers.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 <User className="h-4 w-4 inline mr-1" />
                 Users
               </label>
@@ -445,21 +445,21 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
                   }}
                   onFocus={() => setShowUserDropdown(true)}
                   placeholder="Search users..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 {showUserDropdown && filteredUsers.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-md shadow-lg max-h-48 overflow-y-auto">
                     {filteredUsers.map((user) => (
                       <button
                         key={user.id}
                         onClick={() => handleUserSelect(user.id)}
-                        className={`w-full text-left px-3 py-2 hover:bg-gray-50 text-sm ${
-                          filters.userIds?.includes(user.id) ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                        className={`w-full text-left px-3 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 text-sm ${
+                          filters.userIds?.includes(user.id) ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700' : 'text-gray-700 dark:text-slate-300'
                         }`}
                       >
                         <div className="font-medium">{user.name}</div>
                         {user.email && (
-                          <div className="text-xs text-gray-500">{user.email}</div>
+                          <div className="text-xs text-gray-500 dark:text-slate-400">{user.email}</div>
                         )}
                       </button>
                     ))}
@@ -471,7 +471,7 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
                   {selectedUserNames.map((name, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full"
+                      className="inline-flex items-center px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 rounded-full"
                     >
                       {name}
                       <button
@@ -492,22 +492,22 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
 
           {/* Entity Type Selector */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               Entity Types
             </label>
             <div className="grid grid-cols-2 gap-2">
               {availableEntityTypes.map((entityType) => (
                 <label
                   key={entityType}
-                  className="flex items-center space-x-2 p-2 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer"
+                  className="flex items-center space-x-2 p-2 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 cursor-pointer"
                 >
                   <input
                     type="checkbox"
                     checked={filters.entityTypes?.includes(entityType) ?? false}
                     onChange={() => handleEntityTypeToggle(entityType)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
                   />
-                  <span className="text-sm text-gray-700 capitalize">{entityType}</span>
+                  <span className="text-sm text-gray-700 dark:text-slate-300 capitalize">{entityType}</span>
                 </label>
               ))}
             </div>
@@ -515,7 +515,7 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
 
           {/* Severity Filter (Radio Buttons) */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               Severity
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -525,14 +525,14 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
                   className={`flex items-center space-x-2 p-2 border rounded-md cursor-pointer transition-colors ${
                     filters.severity?.includes(level.value)
                       ? `${level.color} border-current`
-                      : 'border-gray-300 hover:bg-gray-50'
+                      : 'border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50'
                   }`}
                 >
                   <input
                     type="checkbox"
                     checked={filters.severity?.includes(level.value) ?? false}
                     onChange={() => handleSeveritySelect(level.value)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
                   />
                   <span className="text-sm font-medium">{level.label}</span>
                 </label>
@@ -542,7 +542,7 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
 
           {/* Category Filter (Checkboxes) */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               <Tag className="h-4 w-4 inline mr-1" />
               Categories
             </label>
@@ -552,16 +552,16 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
                 return (
                   <label
                     key={category.value}
-                    className="flex items-center space-x-2 p-2 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer"
+                    className="flex items-center space-x-2 p-2 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 cursor-pointer"
                   >
                     <input
                       type="checkbox"
                       checked={filters.categories?.includes(category.value) ?? false}
                       onChange={() => handleCategoryToggle(category.value)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
                     />
-                    <Icon className="h-4 w-4 text-gray-600" />
-                    <span className="text-sm text-gray-700">{category.label}</span>
+                    <Icon className="h-4 w-4 text-gray-600 dark:text-slate-400" />
+                    <span className="text-sm text-gray-700 dark:text-slate-300">{category.label}</span>
                   </label>
                 )
               })}
@@ -570,7 +570,7 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
 
           {/* Risk Level Filter (Checkboxes) */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               Risk Level
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -580,14 +580,14 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
                   className={`flex items-center space-x-2 p-2 border rounded-md cursor-pointer transition-colors ${
                     filters.riskLevels?.includes(level.value)
                       ? `${level.color} border-current`
-                      : 'border-gray-300 hover:bg-gray-50'
+                      : 'border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50'
                   }`}
                 >
                   <input
                     type="checkbox"
                     checked={filters.riskLevels?.includes(level.value) ?? false}
                     onChange={() => handleRiskLevelToggle(level.value)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
                   />
                   <span className="text-sm font-medium">{level.label}</span>
                 </label>
@@ -597,15 +597,15 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
 
           {/* Anomalies Only Filter */}
           <div>
-            <label className="flex items-center space-x-2 p-3 border-2 border-red-200 rounded-md hover:bg-red-50 cursor-pointer">
+            <label className="flex items-center space-x-2 p-3 border-2 border-red-200 dark:border-red-800 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer">
               <input
                 type="checkbox"
                 checked={filters.showAnomaliesOnly ?? false}
                 onChange={handleAnomaliesOnlyToggle}
-                className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                className="rounded border-gray-300 dark:border-slate-600 text-red-600 dark:text-red-400 focus:ring-red-500"
               />
-              <AlertTriangle className="h-5 w-5 text-red-600" />
-              <span className="text-sm font-medium text-gray-900">Show Anomalies Only</span>
+              <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+              <span className="text-sm font-medium text-gray-900 dark:text-slate-100">Show Anomalies Only</span>
             </label>
           </div>
         </div>
@@ -613,10 +613,10 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
 
       {/* Footer with Reset Button */}
       {hasActiveFilters && (
-        <div className="p-4 border-t border-gray-200 bg-gray-50">
+        <div className="p-4 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
           <button
             onClick={handleReset}
-            className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm font-medium flex items-center justify-center space-x-2"
+            className="w-full px-4 py-2 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 text-sm font-medium flex items-center justify-center space-x-2"
           >
             <RotateCcw className="h-4 w-4" />
             <span>Clear All Filters</span>

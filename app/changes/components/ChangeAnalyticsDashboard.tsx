@@ -106,7 +106,7 @@ export default function ChangeAnalyticsDashboard({
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <p className="text-gray-500">{error || t('analytics.noData')}</p>
+          <p className="text-gray-500 dark:text-slate-400">{error || t('analytics.noData')}</p>
         </div>
       </div>
     )
@@ -115,11 +115,11 @@ export default function ChangeAnalyticsDashboard({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{t('analytics.title')}</h2>
-            <p className="text-gray-600 mt-1">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">{t('analytics.title')}</h2>
+            <p className="text-gray-600 dark:text-slate-400 mt-1">
               {t('analytics.subtitle')}
             </p>
           </div>
@@ -127,19 +127,19 @@ export default function ChangeAnalyticsDashboard({
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-slate-200 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
             >
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
               {t('analytics.refresh')}
             </button>
             <button
               onClick={handleExport}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-slate-200 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
             >
               <Download className="h-4 w-4" />
               {t('analytics.export')}
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50">
+            <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-slate-200 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
               <Filter className="h-4 w-4" />
               {t('analytics.filters')}
             </button>
@@ -148,8 +148,8 @@ export default function ChangeAnalyticsDashboard({
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+        <div className="border-b border-gray-200 dark:border-slate-700">
           <nav className="flex space-x-8 px-6">
             {[
               { id: 'overview', label: t('analytics.tabs.overview'), icon: BarChart3 },
@@ -165,8 +165,8 @@ export default function ChangeAnalyticsDashboard({
                   onClick={() => setActiveView(tab.id as any)}
                   className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm ${
                     activeView === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300 hover:border-gray-300 dark:border-slate-600'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -189,12 +189,12 @@ export default function ChangeAnalyticsDashboard({
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-blue-600 text-sm font-medium">Total Changes</p>
+                      <p className="text-blue-600 dark:text-blue-400 text-sm font-medium">Total Changes</p>
                       <p className="text-2xl font-bold text-blue-900">
                         {analyticsData.total_changes}
                       </p>
                     </div>
-                    <FileText className="h-8 w-8 text-blue-600" />
+                    <FileText className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                   </div>
                 </div>
 
@@ -204,12 +204,12 @@ export default function ChangeAnalyticsDashboard({
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-green-600 text-sm font-medium">Approval Rate</p>
+                      <p className="text-green-600 dark:text-green-400 text-sm font-medium">Approval Rate</p>
                       <p className="text-2xl font-bold text-green-900">
                         {analyticsData.approval_rate_percentage.toFixed(1)}%
                       </p>
                     </div>
-                    <CheckCircle className="h-8 w-8 text-green-600" />
+                    <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
                   </div>
                 </div>
 
@@ -219,12 +219,12 @@ export default function ChangeAnalyticsDashboard({
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-orange-600 text-sm font-medium">Avg Approval Time</p>
+                      <p className="text-orange-600 dark:text-orange-400 text-sm font-medium">Avg Approval Time</p>
                       <p className="text-2xl font-bold text-orange-900">
                         {analyticsData.average_approval_time_days.toFixed(1)} days
                       </p>
                     </div>
-                    <Clock className="h-8 w-8 text-orange-600" />
+                    <Clock className="h-8 w-8 text-orange-600 dark:text-orange-400" />
                   </div>
                 </div>
 
@@ -234,12 +234,12 @@ export default function ChangeAnalyticsDashboard({
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-purple-600 text-sm font-medium">Avg Implementation</p>
+                      <p className="text-purple-600 dark:text-purple-400 text-sm font-medium">Avg Implementation</p>
                       <p className="text-2xl font-bold text-purple-900">
                         {analyticsData.average_implementation_time_days.toFixed(1)} days
                       </p>
                     </div>
-                    <Activity className="h-8 w-8 text-purple-600" />
+                    <Activity className="h-8 w-8 text-purple-600 dark:text-purple-400" />
                   </div>
                 </div>
               </div>
@@ -247,8 +247,8 @@ export default function ChangeAnalyticsDashboard({
               {/* Overview Charts */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Changes by Status */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Changes by Status</h3>
+                <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Changes by Status</h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
                       <Pie
@@ -271,8 +271,8 @@ export default function ChangeAnalyticsDashboard({
                 </div>
 
                 {/* Changes by Type */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Changes by Type</h3>
+                <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Changes by Type</h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={typeData}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -285,8 +285,8 @@ export default function ChangeAnalyticsDashboard({
                 </div>
 
                 {/* Changes by Priority */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Changes by Priority</h3>
+                <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Changes by Priority</h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
                       <Pie
@@ -327,8 +327,8 @@ export default function ChangeAnalyticsDashboard({
           {activeView === 'trends' && (
             <div className="space-y-6">
               {/* Monthly Change Volume Trend */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Monthly Change Volume Trends</h3>
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Monthly Change Volume Trends</h3>
                 <ResponsiveContainer width="100%" height={400}>
                   <ComposedChart data={analyticsData.monthly_change_volume}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -345,8 +345,8 @@ export default function ChangeAnalyticsDashboard({
               </div>
 
               {/* Approval Rate Trend */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Approval Rate Trend</h3>
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Approval Rate Trend</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={analyticsData.monthly_change_volume}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -370,59 +370,59 @@ export default function ChangeAnalyticsDashboard({
           {activeView === 'projects' && (
             <div className="space-y-6">
               {/* Project Performance Table */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Project Change Performance</h3>
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Project Change Performance</h3>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+                    <thead className="bg-gray-50 dark:bg-slate-800/50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Project
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Total Changes
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Approved
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Approval Rate
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Avg Cost Impact
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Avg Schedule Impact
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                       {analyticsData.changes_by_project.map((project, index) => (
-                        <tr key={index} className="hover:bg-gray-50 cursor-pointer" onClick={() => handleDrillDown('project', project)}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <tr key={index} className="hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 cursor-pointer" onClick={() => handleDrillDown('project', project)}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-slate-100">
                             {project.project_name}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                             {project.count}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                             {Math.round(project.count * project.approval_rate / 100)}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                               project.approval_rate > 80 
-                                ? 'bg-green-100 text-green-800' 
+                                ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
                                 : project.approval_rate > 60
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-red-100 text-red-800'
+                                ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
+                                : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                             }`}>
                               {project.approval_rate.toFixed(1)}%
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                             ${project.average_cost_impact.toLocaleString()}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                             N/A
                           </td>
                         </tr>
@@ -433,8 +433,8 @@ export default function ChangeAnalyticsDashboard({
               </div>
 
               {/* Project Change Volume Chart */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Change Volume by Project</h3>
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Change Volume by Project</h3>
                 <ResponsiveContainer width="100%" height={400}>
                   <BarChart data={analyticsData.changes_by_project}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -454,61 +454,61 @@ export default function ChangeAnalyticsDashboard({
           {activeView === 'impact' && (
             <div className="space-y-6">
               {/* High Impact Changes */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">High Impact Changes</h3>
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">High Impact Changes</h3>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+                    <thead className="bg-gray-50 dark:bg-slate-800/50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Change Request
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Title
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Cost Impact
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Schedule Impact
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Status
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           Project
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                       {analyticsData.high_impact_changes.map((change, index) => (
-                        <tr key={index} className="hover:bg-gray-50 cursor-pointer" onClick={() => handleDrillDown('change', change)}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
+                        <tr key={index} className="hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 cursor-pointer" onClick={() => handleDrillDown('change', change)}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600 dark:text-blue-400">
                             {change.id}
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
+                          <td className="px-6 py-4 text-sm text-gray-900 dark:text-slate-100 max-w-xs truncate">
                             {change.title}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                             ${change.cost_impact.toLocaleString()}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                             {change.schedule_impact} days
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                               change.status === 'approved' 
-                                ? 'bg-green-100 text-green-800' 
+                                ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
                                 : change.status === 'implementing'
-                                ? 'bg-blue-100 text-blue-800'
+                                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
                                 : change.status === 'pending_approval'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-gray-100 text-gray-800'
+                                ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
+                                : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200'
                             }`}>
                               {change.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                          <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 max-w-xs truncate">
                             N/A
                           </td>
                         </tr>
@@ -521,8 +521,8 @@ export default function ChangeAnalyticsDashboard({
               {/* Impact Distribution Charts */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Cost Impact Distribution */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Cost Impact Distribution</h3>
+                <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Cost Impact Distribution</h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={analyticsData.high_impact_changes.slice(0, 5)}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -535,8 +535,8 @@ export default function ChangeAnalyticsDashboard({
                 </div>
 
                 {/* Schedule Impact Distribution */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Schedule Impact Distribution</h3>
+                <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">Schedule Impact Distribution</h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={analyticsData.high_impact_changes.slice(0, 5)}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -554,11 +554,11 @@ export default function ChangeAnalyticsDashboard({
       </div>
 
       {/* Analytics Metadata */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Info className="h-5 w-5 text-blue-600" />
-            <span className="text-sm text-gray-600">
+            <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <span className="text-sm text-gray-600 dark:text-slate-400">
               Analytics generated on {new Date().toLocaleString()} | 
               Date range: {dateRange.from.toLocaleDateString()} - {dateRange.to.toLocaleDateString()}
               {projectId && ` | Project: ${projectId}`}
@@ -566,7 +566,7 @@ export default function ChangeAnalyticsDashboard({
           </div>
           <div className="flex items-center gap-2">
             {selectedMetric && (
-              <span className="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded">
+              <span className="text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">
                 Drilling down: {selectedMetric}
               </span>
             )}

@@ -15,7 +15,11 @@ from pydantic import BaseModel, Field
 
 from auth.dependencies import get_current_user
 from ai_agents import create_ai_agents
-from config.database import supabase
+from config.database import get_db
+from config.settings import settings
+
+# Use get_db for all DB access; alias so any callee that expects get_supabase_client can resolve
+get_supabase_client = get_db
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/ai/resource-optimizer", tags=["AI Resource Optimizer"])
@@ -122,19 +126,24 @@ async def analyze_resource_allocation(
     analysis_id = f"analysis_{int(start_time.timestamp())}_{uuid.uuid4().hex[:8]}"
     
     try:
-        # Get AI agents
-        supabase = get_supabase_client()
-        ai_agents = create_ai_agents(supabase, "")  # API key handled in agent initialization
+        supabase = get_db()
+        if supabase is None:
+            raise HTTPException(status_code=503, detail="Database not available")
+        openai_key = settings.OPENAI_API_KEY or ""
+        ai_agents = create_ai_agents(supabase, openai_key, settings.OPENAI_BASE_URL)
         resource_optimizer = ai_agents["resource_optimizer"]
         
+        user_id = current_user.get("id") or current_user.get("user_id") or ""
+        if not user_id:
+            raise HTTPException(status_code=401, detail="User not identified")
         # Run comprehensive resource analysis
         optimization_results = await resource_optimizer.analyze_resource_allocation(
-            user_id=current_user["id"],
+            user_id=user_id,
             project_id=request.project_id
         )
         
         # Detect conflicts if requested
-        conflicts_data = await resource_optimizer.detect_resource_conflicts(current_user["id"])
+        conflicts_data = await resource_optimizer.detect_resource_conflicts(user_id)
         
         # Apply constraints if provided
         if request.constraints:
@@ -160,7 +169,7 @@ async def analyze_resource_allocation(
             store_analysis_results,
             analysis_id,
             analysis.dict(),
-            current_user["id"]
+            user_id
         )
         
         # Log performance metrics
@@ -170,13 +179,15 @@ async def analyze_resource_allocation(
             analysis_duration,
             len(analysis.suggestions),
             analysis.overall_confidence,
-            current_user["id"]
+            user_id
         )
         
         return analysis
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Resource optimization analysis failed: {e}")
+        logger.exception("Resource optimization analysis failed")
         raise HTTPException(
             status_code=500,
             detail=f"Analysis failed: {str(e)}"
@@ -192,8 +203,11 @@ async def suggest_team_composition(
     Requirement 6.2: Suggest optimal team compositions based on skills and availability
     """
     try:
-        supabase = get_supabase_client()
-        ai_agents = create_ai_agents(supabase, "")
+        supabase = get_db()
+        if supabase is None:
+            raise HTTPException(status_code=503, detail="Database not available")
+        openai_key = settings.OPENAI_API_KEY or ""
+        ai_agents = create_ai_agents(supabase, openai_key, settings.OPENAI_BASE_URL)
         resource_optimizer = ai_agents["resource_optimizer"]
         
         # Get available resources with skills
@@ -222,8 +236,10 @@ async def suggest_team_composition(
         
         return team_composition
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Team composition suggestion failed: {e}")
+        logger.exception("Team composition suggestion failed")
         raise HTTPException(
             status_code=500,
             detail=f"Team composition analysis failed: {str(e)}"
@@ -236,8 +252,11 @@ async def detect_conflicts(current_user: dict = Depends(get_current_user)):
     Requirement 6.3: Provide alternative strategies and recommendations
     """
     try:
-        supabase = get_supabase_client()
-        ai_agents = create_ai_agents(supabase, "")
+        supabase = get_db()
+        if supabase is None:
+            raise HTTPException(status_code=503, detail="Database not available")
+        openai_key = settings.OPENAI_API_KEY or ""
+        ai_agents = create_ai_agents(supabase, openai_key, settings.OPENAI_BASE_URL)
         resource_optimizer = ai_agents["resource_optimizer"]
         
         # Detect conflicts
@@ -281,8 +300,10 @@ async def detect_conflicts(current_user: dict = Depends(get_current_user)):
             "automated_resolutions": automated_resolutions
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Conflict detection failed: {e}")
+        logger.exception("Conflict detection failed")
         raise HTTPException(
             status_code=500,
             detail=f"Conflict detection failed: {str(e)}"
@@ -300,7 +321,9 @@ async def apply_optimization(
     Requirement 6.3: Track outcomes and improve future recommendations
     """
     try:
-        supabase = get_supabase_client()
+        supabase = get_db()
+        if supabase is None:
+            raise HTTPException(status_code=503, detail="Database not available")
         
         # Retrieve suggestion details
         suggestion_data = await get_suggestion_details(suggestion_id, supabase)
@@ -372,7 +395,9 @@ async def get_optimization_metrics(
     Get real-time optimization metrics and performance tracking
     """
     try:
-        supabase = get_supabase_client()
+        supabase = get_db()
+        if supabase is None:
+            raise HTTPException(status_code=503, detail="Database not available")
         
         # Calculate timeframe
         end_date = datetime.now()
@@ -689,7 +714,9 @@ def generate_recommended_actions(suggestions: List[OptimizationSuggestion]) -> L
 async def store_analysis_results(analysis_id: str, analysis_data: Dict, user_id: str):
     """Store analysis results for future reference"""
     try:
-        supabase = get_supabase_client()
+        supabase = get_db()
+        if supabase is None:
+            return
         supabase.table("optimization_analyses").insert({
             "analysis_id": analysis_id,
             "user_id": user_id,
@@ -702,7 +729,9 @@ async def store_analysis_results(analysis_id: str, analysis_data: Dict, user_id:
 async def log_optimization_metrics(analysis_id: str, duration_ms: int, suggestions_count: int, confidence: float, user_id: str):
     """Log optimization performance metrics"""
     try:
-        supabase = get_supabase_client()
+        supabase = get_db()
+        if supabase is None:
+            return
         supabase.table("optimization_metrics").insert({
             "analysis_id": analysis_id,
             "user_id": user_id,

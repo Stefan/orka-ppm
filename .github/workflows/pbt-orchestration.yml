@@ -52,6 +52,12 @@ env:
   NODE_VERSION: '18'
   HYPOTHESIS_PROFILE: 'ci'
 
+# Required for github-script: create issue on nightly failure, comment on PRs
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 jobs:
   orchestrate-tests:
     name: Orchestrate Property-Based Tests

@@ -283,8 +283,8 @@ export const ShareLinkManager: React.FC<ShareLinkManagerProps> = ({
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Share Links</h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Share Links</h2>
+              <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
                 Create and manage shareable links for external stakeholders
               </p>
             </div>
@@ -325,34 +325,34 @@ export const ShareLinkManager: React.FC<ShareLinkManagerProps> = ({
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <Eye className="h-5 w-5 text-blue-600" />
+                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                      <Eye className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Total Accesses</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Total Accesses</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                         {shareLinks.reduce((sum, link) => sum + link.access_count, 0).toLocaleString()}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <ExternalLink className="h-5 w-5 text-green-600" />
+                    <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                      <ExternalLink className="h-5 w-5 text-green-600 dark:text-green-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Active Links</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Active Links</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                         {shareLinks.filter(link => link.is_active && !isExpired(link.expires_at)).length}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg">
-                    <div className="p-2 bg-purple-100 rounded-lg">
-                      <TrendingUp className="h-5 w-5 text-purple-600" />
+                    <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                      <TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Most Active</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Most Active</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                         {Math.max(...shareLinks.map(link => link.access_count), 0)}
                       </p>
                     </div>
@@ -374,16 +374,16 @@ export const ShareLinkManager: React.FC<ShareLinkManagerProps> = ({
 
       {/* Success/Error Messages */}
       {success && (
-        <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
-          <p className="text-sm text-green-800">{success}</p>
+        <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 dark:border-green-800 rounded-lg">
+          <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+          <p className="text-sm text-green-800 dark:text-green-300">{success}</p>
         </div>
       )}
 
       {error && (
-        <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 dark:border-red-800 rounded-lg">
+          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+          <p className="text-sm text-red-800 dark:text-red-300">{error}</p>
         </div>
       )}
 
@@ -400,7 +400,7 @@ export const ShareLinkManager: React.FC<ShareLinkManagerProps> = ({
             <form onSubmit={handleCreateShareLink} className="space-y-4">
               {/* Permission Level */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   Permission Level *
                 </label>
                 <Select
@@ -409,14 +409,14 @@ export const ShareLinkManager: React.FC<ShareLinkManagerProps> = ({
                   onChange={(value) => setFormData({ ...formData, permission_level: value as SharePermissionLevel })}
                   error={formErrors.permission_level}
                 />
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
                   {getPermissionDescription(formData.permission_level)}
                 </p>
               </div>
 
               {/* Expiry Duration */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   Expiry Duration *
                 </label>
                 <Select
@@ -429,7 +429,7 @@ export const ShareLinkManager: React.FC<ShareLinkManagerProps> = ({
 
               {/* Custom Message */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   Custom Message (Optional)
                 </label>
                 <Textarea
@@ -439,7 +439,7 @@ export const ShareLinkManager: React.FC<ShareLinkManagerProps> = ({
                   rows={3}
                   error={formErrors.custom_message}
                 />
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
                   {formData.custom_message.length}/500 characters
                 </p>
               </div>
@@ -470,19 +470,19 @@ export const ShareLinkManager: React.FC<ShareLinkManagerProps> = ({
 
       {/* Active Share Links List */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
           Active Share Links ({shareLinks.filter(link => link.is_active && !isExpired(link.expires_at)).length})
         </h3>
 
         {loading && shareLinks.length === 0 ? (
           <Card>
-            <CardContent className="py-8 text-center text-gray-500">
+            <CardContent className="py-8 text-center text-gray-500 dark:text-slate-400">
               Loading share links...
             </CardContent>
           </Card>
         ) : shareLinks.length === 0 ? (
           <Card>
-            <CardContent className="py-8 text-center text-gray-500">
+            <CardContent className="py-8 text-center text-gray-500 dark:text-slate-400">
               No share links created yet. Create one to get started.
             </CardContent>
           </Card>
@@ -495,7 +495,7 @@ export const ShareLinkManager: React.FC<ShareLinkManagerProps> = ({
               <Card
                 key={link.id}
                 className={cn(
-                  expired && 'opacity-60 bg-gray-50'
+                  expired && 'opacity-60 bg-gray-50 dark:bg-slate-800/50'
                 )}
               >
                 <CardContent className="py-4">
@@ -505,40 +505,40 @@ export const ShareLinkManager: React.FC<ShareLinkManagerProps> = ({
                       <div className="flex items-center gap-2 mb-2">
                         <span className={cn(
                           'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                          link.permission_level === 'view_only' && 'bg-blue-100 text-blue-800',
-                          link.permission_level === 'limited_data' && 'bg-purple-100 text-purple-800',
-                          link.permission_level === 'full_project' && 'bg-green-100 text-green-800'
+                          link.permission_level === 'view_only' && 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
+                          link.permission_level === 'limited_data' && 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300',
+                          link.permission_level === 'full_project' && 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
                         )}>
                           {getPermissionDisplayName(link.permission_level)}
                         </span>
                         {expired && (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
                             Expired
                           </span>
                         )}
                         {!expired && expiringSoon && (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">
                             <Clock className="h-3 w-3 mr-1" />
                             Expiring Soon
                           </span>
                         )}
                       </div>
 
-                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400 mb-1">
                         <ExternalLink className="h-4 w-4" />
-                        <code className="text-xs bg-gray-100 px-2 py-1 rounded truncate max-w-md">
+                        <code className="text-xs bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded truncate max-w-md">
                           {link.share_url}
                         </code>
                       </div>
 
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-slate-400">
                         <span>Created: {formatDate(link.created_at)}</span>
                         <span>Expires: {formatDate(link.expires_at)}</span>
                         <span>Accesses: {link.access_count}</span>
                       </div>
 
                       {link.custom_message && (
-                        <p className="mt-2 text-sm text-gray-600 italic">
+                        <p className="mt-2 text-sm text-gray-600 dark:text-slate-400 italic">
                           "{link.custom_message}"
                         </p>
                       )}
@@ -579,7 +579,7 @@ export const ShareLinkManager: React.FC<ShareLinkManagerProps> = ({
                         onClick={() => handleRevokeLink(link.id)}
                         disabled={loading}
                         title="Revoke Link"
-                        className="text-red-600 hover:text-red-700"
+                        className="text-red-600 dark:text-red-400 hover:text-red-700"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

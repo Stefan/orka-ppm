@@ -220,7 +220,7 @@ export default function AdminFeatureTogglesPage() {
     return (
       <AppLayout>
         <div className="flex h-64 items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-400" />
         </div>
       </AppLayout>
     )
@@ -233,14 +233,14 @@ export default function AdminFeatureTogglesPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/admin"
-              className="rounded-lg border border-gray-300 bg-white p-2 text-gray-600 hover:bg-gray-50"
+              className="rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-2 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700"
               aria-label="Back to admin"
             >
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Feature Management</h1>
-              <p className="text-sm text-gray-600">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Feature Management</h1>
+              <p className="text-sm text-gray-600 dark:text-slate-400">
                 Enable or disable predefined application features
               </p>
             </div>
@@ -249,7 +249,7 @@ export default function AdminFeatureTogglesPage() {
 
         <div className="relative mb-6">
           <Search
-            className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+            className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-slate-500"
             aria-hidden
           />
           <input
@@ -257,70 +257,70 @@ export default function AdminFeatureTogglesPage() {
             placeholder="Search flags by name..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 py-2 pl-10 pr-4 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+            <thead className="bg-gray-50 dark:bg-slate-700">
                   <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-slate-400">
                   Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-slate-400">
                   Description
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-slate-400">
                   Scope
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-slate-400">
                   Enabled
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-slate-400">
                   Updated
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-slate-400">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
+            <tbody className="divide-y divide-gray-200 dark:divide-slate-700 bg-white dark:bg-slate-800">
               {filteredFlags.map((flag) => {
                 const placeholder = isPlaceholder(flag)
                   return (
-                    <tr key={placeholder ? `predefined-${flag.name}` : flag.id} className="hover:bg-gray-50">
-                    <td className="whitespace-nowrap px-6 py-3 text-sm font-medium text-gray-900">
+                    <tr key={placeholder ? `predefined-${flag.name}` : flag.id} className="hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700">
+                    <td className="whitespace-nowrap px-6 py-3 text-sm font-medium text-gray-900 dark:text-slate-100">
                       {'displayName' in flag ? flag.displayName : flag.name}
                     </td>
-                    <td className="max-w-md px-6 py-3 text-sm text-gray-600 leading-relaxed">
+                    <td className="max-w-md px-6 py-3 text-sm text-gray-600 dark:text-slate-400 leading-relaxed">
                       {'displayName' in flag ? flag.description : (flag.description ?? '—')}
                     </td>
-                    <td className="whitespace-nowrap px-6 py-3 text-sm text-gray-600">
+                    <td className="whitespace-nowrap px-6 py-3 text-sm text-gray-600 dark:text-slate-400">
                       {flag.organization_id == null ? 'Global' : 'Organization'}
                     </td>
                     <td className="whitespace-nowrap px-6 py-3">
                       {placeholder ? (
-                        <span className="text-gray-400 text-xs">Not in DB</span>
+                        <span className="text-gray-400 dark:text-slate-500 text-xs">Not in DB</span>
                       ) : (
                         <button
                           type="button"
                           onClick={() => toggleEnabled(flag)}
                           disabled={togglingId === flag.id}
-                          className="focus:outline-none hover:bg-gray-50 rounded p-1 transition-colors"
+                          className="focus:outline-none hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700 rounded p-1 transition-colors"
                           aria-label={flag.enabled ? 'Disable' : 'Enable'}
                         >
                           {togglingId === flag.id ? (
-                            <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                            <Loader2 className="h-6 w-6 animate-spin text-blue-600 dark:text-blue-400" />
                           ) : flag.enabled ? (
-                            <ToggleRight className="h-6 w-6 text-green-600" />
+                            <ToggleRight className="h-6 w-6 text-green-600 dark:text-green-400" />
                           ) : (
-                            <ToggleLeft className="h-6 w-6 text-gray-400" />
+                            <ToggleLeft className="h-6 w-6 text-gray-400 dark:text-slate-500" />
                           )}
                         </button>
                       )}
                     </td>
-                    <td className="whitespace-nowrap px-6 py-3 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-6 py-3 text-sm text-gray-500 dark:text-slate-400">
                       {placeholder ? '—' : formatTimestamp(flag.updated_at)}
                     </td>
                     <td className="whitespace-nowrap px-6 py-3 text-right">
@@ -337,7 +337,7 @@ export default function AdminFeatureTogglesPage() {
                           Enable
                         </button>
                       ) : (
-                        <span className="text-xs text-gray-400">—</span>
+                        <span className="text-xs text-gray-400 dark:text-slate-500">—</span>
                       )}
                     </td>
                   </tr>
@@ -346,7 +346,7 @@ export default function AdminFeatureTogglesPage() {
             </tbody>
           </table>
           {filteredFlags.length === 0 && (
-            <div className="py-12 text-center text-gray-500">
+            <div className="py-12 text-center text-gray-500 dark:text-slate-400">
               {searchInput.trim()
                 ? 'No flags match your search.'
                 : 'No feature flags yet. Add one to get started.'}
@@ -439,27 +439,27 @@ function FeatureFlagModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-lg">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">
+      <div className="w-full max-w-md rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-lg">
+        <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-slate-100">
           Enable Feature Flag
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Feature</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Feature</label>
             <input
               type="text"
               value={displayName}
               disabled
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:bg-gray-100"
+              className="mt-1 w-full rounded-lg border border-gray-300 dark:border-slate-600 px-3 py-2 text-sm disabled:bg-gray-100 dark:bg-slate-700 dark:disabled:bg-slate-700"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Description</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Description</label>
             <textarea
               value={description}
               disabled
               rows={3}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:bg-gray-100"
+              className="mt-1 w-full rounded-lg border border-gray-300 dark:border-slate-600 px-3 py-2 text-sm disabled:bg-gray-100 dark:bg-slate-700 dark:disabled:bg-slate-700"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -468,9 +468,9 @@ function FeatureFlagModal({
               id="modal-enabled"
               checked={enabled}
               onChange={(e) => setEnabled(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-blue-600"
+              className="h-4 w-4 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400"
             />
-            <label htmlFor="modal-enabled" className="text-sm font-medium text-gray-700">
+            <label htmlFor="modal-enabled" className="text-sm font-medium text-gray-700 dark:text-slate-300">
               Enable this feature
             </label>
           </div>
@@ -478,7 +478,7 @@ function FeatureFlagModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
             >
               Cancel
             </button>

@@ -696,166 +696,176 @@
       "editor": "Editor",
       "insights": "Einblicke",
       "collaboration": "Zusammenarbeit"
-    }
-  },
-  "pmr.insights": {
-    "title": "KI-Einblicke",
-    "refresh": "Aktualisieren",
-    "generating": "Einblicke werden generiert...",
-    "noInsights": "Keine Einblicke verfügbar",
-    "generateInsights": "Einblicke generieren",
-    "totalInsights": "Einblicke Gesamt",
-    "validated": "Validiert",
-    "highPriority": "Hohe Priorität",
-    "filters": {
-      "toggle": "Filter umschalten",
-      "categories": "Kategorien",
-      "minConfidence": "Min. Konfidenz",
-      "clearAll": "Alle Filter löschen"
-    },
-    "categories": {
-      "budget": "Budget",
-      "schedule": "Zeitplan",
-      "resource": "Ressource",
-      "risk": "Risiko",
-      "quality": "Qualität"
-    },
-    "types": {
-      "prediction": "Vorhersage",
-      "recommendation": "Empfehlung",
-      "alert": "Warnung",
-      "summary": "Zusammenfassung"
-    },
-    "priorities": {
-      "low": "niedrig",
-      "medium": "mittel",
-      "high": "hoch",
-      "critical": "kritisch"
-    },
-    "card": {
-      "confidence": "{percent}% Konfidenz",
-      "validated": "Validiert",
-      "details": "Details",
-      "predictedImpact": "Vorhergesagte Auswirkung",
-      "recommendedActions": "Empfohlene Maßnahmen",
-      "supportingData": "Unterstützende Daten",
-      "validationNotes": "Validierungsnotizen",
-      "validate": "Validieren",
-      "markInvalid": "Als ungültig markieren",
-      "apply": "Anwenden",
-      "markHelpful": "Als hilfreich markieren",
-      "markNotHelpful": "Als nicht hilfreich markieren"
-    }
-  },
-  "pmr.collaboration": {
-    "title": "Zusammenarbeit",
-    "tabs": {
-      "users": "Benutzer",
-      "comments": "Kommentare",
-      "conflicts": "Konflikte"
-    },
-    "users": {
-      "you": "(Sie)",
-      "active": "Aktiv {time}",
-      "noUsers": "Keine anderen Benutzer online"
-    },
-    "comments": {
-      "sectionPlaceholder": "Abschnitts-ID (z.B. executive-summary)",
-      "addPlaceholder": "Kommentar hinzufügen...",
-      "sendComment": "Kommentar senden",
-      "on": "zu {section}",
-      "resolveComment": "Kommentar auflösen",
-      "noComments": "Noch keine Kommentare"
-    },
-    "conflicts": {
-      "types": {
-        "simultaneousEdit": "Gleichzeitiger Bearbeitungskonflikt",
-        "versionMismatch": "Versionskonflikt",
-        "permissionConflict": "Berechtigungskonflikt"
-      },
-      "section": "Abschnitt: {section}",
-      "usersConflicting": "{count} Benutzer haben widersprüchliche Änderungen vorgenommen",
-      "conflictingChanges": "Widersprüchliche Änderungen:",
-      "user": "Benutzer: {userId}",
-      "resolve": "Konflikt auflösen:",
-      "useLatest": "Neueste verwenden",
-      "mergeChanges": "Änderungen zusammenführen",
-      "resolveManually": "Manuell auflösen",
-      "noConflicts": "Keine Konflikte erkannt"
-    },
-    "footer": {
-      "online": "{count} online",
-      "comments": "{count} Kommentare",
-      "conflicts": "{count} Konflikte"
-    },
-    "time": {
-      "justNow": "Gerade eben",
-      "minutesAgo": "vor {minutes}m",
-      "hoursAgo": "vor {hours}h"
-    }
-  },
-  "pmr.export": {
-    "title": "Bericht exportieren",
-    "subtitle": "Konfigurieren und exportieren Sie Ihren PMR-Bericht in mehreren Formaten",
-    "tabs": {
-      "configure": "Export konfigurieren",
-      "queue": "Export-Warteschlange"
-    },
-    "formats": {
-      "label": "Exportformat",
-      "pdf": "PDF-Dokument",
-      "excel": "Excel-Tabelle",
-      "powerpoint": "PowerPoint-Präsentation",
-      "word": "Word-Dokument"
-    },
-    "templates": {
-      "label": "Vorlage (Optional)",
-      "default": "Standardvorlage",
-      "defaultDescription": "Standardformat mit allen Abschnitten",
-      "recommended": "Empfohlen"
-    },
-    "options": {
-      "label": "Exportoptionen",
-      "includeCharts": "Diagramme und Visualisierungen einschließen",
-      "includeRawData": "Rohdatentabellen einschließen"
     },
     "sections": {
-      "label": "Einzuschließende Abschnitte",
-      "selectAll": "Alle auswählen",
-      "deselectAll": "Alle abwählen"
+      "executive-summary": "Management-Summary",
+      "budget-status": "Budget-Status"
     },
-    "branding": {
-      "label": "Branding (Optional)",
-      "companyName": "Firmenname",
-      "companyNamePlaceholder": "Firmennamen eingeben",
-      "logoUrl": "Logo-URL",
-      "logoUrlPlaceholder": "https://beispiel.de/logo.png",
-      "colorScheme": "Farbschema",
-      "schemes": {
-        "corporateBlue": "Unternehmensblau",
-        "professionalGray": "Professionelles Grau",
-        "modernGreen": "Modernes Grün"
+    "placeholderContent": {
+      "executive-summary": "Dies ist der Abschnitt Management-Summary...",
+      "budget-status": "Budget-Performance-Analyse...",
+      "reportTitle": "Projekt-Monatsbericht Januar 2026",
+      "reportTitleTemplate": "Projekt-Monatsbericht {month} {year}"
+    },
+    "insights": {
+      "title": "KI-Einblicke",
+      "refresh": "Aktualisieren",
+      "generating": "Einblicke werden generiert...",
+      "noInsights": "Keine Einblicke verfügbar",
+      "generateInsights": "Einblicke generieren",
+      "totalInsights": "Einblicke Gesamt",
+      "validated": "Validiert",
+      "highPriority": "Hohe Priorität",
+      "filters": {
+        "toggle": "Filter umschalten",
+        "categories": "Kategorien",
+        "minConfidence": "Min. Konfidenz",
+        "clearAll": "Alle Filter löschen"
+      },
+      "categories": {
+        "budget": "Budget",
+        "schedule": "Zeitplan",
+        "resource": "Ressource",
+        "risk": "Risiko",
+        "quality": "Qualität"
+      },
+      "types": {
+        "prediction": "Vorhersage",
+        "recommendation": "Empfehlung",
+        "alert": "Warnung",
+        "summary": "Zusammenfassung"
+      },
+      "priorities": {
+        "low": "niedrig",
+        "medium": "mittel",
+        "high": "hoch",
+        "critical": "kritisch"
+      },
+      "card": {
+        "confidence": "{percent}% Konfidenz",
+        "validated": "Validiert",
+        "details": "Details",
+        "predictedImpact": "Vorhergesagte Auswirkung",
+        "recommendedActions": "Empfohlene Maßnahmen",
+        "supportingData": "Unterstützende Daten",
+        "validationNotes": "Validierungsnotizen",
+        "validate": "Validieren",
+        "markInvalid": "Als ungültig markieren",
+        "apply": "Anwenden",
+        "markHelpful": "Als hilfreich markieren",
+        "markNotHelpful": "Als nicht hilfreich markieren"
       }
     },
-    "actions": {
-      "export": "Als {format} exportieren",
-      "exporting": "Exportiert...",
-      "download": "Herunterladen",
-      "cancel": "Abbrechen",
-      "delete": "Löschen"
+    "collaboration": {
+      "title": "Zusammenarbeit",
+      "tabs": {
+        "users": "Benutzer",
+        "comments": "Kommentare",
+        "conflicts": "Konflikte"
+      },
+      "users": {
+        "you": "(Sie)",
+        "active": "Aktiv {time}",
+        "noUsers": "Keine anderen Benutzer online"
+      },
+      "comments": {
+        "sectionPlaceholder": "Abschnitts-ID (z.B. executive-summary)",
+        "addPlaceholder": "Kommentar hinzufügen...",
+        "sendComment": "Kommentar senden",
+        "on": "zu {section}",
+        "resolveComment": "Kommentar auflösen",
+        "noComments": "Noch keine Kommentare"
+      },
+      "conflicts": {
+        "types": {
+          "simultaneousEdit": "Gleichzeitiger Bearbeitungskonflikt",
+          "versionMismatch": "Versionskonflikt",
+          "permissionConflict": "Berechtigungskonflikt"
+        },
+        "section": "Abschnitt: {section}",
+        "usersConflicting": "{count} Benutzer haben widersprüchliche Änderungen vorgenommen",
+        "conflictingChanges": "Widersprüchliche Änderungen:",
+        "user": "Benutzer: {userId}",
+        "resolve": "Konflikt auflösen:",
+        "useLatest": "Neueste verwenden",
+        "mergeChanges": "Änderungen zusammenführen",
+        "resolveManually": "Manuell auflösen",
+        "noConflicts": "Keine Konflikte erkannt"
+      },
+      "footer": {
+        "online": "{count} online",
+        "comments": "{count} Kommentare",
+        "conflicts": "{count} Konflikte"
+      },
+      "time": {
+        "justNow": "Gerade eben",
+        "minutesAgo": "vor {minutes}m",
+        "hoursAgo": "vor {hours}h"
+      }
     },
-    "queue": {
-      "empty": "Noch keine Exporte",
-      "emptyDescription": "Konfigurieren und starten Sie einen Export, um ihn hier zu sehen",
-      "started": "Gestartet {date}",
-      "fileSize": "Dateigröße: {size} KB",
-      "error": "Fehler: {message}"
-    },
-    "status": {
-      "queued": "In Warteschlange",
-      "processing": "Wird verarbeitet",
-      "completed": "Abgeschlossen",
-      "failed": "Fehlgeschlagen"
+    "export": {
+      "title": "Bericht exportieren",
+      "subtitle": "Konfigurieren und exportieren Sie Ihren PMR-Bericht in mehreren Formaten",
+      "tabs": {
+        "configure": "Export konfigurieren",
+        "queue": "Export-Warteschlange"
+      },
+      "formats": {
+        "label": "Exportformat",
+        "pdf": "PDF-Dokument",
+        "excel": "Excel-Tabelle",
+        "powerpoint": "PowerPoint-Präsentation",
+        "word": "Word-Dokument"
+      },
+      "templates": {
+        "label": "Vorlage (Optional)",
+        "default": "Standardvorlage",
+        "defaultDescription": "Standardformat mit allen Abschnitten",
+        "recommended": "Empfohlen"
+      },
+      "options": {
+        "label": "Exportoptionen",
+        "includeCharts": "Diagramme und Visualisierungen einschließen",
+        "includeRawData": "Rohdatentabellen einschließen"
+      },
+      "sections": {
+        "label": "Einzuschließende Abschnitte",
+        "selectAll": "Alle auswählen",
+        "deselectAll": "Alle abwählen"
+      },
+      "branding": {
+        "label": "Branding (Optional)",
+        "companyName": "Firmenname",
+        "companyNamePlaceholder": "Firmennamen eingeben",
+        "logoUrl": "Logo-URL",
+        "logoUrlPlaceholder": "https://beispiel.de/logo.png",
+        "colorScheme": "Farbschema",
+        "schemes": {
+          "corporateBlue": "Unternehmensblau",
+          "professionalGray": "Professionelles Grau",
+          "modernGreen": "Modernes Grün"
+        }
+      },
+      "actions": {
+        "export": "Als {format} exportieren",
+        "exporting": "Exportiert...",
+        "download": "Herunterladen",
+        "cancel": "Abbrechen",
+        "delete": "Löschen"
+      },
+      "queue": {
+        "empty": "Noch keine Exporte",
+        "emptyDescription": "Konfigurieren und starten Sie einen Export, um ihn hier zu sehen",
+        "started": "Gestartet {date}",
+        "fileSize": "Dateigröße: {size} KB",
+        "error": "Fehler: {message}"
+      },
+      "status": {
+        "queued": "In Warteschlange",
+        "processing": "Wird verarbeitet",
+        "completed": "Abgeschlossen",
+        "failed": "Fehlgeschlagen"
+      }
     }
   },
   "feedback": {

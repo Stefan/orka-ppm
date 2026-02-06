@@ -19,6 +19,13 @@ interface NestedGridStore {
   saveScrollPosition: (registerId: string, position: ScrollPosition) => void
   restoreScrollPosition: (registerId: string) => ScrollPosition | null
 
+  /** Hydrate expanded rows from persisted user state (e.g. on mount). Requirements: 9.2 */
+  hydrateExpandedRows: (registerId: string, rowIds: string[]) => void
+  /** Hydrate scroll position from persisted user state. Requirements: 9.2 */
+  hydrateScrollPosition: (registerId: string, position: ScrollPosition) => void
+  /** Hydrate filter state from persisted user state. Requirements: 16.5 */
+  hydrateFilterState: (registerId: string, state: FilterState | null) => void
+
   setFilterState: (registerId: string, filters: FilterState) => void
   getFilterState: (registerId: string) => FilterState | null
 }
@@ -68,6 +75,31 @@ export const useNestedGridStore = create<NestedGridStore>((set, get) => ({
 
   restoreScrollPosition: (registerId) => {
     return get().scrollPositions.get(registerId) ?? null
+  },
+
+  hydrateExpandedRows: (registerId, rowIds) => {
+    set((state) => {
+      const next = new Map(state.expandedRows)
+      next.set(registerId, new Set(rowIds ?? []))
+      return { expandedRows: next }
+    })
+  },
+
+  hydrateScrollPosition: (registerId, position) => {
+    set((state) => {
+      const next = new Map(state.scrollPositions)
+      next.set(registerId, position)
+      return { scrollPositions: next }
+    })
+  },
+
+  hydrateFilterState: (registerId, state) => {
+    set((s) => {
+      const next = new Map(s.filterStates)
+      if (state == null) next.delete(registerId)
+      else next.set(registerId, state)
+      return { filterStates: next }
+    })
   },
 
   setFilterState: (registerId, filters) => {

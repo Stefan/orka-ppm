@@ -318,6 +318,19 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     key: TranslationKey,
     params?: InterpolationParams
   ): string => {
+    // #region agent log
+    const isPmrSections = typeof key === 'string' && key.startsWith('pmr.sections');
+    const isPmrPlaceholder = typeof key === 'string' && key.startsWith('pmr.placeholderContent');
+    if (isPmrSections) {
+      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(entry)',message:'t() pmr.sections entry',data:{key,isLoading,locale,translationsKeysCount:Object.keys(translations).length,hasPmr:!!(translations as any).pmr,hasSections:!!(translations as any).pmr?.sections},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+    }
+    if (isPmrPlaceholder) {
+      const tAny = translations as Record<string, unknown>;
+      const pc = tAny?.pmr as Record<string, unknown> | undefined;
+      const placeholderContent = pc?.placeholderContent as Record<string, string> | undefined;
+      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(entry)',message:'t() pmr.placeholderContent entry',data:{key,isLoading,locale,translationsKeysCount:Object.keys(translations).length,hasPmr:!!tAny?.pmr,hasPlaceholderContent:!!placeholderContent,reportTitle:placeholderContent?.reportTitle},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+    }
+    // #endregion
     // During loading, return the key without logging warnings
     // This prevents console spam during initial page load
     if (isLoading || Object.keys(translations).length === 0) {
@@ -332,6 +345,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       if (value && typeof value === 'object' && k in value) {
         value = value[k];
       } else {
+        // #region agent log
+        if (isPmrSections) {
+          fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(notFound)',message:'t() key not found',data:{key,locale,result:'KEY_NOT_FOUND'},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+        }
+        if (isPmrPlaceholder) {
+          fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(notFound)',message:'t() placeholderContent key not found',data:{key,locale,result:'KEY_NOT_FOUND'},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+        }
+        // #endregion
         // Key not found - log warning in development
         if (process.env.NODE_ENV === 'development') {
           console.warn(`Translation key not found: ${key} (locale: ${locale})`);
@@ -342,6 +363,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       }
     }
 
+    // #region agent log
+    if (isPmrSections && typeof value === 'string') {
+      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(found)',message:'t() pmr.sections found',data:{key,locale,result:value},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+    }
+    if (isPmrPlaceholder && typeof value === 'string') {
+      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(found)',message:'t() placeholderContent found',data:{key,locale,result:value},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+    }
+    // #endregion
     // Ensure we got a string
     if (typeof value !== 'string') {
       // Check if value is a plural rules object
@@ -483,7 +512,8 @@ export function useI18n(): I18nContextValue {
  * 
  * Simpler alternative to useI18n when you only need the translation function.
  * 
- * @returns Object with translation function, locale, and loading state
+ * @returns Object with translation function, locale, and loading state (no namespace)
+ *          or a scoped translation function when namespace is provided
  * 
  * @example
  * ```tsx
@@ -499,13 +529,22 @@ export function useI18n(): I18nContextValue {
  * }
  * ```
  */
+export function useTranslations(): {
+  t: (key: TranslationKey, params?: InterpolationParams) => string;
+  locale: string;
+  isLoading: boolean;
+};
+export function useTranslations(namespace: string): (
+  key: string,
+  params?: Record<string, unknown>
+) => string;
 export function useTranslations(namespace?: string) {
   const { t: baseT, locale, isLoading } = useI18n();
   
   // If namespace is provided, return a scoped translation function
   if (namespace) {
-    const scopedT = (key: string, params?: Record<string, any>) => {
-      return baseT(`${namespace}.${key}`, params);
+    const scopedT = (key: string, params?: Record<string, unknown>) => {
+      return baseT(`${namespace}.${key}` as TranslationKey, params);
     };
     return scopedT;
   }

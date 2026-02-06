@@ -516,22 +516,22 @@ export default function Reports() {
   }
 
   const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 0.8) return 'text-green-600'
-    if (confidence >= 0.6) return 'text-yellow-600'
-    return 'text-red-600'
+    if (confidence >= 0.8) return 'text-green-600 dark:text-green-400'
+    if (confidence >= 0.6) return 'text-yellow-600 dark:text-yellow-400'
+    return 'text-red-600 dark:text-red-400'
   }
 
   return (
     <AppLayout>
       <div data-testid="reports-page" className="h-full flex flex-col chrome-flex-gap-prevention chrome-background-coverage">
         {/* Header */}
-        <div data-testid="reports-header" className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 chrome-flex-item">
+        <div data-testid="reports-header" className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-4 sm:px-6 py-4 chrome-flex-item">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0 chrome-flex-gap-prevention">
             <div className="flex items-center space-x-3 min-w-0">
-              <Bot className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 flex-shrink-0" />
+              <Bot className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 dark:text-blue-400 flex-shrink-0" />
               <div className="min-w-0">
-                <h1 data-testid="reports-title" className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{t('reports.title')}</h1>
-                <p className="text-sm text-gray-700 hidden sm:block">{t('reports.subtitle')}</p>
+                <h1 data-testid="reports-title" className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-slate-100 truncate">{t('reports.title')}</h1>
+                <p className="text-sm text-gray-700 dark:text-slate-300 hidden sm:block">{t('reports.subtitle')}</p>
               </div>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
@@ -540,7 +540,7 @@ export default function Reports() {
                 className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-lg text-sm ${
                   isPMRMode 
                     ? 'bg-purple-600 text-white hover:bg-purple-700' 
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    : 'bg-gray-200 text-gray-700 dark:text-slate-300 hover:bg-gray-300'
                 }`}
               >
                 <Sparkles className="w-4 h-4 flex-shrink-0" />
@@ -560,14 +560,14 @@ export default function Reports() {
 
       {/* Report Options Panel */}
       {showReportOptions && (
-        <div className="bg-blue-50 border-b border-blue-200 px-4 sm:px-6 py-4">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800 px-4 sm:px-6 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
             <span className="text-sm font-medium text-blue-900">{t('reports.format')}:</span>
             <div className="flex items-center space-x-2 sm:space-x-4">
               <select
                 value={reportFormat}
                 onChange={(e) => setReportFormat(e.target.value)}
-                className="px-3 py-1 border border-blue-300 rounded text-sm flex-1 sm:flex-none text-gray-900 bg-white"
+                className="px-3 py-1 border border-blue-300 rounded text-sm flex-1 sm:flex-none text-gray-900 dark:text-slate-100 bg-white dark:bg-slate-800"
               >
                 <option value="text">{t('reports.text')}</option>
                 <option value="markdown">Markdown</option>
@@ -582,7 +582,7 @@ export default function Reports() {
               </button>
               <button
                 onClick={() => setShowReportOptions(false)}
-                className="text-blue-600 text-sm hover:text-blue-800"
+                className="text-blue-600 dark:text-blue-400 text-sm hover:text-blue-800 dark:hover:text-blue-300"
               >
                 {t('common.close')}
               </button>
@@ -596,12 +596,12 @@ export default function Reports() {
         <div className="bg-purple-50 border-b border-purple-200 px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-2">
-              <Sparkles className="w-5 h-5 text-purple-600" />
+              <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               <span className="text-sm font-medium text-purple-900">PMR AI Actions</span>
             </div>
             <button
               onClick={() => setShowPMRActions(!showPMRActions)}
-              className="text-sm text-purple-600 hover:text-purple-800"
+              className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800"
             >
               {showPMRActions ? 'Hide' : 'Show'} Actions
             </button>
@@ -612,42 +612,42 @@ export default function Reports() {
               <button
                 onClick={() => sendPMRAction('update_section', 'Update executive summary with latest data')}
                 disabled={isLoading}
-                className="px-3 py-2 bg-white border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
+                className="px-3 py-2 bg-white dark:bg-slate-800 border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
               >
                 Update Section
               </button>
               <button
                 onClick={() => sendPMRAction('generate_insight', 'Generate budget insights')}
                 disabled={isLoading}
-                className="px-3 py-2 bg-white border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
+                className="px-3 py-2 bg-white dark:bg-slate-800 border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
               >
                 Generate Insights
               </button>
               <button
                 onClick={() => sendPMRAction('analyze_data', 'Analyze schedule performance')}
                 disabled={isLoading}
-                className="px-3 py-2 bg-white border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
+                className="px-3 py-2 bg-white dark:bg-slate-800 border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
               >
                 Analyze Data
               </button>
               <button
                 onClick={() => sendPMRAction('suggest_content', 'Suggest improvements for risk section')}
                 disabled={isLoading}
-                className="px-3 py-2 bg-white border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
+                className="px-3 py-2 bg-white dark:bg-slate-800 border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
               >
                 Suggest Content
               </button>
               <button
                 onClick={() => sendPMRAction('modify_content', 'Make executive summary more concise')}
                 disabled={isLoading}
-                className="px-3 py-2 bg-white border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
+                className="px-3 py-2 bg-white dark:bg-slate-800 border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
               >
                 Modify Content
               </button>
               <button
                 onClick={() => sendPMRAction('add_visualization', 'Add budget variance chart')}
                 disabled={isLoading}
-                className="px-3 py-2 bg-white border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
+                className="px-3 py-2 bg-white dark:bg-slate-800 border border-purple-300 text-purple-700 text-sm rounded hover:bg-purple-100 disabled:opacity-50"
               >
                 Add Visualization
               </button>
@@ -659,28 +659,28 @@ export default function Reports() {
             <div className="mt-4 space-y-2">
               <span className="text-sm font-medium text-purple-900">Pending Changes ({pendingChanges.filter(c => !c.applied).length})</span>
               {pendingChanges.filter(c => !c.applied).map((change) => (
-                <div key={change.id} className="bg-white border border-purple-200 rounded-lg p-3">
+                <div key={change.id} className="bg-white dark:bg-slate-800 border border-purple-200 rounded-lg p-3">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
                         <span className="text-xs font-medium text-purple-700">{change.section}</span>
-                        <span className="text-xs text-gray-500">({change.changeType})</span>
-                        <span className="text-xs text-gray-500">{Math.round(change.confidence * 100)}% confidence</span>
+                        <span className="text-xs text-gray-500 dark:text-slate-400">({change.changeType})</span>
+                        <span className="text-xs text-gray-500 dark:text-slate-400">{Math.round(change.confidence * 100)}% confidence</span>
                       </div>
-                      <p className="text-sm text-gray-700 mb-1">{change.content}</p>
-                      <p className="text-xs text-gray-500">{change.reason}</p>
+                      <p className="text-sm text-gray-700 dark:text-slate-300 mb-1">{change.content}</p>
+                      <p className="text-xs text-gray-500 dark:text-slate-400">{change.reason}</p>
                     </div>
                     <div className="flex space-x-2 ml-3">
                       <button
                         onClick={() => applySuggestedChange(change.id)}
-                        className="p-1 text-green-600 hover:text-green-800"
+                        className="p-1 text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300"
                         title="Apply change"
                       >
                         <CheckCircle className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => rejectSuggestedChange(change.id)}
-                        className="p-1 text-red-600 hover:text-red-800"
+                        className="p-1 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                         title="Reject change"
                       >
                         <XCircle className="w-4 h-4" />
@@ -696,13 +696,13 @@ export default function Reports() {
 
         {/* Error Recovery Panel */}
         {showError && currentError && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-4 mx-4 sm:mx-6 mb-4">
+          <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 dark:border-red-600 p-4 mx-4 sm:mx-6 mb-4">
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <AlertTriangle className="h-5 w-5 text-red-400" />
               </div>
               <div className="ml-3 flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-red-800">
+                <h3 className="text-sm font-medium text-red-800 dark:text-red-300">
                   {currentError.errorType === 'network' ? 'Verbindungsfehler' :
                    currentError.errorType === 'auth' ? 'Authentifizierungsfehler' :
                    currentError.errorType === 'timeout' ? 'Zeitüberschreitung' :
@@ -719,7 +719,7 @@ export default function Reports() {
                     <button
                       onClick={handleRetry}
                       disabled={isLoading}
-                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
                     >
                       <RefreshCw className={`h-4 w-4 mr-1 flex-shrink-0 ${isLoading ? 'animate-spin' : ''}`} />
                       <span>Erneut versuchen</span>
@@ -727,14 +727,14 @@ export default function Reports() {
                   )}
                   <button
                     onClick={() => setShowError(false)}
-                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                   >
                     Schließen
                   </button>
                 </div>
                 {errorRecovery.retryCount >= errorRecovery.maxRetries && (
-                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                    <h4 className="text-sm font-medium text-yellow-800 mb-2">Alternative Aktionen:</h4>
+                  <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+                    <h4 className="text-sm font-medium text-yellow-800 dark:text-yellow-300 mb-2">Alternative Aktionen:</h4>
                     <ul className="text-sm text-yellow-700 space-y-1">
                       {suggestAlternatives().map((suggestion, index) => (
                         <li key={index} className="flex items-start">
@@ -769,10 +769,10 @@ export default function Reports() {
                     className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg ${
                       message.type === 'user'
                         ? 'bg-blue-600 text-white'
-                        : 'bg-white border border-gray-200'
+                        : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700'
                     }`}
                   >
-                    <div className="whitespace-pre-wrap break-words text-sm sm:text-base text-gray-900">{message.content}</div>
+                    <div className="whitespace-pre-wrap break-words text-sm sm:text-base text-gray-900 dark:text-slate-100">{message.content}</div>
                     
                     {/* AI Agent Visualizations */}
                     {message.optimizerResults && (
@@ -810,8 +810,8 @@ export default function Reports() {
                     {/* PMR Action Indicator */}
                     {message.action && (
                       <div className="mt-2 flex items-center space-x-2">
-                        <Sparkles className="w-3 h-3 text-purple-600" />
-                        <span className="text-xs text-purple-600 font-medium">
+                        <Sparkles className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                        <span className="text-xs text-purple-600 dark:text-purple-400 font-medium">
                           Action: {message.action.replace(/_/g, ' ')}
                         </span>
                       </div>
@@ -820,16 +820,16 @@ export default function Reports() {
                     {/* Suggested Changes */}
                     {message.suggestedChanges && message.suggestedChanges.length > 0 && (
                       <div className="mt-3 space-y-2">
-                        <span className="text-xs font-medium text-gray-700">Suggested Changes:</span>
+                        <span className="text-xs font-medium text-gray-700 dark:text-slate-300">Suggested Changes:</span>
                         {message.suggestedChanges.map((change) => (
                           <div key={change.id} className="bg-purple-50 border border-purple-200 rounded p-2">
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
                                 <div className="flex items-center space-x-2 mb-1">
                                   <span className="text-xs font-medium text-purple-700">{change.section}</span>
-                                  <span className="text-xs text-gray-500">({change.changeType})</span>
+                                  <span className="text-xs text-gray-500 dark:text-slate-400">({change.changeType})</span>
                                 </div>
-                                <p className="text-xs text-gray-700">{change.content}</p>
+                                <p className="text-xs text-gray-700 dark:text-slate-300">{change.content}</p>
                               </div>
                             </div>
                           </div>
@@ -864,7 +864,7 @@ export default function Reports() {
                       </div>
                     )}
                   </div>
-                  <div className="mt-1 text-xs text-gray-600">
+                  <div className="mt-1 text-xs text-gray-600 dark:text-slate-400">
                     {formatTimestamp(message.timestamp)}
                   </div>
                 </div>
@@ -884,10 +884,10 @@ export default function Reports() {
               <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-blue-600 rounded-full flex items-center justify-center">
                 <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
               </div>
-              <div className="bg-white border border-gray-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3">
+              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg px-3 sm:px-4 py-2 sm:py-3">
                 <div className="flex items-center space-x-2">
-                  <Loader className="w-4 h-4 animate-spin text-blue-600 flex-shrink-0" />
-                  <span className="text-sm text-gray-700 text-sm sm:text-base">{t('common.loading')}</span>
+                  <Loader className="w-4 h-4 animate-spin text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                  <span className="text-sm text-gray-700 dark:text-slate-300 text-sm sm:text-base">{t('common.loading')}</span>
                 </div>
               </div>
             </div>
@@ -896,7 +896,7 @@ export default function Reports() {
       </div>
 
       {/* Input Area */}
-      <div className="bg-white border-t border-gray-200 px-4 sm:px-6 py-4">
+      <div className="bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 px-4 sm:px-6 py-4">
         <div className="flex flex-col sm:flex-row sm:items-end space-y-3 sm:space-y-0 sm:space-x-4">
           <div className="flex-1">
             <textarea
@@ -904,7 +904,7 @@ export default function Reports() {
               onChange={(e) => setCurrentQuery(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={t('reports.typeMessage')}
-              className="textarea-field w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+              className="textarea-field w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-slate-600 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
               rows={isMobile ? 2 : 3}
               disabled={isLoading}
             />
@@ -921,7 +921,7 @@ export default function Reports() {
         
         {/* Quick Examples */}
         <div className="mt-4">
-          <p className="text-xs text-gray-500 mb-2">Versuchen Sie zu fragen:</p>
+          <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">Versuchen Sie zu fragen:</p>
           <div className="flex flex-wrap gap-2">
             {(isPMRMode ? [
               "Update executive summary with latest project status",
@@ -939,7 +939,7 @@ export default function Reports() {
               <button
                 key={index}
                 onClick={() => setCurrentQuery(example)}
-                className="px-2 sm:px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded hover:bg-gray-200 break-words text-left"
+                className="px-2 sm:px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 text-xs rounded hover:bg-gray-200 dark:hover:bg-slate-600 break-words text-left"
                 disabled={isLoading}
               >
                 {example}

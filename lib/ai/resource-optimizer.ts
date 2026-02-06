@@ -106,7 +106,7 @@ export class AIResourceOptimizer {
   private authToken: string | null = null
 
   constructor(authToken?: string) {
-    this.baseUrl = getApiUrl('/ai/resource-optimizer')
+    this.baseUrl = getApiUrl('/ai/resource-optimizer/')
     this.authToken = authToken || null
   }
 
@@ -135,7 +135,14 @@ export class AIResourceOptimizer {
       })
 
       if (!response.ok) {
-        throw new Error(`Analysis failed: ${response.status} ${response.statusText}`)
+        let detail = response.statusText
+        try {
+          const errBody = await response.json() as { detail?: string }
+          if (typeof errBody?.detail === 'string') detail = errBody.detail
+        } catch {
+          // ignore JSON parse failure
+        }
+        throw new Error(`Analysis failed: ${response.status} ${detail}`)
       }
 
       const data = await response.json()
@@ -179,7 +186,7 @@ export class AIResourceOptimizer {
     risk_factors: string[]
   }> {
     try {
-      const response = await fetch(`${this.baseUrl}/team-composition`, {
+      const response = await fetch(`${this.baseUrl}team-composition`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -220,7 +227,7 @@ export class AIResourceOptimizer {
     }[]
   }> {
     try {
-      const response = await fetch(`${this.baseUrl}/conflicts`, {
+      const response = await fetch(`${this.baseUrl}conflicts`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -262,7 +269,7 @@ export class AIResourceOptimizer {
     }
   }> {
     try {
-      const response = await fetch(`${this.baseUrl}/apply/${suggestionId}`, {
+      const response = await fetch(`${this.baseUrl}apply/${suggestionId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -308,7 +315,7 @@ export class AIResourceOptimizer {
     }[]
   }> {
     try {
-      const response = await fetch(`${this.baseUrl}/metrics?timeframe=${timeframe}`, {
+      const response = await fetch(`${this.baseUrl}metrics?timeframe=${timeframe}`, {
         headers: {
           'Content-Type': 'application/json',
           ...(this.authToken && { 'Authorization': `Bearer ${this.authToken}` })

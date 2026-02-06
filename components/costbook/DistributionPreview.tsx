@@ -23,17 +23,17 @@ export function DistributionPreview({
 }: DistributionPreviewProps) {
   if (distribution.error) {
     return (
-      <div className={`bg-red-50 border border-red-200 rounded-lg p-4 ${className}`}>
-        <p className="text-red-800 font-medium">Distribution Error</p>
-        <p className="text-red-600 text-sm mt-1">{distribution.error}</p>
+      <div className={`bg-red-50 border border-red-200 dark:border-red-800 rounded-lg p-4 ${className}`}>
+        <p className="text-red-800 dark:text-red-300 font-medium">Distribution Error</p>
+        <p className="text-red-600 dark:text-red-400 text-sm mt-1">{distribution.error}</p>
       </div>
     )
   }
 
   if (distribution.periods.length === 0) {
     return (
-      <div className={`bg-gray-50 border border-gray-200 rounded-lg p-4 ${className}`}>
-        <p className="text-gray-600 text-sm">No distribution calculated</p>
+      <div className={`bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg p-4 ${className}`}>
+        <p className="text-gray-600 dark:text-slate-400 text-sm">No distribution calculated</p>
       </div>
     )
   }
@@ -58,7 +58,7 @@ export function DistributionPreview({
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Summary */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-blue-700 font-medium">Total Budget</p>
@@ -72,7 +72,7 @@ export function DistributionPreview({
               {distribution.profile.replace('_', ' ')}
             </p>
             {distribution.confidence && (
-              <p className="text-xs text-blue-600 mt-1">
+              <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
                 Confidence: {(distribution.confidence * 100).toFixed(0)}%
               </p>
             )}
@@ -81,8 +81,8 @@ export function DistributionPreview({
       </div>
 
       {/* Chart */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4">
-        <h4 className="text-sm font-semibold text-gray-700 mb-4">
+      <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-4">
+        <h4 className="text-sm font-semibold text-gray-700 dark:text-slate-300 mb-4">
           Distribution Over Time ({distribution.periods.length} periods)
         </h4>
         <ResponsiveContainer width="100%" height={300}>
@@ -121,55 +121,55 @@ export function DistributionPreview({
       </div>
 
       {/* Detailed Table */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+            <thead className="bg-gray-50 dark:bg-slate-800/50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                   Period
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                   Amount
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                   Percentage
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                   Date Range
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
               {distribution.periods.map((period, idx) => (
                 <tr 
                   key={period.id}
-                  className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                  className={idx % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-gray-50 dark:bg-slate-800/50'}
                 >
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-slate-100">
                     {period.label}
                   </td>
-                  <td className="px-4 py-3 text-sm text-right text-gray-900 font-mono">
+                  <td className="px-4 py-3 text-sm text-right text-gray-900 dark:text-slate-100 font-mono">
                     {formatCurrency(period.amount, currency)}
                   </td>
-                  <td className="px-4 py-3 text-sm text-right text-gray-600">
+                  <td className="px-4 py-3 text-sm text-right text-gray-600 dark:text-slate-400">
                     {period.percentage.toFixed(2)}%
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-500">
+                  <td className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400">
                     {formatDateShort(period.start_date)} - {formatDateShort(period.end_date)}
                   </td>
                 </tr>
               ))}
             </tbody>
-            <tfoot className="bg-gray-100">
+            <tfoot className="bg-gray-100 dark:bg-slate-700">
               <tr>
-                <td className="px-4 py-3 text-sm font-bold text-gray-900">
+                <td className="px-4 py-3 text-sm font-bold text-gray-900 dark:text-slate-100">
                   Total
                 </td>
-                <td className="px-4 py-3 text-sm text-right font-bold text-gray-900 font-mono">
+                <td className="px-4 py-3 text-sm text-right font-bold text-gray-900 dark:text-slate-100 font-mono">
                   {formatCurrency(distribution.total, currency)}
                 </td>
-                <td className="px-4 py-3 text-sm text-right font-bold text-gray-900">
+                <td className="px-4 py-3 text-sm text-right font-bold text-gray-900 dark:text-slate-100">
                   100.00%
                 </td>
                 <td className="px-4 py-3"></td>

@@ -39,7 +39,24 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
+    const err = error as NodeJS.ErrnoException & { cause?: { code?: string } }
+    const isConnectionError =
+      err?.code === 'ECONNREFUSED' ||
+      err?.cause?.code === 'ECONNREFUSED' ||
+      (typeof err?.message === 'string' && (err.message.includes('fetch failed') || err.message.includes('ECONNREFUSED')))
+
     console.error('Projects API error:', error)
+
+    if (isConnectionError) {
+      return NextResponse.json(
+        {
+          error: 'Backend not available',
+          detail: 'The projects service could not be reached. Start the backend (e.g. on port 8000) or check NEXT_PUBLIC_BACKEND_URL.',
+        },
+        { status: 503 }
+      )
+    }
+
     return NextResponse.json(
       { error: 'Failed to fetch projects' },
       { status: 500 }

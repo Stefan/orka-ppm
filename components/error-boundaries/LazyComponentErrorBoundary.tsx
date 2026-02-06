@@ -169,18 +169,18 @@ export class LazyComponentErrorBoundary extends Component<
       
       // Lightweight fallback UI for lazy-loaded components
       return (
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-red-200">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-red-200 dark:border-red-800">
           <div className="flex items-center gap-3 mb-4">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
             <div>
-              <h3 className="text-base font-semibold text-red-800">
+              <h3 className="text-base font-semibold text-red-800 dark:text-red-300">
                 {fallbackMessage || `Unable to load ${componentName}`}
               </h3>
-              <p className="text-sm text-red-600 mt-1">
+              <p className="text-sm text-red-600 dark:text-red-400 mt-1">
                 {error.message}
               </p>
               {retryCount > 0 && (
-                <p className="text-xs text-red-500 mt-1">
+                <p className="text-xs text-red-500 dark:text-red-400 mt-1">
                   Retry attempt {retryCount} of {MAX_RETRY_ATTEMPTS}
                 </p>
               )}
@@ -197,7 +197,7 @@ export class LazyComponentErrorBoundary extends Component<
               {isRetrying ? 'Retrying...' : 'Retry'}
             </button>
           ) : (
-            <div className="text-sm text-red-700 bg-red-50 p-3 rounded">
+            <div className="text-sm text-red-700 bg-red-50 dark:bg-red-900/20 p-3 rounded">
               <p className="font-medium">Maximum retry attempts reached</p>
               <p className="mt-1">Please refresh the page to try again.</p>
             </div>
@@ -208,7 +208,7 @@ export class LazyComponentErrorBoundary extends Component<
               <summary className="cursor-pointer text-sm text-red-700 hover:text-red-900">
                 Error Details (Development)
               </summary>
-              <pre className="mt-2 p-3 bg-red-50 rounded text-xs text-red-800 overflow-auto">
+              <pre className="mt-2 p-3 bg-red-50 dark:bg-red-900/20 rounded text-xs text-red-800 dark:text-red-300 overflow-auto">
                 {error.stack}
               </pre>
             </details>

@@ -102,7 +102,7 @@ export default function ScheduleDetailPage() {
   if (authLoading || !session) {
     return (
       <AppLayout>
-        <div className="p-8 text-gray-500">Loading...</div>
+        <div className="p-8 text-gray-500 dark:text-slate-400">Loading...</div>
       </AppLayout>
     )
   }
@@ -110,7 +110,7 @@ export default function ScheduleDetailPage() {
   if (loading && !schedule) {
     return (
       <AppLayout>
-        <div className="p-8 text-gray-500">Loading schedule...</div>
+        <div className="p-8 text-gray-500 dark:text-slate-400">Loading schedule...</div>
       </AppLayout>
     )
   }
@@ -119,8 +119,8 @@ export default function ScheduleDetailPage() {
     return (
       <AppLayout>
         <div className="p-8">
-          <p className="text-red-600 mb-4">{error ?? 'Schedule not found'}</p>
-          <Link href="/schedules" className="text-blue-600 hover:underline">Back to schedules</Link>
+          <p className="text-red-600 dark:text-red-400 mb-4">{error ?? 'Schedule not found'}</p>
+          <Link href="/schedules" className="text-blue-600 dark:text-blue-400 hover:underline">Back to schedules</Link>
         </div>
       </AppLayout>
     )
@@ -147,30 +147,30 @@ export default function ScheduleDetailPage() {
         <div className="flex items-center gap-4 mb-4">
           <Link
             href="/schedules"
-            className="flex items-center gap-1 text-gray-600 hover:text-gray-900"
+            className="flex items-center gap-1 text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100"
           >
             <ArrowLeft className="w-4 h-4" /> Schedules
           </Link>
         </div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">{schedule.name}</h1>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100">{schedule.name}</h1>
             {schedule.description && (
-              <p className="text-sm text-gray-500 mt-0.5">{schedule.description}</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">{schedule.description}</p>
             )}
-            <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1 flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5" />
               {schedule.start_date} – {schedule.end_date} · {schedule.status}
             </p>
           </div>
         </div>
 
-        <div className="flex gap-2 mb-4 border-b border-gray-200">
+        <div className="flex gap-2 mb-4 border-b border-gray-200 dark:border-slate-700">
           <button
             type="button"
             onClick={() => setActiveTab('gantt')}
             className={`px-3 py-2 text-sm font-medium rounded-t-lg ${
-              activeTab === 'gantt' ? 'bg-white border border-b-0 border-gray-200 text-blue-600' : 'text-gray-600 hover:text-gray-900'
+              activeTab === 'gantt' ? 'bg-white dark:bg-slate-800 border border-b-0 border-gray-200 dark:border-slate-700 text-blue-600 dark:text-blue-400' : 'text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100'
             }`}
           >
             Gantt
@@ -179,7 +179,7 @@ export default function ScheduleDetailPage() {
             type="button"
             onClick={() => setActiveTab('tasks')}
             className={`px-3 py-2 text-sm font-medium rounded-t-lg ${
-              activeTab === 'tasks' ? 'bg-white border border-b-0 border-gray-200 text-blue-600' : 'text-gray-600 hover:text-gray-900'
+              activeTab === 'tasks' ? 'bg-white dark:bg-slate-800 border border-b-0 border-gray-200 dark:border-slate-700 text-blue-600 dark:text-blue-400' : 'text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100'
             }`}
           >
             Task list
@@ -188,7 +188,7 @@ export default function ScheduleDetailPage() {
             type="button"
             onClick={() => setActiveTab('resources')}
             className={`px-3 py-2 text-sm font-medium rounded-t-lg flex items-center gap-1 ${
-              activeTab === 'resources' ? 'bg-white border border-b-0 border-gray-200 text-blue-600' : 'text-gray-600 hover:text-gray-900'
+              activeTab === 'resources' ? 'bg-white dark:bg-slate-800 border border-b-0 border-gray-200 dark:border-slate-700 text-blue-600 dark:text-blue-400' : 'text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100'
             }`}
           >
             <Users className="w-4 h-4" /> Resources
@@ -212,25 +212,25 @@ export default function ScheduleDetailPage() {
         )}
 
         {activeTab === 'tasks' && (
-          <div className="border border-gray-200 rounded-lg overflow-hidden">
+          <div className="border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700">
                 <tr>
-                  <th className="text-left px-4 py-2 font-medium text-gray-700">WBS</th>
-                  <th className="text-left px-4 py-2 font-medium text-gray-700">Name</th>
-                  <th className="text-left px-4 py-2 font-medium text-gray-700">Start</th>
-                  <th className="text-left px-4 py-2 font-medium text-gray-700">End</th>
-                  <th className="text-left px-4 py-2 font-medium text-gray-700">Progress</th>
-                  <th className="text-left px-4 py-2 font-medium text-gray-700">Status</th>
+                  <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-slate-300">WBS</th>
+                  <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-slate-300">Name</th>
+                  <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-slate-300">Start</th>
+                  <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-slate-300">End</th>
+                  <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-slate-300">Progress</th>
+                  <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-slate-300">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {tasks.map((t) => (
-                  <tr key={t.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 font-mono text-gray-500">{t.wbs_code}</td>
+                  <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50">
+                    <td className="px-4 py-2 font-mono text-gray-500 dark:text-slate-400">{t.wbs_code}</td>
                     <td className="px-4 py-2 font-medium">{t.name}</td>
-                    <td className="px-4 py-2 text-gray-600">{t.planned_start_date}</td>
-                    <td className="px-4 py-2 text-gray-600">{t.planned_end_date}</td>
+                    <td className="px-4 py-2 text-gray-600 dark:text-slate-400">{t.planned_start_date}</td>
+                    <td className="px-4 py-2 text-gray-600 dark:text-slate-400">{t.planned_end_date}</td>
                     <td className="px-4 py-2">{t.progress_percentage}%</td>
                     <td className="px-4 py-2">{t.status}</td>
                   </tr>
@@ -238,7 +238,7 @@ export default function ScheduleDetailPage() {
               </tbody>
             </table>
             {tasks.length === 0 && (
-              <div className="py-8 text-center text-gray-500">No tasks in this schedule.</div>
+              <div className="py-8 text-center text-gray-500 dark:text-slate-400">No tasks in this schedule.</div>
             )}
           </div>
         )}
@@ -250,7 +250,7 @@ export default function ScheduleDetailPage() {
                 <Users className="w-4 h-4" /> Assign resource
               </Button>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-slate-400">
               Open &quot;Assign resource&quot; to assign resources to tasks. Conflicts and utilization are shown in the dialog.
             </p>
           </div>

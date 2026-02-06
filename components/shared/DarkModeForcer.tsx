@@ -127,10 +127,13 @@ export function DarkModeForcer() {
   }, [])
 
   useEffect(() => {
-    const isDark = resolvedTheme === 'dark'
+    // Respect explicit light choice: data-theme="light" must never show dark body
+    const dataTheme = typeof document !== 'undefined' ? document.documentElement.getAttribute('data-theme') : null
+    const forceLight = dataTheme === 'light'
+    const isDark = !forceLight && resolvedTheme === 'dark'
     const colors = isDark ? DARK_COLORS : LIGHT_COLORS
 
-    // Apply to body
+    // Apply to body (ThemeProvider uses !important for light; we don't override that)
     document.body.style.backgroundColor = colors.bg
     document.body.style.color = colors.text
 

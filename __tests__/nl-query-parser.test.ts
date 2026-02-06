@@ -7,6 +7,7 @@ import {
   matchesFilter,
   sortProjects,
   getAutocompleteSuggestions,
+  getSimilarSearches,
   exampleQueries,
   FilterCriteria
 } from '@/lib/nl-query-parser'
@@ -316,6 +317,43 @@ describe('NL Query Parser', () => {
     it('should limit suggestions count', () => {
       const suggestions = getAutocompleteSuggestions('', 3)
       expect(suggestions.length).toBeLessThanOrEqual(3)
+    })
+  })
+
+  describe('getSimilarSearches (Ähnliche Suchen)', () => {
+    it('returns empty for empty query', () => {
+      expect(getSimilarSearches('')).toEqual([])
+      expect(getSimilarSearches('   ')).toEqual([])
+    })
+
+    it('returns similar phrasings for over budget', () => {
+      const out = getSimilarSearches('over budget', 3)
+      expect(out.length).toBeGreaterThan(0)
+      expect(out.length).toBeLessThanOrEqual(3)
+      expect(out.some(s => /exceeded|above|negative variance/i.test(s.query))).toBe(true)
+    })
+
+    it('returns similar phrasings for high variance', () => {
+      const out = getSimilarSearches('high variance', 3)
+      expect(out.length).toBeGreaterThan(0)
+      expect(out.some(s => /variance|vendor/i.test(s.query))).toBe(true)
+    })
+
+    it('returns forecast-related suggestions for "forecast" / "variance in forecast" text', () => {
+      const out = getSimilarSearches('high variance in forecast', 5)
+      expect(out.length).toBeGreaterThan(0)
+      expect(out.some(s => /forecast|variance/i.test(s.query))).toBe(true)
+    })
+
+    it('returns commitment-related suggestions for "open committed" text', () => {
+      const out = getSimilarSearches('open committed pro vendor', 5)
+      expect(out.length).toBeGreaterThan(0)
+      expect(out.some(s => /vendor|commit/i.test(s.query))).toBe(true)
+    })
+
+    it('returns at most limit items', () => {
+      const out = getSimilarSearches('over budget', 2)
+      expect(out.length).toBeLessThanOrEqual(2)
     })
   })
 

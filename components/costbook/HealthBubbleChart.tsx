@@ -78,21 +78,21 @@ function CustomTooltip({
   if (active && payload && payload.length) {
     const data = payload[0].payload as BubbleDataPoint
     return (
-      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg max-w-[200px]">
-        <p className="font-medium text-gray-900 mb-2 truncate">{data.name}</p>
+      <div className="bg-white dark:bg-slate-800 p-3 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg max-w-[200px]">
+        <p className="font-medium text-gray-900 dark:text-slate-100 mb-2 truncate">{data.name}</p>
         <div className="space-y-1 text-sm">
           <div className="flex justify-between gap-4">
-            <span className="text-gray-500">Health:</span>
+            <span className="text-gray-500 dark:text-slate-400">Health:</span>
             <span className="font-medium">{data.y}</span>
           </div>
           <div className="flex justify-between gap-4">
-            <span className="text-gray-500">Variance:</span>
-            <span className={`font-medium ${data.x >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <span className="text-gray-500 dark:text-slate-400">Variance:</span>
+            <span className={`font-medium ${data.x >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {formatCurrency(data.x, currency)}
             </span>
           </div>
           <div className="flex justify-between gap-4">
-            <span className="text-gray-500">Spend:</span>
+            <span className="text-gray-500 dark:text-slate-400">Spend:</span>
             <span className="font-medium">{formatCurrency(data.z, currency)}</span>
           </div>
         </div>
@@ -155,9 +155,9 @@ export function HealthBubbleChart({
       className={`w-full ${className}`} 
       data-testid={testId}
     >
-      <h4 className="text-sm font-medium text-gray-700 mb-2">
+      <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
         Project Health vs Variance
-        <span className="ml-2 text-xs text-gray-500 font-normal">
+        <span className="ml-2 text-xs text-gray-500 dark:text-slate-400 font-normal">
           (Bubble size = Total Spend)
         </span>
       </h4>
@@ -267,19 +267,19 @@ export function HealthBubbleChart({
       <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
         <div className="flex items-center gap-1">
           <span className="w-3 h-3 bg-green-500/20 border border-green-500 rounded" />
-          <span className="text-gray-600">Healthy & Under Budget</span>
+          <span className="text-gray-600 dark:text-slate-400">Healthy & Under Budget</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="w-3 h-3 bg-yellow-500/20 border border-yellow-500 rounded" />
-          <span className="text-gray-600">Healthy & Over Budget</span>
+          <span className="text-gray-600 dark:text-slate-400">Healthy & Over Budget</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="w-3 h-3 bg-yellow-500/20 border border-yellow-500 rounded" />
-          <span className="text-gray-600">At Risk & Under Budget</span>
+          <span className="text-gray-600 dark:text-slate-400">At Risk & Under Budget</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="w-3 h-3 bg-red-500/20 border border-red-500 rounded" />
-          <span className="text-gray-600">At Risk & Over Budget</span>
+          <span className="text-gray-600 dark:text-slate-400">At Risk & Over Budget</span>
         </div>
       </div>
     </div>

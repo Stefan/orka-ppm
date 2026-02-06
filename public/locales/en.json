@@ -700,167 +700,177 @@
     "panels": {
       "editor": "Editor",
       "insights": "Insights",
-      "collaboration": "Collab"
-    }
-  },
-  "pmr.insights": {
-    "title": "AI Insights",
-    "refresh": "Refresh",
-    "generating": "Generating insights...",
-    "noInsights": "No insights available",
-    "generateInsights": "Generate insights",
-    "totalInsights": "Total Insights",
-    "validated": "Validated",
-    "highPriority": "High Priority",
-    "filters": {
-      "toggle": "Toggle filters",
-      "categories": "Categories",
-      "minConfidence": "Min Confidence",
-      "clearAll": "Clear all filters"
-    },
-    "categories": {
-      "budget": "budget",
-      "schedule": "schedule",
-      "resource": "resource",
-      "risk": "risk",
-      "quality": "quality"
-    },
-    "types": {
-      "prediction": "prediction",
-      "recommendation": "recommendation",
-      "alert": "alert",
-      "summary": "summary"
-    },
-    "priorities": {
-      "low": "low",
-      "medium": "medium",
-      "high": "high",
-      "critical": "critical"
-    },
-    "card": {
-      "confidence": "{percent}% confidence",
-      "validated": "Validated",
-      "details": "Details",
-      "predictedImpact": "Predicted Impact",
-      "recommendedActions": "Recommended Actions",
-      "supportingData": "Supporting Data",
-      "validationNotes": "Validation Notes",
-      "validate": "Validate",
-      "markInvalid": "Mark Invalid",
-      "apply": "Apply",
-      "markHelpful": "Mark as helpful",
-      "markNotHelpful": "Mark as not helpful"
-    }
-  },
-  "pmr.collaboration": {
-    "title": "Collaboration",
-    "tabs": {
-      "users": "Users",
-      "comments": "Comments",
-      "conflicts": "Conflicts"
-    },
-    "users": {
-      "you": "(You)",
-      "active": "Active {time}",
-      "noUsers": "No other users online"
-    },
-    "comments": {
-      "sectionPlaceholder": "Section ID (e.g., executive-summary)",
-      "addPlaceholder": "Add a comment...",
-      "sendComment": "Send Comment",
-      "on": "on {section}",
-      "resolveComment": "Resolve comment",
-      "noComments": "No comments yet"
-    },
-    "conflicts": {
-      "types": {
-        "simultaneousEdit": "Simultaneous Edit Conflict",
-        "versionMismatch": "Version Mismatch",
-        "permissionConflict": "Permission Conflict"
-      },
-      "section": "Section: {section}",
-      "usersConflicting": "{count} users made conflicting changes",
-      "conflictingChanges": "Conflicting Changes:",
-      "user": "User: {userId}",
-      "resolve": "Resolve Conflict:",
-      "useLatest": "Use Latest",
-      "mergeChanges": "Merge Changes",
-      "resolveManually": "Resolve Manually",
-      "noConflicts": "No conflicts detected"
-    },
-    "footer": {
-      "online": "{count} online",
-      "comments": "{count} comments",
-      "conflicts": "{count} conflicts"
-    },
-    "time": {
-      "justNow": "Just now",
-      "minutesAgo": "{minutes}m ago",
-      "hoursAgo": "{hours}h ago"
-    }
-  },
-  "pmr.export": {
-    "title": "Export Report",
-    "subtitle": "Configure and export your PMR report in multiple formats",
-    "tabs": {
-      "configure": "Configure Export",
-      "queue": "Export Queue"
-    },
-    "formats": {
-      "label": "Export Format",
-      "pdf": "PDF Document",
-      "excel": "Excel Spreadsheet",
-      "powerpoint": "PowerPoint Presentation",
-      "word": "Word Document"
-    },
-    "templates": {
-      "label": "Template (Optional)",
-      "default": "Default Template",
-      "defaultDescription": "Standard format with all sections",
-      "recommended": "Recommended"
-    },
-    "options": {
-      "label": "Export Options",
-      "includeCharts": "Include charts and visualizations",
-      "includeRawData": "Include raw data tables"
+      "collaboration": "Collaboration"
     },
     "sections": {
-      "label": "Sections to Include",
-      "selectAll": "Select All",
-      "deselectAll": "Deselect All"
+      "executive-summary": "Executive Summary",
+      "budget-status": "Budget Status"
     },
-    "branding": {
-      "label": "Branding (Optional)",
-      "companyName": "Company Name",
-      "companyNamePlaceholder": "Enter company name",
-      "logoUrl": "Logo URL",
-      "logoUrlPlaceholder": "https://example.com/logo.png",
-      "colorScheme": "Color Scheme",
-      "schemes": {
-        "corporateBlue": "Corporate Blue",
-        "professionalGray": "Professional Gray",
-        "modernGreen": "Modern Green"
+    "placeholderContent": {
+      "executive-summary": "This is the executive summary section...",
+      "budget-status": "Budget performance analysis...",
+      "reportTitle": "January 2026 Project Monthly Report",
+      "reportTitleTemplate": "{month} {year} Project Monthly Report"
+    },
+    "insights": {
+      "title": "AI Insights",
+      "refresh": "Refresh",
+      "generating": "Generating insights...",
+      "noInsights": "No insights available",
+      "generateInsights": "Generate insights",
+      "totalInsights": "Total Insights",
+      "validated": "Validated",
+      "highPriority": "High Priority",
+      "filters": {
+        "toggle": "Toggle filters",
+        "categories": "Categories",
+        "minConfidence": "Min Confidence",
+        "clearAll": "Clear all filters"
+      },
+      "categories": {
+        "budget": "Budget",
+        "schedule": "Schedule",
+        "resource": "Resource",
+        "risk": "Risk",
+        "quality": "Quality"
+      },
+      "types": {
+        "prediction": "Prediction",
+        "recommendation": "Recommendation",
+        "alert": "Alert",
+        "summary": "Summary"
+      },
+      "priorities": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "critical": "Critical"
+      },
+      "card": {
+        "confidence": "{percent}% confidence",
+        "validated": "Validated",
+        "details": "Details",
+        "predictedImpact": "Predicted Impact",
+        "recommendedActions": "Recommended Actions",
+        "supportingData": "Supporting Data",
+        "validationNotes": "Validation Notes",
+        "validate": "Validate",
+        "markInvalid": "Mark Invalid",
+        "apply": "Apply",
+        "markHelpful": "Mark as helpful",
+        "markNotHelpful": "Mark as not helpful"
       }
     },
-    "actions": {
-      "export": "Export as {format}",
-      "exporting": "Exporting...",
-      "download": "Download",
-      "cancel": "Cancel",
-      "delete": "Delete"
+    "collaboration": {
+      "title": "Collaboration",
+      "tabs": {
+        "users": "Users",
+        "comments": "Comments",
+        "conflicts": "Conflicts"
+      },
+      "users": {
+        "you": "(You)",
+        "active": "Active {time}",
+        "noUsers": "No other users online"
+      },
+      "comments": {
+        "sectionPlaceholder": "Section ID (e.g., executive-summary)",
+        "addPlaceholder": "Add a comment...",
+        "sendComment": "Send Comment",
+        "on": "on {section}",
+        "resolveComment": "Resolve comment",
+        "noComments": "No comments yet"
+      },
+      "conflicts": {
+        "types": {
+          "simultaneousEdit": "Simultaneous Edit Conflict",
+          "versionMismatch": "Version Mismatch",
+          "permissionConflict": "Permission Conflict"
+        },
+        "section": "Section: {section}",
+        "usersConflicting": "{count} users made conflicting changes",
+        "conflictingChanges": "Conflicting Changes:",
+        "user": "User: {userId}",
+        "resolve": "Resolve Conflict:",
+        "useLatest": "Use Latest",
+        "mergeChanges": "Merge Changes",
+        "resolveManually": "Resolve Manually",
+        "noConflicts": "No conflicts detected"
+      },
+      "footer": {
+        "online": "{count} online",
+        "comments": "{count} comments",
+        "conflicts": "{count} conflicts"
+      },
+      "time": {
+        "justNow": "Just now",
+        "minutesAgo": "{minutes}m ago",
+        "hoursAgo": "{hours}h ago"
+      }
     },
-    "queue": {
-      "empty": "No exports yet",
-      "emptyDescription": "Configure and start an export to see it here",
-      "started": "Started {date}",
-      "fileSize": "File size: {size} KB",
-      "error": "Error: {message}"
-    },
-    "status": {
-      "queued": "Queued",
-      "processing": "Processing",
-      "completed": "Completed",
-      "failed": "Failed"
+    "export": {
+      "title": "Export Report",
+      "subtitle": "Configure and export your PMR report in multiple formats",
+      "tabs": {
+        "configure": "Configure Export",
+        "queue": "Export Queue"
+      },
+      "formats": {
+        "label": "Export Format",
+        "pdf": "PDF Document",
+        "excel": "Excel Spreadsheet",
+        "powerpoint": "PowerPoint Presentation",
+        "word": "Word Document"
+      },
+      "templates": {
+        "label": "Template (Optional)",
+        "default": "Default Template",
+        "defaultDescription": "Standard format with all sections",
+        "recommended": "Recommended"
+      },
+      "options": {
+        "label": "Export Options",
+        "includeCharts": "Include charts and visualizations",
+        "includeRawData": "Include raw data tables"
+      },
+      "sections": {
+        "label": "Sections to Include",
+        "selectAll": "Select All",
+        "deselectAll": "Deselect All"
+      },
+      "branding": {
+        "label": "Branding (Optional)",
+        "companyName": "Company Name",
+        "companyNamePlaceholder": "Enter company name",
+        "logoUrl": "Logo URL",
+        "logoUrlPlaceholder": "https://example.com/logo.png",
+        "colorScheme": "Color Scheme",
+        "schemes": {
+          "corporateBlue": "Corporate Blue",
+          "professionalGray": "Professional Gray",
+          "modernGreen": "Modern Green"
+        }
+      },
+      "actions": {
+        "export": "Export as {format}",
+        "exporting": "Exporting...",
+        "download": "Download",
+        "cancel": "Cancel",
+        "delete": "Delete"
+      },
+      "queue": {
+        "empty": "No exports yet",
+        "emptyDescription": "Configure and start an export to see it here",
+        "started": "Started {date}",
+        "fileSize": "File size: {size} KB",
+        "error": "Error: {message}"
+      },
+      "status": {
+        "queued": "Queued",
+        "processing": "Processing",
+        "completed": "Completed",
+        "failed": "Failed"
+      }
     }
   },
   "feedback": {

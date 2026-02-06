@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { CheckCircle, XCircle, MessageSquare, X } from 'lucide-react'
+import { useAuth } from '@/app/providers/SupabaseAuthProvider'
 
 interface ApprovalButtonsProps {
   approvalId: string
@@ -23,6 +24,8 @@ export default function ApprovalButtons({
   const [comments, setComments] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { session } = useAuth()
+  const accessToken = session?.access_token ?? null
 
   const handleButtonClick = (decision: 'approved' | 'rejected') => {
     if (showComments) {
@@ -38,15 +41,14 @@ export default function ApprovalButtons({
       setSubmitting(true)
       setError(null)
 
-      const token = localStorage.getItem('token')
-      if (!token) {
+      if (!accessToken) {
         throw new Error('Not authenticated')
       }
 
       const response = await fetch(`/api/workflows/instances/${workflowInstanceId}/approve`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -94,7 +96,7 @@ export default function ApprovalButtons({
         <button
           onClick={() => handleButtonClick('approved')}
           disabled={disabled || submitting}
-          className="flex-1 bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md"
+          className="flex-1 bg-green-700 text-white px-4 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md"
         >
           <CheckCircle size={20} />
           Approve
@@ -112,23 +114,23 @@ export default function ApprovalButtons({
       {/* Comments Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full shadow-xl">
+          <div className="bg-white dark:bg-slate-800 rounded-lg max-w-md w-full shadow-xl">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 border-b">
               <div className="flex items-center gap-2">
                 {pendingDecision === 'approved' ? (
-                  <CheckCircle className="text-green-600" size={24} />
+                  <CheckCircle className="text-green-600 dark:text-green-400" size={24} />
                 ) : (
-                  <XCircle className="text-red-600" size={24} />
+                  <XCircle className="text-red-600 dark:text-red-400" size={24} />
                 )}
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                   {pendingDecision === 'approved' ? 'Approve' : 'Reject'} Workflow
                 </h3>
               </div>
               <button
                 onClick={handleModalClose}
                 disabled={submitting}
-                className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
+                className="text-gray-400 hover:text-gray-600 dark:text-slate-400 transition-colors disabled:opacity-50"
               >
                 <X size={24} />
               </button>
@@ -137,13 +139,13 @@ export default function ApprovalButtons({
             {/* Modal Body */}
             <div className="p-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Comments {pendingDecision === 'rejected' && <span className="text-red-600">*</span>}
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+                  Comments {pendingDecision === 'rejected' && <span className="text-red-600 dark:text-red-400">*</span>}
                 </label>
                 <textarea
                   value={comments}
                   onChange={(e) => setComments(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                   rows={4}
                   placeholder={
                     pendingDecision === 'approved'
@@ -153,25 +155,25 @@ export default function ApprovalButtons({
                   disabled={submitting}
                 />
                 {pendingDecision === 'rejected' && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                     Comments are required when rejecting a workflow
                   </p>
                 )}
               </div>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <p className="text-sm text-red-800">{error}</p>
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                  <p className="text-sm text-red-800 dark:text-red-300">{error}</p>
                 </div>
               )}
 
               <div className={`p-3 rounded-lg ${
                 pendingDecision === 'approved' 
-                  ? 'bg-green-50 border border-green-200' 
-                  : 'bg-red-50 border border-red-200'
+                  ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' 
+                  : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
               }`}>
                 <p className={`text-sm ${
-                  pendingDecision === 'approved' ? 'text-green-800' : 'text-red-800'
+                  pendingDecision === 'approved' ? 'text-green-800 dark:text-green-300' : 'text-red-800 dark:text-red-300'
                 }`}>
                   {pendingDecision === 'approved' 
                     ? 'This workflow will be approved and moved to the next step.'
@@ -181,11 +183,11 @@ export default function ApprovalButtons({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex gap-3 p-4 border-t bg-gray-50 rounded-b-lg">
+            <div className="flex gap-3 p-4 border-t bg-gray-50 dark:bg-slate-800/50 rounded-b-lg">
               <button
                 onClick={handleModalClose}
                 disabled={submitting}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 Cancel
               </button>
@@ -194,7 +196,7 @@ export default function ApprovalButtons({
                 disabled={submitting || (pendingDecision === 'rejected' && !comments.trim())}
                 className={`flex-1 px-4 py-2 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium ${
                   pendingDecision === 'approved'
-                    ? 'bg-green-600 hover:bg-green-700'
+                    ? 'bg-green-700 hover:bg-green-700'
                     : 'bg-red-600 hover:bg-red-700'
                 }`}
               >

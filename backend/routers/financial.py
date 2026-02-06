@@ -4,7 +4,7 @@ Financial tracking and budget management endpoints
 
 from fastapi import APIRouter, HTTPException, Depends, status, Query, Request
 from uuid import UUID
-from typing import Optional, List
+from typing import Optional, List, Any
 from datetime import datetime, date
 from decimal import Decimal
 import logging
@@ -25,6 +25,16 @@ from services.enterprise_audit_service import EnterpriseAuditService
 router = APIRouter(prefix="/financial-tracking", tags=["financial"])
 budget_alerts_router = APIRouter(prefix="/budget-alerts", tags=["budget-alerts"])
 logger = logging.getLogger(__name__)
+
+
+def _to_float(val: Any) -> float:
+    """Coerce None or invalid values to float; DB nulls can make .get return None."""
+    if val is None:
+        return 0.0
+    try:
+        return float(val)
+    except (TypeError, ValueError):
+        return 0.0
 
 # Initialize PPM integration service lazily
 _ppm_integration = None
@@ -208,17 +218,19 @@ async def get_financial_tracking_budget_alerts(
         alerts = []
         
         for project in projects:
-            if not project.get('budget'):
-                continue
-            
             project_id = project['id']
-            budget = float(project['budget'])
-            
+            budget = _to_float(project.get('budget'))
+            if budget <= 0:
+                continue
+
             # Calculate total spent for this project
             # Use actual_amount for expenses (positive values represent spending)
             expenses_response = supabase.table("financial_tracking").select("actual_amount").eq("project_id", project_id).execute()
-
-            total_spent = sum(float(expense.get('actual_amount', 0)) for expense in expenses_response.data or [] if float(expense.get('actual_amount', 0)) > 0)
+            total_spent = sum(
+                _to_float(expense.get('actual_amount'))
+                for expense in (expenses_response.data or [])
+                if _to_float(expense.get('actual_amount')) > 0
+            )
             current_percentage = (total_spent / budget * 100) if budget > 0 else 0
             
             if current_percentage >= threshold_percentage:
@@ -277,22 +289,22 @@ async def get_comprehensive_financial_report(
         
         financial_response = financial_query.execute()
         financial_entries = financial_response.data or []
-        
-        # Calculate summary metrics
-        total_budget = sum(float(p.get('budget', 0)) for p in projects)
-        total_spent = sum(float(f.get('amount', 0)) for f in financial_entries if f.get('transaction_type') == 'expense')
-        total_income = sum(float(f.get('amount', 0)) for f in financial_entries if f.get('transaction_type') == 'income')
-        
+
+        # Calculate summary metrics (budget/amount may be None from DB)
+        total_budget = sum(_to_float(p.get('budget')) for p in projects)
+        total_spent = sum(_to_float(f.get('amount')) for f in financial_entries if f.get('transaction_type') == 'expense')
+        total_income = sum(_to_float(f.get('amount')) for f in financial_entries if f.get('transaction_type') == 'income')
+
         # Project-level analysis
         project_summaries = []
         for project in projects:
             project_id_str = project['id']
-            project_budget = float(project.get('budget', 0))
-            
+            project_budget = _to_float(project.get('budget'))
+
             # Get project-specific financial entries
             project_entries = [f for f in financial_entries if f.get('project_id') == project_id_str]
-            project_spent = sum(float(f.get('amount', 0)) for f in project_entries if f.get('transaction_type') == 'expense')
-            project_income = sum(float(f.get('amount', 0)) for f in project_entries if f.get('transaction_type') == 'income')
+            project_spent = sum(_to_float(f.get('amount')) for f in project_entries if f.get('transaction_type') == 'expense')
+            project_income = sum(_to_float(f.get('amount')) for f in project_entries if f.get('transaction_type') == 'income')
             
             utilization = (project_spent / project_budget * 100) if project_budget > 0 else 0
             variance = project_spent - project_budget

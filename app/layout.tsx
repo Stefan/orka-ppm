@@ -73,6 +73,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Theme script to prevent flash of incorrect theme */}
         <ThemeScript />
         
+        {/* In development: unregister stale service workers that cache old JS/CSS bundles */}
+        {process.env.NODE_ENV === 'development' && (
+          <script dangerouslySetInnerHTML={{ __html: `
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                registrations.forEach(function(registration) {
+                  registration.unregister().then(function() {
+                    console.log('[DEV] Unregistered stale service worker');
+                  });
+                });
+                if (registrations.length > 0) {
+                  caches.keys().then(function(names) {
+                    names.forEach(function(name) { caches.delete(name); });
+                    console.log('[DEV] Cleared service worker caches:', names);
+                  });
+                }
+              });
+            }
+          `}} suppressHydrationWarning />
+        )}
+        
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />

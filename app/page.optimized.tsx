@@ -15,10 +15,10 @@ export default function Home() {
   // Show loading state while checking authentication
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-800/50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-gray-600 dark:text-slate-400">Loading...</p>
         </div>
       </div>
     )
@@ -154,13 +154,13 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-800/50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-slate-100">
             {isSignup ? 'Create your account' : 'Sign in to your account'}
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-slate-400">
             AI-Powered Project Portfolio Management
           </p>
         </div>
@@ -168,7 +168,7 @@ function LoginForm() {
         <form className="mt-8 space-y-6" onSubmit={handleAuth}>
           <div className="space-y-5">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 required">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-slate-300 required">
                 Email Address
               </label>
               <input
@@ -185,7 +185,7 @@ function LoginForm() {
             </div>
             
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 required">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-slate-300 required">
                 Password
               </label>
               <input
@@ -200,13 +200,13 @@ function LoginForm() {
                 placeholder={isSignup ? "Create a secure password (min. 6 characters)" : "Enter your password"}
               />
               {isSignup && (
-                <p className="text-sm text-gray-500 mt-1">Password must be at least 6 characters long</p>
+                <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Password must be at least 6 characters long</p>
               )}
             </div>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
               <p className="text-sm text-red-700">{error}</p>
             </div>
           )}
@@ -229,7 +229,7 @@ function LoginForm() {
             <button
               type="button"
               onClick={() => setIsSignup(!isSignup)}
-              className="text-blue-600 hover:text-blue-500 text-sm"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-500 text-sm"
             >
               {isSignup ? 'Already have an account? Sign in' : 'Need an account? Sign up'}
             </button>
@@ -237,7 +237,7 @@ function LoginForm() {
             {!isSignup && (
               <a
                 href="/forgot-password"
-                className="text-blue-600 hover:text-blue-500 text-sm"
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-500 text-sm"
               >
                 Forgot password?
               </a>

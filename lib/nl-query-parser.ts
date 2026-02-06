@@ -528,7 +528,8 @@ const similarSearchMap: Record<string, Array<{ query: string; description: strin
   high_variance: [
     { query: 'variance > 50000', description: 'Variance over $50k' },
     { query: 'large variance', description: 'Unusual variance' },
-    { query: 'open committed pro vendor', description: 'By vendor' },
+    { query: 'high variance in forecast', description: 'Forecast variance' },
+    { query: 'open committed pro vendor', description: 'Open committed by vendor' },
   ],
   under_budget: [
     { query: 'within budget', description: 'Under budget' },
@@ -539,17 +540,29 @@ const similarSearchMap: Record<string, Array<{ query: string; description: strin
     { query: 'health < 50', description: 'Critical health' },
   ],
   vendor: [
-    { query: 'vendor ', description: 'Filter by vendor' },
-    { query: 'open committed pro vendor', description: 'Committed by vendor' },
+    { query: 'by vendor', description: 'Filter by vendor' },
+    { query: 'open committed pro vendor', description: 'Open committed by vendor' },
   ],
   sort: [
     { query: 'sort by variance desc', description: 'Highest variance first' },
     { query: 'sort by budget desc', description: 'Largest budget first' },
   ],
+  /** AI-Vorschläge "Ähnliche Suchen" for forecast / semantic-style queries */
+  forecast: [
+    { query: 'high variance in forecast', description: 'Forecast variance' },
+    { query: 'variance > 50000', description: 'Variance over $50k' },
+    { query: 'over budget', description: 'Over budget' },
+  ],
+  commitments: [
+    { query: 'open committed pro vendor', description: 'Open committed by vendor' },
+    { query: 'open commitments', description: 'Open commitments' },
+    { query: 'by vendor', description: 'By vendor' },
+  ],
 }
 
 /**
- * Get 2–3 similar search phrasings for the current query (for "Ähnliche Suchen").
+ * Get 2–3 similar search phrasings for the current query (AI-Vorschläge "Ähnliche Suchen").
+ * Uses parsed criteria and, for text-only queries, keyword mapping (forecast, commitment, variance, etc.).
  */
 export function getSimilarSearches(
   query: string,
@@ -560,26 +573,47 @@ export function getSimilarSearches(
   const result = parseNLQuery(trimmed)
   const out: Array<{ query: string; description: string }> = []
   const added = new Set<string>()
+  const push = (s: { query: string; description: string }) => {
+    if (!added.has(s.query)) {
+      added.add(s.query)
+      out.push(s)
+    }
+  }
   if (result.criteria.overBudget) {
-    similarSearchMap.over_budget.forEach(s => { if (!added.has(s.query)) { added.add(s.query); out.push(s) } })
+    similarSearchMap.over_budget.forEach(push)
   }
   if (result.criteria.highVariance || result.criteria.varianceMin !== undefined) {
-    similarSearchMap.high_variance.forEach(s => { if (!added.has(s.query)) { added.add(s.query); out.push(s) } })
+    similarSearchMap.high_variance.forEach(push)
   }
   if (result.criteria.underBudget) {
-    similarSearchMap.under_budget.forEach(s => { if (!added.has(s.query)) { added.add(s.query); out.push(s) } })
+    similarSearchMap.under_budget.forEach(push)
   }
   if (result.criteria.lowHealth || (result.criteria.healthMax !== undefined && result.criteria.healthMax <= 50)) {
-    similarSearchMap.at_risk.forEach(s => { if (!added.has(s.query)) { added.add(s.query); out.push(s) } })
+    similarSearchMap.at_risk.forEach(push)
   }
   if (result.criteria.vendorName) {
-    similarSearchMap.vendor.forEach(s => { if (!added.has(s.query)) { added.add(s.query); out.push(s) } })
+    similarSearchMap.vendor.forEach(push)
   }
   if (result.criteria.sortBy) {
-    similarSearchMap.sort.forEach(s => { if (!added.has(s.query)) { added.add(s.query); out.push(s) } })
+    similarSearchMap.sort.forEach(push)
+  }
+  // Semantic / text-only: suggest by keywords (e.g. "hohe Variance in Forecast" -> forecast + high_variance)
+  if (result.criteria.textSearch || out.length === 0) {
+    if (/\bforecast\b|prognose|variance\s+in\b/i.test(trimmed)) {
+      similarSearchMap.forecast.forEach(push)
+    }
+    if (/\bcommit(?:ment|ted)?s?\b|offen\s*commit|open\s*commit/i.test(trimmed)) {
+      similarSearchMap.commitments.forEach(push)
+    }
+    if (/\bvarian(?:ce|z)\b|abweichung/i.test(trimmed) && out.length === 0) {
+      similarSearchMap.high_variance.forEach(push)
+    }
+    if (/\bbudget\b/i.test(trimmed) && out.length === 0) {
+      similarSearchMap.over_budget.forEach(push)
+    }
   }
   if (out.length === 0) {
-    exampleQueries.slice(0, limit).forEach(s => out.push(s))
+    exampleQueries.slice(0, limit).forEach(push)
   }
   return out.slice(0, limit)
 }

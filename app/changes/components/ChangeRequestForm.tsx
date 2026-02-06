@@ -321,7 +321,7 @@ export default function ChangeRequestForm({
             value={value}
             onChange={(e) => handleTemplateFieldChange(field.name, e.target.value)}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              error ? 'border-red-500' : 'border-gray-300'
+              error ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
             }`}
             placeholder={field.label}
           />
@@ -334,7 +334,7 @@ export default function ChangeRequestForm({
             onChange={(e) => handleTemplateFieldChange(field.name, e.target.value)}
             rows={3}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              error ? 'border-red-500' : 'border-gray-300'
+              error ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
             }`}
             placeholder={field.label}
           />
@@ -346,7 +346,7 @@ export default function ChangeRequestForm({
             value={value}
             onChange={(e) => handleTemplateFieldChange(field.name, e.target.value)}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              error ? 'border-red-500' : 'border-gray-300'
+              error ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
             }`}
           >
             <option value="">{t('common.select')} {field.label}</option>
@@ -365,7 +365,7 @@ export default function ChangeRequestForm({
             value={value}
             onChange={(e) => handleTemplateFieldChange(field.name, parseFloat(e.target.value) || 0)}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              error ? 'border-red-500' : 'border-gray-300'
+              error ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
             }`}
             placeholder={field.label}
           />
@@ -378,7 +378,7 @@ export default function ChangeRequestForm({
             value={value}
             onChange={(e) => handleTemplateFieldChange(field.name, e.target.value)}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              error ? 'border-red-500' : 'border-gray-300'
+              error ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
             }`}
           />
         )
@@ -390,9 +390,9 @@ export default function ChangeRequestForm({
               type="checkbox"
               checked={value}
               onChange={(e) => handleTemplateFieldChange(field.name, e.target.checked)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
             />
-            <span className="text-sm text-gray-700">{field.label}</span>
+            <span className="text-sm text-gray-700 dark:text-slate-300">{field.label}</span>
           </label>
         )
 
@@ -436,7 +436,7 @@ export default function ChangeRequestForm({
         {/* Basic Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               {t('requestForm.title')}
             </label>
             <input
@@ -445,17 +445,17 @@ export default function ChangeRequestForm({
               value={formData.title}
               onChange={(e) => handleInputChange('title', e.target.value)}
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.title ? 'border-red-500' : 'border-gray-300'
+                errors.title ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
               }`}
               placeholder={t('requestForm.titlePlaceholder')}
             />
             {errors.title && (
-              <p className="mt-1 text-sm text-red-600">{errors.title}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.title}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="project" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="project" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               {t('requestForm.project')}
             </label>
             <select
@@ -463,7 +463,7 @@ export default function ChangeRequestForm({
               value={formData.project_id}
               onChange={(e) => handleProjectChange(e.target.value)}
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.project_id ? 'border-red-500' : 'border-gray-300'
+                errors.project_id ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
               }`}
             >
               <option value="">{t('requestForm.selectProject')}</option>
@@ -474,19 +474,19 @@ export default function ChangeRequestForm({
               ))}
             </select>
             {errors.project_id && (
-              <p className="mt-1 text-sm text-red-600">{errors.project_id}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.project_id}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="template" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="template" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               {t('requestForm.template')}
             </label>
             <select
               id="template"
               value={formData.template_id}
               onChange={(e) => handleTemplateChange(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">{t('requestForm.selectTemplate')}</option>
               {templates.map(template => (
@@ -498,7 +498,7 @@ export default function ChangeRequestForm({
           </div>
 
           <div>
-            <label htmlFor="change-type" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="change-type" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               {t('requestForm.changeType')}
             </label>
             <select
@@ -506,7 +506,7 @@ export default function ChangeRequestForm({
               value={formData.change_type}
               onChange={(e) => handleInputChange('change_type', e.target.value)}
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.change_type ? 'border-red-500' : 'border-gray-300'
+                errors.change_type ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
               }`}
             >
               {CHANGE_TYPES.map(type => (
@@ -516,12 +516,12 @@ export default function ChangeRequestForm({
               ))}
             </select>
             {errors.change_type && (
-              <p className="mt-1 text-sm text-red-600">{errors.change_type}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.change_type}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="priority" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               {t('requestForm.priority')}
             </label>
             <select
@@ -529,7 +529,7 @@ export default function ChangeRequestForm({
               value={formData.priority}
               onChange={(e) => handleInputChange('priority', e.target.value)}
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.priority ? 'border-red-500' : 'border-gray-300'
+                errors.priority ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
               }`}
             >
               {PRIORITY_LEVELS.map(priority => (
@@ -539,7 +539,7 @@ export default function ChangeRequestForm({
               ))}
             </select>
             {errors.priority && (
-              <p className="mt-1 text-sm text-red-600">{errors.priority}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.priority}</p>
             )}
           </div>
         </div>
@@ -547,7 +547,7 @@ export default function ChangeRequestForm({
         {/* Description and Justification */}
         <div className="space-y-4">
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               {t('requestForm.description')}
             </label>
             <textarea
@@ -556,24 +556,24 @@ export default function ChangeRequestForm({
               onChange={(e) => handleInputChange('description', e.target.value)}
               rows={4}
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.description ? 'border-red-500' : 'border-gray-300'
+                errors.description ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
               }`}
               placeholder={t('requestForm.descriptionPlaceholder')}
             />
             {errors.description && (
-              <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.description}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               {t('requestForm.justification')}
             </label>
             <textarea
               value={formData.justification}
               onChange={(e) => handleInputChange('justification', e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder={t('requestForm.justificationPlaceholder')}
             />
           </div>
@@ -582,18 +582,18 @@ export default function ChangeRequestForm({
         {/* Template-specific fields */}
         {selectedTemplate && (
           <div className="border-t pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">
               {t('requestForm.templateFields', { templateName: selectedTemplate.name })}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {selectedTemplate.template_data.fields.map(field => (
                 <div key={field.name} className={field.type === 'textarea' ? 'md:col-span-2' : ''}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     {field.label} {field.required && '*'}
                   </label>
                   {renderTemplateField(field)}
                   {errors[`template_${field.name}`] && (
-                    <p className="mt-1 text-sm text-red-600">
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                       {errors[`template_${field.name}`]}
                     </p>
                   )}
@@ -606,11 +606,11 @@ export default function ChangeRequestForm({
         {/* Impact Estimation */}
         <div className="border-t pt-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900">{t('requestForm.impactEstimation')}</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">{t('requestForm.impactEstimation')}</h3>
             <button
               type="button"
               onClick={() => setShowImpactEstimator(!showImpactEstimator)}
-              className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+              className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
             >
               <Calculator className="h-4 w-4" />
               {showImpactEstimator ? t('requestForm.hideImpactCalculator') : t('requestForm.showImpactCalculator')}
@@ -619,7 +619,7 @@ export default function ChangeRequestForm({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 <DollarSign className="inline h-4 w-4 mr-1" />
                 {t('requestForm.estimatedCostImpact')}
               </label>
@@ -627,7 +627,7 @@ export default function ChangeRequestForm({
                 type="number"
                 value={formData.estimated_cost_impact || ''}
                 onChange={(e) => handleInputChange('estimated_cost_impact', parseFloat(e.target.value) || null)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="0"
                 min="0"
                 step="0.01"
@@ -635,7 +635,7 @@ export default function ChangeRequestForm({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 <Calendar className="inline h-4 w-4 mr-1" />
                 {t('requestForm.scheduleImpact')}
               </label>
@@ -643,14 +643,14 @@ export default function ChangeRequestForm({
                 type="number"
                 value={formData.estimated_schedule_impact_days || ''}
                 onChange={(e) => handleInputChange('estimated_schedule_impact_days', parseInt(e.target.value) || null)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="0"
                 min="0"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 <Clock className="inline h-4 w-4 mr-1" />
                 {t('requestForm.effortHours')}
               </label>
@@ -658,7 +658,7 @@ export default function ChangeRequestForm({
                 type="number"
                 value={formData.estimated_effort_hours || ''}
                 onChange={(e) => handleInputChange('estimated_effort_hours', parseFloat(e.target.value) || null)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="0"
                 min="0"
                 step="0.5"
@@ -667,14 +667,14 @@ export default function ChangeRequestForm({
           </div>
 
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
               {t('requestForm.requiredByDate')}
             </label>
             <input
               type="date"
               value={formData.required_by_date}
               onChange={(e) => handleInputChange('required_by_date', e.target.value)}
-              className="w-full md:w-auto px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full md:w-auto px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -682,14 +682,14 @@ export default function ChangeRequestForm({
         {/* Project Linkages */}
         {selectedProject && (
           <div className="border-t pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">{t('requestForm.projectLinkages')}</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-4">{t('requestForm.projectLinkages')}</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   {t('requestForm.affectedMilestones')}
                 </label>
-                <div className="space-y-2 max-h-32 overflow-y-auto border border-gray-300 rounded-lg p-3">
+                <div className="space-y-2 max-h-32 overflow-y-auto border border-gray-300 dark:border-slate-600 rounded-lg p-3">
                   {selectedProject.milestones.map(milestone => (
                     <label key={milestone.id} className="flex items-center gap-2">
                       <input
@@ -701,19 +701,19 @@ export default function ChangeRequestForm({
                             : formData.affected_milestones.filter(id => id !== milestone.id)
                           handleInputChange('affected_milestones', milestones)
                         }}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
                       />
-                      <span className="text-sm text-gray-700">{milestone.name}</span>
+                      <span className="text-sm text-gray-700 dark:text-slate-300">{milestone.name}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                   {t('requestForm.affectedPurchaseOrders')}
                 </label>
-                <div className="space-y-2 max-h-32 overflow-y-auto border border-gray-300 rounded-lg p-3">
+                <div className="space-y-2 max-h-32 overflow-y-auto border border-gray-300 dark:border-slate-600 rounded-lg p-3">
                   {selectedProject.purchase_orders.map(po => (
                     <label key={po.id} className="flex items-center gap-2">
                       <input
@@ -725,9 +725,9 @@ export default function ChangeRequestForm({
                             : formData.affected_pos.filter(id => id !== po.id)
                           handleInputChange('affected_pos', pos)
                         }}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
                       />
-                      <span className="text-sm text-gray-700">
+                      <span className="text-sm text-gray-700 dark:text-slate-300">
                         {po.number} - {po.description}
                       </span>
                     </label>
@@ -805,7 +805,7 @@ export default function ChangeRequestForm({
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+              className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700 transition-colors"
             >
               {t('requestForm.cancel')}
             </button>

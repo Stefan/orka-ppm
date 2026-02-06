@@ -48,6 +48,8 @@ export interface ChatMessage {
   actions?: QuickAction[]
   attachments?: Attachment[]
   isStreaming?: boolean
+  /** Backend help_logs id for feedback (help_query_feedback) */
+  queryId?: string
 }
 
 export interface SourceReference {
@@ -61,7 +63,9 @@ export interface SourceReference {
 export interface QuickAction {
   id: string
   label: string
-  action: (() => void) | string  // Support both function and string actions
+  action: (() => void) | string  // Support both function and string actions (e.g. "navigate", "open_modal")
+  /** Target path or modal type when action is a string (e.g. "/projects" for navigate) */
+  target?: string
   icon?: string
   variant?: 'primary' | 'secondary' | 'ghost'
 }
@@ -109,6 +113,8 @@ export interface HelpQueryResponse {
   sources: SourceReference[]
   confidence: number
   responseTimeMs: number
+  /** Backend help_logs id for feedback */
+  queryId?: string
   proactiveTips?: ProactiveTip[]
   suggestedActions?: QuickAction[]
   relatedGuides?: GuideReference[]
@@ -123,7 +129,8 @@ export interface HelpContextResponse {
 }
 
 export interface HelpFeedbackRequest {
-  messageId: string
+  messageId?: string
+  queryId?: string
   rating: 1 | 2 | 3 | 4 | 5
   feedbackText?: string
   feedbackType: 'helpful' | 'not_helpful' | 'incorrect' | 'suggestion'

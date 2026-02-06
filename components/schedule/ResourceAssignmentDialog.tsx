@@ -103,17 +103,17 @@ export function ResourceAssignmentDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Users className="w-5 h-5" /> Assign resource
-            {effectiveTaskName && <span className="text-sm font-normal text-gray-500">· {effectiveTaskName}</span>}
+            {effectiveTaskName && <span className="text-sm font-normal text-gray-500 dark:text-slate-400">· {effectiveTaskName}</span>}
           </DialogTitle>
         </DialogHeader>
         <DialogBody className="space-y-4">
           {tasks.length > 0 && !initialTaskId && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Task</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Task</label>
               <select
                 value={taskId}
                 onChange={(e) => setTaskId(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm"
               >
                 <option value="">Select task</option>
                 {tasks.map((t) => (
@@ -125,11 +125,11 @@ export function ResourceAssignmentDialog({
           {effectiveTaskId && (
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Resource</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Resource</label>
                 <select
                   value={resourceId}
                   onChange={(e) => setResourceId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm"
                 >
                   <option value="">Select resource</option>
                   {resources.map((r) => (
@@ -138,7 +138,7 @@ export function ResourceAssignmentDialog({
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Allocation (%)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Allocation (%)</label>
                 <Input
                   type="number"
                   min={1}
@@ -155,10 +155,10 @@ export function ResourceAssignmentDialog({
 
           {conflicts.length > 0 && (
             <div>
-              <h4 className="text-sm font-medium text-gray-800 flex items-center gap-1 mb-2">
+              <h4 className="text-sm font-medium text-gray-800 dark:text-slate-200 flex items-center gap-1 mb-2">
                 <AlertTriangle className="w-4 h-4 text-amber-500" /> Conflicts
               </h4>
-              <ul className="text-sm text-gray-600 space-y-1">
+              <ul className="text-sm text-gray-600 dark:text-slate-400 space-y-1">
                 {conflicts.slice(0, 5).map((c, i) => (
                   <li key={i}>{c.description ?? c.type}</li>
                 ))}
@@ -168,10 +168,10 @@ export function ResourceAssignmentDialog({
 
           {utilization.length > 0 && (
             <div>
-              <h4 className="text-sm font-medium text-gray-800 mb-2">Utilization</h4>
+              <h4 className="text-sm font-medium text-gray-800 dark:text-slate-200 mb-2">Utilization</h4>
               <ul className="text-sm space-y-1">
                 {utilization.slice(0, 5).map((u, i) => (
-                  <li key={i} className={u.is_overallocated ? 'text-amber-600' : 'text-gray-600'}>
+                  <li key={i} className={u.is_overallocated ? 'text-amber-600' : 'text-gray-600 dark:text-slate-400'}>
                     {u.resource_name}: {u.utilization_percentage}%{u.is_overallocated ? ' (overallocated)' : ''}
                   </li>
                 ))}
@@ -180,7 +180,7 @@ export function ResourceAssignmentDialog({
           )}
 
           {!effectiveTaskId && tasks.length === 0 && (
-            <p className="text-sm text-gray-500">No tasks in this schedule. Add tasks first.</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400">No tasks in this schedule. Add tasks first.</p>
           )}
         </DialogBody>
         <DialogFooter>

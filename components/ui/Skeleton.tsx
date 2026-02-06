@@ -64,7 +64,7 @@ export function Skeleton({
 // Specialized skeleton components for common use cases
 export function CardSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('p-6 border border-gray-200 rounded-lg', className)}>
+    <div className={cn('p-6 border border-gray-200 dark:border-slate-700 rounded-lg', className)}>
       <Skeleton variant="text" lines={1} className="mb-4 w-1/3" />
       <Skeleton variant="text" lines={2} className="mb-4" />
       <div className="flex space-x-2">
@@ -77,7 +77,7 @@ export function CardSkeleton({ className }: { className?: string }) {
 
 export function ChartSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('p-4 border border-gray-200 rounded-lg', className)}>
+    <div className={cn('p-4 border border-gray-200 dark:border-slate-700 rounded-lg', className)}>
       <Skeleton variant="text" className="mb-4 w-1/4" />
       <Skeleton variant="chart" />
     </div>
@@ -86,9 +86,9 @@ export function ChartSkeleton({ className }: { className?: string }) {
 
 export function TableSkeleton({ rows = 5, className }: { rows?: number; className?: string }) {
   return (
-    <div className={cn('border border-gray-200 rounded-lg overflow-hidden', className)}>
+    <div className={cn('border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden', className)}>
       {/* Table header skeleton */}
-      <div className="bg-gray-50 p-4 border-b border-gray-200">
+      <div className="bg-gray-50 dark:bg-slate-800/50 p-4 border-b border-gray-200 dark:border-slate-700">
         <div className="flex space-x-4">
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-4 w-32" />
@@ -99,7 +99,7 @@ export function TableSkeleton({ rows = 5, className }: { rows?: number; classNam
 
       {/* Table rows skeleton */}
       {Array.from({ length: rows }, (_, i) => (
-        <div key={i} className="p-4 border-b border-gray-100 last:border-b-0">
+        <div key={i} className="p-4 border-b border-gray-100 dark:border-slate-700 last:border-b-0">
           <div className="flex space-x-4 items-center">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-4 w-32" />

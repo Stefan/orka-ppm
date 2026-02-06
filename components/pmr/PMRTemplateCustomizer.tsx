@@ -121,19 +121,19 @@ const PMRTemplateCustomizer: React.FC<PMRTemplateCustomizerProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-gray-200 dark:border-slate-700">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Customize Template</h2>
-              <p className="text-sm text-gray-600">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2">Customize Template</h2>
+              <p className="text-sm text-gray-600 dark:text-slate-400">
                 Modify sections, metrics, and settings to create your perfect template
               </p>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 dark:text-slate-400 transition-colors"
             >
               <X className="h-6 w-6" />
             </button>
@@ -144,29 +144,29 @@ const PMRTemplateCustomizer: React.FC<PMRTemplateCustomizerProps> = ({
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Basic Info */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Basic Information</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Template Name
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter template name"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Description
                 </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                   placeholder="Describe this template"
                 />
               </div>
@@ -176,13 +176,13 @@ const PMRTemplateCustomizer: React.FC<PMRTemplateCustomizerProps> = ({
           {/* Sections */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Template Sections</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Template Sections</h3>
               <div className="flex items-center space-x-2">
                 {onGetAISuggestions && (
                   <button
                     onClick={handleGetAISuggestions}
                     disabled={isLoadingAI}
-                    className="flex items-center space-x-1 px-3 py-1 text-sm font-medium text-purple-700 bg-purple-100 rounded-lg hover:bg-purple-200 disabled:opacity-50 transition-colors"
+                    className="flex items-center space-x-1 px-3 py-1 text-sm font-medium text-purple-700 bg-purple-100 dark:bg-purple-900/30 rounded-lg hover:bg-purple-200 disabled:opacity-50 transition-colors"
                   >
                     <Sparkles className={`h-4 w-4 ${isLoadingAI ? 'animate-spin' : ''}`} />
                     <span>AI Suggestions</span>
@@ -190,7 +190,7 @@ const PMRTemplateCustomizer: React.FC<PMRTemplateCustomizerProps> = ({
                 )}
                 <button
                   onClick={handleAddSection}
-                  className="flex items-center space-x-1 px-3 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors"
+                  className="flex items-center space-x-1 px-3 py-1 text-sm font-medium text-blue-700 bg-blue-100 dark:bg-blue-900/30 rounded-lg hover:bg-blue-200 transition-colors"
                 >
                   <Plus className="h-4 w-4" />
                   <span>Add Section</span>
@@ -201,11 +201,11 @@ const PMRTemplateCustomizer: React.FC<PMRTemplateCustomizerProps> = ({
               {sections.map((section, index) => (
                 <div
                   key={section.section_id}
-                  className="p-4 bg-gray-50 border border-gray-200 rounded-lg"
+                  className="p-4 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg"
                 >
                   <div className="flex items-start space-x-3">
                     <div className="flex-shrink-0 mt-2 cursor-move">
-                      <GripVertical className="h-5 w-5 text-gray-400" />
+                      <GripVertical className="h-5 w-5 text-gray-400 dark:text-slate-500" />
                     </div>
                     <div className="flex-1 space-y-3">
                       <div className="flex items-start space-x-3">
@@ -213,12 +213,12 @@ const PMRTemplateCustomizer: React.FC<PMRTemplateCustomizerProps> = ({
                           type="text"
                           value={section.title}
                           onChange={(e) => handleUpdateSection(section.section_id, { title: e.target.value })}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Section title"
                         />
                         <button
                           onClick={() => handleRemoveSection(section.section_id)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -227,7 +227,7 @@ const PMRTemplateCustomizer: React.FC<PMRTemplateCustomizerProps> = ({
                         type="text"
                         value={section.description || ''}
                         onChange={(e) => handleUpdateSection(section.section_id, { description: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Section description (optional)"
                       />
                       <label className="flex items-center space-x-2 cursor-pointer">
@@ -235,21 +235,21 @@ const PMRTemplateCustomizer: React.FC<PMRTemplateCustomizerProps> = ({
                           type="checkbox"
                           checked={section.required}
                           onChange={(e) => handleUpdateSection(section.section_id, { required: e.target.checked })}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
                         />
-                        <span className="text-sm text-gray-700">Required section</span>
+                        <span className="text-sm text-gray-700 dark:text-slate-300">Required section</span>
                       </label>
                     </div>
                   </div>
                 </div>
               ))}
               {sections.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+                <div className="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-slate-400">
                   <AlertCircle className="h-8 w-8 mb-2" />
                   <p className="text-sm">No sections added yet</p>
                   <button
                     onClick={handleAddSection}
-                    className="mt-2 text-xs text-blue-600 hover:text-blue-800"
+                    className="mt-2 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                   >
                     Add your first section
                   </button>
@@ -260,7 +260,7 @@ const PMRTemplateCustomizer: React.FC<PMRTemplateCustomizerProps> = ({
 
           {/* Default Metrics */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Default Metrics</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Default Metrics</h3>
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <input
@@ -268,7 +268,7 @@ const PMRTemplateCustomizer: React.FC<PMRTemplateCustomizerProps> = ({
                   value={newMetric}
                   onChange={(e) => setNewMetric(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddMetric()}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Add a metric (e.g., Budget Variance)"
                 />
                 <button
@@ -282,15 +282,15 @@ const PMRTemplateCustomizer: React.FC<PMRTemplateCustomizerProps> = ({
                 {defaultMetrics.map((metric, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-2 bg-green-50 border border-green-200 rounded-lg"
+                    className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg"
                   >
                     <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
-                      <span className="text-sm text-gray-900">{metric}</span>
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                      <span className="text-sm text-gray-900 dark:text-slate-100">{metric}</span>
                     </div>
                     <button
                       onClick={() => handleRemoveMetric(index)}
-                      className="text-red-600 hover:text-red-800"
+                      className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -302,12 +302,12 @@ const PMRTemplateCustomizer: React.FC<PMRTemplateCustomizerProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
+        <div className="p-6 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
           <div className="flex items-center justify-end space-x-3">
             <button
               onClick={onClose}
               disabled={isSaving}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
             >
               Cancel
             </button>

@@ -19,7 +19,7 @@ export default function ChangeOrderIntegration({ projectId }: ChangeOrderIntegra
       </p>
       <Link
         href={projectId ? `/changes/orders/${projectId}` : '/changes/orders'}
-        className="inline-block mt-3 text-sm font-medium text-indigo-600 hover:text-indigo-800"
+        className="inline-block mt-3 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800"
       >
         Manage Change Orders →
       </Link>

@@ -68,27 +68,27 @@ export function MessageRenderer({
   const getMessageIcon = () => {
     switch (message.type) {
       case 'tip':
-        return <Lightbulb className="h-4 w-4 text-yellow-500" />
+        return <Lightbulb className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
       case 'system':
-        return <Info className="h-4 w-4 text-blue-500" />
+        return <Info className="h-4 w-4 text-blue-500 dark:text-blue-400" />
       case 'assistant':
-        return <MessageSquare className="h-4 w-4 text-green-500" />
+        return <MessageSquare className="h-4 w-4 text-green-500 dark:text-green-400" />
       default:
         return null
     }
   }
 
   const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 0.8) return 'text-green-700 bg-green-50 border-green-200'
-    if (confidence >= 0.6) return 'text-yellow-700 bg-yellow-50 border-yellow-200'
-    return 'text-red-700 bg-red-50 border-red-200'
+    if (confidence >= 0.8) return 'text-green-700 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+    if (confidence >= 0.6) return 'text-yellow-700 bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
+    return 'text-red-700 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
   }
 
   const markdownComponents = {
     code: ({ node, inline, className, children, ...props }: any) => {
       if (inline) {
         return (
-          <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono" {...props}>
+          <code className="bg-gray-100 dark:bg-slate-700 px-1 py-0.5 rounded text-sm font-mono" {...props}>
             {children}
           </code>
         )
@@ -96,7 +96,7 @@ export function MessageRenderer({
       
       return (
         <div className="my-2">
-          <pre className="bg-gray-100 rounded-md p-3 overflow-x-auto text-sm border border-gray-200">
+          <pre className="bg-gray-100 dark:bg-slate-700 rounded-md p-3 overflow-x-auto text-sm border border-gray-200 dark:border-slate-700">
             <code className={className} {...props}>
               {children}
             </code>
@@ -122,7 +122,7 @@ export function MessageRenderer({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-blue-600 hover:text-blue-800 underline"
+        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline"
         {...props}
       >
         {children}
@@ -146,7 +146,7 @@ export function MessageRenderer({
     ),
     blockquote: ({ children, ...props }: any) => (
       <blockquote 
-        className="border-l-4 border-gray-400 pl-4 italic text-gray-700 bg-gray-50 py-2 rounded-r" 
+        className="border-l-4 border-gray-400 pl-4 italic text-gray-700 dark:text-slate-300 bg-gray-50 dark:bg-slate-700 py-2 rounded-r" 
         {...props}
       >
         {children}
@@ -154,7 +154,7 @@ export function MessageRenderer({
     ),
     table: ({ children, ...props }: any) => (
       <table 
-        className="min-w-full border-collapse border-2 border-gray-300" 
+        className="min-w-full border-collapse border-2 border-gray-300 dark:border-slate-600" 
         {...props}
       >
         {children}
@@ -162,7 +162,7 @@ export function MessageRenderer({
     ),
     th: ({ children, ...props }: any) => (
       <th 
-        className="border-2 border-gray-300 bg-gray-100 px-3 py-2 text-left font-semibold text-gray-900" 
+        className="border-2 border-gray-300 dark:border-slate-600 bg-gray-100 dark:bg-slate-700 px-3 py-2 text-left font-semibold text-gray-900 dark:text-slate-100" 
         {...props}
       >
         {children}
@@ -170,7 +170,7 @@ export function MessageRenderer({
     ),
     td: ({ children, ...props }: any) => (
       <td 
-        className="border-2 border-gray-300 px-3 py-2 text-gray-800" 
+        className="border-2 border-gray-300 dark:border-slate-600 px-3 py-2 text-gray-800 dark:text-slate-200" 
         {...props}
       >
         {children}
@@ -183,12 +183,12 @@ export function MessageRenderer({
       className={cn(
         'group relative p-4 rounded-lg border-2 transition-all duration-200',
         isUser 
-          ? 'bg-blue-50 border-blue-200 ml-8' 
+          ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 ml-8' 
           : isSystem
-          ? 'bg-gray-50 border-gray-200'
+          ? 'bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-slate-700'
           : isTip
-          ? 'bg-yellow-50 border-yellow-200'
-          : 'bg-white border-gray-200 mr-8',
+          ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
+          : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 mr-8',
         className
       )}
     >
@@ -215,7 +215,7 @@ export function MessageRenderer({
             className="prose prose-sm max-w-none markdown-content"
           >
             {isUser ? (
-              <p className="text-gray-800 whitespace-pre-wrap">{message.content}</p>
+              <p className="text-gray-800 dark:text-slate-200 whitespace-pre-wrap">{message.content}</p>
             ) : (
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
@@ -244,13 +244,13 @@ export function MessageRenderer({
                 </div>
               )}
               {ragData?.cache_hit && (
-                <div className="flex items-center space-x-1 text-xs text-blue-600">
+                <div className="flex items-center space-x-1 text-xs text-blue-600 dark:text-blue-400">
                   <Info className="h-3 w-3" />
                   <span>(cached)</span>
                 </div>
               )}
               {ragData?.is_fallback && (
-                <div className="flex items-center space-x-1 text-xs text-orange-600">
+                <div className="flex items-center space-x-1 text-xs text-orange-600 dark:text-orange-400">
                   <AlertCircle className="h-3 w-3" />
                   <span>(limited response)</span>
                 </div>
@@ -263,12 +263,12 @@ export function MessageRenderer({
               {/* Citations */}
               {ragData?.citations && ragData.citations.length > 0 && (
                 <div className="mb-3">
-                  <h4 className="text-xs font-medium text-gray-700 mb-2">References</h4>
+                  <h4 className="text-xs font-medium text-gray-700 dark:text-slate-300 mb-2">References</h4>
                   <div className="flex flex-wrap gap-1">
                     {ragData.citations.map((citation: any, index: number) => (
                       <span
                         key={index}
-                        className="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full border border-blue-200"
+                        className="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full border border-blue-200 dark:border-blue-800"
                       >
                         [{citation.number}]
                       </span>
@@ -281,13 +281,13 @@ export function MessageRenderer({
               {ragData?.sources && ragData.sources.length > 0 && (
                 <div className="mb-3">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-xs font-medium text-gray-700">
+                    <h4 className="text-xs font-medium text-gray-700 dark:text-slate-300">
                       Referenced Documents ({ragData.sources.length})
                     </h4>
                     {ragData.sources.length > 2 && (
                       <button
                         onClick={() => setExpandedSources(!expandedSources)}
-                        className="text-xs text-blue-600 hover:text-blue-800"
+                        className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                       >
                         {expandedSources ? 'Show less' : 'Show all'}
                       </button>
@@ -298,16 +298,16 @@ export function MessageRenderer({
                     className="space-y-2"
                   >
                     {(expandedSources ? ragData.sources : ragData.sources.slice(0, 2)).map((source: any, index: number) => (
-                      <div key={`rag-source-${index}`} className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                      <div key={`rag-source-${index}`} className="bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-700 rounded-lg p-3">
                         <div className="flex items-start space-x-3">
-                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <Info className="w-4 h-4 text-blue-600" />
+                          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Info className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="font-medium text-gray-900 text-sm mb-1">{source.title}</div>
-                            <div className="text-gray-600 text-sm leading-relaxed mb-2">{source.content_preview}</div>
+                            <div className="font-medium text-gray-900 dark:text-slate-100 text-sm mb-1">{source.title}</div>
+                            <div className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed mb-2">{source.content_preview}</div>
                             {source.category && (
-                              <div className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                              <div className="inline-flex items-center px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs font-medium rounded-full">
                                 {source.category}
                               </div>
                             )}
@@ -323,13 +323,13 @@ export function MessageRenderer({
               {message.sources && message.sources.length > 0 && (!ragData?.sources || ragData.sources.length === 0) && (
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-xs font-medium text-gray-700">
+                    <h4 className="text-xs font-medium text-gray-700 dark:text-slate-300">
                       Sources ({message.sources.length})
                     </h4>
                     {message.sources.length > 2 && (
                       <button
                         onClick={() => setExpandedSources(!expandedSources)}
-                        className="text-xs text-blue-600 hover:text-blue-800"
+                        className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                       >
                         {expandedSources ? 'Show less' : 'Show all'}
                       </button>
@@ -359,7 +359,7 @@ export function MessageRenderer({
                 <button
                   key={action.id || `action-${index}`}
                   onClick={() => onQuickAction(action)}
-                  className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
+                  className="px-3 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
                 >
                   {action.label}
                 </button>
@@ -375,7 +375,7 @@ export function MessageRenderer({
             >
               <button
                 onClick={() => onCopy(message.content)}
-                className="inline-flex items-center space-x-1 px-2 py-1 text-xs text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+                className="inline-flex items-center space-x-1 px-2 py-1 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-800 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors"
                 aria-label="Copy message"
               >
                 <Copy className="h-3 w-3" />
@@ -383,7 +383,7 @@ export function MessageRenderer({
               </button>
               <button
                 onClick={() => setFeedbackMessageId(message.id)}
-                className="inline-flex items-center space-x-1 px-2 py-1 text-xs text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+                className="inline-flex items-center space-x-1 px-2 py-1 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-800 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors"
                 aria-label="Give feedback"
               >
                 <MessageCircle className="h-3 w-3" />
@@ -397,7 +397,7 @@ export function MessageRenderer({
       </div>
 
       {feedbackMessageId === message.id && (
-        <div className="mt-4 pt-4 border-t-2 border-gray-200">
+        <div className="mt-4 pt-4 border-t-2 border-gray-200 dark:border-slate-700">
           <FeedbackInterface
             message={message}
             onSubmitFeedback={onFeedback}
@@ -427,16 +427,16 @@ function SourceCard({ source }: { source: SourceReference }) {
   }
 
   return (
-    <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+    <div className="bg-gray-50 dark:bg-slate-700 rounded-lg p-3 border border-gray-200 dark:border-slate-700">
       <div className="flex items-start space-x-2">
         <span className="text-sm">{getSourceIcon(source.type)}</span>
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2">
-            <h5 className="text-sm font-medium text-gray-900 truncate">
+            <h5 className="text-sm font-medium text-gray-900 dark:text-slate-100 truncate">
               {source.title}
             </h5>
             {source.relevance && (
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-500 dark:text-slate-400">
                 {Math.round(source.relevance * 100)}%
               </span>
             )}
@@ -446,7 +446,7 @@ function SourceCard({ source }: { source: SourceReference }) {
               href={source.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-blue-600 hover:text-blue-800 mt-1 inline-flex items-center"
+              className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 mt-1 inline-flex items-center"
             >
               View source: {source.title}
               <ExternalLink className="h-3 w-3 ml-1" />

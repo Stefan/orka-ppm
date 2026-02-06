@@ -53,7 +53,7 @@ export const LoadingState: React.FC<LoadingConfig & {
         <div className="text-center">
           <LoadingSpinner size="lg" />
           {message && (
-            <p className="mt-4 text-sm text-gray-600">{message}</p>
+            <p className="mt-4 text-sm text-gray-600 dark:text-slate-400">{message}</p>
           )}
           {showProgress && progress !== undefined && (
             <div className="mt-4 w-48 mx-auto">
@@ -63,7 +63,7 @@ export const LoadingState: React.FC<LoadingConfig & {
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <p className="text-xs text-gray-500 mt-1">{progress}% complete</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">{progress}% complete</p>
             </div>
           )}
         </div>
@@ -75,9 +75,9 @@ export const LoadingState: React.FC<LoadingConfig & {
     return (
       <div className="flex items-center justify-center h-64" role="alert">
         <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
-          <h3 className="mt-4 text-lg font-medium text-gray-900">Error Loading Data</h3>
-          <p className="mt-2 text-sm text-gray-600">
+          <AlertCircle className="h-12 w-12 text-red-500 dark:text-red-400 mx-auto" />
+          <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-slate-100">Error Loading Data</h3>
+          <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
             {error || 'An unexpected error occurred. Please try again.'}
           </p>
           <button 
@@ -104,7 +104,7 @@ export const LoadingState: React.FC<LoadingConfig & {
 
 // Skeleton loading components for specific content types
 export const SkeletonCard: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <div className={`animate-pulse bg-white rounded-lg shadow p-6 ${className}`}>
+  <div className={`animate-pulse bg-white dark:bg-slate-800 rounded-lg shadow p-6 ${className}`}>
     <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
     <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
     <div className="h-3 bg-gray-200 rounded w-2/3 mb-4"></div>
@@ -120,7 +120,7 @@ export const SkeletonTable: React.FC<{ rows?: number; columns?: number }> = ({
   columns = 4 
 }) => (
   <div className="animate-pulse">
-    <div className="bg-gray-50 px-6 py-3">
+    <div className="bg-gray-50 dark:bg-slate-800/50 px-6 py-3">
       <div className="flex space-x-4">
         {Array.from({ length: columns }, (_, i) => (
           <div key={i} className="h-4 bg-gray-200 rounded flex-1"></div>
@@ -128,7 +128,7 @@ export const SkeletonTable: React.FC<{ rows?: number; columns?: number }> = ({
       </div>
     </div>
     {Array.from({ length: rows }, (_, rowIndex) => (
-      <div key={rowIndex} className="border-t border-gray-200 px-6 py-4">
+      <div key={rowIndex} className="border-t border-gray-200 dark:border-slate-700 px-6 py-4">
         <div className="flex space-x-4">
           {Array.from({ length: columns }, (_, colIndex) => (
             <div key={colIndex} className="h-4 bg-gray-200 rounded flex-1"></div>
@@ -140,7 +140,7 @@ export const SkeletonTable: React.FC<{ rows?: number; columns?: number }> = ({
 )
 
 export const SkeletonChart: React.FC<{ height?: string }> = ({ height = 'h-64' }) => (
-  <div className={`animate-pulse bg-white rounded-lg shadow p-6 ${height}`}>
+  <div className={`animate-pulse bg-white dark:bg-slate-800 rounded-lg shadow p-6 ${height}`}>
     <div className="h-4 bg-gray-200 rounded w-1/3 mb-6"></div>
     <div className="flex items-end space-x-2 h-32">
       {Array.from({ length: 8 }, (_, i) => (
@@ -341,10 +341,10 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       {children}
       {globalLoading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-sm mx-4">
+          <div className="bg-white dark:bg-slate-800 rounded-lg p-6 max-w-sm mx-4">
             <div className="flex items-center space-x-3">
               <LoadingSpinner />
-              <span className="text-gray-900">{loadingMessage || 'Loading...'}</span>
+              <span className="text-gray-900 dark:text-slate-100">{loadingMessage || 'Loading...'}</span>
             </div>
           </div>
         </div>
