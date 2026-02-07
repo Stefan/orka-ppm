@@ -46,7 +46,7 @@ export default function SchedulesPage() {
       })
       if (!res.ok) return
       const data = await res.json()
-      const list = Array.isArray(data) ? data : data.projects ?? []
+      const list = Array.isArray(data) ? data : data.items ?? data.projects ?? []
       setProjects(list.map((p: { id: string; name: string }) => ({ id: p.id, name: p.name })))
     } catch {
       setProjects([])

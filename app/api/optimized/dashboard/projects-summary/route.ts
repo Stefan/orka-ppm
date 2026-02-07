@@ -33,8 +33,8 @@ export async function GET(request: NextRequest) {
     
     const data = await response.json()
     
-    // Handle both array and object responses
-    const projects = Array.isArray(data) ? data : data?.projects || []
+    // Handle both array and object responses (backend may return { items, total, limit, offset })
+    const projects = Array.isArray(data) ? data : data?.items ?? data?.projects ?? []
     
     return NextResponse.json(projects, {
       status: 200,

@@ -2,7 +2,7 @@
 Base Pydantic models and common enums
 """
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 from enum import Enum
 from uuid import UUID
@@ -76,6 +76,17 @@ class ChangeOrderPermission(str, Enum):
     cost_analysis_approve = "cost_analysis:approve"
     contract_integration_manage = "contract_integration:manage"
     change_order_admin = "change_order:admin"
+
+
+class PaginationParams(BaseModel):
+    """Shared pagination query params for list endpoints (OpenAPI). Use limit/offset in APIs."""
+    limit: int = Field(default=100, ge=1, le=1000, description="Max number of items to return")
+    offset: int = Field(default=0, ge=0, description="Number of items to skip")
+
+    class Config:
+        schema_extra = {
+            "example": {"limit": 50, "offset": 0},
+        }
 
 
 class BaseResponse(BaseModel):

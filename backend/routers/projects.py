@@ -18,16 +18,21 @@ from utils.converters import convert_uuids
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 
-PROJECTS_CACHE_KEY = "projects:list"
-PROJECTS_CACHE_TTL = 60  # seconds
+PROJECTS_CACHE_KEY_PREFIX = "projects:list"
+PROJECTS_CACHE_TTL = 120  # seconds
+
+def _projects_cache_key(org_id: str, offset: int, limit: int) -> str:
+    """Build cache key for projects list (idempotent for same inputs)."""
+    return f"{PROJECTS_CACHE_KEY_PREFIX}:{org_id}:{offset}:{limit}"
+
 
 def _invalidate_projects_cache(request: Request) -> None:
-    """Invalidate projects list cache after create/update/delete."""
+    """Invalidate all projects list cache entries after create/update/delete."""
     cache = getattr(request.app.state, "cache_manager", None)
     if cache:
         try:
             import asyncio
-            asyncio.create_task(cache.delete(PROJECTS_CACHE_KEY))
+            asyncio.create_task(cache.clear_pattern(f"{PROJECTS_CACHE_KEY_PREFIX}:*"))
         except Exception:
             pass
 
@@ -58,33 +63,49 @@ async def create_project(
 @router.get("/")
 async def list_projects(
     request: Request,
+    limit: int = Query(100, ge=1, le=500, description="Max number of projects to return"),
+    offset: int = Query(0, ge=0, description="Number of projects to skip"),
     portfolio_id: Optional[UUID] = Query(None),
     status: Optional[ProjectStatus] = Query(None),
     current_user = Depends(require_permission(Permission.project_read))
 ):
-    """Get all projects with optional filtering. Uses cache (TTL 60s); invalidated on project create."""
+    """Get projects with optional filtering and pagination. Uses cache (TTL 120s); invalidated on project create/update/delete."""
     try:
         if not supabase:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        
+        org_id = (current_user.get("organization_id") or current_user.get("tenant_id") or "default")
+        if isinstance(org_id, UUID):
+            org_id = str(org_id)
         cache = getattr(request.app.state, "cache_manager", None)
+        cache_key = _projects_cache_key(org_id, offset, limit)
         data = None
         if cache:
-            data = await cache.get(PROJECTS_CACHE_KEY)
+            data = await cache.get(cache_key)
         if data is None:
-            response = supabase.table("projects").select(
+            query = supabase.table("projects").select(
                 "id", "name", "status", "portfolio_id", "health", "budget", "actual_cost",
-                "start_date", "end_date", "created_at", "updated_at", "description"
-            ).execute()
+                "start_date", "end_date", "created_at", "updated_at", "description",
+                count="exact"
+            )
+            if portfolio_id is not None:
+                query = query.eq("portfolio_id", str(portfolio_id))
+            if status is not None:
+                query = query.eq("status", status.value)
+            response = query.order("updated_at", desc=True).range(offset, offset + limit - 1).execute()
             data = convert_uuids(response.data)
+            total = getattr(response, "count", None)
+            if total is None and data is not None:
+                total = len(data)
             if cache:
-                await cache.set(PROJECTS_CACHE_KEY, data, ttl=PROJECTS_CACHE_TTL)
-        if portfolio_id is not None:
-            pid = str(portfolio_id)
-            data = [p for p in data if p.get("portfolio_id") == pid]
-        if status is not None:
-            data = [p for p in data if p.get("status") == status.value]
-        return data
+                await cache.set(cache_key, {"items": data, "total": total}, ttl=PROJECTS_CACHE_TTL)
+        if isinstance(data, dict):
+            # Cached payload with items + total
+            items = data.get("items", data)
+            total = data.get("total")
+        else:
+            items = data
+            total = total if total is not None else (len(items) if items else 0)
+        return {"items": items, "total": total, "limit": limit, "offset": offset}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

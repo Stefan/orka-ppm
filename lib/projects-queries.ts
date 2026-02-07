@@ -33,7 +33,7 @@ async function fetchProjects(accessToken: string): Promise<ProjectListItem[]> {
   })
   if (!response.ok) throw new Error('Failed to fetch projects')
   const data = await response.json()
-  return Array.isArray(data) ? data : (data.projects ?? [])
+  return Array.isArray(data) ? data : (data.items ?? data.projects ?? [])
 }
 
 const PROJECTS_QUERY_KEY = ['projects'] as const

@@ -714,38 +714,54 @@ async def get_financial_variances(
         raise HTTPException(status_code=500, detail=f"Failed to get variances: {str(e)}")
 
 
+COMMITMENTS_CACHE_TTL = 60  # seconds; short TTL since data changes on import
+
+
+def _commitments_cache_key(org_id: str, offset: int, limit: int, project_nr: Optional[str]) -> str:
+    """Build cache key for commitments list (idempotent for same inputs)."""
+    pn = project_nr or ""
+    return f"commitments:list:{org_id}:{offset}:{limit}:{pn}"
+
+
 @router.get("/commitments")
 async def get_commitments(
-    limit: int = 100,
-    offset: int = 0,
+    request: Request,
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
     project_nr: Optional[str] = None,
     current_user = Depends(get_current_user)
 ):
     """
-    Get imported commitments data.
-    
-    Returns a list of commitment records with all imported fields.
+    Get imported commitments data with pagination. Response cached (TTL 60s).
     """
     try:
-        # Use service role client to bypass RLS
+        org_id = (current_user.get("organization_id") or current_user.get("tenant_id") or "default")
+        if isinstance(org_id, UUID):
+            org_id = str(org_id)
+        cache = getattr(request.app.state, "cache_manager", None)
+        cache_key = _commitments_cache_key(org_id, offset, limit, project_nr)
+        if cache:
+            data = await cache.get(cache_key)
+            if data is not None:
+                return data
         db_client = service_supabase if service_supabase else supabase
         if db_client is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        
-        # Single query with count=exact (avoids second round-trip)
         query = db_client.table("commitments").select("*", count="exact")
         if project_nr:
             query = query.eq("project_nr", project_nr)
         query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
         response = query.execute()
         total = response.count if hasattr(response, "count") else len(response.data or [])
-        return {
+        result = {
             "commitments": response.data or [],
             "total": total,
             "limit": limit,
             "offset": offset
         }
-        
+        if cache:
+            await cache.set(cache_key, result, ttl=COMMITMENTS_CACHE_TTL)
+        return result
     except Exception as e:
         print(f"Get commitments error: {e}")
         raise HTTPException(
@@ -754,38 +770,54 @@ async def get_commitments(
         )
 
 
+ACTUALS_CACHE_TTL = 60  # seconds
+
+
+def _actuals_cache_key(org_id: str, offset: int, limit: int, project_nr: Optional[str]) -> str:
+    """Build cache key for actuals list (idempotent for same inputs)."""
+    pn = project_nr or ""
+    return f"actuals:list:{org_id}:{offset}:{limit}:{pn}"
+
+
 @router.get("/actuals")
 async def get_actuals(
-    limit: int = 100,
-    offset: int = 0,
+    request: Request,
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
     project_nr: Optional[str] = None,
     current_user = Depends(get_current_user)
 ):
     """
-    Get imported actuals data.
-    
-    Returns a list of actual records with all imported fields.
+    Get imported actuals data with pagination. Response cached (TTL 60s).
     """
     try:
-        # Use service role client to bypass RLS
+        org_id = (current_user.get("organization_id") or current_user.get("tenant_id") or "default")
+        if isinstance(org_id, UUID):
+            org_id = str(org_id)
+        cache = getattr(request.app.state, "cache_manager", None)
+        cache_key = _actuals_cache_key(org_id, offset, limit, project_nr)
+        if cache:
+            data = await cache.get(cache_key)
+            if data is not None:
+                return data
         db_client = service_supabase if service_supabase else supabase
         if db_client is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        
-        # Single query with count=exact (avoids second round-trip)
         query = db_client.table("actuals").select("*", count="exact")
         if project_nr:
             query = query.eq("project_nr", project_nr)
         query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
         response = query.execute()
         total = response.count if hasattr(response, "count") else len(response.data or [])
-        return {
+        result = {
             "actuals": response.data or [],
             "total": total,
             "limit": limit,
             "offset": offset
         }
-        
+        if cache:
+            await cache.set(cache_key, result, ttl=ACTUALS_CACHE_TTL)
+        return result
     except Exception as e:
         print(f"Get actuals error: {e}")
         raise HTTPException(

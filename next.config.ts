@@ -198,7 +198,7 @@ const nextConfig: NextConfig = {
       })
       securityHeaders.push({
         key: 'Content-Security-Policy-Report-Only',
-        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data: https://vercel.live; connect-src 'self' https://*.sentry.io https://*.supabase.co https://*.onrender.com https://vercel.live https://*.vercel.live; frame-src 'self' https://vercel.live; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data: https://vercel.live; connect-src 'self' https://*.sentry.io https://*.supabase.co wss://*.supabase.co https://*.onrender.com https://vercel.live https://*.vercel.live; frame-src 'self' https://vercel.live; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
       })
     }
     return [{ source: '/:path*', headers: securityHeaders }]
@@ -225,6 +225,11 @@ const nextConfig: NextConfig = {
           source: '/api/audit/:path*',
           destination: `http://localhost:8000/api/audit/:path*`,
         },
+        // Admin: handle in Next.js API routes (they proxy to backend /api/admin/*)
+        {
+          source: '/api/admin/:path*',
+          destination: '/api/admin/:path*',
+        },
       // Rewrite all other /api calls to local backend (no /api prefix on backend)
         {
           source: '/api/:path*',
@@ -247,6 +252,11 @@ const nextConfig: NextConfig = {
       {
         source: '/api/audit/:path*',
         destination: `${backendUrl}/api/audit/:path*`,
+      },
+      // Admin: handle in Next.js API routes (they proxy to backend /api/admin/*)
+      {
+        source: '/api/admin/:path*',
+        destination: '/api/admin/:path*',
       },
       // Rewrite all other /api calls to backend (no /api prefix on backend)
       {

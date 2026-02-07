@@ -20,7 +20,7 @@ router = APIRouter(prefix="/api/integrations", tags=["integrations"])
 _integration_config: Dict[str, Dict[str, Any]] = {}
 _integration_status: Dict[str, Dict[str, Any]] = {}
 
-SYSTEMS = ["sap", "microsoft", "oracle", "jira", "slack"]
+SYSTEMS = ["sap", "microsoft", "oracle", "jira", "slack", "csv"]
 
 
 class SyncBody(BaseModel):

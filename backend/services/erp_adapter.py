@@ -5,7 +5,7 @@ Enterprise Readiness: Abstract ErpAdapter interface with SAP + CSV fallback
 
 import logging
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Callable
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -287,17 +287,35 @@ class SlackAdapter(ErpAdapter):
         }
 
 
+# Adapter registry: adapter_type -> factory callable (adapter_type, **kwargs) -> ErpAdapter
+# New adapters can be registered via register_erp_adapter() without changing this module.
+_ERP_ADAPTER_REGISTRY: Dict[str, Callable[..., ErpAdapter]] = {}
+
+
+def register_erp_adapter(adapter_type: str, factory: Callable[..., ErpAdapter]) -> None:
+    """Register a factory for the given adapter_type. Use to add new adapters without editing get_erp_adapter."""
+    _ERP_ADAPTER_REGISTRY[adapter_type.lower()] = factory
+
+
+def _default_erp_adapter_factories() -> Dict[str, Callable[..., ErpAdapter]]:
+    """Built-in adapter factories (SAP, CSV, Microsoft, etc.)."""
+    return {
+        "sap": lambda **kw: SapErpAdapter(host=kw.get("host"), client=kw.get("client")),
+        "microsoft": lambda **kw: MicrosoftDynamicsAdapter(base_url=kw.get("base_url"), api_key=kw.get("api_key")),
+        "oracle": lambda **kw: OracleNetSuiteAdapter(account_id=kw.get("account_id"), token=kw.get("token")),
+        "jira": lambda **kw: JiraAdapter(base_url=kw.get("base_url"), token=kw.get("token")),
+        "slack": lambda **kw: SlackAdapter(webhook_url=kw.get("webhook_url")),
+        "csv": lambda **kw: CsvErpAdapter(csv_path=kw.get("csv_path")),
+    }
+
+
 def get_erp_adapter(adapter_type: str = "csv", **kwargs) -> ErpAdapter:
-    """Factory: returns adapter for given system."""
+    """Factory: returns adapter for given system. Uses registry first, then built-in mapping."""
     t = adapter_type.lower()
-    if t == "sap":
-        return SapErpAdapter(host=kwargs.get("host"), client=kwargs.get("client"))
-    if t == "microsoft":
-        return MicrosoftDynamicsAdapter(base_url=kwargs.get("base_url"), api_key=kwargs.get("api_key"))
-    if t == "oracle":
-        return OracleNetSuiteAdapter(account_id=kwargs.get("account_id"), token=kwargs.get("token"))
-    if t == "jira":
-        return JiraAdapter(base_url=kwargs.get("base_url"), token=kwargs.get("token"))
-    if t == "slack":
-        return SlackAdapter(webhook_url=kwargs.get("webhook_url"))
+    factory = _ERP_ADAPTER_REGISTRY.get(t)
+    if factory is not None:
+        return factory(**kwargs)
+    defaults = _default_erp_adapter_factories()
+    if t in defaults:
+        return defaults[t](**kwargs)
     return CsvErpAdapter(csv_path=kwargs.get("csv_path"))

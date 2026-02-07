@@ -34,7 +34,8 @@ export async function fetchProjects(accessToken: string): Promise<Project[]> {
     if (response.ok) {
       const data = await response.json()
       if (isDev) console.log('Projects data:', data)
-      return Array.isArray(data) ? data as Project[] : []
+      const list = Array.isArray(data) ? data : (data?.items ?? data?.projects ?? [])
+      return list as Project[]
     } else {
       console.error('Projects request failed:', response.status, response.statusText)
       try {

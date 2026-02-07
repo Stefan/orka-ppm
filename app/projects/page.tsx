@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import AppLayout from '@/components/shared/AppLayout'
@@ -152,36 +152,63 @@ export default function ProjectsPage() {
             </div>
           )}
 
-          <div data-testid="projects-list" className="space-y-4">
-            {loading ? (
-              <div className="space-y-4">
-                {/* Loading skeleton */}
-                {Array.from({ length: 3 }, (_, i) => (
-                  <div key={i} className="bg-white dark:bg-slate-800 rounded-lg shadow p-6 animate-pulse">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <div className="h-6 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-2"></div>
-                        <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/4"></div>
-                      </div>
-                      <div className="h-6 bg-gray-200 dark:bg-slate-700 rounded w-16"></div>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {Array.from({ length: 4 }, (_, j) => (
-                        <div key={j} className="text-center">
-                          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-full mb-1"></div>
-                          <div className="h-6 bg-gray-200 dark:bg-slate-700 rounded w-3/4 mx-auto"></div>
+          <Suspense
+            fallback={
+              <div data-testid="projects-list" className="space-y-4">
+                <div className="space-y-4">
+                  {Array.from({ length: 3 }, (_, i) => (
+                    <div key={i} className="bg-white dark:bg-slate-800 rounded-lg shadow p-6 animate-pulse">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <div className="h-6 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-2"></div>
+                          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/4"></div>
                         </div>
-                      ))}
+                        <div className="h-6 bg-gray-200 dark:bg-slate-700 rounded w-16"></div>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {Array.from({ length: 4 }, (_, j) => (
+                          <div key={j} className="text-center">
+                            <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-full mb-1"></div>
+                            <div className="h-6 bg-gray-200 dark:bg-slate-700 rounded w-3/4 mx-auto"></div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            ) : projects.length === 0 ? (
-              <div data-testid="projects-empty" className="bg-white dark:bg-slate-800 rounded-lg shadow p-8 text-center">
-                <p className="text-gray-600 dark:text-slate-400">No projects found</p>
-              </div>
-            ) : (
-              projects.map((project) => (
+            }
+          >
+            <div data-testid="projects-list" className="space-y-4">
+              {loading ? (
+                <div className="space-y-4">
+                  {/* Loading skeleton */}
+                  {Array.from({ length: 3 }, (_, i) => (
+                    <div key={i} className="bg-white dark:bg-slate-800 rounded-lg shadow p-6 animate-pulse">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <div className="h-6 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-2"></div>
+                          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/4"></div>
+                        </div>
+                        <div className="h-6 bg-gray-200 dark:bg-slate-700 rounded w-16"></div>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {Array.from({ length: 4 }, (_, j) => (
+                          <div key={j} className="text-center">
+                            <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-full mb-1"></div>
+                            <div className="h-6 bg-gray-200 dark:bg-slate-700 rounded w-3/4 mx-auto"></div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : projects.length === 0 ? (
+                <div data-testid="projects-empty" className="bg-white dark:bg-slate-800 rounded-lg shadow p-8 text-center">
+                  <p className="text-gray-600 dark:text-slate-400">No projects found</p>
+                </div>
+              ) : (
+                projects.map((project) => (
                 <div
                   key={project.id}
                   data-testid="project-card"
@@ -250,9 +277,10 @@ export default function ProjectsPage() {
                     </div>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
+                ))
+              )}
+            </div>
+          </Suspense>
         </div>
 
         {selectedWorkflow && (
