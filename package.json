@@ -86,7 +86,7 @@
     "curate-feature-overview-with-grok": "tsx scripts/curate-feature-overview-with-grok.ts",
     "build-feature-overview": "tsx scripts/build-feature-overview.ts",
     "feature-overview": "tsx scripts/feature-overview-pipeline.ts",
-    "prepare": "husky install || true"
+    "prepare": "node -e \"if (!process.env.CI) try { require('child_process').execSync('npx husky install', {stdio:'inherit'}) } catch(e) {}\""
   },
   "dependencies": {
     "@dnd-kit/core": "6.3.1",

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import AppLayout from '../../components/shared/AppLayout'
+import AppLayout from '@/components/shared/AppLayout'
 import { getApiUrl } from '@/lib/api'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
 import { Building2, Plus, Pencil, AlertTriangle } from 'lucide-react'
