@@ -16,17 +16,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Authorization required' }, { status: 401 })
     }
     
-    // Build query string
     const queryString = searchParams.toString()
     const url = `${BACKEND_URL}/api/admin/users${queryString ? `?${queryString}` : ''}`
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authHeader
-      }
-    })
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000)
+    let response: Response
+    try {
+      response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': authHeader
+        },
+        signal: controller.signal
+      })
+    } finally {
+      clearTimeout(timeoutId)
+    }
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -40,10 +46,15 @@ export async function GET(request: NextRequest) {
     const data = await response.json()
     return NextResponse.json(data)
   } catch (error) {
+    const err = error as { name?: string; message?: string }
     console.error('Error proxying users request:', error)
+    const isTimeout = err?.name === 'AbortError'
     return NextResponse.json(
-      { error: 'Failed to get users', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      {
+        error: isTimeout ? 'Backend not available' : 'Failed to get users',
+        detail: isTimeout ? 'Backend did not respond in time. Start the backend (e.g. port 8000).' : (err?.message ?? 'Unknown error')
+      },
+      { status: isTimeout ? 503 : 500 }
     )
   }
 }

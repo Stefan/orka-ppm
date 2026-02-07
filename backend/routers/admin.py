@@ -8,7 +8,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 from uuid import UUID
 
-from auth.rbac import require_admin, UserRole, Permission, DEFAULT_ROLE_PERMISSIONS
+from auth.rbac import require_admin, require_super_admin, require_org_admin_or_super, UserRole, Permission, DEFAULT_ROLE_PERMISSIONS
 from auth.dependencies import get_current_user
 from config.database import supabase, service_supabase
 from services.rbac_audit_service import RBACAuditService
@@ -1016,6 +1016,155 @@ def validate_permission_combinations(permissions: List[str]) -> List[str]:
     
     return errors
 
+
+# ============================================================================
+# Organizations (Tenant) CRUD – Super-Admin only
+# ============================================================================
+
+class OrganizationCreate(BaseModel):
+    name: str
+    slug: Optional[str] = None
+    logo_url: Optional[str] = None
+    is_active: bool = True
+    settings: Optional[Dict[str, Any]] = None
+
+class OrganizationUpdate(BaseModel):
+    name: Optional[str] = None
+    slug: Optional[str] = None
+    logo_url: Optional[str] = None
+    is_active: Optional[bool] = None
+    settings: Optional[Dict[str, Any]] = None
+
+@router.get("/organizations")
+async def list_organizations(current_user=Depends(require_super_admin())):
+    """List all organizations (super_admin only)."""
+    if not supabase:
+        raise HTTPException(status_code=503, detail="Database service unavailable")
+    try:
+        r = supabase.table("organizations").select("id, name, code, slug, logo_url, is_active, settings, created_at, updated_at").order("created_at", desc=True).execute()
+        return r.data or []
+    except Exception as e:
+        print(f"List organizations error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/organizations/me")
+async def get_my_organization(current_user=Depends(require_org_admin_or_super())):
+    """Get current user's organization (org_admin or super_admin). Org-admin only sees own org."""
+    if not supabase:
+        raise HTTPException(status_code=503, detail="Database service unavailable")
+    org_id = current_user.get("organization_id") or current_user.get("tenant_id")
+    if not org_id:
+        raise HTTPException(status_code=403, detail="No organization assigned")
+    try:
+        r = supabase.table("organizations").select("*").eq("id", str(org_id)).limit(1).execute()
+        if not r.data or len(r.data) == 0:
+            raise HTTPException(status_code=404, detail="Organization not found")
+        return r.data[0]
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class OrganizationMeUpdate(BaseModel):
+    name: Optional[str] = None
+    logo_url: Optional[str] = None
+
+
+@router.patch("/organizations/me")
+async def update_my_organization(body: OrganizationMeUpdate, current_user=Depends(require_org_admin_or_super())):
+    """Update current user's organization (org_admin: name, logo only; super_admin: full)."""
+    if not supabase:
+        raise HTTPException(status_code=503, detail="Database service unavailable")
+    org_id = current_user.get("organization_id") or current_user.get("tenant_id")
+    if not org_id:
+        raise HTTPException(status_code=403, detail="No organization assigned")
+    roles = current_user.get("roles") or []
+    payload = body.model_dump(exclude_unset=True)
+    if "super_admin" not in roles and payload:
+        allowed = {"name", "logo_url"}
+        payload = {k: v for k, v in payload.items() if k in allowed}
+    if not payload:
+        r = supabase.table("organizations").select("*").eq("id", str(org_id)).limit(1).execute()
+        if not r.data:
+            raise HTTPException(status_code=404, detail="Organization not found")
+        return r.data[0]
+    try:
+        r = supabase.table("organizations").update(payload).eq("id", str(org_id)).execute()
+        if not r.data or len(r.data) == 0:
+            raise HTTPException(status_code=404, detail="Organization not found")
+        return r.data[0]
+    except HTTPException:
+        raise
+    except Exception as e:
+        msg = str(e).lower()
+        if "unique" in msg or "duplicate" in msg:
+            raise HTTPException(status_code=400, detail="Name or slug already in use")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/organizations")
+async def create_organization(body: OrganizationCreate, current_user=Depends(require_super_admin())):
+    """Create a new organization (super_admin only)."""
+    if not supabase:
+        raise HTTPException(status_code=503, detail="Database service unavailable")
+    try:
+        payload = {"name": body.name, "is_active": body.is_active}
+        if body.slug is not None:
+            payload["slug"] = body.slug
+        if body.logo_url is not None:
+            payload["logo_url"] = body.logo_url
+        if body.settings is not None:
+            payload["settings"] = body.settings
+        r = supabase.table("organizations").insert(payload).execute()
+        if not r.data or len(r.data) == 0:
+            raise HTTPException(status_code=500, detail="Create organization failed")
+        return r.data[0]
+    except Exception as e:
+        msg = str(e).lower()
+        if "unique" in msg or "duplicate" in msg or "slug" in msg:
+            raise HTTPException(status_code=400, detail="Slug or name already in use")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/organizations/{org_id}")
+async def get_organization(org_id: UUID, current_user=Depends(require_super_admin())):
+    """Get one organization by id (super_admin only)."""
+    if not supabase:
+        raise HTTPException(status_code=503, detail="Database service unavailable")
+    try:
+        r = supabase.table("organizations").select("*").eq("id", str(org_id)).limit(1).execute()
+        if not r.data or len(r.data) == 0:
+            raise HTTPException(status_code=404, detail="Organization not found")
+        return r.data[0]
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.patch("/organizations/{org_id}")
+async def update_organization(org_id: UUID, body: OrganizationUpdate, current_user=Depends(require_super_admin())):
+    """Update organization (super_admin only)."""
+    if not supabase:
+        raise HTTPException(status_code=503, detail="Database service unavailable")
+    try:
+        payload = body.model_dump(exclude_unset=True)
+        if not payload:
+            r = supabase.table("organizations").select("*").eq("id", str(org_id)).limit(1).execute()
+            if not r.data:
+                raise HTTPException(status_code=404, detail="Organization not found")
+            return r.data[0]
+        r = supabase.table("organizations").update(payload).eq("id", str(org_id)).execute()
+        if not r.data or len(r.data) == 0:
+            raise HTTPException(status_code=404, detail="Organization not found")
+        return r.data[0]
+    except HTTPException:
+        raise
+    except Exception as e:
+        msg = str(e).lower()
+        if "unique" in msg or "duplicate" in msg or "slug" in msg:
+            raise HTTPException(status_code=400, detail="Slug or name already in use")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ============================================================================
 # User Management Endpoints

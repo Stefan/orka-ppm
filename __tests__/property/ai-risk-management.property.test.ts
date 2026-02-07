@@ -13,11 +13,11 @@ import {
   calculateRiskTrend,
   assessMitigationUrgency,
   generateRiskInsights
-} from '@/lib/ai/risk-management'
+} from '../../lib/ai/risk-management'
 
-// Mock the API calls for testing
-jest.mock('@/lib/ai/risk-management', () => {
-  const actual = jest.requireActual('@/lib/ai/risk-management') as object
+// Mock path must match resolution: use relative path so Jest finds lib/ai/risk-management
+jest.mock('../../lib/ai/risk-management', () => {
+  const actual = jest.requireActual('../../lib/ai/risk-management') as object
   return {
     ...actual,
     aiRiskManagementSystem: {

@@ -13,7 +13,7 @@ import {
   animations,
 } from '../design/design-system'
 
-describe('lib/utils/design-system', () => {
+describe('lib/utils/design-system [@regression]', () => {
   describe('getThemeClasses', () => {
     it('returns light classes by default', () => {
       expect(getThemeClasses()).toContain('bg-white')

@@ -8,7 +8,7 @@ Enterprise Test Strategy – Requirement 12: Regression tests on every CI run.
 - **Run only regression tests:**  
   `cd backend && python -m pytest -m regression -v -o addopts=""`
 - **Marked modules:**  
-  `test_projects_endpoints`, `test_audit_permission_enforcement`, `test_audit_permission_403`, `test_financial_tracking_endpoints` (selected tests)
+  `test_projects_endpoints`, `test_audit_permission_enforcement`, `test_audit_permission_403`, `test_financial_tracking_endpoints`, `test_tenant_isolation_api`, `test_search_router` (selected tests)
 
 ## Frontend (Jest)
 
@@ -17,7 +17,7 @@ Enterprise Test Strategy – Requirement 12: Regression tests on every CI run.
   `npm run test:regression`  
   (runs `jest --testNamePattern="@regression"`)
 - **Marked suites:**  
-  `lib/api/client`, `PermissionGuard.unit`, `EnhancedAuthProvider.unit`
+  `lib/api/client`, `PermissionGuard.unit`, `EnhancedAuthProvider.unit`, `GET /api/projects`, `GET /api/admin/users`, `lib/utils/error-handler`, `lib/utils/design-system`, `useDebounce`
 
 - **Weitere Lücken / Reparatur-Backlog:** siehe [fehlende-tests-uebersicht.md](fehlende-tests-uebersicht.md).
 

@@ -2,7 +2,6 @@
 User management endpoints
 """
 
-import json
 import os
 
 from fastapi import APIRouter, HTTPException, Depends, status, Query, Request
@@ -10,18 +9,8 @@ from uuid import UUID
 from typing import Optional, Dict, Any, List
 from datetime import datetime
 
-# #region agent log
-def _debug_log(msg: str, data: dict, hypothesis_id: str = ""):
-    try:
-        payload = {"message": msg, "data": data, "timestamp": int(datetime.now().timestamp() * 1000)}
-        if hypothesis_id:
-            payload["hypothesisId"] = hypothesis_id
-        log_path = "/Users/stefan/Projects/orka-ppm/.cursor/debug.log"
-        with open(log_path, "a") as f:
-            f.write(json.dumps(payload) + "\n")
-    except Exception:
-        pass
-# #endregion
+# When RPC get_users_with_profiles fails once, we skip it on all future requests to avoid 404 + log spam
+_rpc_get_users_available: Optional[bool] = None
 
 from auth.rbac import require_permission, Permission, require_admin
 from config.database import supabase, service_supabase
@@ -69,82 +58,73 @@ async def list_users(
     current_user = Depends(require_admin())
 ):
     """Get all users with pagination, search, and filtering - joins auth.users and user_profiles"""
+    global _rpc_get_users_available
     try:
         if supabase is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
-        # Use RPC function to join auth.users and user_profiles with proper filtering
-        try:
-            # Build the RPC call with filters
-            rpc_params = {
-                "page_num": page,
-                "page_size": per_page
-            }
-            
-            if search and search.strip():
-                rpc_params["search_email"] = search.strip().lower()
-            
-            if status:
-                if status == UserStatus.active:
-                    rpc_params["filter_active"] = True
-                elif status == UserStatus.inactive:
-                    rpc_params["filter_active"] = False
-                elif status == UserStatus.deactivated:
-                    rpc_params["filter_deactivated"] = True
-            
-            if role:
-                rpc_params["filter_role"] = role.value
-            
-            # Call the RPC function to get joined user data
-            result = supabase.rpc("get_users_with_profiles", rpc_params).execute()
-            # #region agent log
-            _debug_log("list_users_rpc_result", {"has_data": bool(result.data), "data_keys": list((result.data or {}).keys()) if isinstance(result.data, dict) else "not_dict"}, "A")
-            # #endregion
-            if result.data:
-                users_data = result.data.get("users", [])
-                total_count = result.data.get("total_count", 0)
-                user_ids = []
-                for row in users_data:
-                    auth_data = row.get("auth", {}) or {}
-                    uid = auth_data.get("id")
-                    if uid:
-                        user_ids.append(str(uid))
-                # #region agent log
-                _debug_log("list_users_rpc_user_ids", {"path": "rpc", "user_ids_len": len(user_ids), "user_ids_sample": user_ids[:3], "first_row_keys": list((users_data[0] or {}).keys()) if users_data else []}, "A")
-                # #endregion
-                roles_by_id = _fetch_roles_for_user_ids(user_ids)
-                # #region agent log
-                _debug_log("list_users_roles_by_id", {"path": "rpc", "roles_by_id_keys": list(roles_by_id.keys()), "sample": {k: roles_by_id[k] for k in list(roles_by_id.keys())[:2]}, "first_user_roles": roles_by_id.get(str(user_ids[0]), []) if user_ids else None}, "B")
-                # #endregion
-                users = []
-                for row in users_data:
-                    profile_data = row.get("profile", {}) or {}
-                    auth_data = row.get("auth", {}) or {}
-                    uid = auth_data.get("id", "")
-                    user_response = create_user_response(
-                        auth_data, profile_data,
-                        roles=roles_by_id.get(str(uid), []) or None
+        # Use RPC function when available; otherwise use manual join (avoids 404 + log spam after first failure)
+        if _rpc_get_users_available is not False:
+            try:
+                # Build the RPC call with filters
+                rpc_params = {
+                    "page_num": page,
+                    "page_size": per_page
+                }
+                if search and search.strip():
+                    rpc_params["search_email"] = search.strip().lower()
+                if status:
+                    if status == UserStatus.active:
+                        rpc_params["filter_active"] = True
+                    elif status == UserStatus.inactive:
+                        rpc_params["filter_active"] = False
+                    elif status == UserStatus.deactivated:
+                        rpc_params["filter_deactivated"] = True
+                if role:
+                    rpc_params["filter_role"] = role.value
+                # Call the RPC function to get joined user data (must run for every request, not only when role is set)
+                result = supabase.rpc("get_users_with_profiles", rpc_params).execute()
+                if result.data:
+                    users_data = result.data.get("users", [])
+                    total_count = result.data.get("total_count", 0)
+                    user_ids = []
+                    for row in users_data:
+                        auth_data = row.get("auth", {}) or {}
+                        uid = auth_data.get("id")
+                        if uid:
+                            user_ids.append(str(uid))
+                    roles_by_id = _fetch_roles_for_user_ids(user_ids)
+                    users = []
+                    for row in users_data:
+                        profile_data = row.get("profile", {}) or {}
+                        auth_data = row.get("auth", {}) or {}
+                        uid = auth_data.get("id", "")
+                        user_response = create_user_response(
+                            auth_data, profile_data,
+                            roles=roles_by_id.get(str(uid), []) or None
+                        )
+                        users.append(user_response)
+                    total_pages = (total_count + per_page - 1) // per_page
+                    _rpc_get_users_available = True
+                    return UserListResponse(
+                        users=users,
+                        total_count=total_count,
+                        page=page,
+                        per_page=per_page,
+                        total_pages=total_pages
                     )
-                    users.append(user_response)
-                total_pages = (total_count + per_page - 1) // per_page
-                return UserListResponse(
-                    users=users,
-                    total_count=total_count,
-                    page=page,
-                    per_page=per_page,
-                    total_pages=total_pages
-                )
-            
-        except Exception as rpc_error:
-            print(f"RPC function failed, falling back to manual join: {rpc_error}")
-            # #region agent log
-            _debug_log("list_users_rpc_failed", {"path": "rpc_failed", "error": str(rpc_error)}, "A")
-            # #endregion
-            # Fallback to manual join if RPC function doesn't exist
+                # RPC returned but no/empty data -> fall back to manual join
+                result = await _manual_join_users_and_profiles(page, per_page, search, status, role)
+                return result
+            except Exception as rpc_error:
+                if _rpc_get_users_available is None:
+                    _rpc_get_users_available = False
+                    print("RPC get_users_with_profiles not available, using manual join (this message appears once).")
+                result = await _manual_join_users_and_profiles(page, per_page, search, status, role)
+                return result
+        else:
             result = await _manual_join_users_and_profiles(page, per_page, search, status, role)
-            print(f"Manual join returned {result.total_count} users")
             return result
-        
     except Exception as e:
         print(f"List users error: {e}")
         import traceback
@@ -161,27 +141,17 @@ async def _manual_join_users_and_profiles(
 ) -> UserListResponse:
     """Manual fallback for joining auth.users and user_profiles when RPC function is not available"""
     try:
-        print(f"[DEBUG] Starting manual join - page={page}, per_page={per_page}")
-        
-        # Use Supabase Admin API to get auth users
         from config.database import service_supabase
-        
+
         if not service_supabase:
-            print("[DEBUG] Service client not available!")
             raise HTTPException(status_code=503, detail="Admin API not available")
-        
-        print("[DEBUG] Fetching users from Supabase admin API...")
-        # Get auth users using admin API
+
         auth_response = service_supabase.auth.admin.list_users()
         auth_users = auth_response if isinstance(auth_response, list) else []
-        print(f"[DEBUG] Found {len(auth_users)} auth users")
-        
-        # Get all user_profiles (service role so RLS does not hide other users' profiles)
-        print("[DEBUG] Fetching user profiles...")
+
         profile_client = service_supabase or supabase
         profile_result = profile_client.table("user_profiles").select("*").execute()
         profiles = {p["user_id"]: p for p in (profile_result.data or [])}
-        print(f"[DEBUG] Found {len(profiles)} user profiles")
         
         # Join the data: collect (auth_dict, profile, user_id) for users that pass filters
         joined = []
@@ -208,15 +178,8 @@ async def _manual_join_users_and_profiles(
             if role and profile.get("role", "user") != role.value:
                 continue
             joined.append((auth_dict, profile, user_id))
-        # Fetch roles from user_roles for all matched user IDs
         user_ids = [uid for (_, _, uid) in joined]
-        # #region agent log
-        _debug_log("manual_join_user_ids", {"path": "manual", "user_ids_len": len(user_ids), "user_ids_sample": user_ids[:3]}, "D")
-        # #endregion
         roles_by_id = _fetch_roles_for_user_ids(user_ids)
-        # #region agent log
-        _debug_log("manual_join_roles_by_id", {"path": "manual", "roles_by_id_keys": list(roles_by_id.keys()), "first_user_roles": roles_by_id.get(user_ids[0], []) if user_ids else None}, "B")
-        # #endregion
         # Build user responses with roles
         joined_users = [
             create_user_response(auth_dict, profile, roles=roles_by_id.get(uid, []) or None)
@@ -722,9 +685,6 @@ def _fetch_roles_for_user_ids(user_ids: List[str]) -> Dict[str, List[str]]:
     try:
         from config.database import service_supabase
         client = service_supabase if service_supabase else supabase
-        # #region agent log
-        _debug_log("fetch_roles_entry", {"user_ids_len": len(user_ids), "has_service_supabase": service_supabase is not None, "has_client": client is not None}, "B")
-        # #endregion
         if not client:
             return {}
         # Select role names via join. Do not filter by is_active - column may not exist (migration 030).
@@ -741,14 +701,8 @@ def _fetch_roles_for_user_ids(user_ids: List[str]) -> Dict[str, List[str]]:
             name = role_obj.get("name") if isinstance(role_obj, dict) else None
             if name and uid in out:
                 out[uid].append(name)
-        # #region agent log
-        _debug_log("fetch_roles_ok", {"row_count": len(response.data or []), "out_keys_with_roles": [k for k, v in out.items() if v]}, "E")
-        # #endregion
         return out
     except Exception as e:
-        # #region agent log
-        _debug_log("fetch_roles_error", {"error": str(e)}, "B")
-        # #endregion
         print(f"Error fetching roles for user list: {e}")
         return {}
 

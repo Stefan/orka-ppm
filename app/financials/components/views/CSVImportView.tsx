@@ -6,6 +6,7 @@ import { CSVImportHistory, CSVUploadResult } from '../../types'
 import { getApiUrl } from '../../../../lib/api'
 import { logger } from '@/lib/monitoring/logger'
 import { useTranslations } from '@/lib/i18n/context'
+import { useDateFormatter } from '@/hooks/useDateFormatter'
 
 interface CSVImportViewProps {
   accessToken: string | undefined
@@ -13,6 +14,7 @@ interface CSVImportViewProps {
 
 export default function CSVImportView({ accessToken }: CSVImportViewProps) {
   const t = useTranslations('dataImport')
+  const { formatDate } = useDateFormatter()
   const [csvImportHistory, setCsvImportHistory] = useState<CSVImportHistory[]>([])
   const [uploadingFile, setUploadingFile] = useState(false)
   const [uploadResult, setUploadResult] = useState<CSVUploadResult | null>(null)
@@ -451,7 +453,7 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
-                      {new Date(importRecord.started_at).toLocaleString('de-DE')}
+                      {formatDate(new Date(importRecord.started_at), { dateStyle: 'short', timeStyle: 'short' })}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
                       {(importRecord.file_size / 1024).toFixed(1)} KB

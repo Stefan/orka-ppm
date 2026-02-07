@@ -131,6 +131,7 @@ function QuickActionButton({ icon: Icon, label, onClick }: any) {
 
 // Alert chip – colored bg with left accent bar, icon, high-contrast text
 function AlertChip({ alert, onDismiss }: { alert: any, onDismiss: (id: string) => void }) {
+  const { t } = useTranslations()
   const severityConfig = {
     critical: {
       bg: 'bg-red-50 dark:bg-red-900/30',
@@ -185,7 +186,7 @@ function AlertChip({ alert, onDismiss }: { alert: any, onDismiss: (id: string) =
       <button
         onClick={() => onDismiss(alert.id)}
         className="p-1 rounded hover:bg-black/10 dark:hover:bg-white dark:bg-slate-800/10 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 text-inherit"
-        aria-label="Dismiss alert"
+        aria-label={t('topbar.dismissAlert')}
       >
         <X size={14} aria-hidden />
       </button>

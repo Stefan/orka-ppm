@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "dashboards": "仪表板",
+    "financials": "财务",
+    "reports": "报告",
+    "resources": "资源"
+  },
+  "common": {
+    "loading": "加载中...",
+    "save": "保存",
+    "cancel": "取消",
+    "close": "关闭",
+    "search": "搜索",
+    "filter": "筛选",
+    "export": "导出",
+    "refresh": "刷新"
+  },
+  "costbook": {
+    "variance": "差异",
+    "eac": "EAC",
+    "bac": "BAC",
+    "predictiveSimulations": "预测模拟",
+    "budget": "预算",
+    "actual": "实际"
+  },
+  "variance": {
+    "trends": "差异趋势",
+    "alerts": "差异警报",
+    "netVariance": "净差异",
+    "noData": "暂无差异数据。"
+  },
+  "financials": {
+    "title": "财务管理",
+    "variance": "差异",
+    "varianceAnalysis": "预算差异分析",
+    "variancePercent": "差异 %",
+    "budget": "预算",
+    "actual": "实际"
+  }
+}

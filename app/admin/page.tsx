@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import AppLayout from '../../components/shared/AppLayout'
-import { Users, Activity, Settings, Layers, ToggleLeft, MessageCircle } from 'lucide-react'
+import { Users, Activity, Settings, Layers, ToggleLeft, MessageCircle, Building2 } from 'lucide-react'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -69,6 +69,15 @@ export default function AdminPage() {
             <MessageCircle className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-2">Help Chat Analytics</h2>
             <p className="text-gray-600 dark:text-slate-400">View help chat usage, satisfaction, and top queries</p>
+          </button>
+
+          <button
+            onClick={() => router.push('/admin/organizations')}
+            className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 hover:shadow-md transition-shadow text-left"
+          >
+            <Building2 className="h-8 w-8 text-teal-600 dark:text-teal-400 mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-2">Organisations</h2>
+            <p className="text-gray-600 dark:text-slate-400">Manage tenants and organisations (Super-Admin)</p>
           </button>
         </div>
       </div>

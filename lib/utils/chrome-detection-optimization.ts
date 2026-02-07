@@ -1,13 +1,20 @@
-/** Re-export for backward compatibility. Prefer @/lib/utils/browser/chrome-detection-optimization */
+/**
+ * Re-export for backward compatibility and Jest resolution.
+ * Implementation lives in ./browser/chrome-detection-optimization.
+ */
 export {
-  detectBrowser,
-  isWebkitBasedBrowser,
   ChromeOptimizationManager,
+  chromeOptimizationManager,
+  detectBrowser,
+  isChromeBasedBrowser,
+  isWebkitBasedBrowser,
   applyBrowserOptimizations,
   applyOptimizationsToElements,
   removeBrowserOptimizations,
   featureDetection,
   BROWSER_CLASSES,
   isChrome,
-  isWebkit
+  isWebkit,
+  type BrowserInfo,
+  type ChromeOptimizationConfig,
 } from './browser/chrome-detection-optimization'

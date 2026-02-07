@@ -25,7 +25,7 @@ import {
 
 const getHandler = () => errorHandler
 
-describe('lib/utils/error-handler', () => {
+describe('lib/utils/error-handler [@regression]', () => {
   beforeEach(() => {
     getHandler().clearStoredErrors()
     try {

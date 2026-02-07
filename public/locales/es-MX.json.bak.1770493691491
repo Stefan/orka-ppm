@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "dashboards": "Tableros",
+    "financials": "Finanzas",
+    "reports": "Reportes",
+    "resources": "Recursos"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "refresh": "Actualizar"
+  },
+  "costbook": {
+    "variance": "Varianza",
+    "eac": "EAC",
+    "bac": "BAC",
+    "predictiveSimulations": "Simulaciones Predictivas",
+    "budget": "Presupuesto",
+    "actual": "Real"
+  },
+  "variance": {
+    "trends": "Tendencias de Varianza",
+    "alerts": "Alertas de Varianza",
+    "netVariance": "Varianza Neta",
+    "noData": "No hay datos de varianza disponibles."
+  },
+  "financials": {
+    "title": "Gestión Financiera",
+    "variance": "Varianza",
+    "varianceAnalysis": "Análisis de Varianza de Presupuesto",
+    "variancePercent": "Varianza %",
+    "budget": "Presupuesto",
+    "actual": "Real"
+  }
+}

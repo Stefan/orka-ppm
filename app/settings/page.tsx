@@ -5,8 +5,8 @@ import AppLayout from '@/components/shared/AppLayout'
 import { useTranslations } from '@/lib/i18n/context'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Card, CardHeader, CardContent } from '@/components/ui/Card'
-import { Settings, Palette, LayoutDashboard, Bell, Shield } from 'lucide-react'
-import { GeneralSettings, DashboardSettings, PrivacySettings } from './components'
+import { Settings, Palette, LayoutDashboard, Bell, Shield, Building2 } from 'lucide-react'
+import { GeneralSettings, DashboardSettings, PrivacySettings, OrganizationSettings } from './components'
 import NotificationSettings from '@/components/notifications/NotificationSettings'
 
 export default function SettingsPage() {
@@ -31,7 +31,7 @@ export default function SettingsPage() {
 
         {/* Settings Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-2 bg-background-tertiary p-2 rounded-xl">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 gap-2 bg-background-tertiary p-2 rounded-xl">
             <TabsTrigger 
               value="general" 
               className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 py-3 px-3 rounded-lg transition-all data-[state=active]:bg-card data-[state=active]:shadow-md data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 text-gray-700 dark:text-slate-300"
@@ -59,6 +59,13 @@ export default function SettingsPage() {
             >
               <Shield className="h-5 w-5" />
               <span className="text-xs sm:text-sm font-medium">{t('settings.privacy') || 'Privacy'}</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="organization"
+              className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 py-3 px-3 rounded-lg transition-all data-[state=active]:bg-card data-[state=active]:shadow-md data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 text-gray-700 dark:text-slate-300"
+            >
+              <Building2 className="h-5 w-5" />
+              <span className="text-xs sm:text-sm font-medium">{t('settings.organization') || 'Organization'}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -126,6 +133,23 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent>
                 <PrivacySettings />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Organization (Eigene Organisation) – org_admin / super_admin */}
+          <TabsContent value="organization">
+            <Card>
+              <CardHeader>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+                  {t('settings.organizationTitle') || 'Organization'}
+                </h2>
+                <p className="text-sm text-gray-500 dark:text-slate-400">
+                  {t('settings.organizationDescription') || 'View and edit your organization name and logo (org_admin or super_admin).'}
+                </p>
+              </CardHeader>
+              <CardContent>
+                <OrganizationSettings />
               </CardContent>
             </Card>
           </TabsContent>

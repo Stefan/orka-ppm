@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "dashboards": "डैशबोर्ड",
+    "financials": "वित्त",
+    "reports": "रिपोर्ट",
+    "resources": "संसाधन"
+  },
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "close": "बंद करें",
+    "search": "खोजें",
+    "filter": "फ़िल्टर",
+    "export": "निर्यात",
+    "refresh": "रीफ्रेश करें"
+  },
+  "costbook": {
+    "variance": "विचरण",
+    "eac": "EAC",
+    "bac": "BAC",
+    "predictiveSimulations": "पूर्वानुमान सिमुलेशन",
+    "budget": "बजट",
+    "actual": "वास्तविक"
+  },
+  "variance": {
+    "trends": "विचरण रुझान",
+    "alerts": "विचरण अलर्ट",
+    "netVariance": "शुद्ध विचरण",
+    "noData": "कोई विचरण डेटा उपलब्ध नहीं है।"
+  },
+  "financials": {
+    "title": "वित्तीय प्रबंधन",
+    "variance": "विचरण",
+    "varianceAnalysis": "बजट विचरण विश्लेषण",
+    "variancePercent": "विचरण %",
+    "budget": "बजट",
+    "actual": "वास्तविक"
+  }
+}

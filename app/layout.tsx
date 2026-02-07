@@ -13,6 +13,7 @@ import { ResourcePreloader } from '../components/performance/ResourcePreloader'
 import PredictivePrefetcher from '../components/performance/PredictivePrefetcher'
 import FirefoxSidebarFix from '../components/navigation/FirefoxSidebarFix'
 import { I18nProvider } from '@/lib/i18n/context'
+import { RtlDirection } from '../components/navigation/RtlDirection'
 
 // Import critical CSS directly - Next.js will optimize and inline it automatically
 import './critical.css'
@@ -152,6 +153,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <EnhancedAuthProvider>
                   <FeatureFlagProvider>
                     <I18nProvider>
+                      <RtlDirection />
                       <ToastProvider>
                         {children}
                       </ToastProvider>

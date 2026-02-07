@@ -748,6 +748,32 @@ def require_admin():
     return admin_checker
 
 
+def require_super_admin():
+    """Dependency to require super_admin role (platform operator; tenant/organization CRUD)."""
+    async def super_admin_checker(current_user=Depends(get_current_user)):
+        user_id = current_user.get("user_id")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Authentication required")
+        roles = current_user.get("roles") or []
+        if "super_admin" not in roles:
+            raise HTTPException(status_code=403, detail="Super-admin privileges required")
+        return current_user
+    return super_admin_checker
+
+
+def require_org_admin_or_super():
+    """Dependency to require org_admin or super_admin (for 'my organization' endpoints)."""
+    async def checker(current_user=Depends(get_current_user)):
+        user_id = current_user.get("user_id")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Authentication required")
+        roles = current_user.get("roles") or []
+        if "super_admin" not in roles and "org_admin" not in roles:
+            raise HTTPException(status_code=403, detail="Org-admin or super-admin required")
+        return current_user
+    return checker
+
+
 # =============================================================================
 # Dynamic Permission Evaluation Functions
 # Requirements: 1.4, 1.5, 7.1 - Dynamic permission evaluation based on request context

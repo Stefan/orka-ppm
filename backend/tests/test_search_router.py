@@ -10,6 +10,7 @@ from main import app
 client = TestClient(app)
 
 
+@pytest.mark.regression
 def test_search_empty_q_returns_200_with_empty_results():
     """Without auth, dev mode may return 200 with default user."""
     r = client.get("/api/v1/search", params={"q": ""})
@@ -24,6 +25,7 @@ def test_search_empty_q_returns_200_with_empty_results():
         assert data["suggestions"] == []
 
 
+@pytest.mark.regression
 def test_search_with_q_returns_200_structure():
     """With q and auth (or dev default), response has correct shape."""
     r = client.get("/api/v1/search", params={"q": "pro"}, headers={"Authorization": "Bearer dev-token"})
@@ -38,6 +40,7 @@ def test_search_with_q_returns_200_structure():
         assert isinstance(data["suggestions"], list)
 
 
+@pytest.mark.regression
 def test_search_limit_param():
     """limit is accepted and bounded."""
     r = client.get("/api/v1/search", params={"q": "x", "limit": 5})

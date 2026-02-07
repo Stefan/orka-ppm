@@ -19,6 +19,7 @@ def client() -> TestClient:
     return TestClient(app)
 
 
+@pytest.mark.regression
 def test_audit_events_with_tenant_scoping_reachable(client: TestClient) -> None:
     """
     GET /api/audit/events is reachable; app applies tenant_id from current_user.
@@ -28,12 +29,14 @@ def test_audit_events_with_tenant_scoping_reachable(client: TestClient) -> None:
     assert r.status_code in (200, 401, 403, 500, 503), f"GET /api/audit/events → {r.status_code}"
 
 
+@pytest.mark.regression
 def test_audit_logs_with_tenant_scoping_reachable(client: TestClient) -> None:
     """GET /api/audit/logs is reachable and uses tenant isolation in handler."""
     r = client.get("/api/audit/logs")
     assert r.status_code in (200, 401, 403, 500, 503), f"GET /api/audit/logs → {r.status_code}"
 
 
+@pytest.mark.regression
 @pytest.mark.parametrize("path", ["/api/audit/events", "/api/audit/logs", "/api/audit/dashboard/stats"])
 def test_audit_read_endpoints_accept_valid_status(path: str, client: TestClient) -> None:
     """Audit read endpoints return allowed status codes (no 422 from route order)."""

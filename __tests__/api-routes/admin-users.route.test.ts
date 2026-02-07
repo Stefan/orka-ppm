@@ -14,7 +14,7 @@ afterEach(() => {
   mockFetch.mockReset()
 })
 
-describe('GET /api/admin/users', () => {
+describe('GET /api/admin/users [@regression]', () => {
   it('returns 401 when Authorization header missing', async () => {
     const { GET } = await import('@/app/api/admin/users/route')
     const request = createMockNextRequest({
@@ -59,6 +59,28 @@ describe('GET /api/admin/users', () => {
       expect.stringMatching(/\?.*role=viewer/),
       expect.any(Object)
     )
+  })
+
+  it('returns 500 when fetch throws', async () => {
+    mockFetch.mockRejectedValueOnce(new Error('Network error'))
+    const { GET } = await import('@/app/api/admin/users/route')
+    const request = createAuthenticatedRequest('http://localhost:3000/api/admin/users')
+    const response = await GET(request as any)
+    const data = await parseJsonResponse(response)
+    expect(response.status).toBe(500)
+    expect((data as Record<string, unknown>).error).toBeDefined()
+  })
+
+  it('returns 503 when backend times out (AbortError)', async () => {
+    const abortErr = new Error('The operation was aborted')
+    abortErr.name = 'AbortError'
+    mockFetch.mockRejectedValueOnce(abortErr)
+    const { GET } = await import('@/app/api/admin/users/route')
+    const request = createAuthenticatedRequest('http://localhost:3000/api/admin/users')
+    const response = await GET(request as any)
+    const data = await parseJsonResponse(response)
+    expect(response.status).toBe(503)
+    expect((data as Record<string, unknown>).error).toContain('Backend not available')
   })
 })
 

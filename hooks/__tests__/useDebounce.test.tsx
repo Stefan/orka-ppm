@@ -4,7 +4,7 @@
 import { renderHook, act } from '@testing-library/react'
 import { useDebounce } from '../useDebounce'
 
-describe('useDebounce', () => {
+describe('useDebounce [@regression]', () => {
   beforeEach(() => {
     jest.useFakeTimers()
   })

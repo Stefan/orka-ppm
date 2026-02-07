@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Search, Mic, MicOff, FileText, FolderOpen, BookOpen, DollarSign } from 'lucide-react'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
+import { useTranslations } from '@/lib/i18n/context'
 
 const DEBOUNCE_MS = 150
 const MAX_RESULTS = 10
@@ -41,6 +42,7 @@ function getIconForType(type: string) {
 }
 
 export default function TopbarSearch() {
+  const { t } = useTranslations()
   const { session } = useAuth()
   const router = useRouter()
   const [query, setQuery] = useState('')
@@ -178,9 +180,9 @@ export default function TopbarSearch() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query.trim() && setOpen(true)}
-          placeholder="Suche Projekte, Features, Docs…"
+          placeholder={t('topbar.searchPlaceholder')}
           className="w-full md:w-96 pl-10 pr-10 py-2 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder-gray-500 dark:placeholder-slate-400 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 focus:shadow outline-none transition-all"
-          aria-label="Search"
+          aria-label={t('topbar.searchAria')}
         />
         {voiceSupported && (
           <button
@@ -188,7 +190,7 @@ export default function TopbarSearch() {
             onClick={startVoice}
             disabled={listening}
             className="absolute right-2 p-1.5 rounded-md text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400 disabled:opacity-50"
-            aria-label={listening ? 'Listening…' : 'Voice search'}
+            aria-label={listening ? t('topbar.listening') : t('topbar.voiceSearch')}
           >
             {listening ? (
               <MicOff className="h-4 w-4" />
@@ -206,7 +208,7 @@ export default function TopbarSearch() {
         >
           {loading && (
             <div className="p-4 text-sm text-gray-500 dark:text-slate-400">
-              Suche…
+              {t('topbar.searching')}
             </div>
           )}
           {!loading && allItems.length > 0 && (
@@ -244,7 +246,7 @@ export default function TopbarSearch() {
           {!loading && hasSuggestions && (
             <div className="px-4 py-2 border-t border-gray-100 dark:border-slate-700">
               <div className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-2">
-                Vorschläge
+                {t('topbar.suggestions')}
               </div>
               <div className="flex flex-wrap gap-1">
                 {(results?.suggestions ?? []).map((s) => (
@@ -265,7 +267,7 @@ export default function TopbarSearch() {
           )}
           {!loading && allItems.length === 0 && !hasSuggestions && query.trim() && (
             <div className="p-4 text-sm text-gray-500 dark:text-slate-400">
-              Keine Treffer für „{query}“
+              {t("topbar.noResults", { query })}
             </div>
           )}
         </div>

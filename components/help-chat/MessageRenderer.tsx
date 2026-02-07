@@ -4,6 +4,22 @@ import React, { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
+
+/** Catches markdown parse errors (e.g. micromark list parser) and falls back to plain text so one bad message does not crash the page. */
+class MarkdownErrorBoundary extends React.Component<
+  { content: string; children: React.ReactNode },
+  { hasError: boolean }
+> {
+  state = { hasError: false }
+  static getDerivedStateFromError = () => ({ hasError: true })
+  render() {
+    if (this.state.hasError) {
+      const text = typeof this.props.content === 'string' ? this.props.content : String(this.props.content ?? '')
+      return <p className="text-gray-800 dark:text-slate-200 whitespace-pre-wrap">{text}</p>
+    }
+    return this.props.children
+  }
+}
 import {
   ExternalLink,
   Star,
@@ -217,13 +233,15 @@ export function MessageRenderer({
             {isUser ? (
               <p className="text-gray-800 dark:text-slate-200 whitespace-pre-wrap">{message.content}</p>
             ) : (
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeHighlight]}
-                components={markdownComponents}
-              >
-                {message.content}
-              </ReactMarkdown>
+              <MarkdownErrorBoundary content={message.content}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeHighlight]}
+                  components={markdownComponents}
+                >
+                  {message.content}
+                </ReactMarkdown>
+              </MarkdownErrorBoundary>
             )}
           </div>
 

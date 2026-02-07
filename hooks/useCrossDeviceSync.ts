@@ -11,7 +11,8 @@ import {
   SessionState, 
   SyncConflict, 
   DeviceInfo,
-  OfflineChange
+  OfflineChange,
+  SyncUnauthorizedError
 } from '../lib/sync/cross-device-sync'
 
 export interface UseCrossDeviceSyncReturn {
@@ -61,32 +62,10 @@ export function useCrossDeviceSync(): UseCrossDeviceSyncReturn {
   const syncServiceRef = useRef(getCrossDeviceSyncService())
   const isInitialized = useRef(false)
 
-  // Initialize sync service (pass accessToken so sync API requests are authenticated)
-  const initialize = useCallback(async (userId: string, accessToken?: string | null) => {
-    if (isInitialized.current || typeof window === 'undefined') return
-
-    try {
-      setIsSyncing(true)
-      await syncServiceRef.current.initialize(userId, accessToken)
-      isInitialized.current = true
-      
-      // Load initial data
-      await loadPreferences()
-      await refreshDevices()
-      loadConflicts()
-      
-      setLastSyncTime(new Date())
-    } catch (error) {
-      console.error('Failed to initialize cross-device sync:', error)
-    } finally {
-      setIsSyncing(false)
-    }
-  }, [])
-
-  // Load preferences from localStorage
+  // Load preferences from localStorage (declared before initialize so it can be used there)
   const loadPreferences = useCallback(() => {
     if (typeof window === 'undefined' || typeof localStorage === 'undefined') return
-    
+
     const stored = localStorage.getItem('user-preferences')
     if (stored) {
       try {
@@ -106,6 +85,51 @@ export function useCrossDeviceSync(): UseCrossDeviceSyncReturn {
     const syncConflicts = syncServiceRef.current.getSyncConflicts()
     setConflicts(syncConflicts)
   }, [])
+
+  // Refresh available devices (declared before initialize so it can be used there)
+  const refreshDevices = useCallback(async () => {
+    try {
+      const devices = await syncServiceRef.current.getAvailableDevices()
+      setAvailableDevices(devices)
+    } catch (error) {
+      const is401 = error instanceof SyncUnauthorizedError || (error && (error as Error).name === 'SyncUnauthorizedError')
+      if (is401) {
+        setAvailableDevices([])
+        return
+      }
+      console.warn('Failed to refresh devices:', error instanceof Error ? error.message : error)
+      setAvailableDevices([])
+    }
+  }, [])
+
+  // Initialize sync service (pass accessToken so sync API requests are authenticated)
+  const initialize = useCallback(async (userId: string, accessToken?: string | null) => {
+    if (isInitialized.current || typeof window === 'undefined') return
+
+    try {
+      setIsSyncing(true)
+      await syncServiceRef.current.initialize(userId, accessToken)
+      isInitialized.current = true
+
+      // Load initial data (local first; 401 on devices is non-fatal)
+      loadPreferences()
+      await refreshDevices()
+      loadConflicts()
+
+      setLastSyncTime(new Date())
+    } catch (error) {
+      const is401 = error instanceof SyncUnauthorizedError || (error && (error as Error).name === 'SyncUnauthorizedError')
+      if (is401) {
+        isInitialized.current = true
+        loadPreferences()
+        setAvailableDevices([])
+      } else {
+        console.error('Failed to initialize cross-device sync:', error)
+      }
+    } finally {
+      setIsSyncing(false)
+    }
+  }, [loadPreferences, loadConflicts, refreshDevices])
 
   // Update preferences
   const updatePreferences = useCallback(async (updates: Partial<UserPreferences>) => {
@@ -158,16 +182,6 @@ export function useCrossDeviceSync(): UseCrossDeviceSyncReturn {
       setIsSyncing(false)
     }
   }, [loadConflicts, loadPreferences])
-
-  // Refresh available devices
-  const refreshDevices = useCallback(async () => {
-    try {
-      const devices = await syncServiceRef.current.getAvailableDevices()
-      setAvailableDevices(devices)
-    } catch (error) {
-      console.error('Failed to refresh devices:', error)
-    }
-  }, [])
 
   // Force sync
   const forceSync = useCallback(async () => {

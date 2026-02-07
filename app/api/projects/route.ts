@@ -12,14 +12,22 @@ export async function GET(request: NextRequest) {
     const queryString = searchParams.toString()
     const backendUrl = `${BACKEND_URL}/projects${queryString ? `?${queryString}` : ''}`
     
-    // Forward request to backend
-    const response = await fetch(backendUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(authHeader && { 'Authorization': authHeader }),
-      },
-    })
+    const controller = new AbortController()
+    const timeoutMs = 5000
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+    let response: Response
+    try {
+      response = await fetch(backendUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authHeader && { 'Authorization': authHeader }),
+        },
+        signal: controller.signal,
+      })
+    } finally {
+      clearTimeout(timeoutId)
+    }
     
     if (!response.ok) {
       const errorText = await response.text()
@@ -40,11 +48,12 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    const err = error as NodeJS.ErrnoException & { cause?: { code?: string } }
+    const err = error as NodeJS.ErrnoException & { cause?: { code?: string }; name?: string }
     const isConnectionError =
       err?.code === 'ECONNREFUSED' ||
       err?.cause?.code === 'ECONNREFUSED' ||
-      (typeof err?.message === 'string' && (err.message.includes('fetch failed') || err.message.includes('ECONNREFUSED')))
+      err?.name === 'AbortError' ||
+      (typeof err?.message === 'string' && (err.message.includes('fetch failed') || err.message.includes('ECONNREFUSED') || err.message.includes('aborted')))
 
     logger.error('Projects API error', { error }, 'api/projects')
 
@@ -52,7 +61,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'Backend not available',
-          detail: 'The projects service could not be reached. Start the backend (e.g. on port 8000) or check NEXT_PUBLIC_BACKEND_URL.',
+          detail: err?.name === 'AbortError'
+            ? 'The backend did not respond in time. Start the backend (e.g. on port 8000) or check NEXT_PUBLIC_BACKEND_URL.'
+            : 'The projects service could not be reached. Start the backend (e.g. on port 8000) or check NEXT_PUBLIC_BACKEND_URL.',
         },
         { status: 503 }
       )

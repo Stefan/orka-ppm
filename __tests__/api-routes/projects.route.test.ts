@@ -8,7 +8,7 @@ import { createMockNextRequest, createAuthenticatedRequest, parseJsonResponse } 
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
 
-describe('GET /api/projects', () => {
+describe('GET /api/projects [@regression]', () => {
   const originalFetch = global.fetch
 
   afterEach(() => {

@@ -9,6 +9,8 @@ from .rbac import (
     require_permission,
     require_any_permission,
     require_admin,
+    require_super_admin,
+    require_org_admin_or_super,
 )
 
 from .enhanced_rbac_models import (
@@ -96,6 +98,8 @@ __all__ = [
     "require_permission",
     "require_any_permission",
     "require_admin",
+    "require_super_admin",
+    "require_org_admin_or_super",
     # Enhanced RBAC models
     "ScopeType",
     "PermissionContext",

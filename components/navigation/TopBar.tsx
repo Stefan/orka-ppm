@@ -186,7 +186,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             onClick={onMenuToggle}
             className="p-2.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-200"
             style={{ display: showNav ? 'none' : 'block' }}
-            aria-label="Toggle menu"
+            aria-label={t('topbar.toggleMenu')}
           >
             <Menu className="h-5 w-5 text-gray-700 dark:text-slate-300" />
           </button>
@@ -198,7 +198,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
               </div>
               <div className="hidden sm:block">
                 <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">ORKA PPM</span>
-                <div className="text-[10px] font-medium text-gray-500 dark:text-slate-400 -mt-1">Portfolio Management</div>
+                <div className="text-[10px] font-medium text-gray-500 dark:text-slate-400 -mt-1">{t('topbar.portfolioManagement')}</div>
               </div>
             </div>
           </Link>
@@ -233,7 +233,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                     : navLinkInactive
               }`}
             >
-              <span className="text-inherit">Projects</span>
+              <span className="text-inherit">{t('nav.projects')}</span>
               <ChevronDown className="h-4 w-4" />
             </button>
 
@@ -244,7 +244,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
               >
                 <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Projects</h3>
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.projects')}</h3>
                 </div>
                 <Link
                   href="/projects"
@@ -256,7 +256,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setProjectsMenuOpen(false)}
                 >
                   <GitBranch className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">All Projects</span>
+                  <span className="font-medium">{t('nav.allProjects')}</span>
                 </Link>
                 <Link
                   href="/resources"
@@ -268,7 +268,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setProjectsMenuOpen(false)}
                 >
                   <Users className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">Resource Management</span>
+                  <span className="font-medium">{t('nav.resourceManagement')}</span>
                 </Link>
               </div>
             )}
@@ -287,7 +287,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                     : navLinkInactive
               }`}
             >
-              <span className="text-inherit">Financials</span>
+              <span className="text-inherit">{t('nav.financials')}</span>
               <ChevronDown className="h-4 w-4" />
             </button>
 
@@ -296,7 +296,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
               <div className="absolute left-0 mt-3 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
                    style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
                 <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Financial Management</h3>
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.financialManagement')}</h3>
                 </div>
                 <Link
                   href="/financials"
@@ -309,7 +309,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onMouseEnter={() => prefetchFinancials(session?.access_token)}
                 >
                   <DollarSign className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">Budget & Cost Tracking</span>
+                  <span className="font-medium">{t('nav.budgetCostTracking')}</span>
                 </Link>
                 <Link
                   href="/reports"
@@ -321,7 +321,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setFinancialsMenuOpen(false)}
                 >
                   <FileText className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">Reports & Analytics</span>
+                  <span className="font-medium">{t('nav.reportsAnalytics')}</span>
                 </Link>
                 <Link
                   href="/project-controls"
@@ -333,7 +333,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setFinancialsMenuOpen(false)}
                 >
                   <Target className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">Project Controls (ETC/EAC)</span>
+                  <span className="font-medium">{t('nav.projectControls')}</span>
                 </Link>
                 <Link
                   href="/reports/pmr"
@@ -345,7 +345,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setFinancialsMenuOpen(false)}
                 >
                   <BookOpen className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">Project Monthly Report</span>
+                  <span className="font-medium">{t('nav.projectMonthlyReport')}</span>
                 </Link>
               </div>
             )}
@@ -363,7 +363,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                     : navLinkInactive
               }`}
             >
-              <span className="text-inherit">Analysis</span>
+              <span className="text-inherit">{t('nav.analysis')}</span>
               <ChevronDown className="h-4 w-4" />
             </button>
 
@@ -372,7 +372,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
               <div className="absolute left-0 mt-3 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
                    style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
                 <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Risk & Analysis</h3>
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.riskAnalysis')}</h3>
                 </div>
                 <Link
                   href="/risks"
@@ -380,7 +380,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setAnalysisMenuOpen(false)}
                 >
                   <AlertTriangle className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">Risk Management</span>
+                  <span className="font-medium">{t('nav.riskManagement')}</span>
                 </Link>
                 <Link
                   href="/scenarios"
@@ -388,7 +388,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setAnalysisMenuOpen(false)}
                 >
                   <Layers className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">What-If Scenarios</span>
+                  <span className="font-medium">{t('nav.whatIfScenarios')}</span>
                 </Link>
                 <Link
                   href="/monte-carlo"
@@ -396,7 +396,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setAnalysisMenuOpen(false)}
                 >
                   <BarChart3 className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">Monte Carlo Analysis</span>
+                  <span className="font-medium">{t('nav.monteCarloAnalysis')}</span>
                 </Link>
                 <Link
                   href="/audit"
@@ -404,7 +404,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setAnalysisMenuOpen(false)}
                 >
                   <FileText className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">Audit Trail</span>
+                  <span className="font-medium">{t('nav.auditTrail')}</span>
                 </Link>
                 <Link
                   href="/schedules"
@@ -412,7 +412,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setAnalysisMenuOpen(false)}
                 >
                   <Calendar className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">Schedule Management</span>
+                  <span className="font-medium">{t('nav.scheduleManagement')}</span>
                 </Link>
               </div>
             )}
@@ -430,7 +430,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                     : navLinkInactive
               }`}
             >
-              <span className="text-inherit">Management</span>
+              <span className="text-inherit">{t('nav.management')}</span>
               <ChevronDown className="h-4 w-4" />
             </button>
 
@@ -439,7 +439,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
               <div className="absolute left-0 mt-3 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
                    style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
                 <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Change & Feedback</h3>
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.changeFeedback')}</h3>
                 </div>
                 <Link
                   href="/changes"
@@ -447,7 +447,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setManagementMenuOpen(false)}
                 >
                   <GitPullRequest className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">Change Management</span>
+                  <span className="font-medium">{t('nav.changeManagement')}</span>
                 </Link>
                 <Link
                   href="/feedback"
@@ -455,7 +455,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setManagementMenuOpen(false)}
                 >
                   <MessageSquare className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">Feedback & Ideas</span>
+                  <span className="font-medium">{t('nav.feedbackIdeas')}</span>
                 </Link>
                 <Link
                   href="/features"
@@ -463,7 +463,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setManagementMenuOpen(false)}
                 >
                   <Layers className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">Features Overview</span>
+                  <span className="font-medium">{t('nav.featuresOverview')}</span>
                 </Link>
                 <Link
                   href="/import"
@@ -471,7 +471,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setManagementMenuOpen(false)}
                 >
                   <Upload className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">Data Import</span>
+                  <span className="font-medium">{t('nav.dataImport')}</span>
                 </Link>
               </div>
             )}
@@ -490,7 +490,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
               }`}
             >
               <Shield className="h-4 w-4" />
-              <span className="text-inherit">Admin</span>
+              <span className="text-inherit">{t('nav.admin')}</span>
               <ChevronDown className="h-4 w-4" />
             </button>
 
@@ -499,7 +499,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
               <div className="absolute left-0 mt-3 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
                    style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
                 <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Administration</h3>
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.administration')}</h3>
                 </div>
                 <Link
                   href="/admin"
@@ -507,7 +507,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setAdminMenuOpen(false)}
                 >
                   <Shield className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">System Admin</span>
+                  <span className="font-medium">{t('nav.systemAdmin')}</span>
                 </Link>
                 <Link
                   href="/admin/performance"
@@ -515,7 +515,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setAdminMenuOpen(false)}
                 >
                   <Activity className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">Performance Monitor</span>
+                  <span className="font-medium">{t('nav.performanceMonitor')}</span>
                 </Link>
                 <Link
                   href="/admin/users"
@@ -523,7 +523,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   onClick={() => setAdminMenuOpen(false)}
                 >
                   <Users className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">User Management</span>
+                  <span className="font-medium">{t('nav.userManagement')}</span>
                 </Link>
               </div>
             )}
@@ -540,8 +540,8 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             data-testid="top-bar-theme-toggle"
             onClick={cycleTheme}
             className="p-2.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-200 group"
-            aria-label={theme === 'dark' ? 'Dark mode' : theme === 'system' ? 'System theme' : 'Light mode'}
-            title={theme === 'dark' ? 'Switch to system theme' : theme === 'system' ? 'Switch to light' : 'Switch to dark'}
+            aria-label={theme === 'dark' ? t('topbar.themeDark') : theme === 'system' ? t('topbar.themeSystem') : t('topbar.themeLight')}
+            title={theme === 'dark' ? t('topbar.switchThemeSystem') : theme === 'system' ? t('topbar.switchThemeLight') : t('topbar.switchThemeDark')}
           >
             <ThemeIcon className="h-5 w-5 text-gray-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
           </button>
@@ -553,7 +553,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           <button
             data-testid="top-bar-notifications"
             className="p-2.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-200 relative group"
-            aria-label="Notifications"
+            aria-label={t('topbar.notifications')}
           >
             <Bell className="h-5 w-5 text-gray-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
             <span className="absolute top-2 right-2 w-2 h-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full shadow-sm animate-pulse"></span>
@@ -591,7 +591,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
               data-testid="top-bar-user-menu"
               onClick={() => setUserMenuOpen(!userMenuOpen)}
               className="flex items-center space-x-2 p-1.5 rounded-xl transition-all duration-200 group"
-              aria-label="User menu"
+              aria-label={t('topbar.userMenu')}
             >
               <div className="w-9 h-9 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 rounded-lg flex items-center justify-center shadow-md shadow-blue-200 dark:shadow-blue-900/30 group-hover:shadow-lg group-hover:shadow-blue-300 dark:group-hover:shadow-blue-900/50 transition-all duration-200 group-hover:scale-105">
                 <span className="text-white text-sm font-semibold">
@@ -626,7 +626,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                     onClick={() => setUserMenuOpen(false)}
                   >
                     <User className="h-5 w-5 mr-3 flex-shrink-0" />
-                    <span className="font-medium">Profile Settings</span>
+                    <span className="font-medium">{t('nav.profileSettings')}</span>
                   </Link>
                   
                   <Link
@@ -635,7 +635,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                     onClick={() => setUserMenuOpen(false)}
                   >
                     <Settings className="h-5 w-5 mr-3 flex-shrink-0" />
-                    <span className="font-medium">Settings</span>
+                    <span className="font-medium">{t('nav.settings')}</span>
                   </Link>
 
                   <div className="sm:hidden px-2 py-2">
@@ -650,7 +650,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                     className="flex items-center w-full px-4 py-2.5 mx-2 rounded-lg text-sm text-red-800 dark:text-red-400 hover:bg-red-100/80 dark:hover:bg-red-900/40 hover:text-red-700 dark:hover:text-red-300 transition-all duration-200"
                   >
                     <LogOut className="h-5 w-5 mr-3 flex-shrink-0" />
-                    <span className="font-medium">Logout</span>
+                    <span className="font-medium">{t('nav.logout')}</span>
                   </button>
                 </div>
               </div>

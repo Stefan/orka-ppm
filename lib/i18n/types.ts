@@ -18,9 +18,21 @@ export type TranslationDictionary = {
 
 /**
  * Supported language codes
- * ISO 639-1 two-letter codes (en, de, fr, es, pl) and ISO 639-3 code (gsw)
+ * ISO 639-1 two-letter codes (en, de, fr, es, pl), ISO 639-3 (gsw), and locale variants (es-MX, zh-CN, hi-IN, ja-JP, ko-KR, vi-VN)
  */
-export type SupportedLocale = 'en' | 'de' | 'fr' | 'es' | 'pl' | 'gsw';
+export type SupportedLocale =
+  | 'en'
+  | 'de'
+  | 'fr'
+  | 'es'
+  | 'pl'
+  | 'gsw'
+  | 'es-MX'
+  | 'zh-CN'
+  | 'hi-IN'
+  | 'ja-JP'
+  | 'ko-KR'
+  | 'vi-VN';
 
 /**
  * Translation key type
@@ -70,18 +82,28 @@ export interface LanguageMetadata {
   name: string;
   nativeName: string;
   formalTone: boolean;
+  /** Right-to-left layout (e.g. for future RTL locales) */
+  rtl?: boolean;
+  /** Emoji/flag for UI (optional) */
+  flag?: string;
 }
 
 /**
  * Supported languages with metadata
  */
 export const SUPPORTED_LANGUAGES: LanguageMetadata[] = [
-  { code: 'en', name: 'English', nativeName: 'English', formalTone: false },
-  { code: 'de', name: 'German', nativeName: 'Deutsch', formalTone: true },
-  { code: 'fr', name: 'French', nativeName: 'Français', formalTone: true },
-  { code: 'es', name: 'Spanish', nativeName: 'Español', formalTone: false },
-  { code: 'pl', name: 'Polish', nativeName: 'Polski', formalTone: false },
-  { code: 'gsw', name: 'Swiss German', nativeName: 'Baseldytsch', formalTone: false },
+  { code: 'en', name: 'English', nativeName: 'English', formalTone: false, flag: '🇬🇧' },
+  { code: 'de', name: 'German', nativeName: 'Deutsch', formalTone: true, flag: '🇩🇪' },
+  { code: 'fr', name: 'French', nativeName: 'Français', formalTone: true, flag: '🇫🇷' },
+  { code: 'es', name: 'Spanish', nativeName: 'Español', formalTone: false, flag: '🇪🇸' },
+  { code: 'pl', name: 'Polish', nativeName: 'Polski', formalTone: false, flag: '🇵🇱' },
+  { code: 'gsw', name: 'Swiss German', nativeName: 'Baseldytsch', formalTone: false, flag: '🇨🇭' },
+  { code: 'es-MX', name: 'Spanish (Mexico)', nativeName: 'Español (México)', formalTone: false, flag: '🇲🇽' },
+  { code: 'zh-CN', name: 'Chinese (Simplified)', nativeName: '简体中文', formalTone: false, flag: '🇨🇳' },
+  { code: 'hi-IN', name: 'Hindi (India)', nativeName: 'हिन्दी', formalTone: false, rtl: false, flag: '🇮🇳' },
+  { code: 'ja-JP', name: 'Japanese', nativeName: '日本語', formalTone: true, flag: '🇯🇵' },
+  { code: 'ko-KR', name: 'Korean', nativeName: '한국어', formalTone: false, flag: '🇰🇷' },
+  { code: 'vi-VN', name: 'Vietnamese', nativeName: 'Tiếng Việt', formalTone: false, flag: '🇻🇳' },
 ];
 
 /**

@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../../providers/SupabaseAuthProvider'
 import { usePermissions } from '../../providers/EnhancedAuthProvider'
-import { Users, UserPlus, UserMinus, UserX, Search, Filter, Shield, AlertTriangle, CheckCircle, XCircle, RefreshCw } from 'lucide-react'
+import { Users, UserPlus, UserMinus, UserX, Search, Shield, AlertTriangle, CheckCircle, XCircle, RefreshCw } from 'lucide-react'
 import AppLayout from '../../../components/shared/AppLayout'
 import { getApiUrl } from '../../../lib/api'
 import { useTranslations } from '@/lib/i18n/context'
@@ -53,6 +53,10 @@ export default function AdminUsers() {
   const { formatDate: formatDateUser } = useDateFormatter()
   const router = useRouter()
   const t = useTranslations('adminUsers')
+  // Stable ref for t so the load effect doesn't re-run when the function reference changes
+  const tRef = useRef(t)
+  tRef.current = t
+  const accessToken = session?.access_token
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -68,7 +72,6 @@ export default function AdminUsers() {
     total_pages: 0
   })
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
-  const [showFilters, setShowFilters] = useState(false)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [availableRoles, setAvailableRoles] = useState<RoleInfo[]>([])
   const [showRoleModal, setShowRoleModal] = useState(false)
@@ -111,130 +114,157 @@ export default function AdminUsers() {
     }
   }, [permissionsLoading, isAdmin, session, router])
 
+  // Debounced filters + reset to page 1 when filters change (single load effect, no duplicate fetches)
+  const [debouncedFilters, setDebouncedFilters] = useState(filters)
+  const filtersDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => {
-    if (session && isAdmin) {
-      fetchUsers()
-      fetchAvailableRoles()
+    filtersDebounceRef.current = setTimeout(() => {
+      setPagination(prev => (prev.page === 1 ? prev : { ...prev, page: 1 }))
+      setDebouncedFilters(filters)
+    }, 150)
+    return () => {
+      if (filtersDebounceRef.current) clearTimeout(filtersDebounceRef.current)
     }
-  }, [session, pagination.page, isAdmin])
+  }, [filters])
 
-  // Debounced effect for filters to prevent excessive API calls
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (session && isAdmin) {
-        setPagination(prev => ({ ...prev, page: 1 })) // Reset to page 1 when filtering
-        fetchUsers()
-      }
-    }, 300) // 300ms debounce
+  const fetchUsersOnly = useCallback(async (opts?: { skipLoading?: boolean }) => {
+    const params = new URLSearchParams({
+      page: pagination.page.toString(),
+      per_page: pagination.per_page.toString()
+    })
+    if (debouncedFilters.search.trim()) params.append('search', debouncedFilters.search.trim())
+    if (debouncedFilters.status) params.append('status', debouncedFilters.status)
+    if (debouncedFilters.role) params.append('role', debouncedFilters.role)
 
-    return () => clearTimeout(timeoutId)
-  }, [filters, session, isAdmin])
-
-  const fetchUsers = async () => {
-    setLoading(true)
-    setError(null)
-    
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000)
     try {
-      const params = new URLSearchParams({
-        page: pagination.page.toString(),
-        per_page: pagination.per_page.toString()
-      })
-      
-      if (filters.search.trim()) params.append('search', filters.search.trim())
-      if (filters.status) params.append('status', filters.status)
-      if (filters.role) params.append('role', filters.role)
-      
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
-      
-      const url = getApiUrl(`/api/admin/users?${params}`)
-      console.log('[DEBUG] Fetching users from URL:', url)
-      console.log('[DEBUG] Auth token present:', !!session?.access_token)
-      
-      const response = await fetch(url, {
+      const response = await fetch(getApiUrl(`/api/admin/users?${params}`), {
         headers: {
-          'Authorization': `Bearer ${session?.access_token || ''}`,
+          'Authorization': `Bearer ${accessToken || ''}`,
           'Content-Type': 'application/json',
         },
         signal: controller.signal
       })
-      
       clearTimeout(timeoutId)
-      
-      console.log('[DEBUG] Response status:', response.status, response.statusText)
-      console.log('[DEBUG] Response URL:', response.url)
-      
       if (!response.ok) {
         const errBody = await response.json().catch(() => ({}))
-        const msg = (errBody as { detail?: string; message?: string }).detail
-          ?? (errBody as { detail?: string; message?: string }).message
-          ?? response.statusText
-        const statusMsg = response.status === 403 ? (t('errors.forbidden') || 'Permission denied') : response.status === 404 ? (t('errors.notFound') || 'Not found') : msg
+        const msg = (errBody as { detail?: string; message?: string }).detail ?? (errBody as { detail?: string; message?: string }).message ?? response.statusText
+        const statusMsg = response.status === 403 ? (tRef.current('errors.forbidden') || 'Permission denied') : response.status === 404 ? (tRef.current('errors.notFound') || 'Not found') : msg
         setError(statusMsg)
-        setLoading(false)
         return
       }
-      
       const data: UserListResponse = await response.json()
-      // #region agent log
-      const u0 = data.users?.[0]
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'admin/users/page.tsx:fetchUsers', message: 'users_loaded', data: { first_user_roles: u0?.roles, first_user_role: u0?.role, users_count: data.users?.length }, timestamp: Date.now(), hypothesisId: 'C' }) }).catch(() => {})
-      // #endregion
       setUsers(data.users)
-      setPagination(prev => ({
-        ...prev,
-        total_count: data.total_count,
-        total_pages: data.total_pages
-      }))
-      
+      setPagination(prev => ({ ...prev, total_count: data.total_count, total_pages: data.total_pages }))
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        console.warn('Request timed out')
-        setError(t('errors.timeout'))
+        setError(tRef.current('errors.timeout'))
       } else {
-        console.error('Error fetching users:', error)
-        setError(error instanceof Error ? error.message : t('errors.fetchFailed'))
+        setError(error instanceof Error ? error.message : tRef.current('errors.fetchFailed'))
       }
     } finally {
-      setLoading(false)
+      if (!opts?.skipLoading) setLoading(false)
     }
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accessToken, pagination.page, pagination.per_page, debouncedFilters])
 
-  const fetchAvailableRoles = async () => {
-    if (!session?.access_token) {
-      console.warn('No session token available, skipping roles fetch')
-      return
-    }
-    
+  const fetchAvailableRolesOnly = useCallback(async () => {
+    if (!accessToken) return
     try {
-      const url = getApiUrl('/api/admin/roles')
-      console.log('Fetching roles from:', url)
-      
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        }
+      const response = await fetch(getApiUrl('/api/admin/roles'), {
+        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' }
       })
-      
-      console.log('Roles response status:', response.status)
-      
       if (!response.ok) {
         const errBody = await response.json().catch(() => ({}))
-        const msg = (errBody as { detail?: string; message?: string }).detail
-          ?? (errBody as { detail?: string; message?: string }).message
-          ?? `${response.status} ${response.statusText}`
-        setError(response.status === 403 ? (t('errors.forbidden') || 'Permission denied') : msg)
+        const msg = (errBody as { detail?: string; message?: string }).detail ?? (errBody as { detail?: string; message?: string }).message ?? `${response.status} ${response.statusText}`
+        setError(response.status === 403 ? (tRef.current('errors.forbidden') || 'Permission denied') : msg)
         return
       }
-      
       const roles: RoleInfo[] = await response.json()
-      console.log('Fetched roles:', roles)
       setAvailableRoles(roles)
-    } catch (error) {
-      console.error('Error fetching roles:', error)
+    } catch {
+      // Non-blocking; roles are optional for initial table render
     }
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accessToken])
+
+  // Single load effect: run users + roles in parallel (no duplicate fetches)
+  // NOTE: Uses accessToken (string) instead of session (object) and tRef instead of t (function)
+  // to avoid infinite re-render loops caused by unstable object/function references.
+  useEffect(() => {
+    if (!accessToken || !isAdmin) return
+    setLoading(true)
+    setError(null)
+    const ac = new AbortController()
+    const timeoutMs = 12000
+    const timeoutId = setTimeout(() => ac.abort(), timeoutMs)
+    let cancelled = false
+    ;(async () => {
+      try {
+        await Promise.all([
+          (async () => {
+            const params = new URLSearchParams({ page: pagination.page.toString(), per_page: pagination.per_page.toString() })
+            if (debouncedFilters.search.trim()) params.append('search', debouncedFilters.search.trim())
+            if (debouncedFilters.status) params.append('status', debouncedFilters.status)
+            if (debouncedFilters.role) params.append('role', debouncedFilters.role)
+            const res = await fetch(getApiUrl(`/api/admin/users?${params}`), {
+              headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+              signal: ac.signal
+            })
+            clearTimeout(timeoutId)
+            if (cancelled) return
+            if (!res.ok) {
+              const errBody = await res.json().catch(() => ({}))
+              const msg = (errBody as { detail?: string; message?: string }).detail ?? (errBody as { detail?: string; message?: string }).message ?? res.statusText
+              setError(res.status === 403 ? (tRef.current('errors.forbidden') || 'Permission denied') : res.status === 404 ? (tRef.current('errors.notFound') || 'Not found') : msg)
+              return
+            }
+            const data: UserListResponse = await res.json()
+            setUsers(data.users)
+            setPagination(prev => ({ ...prev, total_count: data.total_count, total_pages: data.total_pages }))
+          })(),
+          (async () => {
+            if (!accessToken) return
+            const res = await fetch(getApiUrl('/api/admin/roles'), {
+              headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+              signal: ac.signal
+            })
+            if (cancelled) return
+            if (res.ok) {
+              const roles: RoleInfo[] = await res.json()
+              setAvailableRoles(roles)
+            }
+          })()
+        ])
+      } catch (e) {
+        clearTimeout(timeoutId)
+        if (cancelled) return
+        if (e instanceof Error && e.name === 'AbortError') {
+          setError(tRef.current('errors.timeout') || 'Request timed out. Start the backend (e.g. port 8000) or check the connection.')
+          return
+        }
+        setError(e instanceof Error ? e.message : tRef.current('errors.fetchFailed'))
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+      clearTimeout(timeoutId)
+      ac.abort()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accessToken, isAdmin, pagination.page, pagination.per_page, debouncedFilters.search, debouncedFilters.status, debouncedFilters.role])
+
+  const fetchUsers = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    await fetchUsersOnly({ skipLoading: true })
+    setLoading(false)
+  }, [fetchUsersOnly])
+
+  const fetchAvailableRoles = useCallback(() => fetchAvailableRolesOnly(), [fetchAvailableRolesOnly])
 
   /** Normalize API error body to a string (detail/error can be object or array in validation errors). Always returns a string. */
   const getErrorMessage = (errorData: { detail?: unknown; error?: unknown }): string => {
@@ -270,7 +300,7 @@ export default function AdminUsers() {
       const response = await fetch(getApiUrl(`/api/admin/users/${userId}/roles`), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${session?.access_token || ''}`,
+          'Authorization': `Bearer ${accessToken || ''}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ role })
@@ -291,10 +321,11 @@ export default function AdminUsers() {
       
       setSuccessMessage(`Role "${getRoleLabel(role)}" assigned successfully`)
       setTimeout(() => setSuccessMessage(null), 3000)
-      
-      // Refresh users list
+      // Update modal user immediately so the popup reflects the new role
+      setSelectedUserForRole(prev => prev && prev.id === userId
+        ? { ...prev, roles: [...(prev.roles || []), role] }
+        : prev)
       await fetchUsers()
-      
     } catch (error) {
       console.error('Error assigning role:', error)
       setError(error instanceof Error ? error.message : 'Failed to assign role')
@@ -310,7 +341,7 @@ export default function AdminUsers() {
       const response = await fetch(getApiUrl(`/api/admin/users/${userId}/roles/${role}`), {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${session?.access_token || ''}`,
+          'Authorization': `Bearer ${accessToken || ''}`,
           'Content-Type': 'application/json',
         }
       })
@@ -324,10 +355,11 @@ export default function AdminUsers() {
       
       setSuccessMessage(`Role "${getRoleLabel(role)}" removed successfully`)
       setTimeout(() => setSuccessMessage(null), 3000)
-      
-      // Refresh users list
+      // Update modal user immediately so the popup reflects the change
+      setSelectedUserForRole(prev => prev && prev.id === userId
+        ? { ...prev, roles: (prev.roles || []).filter(r => r !== role) }
+        : prev)
       await fetchUsers()
-      
     } catch (error) {
       console.error('Error removing role:', error)
       setError(error instanceof Error ? error.message : 'Failed to remove role')
@@ -395,7 +427,7 @@ export default function AdminUsers() {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${session?.access_token || ''}`,
+          'Authorization': `Bearer ${accessToken || ''}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -458,7 +490,7 @@ export default function AdminUsers() {
       const fetchOptions: RequestInit = {
         method,
         headers: {
-          'Authorization': `Bearer ${session?.access_token || ''}`,
+          'Authorization': `Bearer ${accessToken || ''}`,
           'Content-Type': 'application/json',
         }
       }
@@ -885,14 +917,6 @@ export default function AdminUsers() {
           
           <div className="flex items-center space-x-3">
             <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
-            >
-              <Filter className="h-4 w-4 mr-2" />
-              {t('filters')}
-            </button>
-            
-            <button
               onClick={fetchUsers}
               disabled={loading}
               className="flex items-center px-3 py-2 bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-slate-100 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 disabled:opacity-50"
@@ -900,7 +924,6 @@ export default function AdminUsers() {
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               {t('refresh')}
             </button>
-            
             <button
               onClick={openInviteModal}
               className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -911,61 +934,65 @@ export default function AdminUsers() {
           </div>
         </div>
 
-        {/* Filters */}
-        {showFilters && (
-          <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg border border-gray-200 dark:border-slate-600">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-                  {t('searchByEmail')}
-                </label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
-                  <input
-                    type="text"
-                    value={filters.search}
-                    onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                    placeholder={t('enterEmail')}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-                  {t('status')}
-                </label>
-                <select
-                  value={filters.status}
-                  onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
-                >
-                  <option value="">{t('allStatuses')}</option>
-                  <option value="active">{t('active')}</option>
-                  <option value="inactive">{t('inactive')}</option>
-                  <option value="deactivated">{t('deactivated')}</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-                  {t('role')}
-                </label>
-                <select
-                  value={filters.role}
-                  onChange={(e) => setFilters(prev => ({ ...prev, role: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
-                >
-                  <option value="">{t('allRoles')}</option>
-                  <option value="admin">{t('admin')}</option>
-                  <option value="manager">{t('manager')}</option>
-                  <option value="user">{t('user')}</option>
-                  <option value="viewer">{t('viewer')}</option>
-                </select>
-              </div>
+        {/* Search & Filter bar – compact single row */}
+        <div className="bg-gray-50 dark:bg-slate-800/50 px-4 py-3 rounded-lg border border-gray-200 dark:border-slate-700">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="relative flex-1 min-w-[140px] max-w-[260px]">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500 pointer-events-none" />
+              <input
+                type="text"
+                value={filters.search}
+                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                placeholder={t('searchByEmail')}
+                className="pl-8 w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
+                aria-label={t('searchByEmail')}
+              />
             </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <label className="text-sm text-gray-600 dark:text-slate-400 whitespace-nowrap" htmlFor="admin-users-status-filter">
+                {t('status')}:
+              </label>
+              <select
+                id="admin-users-status-filter"
+                value={filters.status}
+                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                className="w-[100px] sm:w-[110px] px-2.5 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
+                aria-label={t('status')}
+              >
+                <option value="">{t('allStatuses')}</option>
+                <option value="active">{t('active')}</option>
+                <option value="inactive">{t('inactive')}</option>
+                <option value="deactivated">{t('deactivated')}</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <label className="text-sm text-gray-600 dark:text-slate-400 whitespace-nowrap" htmlFor="admin-users-role-filter">
+                {t('role')}:
+              </label>
+              <select
+                id="admin-users-role-filter"
+                value={filters.role}
+                onChange={(e) => setFilters(prev => ({ ...prev, role: e.target.value }))}
+                className="w-[120px] sm:w-[130px] px-2.5 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
+                aria-label={t('role')}
+              >
+                <option value="">{t('allRoles')}</option>
+                {availableRoles.map((r) => (
+                  <option key={r.role} value={r.role}>{getRoleLabel(r.role)}</option>
+                ))}
+              </select>
+            </div>
+            {(filters.search || filters.status || filters.role) && (
+              <button
+                type="button"
+                onClick={() => setFilters({ search: '', status: '', role: '' })}
+                className="shrink-0 px-2.5 py-1.5 text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"
+              >
+                {t('clearFilters')}
+              </button>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Bulk Actions */}
         {selectedUsers.length > 0 && (

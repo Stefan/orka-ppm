@@ -23,6 +23,13 @@ import '@testing-library/jest-dom'
 import ShareLinkManager from '@/components/projects/ShareLinkManager'
 import * as shareLinkApi from '@/lib/api/share-links'
 
+// Avoid HTMLCanvasElement.getContext('2d') in JSDOM (pulled in via Select -> hooks -> useHelpChat -> screenshot-service)
+jest.mock('@/lib/screenshot-service', () => ({
+  screenshotService: { captureScreen: jest.fn().mockResolvedValue({}) },
+  __esModule: true,
+  default: { captureScreen: jest.fn().mockResolvedValue({}) }
+}))
+
 // Mock the API functions
 jest.mock('@/lib/api/share-links', () => ({
   createShareLink: jest.fn(),
@@ -67,10 +74,9 @@ describe('ShareLinkManager - Unit Tests', () => {
     jest.clearAllMocks()
     jest.spyOn(console, 'error').mockImplementation(() => {})
     
-    // Default mock implementations
+    // Default mock implementations – ShareLinkListResponse: { share_links: ShareLink[] }
     ;(shareLinkApi.getProjectShareLinks as jest.Mock).mockResolvedValue({
-      data: [mockShareLink],
-      success: true
+      share_links: [mockShareLink]
     })
   })
 

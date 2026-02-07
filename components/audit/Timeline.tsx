@@ -374,7 +374,7 @@ const Timeline: React.FC<TimelineProps> = ({
     onFilterChange?.({ ...filters, dateRange: { start, end } })
   }, [filters, onFilterChange])
 
-  /** Which shortcut (2d, 7d, 30d, 90d) matches the current filter range, if any */
+  /** Which shortcut (2d, 7d, 30d, 90d) matches the current filter range, if any. Uses tolerance so timezone/rounding still match. */
   const activeShortcutDays = useMemo((): 2 | 7 | 30 | 90 | null => {
     const range = filters?.dateRange
     if (!range?.start || !range?.end) return null
@@ -384,14 +384,14 @@ const Timeline: React.FC<TimelineProps> = ({
     end.setHours(23, 59, 59, 999)
     const diffMs = end.getTime() - start.getTime()
     const diffDays = Math.round(diffMs / (24 * 60 * 60 * 1000))
-    const today = new Date()
-    today.setHours(23, 59, 59, 999)
-    const isEndToday = end.getTime() >= today.getTime() - 24 * 60 * 60 * 1000
-    if (!isEndToday) return null
-    if (diffDays === 2) return 2
-    if (diffDays === 7) return 7
-    if (diffDays === 30) return 30
-    if (diffDays === 90) return 90
+    const now = Date.now()
+    const oneDayMs = 24 * 60 * 60 * 1000
+    const isEndRecent = end.getTime() >= now - oneDayMs * 2
+    if (!isEndRecent) return null
+    if (diffDays >= 1 && diffDays <= 3) return 2
+    if (diffDays >= 5 && diffDays <= 9) return 7
+    if (diffDays >= 27 && diffDays <= 33) return 30
+    if (diffDays >= 85 && diffDays <= 95) return 90
     return null
   }, [filters?.dateRange?.start, filters?.dateRange?.end])
 
@@ -433,7 +433,7 @@ const Timeline: React.FC<TimelineProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap" role="group" aria-label={t('audit.dateRange') === 'audit.dateRange' ? 'Date range' : t('audit.dateRange')}>
           {([2, 7, 30, 90] as const).map((days) => {
             const key = days === 2 ? 'last2Days' : days === 7 ? 'last7Days' : days === 30 ? 'last30Days' : 'last90Days'
             const tKey = `audit.dateRangeShortcuts.${key}` as const
@@ -445,13 +445,15 @@ const Timeline: React.FC<TimelineProps> = ({
                 key={days}
                 type="button"
                 onClick={() => applyDateRangeDays(days)}
-                className={`px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                data-active={isActive}
+                className={
                   isActive
-                    ? 'bg-blue-600 dark:bg-blue-500 text-white ring-2 ring-blue-400 dark:ring-blue-300 ring-offset-2 dark:ring-offset-slate-800 hover:bg-blue-700 dark:hover:bg-blue-600'
-                    : 'bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-300 dark:hover:bg-slate-500'
-                }`}
+                    ? 'px-3 py-1.5 text-xs font-bold rounded-full bg-blue-600 dark:bg-blue-500 text-white border-2 border-blue-600 dark:border-blue-500 shadow-md ring-2 ring-blue-400 dark:ring-blue-400 ring-offset-2 ring-offset-white dark:ring-offset-slate-800 hover:bg-blue-700 dark:hover:bg-blue-600 min-w-[2.5rem]'
+                    : 'px-3 py-1.5 text-xs font-medium rounded-full bg-gray-50 dark:bg-slate-700/50 text-gray-500 dark:text-slate-400 border border-gray-300 dark:border-slate-600 hover:border-gray-400 dark:hover:border-slate-500 hover:text-gray-700 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 min-w-[2.5rem]'
+                }
                 title={label}
                 aria-pressed={isActive}
+                aria-current={isActive ? 'true' : undefined}
               >
                 {days === 90 ? '90d' : days === 30 ? '30d' : days === 7 ? '7d' : '2d'}
               </button>
@@ -481,7 +483,7 @@ const Timeline: React.FC<TimelineProps> = ({
                   ? DATE_RANGE_FALLBACKS['audit.dateRange']
                   : t('audit.dateRange')}
               </label>
-              <div className="flex flex-wrap gap-2 mb-2">
+              <div className="flex flex-wrap gap-2 mb-2" role="group" aria-label={t('audit.dateRange') === 'audit.dateRange' ? 'Date range shortcuts' : t('audit.dateRange')}>
                 {([2, 7, 30, 90] as const).map((days) => {
                   const key = days === 2 ? 'last2Days' : days === 7 ? 'last7Days' : days === 30 ? 'last30Days' : 'last90Days'
                   const tKey = `audit.dateRangeShortcuts.${key}` as const
@@ -500,12 +502,14 @@ const Timeline: React.FC<TimelineProps> = ({
                         start.setHours(0, 0, 0, 0)
                         onFilterChange?.({ ...filters, dateRange: { start, end } })
                       }}
-                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      data-active={isActive}
+                      className={
                         isActive
-                          ? 'bg-blue-600 dark:bg-blue-500 text-white ring-2 ring-blue-400 dark:ring-blue-300 ring-offset-2 dark:ring-offset-slate-800 hover:bg-blue-700 dark:hover:bg-blue-600'
-                          : 'bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-300 dark:hover:bg-slate-500'
-                      }`}
+                          ? 'px-3 py-1.5 text-xs font-bold rounded-full bg-blue-600 dark:bg-blue-500 text-white border-2 border-blue-600 dark:border-blue-500 shadow-md ring-2 ring-blue-400 dark:ring-blue-400 ring-offset-2 ring-offset-white dark:ring-offset-slate-800 hover:bg-blue-700 dark:hover:bg-blue-600'
+                          : 'px-3 py-1.5 text-xs font-medium rounded-full bg-gray-50 dark:bg-slate-700/50 text-gray-500 dark:text-slate-400 border border-gray-300 dark:border-slate-600 hover:border-gray-400 dark:hover:border-slate-500 hover:text-gray-700 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'
+                      }
                       aria-pressed={isActive}
+                      aria-current={isActive ? 'true' : undefined}
                     >
                       {label}
                     </button>

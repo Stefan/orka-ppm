@@ -12,9 +12,8 @@ import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 
 // Import components
-import { HelpChat } from '../components/help-chat/HelpChat'
-import { HelpChatToggle } from '../components/help-chat/HelpChatToggle'
-import { ProactiveTips } from '../components/onboarding/ProactiveTips'
+import { HelpChat } from '../components/HelpChat'
+import { HelpChatToggle } from '../components/HelpChatToggle'
 import { HelpChatProvider } from '../app/providers/HelpChatProvider'
 
 // Import types
@@ -23,7 +22,6 @@ import type {
   HelpQueryResponse,
   HelpFeedbackRequest,
   FeedbackResponse,
-  ProactiveTip,
   ChatMessage
 } from '../types/help-chat'
 
@@ -275,135 +273,6 @@ describe('Help Chat End-to-End Tests', () => {
           expect(screen.getByText(new RegExp(expectedWord, 'i'))).toBeInTheDocument()
         })
       })
-    })
-  })
-
-  describe('Proactive Tips Integration', () => {
-    it('should display and interact with proactive tips', async () => {
-      const user = userEvent.setup()
-      
-      const mockTips: ProactiveTip[] = [
-        {
-          id: 'tip-1',
-          type: 'feature_discovery',
-          title: 'Discover Dashboard Features',
-          content: 'Did you know you can customize your dashboard widgets? Click the settings icon to personalize your view.',
-          priority: 'medium',
-          triggerContext: ['/dashboard'],
-          actions: [
-            {
-              id: 'customize-dashboard',
-              label: 'Customize Dashboard',
-              action: 'navigate',
-              variant: 'primary',
-              target: '/dashboard/settings'
-            }
-          ],
-          dismissible: true,
-          showOnce: false,
-          isRead: false
-        }
-      ]
-      
-      mockHelpChatAPI.getProactiveTips.mockResolvedValue({
-        tips: mockTips,
-        context: {
-          route: '/dashboard',
-          pageTitle: 'Dashboard',
-          userRole: 'user'
-        }
-      })
-      
-      render(
-        <TestWrapper>
-          <ProactiveTips />
-          <HelpChatToggle />
-        </TestWrapper>
-      )
-      
-      // Verify tip is displayed
-      await waitFor(() => {
-        expect(screen.getByText('Discover Dashboard Features')).toBeInTheDocument()
-      })
-      
-      // Verify tip content
-      expect(screen.getByText(/customize your dashboard widgets/i)).toBeInTheDocument()
-      
-      // Test tip action button
-      const actionButton = screen.getByRole('button', { name: /customize dashboard/i })
-      await user.click(actionButton)
-      
-      expect(mockRouter.push).toHaveBeenCalledWith('/dashboard/settings')
-      
-      // Test tip dismissal
-      const dismissButton = screen.getByRole('button', { name: /dismiss/i })
-      await user.click(dismissButton)
-      
-      // Verify tip is dismissed
-      await waitFor(() => {
-        expect(screen.queryByText('Discover Dashboard Features')).not.toBeInTheDocument()
-      })
-      
-      // Verify notification badge on toggle button
-      const toggleButton = screen.getByRole('button', { name: /help/i })
-    })
-
-    it('should show context-specific tips based on current page', async () => {
-      const contextTips = [
-        {
-          route: '/projects',
-          expectedTipType: 'project_management',
-          expectedContent: 'project templates'
-        },
-        {
-          route: '/financials',
-          expectedTipType: 'budget_optimization', 
-          expectedContent: 'budget alerts'
-        },
-        {
-          route: '/resources',
-          expectedTipType: 'resource_allocation',
-          expectedContent: 'resource optimization'
-        }
-      ]
-      
-      for (const { route, expectedTipType, expectedContent } of contextTips) {
-        mockRouter.pathname = route
-        
-        const contextTip: ProactiveTip = {
-          id: `tip-${expectedTipType}`,
-          type: 'feature_discovery',
-          title: `${expectedTipType} Tips`,
-          content: `Learn about ${expectedContent} features.`,
-          priority: 'medium',
-          triggerContext: [route],
-          dismissible: true,
-          showOnce: false,
-          isRead: false
-        }
-        
-        mockHelpChatAPI.getProactiveTips.mockResolvedValue({
-          tips: [contextTip],
-          context: {
-            route,
-            pageTitle: route.substring(1),
-            userRole: 'user'
-          }
-        })
-        
-        const { rerender } = render(
-          <TestWrapper>
-            <ProactiveTips />
-          </TestWrapper>
-        )
-        
-        await waitFor(() => {
-          expect(screen.getByText(new RegExp(expectedContent, 'i'))).toBeInTheDocument()
-        })
-        
-        // Clean up for next iteration
-        rerender(<div />)
-      }
     })
   })
 

@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "dashboards": "대시보드",
+    "financials": "재무",
+    "reports": "보고서",
+    "resources": "리소스"
+  },
+  "common": {
+    "loading": "로딩 중...",
+    "save": "저장",
+    "cancel": "취소",
+    "close": "닫기",
+    "search": "검색",
+    "filter": "필터",
+    "export": "내보내기",
+    "refresh": "새로 고침"
+  },
+  "costbook": {
+    "variance": "편차",
+    "eac": "EAC",
+    "bac": "BAC",
+    "predictiveSimulations": "예측 시뮬레이션",
+    "budget": "예산",
+    "actual": "실적"
+  },
+  "variance": {
+    "trends": "편차 추이",
+    "alerts": "편차 알림",
+    "netVariance": "순편차",
+    "noData": "편차 데이터가 없습니다."
+  },
+  "financials": {
+    "title": "재무 관리",
+    "variance": "편차",
+    "varianceAnalysis": "예산 편차 분석",
+    "variancePercent": "편차 %",
+    "budget": "예산",
+    "actual": "실적"
+  }
+}

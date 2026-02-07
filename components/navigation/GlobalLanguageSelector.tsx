@@ -3,15 +3,13 @@
 import { useState } from 'react'
 import { Globe, Loader2 } from 'lucide-react'
 import { useI18n } from '@/lib/i18n/context'
+import { SUPPORTED_LANGUAGES } from '@/lib/i18n/types'
 
-const LANGUAGES = [
-  { code: 'en', label: 'English', flag: '🇬🇧' },
-  { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
-  { code: 'fr', label: 'Français', flag: '🇫🇷' },
-  { code: 'es', label: 'Español', flag: '🇪🇸' },
-  { code: 'pl', label: 'Polski', flag: '🇵🇱' },
-  { code: 'gsw', label: 'Baseldytsch', flag: '🇨🇭' }
-]
+const LANGUAGES = SUPPORTED_LANGUAGES.map((lang) => ({
+  code: lang.code,
+  label: lang.nativeName,
+  flag: lang.flag ?? '🌐',
+}))
 
 interface GlobalLanguageSelectorProps {
   variant?: 'sidebar' | 'topbar' | 'dropdown'

@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "dashboards": "Bảng điều khiển",
+    "financials": "Tài chính",
+    "reports": "Báo cáo",
+    "resources": "Tài nguyên"
+  },
+  "common": {
+    "loading": "Đang tải...",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "close": "Đóng",
+    "search": "Tìm kiếm",
+    "filter": "Lọc",
+    "export": "Xuất",
+    "refresh": "Làm mới"
+  },
+  "costbook": {
+    "variance": "Chênh lệch",
+    "eac": "EAC",
+    "bac": "BAC",
+    "predictiveSimulations": "Mô phỏng dự báo",
+    "budget": "Ngân sách",
+    "actual": "Thực tế"
+  },
+  "variance": {
+    "trends": "Xu hướng chênh lệch",
+    "alerts": "Cảnh báo chênh lệch",
+    "netVariance": "Chênh lệch ròng",
+    "noData": "Không có dữ liệu chênh lệch."
+  },
+  "financials": {
+    "title": "Quản lý tài chính",
+    "variance": "Chênh lệch",
+    "varianceAnalysis": "Phân tích chênh lệch ngân sách",
+    "variancePercent": "Chênh lệch %",
+    "budget": "Ngân sách",
+    "actual": "Thực tế"
+  }
+}

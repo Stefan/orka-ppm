@@ -36,6 +36,17 @@ Diese Tests existieren, laufen aber nicht (Jest ignoriert sie). Nach Reparatur (
   Diverse Property- und Komponenten-Tests (input-*, error-boundary, etc.) – siehe vollständige Liste in `jest.config.js` unter `testPathIgnorePatterns`.  
   **Repariert und reaktiviert:** `card-border.property.test.tsx` (Card-Klassen auf rounded-xl / border-gray-200 angepasst), `currency-utils.property.test.ts` (fc.float mit Math.fround, Round-Trip ohne JPY, Toleranz angepasst).
 
+### 1.2.1 Werden die ignorierten Tests noch benötigt?
+
+| Kategorie | Empfehlung | Beispiele |
+|-----------|------------|-----------|
+| **Ja – anderer Runner** | Behalten; laufen mit Playwright oder Vitest. | `__tests__/e2e/*.test.tsx` (falls Playwright sie einbindet), `admin-performance-api-integration.test.ts` (Vitest). E2E-**.spec.ts** laufen mit `npm run test:e2e`. |
+| **Ja – reparieren geplant** | Behalten; nach Mocks/Umgebung reparieren und aus testPathIgnorePatterns nehmen. | `EnhancedAuthProvider.test.tsx`, `usePermissions.test.ts`, `guest-project-access-page.test.tsx`, `share-link-manager.test.tsx`, Changes-Komponenten, HelpChat/MessageRenderer. |
+| **Optional – können weg** | Können gelöscht werden, wenn das zu testende Feature obsolet ist oder nie repariert wird. | Viele Property-Tests (Timing, Performance, CSS-Validation), Teile von `scripts/cleanup/__tests__/` wenn Scripts nicht genutzt werden. Vor dem Löschen: prüfen ob getesteter Code noch existiert. |
+| **Unklar** | Einzelfall prüfen. | Tests für Komponenten die es noch gibt (z. B. PermissionGuard, ProjectImportModal) – entweder reparieren oder durch schlankere Unit-Tests ersetzen. |
+
+**Faustregel:** Test-Datei löschen nur, wenn (a) der getestete Code entfernt wurde oder (b) ihr euch bewusst entscheidet, die Abdeckung dafür aufzugeben. Ansonsten: ignoriert lassen oder reparieren.
+
 ### 1.3 Lib – geringe oder keine Abdeckung (Phase 1)
 
 - **Kaum/keine Tests:**  

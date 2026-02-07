@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "dashboards": "ダッシュボード",
+    "financials": "財務",
+    "reports": "レポート",
+    "resources": "リソース"
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "search": "検索",
+    "filter": "フィルター",
+    "export": "エクスポート",
+    "refresh": "更新"
+  },
+  "costbook": {
+    "variance": "差異",
+    "eac": "EAC",
+    "bac": "BAC",
+    "predictiveSimulations": "予測シミュレーション",
+    "budget": "予算",
+    "actual": "実績"
+  },
+  "variance": {
+    "trends": "差異トレンド",
+    "alerts": "差異アラート",
+    "netVariance": "純差異",
+    "noData": "差異データがありません。"
+  },
+  "financials": {
+    "title": "財務管理",
+    "variance": "差異",
+    "varianceAnalysis": "予算差異分析",
+    "variancePercent": "差異 %",
+    "budget": "予算",
+    "actual": "実績"
+  }
+}

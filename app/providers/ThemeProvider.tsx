@@ -1,8 +1,6 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
-import { useAuth } from './SupabaseAuthProvider'
-import { logger } from '@/lib/monitoring/logger'
 
 type Theme = 'light' | 'dark' | 'system'
 
@@ -66,7 +64,6 @@ function applyTheme(theme: Theme) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const { session } = useAuth()
   const [theme, setThemeState] = useState<Theme>('system')
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light')
   const [mounted, setMounted] = useState(false)
@@ -108,40 +105,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => mediaQuery.removeEventListener('change', handleChange)
   }, [theme, mounted])
 
-  // Load theme from user preferences when authenticated (only on initial load).
-  // Request is only made when we have a session and an access token; 401 is handled silently.
-  useEffect(() => {
-    const token = session?.access_token
-    if (!session?.user?.id || !token || !mounted) return
-
-    const loadUserTheme = async () => {
-      try {
-        const response = await fetch(`/api/sync/preferences?userId=${session.user.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        if (response.status === 401) return // Session invalid/expired — no console noise
-        if (!response.ok) return
-        const prefs = await response.json()
-        if (!prefs?.theme || !['light', 'dark', 'system'].includes(prefs.theme)) return
-
-        const localTheme = localStorage.getItem(THEME_STORAGE_KEY)
-        if (localTheme && localTheme !== prefs.theme) return
-
-        setThemeState(prefs.theme)
-        applyTheme(prefs.theme)
-        localStorage.setItem(THEME_STORAGE_KEY, prefs.theme)
-        if (prefs.theme === 'system') {
-          setResolvedTheme(getSystemTheme())
-        } else {
-          setResolvedTheme(prefs.theme)
-        }
-      } catch (error) {
-        logger.error('Failed to load theme from preferences', { error }, 'ThemeProvider')
-      }
-    }
-
-    loadUserTheme()
-  }, [session?.user?.id, session?.access_token, mounted])
+  // Theme is loaded from localStorage only on mount (see effect above).
+  // Synced theme from /api/sync/preferences is applied via useSettings/CrossDeviceSyncService
+  // when the user is authenticated and the API accepts the token; we do not fetch here
+  // to avoid 401 console noise when the token is missing or rejected.
 
   // Set theme function
   const setTheme = useCallback((newTheme: Theme) => {

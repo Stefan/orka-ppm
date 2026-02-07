@@ -69,7 +69,8 @@ export const ShareLinkManager: React.FC<ShareLinkManagerProps> = ({
       setLoading(true)
       setError(null)
       const response = await getProjectShareLinks(projectId)
-      setShareLinks(response.data?.share_links ?? [])
+      const list = response?.share_links ?? response?.data?.share_links ?? []
+      setShareLinks(Array.isArray(list) ? list : [])
     } catch (err: any) {
       setError(err.message || 'Failed to load share links')
     } finally {
