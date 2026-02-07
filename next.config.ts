@@ -142,6 +142,22 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
 
+  // Smaller serverless bundles = faster Vercel upload and cold starts
+  outputFileTracingExcludes: {
+    '*': [
+      'backend/**',
+      '__tests__/**',
+      '**/*.test.ts',
+      '**/*.test.tsx',
+      '**/*.spec.ts',
+      '**/*.spec.tsx',
+      'docs/**',
+      '.kiro/**',
+      'playwright/**',
+      'node_modules/@playwright/**',
+    ],
+  },
+
   // Image optimization
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -182,7 +198,7 @@ const nextConfig: NextConfig = {
       })
       securityHeaders.push({
         key: 'Content-Security-Policy-Report-Only',
-        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.sentry.io https://*.supabase.co https://*.onrender.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data: https://vercel.live; connect-src 'self' https://*.sentry.io https://*.supabase.co https://*.onrender.com https://vercel.live https://*.vercel.live; frame-src 'self' https://vercel.live; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
       })
     }
     return [{ source: '/:path*', headers: securityHeaders }]

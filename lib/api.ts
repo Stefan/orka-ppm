@@ -48,12 +48,18 @@ export interface APIResponse<T = any> {
 }
 
 /**
- * Get the full API URL for an endpoint
+ * Get the full API URL for an endpoint.
+ * When base is same-origin (''), prefix with /api so Next.js rewrites proxy to backend.
  */
 export function getApiUrl(endpoint: string, baseUrl?: string): string {
-  const base = baseUrl || API_CONFIG.baseUrl
+  const base = baseUrl ?? API_CONFIG.baseUrl
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
-  return base.startsWith('http') ? `${base}${cleanEndpoint}` : `${base}${cleanEndpoint}`
+  if (base.startsWith('http')) {
+    return `${base}${cleanEndpoint}`
+  }
+  // Same-origin: request /api/... so Next.js rewrites forward to backend
+  const path = (base === '' && !cleanEndpoint.startsWith('/api')) ? `/api${cleanEndpoint}` : `${base}${cleanEndpoint}`
+  return path
 }
 
 /**
