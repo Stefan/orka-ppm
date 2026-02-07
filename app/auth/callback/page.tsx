@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/api/supabase-minimal'
 
@@ -8,7 +8,7 @@ import { supabase } from '@/lib/api/supabase-minimal'
  * OAuth callback page: Supabase redirects here after IdP login.
  * Client reads session from URL (Supabase handles hash/query), then redirects to /dashboards or /login.
  */
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [status, setStatus] = useState<'loading' | 'ok' | 'error'>('loading')
@@ -72,5 +72,24 @@ export default function AuthCallbackPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+function CallbackFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-800/50" data-testid="auth-callback-page">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
+        <p className="mt-4 text-gray-600 dark:text-slate-400">Signing you in…</p>
+      </div>
+    </div>
+  )
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={<CallbackFallback />}>
+      <AuthCallbackContent />
+    </Suspense>
   )
 }

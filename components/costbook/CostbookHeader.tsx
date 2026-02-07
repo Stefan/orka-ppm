@@ -12,7 +12,6 @@ import {
   Bell,
   Settings,
   LineChart,
-  Sync
 } from 'lucide-react'
 
 export interface CostbookHeaderProps {
@@ -212,7 +211,7 @@ export function CostbookHeader({
           />
           {onSync && (
             <IconButton
-              icon={<Sync className={`w-5 h-5 ${isSyncing ? 'animate-spin' : ''}`} />}
+              icon={<RefreshCw className={`w-5 h-5 ${isSyncing ? 'animate-spin' : ''}`} />}
               label="Sync from ERP"
               onClick={onSync}
               disabled={isSyncing || isLoading}
