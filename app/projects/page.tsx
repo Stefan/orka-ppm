@@ -6,6 +6,7 @@ import { useAuth } from '../providers/SupabaseAuthProvider'
 import AppLayout from '@/components/shared/AppLayout'
 import WorkflowStatusBadge from '@/components/workflow/WorkflowStatusBadge'
 import WorkflowApprovalModal from '@/components/workflow/WorkflowApprovalModal'
+import { getApiUrl } from '@/lib/api'
 import ShareButton from '@/components/projects/ShareButton'
 import ProjectActionButtons from '@/components/projects/ProjectActionButtons'
 import { useWorkflowNotifications } from '@/hooks/useWorkflowRealtime'
@@ -61,8 +62,7 @@ export default function ProjectsPage() {
     try {
       if (!session?.access_token) return
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-      const response = await fetch(`${apiUrl}/api/rbac/user-permissions`, {
+      const response = await fetch(getApiUrl('/api/rbac/user-permissions'), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -109,7 +109,7 @@ export default function ProjectsPage() {
 
   if (error) {
     const retryMessage = (error.includes('fetch') || error.includes('Failed to fetch'))
-      ? 'Backend server is not running. Please start the backend server at http://localhost:8000'
+      ? 'Backend unavailable. Check your connection or try again later.'
       : error
     return (
       <AppLayout>

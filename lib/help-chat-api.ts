@@ -1,10 +1,12 @@
 /**
  * Help Chat API client with RAG support
+ * Uses same-origin /api/ai/help/* so production (Vercel) proxies to backend via Next.js API routes.
  */
 
 import { ChatQueryRequest, ChatResponse, FeedbackRequest, FeedbackResponse, ProactiveTipsResponse, HelpContextResponse } from './types/help-chat';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+/** Same-origin in browser (Vercel/localhost:3000); Next.js API routes proxy to backend. */
+const API_BASE_URL = typeof window !== 'undefined' ? '' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001');
 
 export async function sendHelpQuery(request: ChatQueryRequest): Promise<ChatResponse> {
   const response = await fetch(`${API_BASE_URL}/api/ai/help/query`, {

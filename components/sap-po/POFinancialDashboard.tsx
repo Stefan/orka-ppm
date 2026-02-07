@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import InteractiveChart from '../charts/InteractiveChart'
 import { cn } from '@/lib/design-system'
+import { getApiUrl } from '@/lib/api'
 import { Alert, AlertDescription } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
 import { Modal, ModalFooter } from '@/components/ui/Modal'
@@ -118,8 +119,7 @@ export const POFinancialDashboard: React.FC<POFinancialDashboardProps> = ({
   useEffect(() => {
     const loadThresholdConfig = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-        const response = await fetch(`${apiUrl}/api/v1/projects/${projectId}/po-threshold-config`)
+        const response = await fetch(getApiUrl(`/api/v1/projects/${projectId}/po-threshold-config`))
         if (response.ok) {
           const config = await response.json()
           setThresholdConfig(config)

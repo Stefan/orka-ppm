@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, ReactNode } from 'react'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
+import { getApiUrl } from '@/lib/api'
 import type { PermissionContext } from '@/types/rbac'
 
 /**
@@ -111,10 +112,8 @@ export const ReportAccessGuard: React.FC<ReportAccessGuardProps> = ({
       try {
         setLoading(true)
 
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-
         const response = await fetch(
-          `${apiUrl}/api/rbac/check-report-access`,
+          getApiUrl('/api/rbac/check-report-access'),
           {
             method: 'POST',
             headers: {
@@ -259,10 +258,8 @@ export function useReportAccess() {
     }
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-
       const response = await fetch(
-        `${apiUrl}/api/rbac/check-report-access`,
+        getApiUrl('/api/rbac/check-report-access'),
         {
           method: 'POST',
           headers: {

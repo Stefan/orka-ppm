@@ -5,6 +5,7 @@ import { Clock, CheckCircle, XCircle, AlertCircle, ChevronRight } from 'lucide-r
 import WorkflowStatusBadge from './WorkflowStatusBadge'
 import WorkflowApprovalModal from './WorkflowApprovalModal'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
+import { getApiUrl } from '@/lib/api'
 
 interface WorkflowApproval {
   id: string
@@ -70,8 +71,7 @@ export default function WorkflowDashboard({
       }
 
       // Fetch workflows where user is involved (as initiator or approver)
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-      const response = await fetch(`${apiUrl}/api/workflows/instances/my-workflows`, {
+      const response = await fetch(getApiUrl('/api/workflows/instances/my-workflows'), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json'

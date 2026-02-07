@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, useRef } from 'react'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
+import { getApiUrl } from '@/lib/api'
 import { hasPermissionInList, hasRoleInList } from '@/lib/rbac/permission-utils'
 import type { Permission, PermissionContext, UserPermissions } from '@/types/rbac'
 
@@ -291,11 +292,10 @@ export function usePermissions(): UsePermissionsReturn {
 
       // For context-aware checks, make API call
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
         const contextParam = `&context=${encodeURIComponent(JSON.stringify(context))}`
-        
+        const url = getApiUrl(`/api/rbac/check-permission?permission=${encodeURIComponent(permission)}${contextParam}`)
         const response = await fetch(
-          `${apiUrl}/api/rbac/check-permission?permission=${encodeURIComponent(permission)}${contextParam}`,
+          url,
           {
             method: 'GET',
             headers: {

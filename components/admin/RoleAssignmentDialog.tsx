@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
+import { getApiUrl } from '@/lib/api'
 import {
   Dialog,
   DialogContent,
@@ -96,8 +97,7 @@ export function RoleAssignmentDialog({
     if (!session?.access_token) return
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-      const response = await fetch(`${apiUrl}/api/admin/roles`, {
+      const response = await fetch(getApiUrl('/api/admin/roles'), {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
@@ -129,8 +129,6 @@ export function RoleAssignmentDialog({
 
     try {
       setLoadingScopes(true)
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-      
       let endpoint = ''
       switch (type) {
         case 'organization':
@@ -144,7 +142,7 @@ export function RoleAssignmentDialog({
           break
       }
 
-      const response = await fetch(`${apiUrl}${endpoint}`, {
+      const response = await fetch(getApiUrl(endpoint), {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
@@ -216,7 +214,6 @@ export function RoleAssignmentDialog({
       setLoading(true)
       setError(null)
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
       const payload: any = {
         user_id: user.id,
         role_id: selectedRole,
@@ -228,7 +225,7 @@ export function RoleAssignmentDialog({
         payload.scope_id = selectedScopeId
       }
 
-      const response = await fetch(`${apiUrl}/api/admin/role-assignments`, {
+      const response = await fetch(getApiUrl('/api/admin/role-assignments'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,

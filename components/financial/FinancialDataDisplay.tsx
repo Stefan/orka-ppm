@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
+import { getApiUrl } from '@/lib/api'
 import type { PermissionContext } from '@/types/rbac'
 
 /**
@@ -79,14 +80,11 @@ export const FinancialDataDisplay: React.FC<FinancialDataDisplayProps> = ({
       try {
         setLoading(true)
 
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
         const contextParam = context 
           ? `?context=${encodeURIComponent(JSON.stringify(context))}`
           : ''
-
-        // Get access level first
         const accessResponse = await fetch(
-          `${apiUrl}/api/rbac/financial-access-level${contextParam}`,
+          getApiUrl(`/api/rbac/financial-access-level${contextParam}`),
           {
             method: 'GET',
             headers: {
@@ -245,14 +243,11 @@ export function useFinancialDataFilter() {
     }
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
       const contextParam = context 
         ? `?context=${encodeURIComponent(JSON.stringify(context))}`
         : ''
-
-      // Get access level
       const accessResponse = await fetch(
-        `${apiUrl}/api/rbac/financial-access-level${contextParam}`,
+        getApiUrl(`/api/rbac/financial-access-level${contextParam}`),
         {
           method: 'GET',
           headers: {

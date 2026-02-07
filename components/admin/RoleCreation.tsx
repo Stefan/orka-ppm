@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from 'react'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
+import { getApiUrl } from '@/lib/api'
 import {
   Dialog,
   DialogContent,
@@ -167,11 +168,9 @@ export function RoleCreation({
       setLoading(true)
       setError(null)
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
       const endpoint = existingRole
-        ? `${apiUrl}/api/admin/roles/${existingRole.id}`
-        : `${apiUrl}/api/admin/roles`
-      
+        ? getApiUrl(`/api/admin/roles/${existingRole.id}`)
+        : getApiUrl('/api/admin/roles')
       const method = existingRole ? 'PUT' : 'POST'
 
       const response = await fetch(endpoint, {

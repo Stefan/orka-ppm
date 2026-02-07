@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', 'recharts', '@supabase/supabase-js', 'react-markdown', '@tiptap/react'],
     optimizeCss: true,
+    // Merge CSS chunks to reduce preloads and "preloaded but not used" warnings (see next.js#51524)
+    cssChunking: true,
     webVitalsAttribution: ['CLS', 'LCP', 'FCP', 'FID', 'TTFB'],
     scrollRestoration: true,
     // Enable modern JavaScript output for smaller bundles

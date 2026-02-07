@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
+import { getApiUrl } from '@/lib/api'
 import {
   Dialog,
   DialogContent,
@@ -89,9 +90,8 @@ export function EffectivePermissionsDisplay({
       setLoading(true)
       setError(null)
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
       const response = await fetch(
-        `${apiUrl}/api/admin/users/${user.id}/effective-permissions`,
+        getApiUrl(`/api/admin/users/${user.id}/effective-permissions`),
         {
           method: 'GET',
           headers: {

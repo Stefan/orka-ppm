@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
+import { getApiUrl } from '@/lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -63,8 +64,7 @@ export function RoleManagement() {
       setLoading(true)
       setError(null)
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-      const response = await fetch(`${apiUrl}/api/admin/roles/all`, {
+      const response = await fetch(getApiUrl('/api/admin/roles/all'), {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
@@ -156,8 +156,7 @@ export function RoleManagement() {
     }
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-      const response = await fetch(`${apiUrl}/api/admin/roles/${role.id}`, {
+      const response = await fetch(getApiUrl(`/api/admin/roles/${role.id}`), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,

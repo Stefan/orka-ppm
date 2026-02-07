@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
+import { getApiUrl } from '@/lib/api'
 import type { PermissionContext } from '@/types/rbac'
 
 /**
@@ -94,13 +95,11 @@ export const ViewerIndicator: React.FC<ViewerIndicatorProps> = ({
       try {
         setLoading(true)
 
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
         const contextParam = context 
           ? `?context=${encodeURIComponent(JSON.stringify(context))}`
           : ''
-
         const response = await fetch(
-          `${apiUrl}/api/rbac/viewer-indicators${contextParam}`,
+          getApiUrl(`/api/rbac/viewer-indicators${contextParam}`),
           {
             method: 'GET',
             headers: {
@@ -235,13 +234,11 @@ export function useViewerIndicators(context?: PermissionContext) {
         setLoading(true)
         setError(null)
 
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
         const contextParam = context 
           ? `?context=${encodeURIComponent(JSON.stringify(context))}`
           : ''
-
         const response = await fetch(
-          `${apiUrl}/api/rbac/viewer-indicators${contextParam}`,
+          getApiUrl(`/api/rbac/viewer-indicators${contextParam}`),
           {
             method: 'GET',
             headers: {

@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic'
 import AppLayout from '../../components/shared/AppLayout'
 import { Upload } from 'lucide-react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
+import { getApiUrl } from '@/lib/api'
 import { useTranslations } from '@/lib/i18n/context'
 import { GuidedTour, useGuidedTour, TourTriggerButton, importTourSteps } from '@/components/guided-tour'
 
@@ -74,7 +75,7 @@ export default function ImportPage() {
         setUploadProgress(prev => Math.min(prev + 10, 90))
       }, 200)
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/projects/import`, {
+      const response = await fetch(getApiUrl('/api/projects/import'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session.access_token}`

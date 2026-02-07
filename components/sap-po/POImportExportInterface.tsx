@@ -20,6 +20,7 @@ import { Modal, ModalFooter } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { Alert, AlertDescription } from '@/components/ui/Alert'
 import { cn } from '@/lib/design-system'
+import { getApiUrl } from '@/lib/api'
 
 /**
  * Import Error Interface
@@ -140,8 +141,7 @@ export const POImportExportInterface: React.FC<POImportExportInterfaceProps> = (
         setProgress(prev => Math.min(prev + 10, 90))
       }, 500)
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-      const response = await fetch(`${apiUrl}/api/v1/projects/${projectId}/po-breakdowns/import`, {
+      const response = await fetch(getApiUrl(`/api/v1/projects/${projectId}/po-breakdowns/import`), {
         method: 'POST',
         body: formData,
       })
@@ -180,7 +180,6 @@ export const POImportExportInterface: React.FC<POImportExportInterfaceProps> = (
     setLoading(true)
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
       const queryParams = new URLSearchParams({
         format: exportConfig.format,
         include_hierarchy: exportConfig.includeHierarchy.toString(),
@@ -197,10 +196,8 @@ export const POImportExportInterface: React.FC<POImportExportInterfaceProps> = (
       }
 
       const response = await fetch(
-        `${apiUrl}/api/v1/projects/${projectId}/po-breakdowns/export?${queryParams}`,
-        {
-          method: 'GET',
-        }
+        getApiUrl(`/api/v1/projects/${projectId}/po-breakdowns/export?${queryParams}`),
+        { method: 'GET' }
       )
 
       if (!response.ok) {
