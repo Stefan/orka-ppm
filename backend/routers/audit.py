@@ -791,9 +791,10 @@ async def semantic_search(
         except Exception:
             pass
         
-        # Convert results to response format
+        # Convert results to response format (support dict or legacy list)
+        raw_results = search_results.get("results", []) if isinstance(search_results, dict) else search_results or []
         results = []
-        for result in search_results.get("results", []):
+        for result in raw_results:
             try:
                 audit_event = AuditEvent(**result["event"])
                 search_result = SearchResult(
@@ -826,8 +827,8 @@ async def semantic_search(
         return SearchResponse(
             query=search_request.query,
             results=results,
-            ai_response=search_results.get("ai_response", ""),
-            sources=search_results.get("sources", []),
+            ai_response=search_results.get("ai_response", "") if isinstance(search_results, dict) else "",
+            sources=search_results.get("sources", []) if isinstance(search_results, dict) else [],
             total_results=len(results)
         )
     

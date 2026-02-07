@@ -9,8 +9,9 @@ Requirements: 1.3, 1.4, 1.5, 2.4, 2.5, 4.1, 4.2, 4.3, 4.4, 4.5
 """
 
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, status
-from typing import List, Dict, Any
-from uuid import UUID
+from typing import List, Dict, Any, Optional
+from uuid import UUID, uuid4
+from datetime import datetime
 import logging
 
 from auth.dependencies import get_current_user
@@ -18,10 +19,39 @@ from auth.rbac import require_permission, Permission
 from models.projects import ProjectCreate
 from services.import_service import ImportService, ImportResult
 from services.csv_parser import CSVParser, CSVParseError
-from config.database import get_db
+from config.database import get_db, service_supabase
+from services.data_import_audit import log_data_import_to_audit_trail
 
 router = APIRouter(prefix="/api/projects", tags=["import"])
 logger = logging.getLogger(__name__)
+
+
+def _log_project_import_to_history(
+    user_id: str,
+    result: ImportResult,
+    total_records: int,
+) -> None:
+    """Write a project import to import_audit_logs so it appears in Data Import history."""
+    if not service_supabase or not user_id:
+        return
+    try:
+        now = datetime.utcnow().isoformat()
+        row = {
+            "import_id": str(uuid4()),
+            "user_id": str(user_id),
+            "import_type": "projects",
+            "total_records": total_records,
+            "success_count": result.count,
+            "duplicate_count": 0,
+            "error_count": len(result.errors) if result.errors else 0,
+            "status": "completed" if result.success else "failed",
+            "errors": result.errors if result.errors else None,
+            "created_at": now,
+            "completed_at": now,
+        }
+        service_supabase.table("import_audit_logs").insert(row).execute()
+    except Exception as e:
+        logger.warning("Failed to log project import to history: %s", e)
 
 
 def _create_error_response(
@@ -99,6 +129,21 @@ async def import_projects_json(
         result: ImportResult = await import_service.import_projects(
             projects=projects,
             import_method="json"
+        )
+        
+        # Log to import_audit_logs so it appears in Data Import history
+        _log_project_import_to_history(user_id, result, total_records=len(projects))
+        # Also write to central audit trail (audit_logs)
+        tenant_id = current_user.get("organization_id") or current_user.get("tenant_id")
+        log_data_import_to_audit_trail(
+            user_id=user_id,
+            import_type="projects",
+            success=result.success,
+            total_records=len(projects),
+            success_count=result.count,
+            error_count=len(result.errors) if result.errors else 0,
+            duplicate_count=0,
+            tenant_id=tenant_id,
         )
         
         # Return appropriate response based on result
@@ -300,6 +345,21 @@ async def import_projects_csv(
         result: ImportResult = await import_service.import_projects(
             projects=projects,
             import_method="csv"
+        )
+        
+        # Log to import_audit_logs so it appears in Data Import history
+        _log_project_import_to_history(user_id, result, total_records=len(projects))
+        # Also write to central audit trail (audit_logs)
+        tenant_id = current_user.get("organization_id") or current_user.get("tenant_id")
+        log_data_import_to_audit_trail(
+            user_id=user_id,
+            import_type="projects",
+            success=result.success,
+            total_records=len(projects),
+            success_count=result.count,
+            error_count=len(result.errors) if result.errors else 0,
+            duplicate_count=0,
+            tenant_id=tenant_id,
         )
         
         # Return appropriate response based on result

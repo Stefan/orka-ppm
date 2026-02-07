@@ -25,6 +25,9 @@ jest.mock('next/navigation', () => ({
     replace: jest.fn(),
     prefetch: jest.fn(),
   })),
+  useSearchParams: jest.fn(() => ({
+    get: jest.fn(() => null),
+  })),
 }))
 
 // Mock the auth provider

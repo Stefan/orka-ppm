@@ -32,6 +32,7 @@ from models.imports import (
 )
 from .anonymizer import AnonymizerService
 from .project_linker import ProjectLinker
+from .data_import_audit import log_data_import_to_audit_trail
 
 logger = logging.getLogger(__name__)
 
@@ -921,6 +922,20 @@ class ActualsCommitmentsImportService:
                 logger.info(f"Logged import {import_id} to audit table")
             else:
                 logger.warning(f"Failed to log import {import_id} to audit table")
+
+            # Also write to central audit trail (audit_logs) for Audit Trail UI
+            log_data_import_to_audit_trail(
+                user_id=self.user_id,
+                import_type=import_type.value,
+                success=result.success,
+                total_records=result.total_records,
+                success_count=result.success_count,
+                error_count=result.error_count,
+                duplicate_count=result.duplicate_count,
+                tenant_id=None,
+                error_message=result.errors[0].error if result.errors else None,
+                import_id=import_id,
+            )
                 
         except Exception as e:
             # Don't fail the import if audit logging fails

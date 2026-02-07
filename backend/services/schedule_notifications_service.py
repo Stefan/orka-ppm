@@ -87,7 +87,11 @@ class ScheduleNotificationsService:
                 for x in rows
             ]
         except Exception as e:
-            logger.error(f"Error getting task assignment notifications: {e}")
+            err_str = str(e)
+            if "PGRST205" in err_str or "Could not find the table" in err_str:
+                logger.debug("Task assignment notifications skipped (table not in schema): %s", err_str)
+            else:
+                logger.error("Error getting task assignment notifications: %s", e)
             return []
 
     async def get_schedule_notifications(

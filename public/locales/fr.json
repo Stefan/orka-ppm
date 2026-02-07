@@ -960,7 +960,9 @@
       "project_created": "Projet créé",
       "project_updated": "Projet mis à jour",
       "change_request_created": "Demande de changement créée",
-      "change_request_approved": "Demande de changement approuvée"
+      "change_request_approved": "Demande de changement approuvée",
+      "data_import": "Import de données",
+      "user_management": "Gestion des utilisateurs"
     },
     "entityTypes": {
       "project": "Projet",
@@ -971,13 +973,30 @@
       "user": "Utilisateur",
       "report": "Rapport"
     },
+    "dateRange": "Plage de dates",
+    "dateRangeShortcuts": {
+      "last2Days": "2 derniers jours",
+      "last7Days": "7 derniers jours",
+      "last30Days": "30 derniers jours",
+      "last90Days": "90 derniers jours"
+    },
     "relevance": "Pertinence",
     "viewDetails": "Voir les détails",
     "entity": "Entité",
     "close": "Fermer",
     "recentEvents": "Événements récents",
     "viewAll": "Tout afficher",
-    "noRecentEvents": "Aucun événement récent"
+    "noRecentEvents": "Aucun événement récent",
+    "timelineTitle": "Chronologie d'audit",
+    "event": "événement",
+    "anomaly": "anomalie",
+    "severityInfo": "Info",
+    "severityWarning": "Avertissement",
+    "severityError": "Erreur",
+    "severityCritical": "Critique",
+    "largerBubblesHint": "Bulles plus grandes = score d'anomalie plus élevé",
+    "loadingTimeline": "Chargement de la chronologie...",
+    "noEventsToDisplay": "Aucun événement à afficher"
   },
   "adminPerformance": {
     "title": "Tableau de Bord des Performances",

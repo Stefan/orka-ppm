@@ -296,15 +296,14 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
   )
 }
 
-// Development-only debug panel
+// Development-only debug panel — single return so hook count is never conditional
 const PerformanceDebugPanel: React.FC<{ performanceState: PerformanceState }> = ({
   performanceState
 }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const isDev = process.env.NODE_ENV === 'development'
 
-  if (process.env.NODE_ENV !== 'development') return null
-
-  return (
+  return isDev ? (
     <div className="fixed bottom-4 right-4 z-50">
       <Button
         onClick={() => setIsOpen(!isOpen)}
@@ -417,7 +416,7 @@ const PerformanceDebugPanel: React.FC<{ performanceState: PerformanceState }> = 
         </div>
       )}
     </div>
-  )
+  ) : null
 }
 
 export default PerformanceOptimizer

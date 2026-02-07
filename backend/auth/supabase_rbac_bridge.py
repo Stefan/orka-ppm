@@ -504,6 +504,12 @@ class SupabaseRBACBridge:
         Requirements: 2.1 - User authentication and role retrieval
         """
         try:
+            # Supabase JWTs use RS256; do not attempt HS256 for those (avoids "alg value is not allowed")
+            header = jwt.get_unverified_header(token)
+            alg = (header.get("alg") or "").upper()
+            if alg in ("RS256", "RS384", "RS512", "ES256", "ES384", "ES512"):
+                # Token is asymmetric-signed; verification should be done via JWKS in dependencies
+                return None
             if secret_key:
                 payload = jwt.decode(token, secret_key, algorithms=["HS256"])
             else:

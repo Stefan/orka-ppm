@@ -1,17 +1,18 @@
 'use client'
 
 import React, { useState, useEffect, useMemo, forwardRef, useImperativeHandle } from 'react'
-import { 
-  ArrowUpDown, 
-  ArrowUp, 
-  ArrowDown, 
-  Download, 
-  ChevronLeft, 
+import {
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Download,
+  ChevronLeft,
   ChevronRight,
   FileText,
   Filter
 } from 'lucide-react'
 import { getApiUrl } from '../../../../lib/api'
+import { useDateFormatter } from '@/hooks/useDateFormatter'
 
 interface Actual {
   id: string
@@ -40,6 +41,7 @@ type SortDirection = 'asc' | 'desc' | null
 type SortField = keyof Actual | null
 
 const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ accessToken, onProjectClick }, ref) => {
+  const { formatDate } = useDateFormatter()
   const [actuals, setActuals] = useState<Actual[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -215,8 +217,8 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
     format?: (value: any) => string
   }> = [
     { key: 'fi_doc_no', label: 'FI Doc No', width: 'w-32' },
-    { key: 'posting_date', label: 'Posting Date', width: 'w-28', format: (v) => v ? new Date(v).toLocaleDateString() : '' },
-    { key: 'document_date', label: 'Document Date', width: 'w-28', format: (v) => v ? new Date(v).toLocaleDateString() : '' },
+    { key: 'posting_date', label: 'Posting Date', width: 'w-28', format: (v) => v ? formatDate(new Date(v)) : '' },
+    { key: 'document_date', label: 'Document Date', width: 'w-28', format: (v) => v ? formatDate(new Date(v)) : '' },
     { key: 'vendor', label: 'Vendor', width: 'w-32' },
     { key: 'vendor_description', label: 'Vendor Description', width: 'w-48' },
     { key: 'project_nr', label: 'Project Nr', width: 'w-28' },

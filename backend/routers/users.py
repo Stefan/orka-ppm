@@ -25,6 +25,7 @@ def _debug_log(msg: str, data: dict, hypothesis_id: str = ""):
 
 from auth.rbac import require_permission, Permission, require_admin
 from config.database import supabase, service_supabase
+from services.user_management_audit import log_user_management_to_audit_trail
 from models.users import (
     UserCreateRequest, UserResponse, UserUpdateRequest, UserDeactivationRequest,
     UserListResponse, UserStatus, UserRole, UserRoleResponse, UserInviteRequest
@@ -663,7 +664,7 @@ async def deactivate_user(
 
 # Helper function for logging admin actions
 async def log_admin_action(admin_user_id: str, target_user_id: str, action: str, details: Dict[str, Any]):
-    """Log administrative actions for audit trail"""
+    """Log administrative actions to admin_audit_log and to central audit trail (audit_logs)."""
     try:
         if supabase is None:
             return
@@ -678,6 +679,14 @@ async def log_admin_action(admin_user_id: str, target_user_id: str, action: str,
         supabase.table("admin_audit_log").insert(log_data).execute()
     except Exception as e:
         print(f"Failed to log admin action: {e}")
+
+    # Also write to central audit trail so user management appears in Audit Trail UI
+    log_user_management_to_audit_trail(
+        admin_user_id=admin_user_id or "",
+        target_user_id=target_user_id,
+        action=action,
+        details=details,
+    )
 
 
 async def get_user_with_profile(user_id: str) -> Optional[Dict[str, Any]]:

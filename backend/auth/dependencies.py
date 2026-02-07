@@ -115,7 +115,14 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
         # 3) Fallback: verify with HS256 secret or decode without verification (legacy)
         if not payload:
             if secret_key:
-                payload = jwt.decode(token, secret_key, algorithms=["HS256"])
+                try:
+                    payload = jwt.decode(token, secret_key, algorithms=["HS256"])
+                except jwt.InvalidAlgorithmError:
+                    # Token is RS256/ES256 (e.g. Supabase) but JWKS verification failed; decode without verification for dev
+                    if _allow_dev_default_user():
+                        payload = jwt.decode(token, options={"verify_signature": False})
+                    else:
+                        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
             else:
                 payload = jwt.decode(token, options={"verify_signature": False})
 

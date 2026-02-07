@@ -7,7 +7,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
-import { useAuth } from '../app/providers/AuthProvider'
+import { useAuth } from '../app/providers/SupabaseAuthProvider'
 
 export interface PageContextData {
   route: string

@@ -13,7 +13,7 @@ import {
   chromeScrollLogger,
   type ChromeScrollEvent,
   type ChromeScrollMetrics 
-} from '../lib/utils/chrome-scroll-logger'
+} from '@/lib/utils/browser/chrome-scroll-logger'
 import { 
   ChromeOptimizationManager,
   chromeOptimizationManager,
@@ -22,7 +22,7 @@ import {
   applyBrowserOptimizations,
   featureDetection,
   BROWSER_CLASSES
-} from '../lib/utils/chrome-detection-optimization'
+} from '@/lib/utils/browser/chrome-detection-optimization'
 
 // Mock performance API
 const mockPerformance = {

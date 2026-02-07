@@ -13,7 +13,7 @@ interface ApiStatus {
 }
 
 export default function ApiDebugger() {
-  const t = useTranslations();
+  const { t } = useTranslations();
   const [apiStatus, setApiStatus] = useState<ApiStatus>({
     url: '',
     status: 'checking',

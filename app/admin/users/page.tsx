@@ -8,6 +8,7 @@ import { Users, UserPlus, UserMinus, UserX, Search, Filter, Shield, AlertTriangl
 import AppLayout from '../../../components/shared/AppLayout'
 import { getApiUrl } from '../../../lib/api'
 import { useTranslations } from '@/lib/i18n/context'
+import { useDateFormatter } from '@/hooks/useDateFormatter'
 
 interface User {
   id: string
@@ -49,6 +50,7 @@ interface UserFilters {
 export default function AdminUsers() {
   const { session, user } = useAuth()
   const { hasPermission, loading: permissionsLoading } = usePermissions()
+  const { formatDate: formatDateUser } = useDateFormatter()
   const router = useRouter()
   const t = useTranslations('adminUsers')
   const [users, setUsers] = useState<User[]>([])
@@ -560,7 +562,7 @@ export default function AdminUsers() {
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return t('never')
-    return new Date(dateString).toLocaleDateString('de-DE', {
+    return formatDateUser(new Date(dateString), {
       year: 'numeric',
       month: 'short',
       day: 'numeric',

@@ -158,7 +158,11 @@ class ScheduleManager:
             ]
             return schedules, total
         except Exception as e:
-            logger.error(f"Error listing schedules: {e}")
+            err_str = str(e)
+            if "PGRST205" in err_str or "Could not find the table" in err_str:
+                logger.debug("Schedules table not in schema, returning empty list: %s", err_str)
+                return [], 0
+            logger.error("Error listing schedules: %s", e)
             raise RuntimeError(f"Failed to list schedules: {str(e)}")
 
     async def update_schedule(

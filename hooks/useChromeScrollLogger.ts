@@ -9,7 +9,7 @@ import {
   ChromeScrollEvent, 
   ChromeScrollMetrics,
   ChromeScrollLoggerConfig 
-} from '../lib/utils/chrome-scroll-logger'
+} from '../lib/utils/browser/chrome-scroll-logger'
 
 export interface UseChromeScrollLoggerOptions extends Partial<ChromeScrollLoggerConfig> {
   elementRef?: React.RefObject<HTMLElement | null> | undefined
@@ -42,8 +42,9 @@ export function useChromeScrollLogger(
     onScrollEvent,
     onMetricsUpdate,
     autoStart = true,
-    ...config
+    ...rest
   } = options
+  const config: Partial<ChromeScrollLoggerConfig> = rest
 
   const [scrollEvents, setScrollEvents] = useState<ChromeScrollEvent[]>([])
   const [scrollMetrics, setScrollMetrics] = useState<ChromeScrollMetrics>({

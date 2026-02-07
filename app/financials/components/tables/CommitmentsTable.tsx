@@ -12,6 +12,7 @@ import {
   Filter
 } from 'lucide-react'
 import { getApiUrl } from '../../../../lib/api'
+import { useDateFormatter } from '@/hooks/useDateFormatter'
 
 interface Commitment {
   id: string
@@ -41,6 +42,7 @@ type SortDirection = 'asc' | 'desc' | null
 type SortField = keyof Commitment | null
 
 const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTableProps>(({ accessToken, onProjectClick }, ref) => {
+  const { formatDate } = useDateFormatter()
   const [commitments, setCommitments] = useState<Commitment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -219,7 +221,7 @@ const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTablePro
   }> = [
     { key: 'po_number', label: 'PO Number', width: 'w-32' },
     { key: 'po_line_nr', label: 'Line', width: 'w-16' },
-    { key: 'po_date', label: 'PO Date', width: 'w-28', format: (v) => v ? new Date(v).toLocaleDateString() : '' },
+    { key: 'po_date', label: 'PO Date', width: 'w-28', format: (v) => v ? formatDate(new Date(v)) : '' },
     { key: 'vendor', label: 'Vendor', width: 'w-32' },
     { key: 'vendor_description', label: 'Vendor Description', width: 'w-48' },
     { key: 'project_nr', label: 'Project Nr', width: 'w-28' },
@@ -228,7 +230,7 @@ const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTablePro
     { key: 'total_amount', label: 'Total Amount', width: 'w-28', format: (v) => v?.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00' },
     { key: 'currency', label: 'Currency', width: 'w-20' },
     { key: 'po_status', label: 'Status', width: 'w-24' },
-    { key: 'delivery_date', label: 'Delivery Date', width: 'w-28', format: (v) => v ? new Date(v).toLocaleDateString() : '' },
+    { key: 'delivery_date', label: 'Delivery Date', width: 'w-28', format: (v) => v ? formatDate(new Date(v)) : '' },
   ]
 
   // Render sort icon

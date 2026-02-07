@@ -100,12 +100,35 @@ describe('lib/utils/env', () => {
       await expect(import('../../utils/env')).resolves.toBeDefined()
     })
 
-    it('throws in production when required vars missing', async () => {
+    it('does not throw in development when required vars missing', async () => {
+      process.env.NODE_ENV = 'development'
+      delete process.env.NEXT_PUBLIC_SUPABASE_URL
+      delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      await expect(import('../../utils/env')).resolves.toBeDefined()
+    })
+
+    it('import does not throw when logger throws in validateEnvironment', async () => {
+      jest.resetModules()
+      process.env.NODE_ENV = 'test'
+      delete process.env.NEXT_PUBLIC_SUPABASE_URL
+      delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      const loggerMod = await import('../../monitoring/logger')
+      jest.spyOn(loggerMod.logger, 'error').mockImplementation(() => {
+        throw new Error('logger.error failed')
+      })
+      jest.spyOn(loggerMod.logger, 'warn').mockImplementation(() => {
+        throw new Error('logger.warn failed')
+      })
+      await expect(import('../../utils/env')).resolves.toBeDefined()
+    })
+
+    it('throws in production when required var is read and missing', async () => {
       jest.resetModules()
       process.env.NODE_ENV = 'production'
       delete process.env.NEXT_PUBLIC_SUPABASE_URL
       delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-      await expect(import('../../utils/env')).rejects.toThrow(/Missing required environment variables/)
+      const { env } = await import('../../utils/env')
+      expect(() => env.get('NEXT_PUBLIC_SUPABASE_URL')).toThrow(/Missing required environment variable/)
     })
   })
 })

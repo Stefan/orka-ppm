@@ -960,7 +960,9 @@
       "project_created": "Proyecto creado",
       "project_updated": "Proyecto actualizado",
       "change_request_created": "Solicitud de cambio creada",
-      "change_request_approved": "Solicitud de cambio aprobada"
+      "change_request_approved": "Solicitud de cambio aprobada",
+      "data_import": "Importación de datos",
+      "user_management": "Gestión de usuarios"
     },
     "entityTypes": {
       "project": "Proyecto",
@@ -971,13 +973,30 @@
       "user": "Usuario",
       "report": "Informe"
     },
+    "dateRange": "Rango de fechas",
+    "dateRangeShortcuts": {
+      "last2Days": "Últimos 2 días",
+      "last7Days": "Últimos 7 días",
+      "last30Days": "Últimos 30 días",
+      "last90Days": "Últimos 90 días"
+    },
     "relevance": "Relevancia",
     "viewDetails": "Ver detalles",
     "entity": "Entidad",
     "close": "Cerrar",
     "recentEvents": "Eventos recientes",
     "viewAll": "Ver todo",
-    "noRecentEvents": "No hay eventos recientes"
+    "noRecentEvents": "No hay eventos recientes",
+    "timelineTitle": "Línea de tiempo de auditoría",
+    "event": "evento",
+    "anomaly": "anomalía",
+    "severityInfo": "Info",
+    "severityWarning": "Advertencia",
+    "severityError": "Error",
+    "severityCritical": "Crítico",
+    "largerBubblesHint": "Burbujas más grandes = mayor puntuación de anomalía",
+    "loadingTimeline": "Cargando línea de tiempo...",
+    "noEventsToDisplay": "No hay eventos que mostrar"
   },
   "adminPerformance": {
     "title": "Panel de Rendimiento",

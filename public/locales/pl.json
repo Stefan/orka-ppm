@@ -956,7 +956,9 @@
       "project_created": "Projekt utworzony",
       "project_updated": "Projekt zaktualizowany",
       "change_request_created": "Wniosek o zmianę utworzony",
-      "change_request_approved": "Wniosek o zmianę zatwierdzony"
+      "change_request_approved": "Wniosek o zmianę zatwierdzony",
+      "data_import": "Import danych",
+      "user_management": "Zarządzanie użytkownikami"
     },
     "entityTypes": {
       "project": "Projekt",
@@ -967,13 +969,30 @@
       "user": "Użytkownik",
       "report": "Raport"
     },
+    "dateRange": "Zakres dat",
+    "dateRangeShortcuts": {
+      "last2Days": "Ostatnie 2 dni",
+      "last7Days": "Ostatnie 7 dni",
+      "last30Days": "Ostatnie 30 dni",
+      "last90Days": "Ostatnie 90 dni"
+    },
     "relevance": "Trafność",
     "viewDetails": "Pokaż szczegóły",
     "entity": "Encja",
     "close": "Zamknij",
     "recentEvents": "Ostatnie zdarzenia",
     "viewAll": "Pokaż wszystko",
-    "noRecentEvents": "Brak ostatnich zdarzeń"
+    "noRecentEvents": "Brak ostatnich zdarzeń",
+    "timelineTitle": "Oś czasu audytu",
+    "event": "zdarzenie",
+    "anomaly": "anomalia",
+    "severityInfo": "Info",
+    "severityWarning": "Ostrzeżenie",
+    "severityError": "Błąd",
+    "severityCritical": "Krytyczny",
+    "largerBubblesHint": "Większe bąbelki = wyższy wynik anomalii",
+    "loadingTimeline": "Ładowanie osi czasu...",
+    "noEventsToDisplay": "Brak zdarzeń do wyświetlenia"
   },
   "adminPerformance": {
     "title": "Panel Wydajności",

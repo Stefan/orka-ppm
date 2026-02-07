@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useTranslations } from '@/lib/i18n/context'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
-import { Sun, Moon, Monitor, Clock, DollarSign, Check } from 'lucide-react'
+import { Sun, Moon, Monitor, Clock, DollarSign, Check, Calendar } from 'lucide-react'
 import { useSettings } from '@/hooks/useSettings'
 import { useTheme } from '@/app/providers/ThemeProvider'
 import { logger } from '@/lib/monitoring/logger'
@@ -26,6 +26,8 @@ const CURRENCIES = [
   { value: 'GBP', label: 'GBP (£)' },
 ]
 
+type DateFormatValue = 'browser' | 'de-DE' | 'en-US' | 'en-GB' | 'iso'
+
 type Theme = 'light' | 'dark' | 'system'
 
 export function GeneralSettings() {
@@ -35,12 +37,14 @@ export function GeneralSettings() {
   
   const [timezone, setTimezone] = useState(settings?.timezone || 'UTC')
   const [currency, setCurrency] = useState(settings?.currency || 'USD')
+  const [dateFormat, setDateFormat] = useState<DateFormatValue>(settings?.dateFormat || 'browser')
   const [hasChanges, setHasChanges] = useState(false)
 
   useEffect(() => {
     if (settings) {
       setTimezone(settings.timezone || 'UTC')
       setCurrency(settings.currency || 'USD')
+      setDateFormat((settings.dateFormat as DateFormatValue) || 'browser')
     }
   }, [settings])
 
@@ -68,6 +72,7 @@ export function GeneralSettings() {
     try {
       await updateSetting('timezone', timezone)
       await updateSetting('currency', currency)
+      await updateSetting('dateFormat', dateFormat)
       setHasChanges(false)
     } catch {
       logger.warn('Settings sync failed, changes saved locally', undefined, 'GeneralSettings')
@@ -114,6 +119,34 @@ export function GeneralSettings() {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Date format */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-gray-600 dark:text-slate-400" aria-hidden />
+            {t('settings.dateFormat') || 'Date format'}
+          </div>
+        </label>
+        <Select
+          value={dateFormat}
+          onChange={(value) => {
+            setDateFormat(value as DateFormatValue)
+            setHasChanges(true)
+          }}
+          options={[
+            { value: 'browser', label: t('settings.dateFormatBrowser') || 'Browser default' },
+            { value: 'de-DE', label: t('settings.dateFormatDe') || 'German (DD.MM.YYYY)' },
+            { value: 'en-US', label: t('settings.dateFormatEnUs') || 'US (MM/DD/YYYY)' },
+            { value: 'en-GB', label: t('settings.dateFormatEnGb') || 'UK (DD/MM/YYYY)' },
+            { value: 'iso', label: t('settings.dateFormatIso') || 'ISO (YYYY-MM-DD)' },
+          ]}
+          className="w-full max-w-xs"
+        />
+        <p className="text-xs text-gray-500 dark:text-slate-400">
+          {t('settings.dateFormatHint') || 'How dates are displayed. Default uses your browser language.'}
+        </p>
       </div>
 
       {/* Timezone Selection */}

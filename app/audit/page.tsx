@@ -13,6 +13,7 @@ import type { SearchResponse } from '../../components/audit/SemanticSearch'
 import type { AuditFilters as AuditFiltersType } from '../../components/audit/AuditFilters'
 import { useFeatureFlag } from '../../contexts/FeatureFlagContext'
 import { GuidedTour, useGuidedTour, TourTriggerButton, auditTourSteps } from '@/components/guided-tour'
+import { useDateFormatter } from '@/hooks/useDateFormatter'
 
 // Tab types
 type TabType = 'dashboard' | 'timeline' | 'anomalies' | 'search'
@@ -44,6 +45,7 @@ function emptyStats(): DashboardStats {
 export default function AuditDashboard() {
   const { session } = useAuth()
   const { t } = useTranslations()
+  const { formatDate } = useDateFormatter()
   const [activeTab, setActiveTab] = useState<TabType>('dashboard')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -63,9 +65,16 @@ export default function AuditDashboard() {
   const [autoRefresh, setAutoRefresh] = useState(false)
   const [exportLoading, setExportLoading] = useState<'pdf' | 'csv' | null>(null)
   
-  // Timeline state
+  // Timeline state: default to last 7 days so the timeline shows a sensible range without user picking dates
   const [timelineEvents, setTimelineEvents] = useState<AuditEvent[]>([])
-  const [timelineFilters, setTimelineFilters] = useState<TimelineFilters>({})
+  const [timelineFilters, setTimelineFilters] = useState<TimelineFilters>(() => {
+    const end = new Date()
+    end.setHours(23, 59, 59, 999)
+    const start = new Date(end)
+    start.setDate(start.getDate() - 7)
+    start.setHours(0, 0, 0, 0)
+    return { dateRange: { start, end } }
+  })
   const [timelineLoading, setTimelineLoading] = useState(false)
 
   // Recent events for dashboard tab (same data as timeline, so record appears in both)
@@ -772,9 +781,10 @@ export default function AuditDashboard() {
                                     {event.entity_type}
                                     {event.timestamp && (
                                       <span className="ml-2">
-                                        {typeof event.timestamp === 'string'
-                                          ? new Date(event.timestamp).toLocaleString()
-                                          : (event.timestamp as Date).toLocaleString?.() ?? String(event.timestamp)}
+                                        {formatDate(
+                                          typeof event.timestamp === 'string' ? new Date(event.timestamp) : new Date((event.timestamp as Date).getTime()),
+                                          { dateStyle: 'short', timeStyle: 'short' }
+                                        )}
                                       </span>
                                     )}
                                   </p>

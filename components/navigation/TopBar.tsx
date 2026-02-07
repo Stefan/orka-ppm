@@ -270,18 +270,6 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   <Users className="h-5 w-5 mr-3 flex-shrink-0" />
                   <span className="font-medium">Resource Management</span>
                 </Link>
-                <Link
-                  href="/projects/import"
-                  className={`${dropdownItemBase} ${
-                    pathname === '/projects/import'
-                      ? dropdownItemActive
-                      : dropdownItemInactive
-                  }`}
-                  onClick={() => setProjectsMenuOpen(false)}
-                >
-                  <Upload className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">Import</span>
-                </Link>
               </div>
             )}
           </div>
@@ -435,7 +423,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             <button
               onClick={() => toggleDropdown(setManagementMenuOpen, managementMenuOpen)}
               className={`flex items-center space-x-1 ${navLinkBase} ${
-                ['/changes', '/feedback', '/features'].includes(pathname)
+                ['/changes', '/feedback', '/features', '/import'].includes(pathname)
                   ? navLinkActive
                   : managementMenuOpen
                     ? navLinkOpen
@@ -476,6 +464,14 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 >
                   <Layers className="h-5 w-5 mr-3 flex-shrink-0" />
                   <span className="font-medium">Features Overview</span>
+                </Link>
+                <Link
+                  href="/import"
+                  className={`${dropdownItemBase} ${pathname === '/import' ? dropdownItemActive : dropdownItemInactive}`}
+                  onClick={() => setManagementMenuOpen(false)}
+                >
+                  <Upload className="h-5 w-5 mr-3 flex-shrink-0" />
+                  <span className="font-medium">Data Import</span>
                 </Link>
               </div>
             )}

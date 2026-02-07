@@ -112,7 +112,7 @@ export interface ComprehensiveFinancialReport {
 
 export interface CSVImportHistory {
   id: string
-  import_type: 'commitments' | 'actuals'
+  import_type: 'commitments' | 'actuals' | 'projects'
   file_name: string
   file_size: number
   records_processed: number

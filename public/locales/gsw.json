@@ -956,7 +956,9 @@
       "project_created": "Projekt erstellt",
       "project_updated": "Projekt aktualisiert",
       "change_request_created": "Änderigsaafrag erstellt",
-      "change_request_approved": "Änderigsaafrag gnehmigt"
+      "change_request_approved": "Änderigsaafrag gnehmigt",
+      "data_import": "Dateimport",
+      "user_management": "Benutzerverwaltig"
     },
     "entityTypes": {
       "project": "Projekt",
@@ -967,13 +969,30 @@
       "user": "Benutzer",
       "report": "Bericht"
     },
+    "dateRange": "Zytruum",
+    "dateRangeShortcuts": {
+      "last2Days": "Letschti 2 Täg",
+      "last7Days": "Letschti 7 Täg",
+      "last30Days": "Letschti 30 Täg",
+      "last90Days": "Letschti 90 Täg"
+    },
     "relevance": "Relevanz",
     "viewDetails": "Details aazeige",
     "entity": "Entität",
     "close": "Schliesse",
     "recentEvents": "Letti Eräigniss",
     "viewAll": "Alli aazeige",
-    "noRecentEvents": "Keini letti Eräigniss"
+    "noRecentEvents": "Keini letti Eräigniss",
+    "timelineTitle": "Audit-Zitachse",
+    "event": "Eräignis",
+    "anomaly": "Anomalie",
+    "severityInfo": "Info",
+    "severityWarning": "Warnig",
+    "severityError": "Fehler",
+    "severityCritical": "Kritisch",
+    "largerBubblesHint": "Grösseri Blose = höchere Anomalie-Pünkt",
+    "loadingTimeline": "Zitachse wird glaade...",
+    "noEventsToDisplay": "Keini Eräigniss zum Aazeige"
   },
   "adminPerformance": {
     "title": "Performance-Dashboard",

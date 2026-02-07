@@ -3,7 +3,7 @@
  * Tests scroll event capture functionality, logging output format, and Chrome-specific event properties
  */
 
-import { ChromeScrollLogger, chromeScrollLogger } from '../lib/utils/chrome-scroll-logger'
+import { ChromeScrollLogger, chromeScrollLogger } from '@/lib/utils/browser/chrome-scroll-logger'
 
 // Mock DOM APIs
 const mockElement = {

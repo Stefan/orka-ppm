@@ -1,15 +1,18 @@
 'use client'
 
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
+import dynamic from 'next/dynamic'
 import AppLayout from '../../components/shared/AppLayout'
-import { Upload, FileText, Database, DollarSign } from 'lucide-react'
+import { Upload } from 'lucide-react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { useFeatureFlag } from '@/contexts/FeatureFlagContext'
-import { useRouter } from 'next/navigation'
+import { useTranslations } from '@/lib/i18n/context'
 import { GuidedTour, useGuidedTour, TourTriggerButton, importTourSteps } from '@/components/guided-tour'
 
-type EntityType = 'projects' | 'resources' | 'financials'
+const CSVImportView = dynamic(
+  () => import('@/app/financials/components/views/CSVImportView'),
+  { ssr: false, loading: () => <div className="animate-pulse h-48 bg-gray-200 dark:bg-slate-700 rounded-lg" /> }
+)
 
 interface ImportError {
   line_number: number
@@ -27,25 +30,14 @@ interface ImportResult {
 
 export default function ImportPage() {
   const { session } = useAuth()
-  const router = useRouter()
-  const { enabled: importEnabled } = useFeatureFlag('import_builder_ai')
-
-  // When AI import builder is disabled, redirect to project import page instead of dashboard
-  useEffect(() => {
-    if (!importEnabled) {
-      router.replace('/projects/import')
-    }
-  }, [importEnabled, router])
-
+  const t = useTranslations('dataImport')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [entityType, setEntityType] = useState<EntityType>('projects')
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [result, setResult] = useState<ImportResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const { isOpen, startTour, closeTour, completeTour, resetAndStartTour, hasCompletedTour } = useGuidedTour('import-v1')
 
-  // File drop handler
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0]
     if (file) {
@@ -65,7 +57,6 @@ export default function ImportPage() {
     multiple: false
   })
 
-  // Handle file upload
   const handleUpload = async () => {
     if (!selectedFile || !session?.access_token) return
 
@@ -75,17 +66,14 @@ export default function ImportPage() {
     setResult(null)
 
     try {
-      // Create form data
       const formData = new FormData()
       formData.append('file', selectedFile)
-      formData.append('entity_type', entityType)
+      formData.append('entity_type', 'projects')
 
-      // Simulate progress (since we can't track actual upload progress easily)
       const progressInterval = setInterval(() => {
         setUploadProgress(prev => Math.min(prev + 10, 90))
       }, 200)
 
-      // Upload to backend
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/projects/import`, {
         method: 'POST',
         headers: {
@@ -105,7 +93,6 @@ export default function ImportPage() {
       const data: ImportResult = await response.json()
       setResult(data)
 
-      // Clear file if successful
       if (data.error_count === 0) {
         setSelectedFile(null)
       }
@@ -118,7 +105,6 @@ export default function ImportPage() {
     }
   }
 
-  // Download error report
   const downloadErrorReport = () => {
     if (!result || result.errors.length === 0) return
 
@@ -143,12 +129,6 @@ export default function ImportPage() {
     URL.revokeObjectURL(url)
   }
 
-  const entityTypeOptions = [
-    { value: 'projects', label: 'Projects', icon: FileText, description: 'Import project data' },
-    { value: 'resources', label: 'Resources', icon: Database, description: 'Import resource allocations' },
-    { value: 'financials', label: 'Financials', icon: DollarSign, description: 'Import financial records' }
-  ]
-
   return (
     <AppLayout>
       <div data-testid="import-page" className="p-4 sm:p-6 lg:p-8">
@@ -156,9 +136,9 @@ export default function ImportPage() {
           {/* Header */}
           <div data-testid="import-header" className="mb-8 flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <h1 data-testid="import-title" className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-2">Bulk Import</h1>
+              <h1 data-testid="import-title" className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-2">{t('title')}</h1>
               <p className="text-gray-700 dark:text-slate-300">
-                Import multiple records from CSV or JSON files
+                {t('subtitle')}
               </p>
             </div>
             <TourTriggerButton
@@ -167,203 +147,120 @@ export default function ImportPage() {
             />
           </div>
 
-          {/* Entity Type Selector + Mapping */}
+          {/* 1. Import Projects */}
           <div data-testid="import-interface" data-tour="import-mapping" className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Select Entity Type</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {entityTypeOptions.map(option => {
-                const Icon = option.icon
-                return (
-                  <button
-                    key={option.value}
-                    onClick={() => setEntityType(option.value as EntityType)}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      entityType === option.value
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                        : 'border-gray-200 dark:border-slate-700 hover:border-gray-300 dark:hover:border-slate-500'
-                    }`}
-                  >
-                    <Icon className={`h-8 w-8 mb-2 ${
-                      entityType === option.value ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-slate-500'
-                    }`} />
-                    <div className="text-left">
-                      <div className="font-semibold text-gray-900 dark:text-slate-100">{option.label}</div>
-                      <div className="text-sm text-gray-700 dark:text-slate-300">{option.description}</div>
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">{t('projects')}</h2>
+            <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">
+              {t('projectsDescription')}
+            </p>
+            <div data-tour="import-preview" className="mt-4">
+              <div
+                {...getRootProps()}
+                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                  isDragActive
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                    : 'border-gray-300 dark:border-slate-600 hover:border-gray-400 dark:hover:border-slate-500'
+                }`}
+              >
+                <input {...getInputProps()} />
+                <Upload className={`h-12 w-12 mx-auto mb-4 ${
+                  isDragActive ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-slate-500'
+                }`} />
+                {selectedFile ? (
+                  <div>
+                    <p className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-1">{selectedFile.name}</p>
+                    <p className="text-sm text-gray-700 dark:text-slate-300">{(selectedFile.size / 1024).toFixed(2)} KB</p>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-gray-700 dark:text-slate-300 mb-2">
+                      {isDragActive ? t('dropzoneActive') : t('dropzonePrompt')}
+                    </p>
+                    <p className="text-sm text-gray-700 dark:text-slate-300">{t('acceptedFormats')}</p>
+                  </div>
+                )}
+              </div>
 
-          {/* File Upload Dropzone + Preview */}
-          <div data-tour="import-preview" className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Upload File</h2>
-            <div
-              {...getRootProps()}
-              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-                isDragActive
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                  : 'border-gray-300 dark:border-slate-600 hover:border-gray-400 dark:hover:border-slate-500'
-              }`}
-            >
-              <input {...getInputProps()} />
-              <Upload className={`h-12 w-12 mx-auto mb-4 ${
-                isDragActive ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-slate-500'
-              }`} />
-              {selectedFile ? (
-                <div>
-                  <p className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-1">
-                    {selectedFile.name}
-                  </p>
-                  <p className="text-sm text-gray-700 dark:text-slate-300">
-                    {(selectedFile.size / 1024).toFixed(2)} KB
-                  </p>
-                </div>
-              ) : (
-                <div>
-                  <p className="text-gray-700 dark:text-slate-300 mb-2">
-                    {isDragActive
-                      ? 'Drop file here...'
-                      : 'Drag & drop CSV or JSON file, or click to select'}
-                  </p>
-                  <p className="text-sm text-gray-700 dark:text-slate-300">
-                    Supported formats: .csv, .json
-                  </p>
+              {selectedFile && (
+                <div className="mt-4 flex gap-3" data-tour="import-start">
+                  <button
+                    onClick={handleUpload}
+                    disabled={uploading}
+                    className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  >
+                    {uploading ? t('processing') : t('importButton')}
+                  </button>
+                  <button
+                    onClick={() => setSelectedFile(null)}
+                    disabled={uploading}
+                    className="px-6 py-3 border border-gray-300 dark:border-slate-600 text-gray-900 dark:text-slate-100 rounded-lg hover:bg-gray-50 dark:bg-slate-800/50 disabled:opacity-50"
+                  >
+                    {t('clear')}
+                  </button>
                 </div>
               )}
             </div>
 
-            {selectedFile && (
-              <div className="mt-4 flex gap-3" data-tour="import-start">
-                <button
-                  onClick={handleUpload}
-                  disabled={uploading}
-                  className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-                >
-                  {uploading ? 'Uploading...' : 'Import Data'}
-                </button>
-                <button
-                  onClick={() => setSelectedFile(null)}
-                  disabled={uploading}
-                  className="px-6 py-3 border border-gray-300 dark:border-slate-600 text-gray-900 dark:text-slate-100 rounded-lg hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700 disabled:opacity-50"
-                >
-                  Clear
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Upload Progress */}
-          {uploading && (
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6 mb-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700 dark:text-slate-300">Processing...</span>
+            {uploading && (
+              <div className="mt-4 flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('processing')}</span>
                 <span className="text-sm text-gray-700 dark:text-slate-300">{uploadProgress}%</span>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2">
+            )}
+            {uploading && (
+              <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 mt-2">
                 <div
                   className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${uploadProgress}%` }}
                 />
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Error Display */}
-          {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800 dark:text-red-300">Import Failed</h3>
-                  <p className="text-sm text-red-700 dark:text-red-400 mt-1">{error}</p>
-                </div>
+            {error && (
+              <div className="mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                <h3 className="text-sm font-medium text-red-800 dark:text-red-300">{t('importFailed')}</h3>
+                <p className="text-sm text-red-700 dark:text-red-400 mt-1">{error}</p>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Success/Error Results */}
-          {result && (
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Import Results</h2>
-              
-              {/* Summary */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-green-700 dark:text-green-400">{result.success_count}</div>
-                  <div className="text-sm text-green-600 dark:text-green-400">Records Imported</div>
+            {result && (
+              <div className="mt-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100 mb-3">{t('results')}</h3>
+                <div className="grid grid-cols-2 gap-4 mb-3">
+                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
+                    <div className="text-xl font-bold text-green-700 dark:text-green-400">{result.success_count}</div>
+                    <div className="text-xs text-green-600 dark:text-green-400">{t('imported')}</div>
+                  </div>
+                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                    <div className="text-xl font-bold text-red-700 dark:text-red-400">{result.error_count}</div>
+                    <div className="text-xs text-red-600 dark:text-red-400">{t('errors')}</div>
+                  </div>
                 </div>
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-red-700 dark:text-red-400">{result.error_count}</div>
-                  <div className="text-sm text-red-600 dark:text-red-400">Errors</div>
-                </div>
-              </div>
-
-              <div className="text-sm text-gray-700 dark:text-slate-300 mb-4">
-                Processing time: {result.processing_time_seconds.toFixed(2)}s
-              </div>
-
-              {/* Validation Errors */}
-              {result.errors.length > 0 && (
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-medium text-gray-900 dark:text-slate-100">Validation Errors</h3>
+                <p className="text-xs text-gray-700 dark:text-slate-300 mb-3">
+                  {t('processingTime', { seconds: result.processing_time_seconds.toFixed(2) })}
+                </p>
+                {result.errors.length > 0 && (
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-900 dark:text-slate-100">{t('validationErrors')}</span>
                     <button
                       onClick={downloadErrorReport}
                       className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium"
                     >
-                      Download Error Report
+                      {t('downloadReport')}
                     </button>
                   </div>
-                  <div className="border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden">
-                    <div className="max-h-96 overflow-y-auto">
-                      <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
-                        <thead className="bg-gray-50 dark:bg-slate-700 sticky top-0">
-                          <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase">Line</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase">Field</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase">Error</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase">Value</th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
-                          {result.errors.map((err, idx) => (
-                            <tr key={idx} className="hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700">
-                              <td className="px-4 py-3 text-sm text-gray-900 dark:text-slate-100">{err.line_number}</td>
-                              <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-slate-100">{err.field}</td>
-                              <td className="px-4 py-3 text-sm text-red-600 dark:text-red-400">{err.message}</td>
-                              <td className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300 truncate max-w-xs">
-                                {err.value !== null && err.value !== undefined ? String(err.value) : '-'}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              )}
+                )}
+                {result.error_count === 0 && (
+                  <p className="text-sm font-medium text-green-800 dark:text-green-300">{t('allSuccess')}</p>
+                )}
+              </div>
+            )}
+          </div>
 
-              {/* Success Message */}
-              {result.error_count === 0 && (
-                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                  <div className="flex items-center">
-                    <svg className="h-5 w-5 text-green-400 mr-3" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-sm font-medium text-green-800 dark:text-green-300">
-                      All records imported successfully!
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+          {/* Commitments & Actuals */}
+          <div data-testid="import-csv-view">
+            <CSVImportView accessToken={session?.access_token} />
+          </div>
         </div>
       </div>
       <GuidedTour

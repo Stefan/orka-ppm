@@ -12,7 +12,7 @@ import { ArrowLeft, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import ShareLinkManager from '@/components/projects/ShareLinkManager'
-import { tabs } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 
 interface Project {
   id: string

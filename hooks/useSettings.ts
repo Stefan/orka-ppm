@@ -50,7 +50,7 @@ export function useSettings(): UseSettingsReturn {
       if (session?.user?.id && !initialized) {
         try {
           setLoading(true)
-          await initialize(session.user.id)
+          await initialize(session.user.id, session.access_token ?? undefined)
           setInitialized(true)
         } catch (err) {
           console.error('Failed to initialize settings:', err)
@@ -118,6 +118,7 @@ export function useSettings(): UseSettingsReturn {
       theme: 'auto',
       language: 'en',
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+      dateFormat: 'browser',
       currency: 'USD',
       dashboardLayout: {
         widgets: [],

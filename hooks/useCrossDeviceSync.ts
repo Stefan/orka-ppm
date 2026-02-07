@@ -61,13 +61,13 @@ export function useCrossDeviceSync(): UseCrossDeviceSyncReturn {
   const syncServiceRef = useRef(getCrossDeviceSyncService())
   const isInitialized = useRef(false)
 
-  // Initialize sync service
-  const initialize = useCallback(async (userId: string) => {
+  // Initialize sync service (pass accessToken so sync API requests are authenticated)
+  const initialize = useCallback(async (userId: string, accessToken?: string | null) => {
     if (isInitialized.current || typeof window === 'undefined') return
-    
+
     try {
       setIsSyncing(true)
-      await syncServiceRef.current.initialize(userId)
+      await syncServiceRef.current.initialize(userId, accessToken)
       isInitialized.current = true
       
       // Load initial data

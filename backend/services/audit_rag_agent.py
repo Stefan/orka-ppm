@@ -268,31 +268,106 @@ class AuditRAGAgent(AIAgentBase):
             sql_query += " ORDER BY ae.embedding <=> %s::vector LIMIT %s"
             params.extend([json.dumps(query_embedding), limit])
             
-            # Execute query using Supabase RPC or direct SQL
-            # Note: This is a simplified version - actual implementation may need RPC function
+            # Prefer Supabase RPC (audit_logs.embedding) when available
+            rpc_result = await self._semantic_search_rpc(
+                query_embedding=query_embedding,
+                tenant_id=tenant_id,
+                filters=filters,
+                limit=limit,
+            )
+            if rpc_result is not None:
+                if self.redis and rpc_result.get("results"):
+                    await self._cache_result(cache_key, rpc_result, self.cache_ttl)
+                logger.info(f"Semantic search (RPC) returned {len(rpc_result.get('results', []))} results for query: {query}")
+                return rpc_result
+
+            # Fallback: execute raw SQL path (e.g. audit_embeddings)
             results = await self._execute_vector_search(sql_query, params)
-            
-            # Cache results
-            if self.redis and results:
-                await self._cache_result(cache_key, results, self.cache_ttl)
-            
-            logger.info(f"Semantic search returned {len(results)} results for query: {query}")
-            return results
-            
+            if results:
+                out = {"results": results, "ai_response": "", "sources": []}
+                if self.redis:
+                    await self._cache_result(cache_key, out, self.cache_ttl)
+                logger.info(f"Semantic search returned {len(results)} results for query: {query}")
+                return out
+
+            logger.info(f"Semantic search returned 0 results for query: {query}")
+            return {"results": [], "ai_response": "", "sources": []}
+
         except Exception as e:
             logger.error(f"Semantic search failed: {e}")
-            return []
-    
+            return {"results": [], "ai_response": "", "sources": []}
+
+    async def _semantic_search_rpc(
+        self,
+        query_embedding: List[float],
+        tenant_id: str,
+        filters: Optional[Dict[str, Any]] = None,
+        limit: int = 10,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Run semantic search via Supabase RPC search_audit_logs_semantic (audit_logs.embedding).
+        Returns None if RPC is not available or fails.
+        """
+        try:
+            start_date = filters.get("start_date") if filters else None
+            end_date = filters.get("end_date") if filters else None
+            event_types = filters.get("event_types") if filters else None
+            if start_date and hasattr(start_date, "isoformat"):
+                start_date = start_date.isoformat()
+            if end_date and hasattr(end_date, "isoformat"):
+                end_date = end_date.isoformat()
+            rpc_params = {
+                "query_embedding": query_embedding,
+                "p_tenant_id": tenant_id,
+                "event_types": event_types,
+                "start_date": start_date,
+                "end_date": end_date,
+                "similarity_limit": limit,
+                "similarity_threshold": 0.0,
+            }
+            result = self.supabase.rpc("search_audit_logs_semantic", rpc_params).execute()
+            rows = result.data or []
+            results = []
+            for row in rows:
+                event = {
+                    "id": row.get("id"),
+                    "event_type": row.get("event_type"),
+                    "user_id": row.get("user_id"),
+                    "entity_type": row.get("entity_type"),
+                    "entity_id": row.get("entity_id"),
+                    "action_details": row.get("action_details") or {},
+                    "severity": row.get("severity") or "info",
+                    "timestamp": row.get("timestamp"),
+                    "anomaly_score": row.get("anomaly_score"),
+                    "is_anomaly": bool(row.get("is_anomaly")),
+                    "category": row.get("category"),
+                    "risk_level": row.get("risk_level"),
+                    "tags": row.get("tags"),
+                    "ai_insights": None,
+                    "tenant_id": tenant_id,
+                    "ip_address": None,
+                    "user_agent": None,
+                    "project_id": None,
+                    "performance_metrics": None,
+                    "hash": None,
+                    "previous_hash": None,
+                }
+                results.append({
+                    "event": event,
+                    "similarity_score": float(row.get("similarity_score", 0.0)),
+                    "relevance_explanation": "",
+                })
+            return {"results": results, "ai_response": "", "sources": []}
+        except Exception as e:
+            logger.debug("Semantic search RPC not used: %s", e)
+            return None
+
     async def _execute_vector_search(self, sql_query: str, params: List[Any]) -> List[Dict[str, Any]]:
         """
-        Execute vector similarity search query
-        
-        This is a placeholder for the actual implementation which would use
-        Supabase RPC or direct PostgreSQL connection
+        Execute vector similarity search query (audit_embeddings path).
+        Returns list of { event, similarity_score, relevance_explanation }.
         """
-        # TODO: Implement actual vector search execution
-        # For now, return empty list as fallback
-        logger.warning("Vector search execution not fully implemented - using fallback")
+        logger.debug("Vector search via SQL not implemented - using RPC only")
         return []
     
     async def generate_summary(

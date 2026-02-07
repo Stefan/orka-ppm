@@ -24,7 +24,7 @@ export default function ShareableURLWidget({
   projectName,
   onClose 
 }: ShareableURLWidgetProps) {
-  const t = useTranslations();
+  const { t } = useTranslations();
   const [isOpen, setIsOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedURL, setGeneratedURL] = useState<string | null>(null);

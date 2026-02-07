@@ -13,11 +13,11 @@ import {
   calculateRiskTrend,
   assessMitigationUrgency,
   generateRiskInsights
-} from '../../lib/ai/risk-management'
+} from '@/lib/ai/risk-management'
 
 // Mock the AI Risk Management System for testing
-jest.mock('../../lib/ai-risk-management', () => {
-  const actual = jest.requireActual('../lib/ai-risk-management')
+jest.mock('@/lib/ai/risk-management', () => {
+  const actual = jest.requireActual('@/lib/ai/risk-management')
   return {
     ...actual,
     aiRiskManagementSystem: {

@@ -37,7 +37,6 @@ const NAV_ITEMS = [
   // Projects & Resources
   { href: '/projects', label: 'All Projects', icon: GitBranch, group: 'Projects' },
   { href: '/resources', label: 'Resource Management', icon: Users, group: 'Projects' },
-  { href: '/projects/import', label: 'Import', icon: Upload, group: 'Projects' },
 
   // Financial Management
   { href: '/financials', label: 'Budget & Cost Tracking', icon: DollarSign, group: 'Financials' },
@@ -56,6 +55,7 @@ const NAV_ITEMS = [
   { href: '/changes', label: 'Change Management', icon: GitPullRequest, group: 'Management' },
   { href: '/feedback', label: 'Feedback & Ideas', icon: MessageSquare, group: 'Management' },
   { href: '/features', label: 'Features Overview', icon: Layers, group: 'Management' },
+  { href: '/import', label: 'Data Import', icon: Upload, group: 'Management' },
   { href: '/settings', label: 'Settings', icon: Settings, group: 'Management' },
 
   // Administration

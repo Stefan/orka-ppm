@@ -28,6 +28,16 @@ import {
   Tag
 } from 'lucide-react'
 import { useTranslations } from '@/lib/i18n/context'
+import { useDateFormatter } from '@/hooks/useDateFormatter'
+
+/** Fallbacks when audit.dateRange / dateRangeShortcuts keys are missing (e.g. cached locale) */
+const DATE_RANGE_FALLBACKS: Record<string, string> = {
+  'audit.dateRange': 'Date Range',
+  'audit.dateRangeShortcuts.last2Days': 'Last 2 days',
+  'audit.dateRangeShortcuts.last7Days': 'Last 7 days',
+  'audit.dateRangeShortcuts.last30Days': 'Last 30 days',
+  'audit.dateRangeShortcuts.last90Days': 'Last 90 days',
+}
 
 /**
  * Audit Event Interface
@@ -138,8 +148,22 @@ const Timeline: React.FC<TimelineProps> = ({
   className = ''
 }) => {
   const { t } = useTranslations()
+  const { formatDate: formatDateUser } = useDateFormatter()
   const [selectedEvent, setSelectedEvent] = useState<AuditEvent | null>(null)
   const [showFilters, setShowFilters] = useState(false)
+
+  /**
+   * X-axis domain from filter date range so the chart reflects the selected time period.
+   * When no date range is set, use data min/max.
+   */
+  const xAxisDomain = useMemo((): [number, number] | ['dataMin', 'dataMax'] => {
+    if (filters?.dateRange?.start && filters?.dateRange?.end) {
+      const start = new Date(filters.dateRange.start).getTime()
+      const end = new Date(filters.dateRange.end).getTime()
+      return [start, end]
+    }
+    return ['dataMin', 'dataMax']
+  }, [filters?.dateRange?.start, filters?.dateRange?.end])
 
   /**
    * Transform events for Recharts scatter plot
@@ -198,7 +222,7 @@ const Timeline: React.FC<TimelineProps> = ({
             <div>
               <p className="font-semibold text-gray-900 dark:text-slate-100">{t(`audit.eventTypes.${event.event_type}` as any) || event.event_type}</p>
               <p className="text-xs text-gray-500 dark:text-slate-400">
-                {new Date(event.timestamp).toLocaleString()}
+                {formatDateUser(new Date(event.timestamp), { dateStyle: 'short', timeStyle: 'short' })}
               </p>
             </div>
           </div>
@@ -321,8 +345,7 @@ const Timeline: React.FC<TimelineProps> = ({
    * Format X-axis (timestamp)
    */
   const formatXAxis = (timestamp: number) => {
-    const date = new Date(timestamp)
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    return formatDateUser(new Date(timestamp), { month: 'short', day: 'numeric' })
   }
 
   /**
@@ -330,20 +353,54 @@ const Timeline: React.FC<TimelineProps> = ({
    */
   const formatYAxis = (value: number) => {
     switch (value) {
-      case 4: return 'Critical'
-      case 3: return 'Error'
-      case 2: return 'Warning'
-      case 1: return 'Info'
+      case 4: return t('audit.severityCritical')
+      case 3: return t('audit.severityError')
+      case 2: return t('audit.severityWarning')
+      case 1: return t('audit.severityInfo')
       default: return ''
     }
   }
+
+  /**
+   * Apply date range shortcut (2d, 7d, 30d, 90d). Must be declared before any early return
+   * so hook count is consistent across renders.
+   */
+  const applyDateRangeDays = useCallback((days: 2 | 7 | 30 | 90) => {
+    const end = new Date()
+    end.setHours(23, 59, 59, 999)
+    const start = new Date(end)
+    start.setDate(start.getDate() - days)
+    start.setHours(0, 0, 0, 0)
+    onFilterChange?.({ ...filters, dateRange: { start, end } })
+  }, [filters, onFilterChange])
+
+  /** Which shortcut (2d, 7d, 30d, 90d) matches the current filter range, if any */
+  const activeShortcutDays = useMemo((): 2 | 7 | 30 | 90 | null => {
+    const range = filters?.dateRange
+    if (!range?.start || !range?.end) return null
+    const start = new Date(range.start)
+    const end = new Date(range.end)
+    start.setHours(0, 0, 0, 0)
+    end.setHours(23, 59, 59, 999)
+    const diffMs = end.getTime() - start.getTime()
+    const diffDays = Math.round(diffMs / (24 * 60 * 60 * 1000))
+    const today = new Date()
+    today.setHours(23, 59, 59, 999)
+    const isEndToday = end.getTime() >= today.getTime() - 24 * 60 * 60 * 1000
+    if (!isEndToday) return null
+    if (diffDays === 2) return 2
+    if (diffDays === 7) return 7
+    if (diffDays === 30) return 30
+    if (diffDays === 90) return 90
+    return null
+  }, [filters?.dateRange?.start, filters?.dateRange?.end])
 
   if (loading) {
     return (
       <div className={`flex items-center justify-center ${className}`} style={{ height }}>
         <div className="text-center">
           <Clock className="h-8 w-8 text-gray-400 dark:text-slate-500 animate-spin mx-auto mb-2" />
-          <p className="text-sm text-gray-600 dark:text-slate-400">Loading timeline...</p>
+          <p className="text-sm text-gray-600 dark:text-slate-400">{t('audit.loadingTimeline')}</p>
         </div>
       </div>
     )
@@ -354,7 +411,7 @@ const Timeline: React.FC<TimelineProps> = ({
       <div className={`flex items-center justify-center ${className}`} style={{ height }}>
         <div className="text-center">
           <Info className="h-8 w-8 text-gray-400 dark:text-slate-500 mx-auto mb-2" />
-          <p className="text-sm text-gray-600 dark:text-slate-400">No events to display</p>
+          <p className="text-sm text-gray-600 dark:text-slate-400">{t('audit.noEventsToDisplay')}</p>
         </div>
       </div>
     )
@@ -362,29 +419,54 @@ const Timeline: React.FC<TimelineProps> = ({
 
   return (
     <div className={`relative bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 ${className}`} data-testid="audit-timeline">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
+      {/* Header: title, quick time range, filter toggle */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 border-b border-gray-200 dark:border-slate-700">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Audit Timeline</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{t('audit.timelineTitle')}</h3>
           <p className="text-sm text-gray-600 dark:text-slate-400">
-            {events.length} event{events.length !== 1 ? 's' : ''}
+            {events.length} {events.length === 1 ? t('audit.event') : t('audit.events')}
             {events.filter(e => e.is_anomaly).length > 0 && (
               <span className="ml-2 text-red-600 dark:text-red-400">
-                • {events.filter(e => e.is_anomaly).length} anomal{events.filter(e => e.is_anomaly).length !== 1 ? 'ies' : 'y'}
+                • {events.filter(e => e.is_anomaly).length} {events.filter(e => e.is_anomaly).length === 1 ? t('audit.anomaly') : t('audit.anomalies')}
               </span>
             )}
           </p>
         </div>
 
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className={`p-2 rounded-lg transition-colors ${
-            showFilters ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' : 'text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700'
-          }`}
-          title="Toggle Filters"
-        >
-          <Filter className="h-5 w-5" />
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          {([2, 7, 30, 90] as const).map((days) => {
+            const key = days === 2 ? 'last2Days' : days === 7 ? 'last7Days' : days === 30 ? 'last30Days' : 'last90Days'
+            const tKey = `audit.dateRangeShortcuts.${key}` as const
+            const translated = t(tKey as any)
+            const label = translated === tKey && DATE_RANGE_FALLBACKS[tKey] ? DATE_RANGE_FALLBACKS[tKey] : translated
+            const isActive = activeShortcutDays === days
+            return (
+              <button
+                key={days}
+                type="button"
+                onClick={() => applyDateRangeDays(days)}
+                className={`px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                  isActive
+                    ? 'bg-blue-600 dark:bg-blue-500 text-white ring-2 ring-blue-400 dark:ring-blue-300 ring-offset-2 dark:ring-offset-slate-800 hover:bg-blue-700 dark:hover:bg-blue-600'
+                    : 'bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-300 dark:hover:bg-slate-500'
+                }`}
+                title={label}
+                aria-pressed={isActive}
+              >
+                {days === 90 ? '90d' : days === 30 ? '30d' : days === 7 ? '7d' : '2d'}
+              </button>
+            )
+          })}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`p-2 rounded-lg transition-colors ${
+              showFilters ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' : 'text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 dark:bg-slate-700'
+            }`}
+            title="Toggle Filters"
+          >
+            <Filter className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
       {/* Filters Panel */}
@@ -395,8 +477,41 @@ const Timeline: React.FC<TimelineProps> = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 <Calendar className="h-4 w-4 inline mr-1" />
-                Date Range
+                {t('audit.dateRange') === 'audit.dateRange'
+                  ? DATE_RANGE_FALLBACKS['audit.dateRange']
+                  : t('audit.dateRange')}
               </label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {([2, 7, 30, 90] as const).map((days) => {
+                  const key = days === 2 ? 'last2Days' : days === 7 ? 'last7Days' : days === 30 ? 'last30Days' : 'last90Days'
+                  const tKey = `audit.dateRangeShortcuts.${key}` as const
+                  const translated = t(tKey as any)
+                  const label = translated === tKey && DATE_RANGE_FALLBACKS[tKey] ? DATE_RANGE_FALLBACKS[tKey] : translated
+                  const isActive = activeShortcutDays === days
+                  return (
+                    <button
+                      key={days}
+                      type="button"
+                      onClick={() => {
+                        const end = new Date()
+                        end.setHours(23, 59, 59, 999)
+                        const start = new Date(end)
+                        start.setDate(start.getDate() - days)
+                        start.setHours(0, 0, 0, 0)
+                        onFilterChange?.({ ...filters, dateRange: { start, end } })
+                      }}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 dark:bg-blue-500 text-white ring-2 ring-blue-400 dark:ring-blue-300 ring-offset-2 dark:ring-offset-slate-800 hover:bg-blue-700 dark:hover:bg-blue-600'
+                          : 'bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-300 dark:hover:bg-slate-500'
+                      }`}
+                      aria-pressed={isActive}
+                    >
+                      {label}
+                    </button>
+                  )
+                })}
+              </div>
               <div className="space-y-2">
                 <input
                   type="date"
@@ -572,7 +687,7 @@ const Timeline: React.FC<TimelineProps> = ({
               type="number"
               dataKey="x"
               name="Time"
-              domain={['dataMin', 'dataMax']}
+              domain={xAxisDomain}
               tickFormatter={formatXAxis}
               tick={{ fontSize: 12 }}
             />
@@ -616,23 +731,23 @@ const Timeline: React.FC<TimelineProps> = ({
       <div className="px-4 pb-4 flex flex-wrap gap-4 text-sm">
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-          <span className="text-gray-600 dark:text-slate-400">Info</span>
+          <span className="text-gray-600 dark:text-slate-400">{t('audit.severityInfo')}</span>
         </div>
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-          <span className="text-gray-600 dark:text-slate-400">Warning</span>
+          <span className="text-gray-600 dark:text-slate-400">{t('audit.severityWarning')}</span>
         </div>
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-          <span className="text-gray-600 dark:text-slate-400">Error</span>
+          <span className="text-gray-600 dark:text-slate-400">{t('audit.severityError')}</span>
         </div>
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 rounded-full bg-red-500"></div>
-          <span className="text-gray-600 dark:text-slate-400">Critical</span>
+          <span className="text-gray-600 dark:text-slate-400">{t('audit.severityCritical')}</span>
         </div>
         <div className="flex items-center space-x-2">
           <AlertTriangle className="h-3 w-3 text-red-600 dark:text-red-400" />
-          <span className="text-gray-600 dark:text-slate-400">Larger bubbles = Higher anomaly score</span>
+          <span className="text-gray-600 dark:text-slate-400">{t('audit.largerBubblesHint')}</span>
         </div>
       </div>
 
@@ -658,7 +773,7 @@ const Timeline: React.FC<TimelineProps> = ({
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-slate-400">
-                  {new Date(selectedEvent.timestamp).toLocaleString('en-US', {
+                  {formatDateUser(new Date(selectedEvent.timestamp), {
                     dateStyle: 'full',
                     timeStyle: 'long'
                   })}

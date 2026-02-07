@@ -5,34 +5,48 @@
  */
 
 
+/** Options for sync API requests; token is sent as Authorization: Bearer when present */
+type SyncApiOptions = RequestInit & { token?: string | null }
+
+/** Error thrown when sync API returns 401; callers can skip or retry with token */
+export class SyncUnauthorizedError extends Error {
+  constructor(message: string = 'Unauthorized') {
+    super(message)
+    this.name = 'SyncUnauthorizedError'
+  }
+}
+
 // Helper function for API requests to Next.js API routes
-async function apiRequest<T = any>(endpoint: string, options: RequestInit = {}): Promise<T> {
+async function apiRequest<T = any>(endpoint: string, options: SyncApiOptions = {}): Promise<T> {
   // Only make API calls in browser environment
   if (typeof window === 'undefined') {
     console.warn('apiRequest called in non-browser environment, skipping:', endpoint)
     throw new Error('API calls not available in server environment')
   }
-  
+
+  const { token, ...fetchOptions } = options
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(fetchOptions.headers as Record<string, string>),
+  }
+  if (token) headers['Authorization'] = `Bearer ${token}`
+
   const baseUrl = window.location.origin
   const url = `${baseUrl}/api${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`
-  
-  console.log('Cross-device sync API request:', url)
-  
-  try {
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      ...options,
-    })
 
+  try {
+    const response = await fetch(url, { ...fetchOptions, headers })
+
+    if (response.status === 401) {
+      throw new SyncUnauthorizedError(`HTTP 401: ${response.statusText}`)
+    }
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
 
     return response.json()
   } catch (error) {
+    if (error instanceof SyncUnauthorizedError) throw error
     // Log as warning, not error — sync failures are expected when backend is down
     console.warn('Cross-device sync API:', error instanceof Error ? error.message : error)
     throw error
@@ -69,11 +83,16 @@ export interface AISettings {
   enableAutoOptimization: boolean
 }
 
+/** Date format preference: browser = use navigator locale, or a specific locale/iso */
+export type DateFormatPreference = 'browser' | 'de-DE' | 'en-US' | 'en-GB' | 'iso'
+
 export interface UserPreferences {
   userId: string
   theme: 'light' | 'dark' | 'auto'
   language: string
   timezone: string
+  /** Date display format; default 'browser' uses the browser's locale */
+  dateFormat?: DateFormatPreference
   currency: 'USD' | 'EUR' | 'CHF' | 'GBP'
   dashboardLayout: {
     widgets: any[]
@@ -137,6 +156,7 @@ export interface OfflineChange {
  */
 export class CrossDeviceSyncService {
   private userId: string | null = null
+  private accessToken: string | null = null
   private deviceId: string
   private syncInterval: NodeJS.Timeout | null = null
   private offlineChanges: OfflineChange[] = []
@@ -150,10 +170,12 @@ export class CrossDeviceSyncService {
 
   /**
    * Initialize the sync service for a user
+   * @param accessToken - Optional Supabase session access_token for authenticated API calls
    */
-  async initialize(userId: string): Promise<void> {
+  async initialize(userId: string, accessToken?: string | null): Promise<void> {
     this.userId = userId
-    
+    this.accessToken = accessToken ?? null
+
     // Only initialize in browser environment
     if (typeof window !== 'undefined') {
       await this.registerDevice()
@@ -224,18 +246,23 @@ export class CrossDeviceSyncService {
     }
 
     try {
-      console.log('Registering device:', deviceInfo)
       await apiRequest('/sync/devices', {
         method: 'POST',
         body: JSON.stringify({
           userId: this.userId,
           device: deviceInfo
-        })
+        }),
+        token: this.accessToken
       })
-      console.log('Device registered successfully')
     } catch (error) {
-      console.error('Failed to register device:', error)
-      // Don't throw the error to prevent breaking the initialization
+      if (error instanceof SyncUnauthorizedError) {
+        // No token or expired — skip device registration without surfacing an error
+        if (typeof window !== 'undefined' && window.location?.hostname !== 'localhost') {
+          console.debug('Cross-device sync: device registration skipped (no auth)')
+        }
+        return
+      }
+      console.warn('Failed to register device:', error instanceof Error ? error.message : error)
     }
   }
 
@@ -406,7 +433,9 @@ export class CrossDeviceSyncService {
    */
   private async getRemotePreferences(): Promise<UserPreferences | null> {
     try {
-      const response = await apiRequest<UserPreferences>(`/sync/preferences?userId=${this.userId}`)
+      const response = await apiRequest<UserPreferences>(`/sync/preferences?userId=${this.userId}`, {
+        token: this.accessToken
+      })
       return {
         ...response,
         lastModified: new Date(response.lastModified)
@@ -423,7 +452,8 @@ export class CrossDeviceSyncService {
   private async uploadPreferences(preferences: UserPreferences): Promise<void> {
     await apiRequest('/sync/preferences', {
       method: 'PUT',
-      body: JSON.stringify(preferences)
+      body: JSON.stringify(preferences),
+      token: this.accessToken
     })
   }
 
@@ -524,7 +554,8 @@ export class CrossDeviceSyncService {
       
       await apiRequest('/sync/session', {
         method: 'PUT',
-        body: JSON.stringify(sessionState)
+        body: JSON.stringify(sessionState),
+        token: this.accessToken
       })
     } catch (error) {
       console.error('Failed to sync session state:', error)
@@ -575,11 +606,13 @@ export class CrossDeviceSyncService {
     if (!this.userId || !this.isOnline) return null
 
     try {
-      const endpoint = deviceId 
+      const endpoint = deviceId
         ? `/sync/session?userId=${this.userId}&deviceId=${deviceId}`
         : `/sync/session?userId=${this.userId}`
-        
-      const sessionState = await apiRequest<SessionState>(endpoint)
+
+      const sessionState = await apiRequest<SessionState>(endpoint, {
+        token: this.accessToken
+      })
       
       // Apply session state only in browser environment
       if (typeof window !== 'undefined' && typeof sessionStorage !== 'undefined') {
@@ -678,7 +711,8 @@ export class CrossDeviceSyncService {
     
     await apiRequest(endpoint, {
       method: 'POST',
-      body: JSON.stringify(change)
+      body: JSON.stringify(change),
+      token: this.accessToken
     })
   }
 
@@ -795,7 +829,9 @@ export class CrossDeviceSyncService {
     if (!this.userId || !this.isOnline) return []
     
     try {
-      return await apiRequest<DeviceInfo[]>(`/sync/devices?userId=${this.userId}`)
+      return await apiRequest<DeviceInfo[]>(`/sync/devices?userId=${this.userId}`, {
+        token: this.accessToken
+      })
     } catch (error) {
       console.error('Failed to get available devices:', error)
       return []

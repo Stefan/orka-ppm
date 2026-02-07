@@ -36,13 +36,13 @@ jobs:
       - name: Run admin performance endpoint tests
         run: |
           cd backend
-          pytest tests/test_admin_performance_endpoints.py -v --tb=short
+          pytest tests/test_admin_performance_endpoints.py -v --tb=short --override-ini='addopts=--strict-markers --strict-config -v --tb=short -ra -p no:warnings'
         continue-on-error: false
       
       - name: Run performance tracker tests
         run: |
           cd backend
-          pytest tests/test_performance_tracker.py -v --tb=short
+          pytest tests/test_performance_tracker.py -v --tb=short --override-ini='addopts=--strict-markers --strict-config -v --tb=short -ra -p no:warnings'
         continue-on-error: false
       
       - name: Check for Permission enum errors

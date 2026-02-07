@@ -26,6 +26,7 @@ function getDefaultPreferences(userId: string) {
     theme: 'auto',
     language: 'en',
     timezone: 'UTC',
+    dateFormat: 'browser',
     currency: 'USD',
     dashboardLayout: {
       widgets: [],
@@ -221,6 +222,7 @@ export async function GET(request: NextRequest) {
     const mergedPreferences = {
       ...defaults,
       ...data.preferences,
+      dateFormat: data.preferences.dateFormat ?? defaults.dateFormat,
       // Ensure nested objects are properly merged
       dashboardLayout: {
         ...defaults.dashboardLayout,

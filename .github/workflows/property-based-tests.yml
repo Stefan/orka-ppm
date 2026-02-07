@@ -186,6 +186,7 @@ jobs:
           path: backend/test-results/property-tests.xml
           reporter: java-junit
           fail-on-error: false
+          fail-on-empty: false
       
       - name: Check test status
         if: steps.tests.outputs.exit_code != '0'

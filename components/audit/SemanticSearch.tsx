@@ -14,6 +14,7 @@ import {
   Info
 } from 'lucide-react'
 import { useTranslations } from '@/lib/i18n/context'
+import { useDateFormatter } from '@/hooks/useDateFormatter'
 import { AuditEvent } from './Timeline'
 
 /**
@@ -113,6 +114,7 @@ const SemanticSearch: React.FC<SemanticSearchProps> = ({
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const { t } = useTranslations()
+  const { formatDate } = useDateFormatter()
 
   /**
    * Handle search submission
@@ -314,7 +316,7 @@ const SemanticSearch: React.FC<SemanticSearchProps> = ({
                         >
                           <span className="font-medium">{translateEventType(source.event_type)}</span>
                           <span className="text-gray-500 dark:text-slate-400 ml-1">
-                            • {new Date(source.timestamp).toLocaleDateString()}
+                            • {formatDate(new Date(source.timestamp))}
                           </span>
                         </div>
                       ))}
@@ -375,7 +377,7 @@ const SemanticSearch: React.FC<SemanticSearchProps> = ({
                         <div className="flex items-center space-x-3 text-xs text-gray-600 dark:text-slate-400">
                           <span className="flex items-center">
                             <Clock className="h-3 w-3 mr-1" />
-                            {new Date(result.event.timestamp).toLocaleString()}
+                            {formatDate(new Date(result.event.timestamp), { dateStyle: 'short', timeStyle: 'short' })}
                           </span>
                           {result.event.user_name && (
                             <span>User: {result.event.user_name}</span>
@@ -511,7 +513,7 @@ const SemanticSearch: React.FC<SemanticSearchProps> = ({
                     <div>
                       <dt className="text-xs text-gray-600 dark:text-slate-400">Timestamp</dt>
                       <dd className="text-sm text-gray-900 dark:text-slate-100">
-                        {new Date(selectedResult.event.timestamp).toLocaleString()}
+                        {formatDate(new Date(selectedResult.event.timestamp), { dateStyle: 'short', timeStyle: 'short' })}
                       </dd>
                     </div>
                     {selectedResult.event.user_name && (
