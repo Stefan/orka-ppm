@@ -20,7 +20,7 @@
     "build": "next build --webpack",
     "build:analyze": "ANALYZE=true next build --webpack && node scripts/analyze-bundle-size.js",
     "build:fast": "next build --webpack --no-lint",
-    "build:vercel": "next build --webpack",
+    "build:vercel": "next build",
     "start": "next start",
     "analyze:bundle": "node scripts/analyze-bundle-size.js",
     "generate-types": "tsx scripts/generate-translation-types.ts",

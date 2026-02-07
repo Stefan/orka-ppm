@@ -18,6 +18,7 @@ ADMIN_USER_CREDENTIALS.md
 *.tsbuildinfo
 
 # Cache and temporary files
+.pip-cache/
 __pycache__/
 *.pyc
 *.pyo

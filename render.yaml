@@ -6,7 +6,8 @@ services:
     buildCommand: |
       cd backend
       pip install --upgrade pip
-      pip install --no-cache-dir -r requirements.txt
+      export PIP_CACHE_DIR=".pip-cache"
+      pip install --prefer-binary -r requirements.txt
     startCommand: "cd backend && SKIP_PRE_STARTUP_TESTS=true uvicorn main:app --host 0.0.0.0 --port $PORT --workers 2 --log-level warning"
     plan: starter
     region: frankfurt
@@ -38,4 +39,3 @@ services:
       - key: USE_LOCAL_EMBEDDINGS
         value: true
     autoDeploy: true
-    preDeployCommand: "echo 'Starting optimized deployment...'"

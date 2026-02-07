@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8001'
+const PRODUCTION_BACKEND = 'https://orka-ppm.onrender.com'
+const BACKEND_URL = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || (process.env.NODE_ENV === 'production' ? PRODUCTION_BACKEND : 'http://localhost:8001')
 const USE_MOCK = false // Use real Knowledge Base RAG system
 
 export async function POST(request: NextRequest) {
@@ -73,7 +74,6 @@ export async function POST(request: NextRequest) {
     }
     
     console.log('[Help Chat Proxy] Sending to backend:', JSON.stringify(backendBody, null, 2))
-    
     const authHeader = request.headers.get('authorization')
     const backendUrl = `${BACKEND_URL}/api/ai/help/query`
     

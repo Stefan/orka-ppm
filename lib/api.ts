@@ -4,8 +4,10 @@
  */
 
 // API Configuration
+// Prefer env; in production when unset use same-origin so Next.js rewrites can proxy (no localhost in bundle).
+const _baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || (typeof window !== 'undefined' ? '' : 'http://localhost:8001')
 export const API_CONFIG = {
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001',
+  baseUrl: _baseUrl,
   timeout: 30000,
   retryAttempts: 3,
   retryDelay: 1000
@@ -51,15 +53,7 @@ export interface APIResponse<T = any> {
 export function getApiUrl(endpoint: string, baseUrl?: string): string {
   const base = baseUrl || API_CONFIG.baseUrl
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
-  
-  // If base is a full URL (starts with http/https), use it directly with the endpoint
-  // The endpoint should already include /api if needed (e.g., /api/ai/help/languages)
-  if (base.startsWith('http')) {
-    return `${base}${cleanEndpoint}`
-  }
-  
-  // For relative paths (like '/api'), append the endpoint
-  return `${base}${cleanEndpoint}`
+  return base.startsWith('http') ? `${base}${cleanEndpoint}` : `${base}${cleanEndpoint}`
 }
 
 /**

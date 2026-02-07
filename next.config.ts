@@ -7,8 +7,8 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   
-  // Production optimizations
-  productionBrowserSourceMaps: true, // Enable source maps for debugging
+  // Production optimizations (source maps off for faster/smaller Vercel builds; enable in CI if needed)
+  productionBrowserSourceMaps: false,
   
   // Bundle optimization
   experimental: {
@@ -131,10 +131,15 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
 
-  // TypeScript configuration
+  // TypeScript configuration (type-check in CI; skip here for faster Vercel build)
   typescript: {
-    ignoreBuildErrors: true, // Skip type checking in production build
+    ignoreBuildErrors: true,
     tsconfigPath: './tsconfig.prod.json',
+  },
+
+  // Skip ESLint during build (run in CI); speeds up Vercel deploy
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 
   // Image optimization

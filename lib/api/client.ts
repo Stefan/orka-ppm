@@ -158,13 +158,8 @@ export const API_CONFIG = {
 export function getApiUrl(endpoint: string): string {
   // Ensure endpoint starts with /
   const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
-  
   // Remove /api prefix if present since we'll add it
-  const cleanEndpoint = normalizedEndpoint.startsWith('/api/') 
-    ? normalizedEndpoint.slice(4) 
-    : normalizedEndpoint
-  
-  // Use Next.js API proxy for all requests
+  const cleanEndpoint = normalizedEndpoint.startsWith('/api/') ? normalizedEndpoint.slice(4) : normalizedEndpoint
   return `/api${cleanEndpoint}`
 }
 

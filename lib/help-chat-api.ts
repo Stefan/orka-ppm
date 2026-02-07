@@ -5,8 +5,9 @@
 
 import { ChatQueryRequest, ChatResponse, FeedbackRequest, FeedbackResponse, ProactiveTipsResponse, HelpContextResponse } from './types/help-chat';
 
-/** Same-origin in browser (Vercel/localhost:3000); Next.js API routes proxy to backend. */
-const API_BASE_URL = typeof window !== 'undefined' ? '' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001');
+/** Same-origin in browser; server-side: env or production fallback so we never call localhost in prod. */
+const PRODUCTION_BACKEND = 'https://orka-ppm.onrender.com'
+const API_BASE_URL = typeof window !== 'undefined' ? '' : (process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || (process.env.NODE_ENV === 'production' ? PRODUCTION_BACKEND : 'http://localhost:8001'));
 
 export async function sendHelpQuery(request: ChatQueryRequest): Promise<ChatResponse> {
   const response = await fetch(`${API_BASE_URL}/api/ai/help/query`, {
