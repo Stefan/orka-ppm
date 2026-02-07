@@ -13,6 +13,8 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   variant?: ButtonVariant
   size?: ComponentSize
   disabled?: boolean
+  /** When true, button is disabled and can show loading state; never passed to DOM */
+  loading?: boolean
   children: React.ReactNode
   className?: string
 }
@@ -83,14 +85,19 @@ const buttonBaseStyles = [
   'disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none',
 ].join(' ')
 
-export function Button({ 
-  variant = 'primary', 
-  size = 'md', 
-  disabled = false,
-  className,
-  children,
-  ...props 
-}: ButtonProps) {
+export function Button(props: ButtonProps) {
+  const {
+    variant = 'primary',
+    size = 'md',
+    disabled = false,
+    loading,
+    className,
+    children,
+    ...rest
+  } = props
+  // Ensure loading is never passed to DOM (invalid on <button>)
+  const domProps = { ...rest }
+  if ('loading' in domProps) delete domProps.loading
   return (
     <button
       className={cn(
@@ -99,8 +106,8 @@ export function Button({
         buttonSizes[size],
         className
       )}
-      disabled={disabled}
-      {...props}
+      disabled={disabled || loading}
+      {...domProps}
     >
       {children}
     </button>

@@ -2,11 +2,14 @@
 Project management endpoints
 """
 
-from fastapi import APIRouter, HTTPException, Depends, Query
+import logging
+from fastapi import APIRouter, HTTPException, Depends, Query, Request
 from uuid import UUID
 from typing import Optional
 
 from auth.rbac import require_permission, Permission
+
+logger = logging.getLogger(__name__)
 from auth.dependencies import get_current_user
 from config.database import supabase
 from models.projects import ProjectCreate, ProjectResponse, ProjectStatus
@@ -15,9 +18,24 @@ from utils.converters import convert_uuids
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 
+PROJECTS_CACHE_KEY = "projects:list"
+PROJECTS_CACHE_TTL = 60  # seconds
+
+def _invalidate_projects_cache(request: Request) -> None:
+    """Invalidate projects list cache after create/update/delete."""
+    cache = getattr(request.app.state, "cache_manager", None)
+    if cache:
+        try:
+            import asyncio
+            asyncio.create_task(cache.delete(PROJECTS_CACHE_KEY))
+        except Exception:
+            pass
+
+
 @router.post("/", response_model=ProjectResponse, status_code=201)
 async def create_project(
-    project: ProjectCreate, 
+    request: Request,
+    project: ProjectCreate,
     current_user = Depends(require_permission(Permission.project_create))
 ):
     """Create a new project"""
@@ -32,30 +50,41 @@ async def create_project(
         if not response.data:
             raise HTTPException(status_code=400, detail="Failed to create project")
         
+        _invalidate_projects_cache(request)
         return convert_uuids(response.data[0])
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/")
 async def list_projects(
+    request: Request,
     portfolio_id: Optional[UUID] = Query(None),
     status: Optional[ProjectStatus] = Query(None),
     current_user = Depends(require_permission(Permission.project_read))
 ):
-    """Get all projects with optional filtering"""
+    """Get all projects with optional filtering. Uses cache (TTL 60s); invalidated on project create."""
     try:
         if not supabase:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
-        query = supabase.table("projects").select("*")
-        
-        if portfolio_id:
-            query = query.eq("portfolio_id", str(portfolio_id))
-        if status:
-            query = query.eq("status", status.value)
-        
-        response = query.execute()
-        return convert_uuids(response.data)
+        cache = getattr(request.app.state, "cache_manager", None)
+        data = None
+        if cache:
+            data = await cache.get(PROJECTS_CACHE_KEY)
+        if data is None:
+            response = supabase.table("projects").select(
+                "id", "name", "status", "portfolio_id", "health", "budget", "actual_cost",
+                "start_date", "end_date", "created_at", "updated_at", "description"
+            ).execute()
+            data = convert_uuids(response.data)
+            if cache:
+                await cache.set(PROJECTS_CACHE_KEY, data, ttl=PROJECTS_CACHE_TTL)
+        if portfolio_id is not None:
+            pid = str(portfolio_id)
+            data = [p for p in data if p.get("portfolio_id") == pid]
+        if status is not None:
+            data = [p for p in data if p.get("status") == status.value]
+        return data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -181,5 +210,5 @@ async def get_project_scenarios(
         }
         
     except Exception as e:
-        print(f"Get project scenarios error: {e}")
+        logger.exception("Get project scenarios error: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to get scenarios: {str(e)}")

@@ -40,10 +40,11 @@ export default function OverviewView({
     ? { backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f1f5f9' }
     : { backgroundColor: '#ffffff', border: '1px solid #e5e7eb', color: '#111827' }
 
-  // Fetch commitments & actuals data
+  // Fetch commitments & actuals after first paint so Overview shows project-based metrics immediately
   const { summary, analytics, loading: commitmentsLoading } = useCommitmentsActualsData({
     accessToken,
-    selectedCurrency
+    selectedCurrency,
+    deferMs: 150
   })
 
   // Use commitments/actuals analytics if available, otherwise fall back to project budget analytics

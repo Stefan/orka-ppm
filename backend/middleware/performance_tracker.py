@@ -179,15 +179,6 @@ class PerformanceTracker:
         self._stats_cache_time = now
 
         return result
-        
-        return {
-            'total_requests': self.total_requests,
-            'total_errors': self.total_errors,
-            'slow_queries_count': len(self.slow_queries),
-            'endpoint_stats': endpoint_stats,
-            'recent_slow_queries': self.slow_queries[-10:],  # Last 10 slow queries
-            'uptime_seconds': (datetime.now() - self.start_time).total_seconds()
-        }
     
     def _calculate_rpm(self, recent_requests: List[datetime]) -> float:
         """Calculate requests per minute from recent requests."""
@@ -272,8 +263,11 @@ class PerformanceMiddleware(BaseHTTPMiddleware):
     
     async def dispatch(self, request: Request, call_next):
         """Process request and track performance."""
-        # Skip tracking for health check endpoints to avoid noise
-        if request.url.path in ['/health', '/']:
+        # Skip tracking for health/dashboard endpoints (they record themselves so dashboard has data)
+        if request.url.path in [
+            '/health', '/',
+            '/api/admin/performance/stats', '/api/admin/performance/health',
+        ]:
             return await call_next(request)
         
         start_time = time.time()

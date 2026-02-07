@@ -153,14 +153,19 @@ export default function PerformanceDashboard() {
       performanceMonitoring.recordAPICall('/api/admin/performance/stats', fetchDuration, statsResponse.status)
       performanceMonitoring.recordAPICall('/api/admin/performance/health', fetchDuration, healthResponse.status)
 
-      // Process critical responses immediately
+      // Process critical responses immediately; set error when backend returns 403/500
       if (statsResponse.ok) {
         const statsData = await statsResponse.json()
         if (statsData && typeof statsData === 'object') {
           startTransition(() => {
             setStats(statsData)
+            setError(null)
           })
         }
+      } else {
+        const errBody = await statsResponse.json().catch(() => ({}))
+        const msg = errBody?.detail || errBody?.error || `Stats: ${statsResponse.status}`
+        startTransition(() => setError(msg))
       }
 
       if (healthResponse.ok) {
@@ -170,6 +175,10 @@ export default function PerformanceDashboard() {
             setHealth(healthData)
           })
         }
+      } else {
+        const errBody = await healthResponse.json().catch(() => ({}))
+        const msg = errBody?.detail || errBody?.error || `Health: ${healthResponse.status}`
+        startTransition(() => setError((prev) => prev || msg))
       }
 
       // Fetch cache stats with lower priority (non-blocking, fetched after critical data)
@@ -382,6 +391,15 @@ export default function PerformanceDashboard() {
                 <X className="h-4 w-4" />
               </button>
             </div>
+          </div>
+        )}
+
+        {/* No traffic yet hint */}
+        {stats && stats.total_requests === 0 && !error && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4">
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              {t('noTrafficYet') || 'No API traffic recorded yet. Use the app (projects, audit, etc.) or refresh this page to see metrics.'}
+            </p>
           </div>
         )}
 

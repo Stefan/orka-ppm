@@ -7,6 +7,7 @@ import {
   AlertTriangle, DollarSign, Target, PieChart, FileText
 } from 'lucide-react'
 import { getApiUrl } from '../../../../lib/api'
+import { logger } from '@/lib/monitoring/logger'
 
 interface FinancialVariance {
   id: string
@@ -55,11 +56,11 @@ const VarianceAnalysisView = forwardRef<{ refresh: () => void }, VarianceAnalysi
     }
   }, [projectFilter])
 
-  // Fetch variance data
+  // Fetch variance data after first paint so tab shows immediately
   useEffect(() => {
-    if (session) {
-      fetchVarianceData()
-    }
+    if (!session) return
+    const t = setTimeout(() => fetchVarianceData(), 100)
+    return () => clearTimeout(t)
   }, [session, selectedCurrency])
 
   const fetchVarianceData = async () => {
@@ -81,7 +82,7 @@ const VarianceAnalysisView = forwardRef<{ refresh: () => void }, VarianceAnalysi
       const data = await response.json()
       setVariances(data.variances || [])
     } catch (error: unknown) {
-      console.error('Error fetching variance data:', error)
+      logger.error('Error fetching variance data', { error }, 'VarianceAnalysisView')
       setError(error instanceof Error ? error.message : 'Failed to fetch variance data')
     } finally {
       setLoading(false)

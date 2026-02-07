@@ -2,10 +2,14 @@
 FastAPI application entry point - Refactored modular architecture
 """
 
+import logging
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from datetime import datetime
 import os
+
+logger = logging.getLogger(__name__)
 
 # Import configuration
 from config.settings import settings
@@ -33,7 +37,7 @@ from routers.ai import router as ai_router
 from routers.csv_import import router as csv_import_router
 from routers.variance import router as variance_router
 from routers.admin import router as admin_router
-# from routers.change_management_simple import router as change_management_router
+# from routers.change.change_management_simple import router as change_management_router
 from routers.schedules import router as schedules_router
 from routers.help_chat import router as help_chat_router
 from routers.ai_resource_optimizer import router as ai_resource_optimizer_router
@@ -52,10 +56,10 @@ from routers.features import router as features_router
 from routers.feature_toggles import router as feature_toggles_router
 from routers.erp import router as erp_router
 from routers.costbook import router as costbook_router
-from routers.change_orders import router as change_orders_router
-from routers.change_approvals import router as change_approvals_router
+from routers.change.change_orders import router as change_orders_router
+from routers.change.change_approvals import router as change_approvals_router
 from routers.contract_integration import router as contract_integration_router
-from routers.change_analytics import router as change_analytics_router
+from routers.change.change_analytics import router as change_analytics_router
 from routers.project_controls import router as project_controls_router
 from routers.forecasts import router as forecasts_router
 from routers.earned_value import router as earned_value_router
@@ -71,24 +75,24 @@ try:
     from ai_agents import create_ai_agents
     ai_agents = create_ai_agents(supabase, settings.OPENAI_API_KEY, settings.OPENAI_BASE_URL) if supabase and settings.OPENAI_API_KEY else None
     if ai_agents:
-        print("✅ AI agents initialized successfully")
+        logger.info("AI agents initialized successfully")
         if settings.OPENAI_BASE_URL:
-            print(f"   Using custom API endpoint: {settings.OPENAI_BASE_URL}")
+            logger.info("Using custom API endpoint: %s", settings.OPENAI_BASE_URL)
     else:
-        print("⚠️ AI agents not available - missing dependencies or configuration")
+        logger.warning("AI agents not available - missing dependencies or configuration")
 except ImportError as e:
-    print(f"⚠️ AI agents not available: {e}")
+    logger.warning("AI agents not available: %s", e)
     ai_agents = None
 # Import and initialize help chat performance service
 try:
     from services.help_chat_performance import initialize_help_chat_performance
     help_chat_performance = initialize_help_chat_performance(supabase) if supabase else None
     if help_chat_performance:
-        print("✅ Help chat performance service initialized")
+        logger.info("Help chat performance service initialized")
     else:
-        print("⚠️ Help chat performance service not available - database not configured")
+        logger.warning("Help chat performance service not available - database not configured")
 except ImportError as e:
-    print(f"⚠️ Help chat performance service not available: {e}")
+    logger.warning("Help chat performance service not available: %s", e)
     help_chat_performance = None
 
 # Import performance optimization components
@@ -107,9 +111,9 @@ try:
     bulk_operation_manager = BulkOperationManager(cache_manager)
     version_manager = APIVersionManager()
     
-    print("✅ Performance optimization components loaded")
+    logger.info("Performance optimization components loaded")
 except ImportError as e:
-    print(f"⚠️ Performance optimization not available: {e}")
+    logger.warning("Performance optimization not available: %s", e)
     cache_manager = None
     performance_monitor = None
     bulk_operation_manager = None
@@ -121,13 +125,13 @@ try:
     
     # Determine base URL for testing based on environment
     base_url = settings.base_url
-    print(f"🌍 Detected environment: {settings.environment}")
-    print(f"🔗 Base URL for testing: {base_url}")
+    logger.info("Detected environment: %s", settings.environment)
+    logger.info("Base URL for testing: %s", base_url)
     
     pre_startup_integration = None  # Will be set after app creation
-    print("✅ Pre-startup testing system available")
+    logger.info("Pre-startup testing system available")
 except ImportError as e:
-    print(f"⚠️ Pre-startup testing system not available: {e}")
+    logger.warning("Pre-startup testing system not available: %s", e)
     pre_startup_integration = None
 
 # Create FastAPI application
@@ -148,6 +152,9 @@ if bulk_operation_manager:
     app.state.bulk_operation_manager = bulk_operation_manager
 if version_manager:
     app.state.version_manager = version_manager
+
+# Response compression for large JSON payloads
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # Add middleware
 if cache_manager and performance_monitor:
@@ -195,9 +202,9 @@ app.add_middleware(
 if pre_startup_integration is None:
     try:
         pre_startup_integration = integrate_pre_startup_testing(app, settings.base_url)
-        print("✅ Pre-startup testing system integrated")
+        logger.info("Pre-startup testing system integrated")
     except Exception as e:
-        print(f"⚠️ Error integrating pre-startup testing: {e}")
+        logger.warning("Error integrating pre-startup testing: %s", e)
 
 # Register routers
 app.include_router(portfolios_router)
@@ -207,6 +214,8 @@ app.include_router(scenarios_router)
 app.include_router(simulations_router)
 app.include_router(reports_router)
 app.include_router(resources_router)
+# Admin before users so DELETE /api/admin/users/{id}/roles/{role_name} matches admin (role=str), not users (role_id=UUID)
+app.include_router(admin_router)
 app.include_router(users_router)
 app.include_router(risks_router)
 app.include_router(financial_router)
@@ -214,7 +223,6 @@ app.include_router(feedback_router)
 app.include_router(ai_router)
 app.include_router(csv_import_router)
 app.include_router(variance_router)
-app.include_router(admin_router)
 # app.include_router(change_management_router)
 app.include_router(schedules_router)
 app.include_router(help_chat_router)
@@ -247,7 +255,7 @@ app.include_router(distribution_router)
 
 # Add performance tracking middleware
 app.add_middleware(PerformanceMiddleware, tracker=performance_tracker)
-print("✅ Performance tracking middleware enabled")
+logger.info("Performance tracking middleware enabled")
 
 # Basic endpoints
 @app.get("/")
@@ -264,7 +272,7 @@ async def root():
             "environment": settings.environment
         }
     except Exception as e:
-        print(f"Root endpoint error: {e}")
+        logger.exception("Root endpoint error: %s", e)
         return {
             "message": "PPM SaaS API",
             "status": "error",
@@ -360,6 +368,69 @@ async def debug_info():
             "error_type": type(e).__name__,
             "timestamp": datetime.now().isoformat()
         }
+
+
+@app.get("/debug/verify-jwt")
+async def debug_verify_jwt(request: Request):
+    """
+    Verify whether the given Bearer token can be validated by JWKS or SUPABASE_JWT_SECRET.
+    Only available in development. Call with: Authorization: Bearer <your-session-access-token>
+    """
+    if settings.environment != "development":
+        raise HTTPException(status_code=404, detail="Not available")
+    auth = request.headers.get("Authorization") or request.headers.get("authorization")
+    if not auth or not auth.startswith("Bearer "):
+        return {
+            "valid": False,
+            "error": "Missing or invalid Authorization header (expected: Bearer <token>)",
+        }
+    token = auth[7:].strip()
+    if not token:
+        return {"valid": False, "error": "Empty token"}
+    import jwt
+    # 1) Try JWKS first if SUPABASE_URL is set
+    supabase_url = (settings.SUPABASE_URL or "").strip()
+    if supabase_url:
+        from auth.jwks_client import get_supabase_jwks_url, verify_token_with_jwks
+        jwks_url = get_supabase_jwks_url(supabase_url)
+        if jwks_url:
+            payload = verify_token_with_jwks(token, jwks_url)
+            if payload:
+                return {
+                    "valid": True,
+                    "method": "JWKS",
+                    "sub": payload.get("sub"),
+                    "exp": payload.get("exp"),
+                    "email": payload.get("email"),
+                }
+    # 2) Fallback: HS256 with SUPABASE_JWT_SECRET
+    secret = (settings.SUPABASE_JWT_SECRET or "").strip()
+    if not secret:
+        return {
+            "valid": False,
+            "error": "SUPABASE_JWT_SECRET is not set and JWKS verification did not succeed (or SUPABASE_URL not set). Set SUPABASE_URL for JWKS or SUPABASE_JWT_SECRET in backend .env",
+        }
+    try:
+        payload = jwt.decode(token, secret, algorithms=["HS256"])
+        return {
+            "valid": True,
+            "method": "HS256",
+            "sub": payload.get("sub"),
+            "exp": payload.get("exp"),
+            "email": payload.get("email"),
+        }
+    except jwt.ExpiredSignatureError:
+        return {"valid": False, "error": "Token expired (exp)"}
+    except jwt.InvalidSignatureError:
+        return {
+            "valid": False,
+            "error": "Invalid signature – SUPABASE_JWT_SECRET does not match the Supabase project that issued this token. Prefer JWKS by setting SUPABASE_URL, or check Project Settings → API → JWT Secret.",
+        }
+    except jwt.InvalidTokenError as e:
+        return {"valid": False, "error": f"Invalid token: {e}"}
+    except Exception as e:
+        return {"valid": False, "error": str(e)}
+
 
 # Enhanced health check endpoints
 @app.get("/health/comprehensive")
@@ -463,11 +534,11 @@ async def get_dashboard_data(request: Request, current_user = Depends(get_curren
         return dashboard_data
         
     except Exception as e:
-        print(f"Dashboard error: {e}")
+        logger.exception("Dashboard error: %s", e)
         raise HTTPException(status_code=500, detail=f"Dashboard data retrieval failed: {str(e)}")
 
+# Historical note: routers below were added elsewhere; this block kept for reference.
 # Import additional routers as they are created
-# TODO: Add these routers as they are implemented:
 # from routers.resources import router as resources_router
 # from routers.financial import router as financial_router
 # from routers.risks import router as risks_router
@@ -478,7 +549,7 @@ async def get_dashboard_data(request: Request, current_user = Depends(get_curren
 # from routers.scenarios import router as scenarios_router
 # from routers.simulations import router as simulations_router
 # from routers.shareable_urls import router as shareable_urls_router
-# from routers.change_management import router as change_management_router
+# from routers.change.change_management import router as change_management_router
 
 # app.include_router(resources_router)
 # app.include_router(financial_router)
@@ -496,9 +567,9 @@ async def get_dashboard_data(request: Request, current_user = Depends(get_curren
 try:
     from services.rundown_scheduler import get_rundown_scheduler
     rundown_scheduler = get_rundown_scheduler()
-    print("✅ Rundown profile scheduler available")
+    logger.info("Rundown profile scheduler available")
 except ImportError as e:
-    print(f"⚠️ Rundown scheduler not available: {e}")
+    logger.warning("Rundown scheduler not available: %s", e)
     rundown_scheduler = None
 
 # Startup event for scheduler
@@ -510,9 +581,9 @@ async def startup_event():
             await rundown_scheduler.start()
             next_run = rundown_scheduler.get_next_run_time()
             if next_run:
-                print(f"📅 Next rundown profile generation scheduled for: {next_run}")
+                logger.info("Next rundown profile generation scheduled for: %s", next_run)
         except Exception as e:
-            print(f"⚠️ Failed to start rundown scheduler: {e}")
+            logger.warning("Failed to start rundown scheduler: %s", e)
 
 # Shutdown event for scheduler
 @app.on_event("shutdown")
@@ -522,7 +593,7 @@ async def shutdown_event():
         try:
             await rundown_scheduler.stop()
         except Exception as e:
-            print(f"⚠️ Error stopping rundown scheduler: {e}")
+            logger.warning("Error stopping rundown scheduler: %s", e)
 
 # For deployment - Vercel serverless function handler
 handler = app

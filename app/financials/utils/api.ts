@@ -7,10 +7,12 @@ import {
   CSVUploadResult
 } from '../types'
 
+const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV === 'development'
+
 export async function fetchProjects(accessToken: string): Promise<Project[]> {
   try {
     const url = '/api/projects'
-    console.log('Fetching projects from:', url)
+    if (isDev) console.log('Fetching projects from:', url)
 
     const controller = new AbortController()
     const timeoutId = setTimeout(
@@ -27,11 +29,11 @@ export async function fetchProjects(accessToken: string): Promise<Project[]> {
     })
 
     clearTimeout(timeoutId)
-    console.log('Projects response status:', response.status)
+    if (isDev) console.log('Projects response status:', response.status)
 
     if (response.ok) {
       const data = await response.json()
-      console.log('Projects data:', data)
+      if (isDev) console.log('Projects data:', data)
       return Array.isArray(data) ? data as Project[] : []
     } else {
       console.error('Projects request failed:', response.status, response.statusText)
@@ -66,7 +68,7 @@ export async function fetchBudgetVariance(
 ): Promise<BudgetVariance | null> {
   try {
     const url = `/api/projects/${projectId}/budget-variance?currency=${currency}`
-    console.log('Fetching budget variance from:', url)
+    if (isDev) console.log('Fetching budget variance from:', url)
 
     const controller = new AbortController()
     const timeoutId = setTimeout(
@@ -86,17 +88,17 @@ export async function fetchBudgetVariance(
 
     if (response.ok) {
       const data = await response.json()
-      console.log('Budget variance data:', data)
+      if (isDev) console.log('Budget variance data:', data)
       return data
     }
 
     // Silently handle 404 - endpoint may not be implemented
     if (response.status === 404) {
-      console.log('Budget variance endpoint not found (404)')
+      if (isDev) console.log('Budget variance endpoint not found (404)')
       return null
     }
 
-    console.error('Budget variance request failed:', response.status, response.statusText)
+    if (isDev) console.error('Budget variance request failed:', response.status, response.statusText)
     return null
   } catch (error) {
     const err = error instanceof Error ? error : new Error(error != null && typeof error === 'object' && 'message' in error ? String((error as Error).message) : String(error))
@@ -112,7 +114,7 @@ export async function fetchBudgetVariance(
 export async function fetchFinancialAlerts(accessToken: string): Promise<FinancialAlert[]> {
   try {
     const url = '/api/financial-tracking/budget-alerts?threshold_percentage=80'
-    console.log('Fetching financial alerts from:', url)
+    if (isDev) console.log('Fetching financial alerts from:', url)
 
     const controller = new AbortController()
     const timeoutId = setTimeout(
@@ -129,11 +131,11 @@ export async function fetchFinancialAlerts(accessToken: string): Promise<Financi
     })
 
     clearTimeout(timeoutId)
-    console.log('Financial alerts response status:', response.status)
+    if (isDev) console.log('Financial alerts response status:', response.status)
 
     if (response.ok) {
       const data = await response.json()
-      console.log('Financial alerts data:', data)
+      if (isDev) console.log('Financial alerts data:', data)
       // Handle both response formats
       if (data.alerts) {
         return data.alerts

@@ -346,6 +346,7 @@ function FinancialsContent() {
               <Costbook
                 useMockData={true}
                 initialCurrency={selectedCurrency as import('@/types/costbook').Currency}
+                showTourButton={false}
               />
             </Suspense>
           </div>

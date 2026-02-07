@@ -84,6 +84,9 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const queryUserId = searchParams.get('userId')
+    if (!queryUserId?.trim()) {
+      return NextResponse.json({ error: 'Missing required parameter: userId' }, { status: 400 })
+    }
     const auth = await enforceSyncAuth(request.headers.get('Authorization'), queryUserId)
     if (auth instanceof Response) {
       return NextResponse.json(

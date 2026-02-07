@@ -732,22 +732,13 @@ async def get_commitments(
         if db_client is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
-        # Build query
-        query = db_client.table("commitments").select("*")
-        
-        # Apply filters
+        # Single query with count=exact (avoids second round-trip)
+        query = db_client.table("commitments").select("*", count="exact")
         if project_nr:
             query = query.eq("project_nr", project_nr)
-        
-        # Apply pagination
         query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
-        
         response = query.execute()
-        
-        # Get total count
-        count_response = db_client.table("commitments").select("id", count="exact").execute()
-        total = count_response.count if hasattr(count_response, 'count') else len(response.data or [])
-        
+        total = response.count if hasattr(response, "count") else len(response.data or [])
         return {
             "commitments": response.data or [],
             "total": total,
@@ -781,22 +772,13 @@ async def get_actuals(
         if db_client is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
-        # Build query
-        query = db_client.table("actuals").select("*")
-        
-        # Apply filters
+        # Single query with count=exact (avoids second round-trip)
+        query = db_client.table("actuals").select("*", count="exact")
         if project_nr:
             query = query.eq("project_nr", project_nr)
-        
-        # Apply pagination
         query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
-        
         response = query.execute()
-        
-        # Get total count
-        count_response = db_client.table("actuals").select("id", count="exact").execute()
-        total = count_response.count if hasattr(count_response, 'count') else len(response.data or [])
-        
+        total = response.count if hasattr(response, "count") else len(response.data or [])
         return {
             "actuals": response.data or [],
             "total": total,

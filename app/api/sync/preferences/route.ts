@@ -66,9 +66,15 @@ function getDefaultPreferences(userId: string) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('Authorization')
     const preferences = await request.json().catch(() => ({}))
-    const auth = await enforceSyncAuth(authHeader, preferences.userId ?? null)
+    if (!preferences.userId) {
+      return NextResponse.json({
+        error: 'Missing required field: userId'
+      }, { status: 400 })
+    }
+
+    const authHeader = request.headers.get('Authorization')
+    const auth = await enforceSyncAuth(authHeader, preferences.userId)
     if (auth instanceof Response) {
       return NextResponse.json(
         (await auth.json().catch(() => ({ error: 'Unauthorized' }))) as { error: string },
@@ -80,12 +86,6 @@ export async function PUT(request: NextRequest) {
     const supabase = getSupabase()
     if (!supabase) {
       return NextResponse.json({ error: 'Preferences sync not configured' }, { status: 503 })
-    }
-
-    if (!preferences.userId) {
-      return NextResponse.json({
-        error: 'Missing required field: userId'
-      }, { status: 400 })
     }
     if (preferences.userId !== userId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -163,9 +163,12 @@ export async function PUT(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('Authorization')
     const { searchParams } = new URL(request.url)
     const queryUserId = searchParams.get('userId')
+    if (!queryUserId?.trim()) {
+      return NextResponse.json({ error: 'Missing required parameter: userId' }, { status: 400 })
+    }
+    const authHeader = request.headers.get('Authorization')
     const auth = await enforceSyncAuth(authHeader, queryUserId)
     if (auth instanceof Response) {
       return NextResponse.json(

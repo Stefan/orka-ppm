@@ -978,6 +978,8 @@
     "refresh": "Aktualisieren",
     "authRequired": "Authentifizierung erforderlich",
     "authRequiredMessage": "Bitte melden Sie sich an, um auf das Audit-Dashboard zuzugreifen.",
+    "errorAuthMissing": "Autorisierung fehlt. Bitte anmelden.",
+    "errorAuthInvalid": "Sitzung abgelaufen oder ungültig. Bitte erneut anmelden.",
     "error": "Fehler",
     "tabs": {
       "dashboard": "Dashboard",
@@ -1002,7 +1004,40 @@
     "noEventVolumeData": "Keine Ereignisvolumen-Daten verfügbar",
     "timelineView": "Zeitachsenansicht wird in Aufgabe 13 implementiert",
     "anomaliesView": "Anomalienansicht wird in Aufgabe 14 implementiert",
-    "searchView": "Semantische Suche wird in Aufgabe 15 implementiert"
+    "searchView": "Semantische Suche wird in Aufgabe 15 implementiert",
+    "eventTypes": {
+      "user_login": "Benutzer-Anmeldung",
+      "user_logout": "Benutzer-Abmeldung",
+      "budget_change": "Budget-Änderung",
+      "permission_change": "Berechtigungsänderung",
+      "resource_assignment": "Ressourcen-Zuweisung",
+      "resource_created": "Ressource angelegt",
+      "resource_updated": "Ressource aktualisiert",
+      "resource_deleted": "Ressource gelöscht",
+      "risk_created": "Risiko erstellt",
+      "risk_updated": "Risiko aktualisiert",
+      "report_generated": "Bericht erstellt",
+      "project_created": "Projekt erstellt",
+      "project_updated": "Projekt aktualisiert",
+      "change_request_created": "Änderungsanfrage erstellt",
+      "change_request_approved": "Änderungsanfrage genehmigt"
+    },
+    "entityTypes": {
+      "project": "Projekt",
+      "resource": "Ressource",
+      "risk": "Risiko",
+      "change_request": "Änderungsanfrage",
+      "budget": "Budget",
+      "user": "Benutzer",
+      "report": "Bericht"
+    },
+    "relevance": "Relevanz",
+    "viewDetails": "Details anzeigen",
+    "entity": "Entität",
+    "close": "Schließen",
+    "recentEvents": "Letzte Ereignisse",
+    "viewAll": "Alle anzeigen",
+    "noRecentEvents": "Keine letzten Ereignisse"
   },
   "adminPerformance": {
     "title": "Performance-Dashboard",
@@ -1033,6 +1068,7 @@
     "avgDuration": "Durchschn. Dauer",
     "totalRequestsLabel": "Anfragen Gesamt",
     "requestsPerMin": "Anfragen/Min",
+    "noTrafficYet": "Noch keine API-Anfragen erfasst. App nutzen (Projekte, Audit usw.) oder Seite neu laden, um Metriken zu sehen.",
     "status": {
       "healthy": "Gesund",
       "degraded": "Beeinträchtigt",
@@ -1073,6 +1109,17 @@
     "portfolioManager": "Portfoliomanager",
     "resourceManager": "Ressourcenmanager",
     "usersSelected": "Benutzer ausgewählt",
+    "permissions": {
+      "portfolio_read": "Portfolio lesen",
+      "portfolio_create": "Portfolio anlegen",
+      "portfolio_update": "Portfolio bearbeiten",
+      "portfolio_delete": "Portfolio löschen",
+      "project_read": "Projekt lesen",
+      "project_create": "Projekt anlegen",
+      "resource_read": "Ressource lesen",
+      "financial_read": "Finanzen lesen",
+      "risk_read": "Risiko lesen"
+    },
     "activate": "Aktivieren",
     "deactivate": "Deaktivieren",
     "delete": "Löschen",
@@ -1113,7 +1160,9 @@
       "actionFailed": "Fehler beim {action} des Benutzers",
       "emailRequired": "E-Mail ist erforderlich",
       "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
-      "inviteFailed": "Fehler beim Einladen des Benutzers"
+      "inviteFailed": "Fehler beim Einladen des Benutzers",
+      "forbidden": "Keine Berechtigung",
+      "notFound": "Nicht gefunden"
     }
   },
   "auth": {

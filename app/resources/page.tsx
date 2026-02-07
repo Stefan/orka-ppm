@@ -5,7 +5,6 @@ import { useAuth } from '../providers/SupabaseAuthProvider'
 import { Users, Plus, Search, Filter, TrendingUp, AlertCircle, BarChart3, PieChart as PieChartIcon, Target, Zap, RefreshCw, Download, MapPin, RotateCcw } from 'lucide-react'
 import AppLayout from '../../components/shared/AppLayout'
 import ResourceCard from './components/ResourceCard'
-import ResourceActionButtons from '../../components/resources/ResourceActionButtons'
 import { getApiUrl } from '../../lib/api/client'
 import { SkeletonCard, SkeletonChart } from '../../components/ui/skeletons'
 import { useDebounce } from '@/hooks/useDebounce'
@@ -83,6 +82,13 @@ export default function Resources() {
   const [showFilters, setShowFilters] = useState(false)
   const [showOptimization, setShowOptimization] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [addError, setAddError] = useState<string | null>(null)
+  const [resourceToDelete, setResourceToDelete] = useState<Resource | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [deleteInProgress, setDeleteInProgress] = useState(false)
+  const [detailResource, setDetailResource] = useState<Resource | null>(null)
+  const [editResource, setEditResource] = useState<Resource | null>(null)
+  const [editError, setEditError] = useState<string | null>(null)
   const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null)
   const [autoRefresh, setAutoRefresh] = useState(false)
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
@@ -149,8 +155,9 @@ export default function Resources() {
       
       // Skills filter
       if (filters.skills.length > 0) {
-        const hasRequiredSkills = filters.skills.some(skill => 
-          resource.skills.some(resourceSkill => 
+        const skills = resource.skills ?? []
+        const hasRequiredSkills = filters.skills.some(skill =>
+          skills.some(resourceSkill =>
             resourceSkill.toLowerCase().includes(skill.toLowerCase())
           )
         )
@@ -171,7 +178,7 @@ export default function Resources() {
     ]
 
     const skillsDistribution = resources.reduce((acc, resource) => {
-      resource.skills.forEach(skill => {
+      (resource.skills ?? []).forEach(skill => {
         acc[skill] = (acc[skill] || 0) + 1
       })
       return acc
@@ -206,9 +213,7 @@ export default function Resources() {
   }, [resources, deferredFilters])
 
   useEffect(() => {
-    if (session) {
-      fetchResources()
-    }
+    if (session) fetchResources()
   }, [session])
 
   async function fetchResources() {
@@ -223,7 +228,7 @@ export default function Resources() {
           'Content-Type': 'application/json',
         }
       })
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch resources: ${response.status}`)
       }
@@ -261,8 +266,19 @@ export default function Resources() {
       })
       
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.detail || `Failed to create resource: ${response.status}`)
+        const errorData = await response.json().catch(() => ({}))
+        let detail: string | undefined
+        const raw = errorData.detail
+        if (Array.isArray(raw)) {
+          detail = raw.map((e: { msg?: string; loc?: unknown }) => e.msg || JSON.stringify(e.loc)).join(', ')
+        } else if (raw && typeof raw === 'object' && 'message' in raw) {
+          detail = (raw as { message?: string }).message
+        } else if (typeof raw === 'string') {
+          detail = raw
+        } else {
+          detail = errorData.error
+        }
+        throw new Error(detail || `Failed to create resource: ${response.status}`)
       }
       
       const newResource = await response.json()
@@ -270,8 +286,92 @@ export default function Resources() {
       setShowAddModal(false)
       return newResource
     } catch (error: unknown) {
-      console.error('Error creating resource:', error)
-      throw error instanceof Error ? error : new Error('Unknown error creating resource')
+      const message = error instanceof Error ? error.message : 'Unknown error creating resource'
+      const isDuplicateEmail = message.toLowerCase().includes('already exists')
+      if (!isDuplicateEmail) console.error('Error creating resource:', error)
+      throw error instanceof Error ? error : new Error(message)
+    }
+  }
+
+  async function deleteResource(resource: Resource) {
+    if (!session?.access_token) throw new Error('Not authenticated')
+    try {
+      const response = await fetch(getApiUrl(`/resources/${resource.id}`), {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${session?.access_token || ''}`,
+          'Content-Type': 'application/json',
+        },
+      })
+      if (!response.ok) {
+        const status = response.status
+        const errorData = await response.json().catch(() => ({}))
+        const raw = errorData.detail
+        const msg =
+          (raw && typeof raw === 'object' && 'message' in raw
+            ? (raw as { message?: string }).message
+            : typeof raw === 'string'
+              ? raw
+              : errorData.error) || `Failed to delete resource (${status})`
+        throw new Error(msg)
+      }
+      setResources((prev) => prev.filter((r) => r.id !== resource.id))
+    } catch (error: unknown) {
+      console.error('Error deleting resource:', error)
+      throw error instanceof Error ? error : new Error('Unknown error deleting resource')
+    }
+  }
+
+  async function updateResource(
+    resourceId: string,
+    resourceData: {
+      name: string
+      email: string
+      role?: string
+      capacity?: number
+      availability?: number
+      hourly_rate?: number
+      skills?: string[]
+      location?: string
+    }
+  ) {
+    if (!session?.access_token) throw new Error('Not authenticated')
+    try {
+      const response = await fetch(getApiUrl(`/resources/${resourceId}`), {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${session?.access_token || ''}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(resourceData),
+      })
+      if (!response.ok) {
+        let detail: string | undefined
+        const text = await response.text()
+        try {
+          const errorData = text ? JSON.parse(text) : {}
+          const raw = errorData.detail
+          if (Array.isArray(raw)) {
+            detail = raw.map((e: { msg?: string; loc?: unknown }) => e.msg || JSON.stringify(e.loc)).join(', ')
+          } else if (raw && typeof raw === 'object' && 'message' in raw) {
+            detail = (raw as { message?: string }).message
+          } else if (typeof raw === 'string') {
+            detail = raw
+          } else {
+            detail = errorData.error
+          }
+        } catch {
+          detail = text?.slice(0, 200) || undefined
+        }
+        throw new Error(detail || `Failed to update resource: ${response.status}`)
+      }
+      const updated = await response.json()
+      setResources((prev) => prev.map((r) => (r.id === resourceId ? { ...r, ...updated } : r)))
+      setEditResource(null)
+      return updated
+    } catch (error: unknown) {
+      console.error('Error updating resource:', error)
+      throw error instanceof Error ? error : new Error('Unknown error updating resource')
     }
   }
 
@@ -396,10 +496,10 @@ export default function Resources() {
                 const btnToggle = (active: boolean) => active ? btnPrimary : btnSecondary
                 return (
                   <>
-                    {/* Gruppe 1: Ressourcen – Add (Hot), Assign/Schedule einheitlich grau */}
+                    {/* Gruppe 1: Nur „Ressource hinzufügen“ – Assign/Schedule brauchen Projektkontext (z. B. Projektseite) */}
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => setShowAddModal(true)}
+                        onClick={() => { setAddError(null); setShowAddModal(true) }}
                         className={btnPrimary}
                         title="Ressource hinzufügen"
                         aria-label="Ressource hinzufügen"
@@ -408,11 +508,6 @@ export default function Resources() {
                         <span className="hidden sm:inline">Add Resource</span>
                         <span className="sm:hidden">Add</span>
                       </button>
-                      <ResourceActionButtons
-                        onAssignResource={() => {/* Handle assign */}}
-                        onScheduleResource={() => {/* Handle schedule */}}
-                        variant="compact"
-                      />
                     </div>
 
                     <div className="w-px self-stretch min-h-[32px] bg-slate-200/80 dark:bg-slate-600/70 rounded-full" aria-hidden />
@@ -728,7 +823,13 @@ export default function Resources() {
           {viewMode === 'cards' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredResources.map((resource) => (
-                <ResourceCard key={resource.id} resource={resource} />
+                <ResourceCard
+                  key={resource.id}
+                  resource={resource}
+                  onViewDetails={(r) => setDetailResource(r)}
+                  onEdit={(r) => { setEditError(null); setEditResource(r) }}
+                  onDelete={(r) => { setDeleteError(null); setResourceToDelete(r) }}
+                />
               ))}
             </div>
           )}
@@ -739,6 +840,7 @@ export default function Resources() {
                 resources={filteredResources}
                 height={600}
                 itemHeight={80}
+                onViewDetails={(r) => setDetailResource(r)}
               />
             </Suspense>
           )}
@@ -770,13 +872,15 @@ export default function Resources() {
                 }
                 
                 return (
-                  <div
+                  <button
                     key={resource.id}
-                    className={`p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 cursor-pointer touch-manipulation min-h-[120px] sm:min-h-[140px] ${colorClasses[utilizationLevel]}`}
-                    title={`${resource.name} - ${resource.role || 'Unassigned'} - ${resource.utilization_percentage.toFixed(1)}% utilized`}
-                    style={{ 
+                    type="button"
+                    className={`w-full text-left p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 cursor-pointer touch-manipulation min-h-[120px] sm:min-h-[140px] ${colorClasses[utilizationLevel]}`}
+                    title={`${resource.name} – in Kartenansicht öffnen`}
+                    aria-label={`${resource.name}, ${resource.utilization_percentage.toFixed(0)}% Auslastung. In Kartenansicht öffnen.`}
+                    style={{
                       transform: 'scale(1)',
-                      touchAction: 'manipulation'
+                      touchAction: 'manipulation',
                     }}
                     onTouchStart={(e) => {
                       e.currentTarget.style.transform = 'scale(0.98)'
@@ -784,6 +888,7 @@ export default function Resources() {
                     onTouchEnd={(e) => {
                       e.currentTarget.style.transform = 'scale(1)'
                     }}
+                    onClick={() => setViewMode('cards')}
                   >
                     <div className="text-center h-full flex flex-col justify-between">
                       <div>
@@ -814,17 +919,17 @@ export default function Resources() {
                       </div>
                       
                       {/* Skills preview */}
-                      {resource.skills.length > 0 && (
+                      {(resource.skills ?? []).length > 0 && (
                         <div className="mt-2">
                           <div className="flex flex-wrap gap-1 justify-center">
-                            {resource.skills.slice(0, 2).map((skill, index) => (
+                            {(resource.skills ?? []).slice(0, 2).map((skill, index) => (
                               <span key={index} className="px-1 py-0.5 bg-white dark:bg-slate-800 bg-opacity-60 text-xs rounded truncate max-w-full">
                                 {skill}
                               </span>
                             ))}
-                            {resource.skills.length > 2 && (
+                            {(resource.skills ?? []).length > 2 && (
                               <span className="px-1 py-0.5 bg-white dark:bg-slate-800 bg-opacity-60 text-xs rounded">
-                                +{resource.skills.length - 2}
+                                +{(resource.skills ?? []).length - 2}
                               </span>
                             )}
                           </div>
@@ -842,7 +947,7 @@ export default function Resources() {
                         </span>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 )
               })}
             </div>
@@ -924,15 +1029,21 @@ export default function Resources() {
           )}
         </div>
 
-        {/* Enhanced Mobile-First Add Resource Modal */}
+        {/* Enhanced Mobile-First Add Resource Modal – soft overlay, card look */}
         {showAddModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-slate-800 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 p-4 sm:p-6">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="absolute inset-0 bg-slate-900/40 dark:bg-slate-950/50 backdrop-blur-sm"
+              aria-hidden="true"
+              onClick={() => { setAddError(null); setShowAddModal(false) }}
+            />
+            <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 w-full max-w-md max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 p-4 sm:p-6 rounded-t-xl">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Add New Resource</h3>
               </div>
               <form onSubmit={async (e) => {
                 e.preventDefault()
+                setAddError(null)
                 const formData = new FormData(e.currentTarget)
                 const skillsInput = formData.get('skills') as string
                 const skills = skillsInput ? skillsInput.split(',').map(s => s.trim()).filter(Boolean) : []
@@ -952,11 +1063,19 @@ export default function Resources() {
                     skills,
                     ...(locationValue && { location: locationValue })
                   })
-                } catch (error) {
-                  alert(error instanceof Error ? error.message : 'Failed to create resource')
+                } catch (err) {
+                  setAddError(err instanceof Error ? err.message : 'Failed to create resource')
                 }
               }} className="p-4 sm:p-6 space-y-4"
               >
+                {addError && (
+                  <div className="rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 px-3 py-2 text-sm" role="alert">
+                    <p>{addError}</p>
+                    {addError.toLowerCase().includes('already exists') && (
+                      <p className="mt-1 text-amber-700 dark:text-amber-300">Use a different email or edit the existing resource.</p>
+                    )}
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Name *</label>
                   <input
@@ -1050,7 +1169,7 @@ export default function Resources() {
                 <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4 border-t border-gray-200 dark:border-slate-700">
                   <button
                     type="button"
-                    onClick={() => setShowAddModal(false)}
+                    onClick={() => { setAddError(null); setShowAddModal(false) }}
                     className="w-full sm:w-auto min-h-[44px] px-4 py-2 text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 active:bg-gray-300 font-medium"
                   >
                     Cancel
@@ -1063,6 +1182,319 @@ export default function Resources() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Resource Confirmation Modal – app-specific, same styling as Add/Edit */}
+        {resourceToDelete && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="absolute inset-0 bg-slate-900/40 dark:bg-slate-950/50 backdrop-blur-sm"
+              aria-hidden="true"
+              onClick={() => { setDeleteError(null); setResourceToDelete(null) }}
+            />
+            <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 w-full max-w-md">
+              <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-slate-700">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Ressource löschen</h3>
+              </div>
+              <div className="p-4 sm:p-6 space-y-4">
+                <p className="text-gray-700 dark:text-slate-300">
+                  &quot;{resourceToDelete.name}&quot; ({resourceToDelete.email}) wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
+                </p>
+                {deleteError && (
+                  <div className="rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-3 py-2 text-sm" role="alert">
+                    {deleteError}
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 p-4 sm:p-6 border-t border-gray-200 dark:border-slate-700">
+                <button
+                  type="button"
+                  onClick={() => { setDeleteError(null); setResourceToDelete(null) }}
+                  disabled={deleteInProgress}
+                  className="w-full sm:w-auto min-h-[44px] px-4 py-2 text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 disabled:opacity-50 font-medium"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!resourceToDelete) return
+                    setDeleteError(null)
+                    setDeleteInProgress(true)
+                    try {
+                      await deleteResource(resourceToDelete)
+                      setResourceToDelete(null)
+                    } catch (err) {
+                      setDeleteError(err instanceof Error ? err.message : 'Löschen fehlgeschlagen')
+                    } finally {
+                      setDeleteInProgress(false)
+                    }
+                  }}
+                  disabled={deleteInProgress}
+                  className="w-full sm:w-auto min-h-[44px] px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 active:bg-red-800 disabled:opacity-50 font-medium"
+                >
+                  {deleteInProgress ? 'Wird gelöscht…' : 'Löschen'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Resource Modal – same overlay/card styling, form pre-filled */}
+        {editResource && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="absolute inset-0 bg-slate-900/40 dark:bg-slate-950/50 backdrop-blur-sm"
+              aria-hidden="true"
+              onClick={() => { setEditResource(null); setEditError(null) }}
+            />
+            <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 w-full max-w-md max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 p-4 sm:p-6 rounded-t-xl">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Edit Resource</h3>
+              </div>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault()
+                  setEditError(null)
+                  const formData = new FormData(e.currentTarget)
+                  const skillsInput = formData.get('skills') as string
+                  const skills = skillsInput ? skillsInput.split(',').map((s) => s.trim()).filter(Boolean) : []
+                  try {
+                    const roleValue = formData.get('role') as string
+                    const hourlyRateValue = formData.get('hourly_rate') as string
+                    const locationValue = formData.get('location') as string
+                    await updateResource(editResource.id, {
+                      name: formData.get('name') as string,
+                      email: formData.get('email') as string,
+                      ...(roleValue && { role: roleValue }),
+                      capacity: parseInt(formData.get('capacity') as string) || 40,
+                      availability: parseInt(formData.get('availability') as string) || 100,
+                      ...(hourlyRateValue && { hourly_rate: parseFloat(hourlyRateValue) }),
+                      skills,
+                      ...(locationValue && { location: locationValue }),
+                    })
+                  } catch (error) {
+                    setEditError(error instanceof Error ? error.message : 'Failed to update resource')
+                  }
+                }}
+                className="p-4 sm:p-6 space-y-4"
+              >
+                {editError && (
+                  <div className="rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-3 py-2 text-sm" role="alert">
+                    {editError}
+                  </div>
+                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Name *</label>
+                  <input
+                    type="text"
+                    name="name"
+                    required
+                    defaultValue={editResource.name}
+                    className="w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    placeholder="Enter full name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Email *</label>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    defaultValue={editResource.email}
+                    className="w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    placeholder="Enter email address"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Role</label>
+                  <input
+                    type="text"
+                    name="role"
+                    defaultValue={editResource.role ?? ''}
+                    placeholder="e.g. Developer, Designer, Manager"
+                    className="input-field w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Capacity (hrs/week)</label>
+                    <input
+                      type="number"
+                      name="capacity"
+                      defaultValue={editResource.capacity ?? 40}
+                      min="1"
+                      max="80"
+                      className="input-field w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Availability (%)</label>
+                    <input
+                      type="number"
+                      name="availability"
+                      defaultValue={editResource.availability ?? 100}
+                      min="0"
+                      max="100"
+                      className="input-field w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Hourly Rate ($)</label>
+                  <input
+                    type="number"
+                    name="hourly_rate"
+                    step="0.01"
+                    min="0"
+                    defaultValue={editResource.hourly_rate ?? ''}
+                    placeholder="Optional"
+                    className="input-field w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Skills</label>
+                  <input
+                    type="text"
+                    name="skills"
+                    defaultValue={Array.isArray(editResource.skills) ? editResource.skills.join(', ') : ''}
+                    placeholder="e.g. React, Python, Design (comma-separated)"
+                    className="input-field w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Location</label>
+                  <input
+                    type="text"
+                    name="location"
+                    defaultValue={editResource.location ?? ''}
+                    placeholder="e.g. Berlin, Remote"
+                    className="input-field w-full min-h-[44px] p-3 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                  />
+                </div>
+                <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4 border-t border-gray-200 dark:border-slate-700">
+                  <button
+                    type="button"
+                    onClick={() => { setEditResource(null); setEditError(null) }}
+                    className="w-full sm:w-auto min-h-[44px] px-4 py-2 text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 active:bg-gray-300 font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto min-h-[44px] px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 active:bg-blue-800 font-medium"
+                  >
+                    Save changes
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Resource Detail Modal – styling aligned with app (soft overlay, card look) */}
+        {detailResource && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="resource-detail-title"
+          >
+            <div
+              className="absolute inset-0 bg-slate-900/40 dark:bg-slate-950/50 backdrop-blur-sm"
+              aria-hidden="true"
+              onClick={() => setDetailResource(null)}
+            />
+            <div
+              className="relative bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 w-full max-w-lg max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 p-4 sm:p-6 flex justify-between items-center rounded-t-xl">
+                <h2 id="resource-detail-title" className="text-lg font-semibold text-gray-900 dark:text-slate-100">Resource Details</h2>
+                <button
+                  type="button"
+                  onClick={() => setDetailResource(null)}
+                  className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:hover:text-slate-400 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700"
+                  aria-label="Close"
+                >
+                  <span className="text-xl leading-none">×</span>
+                </button>
+              </div>
+              <div className="p-4 sm:p-6 space-y-4">
+                <div>
+                  <div className="text-sm text-gray-500 dark:text-slate-400">Name</div>
+                  <div className="font-medium text-gray-900 dark:text-slate-100">{detailResource.name}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-500 dark:text-slate-400">Email</div>
+                  <div className="font-medium text-gray-900 dark:text-slate-100">{detailResource.email}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-500 dark:text-slate-400">Role</div>
+                  <div className="font-medium text-gray-900 dark:text-slate-100">{detailResource.role || '—'}</div>
+                </div>
+                {detailResource.location && (
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-slate-400">Location</div>
+                    <div className="font-medium text-gray-900 dark:text-slate-100">{detailResource.location}</div>
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-slate-400">Capacity</div>
+                    <div className="font-medium text-gray-900 dark:text-slate-100">{detailResource.capacity} h/week</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-slate-400">Availability</div>
+                    <div className="font-medium text-gray-900 dark:text-slate-100">{detailResource.availability}%</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-slate-400">Utilization</div>
+                    <div className="font-medium text-gray-900 dark:text-slate-100">{(detailResource.utilization_percentage ?? 0).toFixed(1)}%</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-slate-400">Available hours</div>
+                    <div className="font-medium text-gray-900 dark:text-slate-100">{(detailResource.available_hours ?? 0).toFixed(1)} h</div>
+                  </div>
+                </div>
+                {detailResource.hourly_rate != null && (
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-slate-400">Hourly rate</div>
+                    <div className="font-medium text-gray-900 dark:text-slate-100">${detailResource.hourly_rate}/hr</div>
+                  </div>
+                )}
+                <div>
+                  <div className="text-sm text-gray-500 dark:text-slate-400">Status</div>
+                  <div className="font-medium text-gray-900 dark:text-slate-100">{(detailResource.availability_status ?? '').replace(/_/g, ' ')}</div>
+                </div>
+                {(detailResource.skills ?? []).length > 0 && (
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-slate-400 mb-1">Skills</div>
+                    <div className="flex flex-wrap gap-1">
+                      {(detailResource.skills ?? []).map((skill, i) => (
+                        <span key={i} className="px-2 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 text-xs rounded">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div>
+                  <div className="text-sm text-gray-500 dark:text-slate-400">Current projects</div>
+                  <div className="font-medium text-gray-900 dark:text-slate-100">{(detailResource.current_projects ?? []).length}</div>
+                </div>
+              </div>
+              <div className="p-4 sm:p-6 border-t border-gray-200 dark:border-slate-700">
+                <button
+                  type="button"
+                  onClick={() => setDetailResource(null)}
+                  className="w-full min-h-[44px] px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-900 dark:text-slate-100 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 font-medium"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         )}

@@ -11,7 +11,7 @@ import {
   designTokens,
   responsive,
   animations,
-} from '../design-system'
+} from '../design/design-system'
 
 describe('lib/utils/design-system', () => {
   describe('getThemeClasses', () => {

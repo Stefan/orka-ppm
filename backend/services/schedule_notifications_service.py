@@ -96,11 +96,18 @@ class ScheduleNotificationsService:
         schedule_id: Optional[UUID] = None,
         days_ahead: int = 14,
     ) -> Dict[str, Any]:
-        """Aggregated notifications: milestone alerts + recent assignments."""
-        milestone_alerts = await self.get_milestone_deadline_alerts(user_id=user_id, days_ahead=days_ahead)
+        """Aggregated notifications: milestone alerts + recent assignments (parallelized)."""
+        import asyncio
+        if user_id:
+            milestone_alerts, task_notifications = await asyncio.gather(
+                self.get_milestone_deadline_alerts(user_id=user_id, days_ahead=days_ahead),
+                self.get_task_assignment_notifications(user_id=user_id),
+            )
+        else:
+            milestone_alerts = await self.get_milestone_deadline_alerts(user_id=user_id, days_ahead=days_ahead)
+            task_notifications = []
         if schedule_id:
             milestone_alerts = [a for a in milestone_alerts if a.get("schedule_id") == str(schedule_id)]
-        task_notifications = await self.get_task_assignment_notifications(user_id=user_id) if user_id else []
         return {
             "milestone_alerts": milestone_alerts,
             "task_assignments": task_notifications[:20],

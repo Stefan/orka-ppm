@@ -92,7 +92,8 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
   }
 
   useEffect(() => {
-    fetchActuals()
+    const t = setTimeout(() => fetchActuals(), 100)
+    return () => clearTimeout(t)
   }, [accessToken, currentPage, pageSize])
 
   // Expose refresh method to parent

@@ -1,5 +1,9 @@
 'use client'
 
+/**
+ * @deprecated Alternate home page; not used by routing. Main entry is app/page.tsx.
+ * Kept for reference or removal during cleanup.
+ */
 import React, { useState } from 'react'
 import { useAuth } from './providers/SupabaseAuthProvider'
 import Sidebar from '../components/navigation/Sidebar'

@@ -100,11 +100,12 @@ class GenericAuditService:
         ip_address: Optional[str] = None,
         user_agent: Optional[str] = None,
         project_id: Optional[UUID] = None,
-        performance_metrics: Optional[Dict[str, Any]] = None
+        performance_metrics: Optional[Dict[str, Any]] = None,
+        tenant_id: Optional[str] = None,
     ) -> bool:
         """
         Log an audit event with comprehensive context.
-        
+
         Args:
             event_type: Type of audit event
             user_id: ID of user performing the action (None for system events)
@@ -116,7 +117,8 @@ class GenericAuditService:
             user_agent: User agent string
             project_id: Associated project ID if applicable
             performance_metrics: Performance data (execution time, resource usage, etc.)
-            
+            tenant_id: Optional tenant/organization ID so the event appears for that tenant in the Audit Trail
+
         Returns:
             bool: True if logging succeeded, False otherwise
         """
@@ -132,8 +134,10 @@ class GenericAuditService:
                 "user_agent": user_agent,
                 "project_id": str(project_id) if project_id else None,
                 "performance_metrics": json.dumps(performance_metrics) if performance_metrics else None,
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
+            if tenant_id is not None:
+                audit_entry["tenant_id"] = str(tenant_id).strip() or None
             
             # Log to database
             if self.supabase:

@@ -4,7 +4,16 @@
  * @jest-environment node
  */
 
-import { createMockNextRequest, parseJsonResponse } from './helpers'
+import { createMockNextRequest, createAuthenticatedRequest, parseJsonResponse } from './helpers'
+
+jest.mock('@/lib/auth/verify-jwt', () => ({
+  enforceSyncAuth: async (_h: string | null, requestUserId: string | null) => {
+    if (!_h || !_h.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Authorization required' }), { status: 401 })
+    }
+    return { userId: requestUserId ?? 'test-user' }
+  },
+}))
 
 describe('POST /api/sync/devices', () => {
   it('returns 400 when userId or device missing', async () => {
@@ -23,8 +32,7 @@ describe('POST /api/sync/devices', () => {
 
   it('returns 200 and registers a new device', async () => {
     const { POST } = await import('@/app/api/sync/devices/route')
-    const request = createMockNextRequest({
-      url: 'http://localhost:3000/api/sync/devices',
+    const request = createAuthenticatedRequest('http://localhost:3000/api/sync/devices', 'test-token', {
       method: 'POST',
       body: {
         userId: 'user-devices-1',
@@ -59,15 +67,13 @@ describe('POST /api/sync/devices', () => {
       isActive: true,
     }
     await POST(
-      createMockNextRequest({
-        url: 'http://localhost:3000/api/sync/devices',
+      createAuthenticatedRequest('http://localhost:3000/api/sync/devices', 'test-token', {
         method: 'POST',
         body: { userId, device },
       }) as any
     )
     const updateResponse = await POST(
-      createMockNextRequest({
-        url: 'http://localhost:3000/api/sync/devices',
+      createAuthenticatedRequest('http://localhost:3000/api/sync/devices', 'test-token', {
         method: 'POST',
         body: { userId, device: { ...device, name: 'Firefox Updated' } },
       }) as any
@@ -77,10 +83,7 @@ describe('POST /api/sync/devices', () => {
     expect((updateData as Record<string, unknown>).totalDevices).toBe(1)
 
     const getResponse = await GET(
-      createMockNextRequest({
-        url: `http://localhost:3000/api/sync/devices?userId=${userId}`,
-        method: 'GET',
-      }) as any
+      createAuthenticatedRequest(`http://localhost:3000/api/sync/devices?userId=${userId}`, 'test-token', { method: 'GET' }) as any
     )
     const getData = await parseJsonResponse(getResponse)
     expect((getData as Record<string, unknown>).devices).toHaveLength(1)
@@ -104,10 +107,7 @@ describe('GET /api/sync/devices', () => {
 
   it('returns 200 with empty devices when user has none', async () => {
     const { GET } = await import('@/app/api/sync/devices/route')
-    const request = createMockNextRequest({
-      url: 'http://localhost:3000/api/sync/devices?userId=user-no-devices',
-      method: 'GET',
-    })
+    const request = createAuthenticatedRequest('http://localhost:3000/api/sync/devices?userId=user-no-devices', 'test-token', { method: 'GET' })
     const response = await GET(request as any)
     const data = await parseJsonResponse(response)
 

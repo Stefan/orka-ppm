@@ -62,18 +62,26 @@ Summary of findings and recommended cleanup areas. Use the `chore/codebase-clean
 ## 6. Suggested cleanup order
 
 1. **Done:** Move root one-off docs to docs/archive; add docs/README.md; ensure .gitignore.
-2. **Next:** Archive obsolete *_SUMMARY.md; resolve screenshot-service roles (document only done); document lib/api vs lib/api.ts.
-3. **Later:** Logger for frontend; logging in production backend; triage TODO/FIXME.
+2. **Done:** Archive obsolete *_SUMMARY.md to docs/archive/summaries/; screenshot-service + lib/api documented in code.
+3. **Done:** Logger for frontend (prod: no console output); logging in backend main.py; TODO in main.py cleared. **Ongoing:** Replace remaining console.* in app/ with logger; use logging in routers/services where still print().
 
 ---
 
-## 7. Metrics snapshot
+## 7. Ungenutzte Exports
 
-| Area                    | Count / scope     |
-|-------------------------|-------------------|
-| TODO/FIXME/deprecated   | ~107 in 30 files  |
-| console.* (frontend)    | ~1,127 in 168 files |
-| print() (backend)        | ~6,046 in 243 files |
-| *_SUMMARY.md            | ~60 files         |
-| Root one-off docs       | Moved to docs/archive |
-| Duplicate modules       | screenshot (2); API entry (2) — documented |
+- **Erledigt:** In `lib/monitoring/index.ts` die Re-Exports von `production-monitoring` und `security` entfernt (keine Imports im Projekt). Direktimport z. B. `@/lib/monitoring/production-monitoring` bleibt möglich.
+- **Tooling:** Ungenutzte Exports finden mit `npx ts-prune` (kann in großen Repos langsam sein) oder [knip](https://github.com/webpro/knip). Empfehlung: `npx ts-prune --project tsconfig.json 2>&1 | grep -v __tests__ | grep -v node_modules` oder knip einmalig einrichten.
+
+---
+
+## 8. Metrics snapshot
+
+| Area                    | Count / scope     | Status |
+|-------------------------|-------------------|--------|
+| TODO/FIXME/deprecated   | ~107 in 30 files  | main.py cleared; rest on demand |
+| console.* (frontend)    | ~1,127 in 168 files | Logger gates prod; ThemeProvider uses logger; rest incremental |
+| print() (backend)        | ~6,046 in 243 files | main.py → logging; routers/services on demand |
+| *_SUMMARY.md            | ~60 files         | Backend root → docs/archive/summaries/backend |
+| Root one-off docs       | —                 | Moved to docs/archive |
+| Duplicate modules       | screenshot (2); API entry (2) | Documented in code |
+| Unused barrel exports   | lib/monitoring (production, security) | Removed from index; direct import still available |

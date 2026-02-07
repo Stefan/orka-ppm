@@ -1,3 +1,9 @@
+/**
+ * Next.js API client: getApiUrl, fetch with auth, mock fallbacks.
+ * Use this (or lib/api/supabase, lib/api/auth) for app requests.
+ * Legacy generic helpers are in lib/api.ts.
+ */
+
 // Browser API type declarations
 declare global {
   interface RequestInit {

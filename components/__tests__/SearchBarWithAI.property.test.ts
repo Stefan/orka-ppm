@@ -8,6 +8,16 @@ import * as fc from 'fast-check'
 import { fuzzySearch, generateSearchSuggestions, highlightMatch } from '../../utils/fuzzySearch'
 import type { SearchResult } from '../../types/search'
 
+/** Decode HTML entities so we can compare highlightMatch output to original text (implementation escapes HTML) */
+function decodeHtml(html: string): string {
+  return html
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+}
+
 // Test data generators
 const searchResultArbitrary = fc.record({
   id: fc.string({ minLength: 1, maxLength: 20 }).filter(s => s.trim().length > 0),
@@ -189,9 +199,9 @@ describe('SearchBarWithAI Smart Search Functionality - Property Tests', () => {
             // Should return a string
             expect(typeof highlighted).toBe('string')
 
-            // If query is empty, should return original text
+            // If query is empty/whitespace, implementation returns HTML-escaped text for safe rendering
             if (!query.trim()) {
-              expect(highlighted).toBe(text)
+              expect(decodeHtml(highlighted)).toBe(text)
               return
             }
 
@@ -205,9 +215,9 @@ describe('SearchBarWithAI Smart Search Functionality - Property Tests', () => {
               expect(highlighted).toContain('bg-yellow-200')
             }
 
-            // Highlighted text should still contain original content
+            // Highlighted text (with <mark> removed) is HTML-escaped; decoded should equal original
             const strippedHighlight = highlighted.replace(/<mark[^>]*>|<\/mark>/g, '')
-            expect(strippedHighlight).toBe(text)
+            expect(decodeHtml(strippedHighlight)).toBe(text)
 
             // Should not break on special regex characters
             const specialChars = ['(', ')', '[', ']', '{', '}', '+', '*', '?', '^', '$', '|', '.', '\\']

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { Layers, Zap, X } from 'lucide-react'
 import { ProjectWithFinancials, Currency, KPIMetrics } from '@/types/costbook'
 import { calculateKPIs } from '@/lib/costbook-calculations'
@@ -66,6 +67,8 @@ export interface CostbookProps {
   initialCurrency?: Currency
   /** Handler for project selection */
   onProjectSelect?: (project: ProjectWithFinancials) => void
+  /** Show "Start Tour" button (set false when embedded e.g. in Financials to avoid duplicate) */
+  showTourButton?: boolean
   /** Additional CSS classes */
   className?: string
   /** Test ID for testing */
@@ -73,15 +76,8 @@ export interface CostbookProps {
 }
 
 import { DistributionSettingsDialog } from './DistributionSettingsDialog'
+import { DistributionRulesPanel } from './DistributionRulesPanel'
 import { GuidedTour, useGuidedTour, TourTriggerButton, costbookTourSteps } from '@/components/guided-tour'
-const DistributionRulesPanelStub: React.FC<{
-  rules: DistributionRule[]
-  onCreateRule: (rule: Omit<DistributionRule, 'id' | 'created_at' | 'last_applied' | 'application_count'>) => void
-  onUpdateRule: (ruleId: string, updates: Partial<DistributionRule>) => void
-  onDeleteRule: (ruleId: string) => void
-  onApplyRule: (ruleId: string, projectIds: string[]) => void
-  className?: string
-}> = () => null
 
 /**
  * Main Costbook component
@@ -91,6 +87,7 @@ function CostbookInner({
   useMockData = false,
   initialCurrency = Currency.USD,
   onProjectSelect,
+  showTourButton = true,
   className = '',
   'data-testid': testId = 'costbook'
 }: CostbookProps) {
@@ -701,10 +698,12 @@ function CostbookInner({
           lastRefreshTime={lastRefreshTime || undefined}
           className="mb-0"
         />
-        <TourTriggerButton
-          onStart={hasCompletedTour ? resetAndStartTour : startTour}
-          hasCompletedTour={hasCompletedTour}
-        />
+        {showTourButton && (
+          <TourTriggerButton
+            onStart={hasCompletedTour ? resetAndStartTour : startTour}
+            hasCompletedTour={hasCompletedTour}
+          />
+        )}
         {error && (
           <ErrorDisplay
             error={error}
@@ -758,13 +757,14 @@ function CostbookInner({
             </div>
             <div className="flex-1 min-h-[280px] overflow-auto bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
               {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {[1, 2, 3, 4, 5, 6].map((i) => <CardSkeleton key={i} />)}
                 </div>
               ) : filteredProjects.length === 0 && searchTerm ? (
                 <NoResults query={searchTerm} onSuggestionSelect={handleSearch} />
               ) : (
-                <ProjectsGrid
+                <div className="min-h-0">
+                  <ProjectsGrid
                   projects={filteredProjects}
                   currency={selectedCurrency}
                   selectedProjectId={selectedProjectId}
@@ -776,6 +776,7 @@ function CostbookInner({
                   commentCounts={commentCounts}
                   onCommentsClick={handleCommentsClick}
                 />
+                </div>
               )}
             </div>
           </section>
@@ -955,10 +956,10 @@ function CostbookInner({
         data-testid="recommendation-detail-dialog"
       />
 
-      {/* AI Optimize Costbook Modal */}
-      {showOptimizeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" role="dialog" aria-modal="true" aria-labelledby="optimize-title">
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col">
+      {/* AI Optimize Costbook Modal – rendered in portal so it centers on viewport */}
+      {showOptimizeModal && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/30" role="dialog" aria-modal="true" aria-labelledby="optimize-title">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-lg w-full max-h-[80vh] overflow-hidden flex flex-col">
             <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
               <h2 id="optimize-title" className="font-semibold text-gray-900 dark:text-slate-100 flex items-center gap-2">
                 <Zap className="h-4 w-4 text-amber-500" />
@@ -989,7 +990,8 @@ function CostbookInner({
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Distribution Settings Dialog (Phase 2) */}
@@ -1017,22 +1019,22 @@ function CostbookInner({
         )
       })()}
 
-      {/* Distribution Rules Panel (Phase 2) */}
-      {costbookPhase2Enabled && showDistributionRules && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+      {/* Distribution Rules Panel – always open on click (no feature-flag gate) */}
+      {showDistributionRules && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="distribution-rules-title">
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-slate-700">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100">Distribution Rules Manager</h2>
+              <h2 id="distribution-rules-title" className="text-xl font-bold text-gray-900 dark:text-slate-100">Distribution Rules Manager</h2>
               <button
                 onClick={() => setShowDistributionRules(false)}
-                className="text-gray-400 hover:text-gray-600 dark:text-slate-400 transition-colors"
+                className="text-gray-400 hover:text-gray-600 dark:text-slate-400 transition-colors p-1 rounded hover:bg-gray-100 dark:hover:bg-slate-700"
                 aria-label="Close"
               >
                 ×
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-6">
-              <DistributionRulesPanelStub
+              <DistributionRulesPanel
                 rules={distributionRules}
                 onCreateRule={handleCreateRule}
                 onUpdateRule={handleUpdateRule}
@@ -1041,7 +1043,8 @@ function CostbookInner({
               />
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
       <GuidedTour
         steps={costbookTourSteps}

@@ -5,6 +5,7 @@
 import { get, post, put, del } from '@/lib/api'
 import type {
   ShareLink,
+  ShareLinkListResponse,
   CreateShareLinkRequest,
   ShareAnalytics
 } from '@/types/share-links'
@@ -16,7 +17,7 @@ export async function createShareLink(
   projectId: string,
   data: Omit<CreateShareLinkRequest, 'project_id'>
 ) {
-  return post<ShareLink>(`/projects/${projectId}/shares`, {
+  return post<ShareLink>(`/api/projects/${projectId}/shares`, {
     ...data,
     project_id: projectId
   })
@@ -26,21 +27,21 @@ export async function createShareLink(
  * Get all share links for a project
  */
 export async function getProjectShareLinks(projectId: string) {
-  return get<ShareLink[]>(`/projects/${projectId}/shares`)
+  return get<ShareLinkListResponse>(`/api/projects/${projectId}/shares`)
 }
 
 /**
  * Revoke a share link
  */
 export async function revokeShareLink(shareId: string) {
-  return del<{ success: boolean }>(`/shares/${shareId}`)
+  return del<{ success: boolean }>(`/api/shares/${shareId}`)
 }
 
 /**
  * Extend the expiry of a share link
  */
 export async function extendShareExpiry(shareId: string, newExpiry: string) {
-  return put<ShareLink>(`/shares/${shareId}/extend`, {
+  return put<ShareLink>(`/api/shares/${shareId}/extend`, {
     new_expiry: newExpiry
   })
 }
@@ -49,7 +50,7 @@ export async function extendShareExpiry(shareId: string, newExpiry: string) {
  * Get analytics for a share link
  */
 export async function getShareAnalytics(shareId: string) {
-  return get<ShareAnalytics>(`/shares/${shareId}/analytics`)
+  return get<ShareAnalytics>(`/api/shares/${shareId}/analytics`)
 }
 
 /**

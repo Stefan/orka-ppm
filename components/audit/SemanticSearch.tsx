@@ -13,6 +13,7 @@ import {
   X,
   Info
 } from 'lucide-react'
+import { useTranslations } from '@/lib/i18n/context'
 import { AuditEvent } from './Timeline'
 
 /**
@@ -111,6 +112,7 @@ const SemanticSearch: React.FC<SemanticSearchProps> = ({
   const [error, setError] = useState<string | null>(null)
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const { t } = useTranslations()
 
   /**
    * Handle search submission
@@ -163,10 +165,23 @@ const SemanticSearch: React.FC<SemanticSearchProps> = ({
   }, [])
 
   /**
-   * Format similarity score as percentage
+   * Format similarity score as percentage (guards against NaN/undefined)
    */
-  const formatScore = (score: number): string => {
-    return `${(score * 100).toFixed(1)}%`
+  const formatScore = (score: number | undefined | null): string => {
+    const n = Number(score)
+    if (typeof score !== 'number' || !Number.isFinite(n) || n < 0 || n > 1) {
+      return '—'
+    }
+    return `${(n * 100).toFixed(1)}%`
+  }
+
+  const translateEventType = (key: string): string => {
+    const out = t(`audit.eventTypes.${key}` as any)
+    return out && out !== `audit.eventTypes.${key}` ? out : key
+  }
+  const translateEntityType = (key: string): string => {
+    const out = t(`audit.entityTypes.${key}` as any)
+    return out && out !== `audit.entityTypes.${key}` ? out : key
   }
 
   return (
@@ -297,7 +312,7 @@ const SemanticSearch: React.FC<SemanticSearchProps> = ({
                           key={index}
                           className="px-2 py-1 text-xs bg-white dark:bg-slate-800 border border-purple-200 rounded text-gray-700 dark:text-slate-300"
                         >
-                          <span className="font-medium">{source.event_type}</span>
+                          <span className="font-medium">{translateEventType(source.event_type)}</span>
                           <span className="text-gray-500 dark:text-slate-400 ml-1">
                             • {new Date(source.timestamp).toLocaleDateString()}
                           </span>
@@ -341,7 +356,7 @@ const SemanticSearch: React.FC<SemanticSearchProps> = ({
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-1">
                           <h4 className="text-sm font-semibold text-gray-900 dark:text-slate-100">
-                            {result.event.event_type}
+                            {translateEventType(result.event.event_type)}
                           </h4>
                           <span className={`px-2 py-0.5 text-xs rounded-full ${
                             result.event.severity === 'critical' ? 'bg-red-100 dark:bg-red-900/30 text-red-700' :
@@ -381,7 +396,7 @@ const SemanticSearch: React.FC<SemanticSearchProps> = ({
                             {formatScore(result.similarity_score)}
                           </span>
                         </div>
-                        <span className="text-xs text-gray-500 dark:text-slate-400">relevance</span>
+                        <span className="text-xs text-gray-500 dark:text-slate-400">{t('audit.relevance')}</span>
                       </div>
                     </div>
 
@@ -414,10 +429,10 @@ const SemanticSearch: React.FC<SemanticSearchProps> = ({
                     {/* View Details Link */}
                     <div className="mt-3 pt-2 border-t border-gray-100 dark:border-slate-700 flex items-center justify-between">
                       <span className="text-xs text-gray-500 dark:text-slate-400">
-                        Entity: {result.event.entity_type}
+                        {t('audit.entity')}: {translateEntityType(result.event.entity_type)}
                       </span>
                       <button className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 flex items-center">
-                        View Details
+                        {t('audit.viewDetails')}
                         <ChevronRight className="h-3 w-3 ml-1" />
                       </button>
                     </div>
@@ -454,16 +469,16 @@ const SemanticSearch: React.FC<SemanticSearchProps> = ({
 
       {/* Selected Result Modal */}
       {selectedResult && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 p-6 flex items-start justify-between">
               <div className="flex-1">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100 mb-1">
-                  {selectedResult.event.event_type}
+                  {translateEventType(selectedResult.event.event_type)}
                 </h2>
                 <p className="text-sm text-gray-600 dark:text-slate-400">
-                  Relevance: {formatScore(selectedResult.similarity_score)}
+                  {t('audit.relevance')}: {formatScore(selectedResult.similarity_score)}
                 </p>
               </div>
               <button
@@ -506,8 +521,8 @@ const SemanticSearch: React.FC<SemanticSearchProps> = ({
                       </div>
                     )}
                     <div>
-                      <dt className="text-xs text-gray-600 dark:text-slate-400">Entity</dt>
-                      <dd className="text-sm text-gray-900 dark:text-slate-100">{selectedResult.event.entity_type}</dd>
+                      <dt className="text-xs text-gray-600 dark:text-slate-400">{t('audit.entity')}</dt>
+                      <dd className="text-sm text-gray-900 dark:text-slate-100">{translateEntityType(selectedResult.event.entity_type)}</dd>
                     </div>
                     <div>
                       <dt className="text-xs text-gray-600 dark:text-slate-400">Severity</dt>
@@ -560,7 +575,7 @@ const SemanticSearch: React.FC<SemanticSearchProps> = ({
                 onClick={() => setSelectedResult(null)}
                 className="px-4 py-2 text-sm text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700"
               >
-                Close
+                {t('audit.close')}
               </button>
             </div>
           </div>

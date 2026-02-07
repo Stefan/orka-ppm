@@ -21,6 +21,7 @@ import {
   WifiOff,
   TriangleAlert
 } from 'lucide-react'
+import { useTranslations } from '@/lib/i18n/context'
 import { AuditEvent } from './Timeline'
 
 /**
@@ -106,6 +107,7 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
   websocketUrl,
   onNewAnomaly
 }) => {
+  const { t } = useTranslations()
   const [expandedAnomaly, setExpandedAnomaly] = useState<string | null>(null)
   const [feedbackAnomaly, setFeedbackAnomaly] = useState<string | null>(null)
   const [feedbackNotes, setFeedbackNotes] = useState('')
@@ -343,7 +345,7 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
                       Critical Anomaly Detected
                     </h4>
                     <p className="text-sm opacity-90 mb-2">
-                      {notification.audit_event.event_type}
+                      {t(`audit.eventTypes.${notification.audit_event.event_type}` as any) || notification.audit_event.event_type}
                     </p>
                     <p className="text-xs opacity-75">
                       Score: {(notification.anomaly_score * 100).toFixed(1)}% • {' '}
@@ -472,7 +474,7 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
                   <div className="flex items-center space-x-3 mb-2">
                     {getCategoryIcon(event.category)}
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-                      {event.event_type}
+                      {t(`audit.eventTypes.${event.event_type}` as any) || event.event_type}
                     </h3>
                     <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
                       colorScheme === 'red' ? 'bg-red-100 dark:bg-red-900/30 text-red-700' :

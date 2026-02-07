@@ -24,15 +24,18 @@ export interface TrendsSummary {
 interface UseCommitmentsActualsTrendsProps {
   accessToken: string | undefined
   selectedCurrency: string
+  /** Defer initial fetch so tab paints first */
+  deferMs?: number
 }
 
 export function useCommitmentsActualsTrends({ 
   accessToken, 
-  selectedCurrency 
+  selectedCurrency,
+  deferMs = 0
 }: UseCommitmentsActualsTrendsProps) {
   const [monthlyData, setMonthlyData] = useState<MonthlyTrendData[]>([])
   const [summary, setSummary] = useState<TrendsSummary | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(deferMs <= 0)
   const [error, setError] = useState<string | null>(null)
 
   const fetchTrends = useCallback(async () => {
@@ -42,15 +45,15 @@ export function useCommitmentsActualsTrends({
     setError(null)
     
     try {
-      // Fetch commitments and actuals data
+      const limit = 2000
       const [commitmentsRes, actualsRes] = await Promise.all([
-        fetch(getApiUrl('/csv-import/commitments?limit=10000'), {
+        fetch(getApiUrl(`/csv-import/commitments?limit=${limit}`), {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           }
         }),
-        fetch(getApiUrl('/csv-import/actuals?limit=10000'), {
+        fetch(getApiUrl(`/csv-import/actuals?limit=${limit}`), {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
@@ -156,8 +159,12 @@ export function useCommitmentsActualsTrends({
   }, [accessToken, selectedCurrency])
 
   useEffect(() => {
+    if (deferMs > 0) {
+      const t = setTimeout(() => fetchTrends(), deferMs)
+      return () => clearTimeout(t)
+    }
     fetchTrends()
-  }, [fetchTrends])
+  }, [fetchTrends, deferMs])
 
   return {
     monthlyData,

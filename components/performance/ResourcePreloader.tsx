@@ -7,7 +7,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { initializeResourcePreloading } from '../../lib/utils/resource-preloader'
+import { initializeResourcePreloading } from '../../lib/utils/performance/resource-preloader'
 
 export function ResourcePreloader() {
   useEffect(() => {

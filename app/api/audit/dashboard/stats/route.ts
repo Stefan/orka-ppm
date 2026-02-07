@@ -1,77 +1,79 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL || 'http://localhost:8000'
+
+/**
+ * GET /api/audit/dashboard/stats
+ * Proxies to backend for real audit dashboard statistics (no mock data).
+ * Requires Authorization: Bearer <token> (Supabase session access_token).
+ */
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader) {
+    // Prefer header; also accept lowercase 'authorization' (some proxies normalize)
+    const authHeader =
+      request.headers.get('authorization') ?? request.headers.get('Authorization')
+    const token = authHeader?.startsWith('Bearer ')
+      ? authHeader.slice(7).trim()
+      : null
+
+    if (!token) {
       return NextResponse.json(
-        { error: 'Authorization header missing' },
+        { error: 'Authorization header missing', code: 'MISSING_AUTH' },
         { status: 401 }
       )
     }
 
-    // Temporary mock data until backend is properly connected
-    console.log('🔄 Returning mock audit dashboard stats')
-
-    const mockStats = {
-      total_events_24h: 42,
-      total_anomalies_24h: 3,
-      critical_events_24h: 2,
-      event_volume_chart: [
-        { hour: "00", count: 5 },
-        { hour: "01", count: 3 },
-        { hour: "02", count: 7 },
-        { hour: "03", count: 2 },
-        { hour: "04", count: 1 },
-        { hour: "05", count: 4 },
-        { hour: "06", count: 8 },
-        { hour: "07", count: 12 }
-      ],
-      top_users: [
-        { user_id: "user-1", count: 15 },
-        { user_id: "user-2", count: 12 },
-        { user_id: "user-3", count: 8 }
-      ],
-      top_event_types: [
-        { event_type: "user_login", count: 18 },
-        { event_type: "project_update", count: 12 },
-        { event_type: "resource_allocation", count: 9 }
-      ],
-      category_breakdown: {
-        "Security Change": 18,
-        "Financial Impact": 12,
-        "Resource Allocation": 9,
-        "Compliance Action": 3
+    const backendUrl = `${BACKEND_URL}/api/audit/dashboard/stats`
+    const response = await fetch(backendUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
-      system_health: {
-        status: "healthy",
-        uptime: "2d 4h 32m",
-        memory_usage: "67%"
-      }
-    }
+    })
 
-    return NextResponse.json(mockStats)
-
-  } catch (error) {
-    console.error('Audit dashboard stats API error:', error)
-
-    // Provide more specific error messages
-    if (error instanceof Error) {
-      if (error.message.includes('fetch')) {
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Audit dashboard stats backend error:', response.status, errorText)
+      if (response.status === 401) {
+        let detail = 'Unauthorized'
+        try {
+          const errJson = JSON.parse(errorText)
+          detail = errJson.detail ?? errJson.error ?? detail
+        } catch {
+          if (errorText) detail = errorText.slice(0, 200)
+        }
         return NextResponse.json(
-          { error: 'Backend server not reachable. Please ensure the backend is running on port 8001.' },
+          { error: detail, code: 'UNAUTHORIZED' },
+          { status: 401 }
+        )
+      }
+      if (response.status === 503 || response.status === 502) {
+        return NextResponse.json(
+          { error: 'Backend not reachable. Ensure the backend is running.' },
           { status: 503 }
         )
       }
       return NextResponse.json(
-        { error: `Request failed: ${error.message}` },
-        { status: 500 }
+        { error: 'Failed to fetch dashboard stats' },
+        { status: response.status }
       )
     }
 
+    const data = await response.json()
+    return NextResponse.json(data, {
+      headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+    })
+  } catch (error) {
+    console.error('Audit dashboard stats API error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Backend server not reachable. Please ensure the backend is running.',
+      },
+      { status: 503 }
     )
   }
 }

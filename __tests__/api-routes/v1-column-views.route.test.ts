@@ -4,7 +4,14 @@
  * @jest-environment node
  */
 
-import { createMockNextRequest, parseJsonResponse } from './helpers'
+import { createMockNextRequest, createAuthenticatedRequest, parseJsonResponse } from './helpers'
+
+jest.mock('@/lib/auth/verify-jwt', () => ({
+  getUserIdFromAuthHeader: async (h: string | null) => {
+    if (h?.startsWith('Bearer ')) return 'test-user-id'
+    return null
+  },
+}))
 
 function createSupabaseMock(getResult: unknown[], postResult: { data?: unknown; error?: { message: string } | null }) {
   const thenable = { then: (resolve: (v: { data: unknown[] }) => void) => resolve({ data: getResult }) }
@@ -49,10 +56,7 @@ describe('GET /api/v1/column-views', () => {
     process.env.SUPABASE_SERVICE_ROLE_KEY = ''
 
     const { GET } = await import('@/app/api/v1/column-views/route')
-    const request = createMockNextRequest({
-      url: 'http://localhost:3000/api/v1/column-views',
-      method: 'GET',
-    })
+    const request = createAuthenticatedRequest('http://localhost:3000/api/v1/column-views', 'test-token', { method: 'GET' })
     const response = await GET(request as any)
     const data = await parseJsonResponse(response)
 
@@ -72,10 +76,7 @@ describe('GET /api/v1/column-views', () => {
     )
 
     const { GET } = await import('@/app/api/v1/column-views/route')
-    const request = createMockNextRequest({
-      url: 'http://localhost:3000/api/v1/column-views',
-      method: 'GET',
-    })
+    const request = createAuthenticatedRequest('http://localhost:3000/api/v1/column-views', 'test-token', { method: 'GET' })
     const response = await GET(request as any)
     const data = await parseJsonResponse(response)
 
@@ -98,8 +99,7 @@ describe('POST /api/v1/column-views', () => {
 
   it('returns 400 when name, entity or columns missing', async () => {
     const { POST } = await import('@/app/api/v1/column-views/route')
-    const request = createMockNextRequest({
-      url: 'http://localhost:3000/api/v1/column-views',
+    const request = createAuthenticatedRequest('http://localhost:3000/api/v1/column-views', 'test-token', {
       method: 'POST',
       body: { name: 'My View' },
     })
@@ -112,8 +112,7 @@ describe('POST /api/v1/column-views', () => {
 
   it('returns 400 when columns is not array', async () => {
     const { POST } = await import('@/app/api/v1/column-views/route')
-    const request = createMockNextRequest({
-      url: 'http://localhost:3000/api/v1/column-views',
+    const request = createAuthenticatedRequest('http://localhost:3000/api/v1/column-views', 'test-token', {
       method: 'POST',
       body: { name: 'V', entity: 'projects', columns: 'name' },
     })
@@ -129,8 +128,7 @@ describe('POST /api/v1/column-views', () => {
     process.env.SUPABASE_SERVICE_ROLE_KEY = ''
 
     const { POST } = await import('@/app/api/v1/column-views/route')
-    const request = createMockNextRequest({
-      url: 'http://localhost:3000/api/v1/column-views',
+    const request = createAuthenticatedRequest('http://localhost:3000/api/v1/column-views', 'test-token', {
       method: 'POST',
       body: { name: 'Local View', entity: 'projects', columns: ['name', 'status'] },
     })
@@ -163,8 +161,7 @@ describe('POST /api/v1/column-views', () => {
     )
 
     const { POST } = await import('@/app/api/v1/column-views/route')
-    const request = createMockNextRequest({
-      url: 'http://localhost:3000/api/v1/column-views',
+    const request = createAuthenticatedRequest('http://localhost:3000/api/v1/column-views', 'test-token', {
       method: 'POST',
       body: { name: 'New View', entity: 'projects', columns: ['name'] },
     })

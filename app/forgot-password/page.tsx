@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/api/supabase-minimal'
+import { Input } from '@/components/ui/Input'
 import { AlertTriangle, CheckCircle, Mail, ArrowLeft } from 'lucide-react'
 
 export default function ForgotPassword() {
@@ -97,22 +98,18 @@ export default function ForgotPassword() {
 
         <form className="mt-8 space-y-6" onSubmit={handlePasswordReset}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-slate-300 required">
-              Email Address
-            </label>
-            <div className="mt-2">
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="input-field w-full"
-                placeholder="Enter the email address for your account"
-              />
-            </div>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              label="Email Address"
+              placeholder="Enter the email address for your account"
+              size="md"
+            />
             <p className="text-sm text-gray-500 dark:text-slate-400 mt-2">We&apos;ll send you a secure link to reset your password</p>
           </div>
 

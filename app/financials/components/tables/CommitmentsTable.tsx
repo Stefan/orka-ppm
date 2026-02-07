@@ -93,7 +93,8 @@ const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTablePro
   }
 
   useEffect(() => {
-    fetchCommitments()
+    const t = setTimeout(() => fetchCommitments(), 100)
+    return () => clearTimeout(t)
   }, [accessToken, currentPage, pageSize])
 
   // Expose refresh method to parent

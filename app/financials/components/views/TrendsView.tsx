@@ -36,7 +36,8 @@ export default function TrendsView({
   
   const { monthlyData, summary, loading } = useCommitmentsActualsTrends({
     accessToken,
-    selectedCurrency
+    selectedCurrency,
+    deferMs: 150
   })
 
   if (loading) {

@@ -9,36 +9,25 @@ import WorkflowApprovalModal from '@/components/workflow/WorkflowApprovalModal'
 import ShareButton from '@/components/projects/ShareButton'
 import ProjectActionButtons from '@/components/projects/ProjectActionButtons'
 import { useWorkflowNotifications } from '@/hooks/useWorkflowRealtime'
+import { useProjectsQuery, useInvalidateProjects, type ProjectListItem } from '@/lib/projects-queries'
 
-interface Project {
-  id: string
-  name: string
-  description: string
-  status: string
-  start_date: string
-  end_date: string
-  budget: number
-  workflow_instance?: {
-    id: string
-    status: string
-    current_step: number
-    workflow_name: string
-    pending_approvals: number
-  }
-}
+type Project = ProjectListItem & { description?: string }
 
 export default function ProjectsPage() {
   const router = useRouter()
   const { session, loading: authLoading } = useAuth()
-  const [projects, setProjects] = useState<Project[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [selectedWorkflow, setSelectedWorkflow] = useState<string | null>(null)
   const [notification, setNotification] = useState<string | null>(null)
   const [userPermissions, setUserPermissions] = useState<string[]>([])
 
-  const currentUserId = session?.user?.id || null
-  const { subscribe } = useWorkflowNotifications(currentUserId)
+  const currentUserId = session?.user?.id ?? undefined
+  const accessToken = session?.access_token ?? undefined
+  const { data: projectsData, isLoading: loading, error: queryError, refetch } = useProjectsQuery(accessToken, currentUserId)
+  const invalidateProjects = useInvalidateProjects()
+  const projects: Project[] = (projectsData ?? []).map((p) => ({ ...p, description: p.description ?? '' }))
+  const error = queryError ? (queryError instanceof Error ? queryError.message : 'An error occurred') : null
+
+  const { subscribe } = useWorkflowNotifications(currentUserId ?? null)
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -49,7 +38,6 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     if (session) {
-      fetchProjects()
       fetchUserPermissions()
     }
   }, [session])
@@ -58,19 +46,16 @@ export default function ProjectsPage() {
     if (currentUserId) {
       subscribe((payload) => {
         const notificationData = payload.new
-        if (notificationData.type === 'approval_required' || 
+        if (notificationData.type === 'approval_required' ||
             notificationData.type === 'workflow_completed' ||
             notificationData.type === 'workflow_rejected') {
           setNotification(`Workflow notification: ${notificationData.type}`)
-          // Refresh projects to show updated workflow status
-          fetchProjects()
-          
-          // Clear notification after 5 seconds
+          invalidateProjects()
           setTimeout(() => setNotification(null), 5000)
         }
       })
     }
-  }, [currentUserId, subscribe])
+  }, [currentUserId, subscribe, invalidateProjects])
 
   const fetchUserPermissions = async () => {
     try {
@@ -93,50 +78,13 @@ export default function ProjectsPage() {
     }
   }
 
-  const fetchProjects = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      
-      if (!session?.access_token) {
-        return
-      }
-
-      const response = await fetch('/api/projects', {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch projects')
-      }
-
-      const data = await response.json()
-      setProjects(Array.isArray(data) ? data : (data.projects || []))
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred'
-      
-      // Check if it's a connection error
-      if (errorMessage.includes('fetch') || errorMessage.includes('Failed to fetch')) {
-        setError('Backend server is not running. Please start the backend server at http://localhost:8000')
-      } else {
-        setError(errorMessage)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const handleWorkflowClick = (workflowInstanceId: string) => {
     setSelectedWorkflow(workflowInstanceId)
   }
 
   const handleWorkflowClose = () => {
     setSelectedWorkflow(null)
-    // Refresh projects to get updated workflow status
-    fetchProjects()
+    invalidateProjects()
   }
 
   // Show loading while checking auth
@@ -160,14 +108,17 @@ export default function ProjectsPage() {
   }
 
   if (error) {
+    const retryMessage = (error.includes('fetch') || error.includes('Failed to fetch'))
+      ? 'Backend server is not running. Please start the backend server at http://localhost:8000'
+      : error
     return (
       <AppLayout>
         <div className="p-8">
           <div className="max-w-7xl mx-auto">
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-              <p className="text-red-800 dark:text-red-300">{error}</p>
+              <p className="text-red-800 dark:text-red-300">{retryMessage}</p>
               <button
-                onClick={fetchProjects}
+                onClick={() => refetch()}
                 className="mt-2 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline"
               >
                 Retry
@@ -271,10 +222,10 @@ export default function ProjectsPage() {
                       {/* Project Action Buttons with RBAC */}
                       <ProjectActionButtons
                         projectId={project.id}
-                        onEdit={() => router.push(`/projects/${project.id}/edit`)}
-                        onBudgetUpdate={() => router.push(`/projects/${project.id}/budget`)}
-                        onResourceManage={() => router.push(`/projects/${project.id}/resources`)}
-                        onReportGenerate={() => router.push(`/projects/${project.id}/reports`)}
+                        onEdit={() => router.push(`/projects/${project.id}`)}
+                        onBudgetUpdate={() => router.push(`/financials`)}
+                        onResourceManage={() => router.push(`/resources`)}
+                        onReportGenerate={() => router.push(`/reports`)}
                         variant="compact"
                       />
 

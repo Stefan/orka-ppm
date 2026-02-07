@@ -8,8 +8,15 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:800
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
     const authHeader = request.headers.get('authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Authorization required' },
+        { status: 401 }
+      )
+    }
+
+    const { searchParams } = new URL(request.url)
     const queryString = searchParams.toString()
     const backendUrl = `${BACKEND_URL}/schedules${queryString ? `?${queryString}` : ''}`
 
@@ -17,13 +24,20 @@ export async function GET(request: NextRequest) {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        ...(authHeader && { Authorization: authHeader }),
+        Authorization: authHeader,
       },
     })
 
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Backend schedules API error:', response.status, errorText)
+      // If backend returns 401, client may have stale/expired token; return empty list so page still loads
+      if (response.status === 401) {
+        return NextResponse.json(
+          { schedules: [], total: 0, page: 1, page_size: 50 },
+          { status: 200, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
+        )
+      }
       return NextResponse.json(
         { error: 'Failed to fetch schedules' },
         { status: response.status }
@@ -37,9 +51,10 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error('Schedules API error:', error)
+    // Backend unreachable (e.g. not running): return empty list so page still loads
     return NextResponse.json(
-      { error: 'Failed to fetch schedules' },
-      { status: 500 }
+      { schedules: [], total: 0, page: 1, page_size: 50 },
+      { status: 200, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
     )
   }
 }

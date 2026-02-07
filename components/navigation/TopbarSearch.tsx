@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Search, Mic, MicOff, FileText, FolderOpen, BookOpen, DollarSign } from 'lucide-react'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
 
-const DEBOUNCE_MS = 300
+const DEBOUNCE_MS = 150
 const MAX_RESULTS = 10
 
 export interface SearchResultItem {
@@ -49,6 +49,7 @@ export default function TopbarSearch() {
   const [results, setResults] = useState<SearchResponse | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const abortRef = useRef<AbortController | null>(null)
 
   const fetchSearch = useCallback(
     async (q: string) => {
@@ -61,25 +62,29 @@ export default function TopbarSearch() {
         setResults({ fulltext: [], semantic: [], suggestions: [] })
         return
       }
+      abortRef.current?.abort()
+      abortRef.current = new AbortController()
+      const signal = abortRef.current.signal
       setLoading(true)
       try {
         const res = await fetch(
           `/api/search?q=${encodeURIComponent(q)}&limit=${MAX_RESULTS}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` }, signal }
         )
+        if (signal.aborted) return
         if (res.ok) {
           const data: SearchResponse = await res.json()
+          if (signal.aborted) return
           setResults(data)
           setOpen(true)
         } else {
           setResults({ fulltext: [], semantic: [], suggestions: [] })
         }
-      } catch {
+      } catch (err) {
+        if ((err as Error)?.name === 'AbortError') return
         setResults({ fulltext: [], semantic: [], suggestions: [] })
       } finally {
-        setLoading(false)
+        if (!signal.aborted) setLoading(false)
       }
     },
     [session?.access_token]

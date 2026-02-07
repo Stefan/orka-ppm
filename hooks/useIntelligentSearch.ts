@@ -80,6 +80,15 @@ const SEARCH_DATA: SearchResult[] = [
     relevanceScore: 0,
     keywords: ['change', 'management', 'tracking', 'approval', 'requests']
   },
+  {
+    id: 'nav-audit',
+    title: 'Audit Trail',
+    description: 'Audit logs, timeline, anomalies and compliance',
+    href: '/audit',
+    category: 'navigation',
+    relevanceScore: 0,
+    keywords: ['audit', 'audit trail', 'trail', 'logs', 'compliance', 'timeline', 'anomalies', 'audit logs']
+  },
   // Feature items
   {
     id: 'feature-create-project',

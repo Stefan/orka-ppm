@@ -3,7 +3,7 @@
  * Provides feature detection, fallbacks, and graceful degradation for cross-browser compatibility
  */
 
-import { detectBrowser } from './browser-detection'
+import { detectBrowser } from './browser/browser-detection'
 
 export interface FeatureSupport {
   css: {

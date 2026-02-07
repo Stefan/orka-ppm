@@ -42,10 +42,11 @@ export default function AnalysisView({
     ? { backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f1f5f9' }
     : { backgroundColor: '#ffffff', border: '1px solid #e5e7eb', color: '#111827' }
 
-  // Fetch commitments & actuals data
+  // Fetch commitments & actuals after first paint so tab shows immediately
   const { summary, analytics } = useCommitmentsActualsData({
     accessToken,
-    selectedCurrency
+    selectedCurrency,
+    deferMs: 150
   })
 
   const getTrendIcon = (trend: string) => {

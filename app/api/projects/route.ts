@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { logger } from '@/lib/monitoring/logger'
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
 
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
     
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('Backend projects API error:', response.status, errorText)
+      logger.error('Backend projects API error', { status: response.status, errorText }, 'api/projects')
       return NextResponse.json(
         { error: 'Failed to fetch projects from backend' },
         { status: response.status }
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
       err?.cause?.code === 'ECONNREFUSED' ||
       (typeof err?.message === 'string' && (err.message.includes('fetch failed') || err.message.includes('ECONNREFUSED')))
 
-    console.error('Projects API error:', error)
+    logger.error('Projects API error', { error }, 'api/projects')
 
     if (isConnectionError) {
       return NextResponse.json(

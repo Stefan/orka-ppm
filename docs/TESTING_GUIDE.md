@@ -1,5 +1,7 @@
 # Testing Guide - Catching API Errors Early
 
+For **frontend test layout** (unit vs integration vs api-routes vs property), see [\_\_tests\_\_/README.md](../__tests__/README.md).
+
 ## Overview
 
 This guide explains the comprehensive test suite designed to catch common API errors before they reach production, specifically errors like:

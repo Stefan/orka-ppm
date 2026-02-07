@@ -318,17 +318,18 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     key: TranslationKey,
     params?: InterpolationParams
   ): string => {
-    // #region agent log
+    // #region agent log (only when NEXT_PUBLIC_AGENT_INGEST_URL is set)
+    const ingestUrl = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_AGENT_INGEST_URL : undefined;
     const isPmrSections = typeof key === 'string' && key.startsWith('pmr.sections');
     const isPmrPlaceholder = typeof key === 'string' && key.startsWith('pmr.placeholderContent');
-    if (isPmrSections) {
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(entry)',message:'t() pmr.sections entry',data:{key,isLoading,locale,translationsKeysCount:Object.keys(translations).length,hasPmr:!!(translations as any).pmr,hasSections:!!(translations as any).pmr?.sections},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+    if (ingestUrl && isPmrSections) {
+      fetch(ingestUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(entry)',message:'t() pmr.sections entry',data:{key,isLoading,locale,translationsKeysCount:Object.keys(translations).length,hasPmr:!!(translations as any).pmr,hasSections:!!(translations as any).pmr?.sections},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
     }
-    if (isPmrPlaceholder) {
+    if (ingestUrl && isPmrPlaceholder) {
       const tAny = translations as Record<string, unknown>;
       const pc = tAny?.pmr as Record<string, unknown> | undefined;
       const placeholderContent = pc?.placeholderContent as Record<string, string> | undefined;
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(entry)',message:'t() pmr.placeholderContent entry',data:{key,isLoading,locale,translationsKeysCount:Object.keys(translations).length,hasPmr:!!tAny?.pmr,hasPlaceholderContent:!!placeholderContent,reportTitle:placeholderContent?.reportTitle},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+      fetch(ingestUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(entry)',message:'t() pmr.placeholderContent entry',data:{key,isLoading,locale,translationsKeysCount:Object.keys(translations).length,hasPmr:!!tAny?.pmr,hasPlaceholderContent:!!placeholderContent,reportTitle:placeholderContent?.reportTitle},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
     }
     // #endregion
     // During loading, return the key without logging warnings
@@ -346,11 +347,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
         value = value[k];
       } else {
         // #region agent log
-        if (isPmrSections) {
-          fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(notFound)',message:'t() key not found',data:{key,locale,result:'KEY_NOT_FOUND'},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+        if (ingestUrl && isPmrSections) {
+          fetch(ingestUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(notFound)',message:'t() key not found',data:{key,locale,result:'KEY_NOT_FOUND'},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
         }
-        if (isPmrPlaceholder) {
-          fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(notFound)',message:'t() placeholderContent key not found',data:{key,locale,result:'KEY_NOT_FOUND'},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+        if (ingestUrl && isPmrPlaceholder) {
+          fetch(ingestUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(notFound)',message:'t() placeholderContent key not found',data:{key,locale,result:'KEY_NOT_FOUND'},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
         }
         // #endregion
         // Key not found - log warning in development
@@ -364,11 +365,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
 
     // #region agent log
-    if (isPmrSections && typeof value === 'string') {
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(found)',message:'t() pmr.sections found',data:{key,locale,result:value},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+    if (ingestUrl && isPmrSections && typeof value === 'string') {
+      fetch(ingestUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(found)',message:'t() pmr.sections found',data:{key,locale,result:value},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
     }
-    if (isPmrPlaceholder && typeof value === 'string') {
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(found)',message:'t() placeholderContent found',data:{key,locale,result:value},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+    if (ingestUrl && isPmrPlaceholder && typeof value === 'string') {
+      fetch(ingestUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:t(found)',message:'t() placeholderContent found',data:{key,locale,result:value},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
     }
     // #endregion
     // Ensure we got a string

@@ -66,7 +66,8 @@ export async function loadTranslations(
     const sections = pmr?.sections as Record<string, string> | undefined;
     const placeholderContent = pmr?.placeholderContent as Record<string, string> | undefined;
     const isTest = typeof process !== 'undefined' && (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined);
-    if (!isTest && typeof fetch !== 'undefined') { fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/loader.ts:cacheHit',message:'loader cache hit',data:{locale,hasPmrSections:!!sections,hasPlaceholderContent:!!placeholderContent,reportTitle:placeholderContent?.reportTitle},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H5'})}).catch(()=>{}); }
+    const ingestUrl = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_AGENT_INGEST_URL : undefined;
+    if (ingestUrl && !isTest && typeof fetch !== 'undefined') { fetch(ingestUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/loader.ts:cacheHit',message:'loader cache hit',data:{locale,hasPmrSections:!!sections,hasPlaceholderContent:!!placeholderContent,reportTitle:placeholderContent?.reportTitle},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H5'})}).catch(()=>{}); }
     // #endregion
     return cached;
   }
@@ -92,7 +93,8 @@ export async function loadTranslations(
       const sections = pmr?.sections as Record<string, string> | undefined;
       const placeholderContent = pmr?.placeholderContent as Record<string, string> | undefined;
       const isTest = typeof process !== 'undefined' && (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined);
-      if (!isTest && typeof fetch !== 'undefined') { fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/loader.ts:afterParse',message:'loader after fetch',data:{locale,hasPmrSections:!!sections,hasPlaceholderContent:!!placeholderContent,reportTitle:placeholderContent?.reportTitle},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{}); }
+      const ingestUrl = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_AGENT_INGEST_URL : undefined;
+      if (ingestUrl && !isTest && typeof fetch !== 'undefined') { fetch(ingestUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/loader.ts:afterParse',message:'loader after fetch',data:{locale,hasPmrSections:!!sections,hasPlaceholderContent:!!placeholderContent,reportTitle:placeholderContent?.reportTitle},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{}); }
       // #endregion
       // Validate structure
       if (typeof translations !== 'object' || translations === null || Array.isArray(translations)) {

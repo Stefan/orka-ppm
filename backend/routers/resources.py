@@ -2,14 +2,18 @@
 Resource management endpoints
 """
 
+import logging
+from datetime import datetime
 from fastapi import APIRouter, HTTPException, Depends, status
 from uuid import UUID
-from typing import List
+from typing import List, Dict, Any
 
 from auth.rbac import require_permission, Permission
-from config.database import supabase
+from config.database import supabase, service_supabase
+
+logger = logging.getLogger(__name__)
 from models.resources import (
-    ResourceCreate, ResourceResponse, ResourceUpdate, 
+    ResourceCreate, ResourceResponse, ResourceUpdate,
     ResourceSearchRequest, ResourceAllocationSuggestion
 )
 from utils.converters import convert_uuids
@@ -20,45 +24,149 @@ from utils.resource_calculations import (
 
 router = APIRouter(prefix="/resources", tags=["resources"])
 
+# Use service role when available so RLS does not block (backend already enforces resource_* permissions).
+_db = service_supabase if service_supabase is not None else supabase
+
+
+def _log_resource_audit(
+    event_type: str,
+    entity_id: str,
+    current_user: Dict[str, Any],
+    action_details: Dict[str, Any],
+    severity: str = "info",
+) -> None:
+    """Write resource event to audit_logs for audit trail. Failures are logged but do not break the request."""
+    if _db is None:
+        return
+    user_id = current_user.get("user_id") or current_user.get("id")
+    tenant_id = (
+        current_user.get("tenant_id")
+        or current_user.get("organization_id")
+        or user_id
+    )
+    # Map event_type to 040 action (CHECK: CREATE, UPDATE, DELETE, EXPORT, LOGIN, LOGIN_FAILED)
+    action_map = {"resource_created": "CREATE", "resource_updated": "UPDATE", "resource_deleted": "DELETE"}
+    action = action_map.get(event_type, "CREATE")
+    occurred_at = datetime.utcnow().isoformat().replace("+00:00", "") + "Z"
+    audit_event = {
+        "table_name": "resources",  # 001 NOT NULL
+        "record_id": entity_id,  # 001 NOT NULL
+        "action": action,  # 001 + 040 NOT NULL
+        "entity": "resource",  # 040 NOT NULL
+        "occurred_at": occurred_at,  # 040 NOT NULL
+        "event_type": event_type,
+        "entity_type": "resource",
+        "entity_id": entity_id,
+        "action_details": action_details if isinstance(action_details, dict) else {"raw": str(action_details)},
+        "severity": severity,
+        "timestamp": occurred_at,
+        "category": "Resource Allocation",
+    }
+    # 040 requires user_id NOT NULL; avoid placeholder UUID so it doesn't appear as "Top-Benutzer"
+    _placeholder_ids = ("00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000001")
+    _uid = user_id if (user_id and str(user_id) not in _placeholder_ids) else tenant_id
+    if not _uid:
+        logger.debug("Skipping audit insert: no user_id/tenant_id (resource event %s)", event_type)
+        return
+    audit_event["user_id"] = str(_uid)
+    if tenant_id:
+        audit_event["tenant_id"] = str(tenant_id)
+    try:
+        _db.table("audit_logs").insert(audit_event).execute()
+    except Exception as e:
+        logger.warning(
+            "Audit log write failed (%s): %s (user_id=%s, tenant_id=%s)",
+            event_type,
+            e,
+            user_id,
+            tenant_id,
+            exc_info=True,
+        )
+
+
 @router.post("/", response_model=ResourceResponse, status_code=status.HTTP_201_CREATED)
 async def create_resource(
-    resource: ResourceCreate, 
+    resource: ResourceCreate,
     current_user = Depends(require_permission(Permission.resource_create))
 ):
     """Create a new resource"""
     try:
-        if supabase is None:
+        if _db is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        
+
+        # Payload for insert: only columns that exist on resources table (no skills if column missing)
         resource_data = resource.dict()
-        response = supabase.table("resources").insert(resource_data).execute()
-        
+        insert_payload = {
+            "name": resource_data["name"],
+            "email": resource_data["email"],
+            "role": resource_data.get("role") or "",
+            "capacity": resource_data.get("capacity", 40),
+            "availability": resource_data.get("availability", 100),
+            "hourly_rate": resource_data.get("hourly_rate"),
+            "location": resource_data.get("location"),
+        }
+        response = _db.table("resources").insert(insert_payload).execute()
+
         if not response.data:
             raise HTTPException(status_code=400, detail="Failed to create resource")
-        
-        created_resource = response.data[0]
-        
+
+        created_resource = dict(response.data[0])
+
         # Calculate availability metrics
         availability_metrics = calculate_enhanced_resource_availability(created_resource)
         created_resource.update(availability_metrics)
-        
-        return convert_uuids(created_resource)
-        
+
+        # Ensure response matches ResourceResponse: required types and defaults
+        now_iso = datetime.utcnow().isoformat() + "Z"
+        created_resource.setdefault("created_at", now_iso)
+        created_resource.setdefault("updated_at", now_iso)
+        created_resource["role"] = created_resource.get("role") or ""
+        created_resource["skills"] = created_resource.get("skills") if isinstance(created_resource.get("skills"), list) else (resource_data.get("skills") or [])
+        created_resource["current_projects"] = created_resource.get("current_projects") if isinstance(created_resource.get("current_projects"), list) else []
+
+        # Audit trail: resource created
+        _log_resource_audit(
+            event_type="resource_created",
+            entity_id=str(created_resource.get("id", "")),
+            current_user=current_user,
+            action_details={
+                "name": created_resource.get("name"),
+                "email": created_resource.get("email"),
+                "role": created_resource.get("role"),
+            },
+        )
+
+        try:
+            return convert_uuids(created_resource)
+        except Exception as serialize_error:
+            print(f"Create resource response serialize error: {serialize_error}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Resource created but response invalid: {str(serialize_error)}",
+            )
+
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Create resource error: {e}")
+        err_str = str(e).lower()
+        err_code = getattr(e, "code", None) or ""
+        if "23505" in err_str or "23505" in str(err_code) or "duplicate key" in err_str or "unique constraint" in err_str:
+            raise HTTPException(
+                status_code=409,
+                detail="A resource with this email address already exists.",
+            )
         raise HTTPException(status_code=400, detail=f"Failed to create resource: {str(e)}")
 
 @router.get("/")
 async def list_resources(current_user = Depends(require_permission(Permission.resource_read))):
     """Get all resources with utilization data"""
     try:
-        if supabase is None:
+        if _db is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        
-        # Get resources from database
-        resources_response = supabase.table("resources").select("*").execute()
+
+        resources_response = _db.table("resources").select("*").execute()
         resources = convert_uuids(resources_response.data)
-        
         # If no resources exist, return mock data for development
         if not resources:
             mock_resources = [
@@ -144,14 +252,12 @@ async def list_resources(current_user = Depends(require_permission(Permission.re
                 }
             ]
             return mock_resources
-        
-        # Calculate availability metrics for each resource
+
         enhanced_resources = []
         for resource in resources:
             availability_metrics = calculate_enhanced_resource_availability(resource)
             resource.update(availability_metrics)
             enhanced_resources.append(resource)
-        
         return enhanced_resources
         
     except Exception as e:
@@ -165,10 +271,10 @@ async def get_resource(
 ):
     """Get a specific resource by ID"""
     try:
-        if supabase is None:
+        if _db is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        
-        response = supabase.table("resources").select("*").eq("id", str(resource_id)).execute()
+
+        response = _db.table("resources").select("*").eq("id", str(resource_id)).execute()
         
         if not response.data:
             raise HTTPException(status_code=404, detail="Resource not found")
@@ -195,28 +301,50 @@ async def update_resource(
 ):
     """Update a resource"""
     try:
-        if supabase is None:
+        if _db is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        
-        # Only include non-None fields in the update
+
         update_data = {k: v for k, v in resource_update.dict().items() if v is not None}
-        
+
         if not update_data:
             raise HTTPException(status_code=400, detail="No fields to update")
-        
-        response = supabase.table("resources").update(update_data).eq("id", str(resource_id)).execute()
-        
+
+        response = _db.table("resources").update(update_data).eq("id", str(resource_id)).execute()
+
         if not response.data:
             raise HTTPException(status_code=404, detail="Resource not found")
-        
-        updated_resource = convert_uuids(response.data[0])
-        
+
+        updated_resource = dict(convert_uuids(response.data[0]))
+
         # Calculate availability metrics
         availability_metrics = calculate_enhanced_resource_availability(updated_resource)
         updated_resource.update(availability_metrics)
-        
+
+        # Ensure response matches ResourceResponse (types and required fields)
+        now_iso = datetime.utcnow().isoformat() + "Z"
+        updated_resource.setdefault("created_at", now_iso)
+        updated_resource.setdefault("updated_at", now_iso)
+        updated_resource["role"] = updated_resource.get("role") or ""
+        updated_resource["skills"] = updated_resource.get("skills") if isinstance(updated_resource.get("skills"), list) else (resource_update.skills if resource_update.skills is not None else [])
+        updated_resource["current_projects"] = updated_resource.get("current_projects") if isinstance(updated_resource.get("current_projects"), list) else []
+        try:
+            updated_resource["capacity"] = int(updated_resource.get("capacity", 40))
+        except (TypeError, ValueError):
+            updated_resource["capacity"] = 40
+        try:
+            updated_resource["availability"] = int(updated_resource.get("availability", 100))
+        except (TypeError, ValueError):
+            updated_resource["availability"] = 100
+
+        # Audit trail: resource updated
+        _log_resource_audit(
+            event_type="resource_updated",
+            entity_id=str(resource_id),
+            current_user=current_user,
+            action_details={"updated_fields": list(update_data.keys()), "name": updated_resource.get("name"), "email": updated_resource.get("email")},
+        )
         return updated_resource
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -230,13 +358,22 @@ async def delete_resource(
 ):
     """Delete a resource"""
     try:
-        if supabase is None:
+        if _db is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        
-        response = supabase.table("resources").delete().eq("id", str(resource_id)).execute()
-        
+
+        response = _db.table("resources").delete().eq("id", str(resource_id)).execute()
+        deleted = response.data
         if not response.data:
             raise HTTPException(status_code=404, detail="Resource not found")
+        
+        # Audit trail: resource deleted
+        rec = deleted[0] if deleted else {}
+        _log_resource_audit(
+            event_type="resource_deleted",
+            entity_id=str(resource_id),
+            current_user=current_user,
+            action_details={"name": rec.get("name"), "email": rec.get("email")},
+        )
         
         return None
         
@@ -253,11 +390,10 @@ async def search_resources(
 ):
     """Search resources based on skills, capacity, availability, and other criteria"""
     try:
-        if supabase is None:
+        if _db is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        
-        # Start with base query
-        query = supabase.table("resources").select("*")
+
+        query = _db.table("resources").select("*")
         
         # Apply filters
         if search_request.role:
@@ -316,11 +452,10 @@ async def get_resource_utilization_summary(
 ):
     """Get resource utilization summary for analytics"""
     try:
-        if supabase is None:
+        if _db is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        
-        # Get all resources
-        resources_response = supabase.table("resources").select("*").execute()
+
+        resources_response = _db.table("resources").select("*").execute()
         resources = convert_uuids(resources_response.data)
         
         if not resources:

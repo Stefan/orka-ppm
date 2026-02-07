@@ -5,8 +5,10 @@
 // Design: Grid-based, Mobile-first, Hover details, Minimal scrolling
 // Note: AppLayout has TopBar, so available height is less than 100vh
 
-import { useEffect, useState, useCallback, Suspense } from 'react'
+import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
+import { createPortal } from 'react-dom'
 import dynamic from 'next/dynamic'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import AppLayout from '../../components/shared/AppLayout'
 import { useTranslations } from '@/lib/i18n/context'
@@ -24,6 +26,7 @@ import {
 import ProjectImportModal from '@/components/projects/ProjectImportModal'
 import { ChartSkeleton } from '../../components/ui/Skeleton'
 import { GuidedTour, useGuidedTour, TourTriggerButton, dashboardTourSteps } from '@/components/guided-tour'
+import { logger } from '@/lib/monitoring/logger'
 // Charts werden nicht auf der Dashboard-Hauptseite verwendet, daher entfernen
 // import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
@@ -233,6 +236,7 @@ export default function CompactDashboard() {
   const { session } = useAuth()
   const { t } = useTranslations()
   
+  const router = useRouter()
   const [quickStats, setQuickStats] = useState<QuickStats | null>(null)
   const [kpis, setKPIs] = useState<KPIs | null>(null)
   const [recentProjects, setRecentProjects] = useState<Project[]>([])
@@ -246,17 +250,20 @@ export default function CompactDashboard() {
     { id: '3', title: 'Resource Conflict', description: 'Team member assigned to multiple projects', severity: 'warning' },
   ])
   const [showImportModal, setShowImportModal] = useState(false)
+  const hasCriticalDataRef = useRef(false)
   const { isOpen, startTour, closeTour, completeTour, resetAndStartTour, hasCompletedTour } = useGuidedTour('dashboard-v1')
 
   const loadOptimizedData = useCallback(async () => {
     if (!session?.access_token) return
     
-    setLoading(true)
+    // Only show full-page loading when we have no data yet (refresh/revisit keeps showing current UI)
+    setLoading((prev) => (hasCriticalDataRef.current ? prev : true))
     
     try {
       await loadDashboardData(
         session.access_token,
         (criticalData) => {
+          hasCriticalDataRef.current = true
           setQuickStats(criticalData.quickStats)
           setKPIs(criticalData.kpis)
           setLoading(false)
@@ -266,7 +273,7 @@ export default function CompactDashboard() {
         }
       )
     } catch (err) {
-      console.error('Dashboard load error:', err)
+      logger.error('Dashboard load error', { err }, 'dashboards/page')
       setQuickStats({
         total_projects: 0,
         active_projects: 0,
@@ -298,7 +305,7 @@ export default function CompactDashboard() {
       clearDashboardCache()
       await loadOptimizedData()
     } catch (err) {
-      console.error('Refresh failed:', err)
+      logger.error('Refresh failed', { err }, 'dashboards/page')
     }
   }, [session?.access_token, loadOptimizedData])
 
@@ -335,8 +342,8 @@ export default function CompactDashboard() {
 
   return (
     <AppLayout>
-      {/* Compact container with reduced spacing */}
-      <div className="max-w-[1600px] mx-auto p-3 sm:p-4 md:p-6 space-y-2 md:space-y-3">
+      {/* Compact container with reduced spacing; pb for Quick Actions bar so content is not hidden when scrolling */}
+      <div className="max-w-[1600px] mx-auto p-3 sm:p-4 md:p-6 space-y-2 md:space-y-3 pb-20">
         
         {/* Header - Row 1: Title + stats + actions */}
         <div data-testid="dashboard-header" data-tour="dashboard-header" className="flex items-center justify-between gap-3 flex-wrap">
@@ -513,46 +520,45 @@ export default function CompactDashboard() {
         </div>
       </div>
 
-      {/* BOTTOM: Quick Actions - Fixed at bottom of viewport with higher z-index */}
-      <div data-testid="dashboard-quick-actions" className="fixed bottom-0 left-0 right-0 border-t-2 border-gray-300 dark:border-slate-700 py-2 px-3 shadow-2xl z-50">
-        {/* Light: gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-t from-white via-white to-white/95 dark:hidden" aria-hidden />
-        {/* Dark: solid background (separate layer so it always applies) */}
-        <div className="absolute inset-0 hidden dark:block bg-slate-800" aria-hidden />
-        <div className="relative z-10 max-w-[1600px] mx-auto">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1">
-            <span className="text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap mr-1">{t('actions.quickActions')}:</span>
-            <button data-testid="action-scenarios" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-700 dark:border dark:border-blue-600 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-600 transition-all whitespace-nowrap shadow-md hover:shadow-lg text-white [&_svg]:text-white [&_span]:text-white">
-              <BarChart3 size={18} className="shrink-0" aria-hidden />
-              <span className="text-sm font-medium">{t('actions.scenarios')}</span>
-            </button>
-            <button data-testid="action-resources" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
-              <Users size={18} className="shrink-0" aria-hidden />
-              <span className="text-sm font-medium">{t('actions.resources')}</span>
-            </button>
-            <button data-testid="action-financials" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
-              <DollarSign size={18} className="shrink-0" aria-hidden />
-              <span className="text-sm font-medium">{t('actions.financials')}</span>
-            </button>
-            <button data-testid="action-reports" onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
-              <FileText size={18} className="shrink-0" aria-hidden />
-              <span className="text-sm font-medium">{t('actions.reports')}</span>
-            </button>
-            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
-              <Clock size={18} className="shrink-0" aria-hidden />
-              <span className="text-sm font-medium">Timeline</span>
-            </button>
-            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
-              <TrendingUp size={18} className="shrink-0" aria-hidden />
-              <span className="text-sm font-medium">Analytics</span>
-            </button>
-            <button data-testid="action-import" onClick={() => setShowImportModal(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-700 dark:border dark:border-blue-600 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-all whitespace-nowrap shadow-md hover:shadow-lg text-white [&_svg]:text-white [&_span]:text-white">
-              <Upload size={18} className="shrink-0" aria-hidden />
-              <span className="text-sm font-medium">Import Projects</span>
-            </button>
+      {/* Quick Actions: rendered via portal so it stays fixed at viewport bottom when scrolling */}
+      {typeof document !== 'undefined' && createPortal(
+        <div data-testid="dashboard-quick-actions" className="fixed bottom-0 left-0 right-0 border-t-2 border-gray-300 dark:border-slate-700 py-2 px-3 shadow-2xl z-[100] bg-white/95 dark:bg-slate-800 backdrop-blur-sm">
+          <div className="max-w-[1600px] mx-auto">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              <span className="text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap mr-1">{t('actions.quickActions')}:</span>
+              <button data-testid="action-scenarios" onClick={() => router.push('/scenarios')} className="flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-700 dark:border dark:border-blue-600 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-600 transition-all whitespace-nowrap shadow-md hover:shadow-lg text-white [&_svg]:text-white [&_span]:text-white">
+                <BarChart3 size={18} className="shrink-0" aria-hidden />
+                <span className="text-sm font-medium">{t('actions.scenarios')}</span>
+              </button>
+              <button data-testid="action-resources" onClick={() => router.push('/resources')} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
+                <Users size={18} className="shrink-0" aria-hidden />
+                <span className="text-sm font-medium">{t('actions.resources')}</span>
+              </button>
+              <button data-testid="action-financials" onClick={() => router.push('/financials')} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
+                <DollarSign size={18} className="shrink-0" aria-hidden />
+                <span className="text-sm font-medium">{t('actions.financials')}</span>
+              </button>
+              <button data-testid="action-reports" onClick={() => router.push('/reports')} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
+                <FileText size={18} className="shrink-0" aria-hidden />
+                <span className="text-sm font-medium">{t('actions.reports')}</span>
+              </button>
+              <button data-testid="action-timeline" onClick={() => router.push('/schedules')} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
+                <Clock size={18} className="shrink-0" aria-hidden />
+                <span className="text-sm font-medium">Timeline</span>
+              </button>
+              <button data-testid="action-analytics" onClick={() => router.push('/dashboards')} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
+                <TrendingUp size={18} className="shrink-0" aria-hidden />
+                <span className="text-sm font-medium">Analytics</span>
+              </button>
+              <button data-testid="action-import" onClick={() => setShowImportModal(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-700 dark:border dark:border-blue-600 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-all whitespace-nowrap shadow-md hover:shadow-lg text-white [&_svg]:text-white [&_span]:text-white">
+                <Upload size={18} className="shrink-0" aria-hidden />
+                <span className="text-sm font-medium">Import Projects</span>
+              </button>
+            </div>
           </div>
-        </div>
-      </div>
+        </div>,
+        document.body
+      )}
 
       <GuidedTour
         steps={dashboardTourSteps}

@@ -2,6 +2,7 @@
 Variance tracking and alert management endpoints
 """
 
+import logging
 from fastapi import APIRouter, HTTPException, Depends, status, Query, Header, Body
 from uuid import UUID
 from typing import Optional, List, Any
@@ -13,6 +14,7 @@ from config.database import supabase
 from utils.converters import convert_uuids
 from services.variance_anomaly_ai import get_root_cause_suggestions, get_auto_fix_suggestions
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/variance", tags=["variance"])
 
 @router.get("/alerts")
@@ -134,7 +136,7 @@ async def get_variance_alerts(
         }
         
     except Exception as e:
-        print(f"Failed to get variance alerts: {e}")
+        logger.exception("Failed to get variance alerts: %s", e)
         # Return mock data on error for development
         mock_alerts = [
             {
@@ -185,8 +187,12 @@ async def resolve_variance_alert(
         # For now, we'll simulate resolving the alert
         # In a full implementation, this would update a variance_alerts table
         
-        print(f"Resolving variance alert {alert_id} by user {current_user.get('user_id', 'unknown')}")
-        print(f"Resolution notes: {resolution_notes}")
+        logger.info(
+            "Resolving variance alert %s by user %s",
+            alert_id,
+            current_user.get("user_id", "unknown"),
+            extra={"resolution_notes": resolution_notes},
+        )
         
         # In a real implementation, you would:
         # 1. Check if alert exists
@@ -204,7 +210,7 @@ async def resolve_variance_alert(
         }
         
     except Exception as e:
-        print(f"Failed to resolve variance alert: {e}")
+        logger.exception("Failed to resolve variance alert: %s", e)
         # Still return success for development mode
         return {
             "success": True,
@@ -265,7 +271,7 @@ async def get_variance_alerts_summary(current_user = Depends(get_current_user)):
         }
         
     except Exception as e:
-        print(f"Failed to get variance alerts summary: {e}")
+        logger.exception("Failed to get variance alerts summary: %s", e)
         return {
             "total_alerts": 2,
             "active_alerts": 2,

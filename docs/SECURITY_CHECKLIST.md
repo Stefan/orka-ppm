@@ -1,5 +1,8 @@
 # Production Security Checklist
 
+**Weitere Security-Docs:** [Vulnerability Analysis](security/vulnerability-analysis.md), [JWT & Env Setup](security/env-setup.md).  
+**Aktualität:** Checkliste und [security/](security/) vor jedem Production-Deploy prüfen und bei Auth/Env/RLS-Änderungen anpassen.
+
 ## Pre-Deployment Security Review
 
 ### ✅ Environment Configuration
@@ -12,8 +15,8 @@
 
 ### ✅ Authentication & Authorization
 - [ ] Supabase Auth is properly configured
-- [ ] JWT token validation is enabled and strict
-- [ ] Service role key is secured and not exposed
+- [ ] JWT token validation is enabled and strict (`SUPABASE_JWT_SECRET` in Backend und Next.js `.env`; siehe [security/env-setup.md](security/env-setup.md))
+- [ ] Service role key is secured and not exposed (nur `SUPABASE_SERVICE_ROLE_KEY`, kein `NEXT_PUBLIC_` prefix)
 - [ ] Row Level Security (RLS) policies are enabled on all tables
 - [ ] Default admin user credentials are changed
 - [ ] Multi-factor authentication is enabled for admin accounts

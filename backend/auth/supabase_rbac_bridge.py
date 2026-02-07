@@ -786,7 +786,7 @@ class SupabaseRBACBridge:
                         "action": f"role_{change_type}",
                         "resource_type": "user_role",
                         "resource_id": user_id_str,
-                        "details": {
+                        "action_details": {
                             "role_name": role_name,
                             "change_type": change_type
                         },

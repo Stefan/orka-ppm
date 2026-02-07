@@ -36,6 +36,8 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
 import { useTheme } from '@/app/providers/ThemeProvider'
+import { prefetchDashboardData } from '@/lib/api/dashboard-loader'
+import { prefetchFinancials } from '@/lib/api/prefetch'
 import { useHelpChat } from '@/hooks/useHelpChat'
 import { GlobalLanguageSelector } from './GlobalLanguageSelector'
 import { useLanguage } from '@/hooks/useLanguage'
@@ -214,6 +216,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           <Link
             href="/dashboards"
             className={`${navLinkBase} ${pathname === '/dashboards' ? navLinkActive : navLinkInactive}`}
+            onMouseEnter={() => session?.access_token && prefetchDashboardData(session.access_token)}
           >
             {t('nav.dashboards')}
           </Link>
@@ -287,6 +290,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           <div className="relative" ref={financialsMenuRef}>
             <button
               onClick={() => toggleDropdown(setFinancialsMenuOpen, financialsMenuOpen)}
+              onMouseEnter={() => prefetchFinancials(session?.access_token)}
               className={`flex items-center space-x-1 ${navLinkBase} ${
                 pathname === '/financials' || pathname.startsWith('/financials/') || pathname === '/reports' || pathname.startsWith('/reports/') || pathname === '/project-controls'
                   ? navLinkActive
@@ -314,6 +318,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                       : dropdownItemInactive
                   }`}
                   onClick={() => setFinancialsMenuOpen(false)}
+                  onMouseEnter={() => prefetchFinancials(session?.access_token)}
                 >
                   <DollarSign className="h-5 w-5 mr-3 flex-shrink-0" />
                   <span className="font-medium">Budget & Cost Tracking</span>

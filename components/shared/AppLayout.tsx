@@ -40,15 +40,17 @@ export default function AppLayout({ children }: AppLayoutProps) {
     }
   }, [session, loading, router])
 
-  // #region agent log
+  // #region agent log (only when NEXT_PUBLIC_AGENT_INGEST_URL is set)
   useEffect(() => {
+    const ingestUrl = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_AGENT_INGEST_URL : undefined
+    if (!ingestUrl) return
     const el = mainContentRef.current
     if (!el) return
     const log = () => {
       const cs = getComputedStyle(el)
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'AppLayout.tsx:main', message: 'main content metrics', data: { offsetHeight: el.offsetHeight, clientHeight: el.clientHeight, minHeight: cs.minHeight, flex: cs.flex, contain: cs.contain }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H1' }) }).catch(() => {})
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'AppLayout.tsx:main', message: 'main content metrics', data: { offsetHeight: el.offsetHeight, clientHeight: el.clientHeight, minHeight: cs.minHeight, flex: cs.flex, contain: cs.contain }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H2' }) }).catch(() => {})
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'AppLayout.tsx:main', message: 'main content metrics', data: { offsetHeight: el.offsetHeight, clientHeight: el.clientHeight, minHeight: cs.minHeight, flex: cs.flex, contain: cs.contain }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H3' }) }).catch(() => {})
+      fetch(ingestUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'AppLayout.tsx:main', message: 'main content metrics', data: { offsetHeight: el.offsetHeight, clientHeight: el.clientHeight, minHeight: cs.minHeight, flex: cs.flex, contain: cs.contain }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H1' }) }).catch(() => {})
+      fetch(ingestUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'AppLayout.tsx:main', message: 'main content metrics', data: { offsetHeight: el.offsetHeight, clientHeight: el.clientHeight, minHeight: cs.minHeight, flex: cs.flex, contain: cs.contain }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H2' }) }).catch(() => {})
+      fetch(ingestUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'AppLayout.tsx:main', message: 'main content metrics', data: { offsetHeight: el.offsetHeight, clientHeight: el.clientHeight, minHeight: cs.minHeight, flex: cs.flex, contain: cs.contain }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H3' }) }).catch(() => {})
     }
     log()
     const ro = new ResizeObserver(log)

@@ -407,8 +407,9 @@ export function ProjectCard({
         p-6
         border-2
         min-h-[320px]
-        min-w-[280px]
+        min-w-0
         w-full
+        max-w-full
         ${selected ? 'border-blue-500 shadow-lg' : 'border-transparent dark:border-slate-700'}
         hover:shadow-lg
         transition-all

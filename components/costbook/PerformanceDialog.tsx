@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import {
   X,
   Activity,
@@ -197,10 +198,13 @@ export function PerformanceDialog({
 
   if (!isOpen) return null
 
-  return (
+  const dialogContent = (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
       data-testid={testId}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="performance-dialog-title"
     >
       {/* Backdrop */}
       <div 
@@ -210,13 +214,13 @@ export function PerformanceDialog({
       />
 
       {/* Dialog */}
-      <div className={`relative bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col ${className}`}>
+      <div className={`relative bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col ${className}`}>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
             <Activity className="w-6 h-6 text-blue-500 dark:text-blue-400" />
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <h2 id="performance-dialog-title" className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 Performance Metrics
               </h2>
               <div className="flex items-center gap-2 mt-0.5">
@@ -411,6 +415,9 @@ export function PerformanceDialog({
       </div>
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(dialogContent, document.body)
 }
 
 export default PerformanceDialog

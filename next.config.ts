@@ -197,7 +197,12 @@ const nextConfig: NextConfig = {
           source: '/api/v1/:path*',
           destination: `http://localhost:8000/api/v1/:path*`,
         },
-        // Rewrite all other /api calls to local backend (no /api prefix on backend)
+        // Audit: backend expects /api/audit (FastAPI router prefix)
+        {
+          source: '/api/audit/:path*',
+          destination: `http://localhost:8000/api/audit/:path*`,
+        },
+      // Rewrite all other /api calls to local backend (no /api prefix on backend)
         {
           source: '/api/:path*',
           destination: `http://localhost:8000/:path*`,
@@ -214,6 +219,11 @@ const nextConfig: NextConfig = {
       {
         source: '/api/v1/:path*',
         destination: `${backendUrl}/api/v1/:path*`,
+      },
+      // Audit router uses prefix /api/audit – preserve full path so backend receives /api/audit/logs etc.
+      {
+        source: '/api/audit/:path*',
+        destination: `${backendUrl}/api/audit/:path*`,
       },
       // Rewrite all other /api calls to backend (no /api prefix on backend)
       {

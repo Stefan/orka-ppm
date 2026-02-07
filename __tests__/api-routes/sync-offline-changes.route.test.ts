@@ -4,7 +4,16 @@
  * @jest-environment node
  */
 
-import { createMockNextRequest, parseJsonResponse } from './helpers'
+import { createMockNextRequest, createAuthenticatedRequest, parseJsonResponse } from './helpers'
+
+jest.mock('@/lib/auth/verify-jwt', () => ({
+  enforceSyncAuth: async (_h: string | null, requestUserId: string | null) => {
+    if (!_h || !_h.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Authorization required' }), { status: 401 })
+    }
+    return { userId: requestUserId ?? 'test-user' }
+  },
+}))
 
 describe('POST /api/sync/offline-changes', () => {
   it('returns 400 when required fields missing', async () => {
@@ -23,8 +32,7 @@ describe('POST /api/sync/offline-changes', () => {
 
   it('returns 200 and records offline change', async () => {
     const { POST } = await import('@/app/api/sync/offline-changes/route')
-    const request = createMockNextRequest({
-      url: 'http://localhost:3000/api/sync/offline-changes',
+    const request = createAuthenticatedRequest('http://localhost:3000/api/sync/offline-changes', 'test-token', {
       method: 'POST',
       body: {
         userId: 'user-offline-1',
@@ -50,8 +58,7 @@ describe('POST /api/sync/offline-changes', () => {
 
   it('assigns id when not provided', async () => {
     const { POST } = await import('@/app/api/sync/offline-changes/route')
-    const request = createMockNextRequest({
-      url: 'http://localhost:3000/api/sync/offline-changes',
+    const request = createAuthenticatedRequest('http://localhost:3000/api/sync/offline-changes', 'test-token', {
       method: 'POST',
       body: {
         userId: 'user-offline-2',
@@ -87,10 +94,7 @@ describe('GET /api/sync/offline-changes', () => {
 
   it('returns 200 with empty changes when user has none', async () => {
     const { GET } = await import('@/app/api/sync/offline-changes/route')
-    const request = createMockNextRequest({
-      url: 'http://localhost:3000/api/sync/offline-changes?userId=user-no-changes',
-      method: 'GET',
-    })
+    const request = createAuthenticatedRequest('http://localhost:3000/api/sync/offline-changes?userId=user-no-changes', 'test-token', { method: 'GET' })
     const response = await GET(request as any)
     const data = await parseJsonResponse(response)
 
@@ -103,8 +107,7 @@ describe('GET /api/sync/offline-changes', () => {
     const { POST, GET } = await import('@/app/api/sync/offline-changes/route')
     const userId = 'user-get-changes'
     await POST(
-      createMockNextRequest({
-        url: 'http://localhost:3000/api/sync/offline-changes',
+      createAuthenticatedRequest('http://localhost:3000/api/sync/offline-changes', 'test-token', {
         method: 'POST',
         body: {
           userId,
@@ -118,10 +121,7 @@ describe('GET /api/sync/offline-changes', () => {
     )
 
     const getResponse = await GET(
-      createMockNextRequest({
-        url: `http://localhost:3000/api/sync/offline-changes?userId=${userId}`,
-        method: 'GET',
-      }) as any
+      createAuthenticatedRequest(`http://localhost:3000/api/sync/offline-changes?userId=${userId}`, 'test-token', { method: 'GET' }) as any
     )
     const getData = await parseJsonResponse(getResponse)
 

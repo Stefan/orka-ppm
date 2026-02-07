@@ -2,7 +2,7 @@
 Admin dashboard and system management endpoints
 """
 
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Request
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 from pydantic import BaseModel, Field
@@ -10,13 +10,16 @@ from uuid import UUID
 
 from auth.rbac import require_admin, UserRole, Permission, DEFAULT_ROLE_PERMISSIONS
 from auth.dependencies import get_current_user
-from config.database import supabase
+from config.database import supabase, service_supabase
 from services.rbac_audit_service import RBACAuditService
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 # Initialize audit service
 audit_service = RBACAuditService(supabase_client=supabase)
+
+# Cache for static roles list (avoids rebuilding on every request)
+_cached_roles: Optional[List["RoleInfo"]] = None
 
 class BootstrapAdminRequest(BaseModel):
     email: str
@@ -323,12 +326,12 @@ class UserRoleInfo(BaseModel):
 async def get_roles(current_user = Depends(require_admin())):
     """
     Get all available roles and their associated permissions.
-    
-    Requirements: 9.1
-    Property 24: Admin Authorization
+    Response is cached (static list).
     """
+    global _cached_roles
     try:
-        # Define role descriptions
+        if _cached_roles is not None:
+            return _cached_roles
         role_descriptions = {
             "admin": "Full system access with user and role management capabilities",
             "portfolio_manager": "Manage portfolios, projects, and resources with AI insights",
@@ -337,8 +340,6 @@ async def get_roles(current_user = Depends(require_admin())):
             "team_member": "Basic project participation and issue reporting",
             "viewer": "Read-only access to projects and reports"
         }
-        
-        # Build response with all roles and their permissions
         roles_info = []
         for role in UserRole:
             permissions = DEFAULT_ROLE_PERMISSIONS.get(role, [])
@@ -347,9 +348,8 @@ async def get_roles(current_user = Depends(require_admin())):
                 permissions=[perm.value for perm in permissions],
                 description=role_descriptions.get(role.value, "")
             ))
-        
+        _cached_roles = roles_info
         return roles_info
-        
     except Exception as e:
         print(f"Get roles error: {e}")
         raise HTTPException(
@@ -360,7 +360,8 @@ async def get_roles(current_user = Depends(require_admin())):
 @router.post("/users/{user_id}/roles")
 async def assign_role_to_user(
     user_id: UUID,
-    request: AssignRoleRequest,
+    request: Request,
+    body: AssignRoleRequest,
     current_user = Depends(require_admin())
 ):
     """
@@ -374,39 +375,76 @@ async def assign_role_to_user(
         if not supabase:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
-        # Validate user exists
+        # Validate user exists (in user_profiles or in Auth; create profile if missing)
         user_response = supabase.table("user_profiles").select("user_id, role, is_active").eq("user_id", str(user_id)).execute()
         if not user_response.data:
-            raise HTTPException(status_code=404, detail=f"User {user_id} not found")
+            # User may exist in Auth but not yet in user_profiles (e.g. never signed in or sync pending)
+            client_for_auth = service_supabase if service_supabase else supabase
+            try:
+                auth_resp = client_for_auth.auth.admin.get_user_by_id(str(user_id))
+                user_obj = getattr(auth_resp, "user", None) if auth_resp else None
+                if not user_obj and auth_resp and hasattr(auth_resp, "id"):
+                    user_obj = auth_resp
+                if not user_obj or str(getattr(user_obj, "id", "")) != str(user_id):
+                    raise HTTPException(status_code=404, detail=f"User {user_id} not found")
+                insert_client = service_supabase if service_supabase else supabase
+                try:
+                    insert_client.table("user_profiles").insert({
+                        "user_id": str(user_id),
+                        "role": "user",
+                        "is_active": True,
+                    }).execute()
+                except Exception as insert_err:
+                    # Profile may already exist (e.g. RLS hid it from select). Continue with role assignment.
+                    err_str = str(insert_err)
+                    if "23505" not in err_str and "unique constraint" not in err_str.lower() and "duplicate key" not in err_str.lower():
+                        raise HTTPException(status_code=404, detail=f"User {user_id} not found")
+            except HTTPException:
+                raise
+            except Exception:
+                raise HTTPException(status_code=404, detail=f"User {user_id} not found")
         
         # Validate role exists
         try:
-            role_enum = UserRole(request.role)
+            role_enum = UserRole(body.role)
         except ValueError:
-            raise HTTPException(status_code=400, detail=f"Invalid role: {request.role}")
+            raise HTTPException(status_code=400, detail=f"Invalid role: {body.role}")
         
-        # Look up role_id from roles table
-        role_lookup = supabase.table("roles").select("id").eq("name", request.role).execute()
+        # Look up role_id from roles table (service role if available, to avoid RLS hiding rows)
+        roles_client = service_supabase if service_supabase else supabase
+        role_lookup = roles_client.table("roles").select("id").eq("name", body.role).execute()
         if not role_lookup.data:
-            # Role doesn't exist in roles table, create it
+            # Role doesn't exist in roles table, create it (use service role to satisfy RLS on roles)
             new_role = {
-                "name": request.role,
-                "description": f"{request.role} role",
+                "name": body.role,
+                "description": f"{body.role} role",
                 "is_active": True,
                 "created_at": datetime.now().isoformat()
             }
-            role_create = supabase.table("roles").insert(new_role).execute()
-            if not role_create.data:
-                raise HTTPException(status_code=500, detail="Failed to create role")
-            role_id = role_create.data[0]["id"]
+            try:
+                role_create = roles_client.table("roles").insert(new_role).execute()
+                if not role_create.data:
+                    raise HTTPException(status_code=500, detail="Failed to create role")
+                role_id = role_create.data[0]["id"]
+            except Exception as create_err:
+                err_str = str(create_err)
+                if "23505" in err_str or "unique constraint" in err_str.lower() or "duplicate key" in err_str.lower():
+                    re_lookup = roles_client.table("roles").select("id").eq("name", body.role).execute()
+                    if re_lookup.data:
+                        role_id = re_lookup.data[0]["id"]
+                    else:
+                        raise HTTPException(status_code=500, detail="Role exists but could not be read. Set SUPABASE_SERVICE_ROLE_KEY for role assignment.")
+                else:
+                    raise
         else:
             role_id = role_lookup.data[0]["id"]
         
-        # Check if role assignment already exists
-        existing_role = supabase.table("user_roles").select("*").eq("user_id", str(user_id)).eq("role_id", role_id).execute()
+        # Check if role assignment already exists (use service role to satisfy RLS on user_roles)
+        admin_client = service_supabase if service_supabase else supabase
+        existing_role = admin_client.table("user_roles").select("*").eq("user_id", str(user_id)).eq("role_id", role_id).execute()
         
         if existing_role.data:
-            raise HTTPException(status_code=400, detail=f"User already has role: {request.role}")
+            raise HTTPException(status_code=400, detail=f"User already has role: {body.role}")
         
         # Assign role to user
         role_assignment = {
@@ -415,33 +453,49 @@ async def assign_role_to_user(
             "assigned_at": datetime.now().isoformat()
         }
         
-        supabase.table("user_roles").insert(role_assignment).execute()
+        try:
+            admin_client.table("user_roles").insert(role_assignment).execute()
+        except Exception as insert_err:
+            err_str = str(insert_err)
+            if not service_supabase and (
+                "row-level security" in err_str or "violates row-level security" in err_str or "RLS" in err_str
+            ):
+                raise HTTPException(
+                    status_code=503,
+                    detail="Role assignment requires SUPABASE_SERVICE_ROLE_KEY. Set it in backend .env and restart."
+                )
+            raise HTTPException(status_code=500, detail=f"Failed to assign role: {err_str}")
         
-        # Log role assignment to audit_logs
+        # Invalidate admin users cache so list shows updated roles
+        cache = getattr(request.app.state, "cache_manager", None)
+        if cache:
+            await cache.delete(ADMIN_USERS_CACHE_KEY)
+        
+        # Log role assignment to audit_logs (no top-level "success" - audit_logs has no such column)
         admin_user_id = current_user.get("user_id")
         organization_id = current_user.get("organization_id", "00000000-0000-0000-0000-000000000000")
-        
         audit_log = {
             "organization_id": organization_id,
             "user_id": admin_user_id,
             "action": "role_assignment",
             "entity_type": "user",
             "entity_id": str(user_id),
-            "details": {
-                "role": request.role,
+            "action_details": {
+                "role": body.role,
                 "affected_user_id": str(user_id),
-                "admin_user_id": admin_user_id
+                "admin_user_id": admin_user_id,
             },
-            "success": True,
-            "created_at": datetime.now().isoformat()
+            "created_at": datetime.now().isoformat(),
         }
-        
-        supabase.table("audit_logs").insert(audit_log).execute()
+        try:
+            supabase.table("audit_logs").insert(audit_log).execute()
+        except Exception as audit_err:
+            print(f"Audit log insert failed (assign role): {audit_err}")
         
         return {
-            "message": f"Role '{request.role}' assigned to user {user_id}",
+            "message": f"Role '{body.role}' assigned to user {user_id}",
             "user_id": str(user_id),
-            "role": request.role,
+            "role": body.role,
             "assigned_at": datetime.now().isoformat()
         }
         
@@ -456,6 +510,7 @@ async def assign_role_to_user(
 
 @router.delete("/users/{user_id}/roles/{role}")
 async def remove_role_from_user(
+    request: Request,
     user_id: UUID,
     role: str,
     current_user = Depends(require_admin())
@@ -471,10 +526,27 @@ async def remove_role_from_user(
         if not supabase:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
-        # Validate user exists
+        # Validate user exists (in user_profiles or in Auth; create profile if missing)
         user_response = supabase.table("user_profiles").select("user_id, role, is_active").eq("user_id", str(user_id)).execute()
         if not user_response.data:
-            raise HTTPException(status_code=404, detail=f"User {user_id} not found")
+            client_for_auth = service_supabase if service_supabase else supabase
+            try:
+                auth_resp = client_for_auth.auth.admin.get_user_by_id(str(user_id))
+                user_obj = getattr(auth_resp, "user", None) if auth_resp else None
+                if not user_obj and auth_resp and hasattr(auth_resp, "id"):
+                    user_obj = auth_resp
+                if not user_obj or str(getattr(user_obj, "id", "")) != str(user_id):
+                    raise HTTPException(status_code=404, detail=f"User {user_id} not found")
+                insert_client = service_supabase if service_supabase else supabase
+                insert_client.table("user_profiles").insert({
+                    "user_id": str(user_id),
+                    "role": "user",
+                    "is_active": True,
+                }).execute()
+            except HTTPException:
+                raise
+            except Exception:
+                raise HTTPException(status_code=404, detail=f"User {user_id} not found")
         
         # Validate role exists
         try:
@@ -482,41 +554,57 @@ async def remove_role_from_user(
         except ValueError:
             raise HTTPException(status_code=400, detail=f"Invalid role: {role}")
         
-        # Look up role_id from roles table
-        role_lookup = supabase.table("roles").select("id").eq("name", role).execute()
+        # Look up role_id and manage user_roles with service role (RLS)
+        admin_client = service_supabase if service_supabase else supabase
+        role_lookup = admin_client.table("roles").select("id").eq("name", role).execute()
         if not role_lookup.data:
             raise HTTPException(status_code=404, detail=f"Role not found: {role}")
         role_id = role_lookup.data[0]["id"]
         
         # Check if role assignment exists
-        existing_role = supabase.table("user_roles").select("*").eq("user_id", str(user_id)).eq("role_id", role_id).execute()
+        existing_role = admin_client.table("user_roles").select("*").eq("user_id", str(user_id)).eq("role_id", role_id).execute()
         
         if not existing_role.data:
             raise HTTPException(status_code=404, detail=f"User does not have role: {role}")
         
         # Remove role from user
-        supabase.table("user_roles").delete().eq("user_id", str(user_id)).eq("role_id", role_id).execute()
+        try:
+            admin_client.table("user_roles").delete().eq("user_id", str(user_id)).eq("role_id", role_id).execute()
+        except Exception as del_err:
+            err_str = str(del_err)
+            if not service_supabase and (
+                "row-level security" in err_str or "violates row-level security" in err_str or "RLS" in err_str
+            ):
+                raise HTTPException(
+                    status_code=503,
+                    detail="Role removal requires SUPABASE_SERVICE_ROLE_KEY. Set it in backend .env and restart."
+                )
+            raise HTTPException(status_code=500, detail=f"Failed to remove role: {err_str}")
         
-        # Log role removal to audit_logs
+        # Log role removal to audit_logs (no top-level "success" - audit_logs has no such column)
         admin_user_id = current_user.get("user_id")
         organization_id = current_user.get("organization_id", "00000000-0000-0000-0000-000000000000")
-        
         audit_log = {
             "organization_id": organization_id,
             "user_id": admin_user_id,
             "action": "role_removal",
             "entity_type": "user",
             "entity_id": str(user_id),
-            "details": {
+            "action_details": {
                 "role": role,
                 "affected_user_id": str(user_id),
-                "admin_user_id": admin_user_id
+                "admin_user_id": admin_user_id,
             },
-            "success": True,
-            "created_at": datetime.now().isoformat()
+            "created_at": datetime.now().isoformat(),
         }
+        try:
+            supabase.table("audit_logs").insert(audit_log).execute()
+        except Exception as audit_err:
+            print(f"Audit log insert failed (remove role): {audit_err}")
         
-        supabase.table("audit_logs").insert(audit_log).execute()
+        cache = getattr(request.app.state, "cache_manager", None)
+        if cache:
+            await cache.delete(ADMIN_USERS_CACHE_KEY)
         
         return {
             "message": f"Role '{role}' removed from user {user_id}",
@@ -942,14 +1030,23 @@ class UserWithRoles(BaseModel):
     created_at: Optional[str] = None
     last_sign_in_at: Optional[str] = None
 
+ADMIN_USERS_CACHE_KEY = "admin:users-with-roles"
+ADMIN_USERS_CACHE_TTL = 60  # seconds
+
 @router.get("/users-with-roles")
-async def get_users_with_roles(current_user = Depends(require_admin())):
+async def get_users_with_roles(request: Request, current_user = Depends(require_admin())):
     """
     Get all users with their role assignments.
-    
+    Cached 60s to reduce load from auth.admin.list_users().
     Requirements: 4.1 - User role management interface
     """
     try:
+        cache = getattr(request.app.state, "cache_manager", None)
+        if cache:
+            cached = await cache.get(ADMIN_USERS_CACHE_KEY)
+            if cached is not None:
+                return cached
+        
         if not supabase:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
@@ -957,7 +1054,10 @@ async def get_users_with_roles(current_user = Depends(require_admin())):
         auth_users = supabase.auth.admin.list_users()
         
         if not auth_users:
-            return []
+            result: List[Dict[str, Any]] = []
+            if cache:
+                await cache.set(ADMIN_USERS_CACHE_KEY, result, ttl=ADMIN_USERS_CACHE_TTL)
+            return result
         
         users_with_roles = []
         
@@ -973,15 +1073,21 @@ async def get_users_with_roles(current_user = Depends(require_admin())):
             created_at = getattr(user, 'created_at', None)
             last_sign_in = getattr(user, 'last_sign_in_at', None)
             
-            # Fetch role assignments for this user from user_roles table
+            # Fetch role assignments for this user from user_roles (use service role so RLS doesn't hide other users' roles)
             roles_list = []
             try:
-                roles_response = supabase.table("user_roles").select(
-                    "role"
+                roles_client = service_supabase if service_supabase else supabase
+                roles_response = roles_client.table("user_roles").select(
+                    "role_id, roles(name)"
                 ).eq("user_id", user_id).execute()
                 
                 if roles_response.data:
-                    roles_list = [r["role"] for r in roles_response.data]
+                    for r in roles_response.data:
+                        role_obj = r.get("roles") if isinstance(r.get("roles"), dict) else None
+                        if role_obj and role_obj.get("name"):
+                            roles_list.append(role_obj["name"])
+                        elif r.get("role"):  # fallback if schema exposes "role" directly
+                            roles_list.append(r["role"])
             except Exception as role_error:
                 print(f"Error fetching roles for user {user_id}: {role_error}")
                 # If user_roles table doesn't exist or error, check user_metadata
@@ -997,6 +1103,8 @@ async def get_users_with_roles(current_user = Depends(require_admin())):
                 "last_sign_in_at": last_sign_in
             })
         
+        if cache:
+            await cache.set(ADMIN_USERS_CACHE_KEY, users_with_roles, ttl=ADMIN_USERS_CACHE_TTL)
         return users_with_roles
         
     except Exception as e:

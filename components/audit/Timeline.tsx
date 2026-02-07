@@ -27,6 +27,7 @@ import {
   Calendar,
   Tag
 } from 'lucide-react'
+import { useTranslations } from '@/lib/i18n/context'
 
 /**
  * Audit Event Interface
@@ -136,6 +137,7 @@ const Timeline: React.FC<TimelineProps> = ({
   height = 500,
   className = ''
 }) => {
+  const { t } = useTranslations()
   const [selectedEvent, setSelectedEvent] = useState<AuditEvent | null>(null)
   const [showFilters, setShowFilters] = useState(false)
 
@@ -194,7 +196,7 @@ const Timeline: React.FC<TimelineProps> = ({
           <div className="flex items-center space-x-2">
             {getCategoryIcon(event.category)}
             <div>
-              <p className="font-semibold text-gray-900 dark:text-slate-100">{event.event_type}</p>
+              <p className="font-semibold text-gray-900 dark:text-slate-100">{t(`audit.eventTypes.${event.event_type}` as any) || event.event_type}</p>
               <p className="text-xs text-gray-500 dark:text-slate-400">
                 {new Date(event.timestamp).toLocaleString()}
               </p>
@@ -589,7 +591,12 @@ const Timeline: React.FC<TimelineProps> = ({
               range={[20, 400]}
               name="Anomaly Score"
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ strokeDasharray: '3 3' }}
+              wrapperStyle={{ backgroundColor: 'transparent', border: 'none', padding: 0 }}
+              contentStyle={{ backgroundColor: 'transparent', border: 'none', padding: 0, boxShadow: 'none' }}
+            />
             <Legend />
             <Scatter
               name="Audit Events"
@@ -639,7 +646,7 @@ const Timeline: React.FC<TimelineProps> = ({
                 <div className="flex items-center space-x-3 mb-2">
                   {getCategoryIcon(selectedEvent.category)}
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
-                    {selectedEvent.event_type}
+                    {t(`audit.eventTypes.${selectedEvent.event_type}` as any) || selectedEvent.event_type}
                   </h2>
                   <span className={`px-3 py-1 text-sm rounded-full ${
                     selectedEvent.severity === 'critical' ? 'bg-red-100 dark:bg-red-900/30 text-red-700' :

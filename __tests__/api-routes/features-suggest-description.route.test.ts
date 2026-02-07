@@ -4,7 +4,14 @@
  * @jest-environment node
  */
 
-import { createMockNextRequest, parseJsonResponse } from './helpers'
+import { createMockNextRequest, createAuthenticatedRequest, parseJsonResponse } from './helpers'
+
+jest.mock('@/lib/auth/verify-jwt', () => ({
+  getUserIdFromAuthHeader: async (h: string | null) => {
+    if (h?.startsWith('Bearer ')) return 'test-user-id'
+    return null
+  },
+}))
 
 describe('POST /api/features/suggest-description', () => {
   const origEnv = process.env
@@ -16,8 +23,7 @@ describe('POST /api/features/suggest-description', () => {
   })
 
   it('returns 400 when name is missing', async () => {
-    const request = createMockNextRequest({
-      url: 'http://localhost:3000/api/features/suggest-description',
+    const request = createAuthenticatedRequest('http://localhost:3000/api/features/suggest-description', 'test-token', {
       method: 'POST',
       body: {},
     })
@@ -34,8 +40,7 @@ describe('POST /api/features/suggest-description', () => {
     const prev = process.env.OPENAI_API_KEY
     delete process.env.OPENAI_API_KEY
 
-    const request = createMockNextRequest({
-      url: 'http://localhost:3000/api/features/suggest-description',
+    const request = createAuthenticatedRequest('http://localhost:3000/api/features/suggest-description', 'test-token', {
       method: 'POST',
       body: { name: 'My Feature' },
     })
@@ -60,8 +65,7 @@ describe('POST /api/features/suggest-description', () => {
       }),
     }) as typeof fetch
 
-    const request = createMockNextRequest({
-      url: 'http://localhost:3000/api/features/suggest-description',
+    const request = createAuthenticatedRequest('http://localhost:3000/api/features/suggest-description', 'test-token', {
       method: 'POST',
       body: { name: 'Reports' },
     })

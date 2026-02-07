@@ -38,15 +38,18 @@ export interface CommitmentsActualsAnalytics {
 interface UseCommitmentsActualsDataProps {
   accessToken: string | undefined
   selectedCurrency: string
+  /** Defer initial fetch by this many ms so the parent can paint first (e.g. Overview) */
+  deferMs?: number
 }
 
 export function useCommitmentsActualsData({ 
   accessToken, 
-  selectedCurrency 
+  selectedCurrency,
+  deferMs = 0
 }: UseCommitmentsActualsDataProps) {
   const [summary, setSummary] = useState<CommitmentsActualsSummary | null>(null)
   const [analytics, setAnalytics] = useState<CommitmentsActualsAnalytics | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(deferMs <= 0)
   const [error, setError] = useState<string | null>(null)
 
   const fetchSummary = useCallback(async () => {
@@ -56,15 +59,16 @@ export function useCommitmentsActualsData({
     setError(null)
     
     try {
-      // Fetch commitments and actuals data
+      // Fetch commitments and actuals (capped for faster overview load)
+      const limit = 2000
       const [commitmentsRes, actualsRes] = await Promise.all([
-        fetch(getApiUrl('/csv-import/commitments?limit=10000'), {
+        fetch(getApiUrl(`/csv-import/commitments?limit=${limit}`), {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           }
         }),
-        fetch(getApiUrl('/csv-import/actuals?limit=10000'), {
+        fetch(getApiUrl(`/csv-import/actuals?limit=${limit}`), {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
@@ -210,8 +214,15 @@ export function useCommitmentsActualsData({
   }, [accessToken, selectedCurrency])
 
   useEffect(() => {
+    if (deferMs > 0) {
+      const t = setTimeout(() => {
+        setLoading(true)
+        fetchSummary()
+      }, deferMs)
+      return () => clearTimeout(t)
+    }
     fetchSummary()
-  }, [fetchSummary])
+  }, [fetchSummary, deferMs])
 
   return {
     summary,

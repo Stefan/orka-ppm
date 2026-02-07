@@ -983,6 +983,8 @@
     "refresh": "Refresh",
     "authRequired": "Authentication Required",
     "authRequiredMessage": "Please log in to access the audit dashboard.",
+    "errorAuthMissing": "Authorization missing. Please log in.",
+    "errorAuthInvalid": "Session expired or invalid. Please log in again.",
     "error": "Error",
     "tabs": {
       "dashboard": "Dashboard",
@@ -1007,7 +1009,40 @@
     "noEventVolumeData": "No event volume data available",
     "timelineView": "Timeline view will be implemented in task 13",
     "anomaliesView": "Anomalies view will be implemented in task 14",
-    "searchView": "Semantic search will be implemented in task 15"
+    "searchView": "Semantic search will be implemented in task 15",
+    "eventTypes": {
+      "user_login": "User Login",
+      "user_logout": "User Logout",
+      "budget_change": "Budget Change",
+      "permission_change": "Permission Change",
+      "resource_assignment": "Resource Assignment",
+      "resource_created": "Resource Created",
+      "resource_updated": "Resource Updated",
+      "resource_deleted": "Resource Deleted",
+      "risk_created": "Risk Created",
+      "risk_updated": "Risk Updated",
+      "report_generated": "Report Generated",
+      "project_created": "Project Created",
+      "project_updated": "Project Updated",
+      "change_request_created": "Change Request Created",
+      "change_request_approved": "Change Request Approved"
+    },
+    "entityTypes": {
+      "project": "Project",
+      "resource": "Resource",
+      "risk": "Risk",
+      "change_request": "Change Request",
+      "budget": "Budget",
+      "user": "User",
+      "report": "Report"
+    },
+    "relevance": "Relevance",
+    "viewDetails": "View Details",
+    "entity": "Entity",
+    "close": "Close",
+    "recentEvents": "Recent Events",
+    "viewAll": "View all",
+    "noRecentEvents": "No recent events"
   },
   "adminPerformance": {
     "title": "Performance Dashboard",
@@ -1038,6 +1073,7 @@
     "avgDuration": "Avg Duration",
     "totalRequestsLabel": "Total Requests",
     "requestsPerMin": "Requests/Min",
+    "noTrafficYet": "No API traffic recorded yet. Use the app (projects, audit, etc.) or refresh this page to see metrics.",
     "status": {
       "healthy": "Healthy",
       "degraded": "Degraded",
@@ -1078,6 +1114,17 @@
     "portfolioManager": "Portfolio Manager",
     "resourceManager": "Resource Manager",
     "usersSelected": "user(s) selected",
+    "permissions": {
+      "portfolio_read": "Portfolio read",
+      "portfolio_create": "Portfolio create",
+      "portfolio_update": "Portfolio update",
+      "portfolio_delete": "Portfolio delete",
+      "project_read": "Project read",
+      "project_create": "Project create",
+      "resource_read": "Resource read",
+      "financial_read": "Financial read",
+      "risk_read": "Risk read"
+    },
     "activate": "Activate",
     "deactivate": "Deactivate",
     "delete": "Delete",
@@ -1118,7 +1165,9 @@
       "actionFailed": "Failed to {action} user",
       "emailRequired": "Email is required",
       "invalidEmail": "Please enter a valid email address",
-      "inviteFailed": "Failed to invite user"
+      "inviteFailed": "Failed to invite user",
+      "forbidden": "Permission denied",
+      "notFound": "Not found"
     }
   },
   "auth": {

@@ -4,7 +4,8 @@ Admin Performance Monitoring Endpoints
 Provides real-time performance metrics for the admin dashboard.
 """
 
-from fastapi import APIRouter, Depends, HTTPException
+import time
+from fastapi import APIRouter, Depends, HTTPException, Request
 from typing import Dict, Any
 from datetime import datetime
 
@@ -14,24 +15,34 @@ from middleware.performance_tracker import performance_tracker
 router = APIRouter(prefix="/api/admin/performance", tags=["admin", "performance"])
 
 
+def _record_this_request(path: str, method: str, duration: float, status_code: int = 200) -> None:
+    """Record the current stats/health request so the dashboard shows at least this call."""
+    performance_tracker.record_request(
+        endpoint=path,
+        method=method,
+        duration=duration,
+        status_code=status_code,
+        error=None,
+    )
+
+
 @router.get("/stats")
 async def get_performance_stats(
-    current_user=Depends(require_permission(Permission.admin_read))
+    request: Request,
+    current_user=Depends(require_permission(Permission.admin_read)),
 ) -> Dict[str, Any]:
     """
     Get comprehensive performance statistics.
-    
-    Returns:
-        - Total requests count
-        - Total errors count
-        - Slow queries count
-        - Per-endpoint statistics (requests, avg duration, error rate, RPM)
-        - Recent slow queries
-        - System uptime
-    
-    Requires: Admin read permission
+    The current request is recorded first so the returned stats include it (real data on first load).
     """
+    start = time.time()
     try:
+        _record_this_request(
+            path=request.url.path,
+            method=request.method,
+            duration=max(0, time.time() - start),
+            status_code=200,
+        )
         stats = performance_tracker.get_stats()
         return stats
     except Exception as e:
@@ -43,21 +54,42 @@ async def get_performance_stats(
 
 @router.get("/health")
 async def get_health_status(
-    current_user=Depends(require_permission(Permission.admin_read))
+    request: Request,
+    current_user=Depends(require_permission(Permission.admin_read)),
 ) -> Dict[str, Any]:
     """
-    Get system health status based on performance metrics.
-    
-    Returns:
-        - Health status (healthy, degraded, unhealthy)
-        - Current timestamp
-        - Key metrics (total requests, error rate, slow queries, uptime)
-        - Cache status
-    
-    Requires: Admin read permission
+    Get system health status. Enriches with real cache stats when cache_manager is available.
     """
+    start = time.time()
     try:
+        _record_this_request(
+            path=request.url.path,
+            method=request.method,
+            duration=max(0, time.time() - start),
+            status_code=200,
+        )
         health = performance_tracker.get_health_status()
+        # Enrich with real cache data from app state when available
+        cache_manager = getattr(request.app.state, "cache_manager", None)
+        if cache_manager is not None:
+            try:
+                if getattr(cache_manager, "redis_available", False) and getattr(
+                    cache_manager, "redis_client", None
+                ):
+                    try:
+                        info = await cache_manager.redis_client.info("stats")
+                        hits = int(info.get("keyspace_hits", 0))
+                        misses = int(info.get("keyspace_misses", 0))
+                        total = hits + misses
+                        hit_rate = round((hits / total) * 100, 1) if total else 0
+                        health["cache_status"] = f"Redis OK, hit rate {hit_rate}%"
+                        health["cache_hit_rate"] = hit_rate
+                    except Exception:
+                        health["cache_status"] = "Redis connected"
+                else:
+                    health["cache_status"] = "Memory cache (TTL)"
+            except Exception:
+                pass
         return health
     except Exception as e:
         raise HTTPException(

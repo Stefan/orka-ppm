@@ -22,10 +22,11 @@ export default function DetailedView({
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [filterStatus, setFilterStatus] = useState<'all' | 'over' | 'under' | 'on'>('all')
   
-  // Fetch commitments & actuals data
+  // Fetch commitments & actuals after first paint so tab shows immediately
   const { analytics, summary, loading } = useCommitmentsActualsData({
     accessToken,
-    selectedCurrency
+    selectedCurrency,
+    deferMs: 150
   })
 
   if (loading) {

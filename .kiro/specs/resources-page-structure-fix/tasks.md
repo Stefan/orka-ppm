@@ -4,6 +4,8 @@
 
 This implementation plan addresses the resources page structure verification failure by ensuring the `resources-grid` test ID is always present. The approach is to refactor the view mode rendering to always include a parent container with the test ID, with conditional content inside.
 
+**Backend-API, Routen & Rollen:** Siehe [backend-api-and-roles.md](./backend-api-and-roles.md) für die bestehenden Backend-Routen, Next.js-Proxy, RBAC-Permissions und Migrationen. Die folgenden Tasks (Backend-API, Migration) sind an diese Spezifikation angepasst.
+
 ## Tasks
 
 - [x] 1. Refactor resources page view mode rendering
@@ -101,11 +103,56 @@ This implementation plan addresses the resources page structure verification fai
   - Ensure structure verification passes
   - Ask the user if questions arise
 
+---
+
+## Backend-API, Proxy, Rollen & Migration (an bestehende Routen/Rollen angepasst)
+
+Referenz: [backend-api-and-roles.md](./backend-api-and-roles.md).
+
+### Backend-API & Validierung
+
+- [x] **8.1** ResourceCreate: `role` optional
+  - In `backend/models/resources.py`: `role: Optional[str] = ""`, damit Anlegen ohne Role (Frontend sendet role nur wenn ausgefüllt) keine 422 auslöst.
+  - _Routen: POST `/resources/`, Permission: `resource_create`._
+
+- [x] **8.2** Fehlerantworten bei Create durchreichen
+  - In `app/api/resources/route.ts`: Bei `!response.ok` Backend-Body als JSON parsen und unverändert mit gleichem Status zurückgeben (nicht durch generisches `{ error: "Backend error: 422" }` ersetzen).
+  - So erhält das Frontend FastAPI-`detail` (z. B. Pydantic-Validierungsfehler) für aussagekräftige Meldungen.
+
+- [x] **8.3** Frontend-Fehleranzeige bei Create
+  - In `app/resources/page.tsx`: Bei 4xx/5xx `errorData.detail` (Array oder String) auswerten; Fallback auf `errorData.error`; klare Fehlermeldung anzeigen (z. B. in `alert` oder UI-Banner).
+
+### Migration (bestehende Schema-Stände)
+
+- [x] **9.1** Dokumentation bestehender Migrationen
+  - Resources-Tabelle: Erweiterung in `001_initial_schema_enhancement.sql` (email, role, availability, hourly_rate, current_projects, capacity, location).
+  - Keine RLS/tenant_id für `resources` in `024_tenant_isolation_policies.sql` (siehe backend-api-and-roles.md).
+
+- [ ] **9.2** (Optional) Tenant-Isolation für Resources
+  - Nur wenn gewünscht: Neue Migration (z. B. `resources` um `tenant_id` ergänzen, RLS-Policies mit `get_current_tenant_id()`), Backend bei Insert/Update/Select tenant_id setzen/filtern.
+  - Abgleich mit bestehenden Rollen: weiterhin `resource_*`-Permissions; RLS filtert nach Tenant.
+
+### Next.js-Proxy (Erweiterung optional)
+
+- [ ] **10.1** (Optional) Proxy für weitere Backend-Routen
+  - Aktuell: Nur GET und POST auf `/api/resources` → Backend GET/POST `/resources/`.
+  - Bei Bedarf: Route-Handler für PUT/DELETE/GET-by-ID (z. B. `app/api/resources/[resourceId]/route.ts`) und ggf. `/api/resources/search`, `/api/resources/utilization/summary` ergänzen; Auth-Header durchreichen; gleiche Fehlerweiterleitung wie in 8.2.
+
+### Rollen-Check (Abnahme)
+
+- [x] **11.1** Rollen-Matrix abgeglichen
+  - admin: create, read, update, delete, allocate.
+  - resource_manager: create, read, update, allocate (kein delete).
+  - portfolio_manager / project_manager: read, allocate.
+  - team_member / viewer: read only.
+  - Siehe `backend/auth/rbac.py` und backend-api-and-roles.md.
+
 ## Notes
 
-- All tasks are required for comprehensive implementation
+- Tasks 1–7 und 8.x, 9.1, 11.1 sind für die Struktur- und Create-Fix-Implementierung relevant; 9.2 und 10.1 sind optionale Erweiterungen.
 - The core fix is in task 1 - refactoring the view mode rendering
 - Property tests use fast-check library for JavaScript property-based testing
 - Each property test runs 100 iterations minimum
 - Structure tests already exist in `__tests__/e2e/page-structure.spec.ts`
 - Manual verification (task 6) is not automated but important for UX validation
+- Backend-Routen und RBAC siehe immer `backend-api-and-roles.md` für Abgleich mit Code.

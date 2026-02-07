@@ -5,6 +5,7 @@ Provides endpoints for AI-powered in-app help chat system
 
 import time
 from fastapi import APIRouter, HTTPException, Depends, status, Request, Body
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any, List
 from uuid import UUID
@@ -865,16 +866,18 @@ async def dismiss_proactive_tip(
 async def get_supported_languages(
     current_user = Depends(get_current_user)
 ):
-    """Get list of supported languages"""
+    """Get list of supported languages (cached 5 min at client)."""
     try:
-        # Return static list - don't depend on translation service
-        # This ensures language selection works even when OpenAI is not configured
-        return SUPPORTED_LANGUAGES
-        
+        return JSONResponse(
+            content=SUPPORTED_LANGUAGES,
+            headers={"Cache-Control": "public, max-age=300"},
+        )
     except Exception as e:
         logger.error(f"Failed to get supported languages: {e}")
-        # Even on error, return the static list
-        return SUPPORTED_LANGUAGES
+        return JSONResponse(
+            content=SUPPORTED_LANGUAGES,
+            headers={"Cache-Control": "public, max-age=300"},
+        )
 
 @router.get("/language/preference", response_model=Dict[str, str])
 async def get_user_language_preference(

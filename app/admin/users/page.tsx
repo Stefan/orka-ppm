@@ -71,6 +71,8 @@ export default function AdminUsers() {
   const [availableRoles, setAvailableRoles] = useState<RoleInfo[]>([])
   const [showRoleModal, setShowRoleModal] = useState(false)
   const [selectedUserForRole, setSelectedUserForRole] = useState<User | null>(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<User | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [inviteEmail, setInviteEmail] = useState('')
@@ -161,13 +163,21 @@ export default function AdminUsers() {
       console.log('[DEBUG] Response URL:', response.url)
       
       if (!response.ok) {
-        console.error(`Failed to fetch users: ${response.statusText}`)
-        setError(`Failed to fetch users: ${response.statusText}`)
+        const errBody = await response.json().catch(() => ({}))
+        const msg = (errBody as { detail?: string; message?: string }).detail
+          ?? (errBody as { detail?: string; message?: string }).message
+          ?? response.statusText
+        const statusMsg = response.status === 403 ? (t('errors.forbidden') || 'Permission denied') : response.status === 404 ? (t('errors.notFound') || 'Not found') : msg
+        setError(statusMsg)
         setLoading(false)
         return
       }
       
       const data: UserListResponse = await response.json()
+      // #region agent log
+      const u0 = data.users?.[0]
+      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'admin/users/page.tsx:fetchUsers', message: 'users_loaded', data: { first_user_roles: u0?.roles, first_user_role: u0?.role, users_count: data.users?.length }, timestamp: Date.now(), hypothesisId: 'C' }) }).catch(() => {})
+      // #endregion
       setUsers(data.users)
       setPagination(prev => ({
         ...prev,
@@ -208,9 +218,12 @@ export default function AdminUsers() {
       console.log('Roles response status:', response.status)
       
       if (!response.ok) {
-        const errorText = await response.text()
-        console.error('Failed to fetch roles:', response.status, errorText)
-        throw new Error(`Failed to fetch roles: ${response.status} ${response.statusText}`)
+        const errBody = await response.json().catch(() => ({}))
+        const msg = (errBody as { detail?: string; message?: string }).detail
+          ?? (errBody as { detail?: string; message?: string }).message
+          ?? `${response.status} ${response.statusText}`
+        setError(response.status === 403 ? (t('errors.forbidden') || 'Permission denied') : msg)
+        return
       }
       
       const roles: RoleInfo[] = await response.json()
@@ -219,6 +232,33 @@ export default function AdminUsers() {
     } catch (error) {
       console.error('Error fetching roles:', error)
     }
+  }
+
+  /** Normalize API error body to a string (detail/error can be object or array in validation errors). Always returns a string. */
+  const getErrorMessage = (errorData: { detail?: unknown; error?: unknown }): string => {
+    const d = errorData.detail ?? errorData.error
+    if (typeof d === 'string') return d
+    if (Array.isArray(d) && d.length > 0) {
+      const first = d[0] as { msg?: unknown; message?: unknown }
+      const m = first?.msg ?? first?.message
+      if (typeof m === 'string') return m
+    }
+    if (d && typeof d === 'object') {
+      const o = d as Record<string, unknown>
+      for (const key of ['msg', 'message', 'detail', 'error']) {
+        const v = o[key]
+        if (typeof v === 'string') return v
+      }
+    }
+    return ''
+  }
+
+  /** Ensure value is a string suitable for Error(message). Never pass an object. */
+  const toErrorString = (value: unknown): string => {
+    if (typeof value === 'string' && value.trim()) return value
+    if (value && typeof value === 'object' && typeof (value as { message?: string }).message === 'string') return (value as { message: string }).message
+    if (value && typeof value === 'object' && typeof (value as { msg?: string }).msg === 'string') return (value as { msg: string }).msg
+    return 'Failed to complete action'
   }
 
   const handleAssignRole = async (userId: string, role: string) => {
@@ -235,11 +275,19 @@ export default function AdminUsers() {
       })
       
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.detail || 'Failed to assign role')
+        const errorData = await response.json().catch(() => ({})) as { detail?: unknown; error?: unknown }
+        const msg = getErrorMessage(errorData)
+        if (response.status === 400 && msg && /already has role/i.test(msg)) {
+          setSuccessMessage(msg)
+          setTimeout(() => setSuccessMessage(null), 3000)
+          await fetchUsers()
+          return
+        }
+        const fallback = response.status === 403 ? (toErrorString(t('errors.forbidden')) || 'Permission denied') : 'Failed to assign role'
+        throw new Error(toErrorString(msg || fallback))
       }
       
-      setSuccessMessage(`Role "${role}" assigned successfully`)
+      setSuccessMessage(`Role "${getRoleLabel(role)}" assigned successfully`)
       setTimeout(() => setSuccessMessage(null), 3000)
       
       // Refresh users list
@@ -266,11 +314,13 @@ export default function AdminUsers() {
       })
       
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.detail || 'Failed to remove role')
+        const errorData = await response.json().catch(() => ({})) as { detail?: unknown; error?: unknown }
+        const apiMsg = getErrorMessage(errorData)
+        const msgStr = apiMsg || (response.status === 403 ? toErrorString(t('errors.forbidden')) || 'Permission denied' : 'Failed to remove role')
+        throw new Error(toErrorString(msgStr))
       }
       
-      setSuccessMessage(`Role "${role}" removed successfully`)
+      setSuccessMessage(`Role "${getRoleLabel(role)}" removed successfully`)
       setTimeout(() => setSuccessMessage(null), 3000)
       
       // Refresh users list
@@ -292,6 +342,22 @@ export default function AdminUsers() {
   const closeRoleModal = () => {
     setSelectedUserForRole(null)
     setShowRoleModal(false)
+  }
+
+  const openDeleteModal = (user: User) => {
+    setUserToDelete(user)
+    setShowDeleteModal(true)
+  }
+
+  const closeDeleteModal = () => {
+    setUserToDelete(null)
+    setShowDeleteModal(false)
+  }
+
+  const confirmDeleteUser = () => {
+    if (!userToDelete) return
+    closeDeleteModal()
+    handleUserAction(userToDelete.id, 'delete')
   }
 
   const openInviteModal = () => {
@@ -324,10 +390,6 @@ export default function AdminUsers() {
 
     try {
       const url = getApiUrl('/api/admin/users/invite')
-      console.log('Calling invite endpoint:', url)
-      console.log('Request body:', { email: inviteEmail, role: inviteRole })
-      console.log('Auth token:', session?.access_token ? 'Present' : 'Missing')
-      
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -340,31 +402,21 @@ export default function AdminUsers() {
         })
       })
 
-      console.log('Response status:', response.status, response.statusText)
-      console.log('Response URL:', response.url)
-
       if (!response.ok) {
-        // Clone response to read body multiple times if needed
         const responseText = await response.text()
-        console.error('Raw error response:', responseText)
-        console.error('Response status:', response.status)
-        
-        let errorMessage = `HTTP ${response.status}: ${response.statusText}`
-        
+        let errorMessage = t('errors.inviteFailed')
         if (responseText) {
           try {
-            const errorData = JSON.parse(responseText)
-            errorMessage = errorData.detail || errorData.message || errorMessage
+            const errorData = JSON.parse(responseText) as { detail?: unknown; message?: string }
+            errorMessage = getErrorMessage(errorData) || errorData.message || errorMessage
           } catch {
-            errorMessage = responseText || errorMessage
+            errorMessage = responseText.trim() || errorMessage
           }
         }
-        
-        throw new Error(errorMessage)
+        throw new Error(toErrorString(errorMessage))
       }
 
       const data = await response.json()
-      console.log('Success response:', data)
       setSuccessMessage(t('inviteSuccess', { email: inviteEmail }))
       setTimeout(() => setSuccessMessage(null), 5000)
       
@@ -372,7 +424,6 @@ export default function AdminUsers() {
       await fetchUsers() // Refresh the user list
       
     } catch (error) {
-      console.error('Error inviting user:', error)
       setError(error instanceof Error ? error.message : t('errors.inviteFailed'))
     } finally {
       setInviteLoading(false)
@@ -381,7 +432,6 @@ export default function AdminUsers() {
 
   const handleUserAction = async (userId: string, action: 'deactivate' | 'activate' | 'delete', reason?: string) => {
     setActionLoading(userId)
-    
     try {
       let endpoint = ''
       let method = 'POST'
@@ -416,9 +466,10 @@ export default function AdminUsers() {
       }
       
       const response = await fetch(getApiUrl(endpoint), fetchOptions)
-      
       if (!response.ok) {
-        throw new Error(`Failed to ${action} user: ${response.statusText}`)
+        const errBody = await response.json().catch(() => ({})) as { detail?: string; message?: string }
+        const msg = errBody.detail ?? errBody.message ?? (response.status === 403 ? (t('errors.forbidden') || 'Permission denied') : response.statusText)
+        throw new Error(msg)
       }
       
       // Refresh users list
@@ -474,6 +525,28 @@ export default function AdminUsers() {
   const getStatusText = (user: User) => {
     if (!user.is_active) return t('inactive')
     return t('active')
+  }
+
+  /** Map permission key to adminUsers.permissions.* translated label */
+  const getPermissionLabel = (permission: string): string => {
+    const translated = t(`permissions.${permission}` as keyof typeof t)
+    return (translated as string) || permission.replace(/_/g, ' ')
+  }
+
+  /** Map API role key (snake_case) to adminUsers i18n key for translated label */
+  const getRoleLabel = (role: string): string => {
+    const keyMap: Record<string, string> = {
+      admin: 'admin',
+      user: 'user',
+      viewer: 'viewer',
+      team_member: 'teamMember',
+      project_manager: 'projectManager',
+      portfolio_manager: 'portfolioManager',
+      resource_manager: 'resourceManager'
+    }
+    const i18nKey = keyMap[role] ?? role
+    const translated = t(i18nKey as keyof typeof t)
+    return (translated as string) || role.charAt(0).toUpperCase() + role.slice(1).replace(/_/g, ' ')
   }
 
   const getRoleColor = (role: string) => {
@@ -536,8 +609,8 @@ export default function AdminUsers() {
     if (!showRoleModal || !selectedUserForRole) return null
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" aria-modal="true" role="dialog">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-gray-200/50 dark:border-slate-700/50">
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Manage Roles</h2>
@@ -570,11 +643,11 @@ export default function AdminUsers() {
               {selectedUserForRole.roles && selectedUserForRole.roles.length > 0 ? (
                 <div className="space-y-2">
                   {selectedUserForRole.roles.map((role) => (
-                    <div key={role} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                    <div key={role} className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                       <div className="flex items-center space-x-3">
                         <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                         <div>
-                          <div className="font-medium text-gray-900 dark:text-slate-100">{role}</div>
+                          <div className="font-medium text-gray-900 dark:text-slate-100">{getRoleLabel(role)}</div>
                           <div className="text-sm text-gray-500 dark:text-slate-400">
                             {availableRoles.find(r => r.role === role)?.description}
                           </div>
@@ -606,7 +679,7 @@ export default function AdminUsers() {
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-2">
                             <Shield className="h-5 w-5 text-gray-600 dark:text-slate-400" />
-                            <span className="font-medium text-gray-900 dark:text-slate-100">{roleInfo.role}</span>
+                            <span className="font-medium text-gray-900 dark:text-slate-100">{getRoleLabel(roleInfo.role)}</span>
                           </div>
                           <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">{roleInfo.description}</p>
                           <div className="flex flex-wrap gap-1">
@@ -615,7 +688,7 @@ export default function AdminUsers() {
                                 key={permission}
                                 className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300"
                               >
-                                {permission}
+                                {getPermissionLabel(permission)}
                               </span>
                             ))}
                             {roleInfo.permissions.length > 5 && (
@@ -653,13 +726,55 @@ export default function AdminUsers() {
     )
   }
 
-  // Invite User Modal Component
+  // Delete User Confirmation Modal (app-styled, no native confirm)
+  const DeleteUserModal = () => {
+    if (!showDeleteModal || !userToDelete) return null
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" aria-modal="true" role="dialog">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-w-md w-full mx-4 border border-gray-200/50 dark:border-slate-700/50">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100">{t('deleteUser')}</h2>
+              <button
+                onClick={closeDeleteModal}
+                className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700"
+                aria-label="Close"
+              >
+                <XCircle className="h-6 w-6" />
+              </button>
+            </div>
+            <p className="text-gray-600 dark:text-slate-300 mb-6">
+              {t('deleteConfirm', { email: userToDelete.email })}
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={closeDeleteModal}
+                className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-slate-100 hover:bg-gray-200 dark:hover:bg-slate-600"
+              >
+                {t('cancel')}
+              </button>
+              <button
+                onClick={confirmDeleteUser}
+                disabled={actionLoading === userToDelete.id}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                {actionLoading === userToDelete.id ? '…' : t('delete')}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Invite User Modal Component (matches Role/Delete modal styling)
   const InviteUserModal = () => {
     if (!showInviteModal) return null
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" aria-modal="true" role="dialog">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-w-md w-full mx-4 border border-gray-200/50 dark:border-slate-700/50">
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">{t('inviteUser')}</h2>
@@ -749,6 +864,7 @@ export default function AdminUsers() {
   return (
     <AppLayout>
       <RoleManagementModal />
+      <DeleteUserModal />
       <InviteUserModal />
       <div className="p-6 space-y-6">
         {/* Header */}
@@ -938,7 +1054,7 @@ export default function AdminUsers() {
                           setSelectedUsers([])
                         }
                       }}
-                      className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
+                      className="h-5 w-5 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-2 focus:ring-blue-500 cursor-pointer"
                     />
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
@@ -975,7 +1091,7 @@ export default function AdminUsers() {
                             setSelectedUsers(prev => prev.filter(id => id !== user.id))
                           }
                         }}
-                        className="rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
+                        className="h-5 w-5 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-2 focus:ring-blue-500 cursor-pointer"
                       />
                     </td>
                     <td className="px-6 py-4">
@@ -1004,13 +1120,13 @@ export default function AdminUsers() {
                               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleColor(role)}`}
                             >
                               {role === 'admin' && <Shield className="h-3 w-3 mr-1" />}
-                              {role.charAt(0).toUpperCase() + role.slice(1)}
+                              {getRoleLabel(role)}
                             </span>
                           ))
                         ) : (
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleColor(user.role)}`}>
                             {user.role === 'admin' && <Shield className="h-3 w-3 mr-1" />}
-                            {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                            {getRoleLabel(user.role)}
                           </span>
                         )}
                       </div>
@@ -1033,46 +1149,40 @@ export default function AdminUsers() {
                       {formatDate(user.created_at)}
                     </td>
                     <td className="px-6 py-4 text-right text-sm font-medium">
-                      <div className="flex items-center justify-end space-x-2">
+                      <div className="flex items-center justify-end gap-3">
                         <button
                           onClick={() => openRoleModal(user)}
-                          className="text-blue-600 dark:text-blue-400 hover:text-blue-900"
+                          className="p-2 rounded-md text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"
                           title="Manage Roles"
                         >
-                          <Shield className="h-4 w-4" />
+                          <Shield className="h-5 w-5" />
                         </button>
-                        
                         {user.is_active ? (
                           <button
                             onClick={() => handleUserAction(user.id, 'deactivate', 'Admin deactivation')}
                             disabled={actionLoading === user.id}
-                            className="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 disabled:opacity-50"
+                            className="p-2 rounded-md text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 hover:text-yellow-900 dark:hover:text-yellow-300 disabled:opacity-50 transition-colors"
                             title={t('deactivateUser')}
                           >
-                            <UserMinus className="h-4 w-4" />
+                            <UserMinus className="h-5 w-5" />
                           </button>
                         ) : (
                           <button
                             onClick={() => handleUserAction(user.id, 'activate')}
                             disabled={actionLoading === user.id}
-                            className="text-green-600 dark:text-green-400 hover:text-green-900 disabled:opacity-50"
+                            className="p-2 rounded-md text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 hover:text-green-900 dark:hover:text-green-300 disabled:opacity-50 transition-colors"
                             title={t('activateUser')}
                           >
-                            <UserPlus className="h-4 w-4" />
+                            <UserPlus className="h-5 w-5" />
                           </button>
                         )}
-                        
                         <button
-                          onClick={() => {
-                            if (confirm(t('deleteConfirm', { email: user.email }))) {
-                              handleUserAction(user.id, 'delete')
-                            }
-                          }}
+                          onClick={() => openDeleteModal(user)}
                           disabled={actionLoading === user.id}
-                          className="text-red-600 dark:text-red-400 hover:text-red-900 disabled:opacity-50"
+                          className="p-2 rounded-md text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-900 dark:hover:text-red-300 disabled:opacity-50 transition-colors"
                           title={t('deleteUser')}
                         >
-                          <UserX className="h-4 w-4" />
+                          <UserX className="h-5 w-5" />
                         </button>
                       </div>
                     </td>

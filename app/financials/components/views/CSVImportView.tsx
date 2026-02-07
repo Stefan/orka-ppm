@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Upload, Download, CheckCircle, XCircle, Clock, RefreshCw, FileText, History } from 'lucide-react'
 import { CSVImportHistory, CSVUploadResult } from '../../types'
 import { getApiUrl } from '../../../../lib/api'
+import { logger } from '@/lib/monitoring/logger'
 
 interface CSVImportViewProps {
   accessToken: string | undefined
@@ -16,9 +17,9 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
   const [dragActive, setDragActive] = useState(false)
 
   useEffect(() => {
-    if (accessToken) {
-      fetchCSVImportHistory()
-    }
+    if (!accessToken) return
+    const t = setTimeout(() => fetchCSVImportHistory(), 100)
+    return () => clearTimeout(t)
   }, [accessToken])
 
   const fetchCSVImportHistory = async () => {
@@ -37,7 +38,7 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
         setCsvImportHistory(data.imports || [])
       }
     } catch (error) {
-      console.error('Failed to fetch CSV import history:', error)
+      logger.error('Failed to fetch CSV import history', { error }, 'CSVImportView')
     }
   }
 
@@ -129,7 +130,7 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
         URL.revokeObjectURL(url)
       }
     } catch (error) {
-      console.error('Failed to download template:', error)
+      logger.error('Failed to download template', { error }, 'CSVImportView')
     }
   }
 

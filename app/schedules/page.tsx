@@ -58,11 +58,11 @@ export default function SchedulesPage() {
   }, [authLoading, session, router])
 
   useEffect(() => {
-    if (session) {
+    if (session?.access_token) {
       fetchSchedules()
       fetchProjects()
     }
-  }, [session, fetchSchedules, fetchProjects])
+  }, [session?.access_token, fetchSchedules, fetchProjects])
 
   const handleCreateSchedule = useCallback(
     async (data: { project_id: string; name: string; description?: string; start_date: string; end_date: string }) => {

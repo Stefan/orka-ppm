@@ -1,12 +1,13 @@
 """
 Unified Search API Router (Topbar Search).
 GET /api/v1/search?q=...&limit=10
+Uses lightweight auth (no DB role fetch) for low latency.
 """
 
 from fastapi import APIRouter, Depends, Query
 from typing import Optional
 
-from auth.dependencies import get_current_user
+from auth.dependencies import get_current_user_light
 from services.unified_search_service import unified_search
 
 router = APIRouter(prefix="/api/v1", tags=["search"])
@@ -16,7 +17,7 @@ router = APIRouter(prefix="/api/v1", tags=["search"])
 async def search(
     q: Optional[str] = Query(None, description="Search query"),
     limit: int = Query(10, ge=1, le=20, description="Max results per category"),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user_light),
 ):
     """
     Unified search: fulltext (pg_trgm) + semantic (RAG) + AI suggestions.

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { useAuth } from './SupabaseAuthProvider'
+import { logger } from '@/lib/monitoring/logger'
 
 type Theme = 'light' | 'dark' | 'system'
 
@@ -107,13 +108,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => mediaQuery.removeEventListener('change', handleChange)
   }, [theme, mounted])
 
-  // Load theme from user preferences when authenticated (only on initial load)
+  // Load theme from user preferences when authenticated (only on initial load).
+  // Request is only made when we have a session and an access token; 401 is handled silently.
   useEffect(() => {
-    if (!session?.user?.id || !mounted) return
-    
+    const token = session?.access_token
+    if (!session?.user?.id || !token || !mounted) return
+
     const loadUserTheme = async () => {
       try {
-        const response = await fetch(`/api/sync/preferences?userId=${session.user.id}`)
+        const response = await fetch(`/api/sync/preferences?userId=${session.user.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (response.status === 401) return // Session invalid/expired — no console noise
         if (!response.ok) return
         const prefs = await response.json()
         if (!prefs?.theme || !['light', 'dark', 'system'].includes(prefs.theme)) return
@@ -130,12 +136,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           setResolvedTheme(prefs.theme)
         }
       } catch (error) {
-        console.error('Failed to load theme from preferences:', error)
+        logger.error('Failed to load theme from preferences', { error }, 'ThemeProvider')
       }
     }
 
     loadUserTheme()
-  }, [session?.user?.id, mounted])
+  }, [session?.user?.id, session?.access_token, mounted])
 
   // Set theme function
   const setTheme = useCallback((newTheme: Theme) => {

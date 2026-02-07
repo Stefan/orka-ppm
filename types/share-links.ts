@@ -23,6 +23,13 @@ export interface ShareLink {
   created_by: string
 }
 
+export interface ShareLinkListResponse {
+  share_links: ShareLink[]
+  total: number
+  active_count: number
+  expired_count: number
+}
+
 export interface CreateShareLinkRequest {
   project_id: string
   permission_level: SharePermissionLevel

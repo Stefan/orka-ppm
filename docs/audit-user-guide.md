@@ -10,7 +10,8 @@
 6. [Export Functionality](#export-functionality)
 7. [Real-Time Dashboard](#real-time-dashboard)
 8. [Best Practices](#best-practices)
-9. [FAQ](#faq)
+9. [Troubleshooting: No events showing](#troubleshooting-no-events-showing)
+10. [FAQ](#faq)
 
 ---
 
@@ -664,9 +665,70 @@ Last Model Training: Jan 10, 2024
 
 ---
 
+## Troubleshooting: No events showing
+
+If the Audit Trail (Timeline or Dashboard) shows no events, check the following.
+
+### 1. Backend and API
+
+- **Backend running:** The audit page loads events from the backend (`/api/audit/logs`). Ensure the backend is running (e.g. `./start-local.sh` or your usual backend process) and reachable from the frontend (e.g. `NEXT_PUBLIC_BACKEND_URL` or Next.js rewrites). The Next.js rewrites must send `/api/audit/*` to the backend’s `/api/audit/*` path so that the audit router receives the request.
+- **No 401/403:** If you see "Authorization missing" or "Session expired", log in again. The audit endpoints require a valid Supabase session.
+
+### 2. Permissions
+
+- Your user needs **audit:read** (or equivalent) to see the Audit page. If you only get empty lists and no error, permissions are usually fine; missing permission typically returns 403.
+
+### 3. Tenant / organization
+
+- Events are filtered by **tenant/organization**. The backend shows only events where `tenant_id` matches your user’s `tenant_id` (or `organization_id`), or events with `tenant_id` = null for "default" tenants.
+- If your JWT has a `tenant_id` (or `organization_id`) and no events were ever written with that tenant, the list will be empty.
+
+### 4. Create events that appear in the Audit Trail
+
+Events are written to the `audit_logs` table by various features. To see something in the Trail:
+
+- **Use features that log to audit_logs:**
+  - **Resources:** Create, update, or delete a resource (Resources page). These writes include `tenant_id` when available.
+  - **Audit access:** Opening the Audit page and loading logs creates an "audit_access" event (so after the first load, a refresh may show that event).
+  - **RBAC / Admin:** Role assignments and removals (if your backend writes them to `audit_logs` with the correct tenant).
+  - **Batch insert (API):** You can POST audit events to the backend batch endpoint with your user’s `tenant_id` (see API docs) for testing.
+
+- **Test events via API (for development):**  
+  POST to the backend batch endpoint (e.g. `/api/audit/events/batch`) with a valid Bearer token and a body like:
+  ```json
+  [
+    {
+      "event_type": "test_event",
+      "entity_type": "test",
+      "severity": "info",
+      "action_details": { "message": "Test audit entry" }
+    }
+  ]
+  ```
+  The backend adds `tenant_id` from the current user. Then reload the Audit Trail; the new events should appear (same tenant).
+
+### 5. Database and migrations
+
+- Ensure migrations have been applied so that the **audit_logs** table (and optional columns like `tenant_id`, `created_at`) exist. Relevant migrations include `023_ai_empowered_audit_trail.sql` and any later audit-related migrations.
+
+### Summary
+
+| Cause | What to do |
+|-------|------------|
+| Backend not running / not reachable | Start backend, check `NEXT_PUBLIC_BACKEND_URL` / rewrites |
+| Not logged in / session expired | Log in again |
+| No permission | Get `audit:read` (or equivalent) |
+| No events for your tenant | Use features that write to `audit_logs` (Resources, Audit page load, RBAC) or insert test events via batch API with your tenant |
+| Table missing / wrong schema | Run audit-related migrations |
+
+---
+
 ## FAQ
 
 ### General Questions
+
+**Q: Why don’t I see any events in the Audit Trail?**  
+A: See [Troubleshooting: No events showing](#troubleshooting-no-events-showing). Typical causes: backend not reachable, no events written for your tenant, or missing migrations.
 
 **Q: How far back can I search audit logs?**  
 A: All audit logs are retained for 7 years. Logs older than 1 year are archived but remain searchable.

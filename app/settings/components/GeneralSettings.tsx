@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { Sun, Moon, Monitor, Clock, DollarSign, Check } from 'lucide-react'
 import { useSettings } from '@/hooks/useSettings'
 import { useTheme } from '@/app/providers/ThemeProvider'
+import { logger } from '@/lib/monitoring/logger'
 
 const TIMEZONES = [
   { value: 'UTC', label: 'UTC' },
@@ -56,7 +57,7 @@ export function GeneralSettings() {
     try {
       await updateSetting('theme', newTheme)
     } catch {
-      console.warn('Theme preference sync failed, using local setting')
+      logger.warn('Theme preference sync failed, using local setting', undefined, 'GeneralSettings')
     }
     // #region agent log
     fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GeneralSettings.tsx:handleThemeChange:done',message:'handleThemeChange COMPLETED (after sync attempt)',data:{htmlClass:document.documentElement.className,dataTheme:document.documentElement.getAttribute('data-theme'),bodyBg:document.body.style.backgroundColor,hasDarkClass:document.documentElement.classList.contains('dark')},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H5'})}).catch(()=>{});
@@ -69,7 +70,7 @@ export function GeneralSettings() {
       await updateSetting('currency', currency)
       setHasChanges(false)
     } catch {
-      console.warn('Settings sync failed, changes saved locally')
+      logger.warn('Settings sync failed, changes saved locally', undefined, 'GeneralSettings')
     }
   }
 

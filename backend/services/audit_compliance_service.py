@@ -7,7 +7,7 @@ reporting capabilities for the change management system.
 
 import asyncio
 from datetime import datetime, date, timedelta
-from typing import List, Optional, Dict, Any, Tuple
+from typing import List, Optional, Dict, Any, Tuple, Union
 from uuid import UUID, uuid4
 from decimal import Decimal
 import logging
@@ -149,16 +149,16 @@ class AuditComplianceService:
     
     async def get_latest_audit_hash(
         self,
-        tenant_id: Optional[UUID] = None
+        tenant_id: Optional[Union[UUID, str]] = None
     ) -> Optional[str]:
         """
         Get the hash of the most recent audit event.
-        
+
         This is used to link new events to the existing chain.
-        
+
         Args:
-            tenant_id: Optional tenant ID for multi-tenant isolation
-            
+            tenant_id: Optional tenant ID for multi-tenant isolation (UUID or string e.g. "default")
+
         Returns:
             str: Hash of the latest event, or None if no events exist
         """
@@ -166,8 +166,8 @@ class AuditComplianceService:
             query = self.db.table("audit_logs").select("hash").order(
                 "timestamp", desc=True
             ).limit(1)
-            
-            if tenant_id:
+
+            if tenant_id is not None:
                 query = query.eq("tenant_id", str(tenant_id))
             
             result = query.execute()
@@ -276,7 +276,7 @@ class AuditComplianceService:
     
     async def verify_hash_chain(
         self,
-        tenant_id: Optional[UUID] = None,
+        tenant_id: Optional[Union[UUID, str]] = None,
         start_date: Optional[datetime] = None,
         end_date: Optional[datetime] = None,
         limit: int = 1000
@@ -1024,51 +1024,66 @@ class AuditComplianceService:
             
             frameworks_result = frameworks_query.execute()
             frameworks = frameworks_result.data
+            framework_codes = [f["framework_code"] for f in frameworks]
             
             total_score = 0.0
             framework_count = 0
+            recent_by_code: Dict[str, Dict[str, Any]] = {}
             
-            # Check compliance for each framework
+            # Load all recent compliance checks in one query (when not force_recheck)
+            if not force_recheck and framework_codes:
+                recent_checks = self.db.table("compliance_monitoring").select("*").eq(
+                    "change_request_id", str(change_request_id)
+                ).in_("framework_code", framework_codes).gte(
+                    "checked_at", (datetime.utcnow() - timedelta(hours=24)).isoformat()
+                ).order("checked_at", desc=True).execute()
+                # Keep latest per framework_code
+                for row in (recent_checks.data or []):
+                    code = row.get("framework_code")
+                    if code and code not in recent_by_code:
+                        recent_by_code[code] = row
+            
+            # Use cached results where available
+            frameworks_to_check: List[Dict[str, Any]] = []
             for framework in frameworks:
                 framework_code = framework["framework_code"]
-                
-                # Check if recent compliance check exists and force_recheck is False
-                if not force_recheck:
-                    recent_check = self.db.table("compliance_monitoring").select("*").eq(
-                        "change_request_id", str(change_request_id)
-                    ).eq("framework_code", framework_code).gte(
-                        "checked_at", (datetime.utcnow() - timedelta(hours=24)).isoformat()
-                    ).order("checked_at", desc=True).limit(1).execute()
-                    
-                    if recent_check.data:
-                        # Use existing check results
-                        existing_check = recent_check.data[0]
-                        compliance_results["framework_results"][framework_code] = {
-                            "compliance_status": existing_check["compliance_status"],
-                            "compliance_score": float(existing_check["compliance_score"]),
-                            "checked_at": existing_check["checked_at"],
-                            "findings": existing_check.get("findings"),
-                            "missing_controls": existing_check.get("missing_controls", [])
-                        }
-                        total_score += float(existing_check["compliance_score"])
-                        framework_count += 1
-                        continue
-                
-                # Perform new compliance check
-                framework_result = await self._check_framework_compliance(
-                    change_request_id, framework
+                existing = recent_by_code.get(framework_code)
+                if existing:
+                    compliance_results["framework_results"][framework_code] = {
+                        "compliance_status": existing["compliance_status"],
+                        "compliance_score": float(existing["compliance_score"]),
+                        "checked_at": existing["checked_at"],
+                        "findings": existing.get("findings"),
+                        "missing_controls": existing.get("missing_controls", [])
+                    }
+                    total_score += float(existing["compliance_score"])
+                    framework_count += 1
+                else:
+                    frameworks_to_check.append(framework)
+            
+            # Perform new compliance checks in parallel
+            if frameworks_to_check:
+                new_results = await asyncio.gather(
+                    *[self._check_framework_compliance(change_request_id, f) for f in frameworks_to_check],
+                    return_exceptions=True
                 )
-                
-                compliance_results["framework_results"][framework_code] = framework_result
-                total_score += framework_result["compliance_score"]
-                framework_count += 1
-                
-                # Store compliance check results
-                await self._store_compliance_check(change_request_id, framework_code, framework_result)
-                
-                # Collect violations
-                if framework_result["compliance_score"] < 80.0:  # Threshold for compliance
-                    compliance_results["violations"].extend(framework_result.get("violations", []))
+                for i, fw in enumerate(frameworks_to_check):
+                    code = fw["framework_code"]
+                    res = new_results[i]
+                    if isinstance(res, Exception):
+                        logger.warning("Compliance check failed for %s: %s", code, res)
+                        compliance_results["framework_results"][code] = {
+                            "compliance_status": "error",
+                            "compliance_score": 0.0,
+                            "error": str(res)
+                        }
+                    else:
+                        compliance_results["framework_results"][code] = res
+                        total_score += res["compliance_score"]
+                        await self._store_compliance_check(change_request_id, code, res)
+                        if res.get("compliance_score", 0) < 80.0:
+                            compliance_results["violations"].extend(res.get("violations", []))
+                    framework_count += 1
             
             # Calculate overall compliance score
             if framework_count > 0:

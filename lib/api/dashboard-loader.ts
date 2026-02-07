@@ -10,8 +10,8 @@
 
 import { apiRequest } from './client'
 
-// Cache configuration
-const CACHE_TTL = 30000 // 30 seconds
+// Cache configuration – longer TTL so revisits feel instant
+const CACHE_TTL = 60000 // 60 seconds
 const cache = new Map<string, { data: any; timestamp: number }>()
 
 // In-flight request tracking for deduplication

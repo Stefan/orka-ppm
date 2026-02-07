@@ -4,7 +4,16 @@
  * @jest-environment node
  */
 
-import { createMockNextRequest, parseJsonResponse } from './helpers'
+import { createMockNextRequest, createAuthenticatedRequest, parseJsonResponse } from './helpers'
+
+jest.mock('@/lib/auth/verify-jwt', () => ({
+  enforceSyncAuth: async (_h: string | null, requestUserId: string | null) => {
+    if (!_h || !_h.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Authorization required' }), { status: 401 })
+    }
+    return { userId: requestUserId ?? 'test-user' }
+  },
+}))
 
 const mockSingleResolve = { data: null, error: { code: 'PGRST116' } }
 const mockInsertResolve = { error: null }
@@ -47,10 +56,7 @@ describe('GET /api/sync/preferences', () => {
 
   it('returns 200 with default preferences when no profile (PGRST116)', async () => {
     const { GET } = await import('@/app/api/sync/preferences/route')
-    const request = createMockNextRequest({
-      url: 'http://localhost:3000/api/sync/preferences?userId=user-1',
-      method: 'GET',
-    })
+    const request = createAuthenticatedRequest('http://localhost:3000/api/sync/preferences?userId=user-1', 'test-token', { method: 'GET' })
     const response = await GET(request as any)
     const data = await parseJsonResponse(response)
 
@@ -79,8 +85,7 @@ describe('PUT /api/sync/preferences', () => {
 
   it('returns 200 and success when userId provided and insert succeeds', async () => {
     const { PUT } = await import('@/app/api/sync/preferences/route')
-    const request = createMockNextRequest({
-      url: 'http://localhost:3000/api/sync/preferences',
+    const request = createAuthenticatedRequest('http://localhost:3000/api/sync/preferences', 'test-token', {
       method: 'PUT',
       body: { userId: 'user-2', theme: 'dark', language: 'de' },
     })

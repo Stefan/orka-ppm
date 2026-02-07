@@ -2,6 +2,8 @@
 
 Übersicht aller Router, Abdeckung durch Backend-Tests und Prioritäten für neue Tests.
 
+**API-Auth:** Backend-Endpoints erwarten `Authorization: Bearer <JWT>`. JWT-Signatur wird mit `SUPABASE_JWT_SECRET` verifiziert. Details: [docs/security/env-setup.md](security/env-setup.md), [docs/security/vulnerability-analysis.md](security/vulnerability-analysis.md).
+
 ## Legende
 
 | Abdeckung | Bedeutung |

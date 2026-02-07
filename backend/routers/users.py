@@ -2,13 +2,29 @@
 User management endpoints
 """
 
+import json
+import os
+
 from fastapi import APIRouter, HTTPException, Depends, status, Query, Request
 from uuid import UUID
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from datetime import datetime
 
+# #region agent log
+def _debug_log(msg: str, data: dict, hypothesis_id: str = ""):
+    try:
+        payload = {"message": msg, "data": data, "timestamp": int(datetime.now().timestamp() * 1000)}
+        if hypothesis_id:
+            payload["hypothesisId"] = hypothesis_id
+        log_path = "/Users/stefan/Projects/orka-ppm/.cursor/debug.log"
+        with open(log_path, "a") as f:
+            f.write(json.dumps(payload) + "\n")
+    except Exception:
+        pass
+# #endregion
+
 from auth.rbac import require_permission, Permission, require_admin
-from config.database import supabase
+from config.database import supabase, service_supabase
 from models.users import (
     UserCreateRequest, UserResponse, UserUpdateRequest, UserDeactivationRequest,
     UserListResponse, UserStatus, UserRole, UserRoleResponse, UserInviteRequest
@@ -16,6 +32,31 @@ from models.users import (
 from utils.converters import convert_uuids
 
 router = APIRouter(prefix="/api/admin/users", tags=["users"])
+
+
+def _get_auth_user_by_id(user_id: str) -> Optional[dict]:
+    """Get auth user by id via Auth Admin API. Returns dict with id, email, created_at, updated_at, last_sign_in_at or None if not found."""
+    client = service_supabase if service_supabase else supabase
+    if not client:
+        return None
+    try:
+        resp = client.auth.admin.get_user_by_id(user_id)
+        user = getattr(resp, "user", None) if resp else None
+        if not user and resp and hasattr(resp, "id"):
+            user = resp
+        if not user:
+            return None
+        return {
+            "id": str(getattr(user, "id", "")),
+            "email": getattr(user, "email", "") or "",
+            "created_at": getattr(user, "created_at", None),
+            "updated_at": getattr(user, "updated_at", None),
+            "last_sign_in_at": getattr(user, "last_sign_in_at", None),
+        }
+    except Exception as e:
+        print(f"Auth admin get_user_by_id error: {e}")
+        return None
+
 
 @router.get("/", response_model=UserListResponse)
 async def list_users(
@@ -55,22 +96,36 @@ async def list_users(
             
             # Call the RPC function to get joined user data
             result = supabase.rpc("get_users_with_profiles", rpc_params).execute()
-            
+            # #region agent log
+            _debug_log("list_users_rpc_result", {"has_data": bool(result.data), "data_keys": list((result.data or {}).keys()) if isinstance(result.data, dict) else "not_dict"}, "A")
+            # #endregion
             if result.data:
                 users_data = result.data.get("users", [])
                 total_count = result.data.get("total_count", 0)
-                
+                user_ids = []
+                for row in users_data:
+                    auth_data = row.get("auth", {}) or {}
+                    uid = auth_data.get("id")
+                    if uid:
+                        user_ids.append(str(uid))
+                # #region agent log
+                _debug_log("list_users_rpc_user_ids", {"path": "rpc", "user_ids_len": len(user_ids), "user_ids_sample": user_ids[:3], "first_row_keys": list((users_data[0] or {}).keys()) if users_data else []}, "A")
+                # #endregion
+                roles_by_id = _fetch_roles_for_user_ids(user_ids)
+                # #region agent log
+                _debug_log("list_users_roles_by_id", {"path": "rpc", "roles_by_id_keys": list(roles_by_id.keys()), "sample": {k: roles_by_id[k] for k in list(roles_by_id.keys())[:2]}, "first_user_roles": roles_by_id.get(str(user_ids[0]), []) if user_ids else None}, "B")
+                # #endregion
                 users = []
                 for row in users_data:
-                    # Handle missing profile gracefully
                     profile_data = row.get("profile", {}) or {}
                     auth_data = row.get("auth", {}) or {}
-                    
-                    user_response = create_user_response(auth_data, profile_data)
+                    uid = auth_data.get("id", "")
+                    user_response = create_user_response(
+                        auth_data, profile_data,
+                        roles=roles_by_id.get(str(uid), []) or None
+                    )
                     users.append(user_response)
-                
                 total_pages = (total_count + per_page - 1) // per_page
-                
                 return UserListResponse(
                     users=users,
                     total_count=total_count,
@@ -81,7 +136,9 @@ async def list_users(
             
         except Exception as rpc_error:
             print(f"RPC function failed, falling back to manual join: {rpc_error}")
-            
+            # #region agent log
+            _debug_log("list_users_rpc_failed", {"path": "rpc_failed", "error": str(rpc_error)}, "A")
+            # #endregion
             # Fallback to manual join if RPC function doesn't exist
             result = await _manual_join_users_and_profiles(page, per_page, search, status, role)
             print(f"Manual join returned {result.total_count} users")
@@ -118,21 +175,18 @@ async def _manual_join_users_and_profiles(
         auth_users = auth_response if isinstance(auth_response, list) else []
         print(f"[DEBUG] Found {len(auth_users)} auth users")
         
-        # Get all user_profiles
+        # Get all user_profiles (service role so RLS does not hide other users' profiles)
         print("[DEBUG] Fetching user profiles...")
-        profile_query = supabase.table("user_profiles").select("*")
-        profile_result = profile_query.execute()
+        profile_client = service_supabase or supabase
+        profile_result = profile_client.table("user_profiles").select("*").execute()
         profiles = {p["user_id"]: p for p in (profile_result.data or [])}
         print(f"[DEBUG] Found {len(profiles)} user profiles")
         
-        # Join the data
-        joined_users = []
+        # Join the data: collect (auth_dict, profile, user_id) for users that pass filters
+        joined = []
         for auth_user in auth_users:
-            # auth_user is a User object from Supabase
             user_id = str(auth_user.id)
             profile = profiles.get(user_id, {})
-            
-            # Convert auth_user to dict
             auth_dict = {
                 "id": user_id,
                 "email": auth_user.email,
@@ -140,13 +194,9 @@ async def _manual_join_users_and_profiles(
                 "updated_at": auth_user.updated_at,
                 "last_sign_in_at": getattr(auth_user, 'last_sign_in_at', None)
             }
-            
-            # Apply email search filter
             if search and search.strip():
                 if search.strip().lower() not in (auth_user.email or "").lower():
                     continue
-            
-            # Apply status filter
             if status:
                 if status == UserStatus.active and not profile.get("is_active", True):
                     continue
@@ -154,21 +204,29 @@ async def _manual_join_users_and_profiles(
                     continue
                 elif status == UserStatus.deactivated and not profile.get("deactivated_at"):
                     continue
-            
-            # Apply role filter
             if role and profile.get("role", "user") != role.value:
                 continue
-            
-            user_response = create_user_response(auth_dict, profile)
-            joined_users.append(user_response)
-        
+            joined.append((auth_dict, profile, user_id))
+        # Fetch roles from user_roles for all matched user IDs
+        user_ids = [uid for (_, _, uid) in joined]
+        # #region agent log
+        _debug_log("manual_join_user_ids", {"path": "manual", "user_ids_len": len(user_ids), "user_ids_sample": user_ids[:3]}, "D")
+        # #endregion
+        roles_by_id = _fetch_roles_for_user_ids(user_ids)
+        # #region agent log
+        _debug_log("manual_join_roles_by_id", {"path": "manual", "roles_by_id_keys": list(roles_by_id.keys()), "first_user_roles": roles_by_id.get(user_ids[0], []) if user_ids else None}, "B")
+        # #endregion
+        # Build user responses with roles
+        joined_users = [
+            create_user_response(auth_dict, profile, roles=roles_by_id.get(uid, []) or None)
+            for auth_dict, profile, uid in joined
+        ]
         # Apply pagination
         total_count = len(joined_users)
         total_pages = (total_count + per_page - 1) // per_page
         start_idx = (page - 1) * per_page
         end_idx = start_idx + per_page
         paginated_users = joined_users[start_idx:end_idx]
-        
         return UserListResponse(
             users=paginated_users,
             total_count=total_count,
@@ -225,30 +283,30 @@ async def invite_user(
         except Exception as e:
             print(f"Error checking existing users: {e}")
         
-        # Generate a temporary password
-        import secrets
-        import string
-        temp_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(16))
-        
-        # Create user in Supabase Auth using admin API
+        # Create user and send invite email via Supabase Auth (invite_user_by_email sends the email)
         try:
-            auth_user = service_supabase.auth.admin.create_user({
-                "email": invite_data.email,
-                "password": temp_password,
-                "email_confirm": True,  # Auto-confirm email for invited users
-                "user_metadata": {
+            invite_options = {
+                "data": {
                     "invited_by": current_user.get("user_id"),
-                    "invited_at": datetime.now().isoformat()
+                    "invited_at": datetime.now().isoformat(),
+                    "role": invite_data.role.value if hasattr(invite_data.role, "value") else invite_data.role,
                 }
-            })
-            
-            user_id = str(auth_user.user.id)
-            
+            }
+            auth_response = service_supabase.auth.admin.invite_user_by_email(
+                invite_data.email,
+                invite_options
+            )
+            user = getattr(auth_response, "user", None)
+            if not user or not getattr(user, "id", None):
+                raise HTTPException(status_code=500, detail="Invite succeeded but no user id returned")
+            user_id = str(user.id)
+        except HTTPException:
+            raise
         except Exception as auth_error:
-            print(f"Error creating auth user: {auth_error}")
+            print(f"Error inviting user by email: {auth_error}")
             raise HTTPException(status_code=500, detail=f"Failed to create user account: {str(auth_error)}")
         
-        # Create user profile
+        # Create user profile (service role so RLS allows admin to insert for another user)
         try:
             user_profile_data = {
                 "user_id": user_id,
@@ -256,8 +314,8 @@ async def invite_user(
                 "is_active": True,
                 "created_at": datetime.now().isoformat()
             }
-            
-            profile_response = supabase.table("user_profiles").insert(user_profile_data).execute()
+            profile_client = service_supabase if service_supabase else supabase
+            profile_response = profile_client.table("user_profiles").insert(user_profile_data).execute()
             
             if not profile_response.data:
                 # Rollback: delete auth user if profile creation fails
@@ -287,9 +345,6 @@ async def invite_user(
             "invite_user",
             {"email": invite_data.email, "role": invite_data.role.value if hasattr(invite_data.role, 'value') else invite_data.role}
         )
-        
-        # In a production system, you would send an invitation email here
-        # For now, we'll just return the user info
         
         return UserResponse(
             id=user_id,
@@ -330,14 +385,14 @@ async def create_user(
             raise HTTPException(status_code=400, detail="User with this email already exists")
         
         # Create user in Supabase Auth (this would typically be done via admin API)
-        # For now, we'll create a placeholder profile
+        # For now, we'll create a placeholder profile (service role so RLS allows insert)
         user_profile_data = {
             "user_id": str(UUID()),  # This should be the actual auth user ID
             "role": user_data.role.value,
             "is_active": True
         }
-        
-        profile_response = supabase.table("user_profiles").insert(user_profile_data).execute()
+        profile_client = service_supabase if service_supabase else supabase
+        profile_response = profile_client.table("user_profiles").insert(user_profile_data).execute()
         
         if not profile_response.data:
             raise HTTPException(status_code=400, detail="Failed to create user profile")
@@ -407,15 +462,14 @@ async def update_user(
         if supabase is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
-        # First check if auth user exists
-        auth_response = supabase.table("auth.users").select("*").eq("id", str(user_id)).execute()
-        if not auth_response.data:
+        # First check if auth user exists (Auth Admin API; no PostgREST on auth.users)
+        auth_user = _get_auth_user_by_id(str(user_id))
+        if not auth_user:
             raise HTTPException(status_code=404, detail="User not found")
         
-        auth_user = auth_response.data[0]
-        
-        # Get existing user profile or create default values
-        profile_response = supabase.table("user_profiles").select("*").eq("user_id", str(user_id)).execute()
+        # Use service role for user_profiles so RLS allows admin to update other users
+        profile_client = service_supabase if service_supabase else supabase
+        profile_response = profile_client.table("user_profiles").select("*").eq("user_id", str(user_id)).execute()
         
         if profile_response.data:
             # Profile exists, update it
@@ -439,7 +493,7 @@ async def update_user(
                     update_data["deactivation_reason"] = None
             
             if update_data:
-                update_response = supabase.table("user_profiles").update(update_data).eq("user_id", str(user_id)).execute()
+                update_response = profile_client.table("user_profiles").update(update_data).eq("user_id", str(user_id)).execute()
                 if not update_response.data:
                     raise HTTPException(status_code=400, detail="Failed to update user profile")
                 
@@ -459,7 +513,7 @@ async def update_user(
                 profile_data["deactivated_by"] = current_user.get("user_id")
                 profile_data["deactivation_reason"] = user_data.deactivation_reason
             
-            create_response = supabase.table("user_profiles").insert(profile_data).execute()
+            create_response = profile_client.table("user_profiles").insert(profile_data).execute()
             if not create_response.data:
                 raise HTTPException(status_code=400, detail="Failed to create user profile")
             
@@ -491,24 +545,36 @@ async def delete_user(
         if supabase is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
-        # Check if auth user exists
-        auth_response = supabase.table("auth.users").select("*").eq("id", str(user_id)).execute()
-        if not auth_response.data:
+        # Check if auth user exists (Auth Admin API)
+        auth_user = _get_auth_user_by_id(str(user_id))
+        if not auth_user:
             raise HTTPException(status_code=404, detail="User not found")
         
         # Prevent self-deletion
         if str(user_id) == current_user.get("user_id"):
             raise HTTPException(status_code=400, detail="Cannot delete your own account")
         
-        # Check if profile exists and delete it if it does
-        profile_response = supabase.table("user_profiles").select("*").eq("user_id", str(user_id)).execute()
+        # Use service role for user_profiles so RLS allows admin to delete other users' profiles
+        profile_client = service_supabase if service_supabase else supabase
+        profile_response = profile_client.table("user_profiles").select("*").eq("user_id", str(user_id)).execute()
         profile_existed = bool(profile_response.data)
-        
         if profile_existed:
-            supabase.table("user_profiles").delete().eq("user_id", str(user_id)).execute()
-        
-        # Note: In a real implementation, you would also delete from auth.users using Supabase Auth admin API
-        # For now, we only delete the profile as auth.users deletion requires special permissions
+            profile_client.table("user_profiles").delete().eq("user_id", str(user_id)).execute()
+
+        # Remove role assignments so auth delete can succeed (user_roles may reference auth.users)
+        if service_supabase:
+            try:
+                service_supabase.table("user_roles").delete().eq("user_id", str(user_id)).execute()
+            except Exception:
+                pass
+
+        # Delete from auth so user disappears from admin list (list is built from auth.admin.list_users())
+        if service_supabase:
+            try:
+                service_supabase.auth.admin.delete_user(str(user_id))
+            except Exception as auth_del_err:
+                print(f"Auth delete user failed (profile may already be removed): {auth_del_err}")
+                # Still return 204; profile/roles are cleaned; auth may need manual cleanup
         
         # Log admin action
         await log_admin_action(
@@ -517,7 +583,6 @@ async def delete_user(
             "delete_user",
             {"reason": "Admin deletion", "profile_existed": profile_existed}
         )
-        
         return None
         
     except HTTPException:
@@ -541,15 +606,14 @@ async def deactivate_user(
         if str(user_id) == current_user.get("user_id"):
             raise HTTPException(status_code=400, detail="Cannot deactivate your own account")
         
-        # Check if auth user exists
-        auth_response = supabase.table("auth.users").select("*").eq("id", str(user_id)).execute()
-        if not auth_response.data:
+        # Check if auth user exists (Auth Admin API)
+        auth_user = _get_auth_user_by_id(str(user_id))
+        if not auth_user:
             raise HTTPException(status_code=404, detail="User not found")
         
-        auth_user = auth_response.data[0]
-        
-        # Check if profile exists
-        profile_response = supabase.table("user_profiles").select("*").eq("user_id", str(user_id)).execute()
+        # Use service role for user_profiles so RLS allows admin to update/insert other users' profiles
+        profile_client = service_supabase if service_supabase else supabase
+        profile_response = profile_client.table("user_profiles").select("*").eq("user_id", str(user_id)).execute()
         
         update_data = {
             "is_active": False,
@@ -560,7 +624,7 @@ async def deactivate_user(
         
         if profile_response.data:
             # Profile exists, update it
-            response = supabase.table("user_profiles").update(update_data).eq("user_id", str(user_id)).execute()
+            response = profile_client.table("user_profiles").update(update_data).eq("user_id", str(user_id)).execute()
             if not response.data:
                 raise HTTPException(status_code=400, detail="Failed to deactivate user")
             updated_profile = response.data[0]
@@ -572,7 +636,7 @@ async def deactivate_user(
                 **update_data
             }
             
-            response = supabase.table("user_profiles").insert(profile_data).execute()
+            response = profile_client.table("user_profiles").insert(profile_data).execute()
             if not response.data:
                 raise HTTPException(status_code=400, detail="Failed to create and deactivate user profile")
             updated_profile = response.data[0]
@@ -617,20 +681,18 @@ async def log_admin_action(admin_user_id: str, target_user_id: str, action: str,
 
 
 async def get_user_with_profile(user_id: str) -> Optional[Dict[str, Any]]:
-    """Get complete user information from both auth.users and user_profiles, handling missing profiles gracefully"""
+    """Get complete user information from Auth Admin API and user_profiles, handling missing profiles gracefully"""
     try:
         if supabase is None:
             return None
         
-        # Get auth user data
-        auth_response = supabase.table("auth.users").select("*").eq("id", user_id).execute()
-        if not auth_response.data:
+        auth_user = _get_auth_user_by_id(user_id)
+        if not auth_user:
             return None
         
-        auth_user = auth_response.data[0]
-        
-        # Get profile data (may not exist)
-        profile_response = supabase.table("user_profiles").select("*").eq("user_id", user_id).execute()
+        # Use service role so we can read any user's profile (e.g. admin viewing another user)
+        profile_client = service_supabase if service_supabase else supabase
+        profile_response = profile_client.table("user_profiles").select("*").eq("user_id", user_id).execute()
         profile = profile_response.data[0] if profile_response.data else {}
         
         return {
@@ -644,7 +706,45 @@ async def get_user_with_profile(user_id: str) -> Optional[Dict[str, Any]]:
         return None
 
 
-def create_user_response(auth_data: dict, profile_data: dict) -> UserResponse:
+def _fetch_roles_for_user_ids(user_ids: List[str]) -> Dict[str, List[str]]:
+    """Fetch role names from user_roles for given user IDs. Uses service role so RLS does not hide rows."""
+    if not user_ids:
+        return {}
+    try:
+        from config.database import service_supabase
+        client = service_supabase if service_supabase else supabase
+        # #region agent log
+        _debug_log("fetch_roles_entry", {"user_ids_len": len(user_ids), "has_service_supabase": service_supabase is not None, "has_client": client is not None}, "B")
+        # #endregion
+        if not client:
+            return {}
+        # Select role names via join. Do not filter by is_active - column may not exist (migration 030).
+        response = client.table("user_roles").select(
+            "user_id, roles(name)"
+        ).in_("user_id", user_ids).execute()
+        out = {uid: [] for uid in user_ids}
+        for row in (response.data or []):
+            uid = row.get("user_id")
+            if uid is None:
+                continue
+            uid = str(uid)
+            role_obj = row.get("roles")
+            name = role_obj.get("name") if isinstance(role_obj, dict) else None
+            if name and uid in out:
+                out[uid].append(name)
+        # #region agent log
+        _debug_log("fetch_roles_ok", {"row_count": len(response.data or []), "out_keys_with_roles": [k for k, v in out.items() if v]}, "E")
+        # #endregion
+        return out
+    except Exception as e:
+        # #region agent log
+        _debug_log("fetch_roles_error", {"error": str(e)}, "B")
+        # #endregion
+        print(f"Error fetching roles for user list: {e}")
+        return {}
+
+
+def create_user_response(auth_data: dict, profile_data: dict, roles: Optional[List[str]] = None) -> UserResponse:
     """Create a consistent UserResponse object from auth and profile data, ensuring backward compatibility"""
     # Convert datetime objects to ISO strings
     last_login = auth_data.get("last_sign_in_at")
@@ -665,12 +765,14 @@ def create_user_response(auth_data: dict, profile_data: dict) -> UserResponse:
     elif updated_at and not isinstance(updated_at, str):
         updated_at = str(updated_at)
     
+    role_from_profile = profile_data.get("role", "user")
     return UserResponse(
         id=auth_data.get("id", ""),
         email=auth_data.get("email", f"user{str(auth_data.get('id', ''))[:8]}@example.com"),
-        role=profile_data.get("role", "user"),  # Default role for users without profiles
+        role=role_from_profile,
+        roles=roles if roles is not None else None,
         status=_determine_user_status(profile_data),
-        is_active=profile_data.get("is_active", True),  # Default to active for users without profiles
+        is_active=profile_data.get("is_active", True),
         last_login=last_login,
         created_at=created_at,
         updated_at=updated_at,
@@ -737,29 +839,8 @@ async def assign_role_to_user(
         print(f"Assign role error: {e}")
         raise HTTPException(status_code=400, detail=f"Failed to assign role: {str(e)}")
 
-@router.delete("/{user_id}/roles/{role_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def remove_role_from_user(
-    user_id: UUID, 
-    role_id: UUID, 
-    current_user = Depends(require_permission(Permission.user_manage))
-):
-    """Remove a role from a user"""
-    try:
-        if supabase is None:
-            raise HTTPException(status_code=503, detail="Database service unavailable")
-        
-        response = supabase.table("user_roles").delete().eq("user_id", str(user_id)).eq("role_id", str(role_id)).execute()
-        
-        if not response.data:
-            raise HTTPException(status_code=404, detail="Role assignment not found")
-        
-        return None
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"Remove role error: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to remove role: {str(e)}")
+# DELETE /users/{user_id}/roles/{role} is implemented in admin router (role = role name string).
+# A route here with role_id: UUID would match the same path and fail when frontend sends role name.
 
 @router.get("/{user_id}/roles")
 async def get_user_roles(user_id: UUID, current_user = Depends(require_permission(Permission.user_manage))):

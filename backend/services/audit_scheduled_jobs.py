@@ -21,6 +21,7 @@ from services.audit_integration_hub import AuditIntegrationHub
 from services.audit_rag_agent import AuditRAGAgent
 from services.audit_ml_service import AuditMLService
 from services.audit_export_service import AuditExportService
+from services.audit_compliance_service import AuditComplianceService
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +67,11 @@ class AuditScheduledJobs:
             supabase_client=self.supabase,
             openai_api_key=self.openai_api_key
         )
+        try:
+            self.compliance_service = AuditComplianceService()
+        except Exception as e:
+            logger.warning("Audit compliance service not available for scheduled jobs: %s", e)
+            self.compliance_service = None
         
         logger.info("AuditScheduledJobs initialized")
     
@@ -124,6 +130,38 @@ class AuditScheduledJobs:
         except Exception as e:
             logger.error(f"Anomaly detection job failed: {str(e)}")
             raise
+    
+    async def run_hash_chain_verification(self, tenant_id: Optional[str] = None):
+        """
+        Scheduled job for audit log hash chain integrity verification (enterprise roadmap).
+        
+        Verifies that each event's previous_hash matches the previous event's hash.
+        On break, logs critical alert and stores in audit_integrity_alerts.
+        Run daily (e.g. via scheduler).
+        """
+        if not self.compliance_service:
+            logger.warning("Hash chain verification skipped: compliance service unavailable")
+            return
+        try:
+            logger.info("Starting scheduled hash chain verification job")
+            result = await self.compliance_service.verify_hash_chain(
+                tenant_id=tenant_id,
+                limit=10000
+            )
+            if result.get("chain_valid") is False:
+                logger.critical(
+                    "Audit hash chain integrity violation: break at event %s (position %s)",
+                    result.get("broken_event_id"),
+                    result.get("break_point")
+                )
+            else:
+                logger.info(
+                    "Hash chain verification completed: %s events, valid=%s",
+                    result.get("total_events", 0),
+                    result.get("chain_valid")
+                )
+        except Exception as e:
+            logger.error("Hash chain verification job failed: %s", e, exc_info=True)
     
     async def _send_anomaly_notifications(self, anomaly):
         """

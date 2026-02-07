@@ -12,7 +12,7 @@ from .base import BaseResponse
 class ResourceCreate(BaseModel):
     name: str
     email: str
-    role: str
+    role: Optional[str] = ""  # optional in UI; default empty
     capacity: int = 40  # hours per week
     availability: int = 100  # percentage
     hourly_rate: Optional[float] = None

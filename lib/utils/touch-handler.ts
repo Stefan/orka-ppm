@@ -4,7 +4,7 @@
  * Implements Requirements 6.1, 6.2, 6.3, 6.4, 6.5
  */
 
-import { detectBrowser, BrowserInfo } from './browser-detection'
+import { detectBrowser, BrowserInfo } from './browser/browser-detection'
 
 export interface TouchOptions {
   /** Prevent default browser behaviors that conflict with app functionality */

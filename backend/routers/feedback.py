@@ -407,12 +407,10 @@ async def get_user_notifications(
         
         user_id = current_user.get("user_id")
         query = supabase.table("notifications").select("*").eq("user_id", user_id)
-        
         if is_read is not None:
             query = query.eq("is_read", is_read)
-        
         response = query.order("created_at", desc=True).range(offset, offset + limit - 1).execute()
-        return convert_uuids(response.data)
+        return convert_uuids(response.data or [])
         
     except Exception as e:
         print(f"Get user notifications error: {e}")

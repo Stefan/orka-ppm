@@ -54,6 +54,7 @@ class UserUpdateRequest(BaseModel):
 class UserResponse(BaseResponse):
     email: str
     role: str
+    roles: Optional[List[str]] = None  # From user_roles table; preferred over role for display
     status: str
     is_active: bool
     last_login: Optional[str]

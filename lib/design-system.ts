@@ -311,8 +311,8 @@ export function motionReduce(staticClass: string): string {
   return `motion-reduce:${staticClass}`
 }
 
-// Re-export from utils/design-system for backward compatibility
-export { componentVariants, touchTargets, atomicPatterns } from './utils/design-system'
+// Re-export from utils design system for backward compatibility
+export { componentVariants, touchTargets, atomicPatterns } from './utils/design/design-system'
 
 export default {
   cn,

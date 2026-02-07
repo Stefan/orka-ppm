@@ -10,7 +10,6 @@ import {
 } from '../types'
 import { 
   fetchProjects, 
-  fetchBudgetVariance, 
   fetchFinancialAlerts, 
   fetchComprehensiveReport 
 } from '../utils/api'
@@ -81,35 +80,25 @@ export function useFinancialData({ accessToken, selectedCurrency }: UseFinancial
     }
   }, [accessToken])
 
-  const fetchAllBudgetVariances = useCallback(async (projectsList: Project[]) => {
-    if (!accessToken || !projectsList.length) {
-      // Use mock data when not authenticated
-      const mockVariances: BudgetVariance[] = projectsList.map(project => ({
+  /** Derive variances from project list (budget/actual_cost). Avoids N per-project API calls. */
+  const variancesFromProjects = useCallback((projectsList: Project[]): BudgetVariance[] => {
+    return projectsList.map((project) => {
+      const planned = project.budget ?? 0
+      const actual = project.actual_cost ?? 0
+      const varianceAmount = actual - planned
+      const variancePercentage = planned !== 0 ? (varianceAmount / planned) * 100 : 0
+      return {
         project_id: project.id,
-        total_planned: project.budget || 0,
-        total_actual: project.actual_cost || 0,
-        variance_amount: (project.actual_cost || 0) - (project.budget || 0),
-        variance_percentage: project.budget ? (((project.actual_cost || 0) - project.budget) / project.budget) * 100 : 0,
+        total_planned: planned,
+        total_actual: actual,
+        variance_amount: varianceAmount,
+        variance_percentage: variancePercentage,
         currency: selectedCurrency,
         categories: [],
         status: 'active'
-      }))
-      setBudgetVariances(mockVariances)
-      return mockVariances
-    }
-
-    const variances: BudgetVariance[] = []
-
-    for (const project of projectsList) {
-      const variance = await fetchBudgetVariance(project.id, selectedCurrency, accessToken)
-      if (variance) {
-        variances.push(variance)
       }
-    }
-
-    setBudgetVariances(variances)
-    return variances
-  }, [accessToken, selectedCurrency])
+    })
+  }, [selectedCurrency])
 
   const fetchAllFinancialAlerts = useCallback(async () => {
     if (!accessToken) {
@@ -164,15 +153,16 @@ export function useFinancialData({ accessToken, selectedCurrency }: UseFinancial
     if (!accessToken) return
     
     try {
-      // Fetch commitments and actuals to calculate real cost analysis
+      // Fetch commitments and actuals (capped for faster cost analysis; we only need top 8 categories)
+      const limit = 2000
       const [commitmentsRes, actualsRes] = await Promise.all([
-        fetch(getApiUrl('/csv-import/commitments?limit=10000'), {
+        fetch(getApiUrl(`/csv-import/commitments?limit=${limit}`), {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           }
         }),
-        fetch(getApiUrl('/csv-import/actuals?limit=10000'), {
+        fetch(getApiUrl(`/csv-import/actuals?limit=${limit}`), {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
@@ -281,36 +271,39 @@ export function useFinancialData({ accessToken, selectedCurrency }: UseFinancial
     setError(null)
     
     try {
-      // Fetch projects first
-      const projectsData = await fetchAllProjects()
+      // Phase 1: projects + alerts in parallel; variances derived from projects (no N variance API calls)
+      const [projectsData] = await Promise.all([
+        fetchAllProjects(),
+        fetchAllFinancialAlerts()
+      ])
+      const list = projectsData || []
+      const variancesData = variancesFromProjects(list)
+      setBudgetVariances(variancesData)
       
-      // Then fetch budget variances
-      const variancesData = await fetchAllBudgetVariances(projectsData || [])
-      
-      // Calculate metrics and performance
-      if (variancesData) {
+      if (variancesData.length) {
         calculateMetrics(variancesData)
         calculatePerformance(variancesData)
       }
-      
-      // Fetch other data in parallel
-      await Promise.all([
-        fetchAllFinancialAlerts(),
+
+      setLoading(false)
+
+      // Phase 2: load report and cost analysis in background (don't block UI)
+      Promise.all([
         fetchAllComprehensiveReport(),
         fetchCostAnalysisData()
-      ])
+      ]).catch((err) => console.error('Financials background load failed:', err))
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Unknown error')
     } finally {
       setLoading(false)
     }
   }, [
-    accessToken, 
-    fetchAllProjects, 
-    fetchAllBudgetVariances, 
-    fetchAllFinancialAlerts, 
-    fetchAllComprehensiveReport, 
+    accessToken,
+    fetchAllProjects,
+    fetchAllFinancialAlerts,
+    fetchAllComprehensiveReport,
     fetchCostAnalysisData,
+    variancesFromProjects,
     calculateMetrics,
     calculatePerformance
   ])

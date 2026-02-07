@@ -198,7 +198,7 @@ async def list_financial_entries(
         return convert_uuids(response.data)
         
     except Exception as e:
-        print(f"List financial entries error: {e}")
+        logger.exception("List financial entries error: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to get financial entries: {str(e)}")
 
 @router.get("/budget-alerts")
@@ -214,29 +214,40 @@ async def get_financial_tracking_budget_alerts(
         # Get all projects with budget information
         projects_response = supabase.table("projects").select("id, name, budget").execute()
         projects = projects_response.data or []
-        
+        if not projects:
+            return {
+                "threshold_percentage": threshold_percentage,
+                "total_alerts": 0,
+                "alerts": [],
+                "generated_at": datetime.now().isoformat()
+            }
+
+        project_ids = [p["id"] for p in projects]
+        # Single query for all spending (avoids N+1)
+        expenses_response = supabase.table("financial_tracking").select("project_id, actual_amount").in_("project_id", project_ids).execute()
+        expenses = expenses_response.data or []
+        spent_by_project: dict = {}
+        for e in expenses:
+            pid = e.get("project_id")
+            if pid is None:
+                continue
+            amt = _to_float(e.get("actual_amount"))
+            if amt <= 0:
+                continue
+            spent_by_project[pid] = spent_by_project.get(pid, 0.0) + amt
+
         alerts = []
-        
         for project in projects:
-            project_id = project['id']
-            budget = _to_float(project.get('budget'))
+            project_id = project["id"]
+            budget = _to_float(project.get("budget"))
             if budget <= 0:
                 continue
-
-            # Calculate total spent for this project
-            # Use actual_amount for expenses (positive values represent spending)
-            expenses_response = supabase.table("financial_tracking").select("actual_amount").eq("project_id", project_id).execute()
-            total_spent = sum(
-                _to_float(expense.get('actual_amount'))
-                for expense in (expenses_response.data or [])
-                if _to_float(expense.get('actual_amount')) > 0
-            )
+            total_spent = spent_by_project.get(project_id, 0.0)
             current_percentage = (total_spent / budget * 100) if budget > 0 else 0
-            
             if current_percentage >= threshold_percentage:
                 alerts.append({
                     "project_id": project_id,
-                    "project_name": project['name'],
+                    "project_name": project["name"],
                     "budget_amount": budget,
                     "spent_amount": total_spent,
                     "current_percentage": round(current_percentage, 2),
@@ -244,7 +255,7 @@ async def get_financial_tracking_budget_alerts(
                     "variance": total_spent - budget,
                     "alert_level": "critical" if current_percentage >= 100 else "warning"
                 })
-        
+
         return {
             "threshold_percentage": threshold_percentage,
             "total_alerts": len(alerts),
@@ -253,7 +264,7 @@ async def get_financial_tracking_budget_alerts(
         }
         
     except Exception as e:
-        print(f"Get budget alerts error: {e}")
+        logger.exception("Get budget alerts error: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to get budget alerts: {str(e)}")
 
 @router.get("/comprehensive-report")
@@ -278,15 +289,16 @@ async def get_comprehensive_financial_report(
         projects_response = projects_query.execute()
         projects = projects_response.data or []
         
-        # Build financial entries query
-        financial_query = supabase.table("financial_tracking").select("*")
+        # Build financial entries query (limit when no project filter to avoid huge pull)
+        financial_query = supabase.table("financial_tracking").select("id, project_id, amount, transaction_type, date_incurred")
         if project_id:
             financial_query = financial_query.eq("project_id", str(project_id))
         if start_date:
             financial_query = financial_query.gte("date_incurred", start_date.isoformat())
         if end_date:
             financial_query = financial_query.lte("date_incurred", end_date.isoformat())
-        
+        if not project_id:
+            financial_query = financial_query.limit(50000)
         financial_response = financial_query.execute()
         financial_entries = financial_response.data or []
 
@@ -330,10 +342,18 @@ async def get_comprehensive_financial_report(
                 "variance_trend": "stable"  # Would analyze variance over time
             }
         
-        # Get active alerts
-        alerts_response = supabase.table("budget_alerts").select("*").eq("is_resolved", False).execute()
-        active_alerts = alerts_response.data or []
-        
+        # Get active alerts (optional table; do not fail report on missing table)
+        active_alerts = []
+        try:
+            alerts_response = supabase.table("budget_alerts").select("*").eq("is_resolved", False).execute()
+            active_alerts = alerts_response.data or []
+        except Exception as alert_err:
+            logger.debug("Budget alerts table unavailable or error: %s", alert_err)
+        try:
+            alerts_out = convert_uuids(active_alerts) if active_alerts else []
+        except Exception:
+            alerts_out = active_alerts
+
         response_data = {
             "summary": {
                 "total_budget": total_budget,
@@ -346,7 +366,7 @@ async def get_comprehensive_financial_report(
                 "currency": currency
             },
             "projects": project_summaries,
-            "alerts": convert_uuids(active_alerts),
+            "alerts": alerts_out,
             "generated_at": datetime.now().isoformat(),
             "filters": {
                 "project_id": str(project_id) if project_id else None,
@@ -363,7 +383,7 @@ async def get_comprehensive_financial_report(
         return response_data
         
     except Exception as e:
-        print(f"Generate financial report error: {e}")
+        logger.exception("Generate financial report error: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to generate financial report: {str(e)}")
 
 # Budget Alert Endpoints
@@ -401,7 +421,7 @@ async def create_budget_alert_rule(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Create budget alert rule error: {e}")
+        logger.exception("Create budget alert rule error: %s", e)
         raise HTTPException(status_code=400, detail=f"Failed to create budget alert rule: {str(e)}")
 
 @budget_alerts_router.get("/rules/")
@@ -427,7 +447,7 @@ async def list_budget_alert_rules(
         return convert_uuids(response.data)
         
     except Exception as e:
-        print(f"List budget alert rules error: {e}")
+        logger.exception("List budget alert rules error: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to get budget alert rules: {str(e)}")
 
 @budget_alerts_router.get("/rules/{rule_id}", response_model=BudgetAlertRuleResponse)
@@ -447,7 +467,7 @@ async def get_budget_alert_rule(rule_id: UUID, current_user = Depends(get_curren
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Get budget alert rule error: {e}")
+        logger.exception("Get budget alert rule error: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to get budget alert rule: {str(e)}")
 
 @budget_alerts_router.put("/rules/{rule_id}", response_model=BudgetAlertRuleResponse)
@@ -479,7 +499,7 @@ async def update_budget_alert_rule(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Update budget alert rule error: {e}")
+        logger.exception("Update budget alert rule error: %s", e)
         raise HTTPException(status_code=400, detail=f"Failed to update budget alert rule: {str(e)}")
 
 @budget_alerts_router.delete("/rules/{rule_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -499,7 +519,7 @@ async def delete_budget_alert_rule(rule_id: UUID, current_user = Depends(get_cur
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Delete budget alert rule error: {e}")
+        logger.exception("Delete budget alert rule error: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to delete budget alert rule: {str(e)}")
 
 @budget_alerts_router.get("/")
@@ -525,7 +545,7 @@ async def list_budget_alerts(
         return convert_uuids(response.data)
         
     except Exception as e:
-        print(f"List budget alerts error: {e}")
+        logger.exception("List budget alerts error: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to get budget alerts: {str(e)}")
 
 @budget_alerts_router.post("/monitor")
@@ -537,7 +557,7 @@ async def monitor_project_budgets(current_user = Depends(get_current_user)):
         return {"message": "Budget monitoring triggered successfully", "timestamp": datetime.now().isoformat()}
         
     except Exception as e:
-        print(f"Budget monitoring error: {e}")
+        logger.exception("Budget monitoring error: %s", e)
         raise HTTPException(status_code=500, detail=f"Budget monitoring failed: {str(e)}")
 
 @budget_alerts_router.post("/{alert_id}/resolve")
@@ -563,7 +583,7 @@ async def resolve_budget_alert(alert_id: UUID, current_user = Depends(get_curren
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Resolve budget alert error: {e}")
+        logger.exception("Resolve budget alert error: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to resolve budget alert: {str(e)}")
 
 @budget_alerts_router.get("/summary")
@@ -599,7 +619,7 @@ async def get_budget_alerts_summary(current_user = Depends(get_current_user)):
         }
         
     except Exception as e:
-        print(f"Get budget alerts summary error: {e}")
+        logger.exception("Get budget alerts summary error: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to get budget alerts summary: {str(e)}")
 
 # Include the budget alerts router in the main router

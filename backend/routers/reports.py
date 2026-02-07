@@ -2,10 +2,13 @@
 Google Suite Report Generation API Router
 """
 
+import logging
 from fastapi import APIRouter, HTTPException, status, Query, Depends, Request, UploadFile
 from typing import List, Dict, Any, Optional
 from uuid import UUID
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 # Import dependencies
 from config.database import supabase
@@ -93,7 +96,7 @@ async def generate_adhoc_report(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Adhoc report generation error: {e}")
+        logger.exception("Adhoc report generation error: %s", e)
         raise HTTPException(
             status_code=500,
             detail=f"Failed to generate adhoc report: {str(e)}"
@@ -124,7 +127,7 @@ async def create_report_template(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error creating report template: {e}")
+        logger.exception("Error creating report template: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to create report template: {str(e)}")
 
 
@@ -154,7 +157,7 @@ async def list_report_templates(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error listing templates: {e}")
+        logger.exception("Error listing templates: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to list templates: {str(e)}")
 
 
@@ -177,7 +180,7 @@ async def validate_template_compatibility(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error validating template: {e}")
+        logger.exception("Error validating template: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to validate template: {str(e)}")
 
 
@@ -218,7 +221,7 @@ async def generate_project_report(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error generating report: {e}")
+        logger.exception("Error generating report: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to generate report: {str(e)}")
 
 
@@ -263,7 +266,7 @@ async def list_project_reports(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error listing project reports: {e}")
+        logger.exception("Error listing project reports: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to list project reports: {str(e)}")
 
 
@@ -291,7 +294,7 @@ async def get_report_status(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error getting report status: {e}")
+        logger.exception("Error getting report status: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to get report status: {str(e)}")
 
 
@@ -327,7 +330,7 @@ async def delete_generated_report(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error deleting report: {e}")
+        logger.exception("Error deleting report: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to delete report: {str(e)}")
 
 
@@ -356,7 +359,7 @@ async def google_suite_health_check(
         return health_status
         
     except Exception as e:
-        print(f"Error checking Google Suite health: {e}")
+        logger.exception("Error checking Google Suite health: %s", e)
         raise HTTPException(status_code=500, detail=f"Health check failed: {str(e)}")
 
 
@@ -390,7 +393,7 @@ async def initiate_google_oauth(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error initiating OAuth flow: {e}")
+        logger.exception("Error initiating OAuth flow: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to initiate OAuth: {str(e)}")
 
 
@@ -429,7 +432,7 @@ async def handle_google_oauth_callback(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error handling OAuth callback: {e}")
+        logger.exception("Error handling OAuth callback: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to handle OAuth callback: {str(e)}")
 
 
@@ -462,5 +465,5 @@ async def check_google_oauth_status(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error checking OAuth status: {e}")
+        logger.exception("Error checking OAuth status: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to check OAuth status: {str(e)}")

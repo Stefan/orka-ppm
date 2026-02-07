@@ -92,16 +92,16 @@ class RBACAuditService:
                 "action": RBACAction.ROLE_ASSIGNMENT_CREATED,
                 "entity_type": RBACEntityType.USER_ROLE,
                 "entity_id": str(role_id),
-                "details": {
+                "action_details": {
                     "target_user_id": str(target_user_id),
                     "role_id": str(role_id),
                     "role_name": role_name,
                     "scope_type": scope_type,
                     "scope_id": str(scope_id) if scope_id else None,
                     "expires_at": expires_at.isoformat() if expires_at else None,
-                    "error_message": error_message
+                    "error_message": error_message,
+                    "success": success
                 },
-                "success": success,
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
             
@@ -153,15 +153,15 @@ class RBACAuditService:
                 "action": RBACAction.ROLE_ASSIGNMENT_REMOVED,
                 "entity_type": RBACEntityType.USER_ROLE,
                 "entity_id": str(role_id),
-                "details": {
+                "action_details": {
                     "target_user_id": str(target_user_id),
                     "role_id": str(role_id),
                     "role_name": role_name,
                     "scope_type": scope_type,
                     "scope_id": str(scope_id) if scope_id else None,
-                    "error_message": error_message
+                    "error_message": error_message,
+                    "success": success
                 },
-                "success": success,
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
             
@@ -211,14 +211,14 @@ class RBACAuditService:
                 "action": RBACAction.CUSTOM_ROLE_CREATED,
                 "entity_type": RBACEntityType.ROLE,
                 "entity_id": str(role_id),
-                "details": {
+                "action_details": {
                     "role_name": role_name,
                     "permissions": permissions,
                     "permissions_count": len(permissions),
                     "description": description,
-                    "error_message": error_message
+                    "error_message": error_message,
+                    "success": success
                 },
-                "success": success,
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
             
@@ -276,7 +276,7 @@ class RBACAuditService:
                 "action": RBACAction.CUSTOM_ROLE_UPDATED,
                 "entity_type": RBACEntityType.ROLE,
                 "entity_id": str(role_id),
-                "details": {
+                "action_details": {
                     "role_name": role_name,
                     "old_permissions": old_permissions,
                     "new_permissions": new_permissions,
@@ -285,9 +285,9 @@ class RBACAuditService:
                     "old_description": old_description,
                     "new_description": new_description,
                     "description_changed": old_description != new_description,
-                    "error_message": error_message
+                    "error_message": error_message,
+                    "success": success
                 },
-                "success": success,
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
             
@@ -337,14 +337,14 @@ class RBACAuditService:
                 "action": RBACAction.CUSTOM_ROLE_DELETED,
                 "entity_type": RBACEntityType.ROLE,
                 "entity_id": str(role_id),
-                "details": {
+                "action_details": {
                     "role_name": role_name,
                     "permissions": permissions,
                     "permissions_count": len(permissions),
                     "affected_users": affected_users_count,
-                    "error_message": error_message
+                    "error_message": error_message,
+                    "success": success
                 },
-                "success": success,
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
             

@@ -56,10 +56,15 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Backend resources POST error:', response.status, errorText)
-      return NextResponse.json(
-        { error: `Backend error: ${response.status}` },
-        { status: response.status }
-      )
+      try {
+        const errorBody = JSON.parse(errorText)
+        return NextResponse.json(errorBody, { status: response.status })
+      } catch {
+        return NextResponse.json(
+          { detail: errorText || `Backend error: ${response.status}` },
+          { status: response.status }
+        )
+      }
     }
 
     const data = await response.json()

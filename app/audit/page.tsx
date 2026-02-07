@@ -28,6 +28,19 @@ interface DashboardStats {
   system_health: any
 }
 
+function emptyStats(): DashboardStats {
+  return {
+    total_events_24h: 0,
+    total_anomalies_24h: 0,
+    critical_events_24h: 0,
+    top_users: [],
+    top_event_types: [],
+    category_breakdown: {},
+    event_volume_chart: [],
+    system_health: {},
+  }
+}
+
 export default function AuditDashboard() {
   const { session } = useAuth()
   const { t } = useTranslations()
@@ -54,6 +67,10 @@ export default function AuditDashboard() {
   const [timelineEvents, setTimelineEvents] = useState<AuditEvent[]>([])
   const [timelineFilters, setTimelineFilters] = useState<TimelineFilters>({})
   const [timelineLoading, setTimelineLoading] = useState(false)
+
+  // Recent events for dashboard tab (same data as timeline, so record appears in both)
+  const [recentEvents, setRecentEvents] = useState<AuditEvent[]>([])
+  const [recentEventsLoading, setRecentEventsLoading] = useState(false)
   
   // Anomalies state
   const [anomalies, setAnomalies] = useState<AnomalyDetection[]>([])
@@ -68,20 +85,34 @@ export default function AuditDashboard() {
 
   // Fetch dashboard stats
   const fetchDashboardStats = useCallback(async () => {
-    if (!session?.access_token) return
-    
+    const token = session?.access_token
+    if (!token?.trim()) return
+
     try {
       const response = await fetch(getApiUrl('/api/audit/dashboard/stats'), {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${token.trim()}`,
           'Content-Type': 'application/json',
-        }
+        },
       })
-      
+
+      if (response.status === 401) {
+        const errBody = await response.json().catch(() => ({}))
+        const message =
+          errBody?.code === 'MISSING_AUTH'
+            ? (t('audit.errorAuthMissing') || 'Authorization missing. Please log in.')
+            : (t('audit.errorAuthInvalid') || 'Session expired or invalid. Please log in again.')
+        setError(message)
+        setStats(emptyStats())
+        setLastUpdated(new Date())
+        setLoading(false)
+        return
+      }
+
       if (!response.ok) {
         throw new Error(`Failed to fetch dashboard stats: ${response.status}`)
       }
-      
+
       const data = await response.json()
       setStats(data)
       setLastUpdated(new Date())
@@ -89,10 +120,11 @@ export default function AuditDashboard() {
     } catch (err) {
       console.error('Error fetching dashboard stats:', err)
       setError(err instanceof Error ? err.message : 'Failed to load dashboard stats')
+      setStats(emptyStats())
     } finally {
       setLoading(false)
     }
-  }, [session?.access_token])
+  }, [session?.access_token, t])
   
   // Fetch timeline events
   const fetchTimelineEvents = useCallback(async () => {
@@ -117,19 +149,20 @@ export default function AuditDashboard() {
         params.append('anomalies_only', 'true')
       }
       
-      const response = await fetch(getApiUrl(`/api/audit/logs?${params.toString()}`), {
+      const url = getApiUrl(`/api/audit/logs?${params.toString()}`)
+      const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         }
       })
-      
+      const data = await response.json().catch(() => ({}))
+
       if (!response.ok) {
         throw new Error(`Failed to fetch timeline events: ${response.status}`)
       }
-      
-      const data = await response.json()
-      setTimelineEvents(data.logs || [])
+
+      setTimelineEvents(data.events ?? data.logs ?? [])
       setError(null)
     } catch (err) {
       console.error('Error fetching timeline events:', err)
@@ -138,6 +171,28 @@ export default function AuditDashboard() {
       setTimelineLoading(false)
     }
   }, [session?.access_token, timelineFilters])
+
+  // Fetch recent events for dashboard tab (limit 10, no date filter)
+  const fetchRecentEvents = useCallback(async () => {
+    if (!session?.access_token) return
+    setRecentEventsLoading(true)
+    try {
+      const url = getApiUrl('/api/audit/logs?limit=10')
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) return
+      setRecentEvents(data.events ?? data.logs ?? [])
+    } catch {
+      setRecentEvents([])
+    } finally {
+      setRecentEventsLoading(false)
+    }
+  }, [session?.access_token])
   
   // Fetch anomalies
   const fetchAnomalies = useCallback(async () => {
@@ -263,12 +318,14 @@ export default function AuditDashboard() {
   useEffect(() => {
     if (!session?.access_token) return
     
-    if (activeTab === 'timeline') {
+    if (activeTab === 'dashboard') {
+      fetchRecentEvents()
+    } else if (activeTab === 'timeline') {
       fetchTimelineEvents()
     } else if (activeTab === 'anomalies') {
       fetchAnomalies()
     }
-  }, [activeTab, session?.access_token, fetchTimelineEvents, fetchAnomalies])
+  }, [activeTab, session?.access_token, fetchRecentEvents, fetchTimelineEvents, fetchAnomalies])
   
   // Fetch timeline events when filters change
   useEffect(() => {
@@ -631,7 +688,7 @@ export default function AuditDashboard() {
                                   {index + 1}
                                 </div>
                                 <span className="text-sm font-medium text-gray-700 dark:text-slate-300 truncate">
-                                  {eventType.event_type}
+                                  {t(`audit.eventTypes.${eventType.event_type}` as any) || eventType.event_type}
                                 </span>
                               </div>
                               <span className="text-sm font-bold text-gray-900 dark:text-slate-100">
@@ -678,6 +735,67 @@ export default function AuditDashboard() {
                           </div>
                         )}
                       </div>
+                    </div>
+
+                    {/* Recent Events - same data as Timeline so records appear here and in Search */}
+                    <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+                          {t('audit.recentEvents') || 'Recent Events'}
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('timeline')}
+                          className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          {t('audit.viewAll') || 'View all'}
+                        </button>
+                      </div>
+                      {recentEventsLoading ? (
+                        <div className="flex items-center justify-center py-8">
+                          <RefreshCw className="h-6 w-6 animate-spin text-gray-400 dark:text-slate-500" />
+                        </div>
+                      ) : recentEvents.length > 0 ? (
+                        <ul className="space-y-3">
+                          {recentEvents.map((event) => (
+                            <li
+                              key={event.id}
+                              className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-slate-700 last:border-0"
+                            >
+                              <div className="flex items-center gap-3">
+                                <FileText className="h-4 w-4 text-gray-500 dark:text-slate-400 shrink-0" />
+                                <div>
+                                  <p className="text-sm font-medium text-gray-900 dark:text-slate-100">
+                                    {t(`audit.eventTypes.${event.event_type}` as any) || event.event_type}
+                                  </p>
+                                  <p className="text-xs text-gray-600 dark:text-slate-400">
+                                    {event.entity_type}
+                                    {event.timestamp && (
+                                      <span className="ml-2">
+                                        {typeof event.timestamp === 'string'
+                                          ? new Date(event.timestamp).toLocaleString()
+                                          : (event.timestamp as Date).toLocaleString?.() ?? String(event.timestamp)}
+                                      </span>
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                event.severity === 'critical' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' :
+                                event.severity === 'error' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300' :
+                                event.severity === 'warning' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300' :
+                                'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300'
+                              }`}>
+                                {event.severity || 'info'}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-gray-600 dark:text-slate-400 text-center py-6">
+                          {t('audit.noRecentEvents') || 'No recent events'}
+                        </p>
+                      )}
                     </div>
                   </>
                 ) : (

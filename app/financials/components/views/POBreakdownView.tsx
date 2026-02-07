@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { POBreakdown, POBreakdownSummary, POImportResult } from '../../types'
 import { getApiUrl } from '../../../../lib/api'
+import { logger } from '@/lib/monitoring/logger'
 
 interface POBreakdownViewProps {
   accessToken?: string
@@ -25,10 +26,12 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
   const [importResult, setImportResult] = useState<POImportResult | null>(null)
 
   useEffect(() => {
-    if (projectId) {
+    if (!projectId) return
+    const t = setTimeout(() => {
       fetchBreakdowns()
       fetchSummary()
-    }
+    }, 100)
+    return () => clearTimeout(t)
   }, [projectId])
 
   const fetchBreakdowns = async () => {
@@ -58,7 +61,7 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
       const data = await response.json()
       setBreakdowns(buildHierarchy(data))
     } catch (err) {
-      console.error('PO Breakdown fetch error:', err)
+      logger.error('PO Breakdown fetch error', { err }, 'POBreakdownView')
       setError('PO Breakdown feature is not yet configured. This requires SAP integration setup.')
     } finally {
       setLoading(false)
@@ -84,7 +87,7 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
         setSummary(data)
       }
     } catch (err) {
-      console.error('Failed to fetch summary:', err)
+      logger.error('Failed to fetch summary', { err }, 'POBreakdownView')
     }
   }
 

@@ -126,6 +126,8 @@ Bevor du committest:
 - [ ] Help Chat wurde getestet
 - [ ] Commit mit aussagekräftiger Message
 
+**Security & Auth:** Änderungen an Authentifizierung, JWT, Sync-APIs oder Env-Variablen bitte in [docs/security/](security/) abbilden (vgl. [env-setup.md](security/env-setup.md), [vulnerability-analysis.md](security/vulnerability-analysis.md)).
+
 ---
 
 ## 🎯 Best Practices

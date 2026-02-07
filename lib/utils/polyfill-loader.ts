@@ -3,7 +3,7 @@
  * Automatically loads polyfills for unsupported browser features
  */
 
-import { detectBrowser } from './browser-detection'
+import { detectBrowser } from './browser/browser-detection'
 
 export interface PolyfillConfig {
   feature: string

@@ -54,23 +54,25 @@ class Logger {
       this.logs = this.logs.slice(-this.maxLogs)
     }
 
-    // Console output
-    const contextStr = context ? `[${context}] ` : ''
-    const logMessage = `${contextStr}${message}`
-
-    switch (level) {
-      case 'debug':
-        console.debug(logMessage, data)
-        break
-      case 'info':
-        console.info(logMessage, data)
-        break
-      case 'warn':
-        console.warn(logMessage, data)
-        break
-      case 'error':
-        console.error(logMessage, data)
-        break
+    // Console output: only in development to avoid noise and leakage in production
+    const isProd = typeof process !== 'undefined' && process.env.NODE_ENV === 'production'
+    if (!isProd) {
+      const contextStr = context ? `[${context}] ` : ''
+      const logMessage = `${contextStr}${message}`
+      switch (level) {
+        case 'debug':
+          console.debug(logMessage, data)
+          break
+        case 'info':
+          console.info(logMessage, data)
+          break
+        case 'warn':
+          console.warn(logMessage, data)
+          break
+        case 'error':
+          console.error(logMessage, data)
+          break
+      }
     }
   }
 
