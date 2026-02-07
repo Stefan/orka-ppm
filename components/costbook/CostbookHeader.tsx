@@ -11,7 +11,8 @@ import {
   Search,
   Bell,
   Settings,
-  LineChart
+  LineChart,
+  Sync
 } from 'lucide-react'
 
 export interface CostbookHeaderProps {
@@ -27,6 +28,10 @@ export interface CostbookHeaderProps {
   onPerformance: () => void
   /** Handler for help button */
   onHelp: () => void
+  /** Handler for integration sync (ERP/SAP etc.) */
+  onSync?: () => void
+  /** Whether integration sync is in progress */
+  isSyncing?: boolean
   /** Handler for regenerating rundown profiles */
   onRegenerateProfiles?: () => void
   /** Whether rundown profile generation is in progress */
@@ -137,6 +142,8 @@ export function CostbookHeader({
   onRefresh,
   onPerformance,
   onHelp,
+  onSync,
+  isSyncing = false,
   onRegenerateProfiles,
   isRegeneratingProfiles = false,
   onSearch,
@@ -203,7 +210,15 @@ export function CostbookHeader({
             disabled={isLoading}
             testId={`${testId}-refresh-btn`}
           />
-          
+          {onSync && (
+            <IconButton
+              icon={<Sync className={`w-5 h-5 ${isSyncing ? 'animate-spin' : ''}`} />}
+              label="Sync from ERP"
+              onClick={onSync}
+              disabled={isSyncing || isLoading}
+              testId={`${testId}-sync-btn`}
+            />
+          )}
           {onRegenerateProfiles && (
             <IconButton
               icon={<LineChart className={`w-5 h-5 ${isRegeneratingProfiles ? 'animate-pulse text-blue-500 dark:text-blue-400' : ''}`} />}

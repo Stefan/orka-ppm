@@ -122,8 +122,182 @@ class SapErpAdapter(ErpAdapter):
         }
 
 
+class MicrosoftDynamicsAdapter(ErpAdapter):
+    """Microsoft Dynamics / PPM – project sync stub."""
+
+    def __init__(self, base_url: Optional[str] = None, api_key: Optional[str] = None):
+        self.base_url = base_url
+        self.api_key = api_key
+
+    @property
+    def adapter_type(self) -> str:
+        return "microsoft"
+
+    def sync_commitments(
+        self,
+        organization_id: Optional[str] = None,
+        since: Optional[datetime] = None,
+    ) -> Dict[str, Any]:
+        logger.info("Microsoft Dynamics: sync_commitments (stub)")
+        return {
+            "total": 0,
+            "inserted": 0,
+            "updated": 0,
+            "errors": ["Microsoft Dynamics connector not configured"] if not self.api_key else [],
+            "rows": [],
+            "synced_at": datetime.utcnow().isoformat() + "Z",
+        }
+
+    def sync_actuals(
+        self,
+        organization_id: Optional[str] = None,
+        since: Optional[datetime] = None,
+    ) -> Dict[str, Any]:
+        logger.info("Microsoft Dynamics: sync_actuals (stub)")
+        return {
+            "total": 0,
+            "inserted": 0,
+            "updated": 0,
+            "errors": ["Microsoft Dynamics connector not configured"] if not self.api_key else [],
+            "rows": [],
+            "synced_at": datetime.utcnow().isoformat() + "Z",
+        }
+
+
+class OracleNetSuiteAdapter(ErpAdapter):
+    """Oracle NetSuite – accounting stub."""
+
+    def __init__(self, account_id: Optional[str] = None, token: Optional[str] = None):
+        self.account_id = account_id
+        self.token = token
+
+    @property
+    def adapter_type(self) -> str:
+        return "oracle"
+
+    def sync_commitments(
+        self,
+        organization_id: Optional[str] = None,
+        since: Optional[datetime] = None,
+    ) -> Dict[str, Any]:
+        logger.info("Oracle NetSuite: sync_commitments (stub)")
+        return {
+            "total": 0,
+            "inserted": 0,
+            "updated": 0,
+            "errors": ["Oracle NetSuite connector not configured"] if not self.token else [],
+            "rows": [],
+            "synced_at": datetime.utcnow().isoformat() + "Z",
+        }
+
+    def sync_actuals(
+        self,
+        organization_id: Optional[str] = None,
+        since: Optional[datetime] = None,
+    ) -> Dict[str, Any]:
+        logger.info("Oracle NetSuite: sync_actuals (stub)")
+        return {
+            "total": 0,
+            "inserted": 0,
+            "updated": 0,
+            "errors": ["Oracle NetSuite connector not configured"] if not self.token else [],
+            "rows": [],
+            "synced_at": datetime.utcnow().isoformat() + "Z",
+        }
+
+
+class JiraAdapter(ErpAdapter):
+    """Jira – agile tasks stub (maps to projects/tasks, not commitments/actuals)."""
+
+    def __init__(self, base_url: Optional[str] = None, token: Optional[str] = None):
+        self.base_url = base_url
+        self.token = token
+
+    @property
+    def adapter_type(self) -> str:
+        return "jira"
+
+    def sync_commitments(
+        self,
+        organization_id: Optional[str] = None,
+        since: Optional[datetime] = None,
+    ) -> Dict[str, Any]:
+        logger.info("Jira: sync_commitments (stub – use project sync)")
+        return {
+            "total": 0,
+            "inserted": 0,
+            "updated": 0,
+            "errors": [],
+            "rows": [],
+            "synced_at": datetime.utcnow().isoformat() + "Z",
+        }
+
+    def sync_actuals(
+        self,
+        organization_id: Optional[str] = None,
+        since: Optional[datetime] = None,
+    ) -> Dict[str, Any]:
+        logger.info("Jira: sync_actuals (stub)")
+        return {
+            "total": 0,
+            "inserted": 0,
+            "updated": 0,
+            "errors": [],
+            "rows": [],
+            "synced_at": datetime.utcnow().isoformat() + "Z",
+        }
+
+
+class SlackAdapter(ErpAdapter):
+    """Slack – notifications stub; no commitments/actuals sync."""
+
+    def __init__(self, webhook_url: Optional[str] = None):
+        self.webhook_url = webhook_url
+
+    @property
+    def adapter_type(self) -> str:
+        return "slack"
+
+    def sync_commitments(
+        self,
+        organization_id: Optional[str] = None,
+        since: Optional[datetime] = None,
+    ) -> Dict[str, Any]:
+        return {
+            "total": 0,
+            "inserted": 0,
+            "updated": 0,
+            "errors": [],
+            "rows": [],
+            "synced_at": datetime.utcnow().isoformat() + "Z",
+        }
+
+    def sync_actuals(
+        self,
+        organization_id: Optional[str] = None,
+        since: Optional[datetime] = None,
+    ) -> Dict[str, Any]:
+        return {
+            "total": 0,
+            "inserted": 0,
+            "updated": 0,
+            "errors": [],
+            "rows": [],
+            "synced_at": datetime.utcnow().isoformat() + "Z",
+        }
+
+
 def get_erp_adapter(adapter_type: str = "csv", **kwargs) -> ErpAdapter:
-    """Factory: returns SAP or CSV adapter."""
-    if adapter_type.lower() == "sap":
+    """Factory: returns adapter for given system."""
+    t = adapter_type.lower()
+    if t == "sap":
         return SapErpAdapter(host=kwargs.get("host"), client=kwargs.get("client"))
+    if t == "microsoft":
+        return MicrosoftDynamicsAdapter(base_url=kwargs.get("base_url"), api_key=kwargs.get("api_key"))
+    if t == "oracle":
+        return OracleNetSuiteAdapter(account_id=kwargs.get("account_id"), token=kwargs.get("token"))
+    if t == "jira":
+        return JiraAdapter(base_url=kwargs.get("base_url"), token=kwargs.get("token"))
+    if t == "slack":
+        return SlackAdapter(webhook_url=kwargs.get("webhook_url"))
     return CsvErpAdapter(csv_path=kwargs.get("csv_path"))

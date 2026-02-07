@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import AppLayout from '../../components/shared/AppLayout'
-import { Users, Activity, Settings, Layers, ToggleLeft, MessageCircle, Building2 } from 'lucide-react'
+import { Users, Activity, Settings, Layers, ToggleLeft, MessageCircle, Building2, LogIn } from 'lucide-react'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -78,6 +78,15 @@ export default function AdminPage() {
             <Building2 className="h-8 w-8 text-teal-600 dark:text-teal-400 mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-2">Organisations</h2>
             <p className="text-gray-600 dark:text-slate-400">Manage tenants and organisations (Super-Admin)</p>
+          </button>
+
+          <button
+            onClick={() => router.push('/admin/sso')}
+            className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 hover:shadow-md transition-shadow text-left"
+          >
+            <LogIn className="h-8 w-8 text-sky-600 dark:text-sky-400 mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-2">SSO</h2>
+            <p className="text-gray-600 dark:text-slate-400">Configure Single Sign-On providers (Google, Microsoft, Okta, Azure AD)</p>
           </button>
         </div>
       </div>

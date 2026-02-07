@@ -59,6 +59,9 @@ import { getMockTransactions, TransactionFilters as TxFilters, filterTransaction
 import { fetchCommentsCountBatch } from '@/lib/comments-service'
 import { CSVImportResult, Commitment, Actual, HierarchyNode, Transaction, DistributionSettings, DistributionRule, CostbookRow } from '@/types/costbook'
 import { getApiUrl } from '@/lib/api'
+import { useAuth } from '@/app/providers/SupabaseAuthProvider'
+import { useToast } from '@/components/shared/Toast'
+import { triggerSync } from '@/lib/integrations/ErpAdapter'
 
 export interface CostbookProps {
   /** Use mock data instead of fetching from Supabase */
@@ -137,6 +140,11 @@ function CostbookInner({
   // Comments state (Phase 3)
   const [commentsPanelProjectId, setCommentsPanelProjectId] = useState<string | null>(null)
   const [commentCounts, setCommentCounts] = useState<Map<string, number>>(new Map())
+
+  // Integration sync (ERP)
+  const [isSyncing, setIsSyncing] = useState(false)
+  const { session } = useAuth()
+  const { addToast } = useToast()
 
   // Performance tracking
   const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetrics>({
@@ -354,6 +362,41 @@ function CostbookInner({
   const handleRefresh = useCallback(() => {
     fetchData()
   }, [fetchData])
+
+  const handleIntegrationSync = useCallback(async () => {
+    const token = session?.access_token
+    if (!token) {
+      addToast({ type: 'warning', title: 'Sync', message: 'Sign in to sync from ERP.' })
+      return
+    }
+    setIsSyncing(true)
+    try {
+      const result = await triggerSync({ adapter: 'sap', entity: 'commitments' }, token)
+      const added = (result.inserted ?? 0) + (result.updated ?? 0)
+      if (result.errors?.length) {
+        addToast({
+          type: 'warning',
+          title: 'Sync completed with issues',
+          message: `${added} records; ${result.errors.length} error(s).`,
+        })
+      } else {
+        addToast({
+          type: 'success',
+          title: 'Sync erfolgreich',
+          message: added > 0 ? `${added} neue/aktualisierte Commitments.` : 'Keine Änderungen.',
+        })
+      }
+      fetchData()
+    } catch (e) {
+      addToast({
+        type: 'error',
+        title: 'Sync fehlgeschlagen',
+        message: e instanceof Error ? e.message : 'Sync failed.',
+      })
+    } finally {
+      setIsSyncing(false)
+    }
+  }, [session?.access_token, addToast, fetchData])
 
   const handleProjectClick = useCallback((project: ProjectWithFinancials) => {
     setSelectedProjectId(project.id)
@@ -692,6 +735,8 @@ function CostbookInner({
           onRefresh={handleRefresh}
           onPerformance={handlePerformance}
           onHelp={handleHelp}
+          onSync={handleIntegrationSync}
+          isSyncing={isSyncing}
           onSearch={handleSearch}
           searchTerm={searchTerm}
           isLoading={isLoading}
