@@ -2,7 +2,14 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../../lib/api/supabase-minimal'
+import { useOrganizationContext, useInvalidateOrganizationContext } from '@/hooks/useOrganizationContext'
 import type { Session, User, AuthError } from '@supabase/supabase-js'
+
+export interface OrganizationContextValue {
+  organizationId: string | null
+  organizationPath: string | null
+  isOrgAdmin: boolean
+}
 
 interface AuthContextType {
   session: Session | null
@@ -10,6 +17,8 @@ interface AuthContextType {
   loading: boolean
   error: AuthError | null
   clearSession: () => Promise<void>
+  /** RLS / sub-orgs: current user's org and path (from API); null when not loaded or no org */
+  organizationContext: OrganizationContextValue | null
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -18,6 +27,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   error: null,
   clearSession: async () => {},
+  organizationContext: null,
 })
 
 export function SupabaseAuthProvider({ children }: { children: React.ReactNode }) {
@@ -25,6 +35,8 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<AuthError | null>(null)
   const [isClient, setIsClient] = useState(false)
+  const invalidateOrgContext = useInvalidateOrganizationContext()
+  const { organizationContext } = useOrganizationContext(session?.access_token)
 
   // Prevent hydration mismatch by only running auth logic on client
   useEffect(() => {
@@ -34,11 +46,10 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   const clearSession = async () => {
     try {
       console.log('🧹 Clearing invalid session...')
+      invalidateOrgContext()
       await supabase.auth.signOut({ scope: 'local' })
       setSession(null)
       setError(null)
-      
-      // Also clear localStorage manually as backup
       try {
         localStorage.removeItem('ppm-auth-token')
         localStorage.removeItem('supabase.auth.token')
@@ -141,6 +152,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     loading,
     error,
     clearSession,
+    organizationContext,
   }
 
   return (

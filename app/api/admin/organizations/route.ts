@@ -13,7 +13,11 @@ export async function GET(request: NextRequest) {
     if (!authHeader) {
       return NextResponse.json({ error: 'Authorization required' }, { status: 401 })
     }
-    const response = await fetch(`${BACKEND_URL}/api/admin/organizations`, {
+    const { searchParams } = new URL(request.url)
+    const hierarchy = searchParams.get('hierarchy')
+    const url = new URL(`${BACKEND_URL}/api/admin/organizations`)
+    if (hierarchy === '1' || hierarchy === 'true') url.searchParams.set('hierarchy', '1')
+    const response = await fetch(url.toString(), {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', 'Authorization': authHeader },
     })
