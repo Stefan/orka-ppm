@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { getApiUrl } from '../../../../lib/api'
 import { useDateFormatter } from '@/hooks/useDateFormatter'
+import type { SavedViewDefinition } from '@/lib/saved-views-api'
 
 interface Actual {
   id: string
@@ -35,12 +36,14 @@ interface Actual {
 interface ActualsTableProps {
   accessToken: string | undefined
   onProjectClick?: (projectNr: string) => void
+  initialView?: SavedViewDefinition | null
+  onDefinitionChange?: (def: SavedViewDefinition) => void
 }
 
 type SortDirection = 'asc' | 'desc' | null
 type SortField = keyof Actual | null
 
-const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ accessToken, onProjectClick }, ref) => {
+const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ accessToken, onProjectClick, initialView, onDefinitionChange }, ref) => {
   const { formatDate } = useDateFormatter()
   const [actuals, setActuals] = useState<Actual[]>([])
   const [loading, setLoading] = useState(true)
@@ -97,6 +100,25 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
     const t = setTimeout(() => fetchActuals(), 100)
     return () => clearTimeout(t)
   }, [accessToken, currentPage, pageSize])
+
+  useEffect(() => {
+    if (!initialView) return
+    if (initialView.filters && Object.keys(initialView.filters).length > 0) {
+      setFilters(initialView.filters as Record<string, string>)
+    }
+    if (initialView.sortBy) setSortField(initialView.sortBy as SortField)
+    if (initialView.sortOrder === 'asc' || initialView.sortOrder === 'desc') setSortDirection(initialView.sortOrder)
+    if (initialView.pageSize != null && initialView.pageSize >= 1) setPageSize(initialView.pageSize)
+  }, [initialView])
+
+  useEffect(() => {
+    onDefinitionChange?.({
+      filters: Object.keys(filters).length ? filters : undefined,
+      sortBy: sortField ?? undefined,
+      sortOrder: sortDirection ?? undefined,
+      pageSize,
+    })
+  }, [filters, sortField, sortDirection, pageSize, onDefinitionChange])
 
   // Expose refresh method to parent
   useImperativeHandle(ref, () => ({

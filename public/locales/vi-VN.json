@@ -77,7 +77,27 @@
     "refresh": "Làm mới",
     "traditionalView": "Chuyển sang Chế độ xem Truyền thống",
     "aiView": "Chuyển sang Chế độ xem Tăng cường AI",
-    "fallbackData": "Sử dụng dữ liệu dự phòng"
+    "fallbackData": "Sử dụng dữ liệu dự phòng",
+    "aiInsightsTitle": "Đề xuất AI",
+    "aiInsightsSummary": "Dùng cảnh báo phương sai để tối ưu ngân sách. Độ lệch nghiêm trọng hiển thị ở đầu trong các cảnh báo.",
+    "last7Days": "7 ngày qua",
+    "last30Days": "30 ngày qua",
+    "last90Days": "90 ngày qua",
+    "thisYear": "Năm nay",
+    "alerts": {
+      "budgetOverrunTitle": "Vượt ngân sách",
+      "budgetOverrunDesc": "Dự án Alpha vượt ngân sách 15%",
+      "scheduleDelayRiskTitle": "Rủi ro trễ tiến độ",
+      "scheduleDelayRiskDesc": "Hoạt động đường găng trễ 3 ngày",
+      "timelineDelayTitle": "Trễ tiến độ",
+      "timelineDelayDesc": "Dự án Beta chậm 2 tuần",
+      "resourceConflictTitle": "Xung đột nguồn lực",
+      "resourceConflictDesc": "Thành viên được giao nhiều dự án"
+    }
+  },
+  "guidedTour": {
+    "startTour": "Bắt đầu tour",
+    "restartTour": "Chạy lại tour"
   },
   "kpi": {
     "successRate": "Tỷ lệ Thành công",
@@ -104,7 +124,10 @@
     "charts": "Biểu đồ",
     "resources": "Nguồn lực",
     "financials": "Tài chính",
-    "reports": "Báo cáo"
+    "reports": "Báo cáo",
+    "timeline": "Dòng thời gian",
+    "analytics": "Phân tích",
+    "importProjects": "Nhập dự án"
   },
   "projects": {
     "recentProjects": "Dự án gần đây"
@@ -167,6 +190,7 @@
     "retry": "Thử lại",
     "close": "Đóng",
     "save": "Lưu",
+    "actions": "Thao tác",
     "saving": "Đang lưu...",
     "saveChanges": "Lưu thay đổi",
     "cancel": "Hủy",
@@ -323,7 +347,10 @@
     "noData": "Không có dữ liệu sai lệch.",
     "importCsvToSee": "Nhập file CSV để xem phân tích sai lệch.",
     "dataUnavailable": "Dữ liệu sai lệch không khả dụng: {error}",
-    "importCsv": "Nhập CSV"
+    "importCsv": "Nhập CSV",
+    "period7d": "7 ngày",
+    "period30d": "30 ngày",
+    "period90d": "90 ngày"
   },
   "financials": {
     "title": "Quản lý tài chính",
@@ -489,10 +516,15 @@
     "aiOptimize": "Tối Ưu Hóa AI",
     "ai": "AI",
     "addResource": "Thêm Nguồn Lực",
+    "addNewResource": "Thêm nguồn lực mới",
+    "addShort": "Thêm",
     "refreshNow": "Làm Mới Ngay",
     "enableAutoRefresh": "Bật tự động làm mới (30s)",
     "disableAutoRefresh": "Tắt tự động làm mới",
     "exportData": "Xuất dữ liệu nguồn lực",
+    "export": "Xuất",
+    "refresh": "Làm mới",
+    "filters": "Bộ lọc",
     "showFilters": "Hiển thị bộ lọc",
     "hideFilters": "Ẩn bộ lọc",
     "showOptimization": "Hiển thị tối ưu hóa AI",
@@ -525,7 +557,35 @@
     "utilizationDistribution": "Phân bố Sử dụng",
     "topSkills": "Kỹ năng Hàng đầu",
     "roleDistribution": "Phân bố Vai trò",
-    "errorLoading": "Lỗi khi tải tài nguyên"
+    "errorLoading": "Lỗi khi tải tài nguyên",
+    "noRoleSpecified": "Chưa chỉ định vai trò",
+    "availableHours": "Giờ khả dụng",
+    "currentProjects": "Dự án hiện tại",
+    "viewDetails": "Xem chi tiết",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "unassigned": "Chưa giao",
+    "utilization": "Mức sử dụng",
+    "skills": "Kỹ năng",
+    "hourlyRate": "Đơn giá theo giờ",
+    "underUtilized": "Dưới mức",
+    "wellUtilized": "Vừa phải",
+    "highlyUtilized": "Cao",
+    "overUtilized": "Vượt mức",
+    "underUtilizedRange": "Dưới mức (0–50%)",
+    "wellUtilizedRange": "Vừa phải (51–80%)",
+    "highlyUtilizedRange": "Cao (81–100%)",
+    "overUtilizedRange": "Vượt mức (>100%)",
+    "utilizationInsights": "Tổng quan sử dụng",
+    "tapCardsForDetails": "Chạm thẻ để xem chi tiết",
+    "mostUtilized": "Sử dụng nhiều nhất",
+    "moreSkills": "+{count} nữa",
+    "deleteResource": "Xóa tài nguyên"
+  },
+  "charts": {
+    "landscapeMode": "Chế độ ngang - tối ưu xem",
+    "pinchToZoom": "Vuốt để thu phóng • Chạm để tương tác • Chạm đúp để đặt lại",
+    "loadingChart": "Đang tải biểu đồ..."
   },
   "reports": {
     "title": "Báo cáo Hỗ trợ AI",

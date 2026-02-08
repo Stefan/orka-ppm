@@ -149,7 +149,7 @@ function FinancialsContent() {
 
   return (
     <AppLayout>
-      <ResponsiveContainer padding="md" className="space-y-6">
+      <ResponsiveContainer padding="md" className="space-y-6 min-w-0">
         {/* Header */}
         <div data-testid="financials-header">
           <FinancialHeader
@@ -165,7 +165,7 @@ function FinancialsContent() {
         </div>
 
         {/* Navigation Tabs */}
-        <div data-testid="financials-tabs" data-tour="financials-tabs" className="flex items-center justify-between gap-4 flex-wrap">
+        <div data-testid="financials-tabs" data-tour="financials-tabs" className="flex items-center justify-between gap-4 flex-wrap min-w-0">
           <TabNavigation
             viewMode={viewMode}
             onViewModeChange={setViewMode}

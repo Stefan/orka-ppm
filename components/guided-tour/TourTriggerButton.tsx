@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { HelpCircle } from 'lucide-react'
+import { useTranslations } from '@/lib/i18n/context'
 
 export interface TourTriggerButtonProps {
   onStart: () => void
@@ -18,11 +19,14 @@ export interface TourTriggerButtonProps {
 export function TourTriggerButton({
   onStart,
   hasCompletedTour,
-  labelStart = 'Tour starten',
-  labelRestart = 'Tour erneut starten',
+  labelStart,
+  labelRestart,
   className = '',
 }: TourTriggerButtonProps) {
-  const label = hasCompletedTour ? labelRestart : labelStart
+  const { t } = useTranslations()
+  const startLabel = labelStart ?? t('guidedTour.startTour')
+  const restartLabel = labelRestart ?? t('guidedTour.restartTour')
+  const label = hasCompletedTour ? restartLabel : startLabel
   return (
     <button
       type="button"

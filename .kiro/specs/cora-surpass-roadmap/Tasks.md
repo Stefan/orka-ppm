@@ -1,6 +1,11 @@
 # Cora-Surpass Roadmap – Tasks
 
-## Phase 1 (4–6 Wochen)
+## Phase 1 (4–6 Wochen) ✅ abgeschlossen
+
+- **Abschluss:** Caching (projects, commitments, actuals), Pagination-Schema, Adapter-Registry, Suspense-kompatibel umgesetzt.
+- Referenz: [docs/cora-surpass-phase1-backend.md](../../docs/cora-surpass-phase1-backend.md).
+
+---
 
 ### 1.1 Caching für zentrale Listen
 
@@ -45,21 +50,50 @@
 
 ---
 
-## Phase 2 (6–8 Wochen)
+## Phase 2 (6–8 Wochen) ✅ umgesetzt
 
-| Sub-Task | Beschreibung | Abhängigkeiten | Tools |
-|----------|--------------|----------------|--------|
-| Workflow-Builder | react-flow: Drag&Drop-Knoten (Steps), Kanten, Eigenschaften-Panel; Steps-Definition wie workflow-engine/design | Phase 1 | react-flow, react-dnd |
-| AI-Mapping-Service | OpenAI/Embeddings für Feld-Matching bei Imports; Mapping-Regeln speicherbar | Phase 1 | OpenAI API |
-| No-Code-Views | Saved Views + AI-Empfehlung für Filter/Layout | Phase 1 | - |
+### 2.1 Workflow-Builder (No-Code) ✅
+
+| Sub-Task | Beschreibung | Abhängigkeiten | Dauer | Referenz |
+|----------|--------------|----------------|-------|----------|
+| react-flow einbinden | Paket `@xyflow/react` (react-flow) installieren; Canvas-Komponente mit Controls, MiniMap optional | Phase 1 | 0.5 d | Design Workflow-Builder |
+| Step-Knoten-Typen | Custom Nodes für Step-Typ (APPROVAL, NOTIFICATION, CONDITION); Drag aus Sidebar oder Toolbox | - | 1 d | [workflow-engine/design.md](../workflow-engine/design.md) WorkflowStep |
+| Kanten & Validierung | Edges zwischen Steps; beim Speichern prüfen: mind. ein Step, keine isolierten Knoten (optional) | Step-Knoten | 0.5 d | - |
+| Eigenschaften-Panel | Bei Knoten-Auswahl: Panel für step_type, approvers, timeout_hours, conditions | Step-Knoten | 1 d | Design Eigenschaften-Panel |
+| Backend-Anbindung | Workflow-Definition (JSON) an POST /workflows/ oder bestehenden Endpoint senden; Response/Fehler anzeigen | Backend workflows API | 0.5 d | [workflow-engine/design.md](../workflow-engine/design.md) |
+| Admin-Seite | Route z. B. `/admin/workflow-builder` oder `/workflows/builder`; nur für Berechtigung workflow_manage | - | 0.5 d | - |
+
+**Umsetzung:** [app/admin/workflow-builder/page.tsx](../../app/admin/workflow-builder/page.tsx), [WorkflowCanvas.tsx](../../app/admin/workflow-builder/WorkflowCanvas.tsx), POST /workflows mit step_type, timeout_hours, conditions. **Tools:** @xyflow/react (react-flow), ggf. react-dnd für Toolbox.
+
+### 2.2 AI-Mapping-Service (Imports) ✅
+
+| Sub-Task | Beschreibung | Abhängigkeiten | Dauer | Referenz |
+|----------|--------------|----------------|-------|----------|
+| Embedding-Service | Backend: Service der CSV-Header/Extern-Felder auf PPM-Schema (commitments/actuals) mappt; OpenAI Embeddings oder einfache Heuristik | Phase 1 | 1–2 d | Requirements FR-I3 |
+| Mapping-Regeln speichern | Speicherbare Konfiguration (z. B. org_id + source_system → Feld-Map); DB-Tabelle oder JSON in Config | - | 1 d | - |
+| Import-UI erweitern | Beim CSV-Upload Mapping-Vorschläge anzeigen; Nutzer kann anpassen und übernehmen | Embedding-Service | 1 d | - |
+
+**Tools:** OpenAI API (Embeddings), Backend [csv_import](backend/routers/csv_import.py).
+
+**Umsetzung:** Service [services/csv_mapping_suggestions.py](backend/services/csv_mapping_suggestions.py); Endpoint `POST /csv-import/suggest-mapping`; Migration 060_csv_import_mappings.sql; Import-UI mit Mapping-Vorschau (CSVImportView). ✅
+
+### 2.3 No-Code-Views ✅
+
+| Sub-Task | Beschreibung | Abhängigkeiten | Dauer | Referenz |
+|----------|--------------|----------------|-------|----------|
+| Saved Views Modell | Backend/DB: gespeicherte View-Definitionen (Filter, Sortierung, Spalten) pro User/Org | Phase 1 | 0.5 d | Requirements FR-C2 |
+| AI-Empfehlung | Optional: aus Nutzerverhalten (z. B. häufig genutzte Filter) Vorschläge für „View speichern“ | Saved Views | 0.5 d | - |
+| UI: View auswählen/speichern | Dropdown oder Sidebar „Saved Views“; „Aktuelle Ansicht speichern“; Apply View | - | 1 d | - |
+
+**Umsetzung:** Migration `059_saved_views.sql`, Model `models/saved_views.py`, Router `routers/saved_views.py` (GET/POST/PATCH/DELETE). Frontend: `lib/saved-views-api.ts`, `components/saved-views/SavedViewsDropdown.tsx`; Integration in Financials (CommitmentsActualsView). Apply-Logik umgesetzt. ✅
 
 ---
 
-## Phase 3 (8–10 Wochen)
+## Phase 3 (8–10 Wochen) ✅ umgesetzt
 
-| Sub-Task | Beschreibung | Abhängigkeiten | Tools |
-|----------|--------------|----------------|--------|
-| AI-Audit-Insights | [audit_anomaly_service.py](backend/services/audit_anomaly_service.py) erweitern; Timeline mit AI-Tags, semantische Suche (RAG) | Phase 2 | Sentry, OpenAI |
-| Proaktive Compliance-Toasts | Toasts/Banner bei Anomalien; „Vorschlag: Überprüfe Key“ | Phase 2 | Bestehendes Toast-System |
-| AI-Benefits in Reports | Kurzfassungen, Empfehlungen, Trend-Hinweise in Dashboards | Phase 2 | Recharts, OpenAI |
-| Copilot-Chat-Integration | Kontextbezogener Assistent; Integration mit Help-Chat | Phase 2 | OpenAI API |
+| Sub-Task | Beschreibung | Abhängigkeiten | Tools | Status |
+|----------|--------------|----------------|--------|--------|
+| AI-Audit-Insights | [audit_anomaly_service.py](backend/services/audit_anomaly_service.py); Timeline mit Anomalie-Filter, semantische Suche (API /api/audit/search) | Phase 2 | Sentry, OpenAI | ✅ |
+| Proaktive Compliance-Toasts | Toasts bei Anomalien (Audit-Seite: „Anomalien erkannt – Vorschlag: Überprüfe Einträge“) | Phase 2 | [Toast.tsx](components/shared/Toast.tsx) | ✅ |
+| AI-Benefits in Reports | Kurzfassung/Empfehlungs-Karte auf Dashboard (AI Insights Card) | Phase 2 | Recharts, OpenAI | ✅ |
+| Copilot-Chat-Integration | Help-Chat mit Kontext (pathname, entityType, entityId) in [help-chat/context](app/api/help-chat/context/route.ts) | Phase 2 | OpenAI API | ✅ |

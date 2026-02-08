@@ -1,12 +1,51 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Upload, Download, CheckCircle, XCircle, Clock, RefreshCw, FileText, History } from 'lucide-react'
+import { Upload, Download, CheckCircle, XCircle, Clock, RefreshCw, FileText, History, Map } from 'lucide-react'
 import { CSVImportHistory, CSVUploadResult } from '../../types'
 import { getApiUrl } from '../../../../lib/api'
+import { fetchSavedCsvMappings, saveCsvMapping, type SavedCsvMapping } from '../../utils/api'
 import { logger } from '@/lib/monitoring/logger'
 import { useTranslations } from '@/lib/i18n/context'
 import { useDateFormatter } from '@/hooks/useDateFormatter'
+
+/** Read first line of CSV as headers (simple comma split; handles quoted commas roughly). */
+function readCsvHeaders(file: File): Promise<string[]> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const text = (reader.result as string) || ''
+      const firstLine = text.split(/\r?\n/)[0] || ''
+      const headers: string[] = []
+      let i = 0
+      while (i < firstLine.length) {
+        if (firstLine[i] === '"') {
+          let end = i + 1
+          while (end < firstLine.length && (firstLine[end] !== '"' || firstLine[end + 1] === '"')) {
+            if (firstLine[end] === '"' && firstLine[end + 1] === '"') end += 2
+            else end += 1
+          }
+          headers.push(firstLine.slice(i + 1, end).replace(/""/g, '"').trim())
+          i = end + 1
+          if (firstLine[i] === ',') i += 1
+          continue
+        }
+        const comma = firstLine.indexOf(',', i)
+        if (comma === -1) {
+          headers.push(firstLine.slice(i).trim())
+          break
+        }
+        headers.push(firstLine.slice(i, comma).trim())
+        i = comma + 1
+      }
+      resolve(headers.filter(Boolean))
+    }
+    reader.onerror = () => reject(reader.error)
+    reader.readAsText(file.slice(0, 8192), 'utf-8')
+  })
+}
+
+export type MappingSuggestion = { source_header: string; target_field: string; confidence: number }
 
 interface CSVImportViewProps {
   accessToken: string | undefined
@@ -19,12 +58,64 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
   const [uploadingFile, setUploadingFile] = useState(false)
   const [uploadResult, setUploadResult] = useState<CSVUploadResult | null>(null)
   const [dragActive, setDragActive] = useState(false)
+  const [pendingFile, setPendingFile] = useState<File | null>(null)
+  const [pendingImportType, setPendingImportType] = useState<'commitments' | 'actuals' | null>(null)
+  const [mappingSuggestions, setMappingSuggestions] = useState<MappingSuggestion[]>([])
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false)
+  const [savedMappings, setSavedMappings] = useState<SavedCsvMapping[]>([])
+  const [savingMapping, setSavingMapping] = useState(false)
 
   useEffect(() => {
     if (!accessToken) return
     const timeoutId = setTimeout(() => fetchCSVImportHistory(), 100)
     return () => clearTimeout(timeoutId)
   }, [accessToken])
+
+  useEffect(() => {
+    if (!pendingFile || !pendingImportType || !accessToken) return
+    let cancelled = false
+    setLoadingSuggestions(true)
+    setMappingSuggestions([])
+    readCsvHeaders(pendingFile)
+      .then((headers) => {
+        if (cancelled || !headers.length) {
+          setMappingSuggestions([])
+          setLoadingSuggestions(false)
+          return
+        }
+        return fetch(getApiUrl('/csv-import/suggest-mapping'), {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ headers, import_type: pendingImportType }),
+        })
+      })
+      .then((res) => {
+        if (cancelled) return
+        if (res?.ok) return res.json()
+        return []
+      })
+      .then((data: MappingSuggestion[]) => {
+        if (!cancelled) {
+          setMappingSuggestions(Array.isArray(data) ? data : [])
+          setLoadingSuggestions(false)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setMappingSuggestions([])
+          setLoadingSuggestions(false)
+        }
+      })
+    return () => { cancelled = true }
+  }, [pendingFile, pendingImportType, accessToken])
+
+  useEffect(() => {
+    if (!pendingImportType || !accessToken) return
+    fetchSavedCsvMappings(accessToken, pendingImportType).then(setSavedMappings)
+  }, [pendingImportType, accessToken, pendingFile])
 
   const fetchCSVImportHistory = async () => {
     if (!accessToken) return
@@ -151,15 +242,62 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
   const handleDrop = (e: React.DragEvent, importType: 'commitments' | 'actuals') => {
     e.preventDefault()
     setDragActive(false)
-    
     const files = e.dataTransfer.files
     if (files.length > 0) {
       const file = files[0]
       if (file && file.name.toLowerCase().endsWith('.csv')) {
-        handleFileUpload(file, importType)
+        setPendingFile(file)
+        setPendingImportType(importType)
       } else {
         alert(t('selectCsvFile'))
       }
+    }
+  }
+
+  const handleFileSelect = (file: File, importType: 'commitments' | 'actuals') => {
+    setPendingFile(file)
+    setPendingImportType(importType)
+  }
+
+  const confirmImport = () => {
+    if (pendingFile && pendingImportType) {
+      handleFileUpload(pendingFile, pendingImportType)
+      setPendingFile(null)
+      setPendingImportType(null)
+      setMappingSuggestions([])
+    }
+  }
+
+  const cancelPreview = () => {
+    setPendingFile(null)
+    setPendingImportType(null)
+    setMappingSuggestions([])
+  }
+
+  const handleLoadSavedMapping = (saved: SavedCsvMapping) => {
+    setMappingSuggestions(
+      saved.mapping.map((m) => ({
+        source_header: m.source_header,
+        target_field: m.target_field,
+        confidence: 1,
+      }))
+    )
+  }
+
+  const handleSaveMapping = async () => {
+    if (!accessToken || !pendingImportType || mappingSuggestions.length === 0) return
+    const name = window.prompt(t('saveMapping') + ' – Name')
+    if (!name?.trim()) return
+    setSavingMapping(true)
+    try {
+      const mapping = mappingSuggestions.map((s) => ({ source_header: s.source_header, target_field: s.target_field }))
+      const created = await saveCsvMapping(accessToken, name.trim(), pendingImportType, mapping)
+      if (created) {
+        setSavedMappings((prev) => [created, ...prev])
+        alert(t('mappingSaved'))
+      }
+    } finally {
+      setSavingMapping(false)
     }
   }
 
@@ -206,7 +344,7 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
                 accept=".csv"
                 onChange={(e) => {
                   const file = e.target.files?.[0]
-                  if (file) handleFileUpload(file, 'commitments')
+                  if (file) handleFileSelect(file, 'commitments')
                 }}
                 className="hidden"
                 id="commitments-upload"
@@ -256,7 +394,7 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
                 accept=".csv"
                 onChange={(e) => {
                   const file = e.target.files?.[0]
-                  if (file) handleFileUpload(file, 'actuals')
+                  if (file) handleFileSelect(file, 'actuals')
                 }}
                 className="hidden"
                 id="actuals-upload"
@@ -277,6 +415,113 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
           </div>
         </div>
       </div>
+
+      {/* Mapping preview (after file select, before upload) */}
+      {pendingFile && pendingImportType && (
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+              <Map className="h-5 w-5 text-blue-500" />
+              {t('mappingPreview')}
+            </h3>
+            <span className="text-sm text-gray-500 dark:text-slate-400 truncate max-w-[200px]" title={pendingFile.name}>
+              {pendingFile.name}
+            </span>
+          </div>
+          {loadingSuggestions ? (
+            <div className="flex items-center gap-2 text-gray-600 dark:text-slate-400 py-4">
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent" />
+              {t('loadingMapping')}
+            </div>
+          ) : (
+            <>
+              <div className="overflow-x-auto max-h-48 overflow-y-auto border border-gray-200 dark:border-slate-600 rounded-lg">
+                <table className="min-w-full text-sm">
+                  <thead className="bg-gray-50 dark:bg-slate-700 sticky top-0">
+                    <tr>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600 dark:text-slate-300">{t('csvColumn')}</th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600 dark:text-slate-300">{t('ppmField')}</th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600 dark:text-slate-300 w-24">{t('confidence')}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-slate-600">
+                    {mappingSuggestions.length === 0 ? (
+                      <tr>
+                        <td colSpan={3} className="px-4 py-3 text-gray-500 dark:text-slate-400">
+                          {t('noMappingSuggested')}
+                        </td>
+                      </tr>
+                    ) : (
+                      mappingSuggestions.map((row, i) => (
+                        <tr key={i} className="bg-white dark:bg-slate-800">
+                          <td className="px-4 py-2 text-gray-900 dark:text-slate-100">{row.source_header}</td>
+                          <td className="px-4 py-2 text-gray-700 dark:text-slate-300">{row.target_field}</td>
+                          <td className="px-4 py-2">
+                            <span className={row.confidence >= 0.9 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}>
+                              {Math.round(row.confidence * 100)}%
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-2 mt-4">
+                <div className="flex items-center gap-2">
+                  {savedMappings.length > 0 && (
+                    <select
+                      className="text-sm border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-1.5 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
+                      onChange={(e) => {
+                        const id = e.target.value
+                        if (!id) return
+                        const saved = savedMappings.find((m) => m.id === id)
+                        if (saved) handleLoadSavedMapping(saved)
+                        e.target.value = ''
+                      }}
+                      value=""
+                    >
+                      <option value="">{t('loadSavedMapping')}</option>
+                      {savedMappings.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  {mappingSuggestions.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleSaveMapping}
+                      disabled={savingMapping}
+                      className="text-sm px-3 py-1.5 text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 disabled:opacity-50"
+                    >
+                      {savingMapping ? '…' : t('saveMapping')}
+                    </button>
+                  )}
+                </div>
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={cancelPreview}
+                    className="px-4 py-2 text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600"
+                  >
+                    {t('cancelPreview')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={confirmImport}
+                    disabled={uploadingFile}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {t('importAnyway')}
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Upload Progress */}
       {uploadingFile && (

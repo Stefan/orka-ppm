@@ -278,11 +278,15 @@ describe('Comments Service', () => {
     })
 
     it('formatRelativeTime should handle any valid date', () => {
+      const minTs = new Date('2020-01-01').getTime()
+      const maxTs = Date.now()
       fc.assert(
         fc.property(
-          fc.date({ min: new Date('2020-01-01'), max: new Date() }),
-          (date) => {
-            const result = formatRelativeTime(date.toISOString())
+          fc.integer({ min: minTs, max: maxTs }),
+          (ts) => {
+            const date = new Date(ts)
+            const iso = date.toISOString()
+            const result = formatRelativeTime(iso)
             expect(typeof result).toBe('string')
             expect(result.length).toBeGreaterThan(0)
           }

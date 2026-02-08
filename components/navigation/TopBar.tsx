@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import {
@@ -64,7 +65,6 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   const [analysisMenuOpen, setAnalysisMenuOpen] = useState(false)
   const [managementMenuOpen, setManagementMenuOpen] = useState(false)
   const [adminMenuOpen, setAdminMenuOpen] = useState(false)
-  const [showNav, setShowNav] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const moreMenuRef = useRef<HTMLDivElement>(null)
   const projectsMenuRef = useRef<HTMLDivElement>(null)
@@ -72,17 +72,6 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   const analysisMenuRef = useRef<HTMLDivElement>(null)
   const managementMenuRef = useRef<HTMLDivElement>(null)
   const adminMenuRef = useRef<HTMLDivElement>(null)
-
-  // Handle responsive navigation
-  useEffect(() => {
-    const handleResize = () => {
-      setShowNav(window.innerWidth >= 768)
-    }
-    
-    handleResize() // Initial check
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
 
   const handleLogout = async () => {
     try {
@@ -97,7 +86,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
     }
   }
 
-  // Close menus when clicking outside
+  // Close menus when clicking outside (use 'click' so the same gesture that opened the menu doesn't close it)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (projectsMenuRef.current && !projectsMenuRef.current.contains(event.target as Node)) {
@@ -124,11 +113,11 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
     }
 
     if (projectsMenuOpen || financialsMenuOpen || analysisMenuOpen || managementMenuOpen || adminMenuOpen || userMenuOpen || moreMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('click', handleClickOutside)
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('click', handleClickOutside)
     }
   }, [projectsMenuOpen, financialsMenuOpen, analysisMenuOpen, managementMenuOpen, adminMenuOpen, userMenuOpen, moreMenuOpen])
 
@@ -158,7 +147,6 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   // Toggle a specific dropdown, closing all others first
   const toggleDropdown = (setter: React.Dispatch<React.SetStateAction<boolean>>, current: boolean) => {
     closeAllDropdowns()
-    // Use setTimeout to ensure close happens before open
     if (!current) {
       setter(true)
     }
@@ -176,16 +164,43 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   const dropdownItemActive = 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md'
   const dropdownItemInactive = 'text-gray-700 dark:text-slate-200 hover:bg-blue-100 dark:hover:bg-slate-600 hover:text-blue-700 dark:hover:text-blue-300'
 
+  const headerRef = useRef<HTMLElement>(null)
+  const actionsRef = useRef<HTMLDivElement>(null)
+  const [dropdownAnchor, setDropdownAnchor] = useState<{ top: number; left: number } | null>(null)
+
+  // Position portaled dropdown under the open menu's trigger (so it isn't clipped by topbar overflow)
+  useEffect(() => {
+    const ref = projectsMenuOpen ? projectsMenuRef : financialsMenuOpen ? financialsMenuRef : analysisMenuOpen ? analysisMenuRef : managementMenuOpen ? managementMenuRef : adminMenuOpen ? adminMenuRef : null
+    if (!ref?.current) {
+      setDropdownAnchor(null)
+      return
+    }
+    const update = () => {
+      if (ref.current) {
+        const r = ref.current.getBoundingClientRect()
+        setDropdownAnchor({ top: r.bottom + 12, left: r.left })
+      }
+    }
+    update()
+    window.addEventListener('scroll', update, true)
+    window.addEventListener('resize', update)
+    return () => {
+      window.removeEventListener('scroll', update, true)
+      window.removeEventListener('resize', update)
+    }
+  }, [projectsMenuOpen, financialsMenuOpen, analysisMenuOpen, managementMenuOpen, adminMenuOpen])
+
   return (
-    <header data-testid="top-bar" className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 w-full" style={{ position: 'sticky', top: 0, zIndex: 9999, flexShrink: 0, minHeight: '64px', boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06)' }}>
-      <div className="flex items-center justify-between h-16 px-6 lg:px-8 w-full">
+    <header ref={headerRef} data-testid="top-bar" className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 w-full max-w-full overflow-visible" style={{ position: 'sticky', top: 0, zIndex: 9999, flexShrink: 0, minHeight: '64px', boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06)' }}>
+      <div className="relative flex items-center h-16 px-6 lg:px-8 w-full min-w-0 max-w-full overflow-visible">
+        {/* Left + Center: reserve space for actions; overflow-x-auto so nav scrolls instead of clipping profile */}
+        <div className="flex items-center flex-1 min-w-0 gap-1 pr-[220px] sm:pr-[260px] overflow-x-auto overflow-y-hidden">
         {/* Left Section: Logo + Menu Button */}
         <div data-testid="top-bar-logo" className="flex items-center space-x-5 flex-shrink-0">
           <button
             data-testid="top-bar-menu-toggle"
             onClick={onMenuToggle}
-            className="p-2.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-200"
-            style={{ display: showNav ? 'none' : 'block' }}
+            className="block lg:hidden p-2.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-200"
             aria-label={t('topbar.toggleMenu')}
           >
             <Menu className="h-5 w-5 text-gray-700 dark:text-slate-300" />
@@ -204,13 +219,10 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           </Link>
         </div>
 
-        {/* Left-aligned Navigation Links */}
+        {/* Left-aligned Navigation Links – min-w-0 so nav can shrink in landscape */}
         <nav
           data-testid="top-bar-nav"
-          className="items-center space-x-1 flex-1"
-          style={{
-            display: showNav ? 'flex' : 'none'
-          }}
+          className="hidden lg:flex items-center space-x-1 flex-1 min-w-0"
         >
           {/* Dashboard - Primary Overview */}
           <Link
@@ -224,7 +236,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           {/* Projects Dropdown */}
           <div className="relative" ref={projectsMenuRef}>
             <button
-              onClick={() => toggleDropdown(setProjectsMenuOpen, projectsMenuOpen)}
+              onClick={(e) => { e.stopPropagation(); toggleDropdown(setProjectsMenuOpen, projectsMenuOpen) }}
               className={`flex items-center space-x-1 ${navLinkBase} ${
                 pathname === '/projects' || pathname.startsWith('/projects/') || pathname === '/resources'
                   ? navLinkActive
@@ -237,47 +249,12 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
               <ChevronDown className="h-4 w-4" />
             </button>
 
-            {/* Projects Dropdown Menu */}
-            {projectsMenuOpen && (
-              <div
-                className="absolute left-0 mt-3 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
-                style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
-              >
-                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.projects')}</h3>
-                </div>
-                <Link
-                  href="/projects"
-                  className={`${dropdownItemBase} ${
-                    pathname === '/projects' || pathname.startsWith('/projects/')
-                      ? dropdownItemActive
-                      : dropdownItemInactive
-                  }`}
-                  onClick={() => setProjectsMenuOpen(false)}
-                >
-                  <GitBranch className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.allProjects')}</span>
-                </Link>
-                <Link
-                  href="/resources"
-                  className={`${dropdownItemBase} ${
-                    pathname === '/resources'
-                      ? dropdownItemActive
-                      : dropdownItemInactive
-                  }`}
-                  onClick={() => setProjectsMenuOpen(false)}
-                >
-                  <Users className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.resourceManagement')}</span>
-                </Link>
-              </div>
-            )}
           </div>
 
           {/* Financials Dropdown */}
           <div className="relative" ref={financialsMenuRef}>
             <button
-              onClick={() => toggleDropdown(setFinancialsMenuOpen, financialsMenuOpen)}
+              onClick={(e) => { e.stopPropagation(); toggleDropdown(setFinancialsMenuOpen, financialsMenuOpen) }}
               onMouseEnter={() => prefetchFinancials(session?.access_token)}
               className={`flex items-center space-x-1 ${navLinkBase} ${
                 pathname === '/financials' || pathname.startsWith('/financials/') || pathname === '/reports' || pathname.startsWith('/reports/') || pathname === '/project-controls'
@@ -291,70 +268,12 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
               <ChevronDown className="h-4 w-4" />
             </button>
 
-            {/* Financials Dropdown Menu */}
-            {financialsMenuOpen && (
-              <div className="absolute left-0 mt-3 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
-                   style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
-                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.financialManagement')}</h3>
-                </div>
-                <Link
-                  href="/financials"
-                  className={`${dropdownItemBase} ${
-                    pathname === '/financials' || pathname.startsWith('/financials/')
-                      ? dropdownItemActive
-                      : dropdownItemInactive
-                  }`}
-                  onClick={() => setFinancialsMenuOpen(false)}
-                  onMouseEnter={() => prefetchFinancials(session?.access_token)}
-                >
-                  <DollarSign className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.budgetCostTracking')}</span>
-                </Link>
-                <Link
-                  href="/reports"
-                  className={`${dropdownItemBase} ${
-                    (pathname === '/reports' || pathname.startsWith('/reports/')) && !pathname.startsWith('/reports/pmr')
-                      ? dropdownItemActive
-                      : dropdownItemInactive
-                  }`}
-                  onClick={() => setFinancialsMenuOpen(false)}
-                >
-                  <FileText className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.reportsAnalytics')}</span>
-                </Link>
-                <Link
-                  href="/project-controls"
-                  className={`${dropdownItemBase} ${
-                    pathname === '/project-controls'
-                      ? dropdownItemActive
-                      : dropdownItemInactive
-                  }`}
-                  onClick={() => setFinancialsMenuOpen(false)}
-                >
-                  <Target className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.projectControls')}</span>
-                </Link>
-                <Link
-                  href="/reports/pmr"
-                  className={`${dropdownItemBase} ${
-                    pathname === '/reports/pmr'
-                      ? dropdownItemActive
-                      : dropdownItemInactive
-                  }`}
-                  onClick={() => setFinancialsMenuOpen(false)}
-                >
-                  <BookOpen className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.projectMonthlyReport')}</span>
-                </Link>
-              </div>
-            )}
           </div>
 
           {/* Analysis Dropdown */}
           <div className="relative" ref={analysisMenuRef}>
             <button
-              onClick={() => toggleDropdown(setAnalysisMenuOpen, analysisMenuOpen)}
+              onClick={(e) => { e.stopPropagation(); toggleDropdown(setAnalysisMenuOpen, analysisMenuOpen) }}
               className={`flex items-center space-x-1 ${navLinkBase} ${
                 ['/risks', '/scenarios', '/monte-carlo', '/audit', '/schedules'].includes(pathname) || pathname.startsWith('/schedules/')
                   ? navLinkActive
@@ -367,61 +286,12 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
               <ChevronDown className="h-4 w-4" />
             </button>
 
-            {/* Analysis Dropdown Menu */}
-            {analysisMenuOpen && (
-              <div className="absolute left-0 mt-3 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
-                   style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
-                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.riskAnalysis')}</h3>
-                </div>
-                <Link
-                  href="/risks"
-                  className={`${dropdownItemBase} ${pathname === '/risks' ? dropdownItemActive : dropdownItemInactive}`}
-                  onClick={() => setAnalysisMenuOpen(false)}
-                >
-                  <AlertTriangle className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.riskManagement')}</span>
-                </Link>
-                <Link
-                  href="/scenarios"
-                  className={`${dropdownItemBase} ${pathname === '/scenarios' ? dropdownItemActive : dropdownItemInactive}`}
-                  onClick={() => setAnalysisMenuOpen(false)}
-                >
-                  <Layers className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.whatIfScenarios')}</span>
-                </Link>
-                <Link
-                  href="/monte-carlo"
-                  className={`${dropdownItemBase} ${pathname === '/monte-carlo' ? dropdownItemActive : dropdownItemInactive}`}
-                  onClick={() => setAnalysisMenuOpen(false)}
-                >
-                  <BarChart3 className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.monteCarloAnalysis')}</span>
-                </Link>
-                <Link
-                  href="/audit"
-                  className={`${dropdownItemBase} ${pathname === '/audit' ? dropdownItemActive : dropdownItemInactive}`}
-                  onClick={() => setAnalysisMenuOpen(false)}
-                >
-                  <FileText className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.auditTrail')}</span>
-                </Link>
-                <Link
-                  href="/schedules"
-                  className={`${dropdownItemBase} ${pathname === '/schedules' || pathname.startsWith('/schedules/') ? dropdownItemActive : dropdownItemInactive}`}
-                  onClick={() => setAnalysisMenuOpen(false)}
-                >
-                  <Calendar className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.scheduleManagement')}</span>
-                </Link>
-              </div>
-            )}
           </div>
 
           {/* Management Dropdown */}
           <div className="relative" ref={managementMenuRef}>
             <button
-              onClick={() => toggleDropdown(setManagementMenuOpen, managementMenuOpen)}
+              onClick={(e) => { e.stopPropagation(); toggleDropdown(setManagementMenuOpen, managementMenuOpen) }}
               className={`flex items-center space-x-1 ${navLinkBase} ${
                 ['/changes', '/feedback', '/features', '/import'].includes(pathname)
                   ? navLinkActive
@@ -434,53 +304,12 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
               <ChevronDown className="h-4 w-4" />
             </button>
 
-            {/* Management Dropdown Menu */}
-            {managementMenuOpen && (
-              <div className="absolute left-0 mt-3 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
-                   style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
-                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.changeFeedback')}</h3>
-                </div>
-                <Link
-                  href="/changes"
-                  className={`${dropdownItemBase} ${pathname === '/changes' ? dropdownItemActive : dropdownItemInactive}`}
-                  onClick={() => setManagementMenuOpen(false)}
-                >
-                  <GitPullRequest className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.changeManagement')}</span>
-                </Link>
-                <Link
-                  href="/feedback"
-                  className={`${dropdownItemBase} ${pathname === '/feedback' ? dropdownItemActive : dropdownItemInactive}`}
-                  onClick={() => setManagementMenuOpen(false)}
-                >
-                  <MessageSquare className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.feedbackIdeas')}</span>
-                </Link>
-                <Link
-                  href="/features"
-                  className={`${dropdownItemBase} ${pathname === '/features' ? dropdownItemActive : dropdownItemInactive}`}
-                  onClick={() => setManagementMenuOpen(false)}
-                >
-                  <Layers className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.featuresOverview')}</span>
-                </Link>
-                <Link
-                  href="/import"
-                  className={`${dropdownItemBase} ${pathname === '/import' ? dropdownItemActive : dropdownItemInactive}`}
-                  onClick={() => setManagementMenuOpen(false)}
-                >
-                  <Upload className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.dataImport')}</span>
-                </Link>
-              </div>
-            )}
           </div>
 
           {/* Admin Dropdown */}
           <div className="relative" ref={adminMenuRef}>
             <button
-              onClick={() => toggleDropdown(setAdminMenuOpen, adminMenuOpen)}
+              onClick={(e) => { e.stopPropagation(); toggleDropdown(setAdminMenuOpen, adminMenuOpen) }}
               className={`flex items-center space-x-1 ${navLinkBase} ${
                 ['/admin', '/admin/performance', '/admin/users'].includes(pathname) || pathname.startsWith('/admin/')
                   ? navLinkActive
@@ -494,47 +323,90 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
               <ChevronDown className="h-4 w-4" />
             </button>
 
-            {/* Admin Dropdown Menu */}
-            {adminMenuOpen && (
-              <div className="absolute left-0 mt-3 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
-                   style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
-                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.administration')}</h3>
-                </div>
-                <Link
-                  href="/admin"
-                  className={`${dropdownItemBase} ${pathname === '/admin' ? dropdownItemActive : dropdownItemInactive}`}
-                  onClick={() => setAdminMenuOpen(false)}
-                >
-                  <Shield className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.systemAdmin')}</span>
-                </Link>
-                <Link
-                  href="/admin/performance"
-                  className={`${dropdownItemBase} ${pathname === '/admin/performance' ? dropdownItemActive : dropdownItemInactive}`}
-                  onClick={() => setAdminMenuOpen(false)}
-                >
-                  <Activity className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.performanceMonitor')}</span>
-                </Link>
-                <Link
-                  href="/admin/users"
-                  className={`${dropdownItemBase} ${pathname === '/admin/users' ? dropdownItemActive : dropdownItemInactive}`}
-                  onClick={() => setAdminMenuOpen(false)}
-                >
-                  <Users className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="font-medium">{t('nav.userManagement')}</span>
-                </Link>
-              </div>
-            )}
           </div>
         </nav>
 
+        {/* Portaled dropdown panels (so they are not clipped by topbar overflow) */}
+        {(projectsMenuOpen || financialsMenuOpen || analysisMenuOpen || managementMenuOpen || adminMenuOpen) && dropdownAnchor && typeof document !== 'undefined' && createPortal(
+          <div
+            className="w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 animate-in fade-in slide-in-from-top-2 duration-200"
+            style={{ position: 'fixed', top: dropdownAnchor.top, left: dropdownAnchor.left, zIndex: 10050, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+          >
+            {projectsMenuOpen && (
+              <>
+                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.projects')}</h3>
+                </div>
+                <Link href="/projects" className={`${dropdownItemBase} ${pathname === '/projects' || pathname.startsWith('/projects/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setProjectsMenuOpen(false)}>
+                  <GitBranch className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.allProjects')}</span>
+                </Link>
+                <Link href="/resources" className={`${dropdownItemBase} ${pathname === '/resources' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setProjectsMenuOpen(false)}>
+                  <Users className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.resourceManagement')}</span>
+                </Link>
+              </>
+            )}
+            {financialsMenuOpen && (
+              <>
+                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.financialManagement')}</h3>
+                </div>
+                <Link href="/financials" className={`${dropdownItemBase} ${pathname === '/financials' || pathname.startsWith('/financials/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setFinancialsMenuOpen(false)} onMouseEnter={() => prefetchFinancials(session?.access_token)}>
+                  <DollarSign className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.budgetCostTracking')}</span>
+                </Link>
+                <Link href="/reports" className={`${dropdownItemBase} ${(pathname === '/reports' || pathname.startsWith('/reports/')) && !pathname.startsWith('/reports/pmr') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setFinancialsMenuOpen(false)}>
+                  <FileText className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.reportsAnalytics')}</span>
+                </Link>
+                <Link href="/project-controls" className={`${dropdownItemBase} ${pathname === '/project-controls' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setFinancialsMenuOpen(false)}>
+                  <Target className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.projectControls')}</span>
+                </Link>
+                <Link href="/reports/pmr" className={`${dropdownItemBase} ${pathname === '/reports/pmr' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setFinancialsMenuOpen(false)}>
+                  <BookOpen className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.projectMonthlyReport')}</span>
+                </Link>
+              </>
+            )}
+            {analysisMenuOpen && (
+              <>
+                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.riskAnalysis')}</h3>
+                </div>
+                <Link href="/risks" className={`${dropdownItemBase} ${pathname === '/risks' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setAnalysisMenuOpen(false)}><AlertTriangle className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.riskManagement')}</span></Link>
+                <Link href="/scenarios" className={`${dropdownItemBase} ${pathname === '/scenarios' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setAnalysisMenuOpen(false)}><Layers className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.whatIfScenarios')}</span></Link>
+                <Link href="/monte-carlo" className={`${dropdownItemBase} ${pathname === '/monte-carlo' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setAnalysisMenuOpen(false)}><BarChart3 className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.monteCarloAnalysis')}</span></Link>
+                <Link href="/audit" className={`${dropdownItemBase} ${pathname === '/audit' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setAnalysisMenuOpen(false)}><FileText className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.auditTrail')}</span></Link>
+                <Link href="/schedules" className={`${dropdownItemBase} ${pathname === '/schedules' || pathname.startsWith('/schedules/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setAnalysisMenuOpen(false)}><Calendar className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.scheduleManagement')}</span></Link>
+              </>
+            )}
+            {managementMenuOpen && (
+              <>
+                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.changeFeedback')}</h3>
+                </div>
+                <Link href="/changes" className={`${dropdownItemBase} ${pathname === '/changes' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setManagementMenuOpen(false)}><GitPullRequest className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.changeManagement')}</span></Link>
+                <Link href="/feedback" className={`${dropdownItemBase} ${pathname === '/feedback' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setManagementMenuOpen(false)}><MessageSquare className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.feedbackIdeas')}</span></Link>
+                <Link href="/features" className={`${dropdownItemBase} ${pathname === '/features' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setManagementMenuOpen(false)}><Layers className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.featuresOverview')}</span></Link>
+                <Link href="/import" className={`${dropdownItemBase} ${pathname === '/import' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setManagementMenuOpen(false)}><Upload className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.dataImport')}</span></Link>
+              </>
+            )}
+            {adminMenuOpen && (
+              <>
+                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.administration')}</h3>
+                </div>
+                <Link href="/admin" className={`${dropdownItemBase} ${pathname === '/admin' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setAdminMenuOpen(false)}><Shield className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.systemAdmin')}</span></Link>
+                <Link href="/admin/performance" className={`${dropdownItemBase} ${pathname === '/admin/performance' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setAdminMenuOpen(false)}><Activity className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.performanceMonitor')}</span></Link>
+                <Link href="/admin/users" className={`${dropdownItemBase} ${pathname === '/admin/users' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setAdminMenuOpen(false)}><Users className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.userManagement')}</span></Link>
+              </>
+            )}
+          </div>,
+          document.body
+        )}
+
         {/* Topbar Unified Search */}
         <TopbarSearch />
+        </div>
 
-        {/* Right Section: Theme, Language, Notifications, User Menu */}
-        <div data-testid="top-bar-actions" className="flex items-center space-x-3 flex-shrink-0">
+        {/* Right Section: fixed at right so profile always visible in landscape */}
+        <div ref={actionsRef} data-testid="top-bar-actions" className="absolute right-0 top-0 bottom-0 flex items-center space-x-2 sm:space-x-3 flex-shrink-0 z-10 pr-6 lg:pr-8 bg-white dark:bg-slate-900">
           {/* Theme Toggle (Light / Dark / System) */}
           <button
             data-testid="top-bar-theme-toggle"

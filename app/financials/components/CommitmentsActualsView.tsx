@@ -1,11 +1,13 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { RefreshCw } from 'lucide-react'
 import SubTabNavigation, { SubTabType } from './SubTabNavigation'
 import VarianceAnalysisView from './views/VarianceAnalysisView'
 import CommitmentsTable from './tables/CommitmentsTable'
 import ActualsTable from './tables/ActualsTable'
+import { SavedViewsDropdown } from '@/components/saved-views/SavedViewsDropdown'
+import type { SavedViewDefinition } from '@/lib/saved-views-api'
 
 interface CommitmentsActualsViewProps {
   session: any
@@ -26,7 +28,13 @@ export default function CommitmentsActualsView({
   const [activeSubTab, setActiveSubTab] = useState<SubTabType>('variance-analysis')
   const [projectFilter, setProjectFilter] = useState<string>('')
   const [isRefreshing, setIsRefreshing] = useState(false)
-  
+  const [appliedView, setAppliedView] = useState<SavedViewDefinition | null>(null)
+  const [currentDefinition, setCurrentDefinition] = useState<SavedViewDefinition>({})
+
+  const handleDefinitionChange = useCallback((def: SavedViewDefinition) => {
+    setCurrentDefinition(def)
+  }, [])
+
   // Refs for child components
   const varianceAnalysisRef = useRef<RefreshableComponent>(null)
   const commitmentsTableRef = useRef<RefreshableComponent>(null)
@@ -85,6 +93,8 @@ export default function CommitmentsActualsView({
             ref={commitmentsTableRef}
             accessToken={session?.access_token}
             onProjectClick={handleProjectClick}
+            initialView={appliedView}
+            onDefinitionChange={handleDefinitionChange}
           />
         )
       case 'actuals':
@@ -93,6 +103,8 @@ export default function CommitmentsActualsView({
             ref={actualsTableRef}
             accessToken={session?.access_token}
             onProjectClick={handleProjectClick}
+            initialView={appliedView}
+            onDefinitionChange={handleDefinitionChange}
           />
         )
       default:
@@ -107,15 +119,23 @@ export default function CommitmentsActualsView({
           activeTab={activeSubTab} 
           onTabChange={setActiveSubTab} 
         />
-        
-        <button
-          onClick={handleUnifiedRefresh}
-          disabled={isRefreshing}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-          {isRefreshing ? 'Refreshing...' : 'Refresh All'}
-        </button>
+        <div className="flex items-center gap-2">
+          <SavedViewsDropdown
+            scope="financials"
+            accessToken={session?.access_token}
+            currentDefinition={currentDefinition}
+            onApply={(def) => setAppliedView(def)}
+            label="Saved views"
+          />
+            <button
+            onClick={handleUnifiedRefresh}
+            disabled={isRefreshing}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {isRefreshing ? 'Refreshing...' : 'Refresh All'}
+          </button>
+        </div>
       </div>
       
       {renderSubTabContent()}

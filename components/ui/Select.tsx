@@ -118,14 +118,13 @@ export const Select: React.FC<SelectProps> = ({
   }
 
   return (
-    <div ref={selectRef} className="relative w-full">
+    <div ref={selectRef} className={cn('relative w-full', className)}>
       <div
         className={cn(
           selectBaseStyles,
           'relative cursor-pointer flex items-center',
           error && 'border-red-500',
-          disabled && 'opacity-50 cursor-not-allowed',
-          className
+          disabled && 'opacity-50 cursor-not-allowed'
         )}
         onClick={() => !disabled && setIsOpen(!isOpen)}
       >
@@ -145,7 +144,7 @@ export const Select: React.FC<SelectProps> = ({
       </div>
 
       {isOpen && !disabled && (
-        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg shadow-lg max-h-60 overflow-auto">
+        <div className="absolute left-0 right-0 z-50 w-full min-w-0 mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg shadow-lg max-h-60 overflow-auto">
           {options.length === 0 ? (
             <div className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400">No options available</div>
           ) : (

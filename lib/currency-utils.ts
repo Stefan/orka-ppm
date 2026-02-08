@@ -23,7 +23,13 @@ export function getCurrencyDisplayName(currency: Currency): string {
     [Currency.EUR]: 'Euro (EUR)',
     [Currency.GBP]: 'British Pound (GBP)',
     [Currency.CHF]: 'Swiss Franc (CHF)',
-    [Currency.JPY]: 'Japanese Yen (JPY)'
+    [Currency.JPY]: 'Japanese Yen (JPY)',
+    [Currency.PLN]: 'Polish Złoty (PLN)',
+    [Currency.MXN]: 'Mexican Peso (MXN)',
+    [Currency.CNY]: 'Chinese Yuan (CNY)',
+    [Currency.INR]: 'Indian Rupee (INR)',
+    [Currency.KRW]: 'South Korean Won (KRW)',
+    [Currency.VND]: 'Vietnamese Dong (VND)'
   }
   return displayNames[currency] || currency
 }

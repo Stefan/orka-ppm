@@ -10,8 +10,8 @@ import { FileText } from 'lucide-react'
 export default function ChangesPage() {
   return (
     <AppLayout>
-      <ResponsiveContainer padding="md">
-        <div data-testid="changes-page">
+      <ResponsiveContainer padding="md" className="min-w-0">
+        <div data-testid="changes-page" className="min-w-0">
           <div data-testid="changes-header" className="mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>

@@ -1,6 +1,7 @@
 /**
- * Help Chat Context API Endpoint
- * Provides contextual help based on current page/state
+ * Help Chat Context API Endpoint (Copilot-Chat-Integration, Phase 3)
+ * Provides contextual help based on current page, pathname, and optional entity.
+ * Body: { context?: string, pathname?: string, entityType?: string, entityId?: string }
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -8,10 +9,11 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { context } = body
+    const { context, pathname, entityType, entityId } = body
+    const path = pathname || context || '/'
     
-    // Mock contextual help based on current context
-    const contextualHelp = {
+    // Contextual help keyed by path (pathname or legacy context)
+    const contextualHelp: Record<string, { title: string; description: string; quickActions: Array<{ label: string; action: string }>; tips: string[] }> = {
       '/dashboards': {
         title: 'Dashboard Help',
         description: 'Your project portfolio dashboard provides real-time insights.',
@@ -39,10 +41,38 @@ export async function POST(request: NextRequest) {
           'Set up automated alerts for critical issues',
           'Leverage AI insights for resource optimization'
         ]
+      },
+      '/audit': {
+        title: 'Audit & Compliance Help',
+        description: 'Audit logs, anomaly detection, and semantic search.',
+        quickActions: [
+          { label: 'View Anomalies', action: 'open_anomalies_tab' },
+          { label: 'Semantic Search', action: 'open_search_tab' },
+          { label: 'Export Report', action: 'export_audit' }
+        ],
+        tips: [
+          'Use the Anomalies tab to review AI-flagged events',
+          'Semantic search finds events by meaning, not just keywords',
+          'Proactive toasts suggest reviewing anomalies when detected'
+        ]
+      },
+      '/financials': {
+        title: 'Financials Help',
+        description: 'Commitments, actuals, and variance tracking.',
+        quickActions: [
+          { label: 'Saved Views', action: 'saved_views' },
+          { label: 'CSV Import', action: 'csv_import' },
+          { label: 'Variance Alerts', action: 'variance_alerts' }
+        ],
+        tips: [
+          'Save filter/sort as a view for quick access',
+          'Use mapping suggestions when importing CSV',
+          'Check variance alerts for budget deviations'
+        ]
       }
     }
     
-    const helpData = contextualHelp[context as keyof typeof contextualHelp] || {
+    const helpData = contextualHelp[path as keyof typeof contextualHelp] || {
       title: 'General Help',
       description: 'Welcome to the PPM platform. How can I assist you?',
       quickActions: [
@@ -58,7 +88,10 @@ export async function POST(request: NextRequest) {
     }
     
     return NextResponse.json({
-      context,
+      context: path,
+      pathname: path,
+      entityType: entityType ?? null,
+      entityId: entityId ?? null,
       help: helpData,
       timestamp: new Date().toISOString()
     }, {

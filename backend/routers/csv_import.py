@@ -10,14 +10,23 @@ import io
 import json
 from datetime import datetime
 
+from pydantic import BaseModel
+
 from auth.dependencies import get_current_user
 from auth.rbac import require_permission, Permission
 from config.database import supabase, service_supabase
 from utils.converters import convert_uuids
 from services.actuals_commitments_import import ActualsCommitmentsImportService
 from services.enterprise_audit_service import EnterpriseAuditService
+from services.csv_mapping_suggestions import suggest_mapping
+from models.csv_import_mappings import CsvImportMappingCreate, CsvImportMappingResponse
 
 router = APIRouter(prefix="/csv-import", tags=["csv-import"])
+
+
+class SuggestMappingBody(BaseModel):
+    headers: List[str]
+    import_type: str = "commitments"
 
 
 def map_csv_columns(rows: List[Dict[str, Any]], import_type: str) -> List[Dict[str, Any]]:
@@ -274,6 +283,90 @@ def map_csv_columns(rows: List[Dict[str, Any]], import_type: str) -> List[Dict[s
         mapped_rows.append(mapped_row)
     
     return mapped_rows
+
+
+@router.post("/suggest-mapping")
+async def post_suggest_mapping(
+    body: SuggestMappingBody,
+    current_user=Depends(get_current_user),
+):
+    """
+    Suggest PPM field mapping for CSV headers (Cora-Surpass Phase 2.2).
+    Returns list of { source_header, target_field, confidence } for each header.
+    """
+    if body.import_type not in ("actuals", "commitments"):
+        return suggest_mapping(body.headers, "commitments")
+    return suggest_mapping(body.headers, body.import_type)
+
+
+def _user_id_from_user(user: Dict[str, Any]) -> str:
+    uid = user.get("user_id") or user.get("id") or user.get("sub")
+    if not uid:
+        raise HTTPException(status_code=401, detail="User ID not found")
+    return str(uid)
+
+
+@router.get("/mappings", response_model=List[CsvImportMappingResponse])
+async def list_csv_import_mappings(
+    import_type: Optional[str] = Query(None, description="Filter by import_type: commitments | actuals"),
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """List saved CSV column mappings for the current user (Phase 2.2)."""
+    if not supabase:
+        raise HTTPException(status_code=503, detail="Database unavailable")
+    user_id = _user_id_from_user(current_user)
+    try:
+        query = supabase.table("csv_import_mappings").select("*").eq("user_id", user_id)
+        if import_type and import_type in ("commitments", "actuals"):
+            query = query.eq("import_type", import_type)
+        response = query.order("created_at", desc=True).execute()
+        return [CsvImportMappingResponse(**convert_uuids(row)) for row in (response.data or [])]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to list mappings")
+
+
+@router.post("/mappings", response_model=CsvImportMappingResponse, status_code=201)
+async def create_csv_import_mapping(
+    body: CsvImportMappingCreate,
+    current_user: Dict[str, Any] = Depends(require_permission(Permission.data_import)),
+):
+    """Save a CSV column mapping for reuse (Phase 2.2)."""
+    if not supabase:
+        raise HTTPException(status_code=503, detail="Database unavailable")
+    user_id = _user_id_from_user(current_user)
+    org_id = current_user.get("organization_id") or current_user.get("tenant_id")
+    row = {
+        "user_id": user_id,
+        "organization_id": str(org_id) if org_id else None,
+        "name": body.name,
+        "import_type": body.import_type,
+        "mapping": body.mapping,
+    }
+    try:
+        response = supabase.table("csv_import_mappings").insert(row).execute()
+        if not response.data:
+            raise HTTPException(status_code=400, detail="Insert failed")
+        return CsvImportMappingResponse(**convert_uuids(response.data[0]))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to save mapping")
+
+
+@router.delete("/mappings/{mapping_id}", status_code=204)
+async def delete_csv_import_mapping(
+    mapping_id: UUID,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """Delete a saved CSV mapping (Phase 2.2). Idempotent: 204 even if not found."""
+    if not supabase:
+        raise HTTPException(status_code=503, detail="Database unavailable")
+    user_id = _user_id_from_user(current_user)
+    try:
+        supabase.table("csv_import_mappings").delete().eq("id", str(mapping_id)).eq("user_id", user_id).execute()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to delete mapping")
+
 
 @router.post("/upload")
 async def upload_csv_file(
@@ -726,7 +819,7 @@ def _commitments_cache_key(org_id: str, offset: int, limit: int, project_nr: Opt
 @router.get("/commitments")
 async def get_commitments(
     request: Request,
-    limit: int = Query(100, ge=1, le=1000),
+    limit: int = Query(100, ge=1, le=10000),
     offset: int = Query(0, ge=0),
     project_nr: Optional[str] = None,
     current_user = Depends(get_current_user)
@@ -782,7 +875,7 @@ def _actuals_cache_key(org_id: str, offset: int, limit: int, project_nr: Optiona
 @router.get("/actuals")
 async def get_actuals(
     request: Request,
-    limit: int = Query(100, ge=1, le=1000),
+    limit: int = Query(100, ge=1, le=10000),
     offset: int = Query(0, ge=0),
     project_nr: Optional[str] = None,
     current_user = Depends(get_current_user)

@@ -246,8 +246,8 @@ export default function MonteCarloPage() {
 
   return (
     <AppLayout>
-      <ResponsiveContainer padding="md" className="space-y-6">
-        <div data-testid="monte-carlo-page">
+      <ResponsiveContainer padding="md" className="min-w-0 space-y-6">
+        <div data-testid="monte-carlo-page" className="min-w-0">
         {/* Header */}
         <div data-testid="monte-carlo-header" data-tour="montecarlo-voice" className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
           <div>
@@ -257,16 +257,18 @@ export default function MonteCarloPage() {
             </p>
           </div>
           
-          <div data-tour="montecarlo-ai-scenarios" className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 items-start sm:items-center">
+          <div data-tour="montecarlo-ai-scenarios" className="flex flex-wrap gap-2 sm:gap-3 items-center">
             <TourTriggerButton
               onStart={hasCompletedTour ? resetAndStartTour : startTour}
               hasCompletedTour={hasCompletedTour}
+              className="shrink-0 whitespace-nowrap"
             />
             <TouchButton
               onClick={() => setShowConfig(!showConfig)}
               variant="secondary"
               size="md"
-              leftIcon={<Settings className="h-4 w-4" />}
+              leftIcon={<Settings className="h-4 w-4 shrink-0" />}
+              className="shrink-0 whitespace-nowrap"
             >
               {t('monteCarlo.configure')}
             </TouchButton>
@@ -276,8 +278,9 @@ export default function MonteCarloPage() {
               disabled={loading || config.risks.length === 0}
               variant="primary"
               size="md"
-              leftIcon={<Play className="h-4 w-4" />}
+              leftIcon={<Play className="h-4 w-4 shrink-0" />}
               loading={loading}
+              className="shrink-0 whitespace-nowrap"
             >
               {loading ? t('monteCarlo.running') : t('monteCarlo.runSimulation')}
             </TouchButton>
@@ -411,10 +414,10 @@ export default function MonteCarloPage() {
           </div>
         )}
 
-        {/* Simulation Results Summary */}
+        {/* Simulation Results Summary – 2 cards per row */}
         {activeSimulation && (
           <AdaptiveGrid 
-            columns={{ mobile: 1, tablet: 2, desktop: 4 }}
+            columns={{ mobile: 1, tablet: 2, desktop: 2 }}
             gap="md"
           >
             <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
@@ -481,7 +484,7 @@ export default function MonteCarloPage() {
 
         {/* Monte Carlo Visualization Component (Charts / Heatmap) */}
         {activeSimulation && (
-          <div data-tour="montecarlo-heatmap">
+          <div data-tour="montecarlo-heatmap" className="pt-6">
             <MonteCarloVisualization
               simulationId={activeSimulation.simulation_id}
               session={session}

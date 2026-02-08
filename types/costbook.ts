@@ -6,7 +6,13 @@ export enum Currency {
   EUR = 'EUR',
   GBP = 'GBP',
   CHF = 'CHF',
-  JPY = 'JPY'
+  JPY = 'JPY',
+  PLN = 'PLN',
+  MXN = 'MXN',
+  CNY = 'CNY',
+  INR = 'INR',
+  KRW = 'KRW',
+  VND = 'VND'
 }
 
 export enum ProjectStatus {
@@ -125,51 +131,51 @@ export interface KPIMetrics {
   under_budget_count: number
 }
 
-// Currency conversion constants (hardcoded for Phase 1)
-export const EXCHANGE_RATES: Record<Currency, Record<Currency, number>> = {
-  [Currency.USD]: {
-    [Currency.USD]: 1.0,
-    [Currency.EUR]: 0.85,
-    [Currency.GBP]: 0.73,
-    [Currency.CHF]: 0.92,
-    [Currency.JPY]: 110.0
-  },
-  [Currency.EUR]: {
-    [Currency.USD]: 1.18,
-    [Currency.EUR]: 1.0,
-    [Currency.GBP]: 0.86,
-    [Currency.CHF]: 1.08,
-    [Currency.JPY]: 129.4
-  },
-  [Currency.GBP]: {
-    [Currency.USD]: 1.37,
-    [Currency.EUR]: 1.16,
-    [Currency.GBP]: 1.0,
-    [Currency.CHF]: 1.26,
-    [Currency.JPY]: 150.6
-  },
-  [Currency.CHF]: {
-    [Currency.USD]: 1.09,
-    [Currency.EUR]: 0.93,
-    [Currency.GBP]: 0.79,
-    [Currency.CHF]: 1.0,
-    [Currency.JPY]: 119.6
-  },
-  [Currency.JPY]: {
-    [Currency.USD]: 0.0091,
-    [Currency.EUR]: 0.0077,
-    [Currency.GBP]: 0.0066,
-    [Currency.CHF]: 0.0084,
-    [Currency.JPY]: 1.0
-  }
+// Approximate USD rates for display/conversion (Phase 1). New currencies converted via USD when no direct rate.
+const USD_PER: Record<Currency, number> = {
+  [Currency.USD]: 1.0,
+  [Currency.EUR]: 0.85,
+  [Currency.GBP]: 0.73,
+  [Currency.CHF]: 0.92,
+  [Currency.JPY]: 0.0091,
+  [Currency.PLN]: 0.25,
+  [Currency.MXN]: 0.059,
+  [Currency.CNY]: 0.14,
+  [Currency.INR]: 0.012,
+  [Currency.KRW]: 0.00077,
+  [Currency.VND]: 0.00004
 }
+
+function buildExchangeRates(): Record<Currency, Record<Currency, number>> {
+  const currencies = Object.values(Currency) as Currency[]
+  const result = {} as Record<Currency, Record<Currency, number>>
+  for (const from of currencies) {
+    result[from] = {} as Record<Currency, number>
+    for (const to of currencies) {
+      if (from === to) {
+        result[from][to] = 1.0
+      } else {
+        result[from][to] = USD_PER[to] / USD_PER[from]
+      }
+    }
+  }
+  return result
+}
+
+export const EXCHANGE_RATES: Record<Currency, Record<Currency, number>> = buildExchangeRates()
 
 export const CURRENCY_SYMBOLS: Record<Currency, string> = {
   [Currency.USD]: '$',
   [Currency.EUR]: '€',
   [Currency.GBP]: '£',
   [Currency.CHF]: 'CHF',
-  [Currency.JPY]: '¥'
+  [Currency.JPY]: '¥',
+  [Currency.PLN]: 'zł',
+  [Currency.MXN]: '$',
+  [Currency.CNY]: '¥',
+  [Currency.INR]: '₹',
+  [Currency.KRW]: '₩',
+  [Currency.VND]: '₫'
 }
 
 // Transaction types for unified processing (Phase 2)

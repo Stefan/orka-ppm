@@ -241,14 +241,14 @@ export default function ChangeRequestManager() {
     >
     <div className="space-y-6">
       {/* Header with Actions */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={handleCreateNew}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shrink-0"
           >
-            <Plus className="h-4 w-4" />
-            New Change Request
+            <Plus className="h-4 w-4 shrink-0" />
+            <span className="whitespace-nowrap">New Change Request</span>
           </button>
           
           {selectedItems.size > 0 && (
@@ -272,10 +272,10 @@ export default function ChangeRequestManager() {
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50"
+            className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 whitespace-nowrap"
           >
             <Filter className="h-4 w-4" />
             Filters
@@ -347,9 +347,53 @@ export default function ChangeRequestManager() {
         )}
       </div>
 
-      {/* Change Requests Table */}
+      {/* Change Requests: cards on mobile, table from md up */}
       <div className="bg-white dark:bg-slate-800 rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile card list (only when there are items) */}
+        {filteredChangeRequests.length > 0 && (
+        <div className="md:hidden divide-y divide-gray-200 dark:divide-slate-700">
+          {filteredChangeRequests.map((cr) => (
+            <div key={cr.id} className="p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-medium text-gray-900 dark:text-slate-100">{cr.change_number}</div>
+                  <div className="text-sm font-medium text-gray-900 dark:text-slate-100 truncate">{cr.title}</div>
+                  <div className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{cr.project_name}</div>
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200 capitalize">{cr.change_type}</span>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${getPriorityColor(cr.priority)}`}>{cr.priority}</span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-2 text-xs text-gray-600 dark:text-slate-300">
+                    {getStatusIcon(cr.status)}
+                    <span className="capitalize">{cr.status.replace('_', ' ')}</span>
+                  </div>
+                  {(cr.estimated_cost_impact != null || cr.estimated_schedule_impact_days != null) && (
+                    <div className="text-xs text-gray-600 dark:text-slate-300 mt-1">
+                      {cr.estimated_cost_impact != null && <span>${cr.estimated_cost_impact.toLocaleString()}</span>}
+                      {cr.estimated_schedule_impact_days != null && <span>{cr.estimated_schedule_impact_days} days</span>}
+                    </div>
+                  )}
+                  {cr.implementation_progress !== undefined && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="flex-1 min-w-0 bg-gray-200 dark:bg-slate-700 rounded-full h-1.5" role="progressbar">
+                        <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${cr.implementation_progress}%` }} />
+                      </div>
+                      <span className="text-xs text-gray-500 dark:text-slate-400">{cr.implementation_progress}%</span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button onClick={() => handleViewDetails(cr.id)} className="p-2 text-blue-600 dark:text-blue-400" title="View" aria-label="View"><Eye className="h-4 w-4" /></button>
+                  <button onClick={() => handleEdit(cr.id)} className="p-2 text-gray-600 dark:text-slate-300" title="Edit" aria-label="Edit"><Edit className="h-4 w-4" /></button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        )}
+
+        {/* Desktop table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
             <thead className="bg-gray-50 dark:bg-slate-800/50">
               <tr>
@@ -513,11 +557,11 @@ export default function ChangeRequestManager() {
 
       {/* Pagination */}
       {filteredChangeRequests.length > 0 && (
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-700 dark:text-slate-300">
+        <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
+          <div className="text-sm text-gray-700 dark:text-slate-300 min-w-0">
             Showing {filteredChangeRequests.length} of {changeRequests?.length || 0} change requests
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button className="px-3 py-1 border border-gray-300 dark:border-slate-600 rounded hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 disabled:opacity-50">
               Previous
             </button>

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useCallback, useEffect } from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import { 
   ResponsiveContainer, 
   BarChart, 
@@ -76,6 +77,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
   className = '',
   onDataPointClick
 }) => {
+  const { t } = useTranslations()
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<HTMLDivElement>(null)
   const [touchState, setTouchState] = useState<TouchState>({
@@ -352,7 +354,9 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
   const renderChart = () => {
     if (!isMounted) return null // Prevent SSR issues
     
-    const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1024
+    const isMobile = width < 768
+    const isTabletOrSmaller = width < 1024 // iPad Air ~820px: compact layout, no overflowing legend
     const chartHeight = viewState.isFullscreen 
       ? (typeof window !== 'undefined' ? Math.max(window.innerHeight - 120, 200) : height)
       : orientation === 'landscape' && isMobile 
@@ -363,7 +367,9 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
       data,
       margin: isMobile 
         ? { top: 10, right: 10, left: 10, bottom: 10 }
-        : { top: 20, right: 30, left: 20, bottom: 20 }
+        : isTabletOrSmaller
+          ? { top: 10, right: 15, left: 15, bottom: 10 }
+          : { top: 20, right: 30, left: 20, bottom: 20 }
     }
 
     const tickProps = {
@@ -406,12 +412,12 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
               data={data}
               cx="50%"
               cy="50%"
-              outerRadius={Math.min(chartHeight * 0.3, isMobile ? 80 : 120)}
+              outerRadius={Math.min(chartHeight * 0.3, isMobile ? 80 : isTabletOrSmaller ? 95 : 120)}
               fill="#8884d8"
               dataKey={dataKey}
               onClick={handleChartClick}
               style={{ cursor: 'pointer' }}
-              label={isMobile ? false : ({ name, percent }) => 
+              label={isTabletOrSmaller ? false : ({ name, percent }) =>
                 `${name}: ${((percent || 0) * 100).toFixed(1)}%`
               }
             >
@@ -423,7 +429,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
               ))}
             </Pie>
             <Tooltip content={<MobileTooltip />} />
-            {showLegend && <Legend />}
+            {showLegend && !isTabletOrSmaller && <Legend />}
           </PieChart>
         )
 
@@ -489,7 +495,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
             minHeight: '200px'
           }}
         >
-          <div className="text-gray-500 dark:text-slate-400 text-sm">Loading chart...</div>
+          <div className="text-gray-500 dark:text-slate-400 text-sm">{t('charts.loadingChart')}</div>
         </div>
       </div>
     )
@@ -507,7 +513,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
           )}
           {orientation === 'landscape' && (
             <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
-              Landscape mode - optimized for better viewing
+              {t('charts.landscapeMode')}
             </p>
           )}
         </div>
@@ -573,11 +579,11 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
         style={{ 
           height: viewState.isFullscreen 
             ? 'calc(100vh - 80px)' 
-            : Math.max(height, 200), // Ensure minimum height
-          minHeight: '200px', // CSS fallback for minimum height
+            : Math.max(height, 200),
+          minHeight: '200px',
           width: '100%',
-          minWidth: '300px', // Ensure minimum width
-          touchAction: 'none' // Prevent default touch behaviors
+          minWidth: 0,
+          touchAction: 'none'
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -585,26 +591,25 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
       >
         <div
           ref={chartRef}
-          className="w-full transition-transform duration-200 ease-out"
+          className="w-full min-w-0 transition-transform duration-200 ease-out"
           style={{
-            height: '300px', // Fixed height instead of h-full
+            height: '300px',
             transform: chartTransform,
-            transformOrigin: 'center center',
-            minWidth: '400px' // Increased minimum width
+            transformOrigin: 'center center'
           }}
         >
           {isMounted ? (
             <ResponsiveContainer
               width="100%"
-              height={300} // Fixed height instead of 100%
-              minWidth={400} // Increased minimum width
-              debounce={50} // Add debounce to prevent rapid resize calculations
+              height={300}
+              minWidth={0}
+              debounce={50}
             >
               {renderChart()}
             </ResponsiveContainer>
           ) : (
             <div className="w-full h-full bg-gray-100 dark:bg-slate-700 animate-pulse rounded flex items-center justify-center">
-              <div className="text-gray-400 dark:text-slate-500 text-sm">Loading chart...</div>
+              <div className="text-gray-400 dark:text-slate-500 text-sm">{t('charts.loadingChart')}</div>
             </div>
           )}
         </div>
@@ -613,7 +618,7 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
         {enablePinchZoom && viewState.scale === 1 && (
           <div className="absolute bottom-2 left-2 right-2 text-center">
             <p className="text-xs text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-800 bg-opacity-80 rounded px-2 py-1 inline-block">
-              Pinch to zoom • Tap to interact • Double tap to reset
+              {t('charts.pinchToZoom')}
             </p>
           </div>
         )}
@@ -626,12 +631,12 @@ const MobileOptimizedChart: React.FC<MobileOptimizedChartProps> = ({
         )}
       </div>
 
-      {/* Mobile Legend (when hidden from chart) */}
-      {showLegend && typeof window !== 'undefined' && window.innerWidth < 768 && type === 'pie' && (
+      {/* Legend below chart on mobile/tablet (avoids Recharts horizontal overflow on iPad) */}
+      {showLegend && typeof window !== 'undefined' && (window.innerWidth < 768 || (type === 'pie' && window.innerWidth < 1024)) && type === 'pie' && (
         <div className="p-3 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
-          <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-2 text-xs">
             {data.map((entry, index) => (
-              <div key={index} className="flex items-center">
+              <div key={index} className="flex items-center min-w-0">
                 <div 
                   className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
                   style={{ backgroundColor: entry.color || colors[index % colors.length] }}

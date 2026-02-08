@@ -10,6 +10,7 @@ import {
   printCoverageReport,
 } from '../coverage';
 import { loadTranslations, clearTranslationCache } from '../loader';
+import { SUPPORTED_LANGUAGES } from '../types';
 
 // Mock fetch globally
 global.fetch = jest.fn();
@@ -92,17 +93,15 @@ describe('Translation Coverage Report', () => {
       // Verify reference locale is English
       expect(report.referenceLocale).toBe('en');
 
-      // Verify all 6 languages are included
-      expect(report.languages).toHaveLength(6);
+      // Verify all supported languages are included
+      expect(report.languages).toHaveLength(SUPPORTED_LANGUAGES.length);
 
       // Verify language codes
       const languageCodes = report.languages.map(lang => lang.locale);
-      expect(languageCodes).toContain('en');
-      expect(languageCodes).toContain('de');
-      expect(languageCodes).toContain('fr');
-      expect(languageCodes).toContain('es');
-      expect(languageCodes).toContain('pl');
-      expect(languageCodes).toContain('gsw');
+      const expectedCodes = SUPPORTED_LANGUAGES.map((l) => l.code);
+      for (const code of expectedCodes) {
+        expect(languageCodes).toContain(code);
+      }
 
       // Verify each language report has required fields
       for (const langReport of report.languages) {
@@ -340,7 +339,7 @@ describe('Translation Coverage Report', () => {
 
       // Should still generate a valid report
       expect(report).toBeDefined();
-      expect(report.languages).toHaveLength(6);
+      expect(report.languages).toHaveLength(SUPPORTED_LANGUAGES.length);
     });
 
     it('should handle nested translation structures', async () => {

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { 
   ChevronRight, ChevronDown, Upload, Plus, Edit2, Trash2, 
   Download, RefreshCw, Search, Filter, AlertCircle, CheckCircle
@@ -24,6 +24,24 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [importResult, setImportResult] = useState<POImportResult | null>(null)
+  const toolbarRowRef = useRef<HTMLDivElement>(null)
+
+  // #region agent log
+  useEffect(() => {
+    const el = toolbarRowRef.current
+    if (!el) return
+    const log = () => {
+      const cw = el.clientWidth
+      const sw = el.scrollWidth
+      const main = document.querySelector('[data-testid="app-layout-main"]')
+      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'POBreakdownView.tsx:toolbar', message: 'toolbar_metrics', data: { toolbarClientWidth: cw, toolbarScrollWidth: sw, overflow: sw > cw, mainClientWidth: main?.clientWidth }, hypothesisId: 'H2', timestamp: Date.now() }) }).catch(() => {})
+    }
+    log()
+    const ro = new ResizeObserver(log)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  // #endregion
 
   useEffect(() => {
     if (!projectId) return
@@ -321,34 +339,34 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
     <div className="space-y-6">
       {/* Summary Cards */}
       {summary && (
-        <div className="summary-cards-grid gap-4">
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
-            <div className="text-sm text-gray-600 dark:text-slate-400 mb-1">Total Planned</div>
-            <div className="text-2xl font-bold text-gray-900 dark:text-slate-100">
+        <div className="summary-cards-grid min-w-0">
+          <div className="bg-white dark:bg-slate-800 p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 min-w-0">
+            <div className="text-xs sm:text-sm text-gray-600 dark:text-slate-400 mb-0.5 sm:mb-1 truncate">Total Planned</div>
+            <div className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-slate-100 truncate">
               {summary.total_planned.toLocaleString()} {summary.currency}
             </div>
           </div>
           
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
-            <div className="text-sm text-gray-600 dark:text-slate-400 mb-1">Total Committed</div>
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+          <div className="bg-white dark:bg-slate-800 p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 min-w-0">
+            <div className="text-xs sm:text-sm text-gray-600 dark:text-slate-400 mb-0.5 sm:mb-1 truncate">Total Committed</div>
+            <div className="text-lg sm:text-2xl font-bold text-blue-600 dark:text-blue-400 truncate">
               {summary.total_committed.toLocaleString()} {summary.currency}
             </div>
           </div>
           
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
-            <div className="text-sm text-gray-600 dark:text-slate-400 mb-1">Total Actual</div>
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+          <div className="bg-white dark:bg-slate-800 p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 min-w-0">
+            <div className="text-xs sm:text-sm text-gray-600 dark:text-slate-400 mb-0.5 sm:mb-1 truncate">Total Actual</div>
+            <div className="text-lg sm:text-2xl font-bold text-green-600 dark:text-green-400 truncate">
               {summary.total_actual.toLocaleString()} {summary.currency}
             </div>
           </div>
           
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
-            <div className="text-sm text-gray-600 dark:text-slate-400 mb-1">Remaining</div>
-            <div className="text-2xl font-bold text-gray-900 dark:text-slate-100">
+          <div className="bg-white dark:bg-slate-800 p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 min-w-0">
+            <div className="text-xs sm:text-sm text-gray-600 dark:text-slate-400 mb-0.5 sm:mb-1 truncate">Remaining</div>
+            <div className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-slate-100 truncate">
               {summary.total_remaining.toLocaleString()} {summary.currency}
             </div>
-            <div className="text-xs text-gray-500 dark:text-slate-500 mt-1">
+            <div className="text-xs text-gray-500 dark:text-slate-500 mt-1 truncate">
               {summary.breakdown_count} items, {summary.hierarchy_levels} levels
             </div>
           </div>
@@ -356,8 +374,8 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
       )}
       
       {/* Toolbar */}
-      <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
-        <div className="flex items-center justify-between">
+      <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 min-w-0">
+        <div ref={toolbarRowRef} className="flex items-center justify-between flex-wrap gap-2 overflow-x-auto min-w-0">
           <div className="flex items-center space-x-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />

@@ -77,7 +77,27 @@
     "refresh": "更新",
     "traditionalView": "従来のビューに切り替え",
     "aiView": "AI強化ビューに切り替え",
-    "fallbackData": "フォールバックデータを使用中"
+    "fallbackData": "フォールバックデータを使用中",
+    "aiInsightsTitle": "AI推奨",
+    "aiInsightsSummary": "予算最適化には分散アラートをご利用ください。重大な乖離はアラートの上部に表示されます。",
+    "last7Days": "過去 7 日間",
+    "last30Days": "過去 30 日間",
+    "last90Days": "過去 90 日間",
+    "thisYear": "今年",
+    "alerts": {
+      "budgetOverrunTitle": "予算超過",
+      "budgetOverrunDesc": "プロジェクト Alpha が予算を 15% 超過",
+      "scheduleDelayRiskTitle": "スケジュール遅延リスク",
+      "scheduleDelayRiskDesc": "クリティカルパス活動が 3 日遅延",
+      "timelineDelayTitle": "スケジュール遅延",
+      "timelineDelayDesc": "プロジェクト Beta が 2 週間遅れ",
+      "resourceConflictTitle": "リソース競合",
+      "resourceConflictDesc": "メンバーが複数プロジェクトにアサイン"
+    }
+  },
+  "guidedTour": {
+    "startTour": "ツアーを開始",
+    "restartTour": "ツアーを再開"
   },
   "kpi": {
     "successRate": "成功率",
@@ -104,7 +124,10 @@
     "charts": "チャート",
     "resources": "リソース",
     "financials": "財務",
-    "reports": "レポート"
+    "reports": "レポート",
+    "timeline": "タイムライン",
+    "analytics": "分析",
+    "importProjects": "プロジェクトをインポート"
   },
   "projects": {
     "recentProjects": "最近のプロジェクト"
@@ -167,6 +190,7 @@
     "retry": "再試行",
     "close": "閉じる",
     "save": "保存",
+    "actions": "操作",
     "saving": "保存中...",
     "saveChanges": "変更を保存",
     "cancel": "キャンセル",
@@ -323,7 +347,10 @@
     "noData": "変動データが利用できません。",
     "importCsvToSee": "CSVファイルをインポートして変動分析を表示",
     "dataUnavailable": "変動データが利用できません: {error}",
-    "importCsv": "CSVのインポート"
+    "importCsv": "CSVのインポート",
+    "period7d": "7日間",
+    "period30d": "30日間",
+    "period90d": "90日間"
   },
   "financials": {
     "title": "財務管理",
@@ -489,10 +516,15 @@
     "aiOptimize": "AI最適化",
     "ai": "AI",
     "addResource": "リソース追加",
+    "addNewResource": "新規リソース追加",
+    "addShort": "追加",
     "refreshNow": "今すぐ更新",
     "enableAutoRefresh": "自動更新を有効にする (30秒)",
     "disableAutoRefresh": "自動更新を無効にする",
     "exportData": "リソースデータをエクスポート",
+    "export": "エクスポート",
+    "refresh": "更新",
+    "filters": "フィルター",
     "showFilters": "フィルターを表示",
     "hideFilters": "フィルターを非表示",
     "showOptimization": "AI最適化を表示",
@@ -525,7 +557,35 @@
     "utilizationDistribution": "稼働率分布",
     "topSkills": "上位スキル",
     "roleDistribution": "役割分布",
-    "errorLoading": "リソースの読み込みエラー"
+    "errorLoading": "リソースの読み込みエラー",
+    "noRoleSpecified": "役割なし",
+    "availableHours": "利用可能時間",
+    "currentProjects": "現在のプロジェクト",
+    "viewDetails": "詳細を見る",
+    "edit": "編集",
+    "delete": "削除",
+    "unassigned": "未割り当て",
+    "utilization": "稼働率",
+    "skills": "スキル",
+    "hourlyRate": "時給",
+    "underUtilized": "低稼働",
+    "wellUtilized": "適正稼働",
+    "highlyUtilized": "高稼働",
+    "overUtilized": "過稼働",
+    "underUtilizedRange": "低稼働 (0–50%)",
+    "wellUtilizedRange": "適正稼働 (51–80%)",
+    "highlyUtilizedRange": "高稼働 (81–100%)",
+    "overUtilizedRange": "過稼働 (>100%)",
+    "utilizationInsights": "稼働の概要",
+    "tapCardsForDetails": "タップで詳細表示",
+    "mostUtilized": "稼働が高い順",
+    "moreSkills": "+{count} 件",
+    "deleteResource": "リソースを削除"
+  },
+  "charts": {
+    "landscapeMode": "横向きモード - 見やすく最適化",
+    "pinchToZoom": "ピンチでズーム • タップで操作 • ダブルタップでリセット",
+    "loadingChart": "グラフを読み込み中..."
   },
   "reports": {
     "title": "AI搭載レポート",

@@ -76,7 +76,27 @@
     "refresh": "Actualiser",
     "traditionalView": "Passer à la vue traditionnelle",
     "aiView": "Passer à la vue améliorée par IA",
-    "fallbackData": "Utilisation des données de secours"
+    "fallbackData": "Utilisation des données de secours",
+    "aiInsightsTitle": "Recommandation IA",
+    "aiInsightsSummary": "Utilisez les alertes de variance pour optimiser le budget. Les écarts critiques apparaissent en haut des alertes.",
+    "last7Days": "7 derniers jours",
+    "last30Days": "30 derniers jours",
+    "last90Days": "90 derniers jours",
+    "thisYear": "Cette année",
+    "alerts": {
+      "budgetOverrunTitle": "Dépassement de budget",
+      "budgetOverrunDesc": "Le projet Alpha a dépassé le budget de 15 %",
+      "scheduleDelayRiskTitle": "Risque de retard",
+      "scheduleDelayRiskDesc": "Activités critiques retardées de 3 jours",
+      "timelineDelayTitle": "Retard planning",
+      "timelineDelayDesc": "Le projet Beta a 2 semaines de retard",
+      "resourceConflictTitle": "Conflit de ressources",
+      "resourceConflictDesc": "Membre affecté à plusieurs projets"
+    }
+  },
+  "guidedTour": {
+    "startTour": "Démarrer la visite",
+    "restartTour": "Relancer la visite"
   },
   "kpi": {
     "successRate": "Taux de réussite",
@@ -103,7 +123,10 @@
     "charts": "Graphiques",
     "resources": "Ressources",
     "financials": "Finances",
-    "reports": "Rapports"
+    "reports": "Rapports",
+    "timeline": "Chronologie",
+    "analytics": "Analytiques",
+    "importProjects": "Importer des projets"
   },
   "projects": {
     "recentProjects": "Projets récents"
@@ -166,6 +189,7 @@
     "retry": "Réessayer",
     "close": "Fermer",
     "save": "Enregistrer",
+    "actions": "Actions",
     "cancel": "Annuler",
     "delete": "Supprimer",
     "edit": "Modifier",
@@ -320,7 +344,10 @@
     "noData": "Aucune donnée de variance disponible.",
     "importCsvToSee": "Importez des fichiers CSV pour voir l'analyse de variance.",
     "dataUnavailable": "Données de variance indisponibles : {error}",
-    "importCsv": "Importer CSV"
+    "importCsv": "Importer CSV",
+    "period7d": "7 jours",
+    "period30d": "30 jours",
+    "period90d": "90 jours"
   },
   "financials": {
     "title": "Gestion financière",
@@ -478,10 +505,15 @@
     "aiOptimize": "Optimiser IA",
     "ai": "IA",
     "addResource": "Ajouter une ressource",
+    "addNewResource": "Ajouter une nouvelle ressource",
+    "addShort": "Ajouter",
     "refreshNow": "Actualiser maintenant",
     "enableAutoRefresh": "Activer l'actualisation automatique (30s)",
     "disableAutoRefresh": "Désactiver l'actualisation automatique",
     "exportData": "Exporter les données de ressources",
+    "export": "Exporter",
+    "refresh": "Actualiser",
+    "filters": "Filtres",
     "showFilters": "Afficher les filtres",
     "hideFilters": "Masquer les filtres",
     "showOptimization": "Afficher l'optimisation IA",
@@ -514,7 +546,35 @@
     "utilizationDistribution": "Distribution de l'utilisation",
     "topSkills": "Compétences principales",
     "roleDistribution": "Distribution des rôles",
-    "errorLoading": "Erreur de chargement des ressources"
+    "errorLoading": "Erreur de chargement des ressources",
+    "noRoleSpecified": "Aucun rôle spécifié",
+    "availableHours": "Heures disponibles",
+    "currentProjects": "Projets actuels",
+    "viewDetails": "Voir les détails",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "unassigned": "Non assigné",
+    "utilization": "Utilisation",
+    "skills": "Compétences",
+    "hourlyRate": "Taux horaire",
+    "underUtilized": "Sous-utilisé",
+    "wellUtilized": "Bien utilisé",
+    "highlyUtilized": "Très utilisé",
+    "overUtilized": "Surutilisé",
+    "underUtilizedRange": "Sous-utilisé (0-50 %)",
+    "wellUtilizedRange": "Bien utilisé (51-80 %)",
+    "highlyUtilizedRange": "Très utilisé (81-100 %)",
+    "overUtilizedRange": "Surutilisé (>100 %)",
+    "utilizationInsights": "Aperçu de l'utilisation",
+    "tapCardsForDetails": "Appuyez sur les cartes pour les détails",
+    "mostUtilized": "Les plus utilisés",
+    "moreSkills": "+{count} de plus",
+    "deleteResource": "Supprimer la ressource"
+  },
+  "charts": {
+    "landscapeMode": "Mode paysage – optimisé pour une meilleure visualisation",
+    "pinchToZoom": "Pincer pour zoomer • Appuyer pour interagir • Double appui pour réinitialiser",
+    "loadingChart": "Chargement du graphique..."
   },
   "reports": {
     "title": "Rapports alimentés par IA",

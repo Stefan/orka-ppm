@@ -1,11 +1,12 @@
 'use client'
 
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import AppLayout from '../../components/shared/AppLayout'
 import { AlertTriangle, Clock, FileText, Search, BarChart3, Download, RefreshCw, FileDown } from 'lucide-react'
 import { getApiUrl } from '../../lib/api/client'
 import { useTranslations } from '../../lib/i18n/context'
+import { useToast } from '@/components/shared/Toast'
 import { Timeline, AnomalyDashboard, SemanticSearch, AuditFilters } from '../../components/audit'
 import type { AuditEvent, TimelineFilters } from '../../components/audit/Timeline'
 import type { AnomalyDetection } from '../../components/audit/AnomalyDashboard'
@@ -46,6 +47,8 @@ export default function AuditDashboard() {
   const { session } = useAuth()
   const { t } = useTranslations()
   const { formatDate } = useDateFormatter()
+  const toast = useToast()
+  const anomalyToastShownRef = useRef(false)
   const [activeTab, setActiveTab] = useState<TabType>('dashboard')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -335,6 +338,19 @@ export default function AuditDashboard() {
       fetchAnomalies()
     }
   }, [activeTab, session?.access_token, fetchRecentEvents, fetchTimelineEvents, fetchAnomalies])
+
+  // Proaktive Compliance-Toasts (Phase 3): Hinweis bei erkannten Anomalien
+  useEffect(() => {
+    if (!anomalyDetectionEnabled || anomaliesLoading || anomalies.length === 0) return
+    if (anomalyToastShownRef.current) return
+    anomalyToastShownRef.current = true
+    const message = t('audit.anomalyToastMessage') || 'Vorschlag: Überprüfe die markierten Einträge im Tab Anomalien.'
+    toast.warning(
+      t('audit.anomaliesDetected') || 'Anomalien erkannt',
+      message,
+      { duration: 8000 }
+    )
+  }, [anomalyDetectionEnabled, anomaliesLoading, anomalies.length, t, toast])
   
   // Fetch timeline events when filters change
   useEffect(() => {
@@ -414,7 +430,7 @@ export default function AuditDashboard() {
 
   return (
     <AppLayout>
-      <div data-testid="audit-page" className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
+      <div data-testid="audit-page" className="min-w-0 p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
         {/* Header */}
         <div data-testid="audit-header" className="flex flex-col space-y-4">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
@@ -575,9 +591,9 @@ export default function AuditDashboard() {
                   </div>
                 ) : stats ? (
                   <>
-                    {/* Stats Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+                    {/* Stats Cards: 2 per row on mobile for better space use, 4 on xl */}
+                    <div className="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
+                      <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 min-w-0">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('audit.stats.totalEvents')}</p>
@@ -587,7 +603,7 @@ export default function AuditDashboard() {
                         </div>
                       </div>
                       
-                      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+                      <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 min-w-0">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('audit.stats.anomalies')}</p>
@@ -597,7 +613,7 @@ export default function AuditDashboard() {
                         </div>
                       </div>
                       
-                      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+                      <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 min-w-0">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('audit.stats.criticalEvents')}</p>
@@ -607,7 +623,7 @@ export default function AuditDashboard() {
                         </div>
                       </div>
                       
-                      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+                      <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 min-w-0">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('audit.stats.eventRate')}</p>

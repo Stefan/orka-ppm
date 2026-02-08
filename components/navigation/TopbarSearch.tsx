@@ -172,7 +172,7 @@ export default function TopbarSearch() {
   }
 
   return (
-    <div ref={containerRef} className="relative flex-1 max-w-md mx-2 md:mx-4">
+    <div ref={containerRef} className="relative flex-1 min-w-0 max-w-48 lg:max-w-xs xl:max-w-md mx-2 md:mx-4">
       <div className="relative flex items-center">
         <Search className="absolute left-3 h-4 w-4 text-gray-400 dark:text-slate-500 pointer-events-none" />
         <input
@@ -181,7 +181,7 @@ export default function TopbarSearch() {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query.trim() && setOpen(true)}
           placeholder={t('topbar.searchPlaceholder')}
-          className="w-full md:w-96 pl-10 pr-10 py-2 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder-gray-500 dark:placeholder-slate-400 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 focus:shadow outline-none transition-all"
+          className="w-full min-w-0 pl-10 pr-10 py-2 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder-gray-500 dark:placeholder-slate-400 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 focus:shadow outline-none transition-all"
           aria-label={t('topbar.searchAria')}
         />
         {voiceSupported && (

@@ -76,7 +76,27 @@
     "refresh": "Odśwież",
     "traditionalView": "Przełącz na Widok Tradycyjny",
     "aiView": "Przełącz na Widok Wzmocniony AI",
-    "fallbackData": "Używanie danych zapasowych"
+    "fallbackData": "Używanie danych zapasowych",
+    "aiInsightsTitle": "Rekomendacja AI",
+    "aiInsightsSummary": "Użyj alertów wariancji do optymalizacji budżetu. Krytyczne odchylenia pojawiają się na górze w alertach.",
+    "last7Days": "Ostatnie 7 dni",
+    "last30Days": "Ostatnie 30 dni",
+    "last90Days": "Ostatnie 90 dni",
+    "thisYear": "Ten rok",
+    "alerts": {
+      "budgetOverrunTitle": "Przekroczenie budżetu",
+      "budgetOverrunDesc": "Projekt Alpha przekroczył budżet o 15 %",
+      "scheduleDelayRiskTitle": "Ryzyko opóźnienia",
+      "scheduleDelayRiskDesc": "Krytyczne aktywności opóźnione o 3 dni",
+      "timelineDelayTitle": "Opóźnienie harmonogramu",
+      "timelineDelayDesc": "Projekt Beta ma 2 tygodnie opóźnienia",
+      "resourceConflictTitle": "Konflikt zasobów",
+      "resourceConflictDesc": "Członek zespołu przypisany do wielu projektów"
+    }
+  },
+  "guidedTour": {
+    "startTour": "Rozpocznij wycieczkę",
+    "restartTour": "Uruchom ponownie"
   },
   "kpi": {
     "successRate": "Wskaźnik Sukcesu",
@@ -103,7 +123,10 @@
     "charts": "Wykresy",
     "resources": "Zasoby",
     "financials": "Finanse",
-    "reports": "Raporty"
+    "reports": "Raporty",
+    "timeline": "Oś czasu",
+    "analytics": "Analityka",
+    "importProjects": "Importuj projekty"
   },
   "projects": {
     "recentProjects": "Ostatnie Projekty"
@@ -166,6 +189,7 @@
     "retry": "Spróbuj ponownie",
     "close": "Zamknij",
     "save": "Zapisz",
+    "actions": "Akcje",
     "cancel": "Anuluj",
     "delete": "Usuń",
     "edit": "Edytuj",
@@ -316,7 +340,10 @@
     "noData": "Brak danych wariancji.",
     "importCsvToSee": "Zaimportuj pliki CSV, aby zobaczyć analizę wariancji.",
     "dataUnavailable": "Dane wariancji niedostępne: {error}",
-    "importCsv": "Importuj CSV"
+    "importCsv": "Importuj CSV",
+    "period7d": "7 dni",
+    "period30d": "30 dni",
+    "period90d": "90 dni"
   },
   "financials": {
     "title": "Zarządzanie Finansami",
@@ -474,10 +501,15 @@
     "aiOptimize": "Optymalizuj AI",
     "ai": "AI",
     "addResource": "Dodaj Zasób",
+    "addNewResource": "Dodaj nowy zasób",
+    "addShort": "Dodaj",
     "refreshNow": "Odśwież teraz",
     "enableAutoRefresh": "Włącz automatyczne odświeżanie (30s)",
     "disableAutoRefresh": "Wyłącz automatyczne odświeżanie",
     "exportData": "Eksportuj dane zasobów",
+    "export": "Eksportuj",
+    "refresh": "Odśwież",
+    "filters": "Filtry",
     "showFilters": "Pokaż filtry",
     "hideFilters": "Ukryj filtry",
     "showOptimization": "Pokaż optymalizację AI",
@@ -510,7 +542,35 @@
     "utilizationDistribution": "Rozkład Wykorzystania",
     "topSkills": "Najważniejsze Umiejętności",
     "roleDistribution": "Rozkład Ról",
-    "errorLoading": "Błąd ładowania zasobów"
+    "errorLoading": "Błąd ładowania zasobów",
+    "noRoleSpecified": "Nie określono roli",
+    "availableHours": "Dostępne godziny",
+    "currentProjects": "Aktualne projekty",
+    "viewDetails": "Zobacz szczegóły",
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "unassigned": "Nieprzypisany",
+    "utilization": "Wykorzystanie",
+    "skills": "Umiejętności",
+    "hourlyRate": "Stawka godzinowa",
+    "underUtilized": "Niewykorzystany",
+    "wellUtilized": "Dobrze wykorzystany",
+    "highlyUtilized": "Wysoko wykorzystany",
+    "overUtilized": "Przeciążony",
+    "underUtilizedRange": "Niewykorzystany (0–50 %)",
+    "wellUtilizedRange": "Dobrze wykorzystany (51–80 %)",
+    "highlyUtilizedRange": "Wysoko wykorzystany (81–100 %)",
+    "overUtilizedRange": "Przeciążony (>100 %)",
+    "utilizationInsights": "Przegląd wykorzystania",
+    "tapCardsForDetails": "Dotknij kart, aby zobaczyć szczegóły",
+    "mostUtilized": "Najbardziej wykorzystani",
+    "moreSkills": "+{count} więcej",
+    "deleteResource": "Usuń zasób"
+  },
+  "charts": {
+    "landscapeMode": "Tryb poziomy – zoptymalizowany do oglądania",
+    "pinchToZoom": "Szczypanie do powiększenia • Dotknij, aby wchodzić w interakcję • Podwójne dotknięcie, aby zresetować",
+    "loadingChart": "Ładowanie wykresu..."
   },
   "reports": {
     "title": "Raporty z AI",

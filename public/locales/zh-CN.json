@@ -77,7 +77,27 @@
     "refresh": "刷新",
     "traditionalView": "切换到传统视图",
     "aiView": "切换到 AI 增强视图",
-    "fallbackData": "使用备用数据"
+    "fallbackData": "使用备用数据",
+    "aiInsightsTitle": "AI 推荐",
+    "aiInsightsSummary": "使用方差警报优化预算。严重偏差会显示在警报顶部。",
+    "last7Days": "最近 7 天",
+    "last30Days": "最近 30 天",
+    "last90Days": "最近 90 天",
+    "thisYear": "今年",
+    "alerts": {
+      "budgetOverrunTitle": "预算超支",
+      "budgetOverrunDesc": "项目 Alpha 超出预算 15%",
+      "scheduleDelayRiskTitle": "进度延误风险",
+      "scheduleDelayRiskDesc": "关键路径活动延误 3 天",
+      "timelineDelayTitle": "时间线延误",
+      "timelineDelayDesc": "项目 Beta 落后计划 2 周",
+      "resourceConflictTitle": "资源冲突",
+      "resourceConflictDesc": "成员被分配至多个项目"
+    }
+  },
+  "guidedTour": {
+    "startTour": "开始导览",
+    "restartTour": "重新开始导览"
   },
   "kpi": {
     "successRate": "成功率",
@@ -104,7 +124,10 @@
     "charts": "图表",
     "resources": "资源",
     "financials": "财务",
-    "reports": "报告"
+    "reports": "报告",
+    "timeline": "时间线",
+    "analytics": "分析",
+    "importProjects": "导入项目"
   },
   "projects": {
     "recentProjects": "最近项目"
@@ -167,6 +190,7 @@
     "retry": "重试",
     "close": "关闭",
     "save": "保存",
+    "actions": "操作",
     "saving": "保存中...",
     "saveChanges": "保存更改",
     "cancel": "取消",
@@ -323,7 +347,10 @@
     "noData": "无偏差数据可用。",
     "importCsvToSee": "导入 CSV 文件查看偏差分析。",
     "dataUnavailable": "偏差数据不可用：{error}",
-    "importCsv": "导入 CSV"
+    "importCsv": "导入 CSV",
+    "period7d": "7 天",
+    "period30d": "30 天",
+    "period90d": "90 天"
   },
   "financials": {
     "title": "财务管理",
@@ -489,10 +516,15 @@
     "aiOptimize": "AI 优化",
     "ai": "AI",
     "addResource": "添加资源",
+    "addNewResource": "添加新资源",
+    "addShort": "添加",
     "refreshNow": "立即刷新",
     "enableAutoRefresh": "启用自动刷新 (30 秒)",
     "disableAutoRefresh": "禁用自动刷新",
     "exportData": "导出资源数据",
+    "export": "导出",
+    "refresh": "刷新",
+    "filters": "筛选",
     "showFilters": "显示筛选器",
     "hideFilters": "隐藏筛选器",
     "showOptimization": "显示 AI 优化",
@@ -525,7 +557,35 @@
     "utilizationDistribution": "利用率分布",
     "topSkills": "顶级技能",
     "roleDistribution": "角色分布",
-    "errorLoading": "加载资源出错"
+    "errorLoading": "加载资源出错",
+    "noRoleSpecified": "未指定角色",
+    "availableHours": "可用工时",
+    "currentProjects": "当前项目",
+    "viewDetails": "查看详情",
+    "edit": "编辑",
+    "delete": "删除",
+    "unassigned": "未分配",
+    "utilization": "利用率",
+    "skills": "技能",
+    "hourlyRate": "时薪",
+    "underUtilized": "低利用",
+    "wellUtilized": "适中",
+    "highlyUtilized": "高利用",
+    "overUtilized": "超负荷",
+    "underUtilizedRange": "低利用 (0–50%)",
+    "wellUtilizedRange": "适中 (51–80%)",
+    "highlyUtilizedRange": "高利用 (81–100%)",
+    "overUtilizedRange": "超负荷 (>100%)",
+    "utilizationInsights": "利用率概览",
+    "tapCardsForDetails": "点击卡片查看详情",
+    "mostUtilized": "利用率最高",
+    "moreSkills": "+{count} 更多",
+    "deleteResource": "删除资源"
+  },
+  "charts": {
+    "landscapeMode": "横屏模式 - 优化显示",
+    "pinchToZoom": "双指缩放 • 点击交互 • 双击重置",
+    "loadingChart": "图表加载中..."
   },
   "reports": {
     "title": "AI 驱动的报告",

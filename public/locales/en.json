@@ -77,7 +77,27 @@
     "refresh": "Refresh",
     "traditionalView": "Switch to Traditional View",
     "aiView": "Switch to AI-Enhanced View",
-    "fallbackData": "Using fallback data"
+    "fallbackData": "Using fallback data",
+    "aiInsightsTitle": "AI Recommendation",
+    "aiInsightsSummary": "Use variance alerts for budget optimization. Critical deviations appear at the top in the alerts.",
+    "last7Days": "Last 7 days",
+    "last30Days": "Last 30 days",
+    "last90Days": "Last 90 days",
+    "thisYear": "This year",
+    "alerts": {
+      "budgetOverrunTitle": "Budget Overrun",
+      "budgetOverrunDesc": "Project Alpha exceeded budget by 15%",
+      "scheduleDelayRiskTitle": "Schedule Delay Risk",
+      "scheduleDelayRiskDesc": "Critical path activities delayed by 3 days",
+      "timelineDelayTitle": "Timeline Delay",
+      "timelineDelayDesc": "Project Beta is 2 weeks behind schedule",
+      "resourceConflictTitle": "Resource Conflict",
+      "resourceConflictDesc": "Team member assigned to multiple projects"
+    }
+  },
+  "guidedTour": {
+    "startTour": "Start tour",
+    "restartTour": "Restart tour"
   },
   "kpi": {
     "successRate": "Success Rate",
@@ -104,7 +124,10 @@
     "charts": "Charts",
     "resources": "Resources",
     "financials": "Financials",
-    "reports": "Reports"
+    "reports": "Reports",
+    "timeline": "Timeline",
+    "analytics": "Analytics",
+    "importProjects": "Import Projects"
   },
   "projects": {
     "recentProjects": "Recent Projects"
@@ -167,6 +190,7 @@
     "retry": "Try again",
     "close": "Close",
     "save": "Save",
+    "actions": "Actions",
     "saving": "Saving...",
     "saveChanges": "Save Changes",
     "cancel": "Cancel",
@@ -249,7 +273,18 @@
     "warnings": "Warnings",
     "rowLabel": "Row {row}",
     "moreErrors": "... and {count} more errors",
-    "moreWarnings": "... and {count} more warnings"
+    "moreWarnings": "... and {count} more warnings",
+    "mappingPreview": "Column mapping preview",
+    "csvColumn": "CSV column",
+    "ppmField": "PPM field",
+    "confidence": "Match",
+    "importAnyway": "Import file",
+    "cancelPreview": "Cancel",
+    "loadingMapping": "Detecting columns…",
+    "noMappingSuggested": "No columns detected or no mapping suggested.",
+    "saveMapping": "Save mapping",
+    "loadSavedMapping": "Load saved mapping",
+    "mappingSaved": "Mapping saved."
   },
   "shared": {
     "shareableUrl": {
@@ -323,7 +358,10 @@
     "noData": "No variance data available.",
     "importCsvToSee": "Import CSV files to see variance analysis.",
     "dataUnavailable": "Variance data unavailable: {error}",
-    "importCsv": "Import CSV"
+    "importCsv": "Import CSV",
+    "period7d": "7 days",
+    "period30d": "30 days",
+    "period90d": "90 days"
   },
   "financials": {
     "title": "Financial Management",
@@ -490,10 +528,15 @@
     "aiOptimize": "AI Optimize",
     "ai": "AI",
     "addResource": "Add Resource",
+    "addNewResource": "Add New Resource",
+    "addShort": "Add",
     "refreshNow": "Refresh now",
     "enableAutoRefresh": "Enable auto-refresh (30s)",
     "disableAutoRefresh": "Disable auto-refresh",
     "exportData": "Export resource data",
+    "export": "Export",
+    "refresh": "Refresh",
+    "filters": "Filters",
     "showFilters": "Show filters",
     "hideFilters": "Hide filters",
     "showOptimization": "Show AI optimization",
@@ -528,7 +571,35 @@
     "utilizationDistribution": "Utilization Distribution",
     "topSkills": "Top Skills",
     "roleDistribution": "Role Distribution",
-    "errorLoading": "Error loading resources"
+    "errorLoading": "Error loading resources",
+    "noRoleSpecified": "No role specified",
+    "availableHours": "Available Hours",
+    "currentProjects": "Current Projects",
+    "viewDetails": "View Details",
+    "edit": "Edit",
+    "delete": "Delete",
+    "unassigned": "Unassigned",
+    "utilization": "Utilization",
+    "skills": "Skills",
+    "hourlyRate": "Hourly Rate",
+    "underUtilized": "Under-utilized",
+    "wellUtilized": "Well-utilized",
+    "highlyUtilized": "Highly-utilized",
+    "overUtilized": "Over-utilized",
+    "underUtilizedRange": "Under-utilized (0-50%)",
+    "wellUtilizedRange": "Well-utilized (51-80%)",
+    "highlyUtilizedRange": "Highly-utilized (81-100%)",
+    "overUtilizedRange": "Over-utilized (>100%)",
+    "utilizationInsights": "Utilization Insights",
+    "tapCardsForDetails": "Tap cards for details",
+    "mostUtilized": "Most Utilized",
+    "moreSkills": "+{count} more",
+    "deleteResource": "Delete resource"
+  },
+  "charts": {
+    "landscapeMode": "Landscape mode - optimized for better viewing",
+    "pinchToZoom": "Pinch to zoom • Tap to interact • Double tap to reset",
+    "loadingChart": "Loading chart..."
   },
   "reports": {
     "title": "AI-Powered Reports",
@@ -1099,6 +1170,8 @@
     "errorAuthMissing": "Authorization missing. Please log in.",
     "errorAuthInvalid": "Session expired or invalid. Please log in again.",
     "error": "Error",
+    "anomaliesDetected": "Anomalies detected",
+    "anomalyToastMessage": "Recommendation: Review the flagged entries in the Anomalies tab.",
     "tabs": {
       "dashboard": "Dashboard",
       "timeline": "Timeline",

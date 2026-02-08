@@ -51,21 +51,15 @@ const customJestConfig = {
     '<rootDir>/__tests__/admin-performance-api-integration.test.ts',
     // Flaky property tests for permission controls
     '<rootDir>/components/auth/__tests__/frontend-permission-controls.property.test.tsx',
-    // usePermissions - fetch in hook not reliably mocked in Jest env; see hooks/__tests__/usePermissions.unit.test.ts
-    '<rootDir>/hooks/__tests__/usePermissions.test.ts',
     // HelpChat test - MessageRenderer ESM/export not transformed by Jest
     '<rootDir>/__tests__/components/HelpChat.test.tsx',
     // Admin critical content - property tests depend on real timer behavior in Jest
     '<rootDir>/__tests__/property/admin-critical-content-render-time.property.test.tsx',
-    // Share link manager - getProjectShareLinks mock timing/loading in Jest; component fixed for response.share_links
-    '<rootDir>/__tests__/share-link-manager.test.tsx',
     // RoleManagement - roles API mock not applied in env, loading never completes
     '<rootDir>/components/admin/__tests__/RoleManagement.test.tsx',
     // Admin API prioritization - property tests depend on strict call order/timing
     '<rootDir>/__tests__/property/admin-api-call-prioritization.property.test.ts',
-    // Guest project access - fetch mock not applied in JSDOM (client component uses different fetch ref)
-    '<rootDir>/__tests__/guest-project-access-page.test.tsx',
-    // EnhancedAuthProvider - roles/permissions API mock not applied in env
+    // EnhancedAuthProvider - supabase mock not applied to provider in Jest; loading never ends (see fehlende-tests-uebersicht 1.2)
     '<rootDir>/app/providers/__tests__/EnhancedAuthProvider.test.tsx',
     // Changes components - API/loading mocks not applied in env
     '<rootDir>/app/changes/components/__tests__/PerformanceMonitoringInterface.test.tsx',
@@ -85,8 +79,6 @@ const customJestConfig = {
     '<rootDir>/components/admin/__tests__/UserRoleManagement.test.tsx',
     '<rootDir>/__tests__/pmr-export-pipeline.test.tsx',
     '<rootDir>/__tests__/enhanced-pmr.integration.test.tsx',
-    // FeatureFlagContext - act() warnings and async fetch timing in Jest
-    '<rootDir>/__tests__/contexts/FeatureFlagContext.test.tsx',
     '<rootDir>/__tests__/property/admin-lazy-loading-timing.property.test.tsx',
     '<rootDir>/__tests__/property/admin-critical-content-timing.property.test.tsx',
     '<rootDir>/__tests__/admin-role-management-ui.test.tsx',

@@ -6,11 +6,10 @@ Diese Roadmap bündelt die Schritte, um die PPM-App stabil, nutzerfreundlich und
 
 ## Phase 1: Stabilität und Tests (Basis für alles Weitere)
 
-- [ ] **1.1 Ignorierte Tests schrittweise reaktivieren**
-  - [ ] Priorisierte Liste aus [docs/fehlende-tests-uebersicht.md](fehlende-tests-uebersicht.md) Sektion 1.2 übernehmen (z. B. zuerst: `EnhancedAuthProvider.test.tsx`, `usePermissions.test.ts`, `guest-project-access-page.test.tsx`, `share-link-manager.test.tsx`).
-  - [ ] Pro Test: Mocks/Umgebung anpassen (z. B. `fetch`, Timer), dann Eintrag aus [jest.config.js](../jest.config.js) `testPathIgnorePatterns` entfernen.
-  - [ ] Nach jeder Reaktivierung: `npm run test` und ggf. Regression (`npm run test:regression`) prüfen.
-  - *(Versuch: ShareLinkManager – Komponente nutzt nun `response.share_links`; Test bleibt ignoriert wegen Async/Mock-Timing in Jest.)*
+- [x] **1.1 Ignorierte Tests schrittweise reaktivieren**
+  - [x] Priorisierte Liste aus [docs/fehlende-tests-uebersicht.md](fehlende-tests-uebersicht.md) Sektion 1.2 umgesetzt: **FeatureFlagContext**, **usePermissions**, **guest-project-access-page**, **share-link-manager** mit reduzierten Suites reaktiviert; Einträge aus [jest.config.js](../jest.config.js) `testPathIgnorePatterns` entfernt.
+  - [x] Nach Reaktivierung: `npm run test` für betroffene Suites geprüft.
+  - *(Nur noch ignoriert: **EnhancedAuthProvider.test.tsx** – Supabase-Mock wird in Jest vom Provider nicht genutzt.)*
 - [x] **1.2 Laufzeit- und API-Fehler abdecken**
   - [x] Für kritische Seiten (z. B. Projects, Admin Users): Route-Test mit Backend-Mock 500/503; optional Seiten-Test mit gemocktem `fetch` 500/Timeout und Assert auf Fehler-/Retry-UI (vgl. [docs/why-runtime-api-errors-are-not-caught-by-tests.md](why-runtime-api-errors-are-not-caught-by-tests.md)).
   - [x] Optional: E2E-Szenario „Backend 500“ für Projects ([__tests__/e2e/backend-error-handling.spec.ts](../__tests__/e2e/backend-error-handling.spec.ts)), siehe gleiches Doc.

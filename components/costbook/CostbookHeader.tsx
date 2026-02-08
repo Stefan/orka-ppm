@@ -157,10 +157,10 @@ export function CostbookHeader({
       className={`bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-3 ${className}`}
       data-testid={testId}
     >
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        {/* Left Section: Title and Currency */}
-        <div className="flex items-center gap-4">
-          <div>
+      <div className="flex flex-wrap items-center gap-4">
+        {/* Left: Title, Currency, Search – no extra stretch */}
+        <div className="flex flex-wrap items-center gap-3 min-w-0">
+          <div className="shrink-0">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Costbook</h1>
             {lastRefreshTime && (
               <p className="text-xs text-gray-500 dark:text-slate-400">
@@ -169,7 +169,7 @@ export function CostbookHeader({
             )}
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <span className="text-sm text-gray-500 dark:text-slate-400">Currency:</span>
             <CurrencySelector
               value={selectedCurrency}
@@ -188,8 +188,8 @@ export function CostbookHeader({
           )}
         </div>
 
-        {/* Center Section: KPI Badges */}
-        <div className="flex-1 flex justify-center">
+        {/* KPI Badges – only the space they need, no huge center gap */}
+        <div className="flex flex-wrap items-center justify-center gap-2 min-w-0">
           <KPIBadges
             kpis={kpis}
             currency={selectedCurrency}
@@ -200,8 +200,8 @@ export function CostbookHeader({
           />
         </div>
 
-        {/* Right Section: Action Buttons */}
-        <div className="flex items-center gap-1">
+        {/* Right: Action Buttons */}
+        <div className="flex items-center gap-1 shrink-0">
           <IconButton
             icon={<RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />}
             label="Refresh data"

@@ -345,3 +345,56 @@ export async function downloadCSVTemplate(
     URL.revokeObjectURL(url)
   }
 }
+
+// Saved CSV column mappings (Cora-Surpass Phase 2.2)
+export type SavedCsvMapping = {
+  id: string
+  user_id: string
+  organization_id: string | null
+  name: string
+  import_type: 'commitments' | 'actuals'
+  mapping: Array<{ source_header: string; target_field: string }>
+  created_at: string
+}
+
+export async function fetchSavedCsvMappings(
+  accessToken: string,
+  importType?: 'commitments' | 'actuals'
+): Promise<SavedCsvMapping[]> {
+  const q = importType ? `?import_type=${importType}` : ''
+  const response = await fetch(`/api/csv-import/mappings${q}`, {
+    headers: { 'Authorization': `Bearer ${accessToken}` },
+  })
+  if (!response.ok) return []
+  const data = await response.json()
+  return Array.isArray(data) ? data : []
+}
+
+export async function saveCsvMapping(
+  accessToken: string,
+  name: string,
+  importType: 'commitments' | 'actuals',
+  mapping: Array<{ source_header: string; target_field: string }>
+): Promise<SavedCsvMapping | null> {
+  const response = await fetch('/api/csv-import/mappings', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name, import_type: importType, mapping }),
+  })
+  if (!response.ok) return null
+  return response.json()
+}
+
+export async function deleteSavedCsvMapping(
+  accessToken: string,
+  mappingId: string
+): Promise<boolean> {
+  const response = await fetch(`/api/csv-import/mappings/${mappingId}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${accessToken}` },
+  })
+  return response.status === 204 || response.status === 200
+}

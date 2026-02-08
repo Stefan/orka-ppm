@@ -97,10 +97,11 @@ export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
 
   return (
     <>
-      {/* Overlay */}
+      {/* Overlay – subtle dim with blur so it doesn’t read as a solid black area */}
       <div 
-        className="fixed inset-0 bg-black bg-opacity-50 z-40 xl:hidden"
+        className="fixed inset-0 bg-black/25 backdrop-blur-sm z-40 xl:hidden"
         onClick={onClose}
+        aria-hidden
       />
       
       {/* Drawer */}

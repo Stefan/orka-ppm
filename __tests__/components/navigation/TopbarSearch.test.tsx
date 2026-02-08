@@ -17,6 +17,42 @@ jest.mock('@/app/providers/SupabaseAuthProvider', () => ({
   useAuth: () => ({ session: mockSession }),
 }))
 
+jest.mock('@/lib/i18n/context', () => {
+  const topbarT: Record<string, string> = {
+    'topbar.searchPlaceholder': 'Search projects, features, docs…',
+    'topbar.searchAria': 'Search',
+    'topbar.searching': 'Searching…',
+    'topbar.suggestions': 'Suggestions',
+    'topbar.noResults': 'No results for "{{query}}"',
+    'topbar.voiceSearch': 'Voice search',
+    'topbar.listening': 'Listening…',
+  }
+  const t = (key: string, params?: Record<string, string>) => {
+    const s = topbarT[key] ?? key
+    return params ? s.replace(/\{\{(\w+)\}\}/g, (_: string, k: string) => params[k] ?? '') : s
+  }
+  return {
+    useI18n: () => ({
+      t,
+      locale: 'en',
+      setLocale: jest.fn(),
+      isLoading: false,
+      translations: {},
+    }),
+    useTranslations: () => ({ t, locale: 'en', isLoading: false }),
+    I18nProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  }
+})
+
+const searchResponse = {
+  fulltext: [
+    { type: 'project', id: 'p1', title: 'Test Project', snippet: 'A project', href: '/projects/p1' },
+  ],
+  semantic: [] as any[],
+  suggestions: ['Costbook', 'Projects'],
+  meta: { role: 'user' },
+}
+
 describe('TopbarSearch', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -24,15 +60,7 @@ describe('TopbarSearch', () => {
       if (String(url).includes('/api/search')) {
         return Promise.resolve({
           ok: true,
-          json: () =>
-            Promise.resolve({
-              fulltext: [
-                { type: 'project', id: 'p1', title: 'Test Project', snippet: 'A project', href: '/projects/p1' },
-              ],
-              semantic: [],
-              suggestions: ['Costbook', 'Projects'],
-              meta: { role: 'user' },
-            }),
+          json: () => Promise.resolve(searchResponse),
         } as Response)
       }
       return Promise.reject(new Error('Unknown URL'))
@@ -41,7 +69,7 @@ describe('TopbarSearch', () => {
 
   it('renders search input with placeholder', () => {
     render(<TopbarSearch />)
-    expect(screen.getByPlaceholderText(/Suche Projekte, Features, Docs/)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/Search projects, features, docs/)).toBeInTheDocument()
     expect(screen.getByRole('searchbox', { name: 'Search' })).toBeInTheDocument()
   })
 

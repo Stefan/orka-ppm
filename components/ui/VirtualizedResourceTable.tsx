@@ -2,6 +2,7 @@
 
 import { memo } from 'react'
 import { List } from 'react-window'
+import { useTranslations } from '@/lib/i18n/context'
 
 interface Resource {
   id: string
@@ -33,6 +34,7 @@ const VirtualizedResourceTable = memo(function VirtualizedResourceTable({
   itemHeight = 80,
   onViewDetails
 }: VirtualizedResourceTableProps) {
+  const { t } = useTranslations()
   // Row component for react-window
   const RowComponent = ({ resource, onViewDetails: onView }: RowProps) => {
     return (
@@ -49,7 +51,7 @@ const VirtualizedResourceTable = memo(function VirtualizedResourceTable({
             <div className="text-sm text-gray-500 dark:text-slate-400 truncate">{resource.email}</div>
           </div>
           <div className="flex-1 px-4">
-            <div className="text-sm text-gray-900 dark:text-slate-100">{resource.role || 'Unassigned'}</div>
+            <div className="text-sm text-gray-900 dark:text-slate-100">{resource.role || t('resources.unassigned')}</div>
           </div>
           <div className="flex-1 px-4">
             <div className="flex items-center">
@@ -86,7 +88,7 @@ const VirtualizedResourceTable = memo(function VirtualizedResourceTable({
               ))}
               {(resource.skills ?? []).length > 2 && (
                 <span className="px-2 py-1 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 text-xs rounded">
-                  +{(resource.skills ?? []).length - 2}
+                  {t('resources.moreSkills', { count: (resource.skills ?? []).length - 2 })}
                 </span>
               )}
             </div>
@@ -98,7 +100,7 @@ const VirtualizedResourceTable = memo(function VirtualizedResourceTable({
               resource.availability_status === 'mostly_allocated' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300' :
               'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
             }`}>
-              {resource.availability_status.replace('_', ' ')}
+              {resource.availability_status === 'available' ? t('resources.availableStatus') : resource.availability_status === 'partially_allocated' ? t('resources.partiallyAllocated') : resource.availability_status === 'mostly_allocated' ? t('resources.mostlyAllocated') : t('resources.fullyAllocated')}
             </span>
           </div>
           {onView && (
@@ -108,7 +110,7 @@ const VirtualizedResourceTable = memo(function VirtualizedResourceTable({
                 onClick={(e) => { e.stopPropagation(); onView(resource) }}
                 className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 min-h-[44px] px-3 py-2 rounded touch-manipulation"
               >
-                View
+                {t('resources.viewDetails')}
               </button>
             </div>
           )}
@@ -125,14 +127,14 @@ const VirtualizedResourceTable = memo(function VirtualizedResourceTable({
           <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
             <thead className="bg-gray-50 dark:bg-slate-800/50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Resource</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Utilization</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Available Hours</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Projects</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Skills</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
-                {onViewDetails && <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>}
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.resources')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('resources.role')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('resources.utilization')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('resources.availableHours')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('resources.currentProjects')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('resources.skills')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('resources.availability')}</th>
+                {onViewDetails && <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('common.actions')}</th>}
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
@@ -152,7 +154,7 @@ const VirtualizedResourceTable = memo(function VirtualizedResourceTable({
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-100">
-                    {resource.role || 'Unassigned'}
+                    {resource.role || t('resources.unassigned')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -187,7 +189,7 @@ const VirtualizedResourceTable = memo(function VirtualizedResourceTable({
                       ))}
                       {(resource.skills ?? []).length > 2 && (
                         <span className="px-2 py-1 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 text-xs rounded">
-                          +{(resource.skills ?? []).length - 2}
+                          {t('resources.moreSkills', { count: (resource.skills ?? []).length - 2 })}
                         </span>
                       )}
                     </div>
@@ -199,7 +201,7 @@ const VirtualizedResourceTable = memo(function VirtualizedResourceTable({
                       resource.availability_status === 'mostly_allocated' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300' :
                       'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                     }`}>
-                      {resource.availability_status.replace('_', ' ')}
+                      {resource.availability_status === 'available' ? t('resources.availableStatus') : resource.availability_status === 'partially_allocated' ? t('resources.partiallyAllocated') : resource.availability_status === 'mostly_allocated' ? t('resources.mostlyAllocated') : t('resources.fullyAllocated')}
                     </span>
                   </td>
                   {onViewDetails && (
@@ -209,7 +211,7 @@ const VirtualizedResourceTable = memo(function VirtualizedResourceTable({
                         onClick={(e) => { e.stopPropagation(); onViewDetails(resource) }}
                         className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 min-h-[44px] px-3 py-2 rounded touch-manipulation"
                       >
-                        View
+                        {t('resources.viewDetails')}
                       </button>
                     </td>
                   )}
@@ -228,13 +230,13 @@ const VirtualizedResourceTable = memo(function VirtualizedResourceTable({
         <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
           <thead className="bg-gray-50 dark:bg-slate-800/50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Resource</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Role</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Utilization</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Available Hours</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Projects</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Skills</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.resources')}</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('resources.role')}</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('resources.utilization')}</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('resources.availableHours')}</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('resources.currentProjects')}</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('resources.skills')}</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('resources.availability')}</th>
             </tr>
           </thead>
         </table>

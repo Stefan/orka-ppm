@@ -68,6 +68,7 @@ from routers.search import router as search_router
 from routers.distribution import router as distribution_router
 from routers.integrations import router as integrations_router
 from routers.auth_sso import router as auth_sso_router
+from routers.saved_views import router as saved_views_router
 
 # Import performance tracking middleware
 from middleware.performance_tracker import PerformanceMiddleware, performance_tracker
@@ -256,6 +257,7 @@ app.include_router(search_router)
 app.include_router(distribution_router)
 app.include_router(integrations_router)
 app.include_router(auth_sso_router)
+app.include_router(saved_views_router)
 
 # Add performance tracking middleware
 app.add_middleware(PerformanceMiddleware, tracker=performance_tracker)

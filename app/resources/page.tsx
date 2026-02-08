@@ -171,10 +171,10 @@ export default function Resources() {
   // Analytics data (uses deferred filters for non-critical chart updates)
   const analyticsData = useMemo(() => {
     const utilizationDistribution = [
-      { name: 'Under-utilized (0-50%)', value: resources.filter(r => r.utilization_percentage <= 50).length, color: '#10B981' },
-      { name: 'Well-utilized (51-80%)', value: resources.filter(r => r.utilization_percentage > 50 && r.utilization_percentage <= 80).length, color: '#3B82F6' },
-      { name: 'Highly-utilized (81-100%)', value: resources.filter(r => r.utilization_percentage > 80 && r.utilization_percentage <= 100).length, color: '#F59E0B' },
-      { name: 'Over-utilized ({">"}100%)', value: resources.filter(r => r.utilization_percentage > 100).length, color: '#EF4444' }
+      { name: t('resources.underUtilizedRange'), rangeKey: 'underUtilized', value: resources.filter(r => r.utilization_percentage <= 50).length, color: '#10B981' },
+      { name: t('resources.wellUtilizedRange'), rangeKey: 'wellUtilized', value: resources.filter(r => r.utilization_percentage > 50 && r.utilization_percentage <= 80).length, color: '#3B82F6' },
+      { name: t('resources.highlyUtilizedRange'), rangeKey: 'highlyUtilized', value: resources.filter(r => r.utilization_percentage > 80 && r.utilization_percentage <= 100).length, color: '#F59E0B' },
+      { name: t('resources.overUtilizedRange'), rangeKey: 'overUtilized', value: resources.filter(r => r.utilization_percentage > 100).length, color: '#EF4444' }
     ]
 
     const skillsDistribution = resources.reduce((acc, resource) => {
@@ -196,7 +196,8 @@ export default function Resources() {
     }, {} as Record<string, number>)
 
     const roleData = Object.entries(roleDistribution).map(([role, count]) => ({
-      name: role,
+      name: role === 'Unassigned' ? t('resources.unassigned') : role,
+      roleKey: role === 'Unassigned' ? 'all' : role,
       value: count,
       color: role === 'Unassigned' ? '#6B7280' : '#3B82F6'
     }))
@@ -210,7 +211,7 @@ export default function Resources() {
       availableResources: resources.filter(r => r.can_take_more_work).length,
       overallocatedResources: resources.filter(r => r.utilization_percentage > 100).length
     }
-  }, [resources, deferredFilters])
+  }, [resources, deferredFilters, t])
 
   useEffect(() => {
     if (session) fetchResources()
@@ -452,13 +453,27 @@ export default function Resources() {
 
   return (
     <AppLayout>
-      <div data-testid="resources-page" className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
-        {/* Enhanced Mobile-First Header */}
+      <div data-testid="resources-page" className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 min-w-0 overflow-x-hidden">
+        {/* Enhanced Mobile-First Header: mobile = title + icon-only buttons in one row; lg+ = title block | toolbar with text */}
         <div data-testid="resources-header" className="flex flex-col space-y-4">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start space-y-4 lg:space-y-0">
             <div className="min-w-0 flex-1">
-              <div className="flex flex-col space-y-2">
+              {/* Mobile: title and icon-only toolbar in one row */}
+              <div className="flex items-center justify-between gap-2 lg:block">
                 <h1 data-testid="resources-title" className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-slate-100">{t('resources.title')}</h1>
+                {/* Icon-only toolbar next to title (mobile/tablet) */}
+                <div className="flex items-center gap-1 shrink-0 lg:hidden">
+                  <TourTriggerButton onStart={hasCompletedTour ? resetAndStartTour : startTour} hasCompletedTour={hasCompletedTour} />
+                  <button onClick={() => { setAddError(null); setShowAddModal(true) }} className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 focus:ring-2 focus:ring-indigo-400" title={t('resources.addResource')} aria-label={t('resources.addResource')}><Plus className="h-4 w-4" /></button>
+                  <button onClick={() => setViewMode(viewMode === 'cards' ? 'table' : viewMode === 'table' ? 'heatmap' : 'cards')} className="inline-flex items-center justify-center w-9 h-9 rounded-lg border bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600" title={viewMode === 'cards' ? t('resources.switchToTable') : viewMode === 'table' ? t('resources.switchToHeatmap') : t('resources.switchToCards')} aria-label={viewMode === 'cards' ? t('resources.switchToTable') : viewMode === 'table' ? t('resources.switchToHeatmap') : t('resources.switchToCards')}>{viewMode === 'cards' ? <BarChart3 className="h-4 w-4" /> : viewMode === 'table' ? <PieChartIcon className="h-4 w-4" /> : <Users className="h-4 w-4" />}</button>
+                  <button onClick={() => fetchResources()} className="inline-flex items-center justify-center w-9 h-9 rounded-lg border bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600" title={t('resources.refreshNow')} aria-label={t('resources.refreshNow')}><RotateCcw className="h-4 w-4" /></button>
+                  <button onClick={() => setAutoRefresh(!autoRefresh)} className={`inline-flex items-center justify-center w-9 h-9 rounded-lg border ${autoRefresh ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600'}`} title={autoRefresh ? t('resources.autoOff') : t('resources.autoOn')} aria-label={autoRefresh ? t('resources.disableAutoRefresh') : t('resources.enableAutoRefresh')}><RefreshCw className={`h-4 w-4 ${autoRefresh ? 'animate-spin' : ''}`} /></button>
+                  <button onClick={() => setShowFilters(!showFilters)} className={`inline-flex items-center justify-center w-9 h-9 rounded-lg border ${showFilters ? 'bg-indigo-600 text-white border-indigo-700' : 'bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600'}`} title={showFilters ? t('resources.hideFilters') : t('resources.showFilters')} aria-label={showFilters ? t('resources.hideFilters') : t('resources.showFilters')}><Filter className="h-4 w-4" /></button>
+                  <button onClick={() => setShowOptimization(!showOptimization)} className={`inline-flex items-center justify-center w-9 h-9 rounded-lg border ${showOptimization ? 'bg-indigo-600 text-white border-indigo-700' : 'bg-indigo-100 dark:bg-indigo-950/60 border-indigo-300 dark:border-indigo-800'}`} title={showOptimization ? t('resources.hideOptimization') : t('resources.showOptimization')} aria-label={showOptimization ? t('resources.hideOptimization') : t('resources.showOptimization')}><Zap className="h-4 w-4" /></button>
+                  <button onClick={exportResourceData} className="inline-flex items-center justify-center w-9 h-9 rounded-lg border bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600" title={t('resources.exportData')} aria-label={t('resources.export')}><Download className="h-4 w-4" /></button>
+                </div>
+              </div>
+              <div className="flex flex-col space-y-2 mt-2">
                 <div className="flex flex-wrap items-center gap-2">
                   {analyticsData.overallocatedResources > 0 && (
                     <div className="flex items-center px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 rounded-full text-sm font-medium">
@@ -473,19 +488,19 @@ export default function Resources() {
                     </div>
                   )}
                 </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-sm text-gray-700 dark:text-slate-300">
-                <span>{filteredResources.length} {t('resources.of')} {resources.length} {t('nav.resources').toLowerCase()}</span>
-                <span>{t('resources.avg')}: {analyticsData.averageUtilization.toFixed(1)}%</span>
-                <span>{analyticsData.availableResources} {t('resources.available')}</span>
-                {lastRefresh && (
-                  <span className="hidden sm:inline">{t('dashboard.updated')}: {lastRefresh.toLocaleTimeString()}</span>
-                )}
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-700 dark:text-slate-300">
+                  <span>{filteredResources.length} {t('resources.of')} {resources.length} {t('nav.resources').toLowerCase()}</span>
+                  <span>{t('resources.avg')}: {analyticsData.averageUtilization.toFixed(1)}%</span>
+                  <span>{analyticsData.availableResources} {t('resources.available')}</span>
+                  {lastRefresh && (
+                    <span className="hidden sm:inline">{t('dashboard.updated')}: {lastRefresh.toLocaleTimeString()}</span>
+                  )}
+                </div>
               </div>
             </div>
             
-            {/* Toolbar: klare Kontraste – Light: graue Flächen, Dark: sichtbare Flächen */}
-            <div className="flex flex-wrap items-center gap-2 mb-4">
+            {/* Toolbar with text (desktop only) */}
+            <div className="min-w-0 hidden lg:flex flex-wrap items-center gap-2 mb-4">
               <TourTriggerButton
                 onStart={hasCompletedTour ? resetAndStartTour : startTour}
                 hasCompletedTour={hasCompletedTour}
@@ -501,12 +516,12 @@ export default function Resources() {
                       <button
                         onClick={() => { setAddError(null); setShowAddModal(true) }}
                         className={btnPrimary}
-                        title="Ressource hinzufügen"
-                        aria-label="Ressource hinzufügen"
+                        title={t('resources.addResource')}
+                        aria-label={t('resources.addResource')}
                       >
                         <Plus className="h-4 w-4 shrink-0" />
-                        <span className="hidden sm:inline">Add Resource</span>
-                        <span className="sm:hidden">Add</span>
+                        <span className="hidden sm:inline">{t('resources.addResource')}</span>
+                        <span className="sm:hidden">{t('resources.addShort')}</span>
                       </button>
                     </div>
 
@@ -517,24 +532,24 @@ export default function Resources() {
                       <button
                         onClick={() => setViewMode(viewMode === 'cards' ? 'table' : viewMode === 'table' ? 'heatmap' : 'cards')}
                         className={btnSecondary}
-                        title={viewMode === 'cards' ? 'Zur Tabellenansicht wechseln' : viewMode === 'table' ? 'Zur Heatmap-Ansicht wechseln' : 'Zur Kartenansicht wechseln'}
-                        aria-label={viewMode === 'cards' ? 'Zur Tabellenansicht wechseln' : viewMode === 'table' ? 'Zur Heatmap-Ansicht wechseln' : 'Zur Kartenansicht wechseln'}
+                        title={viewMode === 'cards' ? t('resources.switchToTable') : viewMode === 'table' ? t('resources.switchToHeatmap') : t('resources.switchToCards')}
+                        aria-label={viewMode === 'cards' ? t('resources.switchToTable') : viewMode === 'table' ? t('resources.switchToHeatmap') : t('resources.switchToCards')}
                       >
                         {viewMode === 'cards' ? <BarChart3 className="h-4 w-4 shrink-0" /> : viewMode === 'table' ? <PieChartIcon className="h-4 w-4 shrink-0" /> : <Users className="h-4 w-4 shrink-0" />}
-                        <span className="hidden sm:inline">{viewMode === 'cards' ? 'Table' : viewMode === 'table' ? 'Heatmap' : 'Cards'}</span>
+                        <span className="hidden sm:inline">{viewMode === 'cards' ? t('resources.table') : viewMode === 'table' ? t('resources.heatmap') : t('resources.cards')}</span>
                       </button>
-                      <button onClick={() => fetchResources()} className={btnSecondary} title="Daten jetzt aktualisieren" aria-label="Daten jetzt aktualisieren">
+                      <button onClick={() => fetchResources()} className={btnSecondary} title={t('resources.refreshNow')} aria-label={t('resources.refreshNow')}>
                         <RotateCcw className="h-4 w-4 shrink-0" />
-                        <span className="hidden sm:inline">Refresh</span>
+                        <span className="hidden sm:inline">{t('resources.refresh') === 'resources.refresh' ? t('resources.refreshNow') : t('resources.refresh')}</span>
                       </button>
                       <button
                         onClick={() => setAutoRefresh(!autoRefresh)}
                         className={autoRefresh ? 'inline-flex items-center gap-2 min-h-[44px] px-4 py-2.5 text-sm font-medium rounded-xl bg-emerald-600 text-white border border-emerald-700 hover:bg-emerald-500 active:bg-emerald-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-white dark:bg-emerald-500 dark:border-emerald-600 dark:hover:bg-emerald-400 dark:focus:ring-offset-slate-900' : btnSecondary}
-                        title={autoRefresh ? 'Auto-Aktualisierung deaktivieren' : 'Auto-Aktualisierung aktivieren (30s)'}
-                        aria-label={autoRefresh ? 'Auto-Aktualisierung deaktivieren' : 'Auto-Aktualisierung aktivieren (30s)'}
+                        title={autoRefresh ? t('resources.disableAutoRefresh') : t('resources.enableAutoRefresh')}
+                        aria-label={autoRefresh ? t('resources.disableAutoRefresh') : t('resources.enableAutoRefresh')}
                       >
                         <RefreshCw className={`h-4 w-4 shrink-0 ${autoRefresh ? 'animate-spin' : ''}`} />
-                        <span className="hidden sm:inline">Auto</span>
+                        <span className="hidden sm:inline">{t('resources.auto')}</span>
                       </button>
                     </div>
 
@@ -545,11 +560,11 @@ export default function Resources() {
                       <button
                         onClick={() => setShowFilters(!showFilters)}
                         className={btnToggle(showFilters)}
-                        title={showFilters ? 'Filter-Optionen ausblenden' : 'Filter-Optionen anzeigen'}
-                        aria-label={showFilters ? 'Filter-Optionen ausblenden' : 'Filter-Optionen anzeigen'}
+                        title={showFilters ? t('resources.hideFilters') : t('resources.showFilters')}
+                        aria-label={showFilters ? t('resources.hideFilters') : t('resources.showFilters')}
                       >
                         <Filter className="h-4 w-4 shrink-0" />
-                        <span className="hidden sm:inline">Filters</span>
+                        <span className="hidden sm:inline">{t('resources.filters') === 'resources.filters' ? t('resources.showFilters') : t('resources.filters')}</span>
                       </button>
                       <button
                         onClick={() => setShowOptimization(!showOptimization)}
@@ -557,21 +572,21 @@ export default function Resources() {
                           ? btnPrimary
                           : 'inline-flex items-center gap-2 min-h-[44px] px-4 py-2.5 text-sm font-medium rounded-xl border transition-[background-color,border-color] duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900 bg-indigo-100 text-indigo-900 border-indigo-300 hover:bg-indigo-200 hover:border-indigo-400 active:bg-indigo-300 dark:bg-indigo-950/60 dark:text-indigo-200 dark:border-indigo-800 dark:hover:bg-indigo-900/70 dark:active:bg-indigo-900'
                         }
-                        title={showOptimization ? 'KI-Optimierung ausblenden' : 'KI-Optimierung anzeigen'}
-                        aria-label={showOptimization ? 'KI-Optimierung ausblenden' : 'KI-Optimierung anzeigen'}
+                        title={showOptimization ? t('resources.hideOptimization') : t('resources.showOptimization')}
+                        aria-label={showOptimization ? t('resources.hideOptimization') : t('resources.showOptimization')}
                       >
                         <Zap className="h-4 w-4 shrink-0" />
-                        <span className="hidden sm:inline">AI Optimize</span>
-                        <span className="sm:hidden">AI</span>
+                        <span className="hidden sm:inline">{t('resources.aiOptimize')}</span>
+                        <span className="sm:hidden">{t('resources.ai')}</span>
                       </button>
                     </div>
 
                     <div className="w-px self-stretch min-h-[32px] bg-slate-200/80 dark:bg-slate-600/70 rounded-full" aria-hidden />
 
                     {/* Gruppe 4: Export – einheitlich Secondary */}
-                    <button onClick={exportResourceData} className={btnSecondary} title="Ressourcendaten exportieren" aria-label="Ressourcendaten exportieren">
+                    <button onClick={exportResourceData} className={btnSecondary} title={t('resources.exportData')} aria-label={t('resources.export')}>
                       <Download className="h-4 w-4 shrink-0" />
-                      <span className="hidden sm:inline">Export</span>
+                      <span className="hidden sm:inline">{t('resources.export') === 'resources.export' ? t('resources.exportData') : t('resources.export')}</span>
                     </button>
                   </>
                 )
@@ -580,12 +595,12 @@ export default function Resources() {
           </div>
         </div>
 
-        {/* Mobile-First Analytics Dashboard */}
-        <div data-tour="resources-overview" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {/* Mobile-First Analytics Dashboard: 1 col on tablet (H2 log kpiCols:2 at 820px) */}
+        <div data-tour="resources-overview" className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           <div className="bg-white dark:bg-slate-800 p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 truncate">Total Resources</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 truncate">{t('resources.totalResources')}</p>
                 <p className="text-lg sm:text-2xl font-bold text-blue-600 dark:text-blue-400">{analyticsData.totalResources}</p>
               </div>
               <Users className="h-5 w-5 sm:h-8 sm:w-8 text-blue-600 dark:text-blue-400 flex-shrink-0" />
@@ -595,7 +610,7 @@ export default function Resources() {
           <div className="bg-white dark:bg-slate-800 p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 truncate">Avg. Utilization</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 truncate">{t('resources.avgUtilization')}</p>
                 <p className="text-lg sm:text-2xl font-bold text-green-600 dark:text-green-400">{analyticsData.averageUtilization.toFixed(1)}%</p>
               </div>
               <TrendingUp className="h-5 w-5 sm:h-8 sm:w-8 text-green-600 dark:text-green-400 flex-shrink-0" />
@@ -605,7 +620,7 @@ export default function Resources() {
           <div className="bg-white dark:bg-slate-800 p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 truncate">Available</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 truncate">{t('resources.available')}</p>
                 <p className="text-lg sm:text-2xl font-bold text-purple-600 dark:text-purple-400">{analyticsData.availableResources}</p>
               </div>
               <Target className="h-5 w-5 sm:h-8 sm:w-8 text-purple-600 dark:text-purple-400 flex-shrink-0" />
@@ -615,7 +630,7 @@ export default function Resources() {
           <div className="bg-white dark:bg-slate-800 p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 truncate">Overallocated</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 truncate">{t('resources.overallocated')}</p>
                 <p className="text-lg sm:text-2xl font-bold text-red-600 dark:text-red-400">{analyticsData.overallocatedResources}</p>
               </div>
               <AlertCircle className="h-5 w-5 sm:h-8 sm:w-8 text-red-600 dark:text-red-400 flex-shrink-0" />
@@ -728,29 +743,29 @@ export default function Resources() {
                 <button
                   onClick={clearFilters}
                   className="w-full min-h-[44px] px-4 py-2 bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-slate-100 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 active:bg-gray-300 font-medium"
-                  title="Alle Filter zurücksetzen"
-                  aria-label="Alle Filter zurücksetzen"
+                  title={t('resources.clearFilters')}
+                  aria-label={t('resources.clearFilters')}
                 >
-                  Clear Filters
+                  {t('resources.clearFilters')}
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Analytics Charts - Mobile Optimized */}
+        {/* Analytics Charts - Mobile/Tablet responsive (min-w-0 avoids overflow on iPad) */}
         <Suspense fallback={
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-w-0">
             <SkeletonChart variant="pie" height="h-64" />
             <SkeletonChart variant="bar" height="h-64" />
             <SkeletonChart variant="pie" height="h-64" />
           </div>
         }>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 min-w-0 overflow-hidden">
             <MobileOptimizedChart
               type="pie"
               data={analyticsData.utilizationDistribution}
-              title="Utilization Distribution"
+              title={t('resources.utilizationDistribution')}
               dataKey="value"
               nameKey="name"
               colors={analyticsData.utilizationDistribution.map(item => item.color)}
@@ -759,16 +774,15 @@ export default function Resources() {
               enablePan={true}
               enableExport={true}
               showLegend={true}
-              className="bg-white dark:bg-slate-800 shadow-sm"
+              className="bg-white dark:bg-slate-800 shadow-sm min-w-0"
               onDataPointClick={(data) => {
-                // Filter resources based on clicked utilization category
-                const utilizationRanges = {
-                  'Under-utilized (0-50%)': [0, 50],
-                  'Well-utilized (51-80%)': [51, 80],
-                  'Highly-utilized (81-100%)': [81, 100],
-                  'Over-utilized (>100%)': [101, 200]
+                const utilizationRanges: Record<string, [number, number]> = {
+                  underUtilized: [0, 50],
+                  wellUtilized: [51, 80],
+                  highlyUtilized: [81, 100],
+                  overUtilized: [101, 200]
                 }
-                const range = utilizationRanges[data.name as keyof typeof utilizationRanges]
+                const range = data.rangeKey && utilizationRanges[data.rangeKey]
                 if (range) {
                   handleFilterChange('utilization_range', range)
                   setShowFilters(true)
@@ -779,7 +793,7 @@ export default function Resources() {
             <MobileOptimizedChart
               type="bar"
               data={analyticsData.topSkills.slice(0, 5)}
-              title="Top Skills"
+              title={t('resources.topSkills')}
               dataKey="value"
               nameKey="name"
               colors={['#3B82F6']}
@@ -788,7 +802,7 @@ export default function Resources() {
               enablePan={true}
               enableExport={true}
               showLegend={false}
-              className="bg-white dark:bg-slate-800 shadow-sm"
+              className="bg-white dark:bg-slate-800 shadow-sm min-w-0"
               onDataPointClick={(data) => {
                 // Filter resources by clicked skill
                 handleFilterChange('skills', [data.name])
@@ -799,7 +813,7 @@ export default function Resources() {
             <MobileOptimizedChart
               type="pie"
               data={analyticsData.roleDistribution}
-              title="Role Distribution"
+              title={t('resources.roleDistribution')}
               dataKey="value"
               nameKey="name"
               colors={analyticsData.roleDistribution.map(item => item.color)}
@@ -808,10 +822,9 @@ export default function Resources() {
               enablePan={true}
               enableExport={true}
               showLegend={true}
-              className="bg-white dark:bg-slate-800 shadow-sm"
+              className="bg-white dark:bg-slate-800 shadow-sm min-w-0"
               onDataPointClick={(data) => {
-                // Filter resources by clicked role
-                handleFilterChange('role', data.name === 'Unassigned' ? 'all' : data.name)
+                handleFilterChange('role', (data as { roleKey?: string }).roleKey ?? 'all')
                 setShowFilters(true)
               }}
             />
@@ -960,28 +973,28 @@ export default function Resources() {
                 >
                   <div className="w-4 h-4 bg-green-100 dark:bg-green-800 border border-green-300 dark:border-green-600 rounded mr-2 flex-shrink-0"></div>
                   <div className="min-w-0">
-                    <div className="font-medium text-green-800 dark:text-green-300">Under-utilized</div>
+                    <div className="font-medium text-green-800 dark:text-green-300">{t('resources.underUtilized')}</div>
                     <div className="text-xs text-green-600 dark:text-green-400">≤50% - {analyticsData.utilizationDistribution[0]?.value || 0}</div>
                   </div>
                 </div>
                 <div className="flex items-center p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
                   <div className="w-4 h-4 bg-blue-100 dark:bg-blue-800 border border-blue-300 dark:border-blue-600 rounded mr-2 flex-shrink-0"></div>
                   <div className="min-w-0">
-                    <div className="font-medium text-blue-800 dark:text-blue-300">Well-utilized</div>
+                    <div className="font-medium text-blue-800 dark:text-blue-300">{t('resources.wellUtilized')}</div>
                     <div className="text-xs text-blue-600 dark:text-blue-400">51-80% - {analyticsData.utilizationDistribution[1]?.value || 0}</div>
                   </div>
                 </div>
                 <div className="flex items-center p-2 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
                   <div className="w-4 h-4 bg-yellow-100 dark:bg-yellow-800 border border-yellow-300 dark:border-yellow-600 rounded mr-2 flex-shrink-0"></div>
                   <div className="min-w-0">
-                    <div className="font-medium text-yellow-800 dark:text-yellow-300">Highly-utilized</div>
+                    <div className="font-medium text-yellow-800 dark:text-yellow-300">{t('resources.highlyUtilized')}</div>
                     <div className="text-xs text-yellow-600 dark:text-yellow-400">81-100% - {analyticsData.utilizationDistribution[2]?.value || 0}</div>
                   </div>
                 </div>
                 <div className="flex items-center p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
                   <div className="w-4 h-4 bg-red-100 dark:bg-red-800 border border-red-300 dark:border-red-600 rounded mr-2 flex-shrink-0"></div>
                   <div className="min-w-0">
-                    <div className="font-medium text-red-800 dark:text-red-300">Over-utilized</div>
+                    <div className="font-medium text-red-800 dark:text-red-300">{t('resources.overUtilized')}</div>
                     <div className="text-xs text-red-600 dark:text-red-400">{">"}100% - {analyticsData.utilizationDistribution[3]?.value || 0}</div>
                   </div>
                 </div>
@@ -990,14 +1003,14 @@ export default function Resources() {
               {/* Touch interaction hints */}
               <div className="bg-gray-50 dark:bg-slate-700 p-3 sm:p-4 rounded-lg border border-gray-200 dark:border-slate-600">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-gray-900 dark:text-slate-100">Utilization Insights</h4>
+                  <h4 className="font-medium text-gray-900 dark:text-slate-100">{t('resources.utilizationInsights')}</h4>
                   <div className="text-xs text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-600 px-2 py-1 rounded border border-gray-200 dark:border-slate-500">
-                    Tap cards for details
+                    {t('resources.tapCardsForDetails')}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-sm">
                   <div>
-                    <span className="text-gray-700 dark:text-slate-300">Most Utilized:</span>
+                    <span className="text-gray-700 dark:text-slate-300">{t('resources.mostUtilized')}:</span>
                     <div className="font-medium text-gray-900 dark:text-slate-100 truncate">
                       {filteredResources.reduce((max, resource) =>
                         resource.utilization_percentage > max.utilization_percentage ? resource : max,
@@ -1039,7 +1052,7 @@ export default function Resources() {
             />
             <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 w-full max-w-md max-h-[90vh] overflow-y-auto">
               <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 p-4 sm:p-6 rounded-t-xl">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Add New Resource</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{t('resources.addNewResource')}</h3>
               </div>
               <form onSubmit={async (e) => {
                 e.preventDefault()
@@ -1178,7 +1191,7 @@ export default function Resources() {
                     type="submit"
                     className="w-full sm:w-auto min-h-[44px] px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 active:bg-blue-800 font-medium"
                   >
-                    Add Resource
+                    {t('resources.addResource')}
                   </button>
                 </div>
               </form>

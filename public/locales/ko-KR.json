@@ -77,7 +77,27 @@
     "refresh": "새로 고침",
     "traditionalView": "전통 보기 전환",
     "aiView": "AI 강화 보기 전환",
-    "fallbackData": "대체 데이터 사용 중"
+    "fallbackData": "대체 데이터 사용 중",
+    "aiInsightsTitle": "AI 권장사항",
+    "aiInsightsSummary": "예산 최적화를 위해 분산 알림을 사용하세요. 중요한 편차는 알림 상단에 표시됩니다.",
+    "last7Days": "최근 7일",
+    "last30Days": "최근 30일",
+    "last90Days": "최근 90일",
+    "thisYear": "올해",
+    "alerts": {
+      "budgetOverrunTitle": "예산 초과",
+      "budgetOverrunDesc": "프로젝트 Alpha가 예산을 15% 초과",
+      "scheduleDelayRiskTitle": "일정 지연 위험",
+      "scheduleDelayRiskDesc": "주요 경로 활동 3일 지연",
+      "timelineDelayTitle": "일정 지연",
+      "timelineDelayDesc": "프로젝트 Beta 2주 일정 지연",
+      "resourceConflictTitle": "리소스 충돌",
+      "resourceConflictDesc": "구성원이 여러 프로젝트에 배정됨"
+    }
+  },
+  "guidedTour": {
+    "startTour": "투어 시작",
+    "restartTour": "투어 다시 시작"
   },
   "kpi": {
     "successRate": "성공률",
@@ -104,7 +124,10 @@
     "charts": "차트",
     "resources": "자원",
     "financials": "재무",
-    "reports": "보고서"
+    "reports": "보고서",
+    "timeline": "타임라인",
+    "analytics": "분석",
+    "importProjects": "프로젝트 가져오기"
   },
   "projects": {
     "recentProjects": "최근 프로젝트"
@@ -167,6 +190,7 @@
     "retry": "다시 시도",
     "close": "닫기",
     "save": "저장",
+    "actions": "작업",
     "saving": "저장 중...",
     "saveChanges": "변경 사항 저장",
     "cancel": "취소",
@@ -323,7 +347,10 @@
     "noData": "변동 데이터가 없습니다.",
     "importCsvToSee": "CSV 파일을 가져와서 변동 분석을 확인하세요.",
     "dataUnavailable": "변동 데이터가 없습니다: {error}",
-    "importCsv": "CSV 가져오기"
+    "importCsv": "CSV 가져오기",
+    "period7d": "7일",
+    "period30d": "30일",
+    "period90d": "90일"
   },
   "financials": {
     "title": "재무 관리",
@@ -489,10 +516,15 @@
     "aiOptimize": "AI 최적화",
     "ai": "AI",
     "addResource": "자원 추가",
+    "addNewResource": "새 자원 추가",
+    "addShort": "추가",
     "refreshNow": "지금 새로고침",
     "enableAutoRefresh": "자동 새로고침 활성화 (30초)",
     "disableAutoRefresh": "자동 새로고침 비활성화",
     "exportData": "자원 데이터 내보내기",
+    "export": "내보내기",
+    "refresh": "새로고침",
+    "filters": "필터",
     "showFilters": "필터 표시",
     "hideFilters": "필터 숨기기",
     "showOptimization": "AI 최적화 표시",
@@ -525,7 +557,35 @@
     "utilizationDistribution": "활용 분포",
     "topSkills": "상위 기술",
     "roleDistribution": "역할 분포",
-    "errorLoading": "리소스 로딩 오류"
+    "errorLoading": "리소스 로딩 오류",
+    "noRoleSpecified": "역할 미지정",
+    "availableHours": "가용 시간",
+    "currentProjects": "현재 프로젝트",
+    "viewDetails": "자세히 보기",
+    "edit": "편집",
+    "delete": "삭제",
+    "unassigned": "미할당",
+    "utilization": "활용률",
+    "skills": "기술",
+    "hourlyRate": "시간당 요금",
+    "underUtilized": "저활용",
+    "wellUtilized": "적정 활용",
+    "highlyUtilized": "고활용",
+    "overUtilized": "과다 활용",
+    "underUtilizedRange": "저활용 (0–50%)",
+    "wellUtilizedRange": "적정 활용 (51–80%)",
+    "highlyUtilizedRange": "고활용 (81–100%)",
+    "overUtilizedRange": "과다 활용 (>100%)",
+    "utilizationInsights": "활용 현황",
+    "tapCardsForDetails": "카드를 탭하여 자세히 보기",
+    "mostUtilized": "가장 많이 활용됨",
+    "moreSkills": "+{count}개 더",
+    "deleteResource": "리소스 삭제"
+  },
+  "charts": {
+    "landscapeMode": "가로 모드 - 보기 최적화",
+    "pinchToZoom": "핀치로 확대/축소 • 탭하여 상호작용 • 더블탭으로 초기화",
+    "loadingChart": "차트 로딩 중..."
   },
   "reports": {
     "title": "AI 기반 보고서",

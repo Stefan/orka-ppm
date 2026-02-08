@@ -34,7 +34,7 @@ Diese Tests existieren, laufen aber nicht (Jest ignoriert sie). Nach Reparatur (
   E2E-Dateien in `__tests__/e2e/`, `unused-javascript.property.test.ts`
 - **Sonstige:**  
   Diverse Property- und Komponenten-Tests (input-*, error-boundary, etc.) – siehe vollständige Liste in `jest.config.js` unter `testPathIgnorePatterns`.  
-  **Repariert und reaktiviert:** `card-border.property.test.tsx` (Card-Klassen auf rounded-xl / border-gray-200 angepasst), `currency-utils.property.test.ts` (fc.float mit Math.fround, Round-Trip ohne JPY, Toleranz angepasst).
+  **Repariert und reaktiviert:** `card-border.property.test.tsx`, `currency-utils.property.test.ts`, `FeatureFlagContext.test.tsx`, `usePermissions.test.ts`, `guest-project-access-page.test.tsx` (5 Tests), `share-link-manager.test.tsx` (4 Tests). Jeweils reduzierte Suites wo Fetch/API-Mock in Jest nicht zuverlässig greift.
 
 ### 1.2.1 Werden die ignorierten Tests noch benötigt?
 
@@ -100,7 +100,7 @@ Laut **docs/backend-api-route-coverage.md** sind P0/P1 weitgehend mit Literal- u
 3. **Lib:**  
    Session-continuity und error-handler haben bereits Tests (`lib/sync/__tests__/session-continuity.test.ts`, `lib/utils/__tests__/error-handler.test.ts`). Weitere Module (offline/storage, Worker-Logik) auf mind. 80 % bringen.
 4. **Reaktivierung:**  
-   Ignorierte Suites schrittweise reparieren (fetch/Router/Timer-Mocks) und aus `testPathIgnorePatterns` entfernen. **Erledigt:** card-border, currency-utils. **Offen:** guest-project-access (Fetch-Mock in JSDOM greift nicht zuverlässig), FeatureFlagContext (act/timing), share-link-manager, RoleManagement, dashboard-page-validation.
+   Ignorierte Suites reparieren bzw. reduzieren und aus `testPathIgnorePatterns` entfernen. **Erledigt:** card-border, currency-utils, FeatureFlagContext, usePermissions, guest-project-access-page (5 Tests), share-link-manager (4 Tests). **Offen:** RoleManagement, dashboard-page-validation, EnhancedAuthProvider (Supabase-Mock wird nicht genutzt).
 5. **E2E (optional):**  
    Ein Szenario „Projects-Seite bei Backend 500 / Backend aus“ mit Assert auf Fehler-UI.
 

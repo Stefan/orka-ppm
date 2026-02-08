@@ -77,7 +77,27 @@
     "refresh": "Aktualisieren",
     "traditionalView": "Zur traditionellen Ansicht wechseln",
     "aiView": "Zur KI-erweiterten Ansicht wechseln",
-    "fallbackData": "Verwende Ersatzdaten"
+    "fallbackData": "Verwende Ersatzdaten",
+    "aiInsightsTitle": "AI-Empfehlung",
+    "aiInsightsSummary": "Nutze die Varianz-Alerts für Budget-Optimierung. Kritische Abweichungen erscheinen oben in den Alerts.",
+    "last7Days": "Letzte 7 Tage",
+    "last30Days": "Letzte 30 Tage",
+    "last90Days": "Letzte 90 Tage",
+    "thisYear": "Dieses Jahr",
+    "alerts": {
+      "budgetOverrunTitle": "Budget-Überschreitung",
+      "budgetOverrunDesc": "Projekt Alpha hat das Budget um 15 % überschritten",
+      "scheduleDelayRiskTitle": "Terminverzögerungsrisiko",
+      "scheduleDelayRiskDesc": "Kritische Pfadaktivitäten um 3 Tage verzögert",
+      "timelineDelayTitle": "Zeitplanverzögerung",
+      "timelineDelayDesc": "Projekt Beta liegt 2 Wochen hinter dem Plan",
+      "resourceConflictTitle": "Ressourcenkonflikt",
+      "resourceConflictDesc": "Mitarbeiter mehreren Projekten zugeordnet"
+    }
+  },
+  "guidedTour": {
+    "startTour": "Tour starten",
+    "restartTour": "Tour erneut starten"
   },
   "kpi": {
     "successRate": "Erfolgsquote",
@@ -104,7 +124,10 @@
     "charts": "Diagramme",
     "resources": "Ressourcen",
     "financials": "Finanzen",
-    "reports": "Berichte"
+    "reports": "Berichte",
+    "timeline": "Zeitachse",
+    "analytics": "Analysen",
+    "importProjects": "Projekte importieren"
   },
   "projects": {
     "recentProjects": "Aktuelle Projekte"
@@ -167,6 +190,7 @@
     "retry": "Erneut versuchen",
     "close": "Schließen",
     "save": "Speichern",
+    "actions": "Aktionen",
     "saving": "Speichert...",
     "saveChanges": "Änderungen speichern",
     "cancel": "Abbrechen",
@@ -249,7 +273,18 @@
     "warnings": "Warnungen",
     "rowLabel": "Zeile {row}",
     "moreErrors": "... und {count} weitere Fehler",
-    "moreWarnings": "... und {count} weitere Warnungen"
+    "moreWarnings": "... und {count} weitere Warnungen",
+    "mappingPreview": "Spaltenzuordnung (Vorschau)",
+    "csvColumn": "CSV-Spalte",
+    "ppmField": "PPM-Feld",
+    "confidence": "Treffer",
+    "importAnyway": "Datei importieren",
+    "cancelPreview": "Abbrechen",
+    "loadingMapping": "Spalten werden erkannt…",
+    "noMappingSuggested": "Keine Spalten erkannt oder keine Zuordnung vorgeschlagen.",
+    "saveMapping": "Zuordnung speichern",
+    "loadSavedMapping": "Gespeicherte Zuordnung laden",
+    "mappingSaved": "Zuordnung gespeichert."
   },
   "shared": {
     "shareableUrl": {
@@ -323,7 +358,10 @@
     "noData": "Keine Varianzdaten vorhanden.",
     "importCsvToSee": "CSV-Dateien importieren, um die Varianzanalyse zu sehen.",
     "dataUnavailable": "Varianzdaten nicht verfügbar: {error}",
-    "importCsv": "CSV importieren"
+    "importCsv": "CSV importieren",
+    "period7d": "7 Tage",
+    "period30d": "30 Tage",
+    "period90d": "90 Tage"
   },
   "financials": {
     "title": "Finanzmanagement",
@@ -474,6 +512,9 @@
   },
   "resources": {
     "title": "Ressourcenmanagement",
+    "refresh": "Aktualisieren",
+    "filters": "Filter",
+    "export": "Export",
     "overallocated": "Überbelegt",
     "live": "Live",
     "of": "von",
@@ -489,6 +530,8 @@
     "aiOptimize": "KI Optimieren",
     "ai": "KI",
     "addResource": "Ressource hinzufügen",
+    "addNewResource": "Neue Ressource hinzufügen",
+    "addShort": "Hinzufügen",
     "refreshNow": "Jetzt aktualisieren",
     "enableAutoRefresh": "Auto-Aktualisierung aktivieren (30s)",
     "disableAutoRefresh": "Auto-Aktualisierung deaktivieren",
@@ -525,7 +568,35 @@
     "utilizationDistribution": "Auslastungsverteilung",
     "topSkills": "Top-Fähigkeiten",
     "roleDistribution": "Rollenverteilung",
-    "errorLoading": "Fehler beim Laden der Ressourcen"
+    "errorLoading": "Fehler beim Laden der Ressourcen",
+    "noRoleSpecified": "Keine Rolle angegeben",
+    "availableHours": "Verfügbare Stunden",
+    "currentProjects": "Aktuelle Projekte",
+    "viewDetails": "Details anzeigen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "unassigned": "Nicht zugewiesen",
+    "utilization": "Auslastung",
+    "skills": "Fähigkeiten",
+    "hourlyRate": "Stundensatz",
+    "underUtilized": "Unterausgelastet",
+    "wellUtilized": "Gut ausgelastet",
+    "highlyUtilized": "Stark ausgelastet",
+    "overUtilized": "Überausgelastet",
+    "underUtilizedRange": "Unterausgelastet (0–50 %)",
+    "wellUtilizedRange": "Gut ausgelastet (51–80 %)",
+    "highlyUtilizedRange": "Stark ausgelastet (81–100 %)",
+    "overUtilizedRange": "Überausgelastet (>100 %)",
+    "utilizationInsights": "Auslastungsübersicht",
+    "tapCardsForDetails": "Karten antippen für Details",
+    "mostUtilized": "Am stärksten ausgelastet",
+    "moreSkills": "+{count} weitere",
+    "deleteResource": "Ressource löschen"
+  },
+  "charts": {
+    "landscapeMode": "Querformat – optimiert für bessere Darstellung",
+    "pinchToZoom": "Zum Zoomen kneifen • Tippen zum Interagieren • Doppeltippen zum Zurücksetzen",
+    "loadingChart": "Diagramm wird geladen..."
   },
   "reports": {
     "title": "KI-gestützte Berichte",
@@ -1094,6 +1165,8 @@
     "errorAuthMissing": "Autorisierung fehlt. Bitte anmelden.",
     "errorAuthInvalid": "Sitzung abgelaufen oder ungültig. Bitte erneut anmelden.",
     "error": "Fehler",
+    "anomaliesDetected": "Anomalien erkannt",
+    "anomalyToastMessage": "Vorschlag: Überprüfe die markierten Einträge im Tab Anomalien.",
     "tabs": {
       "dashboard": "Dashboard",
       "timeline": "Zeitachse",

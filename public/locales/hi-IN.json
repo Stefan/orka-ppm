@@ -77,7 +77,27 @@
     "refresh": "ताज़ा करें",
     "traditionalView": "पारंपरिक दृश्य पर स्विच करें",
     "aiView": "एआई-संवर्धित दृश्य पर स्विच करें",
-    "fallbackData": "फ़ॉलबैक डेटा का उपयोग"
+    "fallbackData": "फ़ॉलबैक डेटा का उपयोग",
+    "aiInsightsTitle": "AI सिफारिश",
+    "aiInsightsSummary": "बजट अनुकूलन के लिए विचरण अलर्ट का उपयोग करें। महत्वपूर्ण विचलन अलर्ट में ऊपर दिखाई देते हैं।",
+    "last7Days": "पिछले 7 दिन",
+    "last30Days": "पिछले 30 दिन",
+    "last90Days": "पिछले 90 दिन",
+    "thisYear": "इस वर्ष",
+    "alerts": {
+      "budgetOverrunTitle": "बजट अधिकता",
+      "budgetOverrunDesc": "प्रोजेक्ट अल्फा ने बजट 15% से अधिक कर दिया",
+      "scheduleDelayRiskTitle": "अनुसूची विलंब जोखिम",
+      "scheduleDelayRiskDesc": "महत्वपूर्ण गतिविधियाँ 3 दिन विलंबित",
+      "timelineDelayTitle": "समयरेखा विलंब",
+      "timelineDelayDesc": "प्रोजेक्ट बीटा 2 सप्ताह पीछे",
+      "resourceConflictTitle": "संसाधन संघर्ष",
+      "resourceConflictDesc": "सदस्य कई परियोजनाओं में नियुक्त"
+    }
+  },
+  "guidedTour": {
+    "startTour": "टूर शुरू करें",
+    "restartTour": "टूर पुनः शुरू करें"
   },
   "kpi": {
     "successRate": "सफलता दर",
@@ -104,7 +124,10 @@
     "charts": "चार्ट",
     "resources": "संसाधन",
     "financials": "वित्तीय",
-    "reports": "रिपोर्ट्स"
+    "reports": "रिपोर्ट्स",
+    "timeline": "टाइमलाइन",
+    "analytics": "विश्लेषण",
+    "importProjects": "प्रोजेक्ट आयात करें"
   },
   "projects": {
     "recentProjects": "हाल के प्रोजेक्ट्स"
@@ -167,6 +190,7 @@
     "retry": "पुनः प्रयास करें",
     "close": "बंद करें",
     "save": "सहेजें",
+    "actions": "कार्रवाई",
     "saving": "सहेजा जा रहा है...",
     "saveChanges": "परिवर्तन सहेजें",
     "cancel": "रद्द करें",
@@ -323,7 +347,10 @@
     "noData": "कोई विचलन डेटा उपलब्ध नहीं है।",
     "importCsvToSee": "विचलन विश्लेषण देखने के लिए CSV फाइलें आयात करें।",
     "dataUnavailable": "विचलन डेटा उपलब्ध नहीं: {error}",
-    "importCsv": "CSV आयात करें"
+    "importCsv": "CSV आयात करें",
+    "period7d": "7 दिन",
+    "period30d": "30 दिन",
+    "period90d": "90 दिन"
   },
   "financials": {
     "title": "वित्तीय प्रबंधन",
@@ -489,10 +516,15 @@
     "aiOptimize": "एआई अनुकूलन",
     "ai": "एआई",
     "addResource": "संसाधन जोड़ें",
+    "addNewResource": "नया संसाधन जोड़ें",
+    "addShort": "जोड़ें",
     "refreshNow": "अभी ताज़ा करें",
     "enableAutoRefresh": "ऑटो-रिफ्रेश सक्षम करें (30s)",
     "disableAutoRefresh": "ऑटो-रिफ्रेश अक्षम करें",
     "exportData": "संसाधन डेटा निर्यात करें",
+    "export": "निर्यात",
+    "refresh": "ताज़ा करें",
+    "filters": "फ़िल्टर",
     "showFilters": "फ़िल्टर दिखाएँ",
     "hideFilters": "फ़िल्टर छिपाएँ",
     "showOptimization": "एआई अनुकूलन दिखाएँ",
@@ -525,7 +557,35 @@
     "utilizationDistribution": "उपयोग वितरण",
     "topSkills": "शीर्ष कौशल",
     "roleDistribution": "भूमिका वितरण",
-    "errorLoading": "संसाधन लोड करने में त्रुटि"
+    "errorLoading": "संसाधन लोड करने में त्रुटि",
+    "noRoleSpecified": "कोई भूमिका निर्दिष्ट नहीं",
+    "availableHours": "उपलब्ध घंटे",
+    "currentProjects": "वर्तमान परियोजनाएं",
+    "viewDetails": "विवरण देखें",
+    "edit": "संपादित करें",
+    "delete": "हटाएं",
+    "unassigned": "अनियत",
+    "utilization": "उपयोग",
+    "skills": "कौशल",
+    "hourlyRate": "प्रति घंटा दर",
+    "underUtilized": "कम उपयोग",
+    "wellUtilized": "अच्छी तरह उपयोग",
+    "highlyUtilized": "अत्यधिक उपयोग",
+    "overUtilized": "अधिक उपयोग",
+    "underUtilizedRange": "कम उपयोग (0-50%)",
+    "wellUtilizedRange": "अच्छी तरह उपयोग (51-80%)",
+    "highlyUtilizedRange": "अत्यधिक उपयोग (81-100%)",
+    "overUtilizedRange": "अधिक उपयोग (>100%)",
+    "utilizationInsights": "उपयोग अवलोकन",
+    "tapCardsForDetails": "विवरण के लिए कार्ड टैप करें",
+    "mostUtilized": "सबसे अधिक उपयोग",
+    "moreSkills": "+{count} और",
+    "deleteResource": "संसाधन हटाएं"
+  },
+  "charts": {
+    "landscapeMode": "लैंडस्केप मोड - बेहतर देखने के लिए अनुकूलित",
+    "pinchToZoom": "ज़ूम के लिए चुटकी • इंटरैक्ट के लिए टैप • रीसेट के लिए डबल टैप",
+    "loadingChart": "चार्ट लोड हो रहा है..."
   },
   "reports": {
     "title": "AI-संचालित रिपोर्ट",

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef, useEffect } from 'react'
 import { 
   BarChart3, TrendingUp, PieChart, Target, Upload, FileText, 
   CheckCircle, FolderTree, BookOpen 
@@ -67,9 +67,27 @@ export default function TabNavigation({ viewMode, onViewModeChange }: TabNavigat
     return tabs
   }, [t, costbookEnabled])
 
+  // #region agent log
+  const wrapRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = wrapRef.current
+    if (!el) return
+    const log = () => {
+      const pw = el.parentElement?.clientWidth
+      const cw = el.clientWidth
+      const sw = el.scrollWidth
+      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'TabNavigation.tsx:tabs', message: 'tab_row_metrics', data: { parentWidth: pw, clientWidth: cw, scrollWidth: sw, overflow: sw > cw }, hypothesisId: 'H1', timestamp: Date.now() }) }).catch(() => {})
+    }
+    log()
+    const ro = new ResizeObserver(log)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [tabConfig.length])
+  // #endregion
+
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-3">
-      <div className="flex flex-wrap gap-2">
+    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-3 min-w-0">
+      <div ref={wrapRef} className="flex flex-wrap gap-2 overflow-x-auto min-w-0">
         {tabConfig.map((tab) => (
           <TabButton
             key={tab.key}

@@ -147,19 +147,19 @@ function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsPro
   }
 
   return (
-    <div data-testid="variance-trends" className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700 h-full flex flex-col" style={{ minHeight: '240px' }}>
-      <div data-testid="variance-trends-header" className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100 uppercase tracking-wide">{t('variance.trends')}</h3>
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-gray-600 dark:text-slate-400" />
+    <div data-testid="variance-trends" className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700 h-full flex flex-col overflow-visible" style={{ minHeight: '240px' }}>
+      <div data-testid="variance-trends-header" className="flex items-center justify-between gap-2 mb-3 min-h-[2rem]">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100 uppercase tracking-wide truncate min-w-0 flex-shrink">{t('variance.trends')}</h3>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Filter className="h-4 w-4 text-gray-600 dark:text-slate-400 shrink-0" aria-hidden />
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value as any)}
-            className="text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 border border-gray-300 dark:border-slate-600 rounded-md px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 border border-gray-300 dark:border-slate-600 rounded-md px-2 py-1.5 min-w-[6.5rem] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="7d">7 days</option>
-            <option value="30d">30 days</option>
-            <option value="90d">90 days</option>
+            <option value="7d">{t('variance.period7d')}</option>
+            <option value="30d">{t('variance.period30d')}</option>
+            <option value="90d">{t('variance.period90d')}</option>
           </select>
         </div>
       </div>

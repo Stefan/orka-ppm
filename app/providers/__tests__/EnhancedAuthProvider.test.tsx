@@ -10,15 +10,15 @@ import React from 'react'
 import { render, screen, waitFor, act } from '@testing-library/react'
 import { EnhancedAuthProvider, useEnhancedAuth, usePermissions, useRoles } from '../EnhancedAuthProvider'
 import * as SupabaseAuthProvider from '../SupabaseAuthProvider'
-import { supabase } from '../../../lib/api/supabase-minimal'
+import { supabase } from '@/lib/api/supabase-minimal'
 
 // Mock the SupabaseAuthProvider
 jest.mock('../SupabaseAuthProvider', () => ({
   useAuth: jest.fn()
 }))
 
-// Mock supabase client
-jest.mock('../../../lib/api/supabase-minimal', () => ({
+// Mock supabase client (use same path as provider so one mock is shared)
+jest.mock('@/lib/api/supabase-minimal', () => ({
   supabase: {
     from: jest.fn(),
     channel: jest.fn(),

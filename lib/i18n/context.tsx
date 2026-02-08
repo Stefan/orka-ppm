@@ -32,6 +32,7 @@ import {
   SUPPORTED_LANGUAGES
 } from './types';
 import { isPluralRules, formatPlural } from './pluralization';
+import { getLocaleFormat, type LocaleFormatConfig } from './locale-config';
 
 /**
  * I18n Context value interface
@@ -48,6 +49,8 @@ interface I18nContextValue {
   setLocale: (locale: string) => Promise<void>;
   /** Translation function - converts keys to translated strings */
   t: (key: TranslationKey, params?: InterpolationParams) => string;
+  /** Date locale, default currency, and time zone for the current language */
+  localeFormat: LocaleFormatConfig;
 }
 
 /**
@@ -462,6 +465,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     isLoading,
     setLocale,
     t,
+    localeFormat: getLocaleFormat(locale),
   };
 
   return (

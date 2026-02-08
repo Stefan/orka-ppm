@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import AppLayout from '../../components/shared/AppLayout'
 import { useTranslations } from '@/lib/i18n/context'
+import type { TranslationKey } from '@/lib/i18n/types'
 import { 
   loadDashboardData, 
   clearDashboardCache,
@@ -21,7 +22,7 @@ import {
 } from '../../lib/api/dashboard-loader'
 import { 
   TrendingUp, TrendingDown, AlertTriangle, DollarSign, Clock, RefreshCw, 
-  BarChart3, Users, FileText, ChevronDown, X, Filter, Upload 
+  BarChart3, Users, FileText, ChevronDown, X, Filter, Upload, Sparkles 
 } from 'lucide-react'
 import ProjectImportModal from '@/components/projects/ProjectImportModal'
 import { ChartSkeleton } from '../../components/ui/Skeleton'
@@ -129,8 +130,17 @@ function QuickActionButton({ icon: Icon, label, onClick }: any) {
   )
 }
 
+// Dashboard alert: either i18n keys (titleKey/descKey) or literal title/description (e.g. from API)
+export type DashboardAlert = {
+  id: string
+  severity: 'critical' | 'high' | 'warning' | 'info'
+} & (
+  | { titleKey: TranslationKey; descKey: TranslationKey; title?: never; description?: never }
+  | { title: string; description: string; titleKey?: never; descKey?: never }
+)
+
 // Alert chip – colored bg with left accent bar, icon, high-contrast text
-function AlertChip({ alert, onDismiss }: { alert: any, onDismiss: (id: string) => void }) {
+function AlertChip({ alert, onDismiss }: { alert: DashboardAlert; onDismiss: (id: string) => void }) {
   const { t } = useTranslations()
   const severityConfig = {
     critical: {
@@ -180,8 +190,8 @@ function AlertChip({ alert, onDismiss }: { alert: any, onDismiss: (id: string) =
 
       <AlertTriangle className={`h-3.5 w-3.5 flex-shrink-0 ${config.icon}`} aria-hidden />
       <div className="flex flex-col min-w-0 flex-1">
-        <span className={`text-sm font-medium ${config.title} truncate`}>{alert.title}</span>
-        <span className={`text-xs ${config.desc} truncate`}>{alert.description}</span>
+        <span className={`text-sm font-medium ${config.title} truncate`}>{'titleKey' in alert && alert.titleKey ? t(alert.titleKey) : alert.title}</span>
+        <span className={`text-xs ${config.desc} truncate`}>{'descKey' in alert && alert.descKey ? t(alert.descKey) : alert.description}</span>
       </div>
       <button
         onClick={() => onDismiss(alert.id)}
@@ -195,9 +205,10 @@ function AlertChip({ alert, onDismiss }: { alert: any, onDismiss: (id: string) =
 }
 
 // Filter Dropdown Component - standardized font sizes
-function FilterDropdown({ value, onChange }: { value: string, onChange: (val: string) => void }) {
+const DASHBOARD_TIME_OPTIONS = ['last7Days', 'last30Days', 'last90Days', 'thisYear'] as const
+
+function FilterDropdown({ value, onChange, t }: { value: string; onChange: (val: string) => void; t: (key: string) => string }) {
   const [isOpen, setIsOpen] = useState(false)
-  const options = ['Last 7 days', 'Last 30 days', 'Last 90 days', 'This year']
   
   return (
     <div className="relative">
@@ -206,26 +217,29 @@ function FilterDropdown({ value, onChange }: { value: string, onChange: (val: st
         className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors text-xs text-gray-900 dark:text-slate-100"
       >
         <Filter size={14} aria-hidden />
-        <span className="hidden sm:inline">{value}</span>
+        <span className="hidden sm:inline">{t(`dashboard.${value}`)}</span>
         <ChevronDown size={14} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} aria-hidden />
       </button>
       
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg z-10">
-          {options.map((option) => (
+          {DASHBOARD_TIME_OPTIONS.map((optionKey) => {
+            const label = t(`dashboard.${optionKey}`)
+            return (
             <button
-              key={option}
+              key={optionKey}
               onClick={() => {
-                onChange(option)
+                onChange(optionKey)
                 setIsOpen(false)
               }}
               className={`w-full text-left px-4 py-2 text-xs hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700 transition-colors first:rounded-t-lg last:rounded-b-lg ${
-                value === option ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 font-medium' : 'text-gray-700 dark:text-slate-200'
+                value === optionKey ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 font-medium' : 'text-gray-700 dark:text-slate-200'
               }`}
             >
-              {option}
-            </button>
-          ))}
+              {label}
+              </button>
+            )
+          })}
         </div>
       )}
     </div>
@@ -243,12 +257,12 @@ export default function CompactDashboard() {
   const [recentProjects, setRecentProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [varianceAlertCount, setVarianceAlertCount] = useState(0)
-  const [timeFilter, setTimeFilter] = useState('Last 30 days')
-  const [alerts, setAlerts] = useState<any[]>([
-    { id: '1', title: 'Budget Overrun', description: 'Project Alpha exceeded budget by 15%', severity: 'critical' },
-    { id: '2', title: 'Schedule Delay Risk', description: 'Critical path activities delayed by 3 days', severity: 'high' },
-    { id: '4', title: 'Timeline Delay', description: 'Project Beta is 2 weeks behind schedule', severity: 'warning' },
-    { id: '3', title: 'Resource Conflict', description: 'Team member assigned to multiple projects', severity: 'warning' },
+  const [timeFilter, setTimeFilter] = useState('last30Days')
+  const [alerts, setAlerts] = useState<DashboardAlert[]>([
+    { id: '1', titleKey: 'dashboard.alerts.budgetOverrunTitle', descKey: 'dashboard.alerts.budgetOverrunDesc', severity: 'critical' },
+    { id: '2', titleKey: 'dashboard.alerts.scheduleDelayRiskTitle', descKey: 'dashboard.alerts.scheduleDelayRiskDesc', severity: 'high' },
+    { id: '4', titleKey: 'dashboard.alerts.timelineDelayTitle', descKey: 'dashboard.alerts.timelineDelayDesc', severity: 'warning' },
+    { id: '3', titleKey: 'dashboard.alerts.resourceConflictTitle', descKey: 'dashboard.alerts.resourceConflictDesc', severity: 'warning' },
   ])
   const [showImportModal, setShowImportModal] = useState(false)
   const hasCriticalDataRef = useRef(false)
@@ -359,7 +373,7 @@ export default function CompactDashboard() {
               onStart={hasCompletedTour ? resetAndStartTour : startTour}
               hasCompletedTour={hasCompletedTour}
             />
-            <FilterDropdown value={timeFilter} onChange={handleFilterChange} />
+            <FilterDropdown value={timeFilter} onChange={handleFilterChange} t={t} />
             <button
               data-testid="dashboard-refresh-button"
               onClick={quickRefresh}
@@ -425,16 +439,34 @@ export default function CompactDashboard() {
           </div>
         )}
 
-        {/* Workflow Approvals - Compact View */}
-        {session?.user?.id && (
-          <Suspense fallback={<div className="h-20 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse"></div>}>
-            <WorkflowDashboard 
-              userId={session.user.id} 
-              userRole={session.user.role || 'viewer'}
-              compact={true}
-            />
-          </Suspense>
-        )}
+        {/* AI Insights + Workflow side by side on desktop to save vertical space */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 md:gap-3">
+          <div
+            data-testid="dashboard-ai-insights"
+            className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800 border border-blue-100 dark:border-slate-600 rounded-lg px-4 py-3 flex items-start gap-3 lg:col-span-1"
+          >
+            <Sparkles className="h-5 w-5 text-blue-500 dark:text-indigo-400 flex-shrink-0 mt-0.5" aria-hidden />
+            <div className="min-w-0">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100">
+                {t('dashboard.aiInsightsTitle')}
+              </h3>
+              <p className="text-sm text-gray-700 dark:text-slate-300 mt-0.5">
+                {t('dashboard.aiInsightsSummary')}
+              </p>
+            </div>
+          </div>
+          {session?.user?.id && (
+            <div className="lg:col-span-2">
+              <Suspense fallback={<div className="h-20 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" />}>
+                <WorkflowDashboard 
+                  userId={session.user.id} 
+                  userRole={session.user.role || 'viewer'}
+                  compact={true}
+                />
+              </Suspense>
+            </div>
+          )}
+        </div>
 
         {/* Budget Variance and Variance Trends side by side */}
         <div data-testid="dashboard-variance-section" data-tour="dashboard-variance" className="flex flex-col sm:flex-row gap-4">
@@ -445,62 +477,49 @@ export default function CompactDashboard() {
             </Suspense>
           </div>
           
-          {/* Variance Trends - takes remaining space */}
-          <div className="w-full sm:flex-1 min-w-0">
+          {/* Variance Trends - takes remaining space; overflow-visible so dropdown is not clipped */}
+          <div className="w-full sm:flex-1 min-w-0 overflow-visible">
             <Suspense fallback={<div className="h-full bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 animate-pulse" style={{ minHeight: '240px' }}></div>}>
               <VarianceTrends session={session} selectedCurrency="USD" />
             </Suspense>
           </div>
         </div>
 
-        {/* Schedule widgets (Task 15) */}
-        {session?.access_token && (
-          <Suspense fallback={<div className="h-32 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" />}>
-            <ScheduleDashboardWidgets accessToken={session.access_token} />
-          </Suspense>
-        )}
-
-        {/* Change Orders widget */}
-        {recentProjects.length > 0 && (
-          <Suspense fallback={<div className="h-24 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" />}>
-            <ChangeOrderWidgets projectIds={recentProjects.map((p) => p.id)} />
-          </Suspense>
-        )}
-
-        {/* Project Controls widget */}
-        {recentProjects.length > 0 && (
-          <Suspense fallback={<div className="h-24 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" />}>
-            <ProjectControlsWidgets projectIds={recentProjects.map((p) => p.id)} />
-          </Suspense>
-        )}
-
-        {/* Health Summary - Full Width */}
-        <div data-testid="dashboard-health-section" className="space-y-2 md:space-y-3">
-          {/* Project Health Summary - Compact - standardized font sizes using design tokens */}
+        {/* Schedule, Change Orders, Project Controls, Health – one row on desktop to use space */}
+        <div data-testid="dashboard-widgets-row" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
+          {session?.access_token && (
+            <Suspense fallback={<div className="h-32 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" />}>
+              <ScheduleDashboardWidgets accessToken={session.access_token} />
+            </Suspense>
+          )}
+          {recentProjects.length > 0 && (
+            <>
+              <Suspense fallback={<div className="h-24 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" />}>
+                <ChangeOrderWidgets projectIds={recentProjects.map((p) => p.id)} />
+              </Suspense>
+              <Suspense fallback={<div className="h-24 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" />}>
+                <ProjectControlsWidgets projectIds={recentProjects.map((p) => p.id)} />
+              </Suspense>
+            </>
+          )}
           {quickStats && (
             <div data-testid="health-summary" className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100 mb-3 uppercase tracking-wide">{t('health.projectHealth')}</h3>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
-                    <span className="text-sm text-gray-700 dark:text-slate-300">{t('health.healthy')}</span>
-                  </div>
-                  <span data-testid="health-healthy-count" className="font-semibold text-gray-900 dark:text-slate-100 text-base">{quickStats.health_distribution?.green || 0}</span>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100 mb-2 uppercase tracking-wide">{t('health.projectHealth')}</h3>
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500 flex-shrink-0" />
+                  <span className="text-sm text-gray-700 dark:text-slate-300">{t('health.healthy')}</span>
+                  <span data-testid="health-healthy-count" className="font-semibold text-gray-900 dark:text-slate-100 text-sm">{quickStats.health_distribution?.green || 0}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
-                    <span className="text-sm text-gray-700 dark:text-slate-300">{t('health.atRisk')}</span>
-                  </div>
-                  <span data-testid="health-at-risk-count" className="font-semibold text-gray-900 dark:text-slate-100 text-base">{quickStats.health_distribution?.yellow || 0}</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500 flex-shrink-0" />
+                  <span className="text-sm text-gray-700 dark:text-slate-300">{t('health.atRisk')}</span>
+                  <span data-testid="health-at-risk-count" className="font-semibold text-gray-900 dark:text-slate-100 text-sm">{quickStats.health_distribution?.yellow || 0}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
-                    <span className="text-sm text-gray-700 dark:text-slate-300">{t('health.critical')}</span>
-                  </div>
-                  <span data-testid="health-critical-count" className="font-semibold text-gray-900 dark:text-slate-100 text-base">{quickStats.health_distribution?.red || 0}</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500 flex-shrink-0" />
+                  <span className="text-sm text-gray-700 dark:text-slate-300">{t('health.critical')}</span>
+                  <span data-testid="health-critical-count" className="font-semibold text-gray-900 dark:text-slate-100 text-sm">{quickStats.health_distribution?.red || 0}</span>
                 </div>
               </div>
             </div>
@@ -508,7 +527,7 @@ export default function CompactDashboard() {
         </div>
 
         {/* Recent Projects Grid - balanced sizing */}
-        <div data-testid="dashboard-projects-section" data-tour="dashboard-projects" className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4 mb-20">
+        <div data-testid="dashboard-projects-section" data-tour="dashboard-projects" className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4 mb-6">
           <h2 className="text-sm font-semibold text-gray-900 dark:text-slate-100 mb-3 uppercase tracking-wide">{t('projects.recentProjects')}</h2>
           <div data-testid="recent-projects-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
             {recentProjects.slice(0, 8).map((project) => (
@@ -545,15 +564,15 @@ export default function CompactDashboard() {
               </button>
               <button data-testid="action-timeline" onClick={() => router.push('/schedules')} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
                 <Clock size={18} className="shrink-0" aria-hidden />
-                <span className="text-sm font-medium">Timeline</span>
+                <span className="text-sm font-medium">{t('actions.timeline')}</span>
               </button>
               <button data-testid="action-analytics" onClick={() => router.push('/dashboards')} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
                 <TrendingUp size={18} className="shrink-0" aria-hidden />
-                <span className="text-sm font-medium">Analytics</span>
+                <span className="text-sm font-medium">{t('actions.analytics')}</span>
               </button>
               <button data-testid="action-import" onClick={() => setShowImportModal(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-700 dark:border dark:border-blue-600 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-all whitespace-nowrap shadow-md hover:shadow-lg text-white [&_svg]:text-white [&_span]:text-white">
                 <Upload size={18} className="shrink-0" aria-hidden />
-                <span className="text-sm font-medium">Import Projects</span>
+                <span className="text-sm font-medium">{t('actions.importProjects')}</span>
               </button>
             </div>
           </div>

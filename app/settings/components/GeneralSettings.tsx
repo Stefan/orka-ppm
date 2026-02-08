@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useTranslations } from '@/lib/i18n/context'
+import { useState, useEffect, useMemo } from 'react'
+import { useTranslations, useI18n } from '@/lib/i18n/context'
+import { getLocaleFormat } from '@/lib/i18n/locale-config'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { Sun, Moon, Monitor, Clock, DollarSign, Check, Calendar } from 'lucide-react'
@@ -9,36 +10,96 @@ import { useSettings } from '@/hooks/useSettings'
 import { useTheme } from '@/app/providers/ThemeProvider'
 import { logger } from '@/lib/monitoring/logger'
 
-const TIMEZONES = [
+// Base order: UTC, then Europe, Americas, Asia (by city name)
+const TIMEZONES_BASE = [
   { value: 'UTC', label: 'UTC' },
-  { value: 'Europe/Zurich', label: 'Europe/Zurich (CET)' },
-  { value: 'Europe/London', label: 'Europe/London (GMT)' },
   { value: 'Europe/Berlin', label: 'Europe/Berlin (CET)' },
-  { value: 'America/New_York', label: 'America/New York (EST)' },
+  { value: 'Europe/London', label: 'Europe/London (GMT)' },
+  { value: 'Europe/Madrid', label: 'Europe/Madrid (CET)' },
+  { value: 'Europe/Paris', label: 'Europe/Paris (CET)' },
+  { value: 'Europe/Warsaw', label: 'Europe/Warsaw (CET)' },
+  { value: 'Europe/Zurich', label: 'Europe/Zurich (CET)' },
   { value: 'America/Los_Angeles', label: 'America/Los Angeles (PST)' },
+  { value: 'America/Mexico_City', label: 'America/Mexico City (CST)' },
+  { value: 'America/New_York', label: 'America/New York (EST)' },
+  { value: 'Asia/Ho_Chi_Minh', label: 'Asia/Ho Chi Minh (ICT)' },
+  { value: 'Asia/Kolkata', label: 'Asia/Kolkata (IST)' },
+  { value: 'Asia/Seoul', label: 'Asia/Seoul (KST)' },
+  { value: 'Asia/Shanghai', label: 'Asia/Shanghai (CST)' },
   { value: 'Asia/Tokyo', label: 'Asia/Tokyo (JST)' },
 ]
 
-const CURRENCIES = [
+// Base order: major first, then alphabetical
+const CURRENCIES_BASE = [
   { value: 'USD', label: 'USD ($)' },
   { value: 'EUR', label: 'EUR (€)' },
-  { value: 'CHF', label: 'CHF (Fr.)' },
   { value: 'GBP', label: 'GBP (£)' },
+  { value: 'CHF', label: 'CHF (Fr.)' },
+  { value: 'JPY', label: 'JPY (¥)' },
+  { value: 'CNY', label: 'CNY (¥)' },
+  { value: 'INR', label: 'INR (₹)' },
+  { value: 'KRW', label: 'KRW (₩)' },
+  { value: 'MXN', label: 'MXN ($)' },
+  { value: 'PLN', label: 'PLN (zł)' },
+  { value: 'VND', label: 'VND (₫)' },
 ]
 
-type DateFormatValue = 'browser' | 'de-DE' | 'en-US' | 'en-GB' | 'iso'
+const DATE_FORMAT_OPTIONS_BASE: { value: DateFormatValue; labelKey: string; labelEn: string }[] = [
+  { value: 'browser', labelKey: 'settings.dateFormatBrowser', labelEn: 'Browser default' },
+  { value: 'de-DE', labelKey: 'settings.dateFormatDe', labelEn: 'German (DD.MM.YYYY)' },
+  { value: 'en-GB', labelKey: 'settings.dateFormatEnGb', labelEn: 'UK (DD/MM/YYYY)' },
+  { value: 'fr-FR', labelKey: '', labelEn: 'French (DD/MM/YYYY)' },
+  { value: 'es-ES', labelKey: '', labelEn: 'Spanish (DD/MM/YYYY)' },
+  { value: 'pl-PL', labelKey: '', labelEn: 'Polish (DD.MM.YYYY)' },
+  { value: 'de-CH', labelKey: '', labelEn: 'Swiss German (DD.MM.YYYY)' },
+  { value: 'en-US', labelKey: 'settings.dateFormatEnUs', labelEn: 'US (MM/DD/YYYY)' },
+  { value: 'es-MX', labelKey: '', labelEn: 'Spanish Mexico (DD/MM/YYYY)' },
+  { value: 'zh-CN', labelKey: '', labelEn: 'Chinese (YYYY/MM/DD)' },
+  { value: 'hi-IN', labelKey: '', labelEn: 'Hindi India (DD/MM/YYYY)' },
+  { value: 'ja-JP', labelKey: '', labelEn: 'Japanese (YYYY/MM/DD)' },
+  { value: 'ko-KR', labelKey: '', labelEn: 'Korean (YYYY. MM. DD)' },
+  { value: 'vi-VN', labelKey: '', labelEn: 'Vietnamese (DD/MM/YYYY)' },
+  { value: 'iso', labelKey: 'settings.dateFormatIso', labelEn: 'ISO (YYYY-MM-DD)' },
+]
+
+type DateFormatValue = 'browser' | 'de-DE' | 'en-US' | 'en-GB' | 'fr-FR' | 'es-ES' | 'pl-PL' | 'de-CH' | 'es-MX' | 'zh-CN' | 'hi-IN' | 'ja-JP' | 'ko-KR' | 'vi-VN' | 'iso'
 
 type Theme = 'light' | 'dark' | 'system'
 
 export function GeneralSettings() {
   const { t } = useTranslations()
+  const { locale } = useI18n()
   const { settings, updateSetting, loading, saving } = useSettings()
   const { theme: currentTheme, setTheme: setGlobalTheme } = useTheme()
-  
+  const localeFormat = getLocaleFormat(locale)
+
   const [timezone, setTimezone] = useState(settings?.timezone || 'UTC')
   const [currency, setCurrency] = useState(settings?.currency || 'USD')
   const [dateFormat, setDateFormat] = useState<DateFormatValue>(settings?.dateFormat || 'browser')
   const [hasChanges, setHasChanges] = useState(false)
+
+  // Context-sensitive sort: option matching current app language (locale) first, then base order
+  const timezoneOptions = useMemo(() => {
+    const match = TIMEZONES_BASE.find((o) => o.value === localeFormat.timeZone)
+    if (!match) return TIMEZONES_BASE
+    return [match, ...TIMEZONES_BASE.filter((o) => o.value !== localeFormat.timeZone)]
+  }, [localeFormat.timeZone])
+
+  const currencyOptions = useMemo(() => {
+    const match = CURRENCIES_BASE.find((o) => o.value === localeFormat.defaultCurrency)
+    if (!match) return CURRENCIES_BASE
+    return [match, ...CURRENCIES_BASE.filter((o) => o.value !== localeFormat.defaultCurrency)]
+  }, [localeFormat.defaultCurrency])
+
+  const dateFormatOptions = useMemo(() => {
+    const withLabels = DATE_FORMAT_OPTIONS_BASE.map((o) => ({
+      value: o.value,
+      label: o.labelKey ? (t(o.labelKey) || o.labelEn) : o.labelEn,
+    }))
+    const match = withLabels.find((opt) => opt.value === localeFormat.dateLocale)
+    if (!match || match.value === 'browser') return withLabels
+    return [withLabels[0], match, ...withLabels.slice(1).filter((o) => o.value !== localeFormat.dateLocale)]
+  }, [localeFormat.dateLocale, t])
 
   useEffect(() => {
     if (settings) {
@@ -135,13 +196,7 @@ export function GeneralSettings() {
             setDateFormat(value as DateFormatValue)
             setHasChanges(true)
           }}
-          options={[
-            { value: 'browser', label: t('settings.dateFormatBrowser') || 'Browser default' },
-            { value: 'de-DE', label: t('settings.dateFormatDe') || 'German (DD.MM.YYYY)' },
-            { value: 'en-US', label: t('settings.dateFormatEnUs') || 'US (MM/DD/YYYY)' },
-            { value: 'en-GB', label: t('settings.dateFormatEnGb') || 'UK (DD/MM/YYYY)' },
-            { value: 'iso', label: t('settings.dateFormatIso') || 'ISO (YYYY-MM-DD)' },
-          ]}
+          options={dateFormatOptions}
           className="w-full max-w-xs"
         />
         <p className="text-xs text-gray-500 dark:text-slate-400">
@@ -163,7 +218,7 @@ export function GeneralSettings() {
             setTimezone(value)
             setHasChanges(true)
           }}
-          options={TIMEZONES}
+          options={timezoneOptions}
           className="w-full max-w-xs"
         />
       </div>
@@ -182,7 +237,7 @@ export function GeneralSettings() {
             setCurrency(value)
             setHasChanges(true)
           }}
-          options={CURRENCIES}
+          options={currencyOptions}
           className="w-full max-w-xs"
         />
         <p className="text-xs text-gray-500 dark:text-slate-400">

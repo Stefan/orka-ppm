@@ -76,7 +76,27 @@
     "refresh": "Aktualisiere",
     "traditionalView": "Zur traditionelle Aasicht wäggsle",
     "aiView": "Zur AI-verbesserte Aasicht wäggsle",
-    "fallbackData": "Bruuche Ersatz-Date"
+    "fallbackData": "Bruuche Ersatz-Date",
+    "aiInsightsTitle": "AI-Empfählung",
+    "aiInsightsSummary": "Bruuch d Varianz-Alerts für s Budget-Optimierig. Kritischi Abwichige erschynen obe in de Alerts.",
+    "last7Days": "Letschti 7 Täg",
+    "last30Days": "Letschti 30 Täg",
+    "last90Days": "Letschti 90 Täg",
+    "thisYear": "Des Jahr",
+    "alerts": {
+      "budgetOverrunTitle": "Budget-Überschriitig",
+      "budgetOverrunDesc": "Projäkt Alpha het s Budget um 15 % überschritte",
+      "scheduleDelayRiskTitle": "Terminverzögerigsrisiko",
+      "scheduleDelayRiskDesc": "Kritischi Pfadaktivitäte um 3 Täg verzögeret",
+      "timelineDelayTitle": "Zytplanverzögerig",
+      "timelineDelayDesc": "Projäkt Beta ligt 2 Wuche hinder em Plan",
+      "resourceConflictTitle": "Ressourchekonflikt",
+      "resourceConflictDesc": "Mitarbeiter mehrere Projäkt zuegordnet"
+    }
+  },
+  "guidedTour": {
+    "startTour": "Tour starte",
+    "restartTour": "Tour nomol starte"
   },
   "kpi": {
     "successRate": "Erfolgsrate",
@@ -103,7 +123,10 @@
     "charts": "Diagramm",
     "resources": "Ressurse",
     "financials": "Finanze",
-    "reports": "Bricht"
+    "reports": "Bricht",
+    "timeline": "Zytachse",
+    "analytics": "Analys",
+    "importProjects": "Projäkt importiere"
   },
   "projects": {
     "recentProjects": "Letschti Projäkt"
@@ -166,6 +189,7 @@
     "retry": "Nomol probiere",
     "close": "Schliesse",
     "save": "Speichere",
+    "actions": "Aktione",
     "cancel": "Abbräche",
     "delete": "Lösche",
     "edit": "Bearbeite",
@@ -316,7 +340,10 @@
     "noData": "Kei Abwyychigs-Date verfüegbar.",
     "importCsvToSee": "CSV-Dateie importiere zum Abwyychigs-Analyse gseh.",
     "dataUnavailable": "Abwyychigs-Date nöd verfüegbar: {error}",
-    "importCsv": "CSV importiere"
+    "importCsv": "CSV importiere",
+    "period7d": "7 Täg",
+    "period30d": "30 Täg",
+    "period90d": "90 Täg"
   },
   "financials": {
     "title": "Finanz-Verwaltung",
@@ -474,10 +501,15 @@
     "aiOptimize": "AI Optimiere",
     "ai": "AI",
     "addResource": "Ressurse hinzuefüege",
+    "addNewResource": "Neui Ressurse hinzuefüege",
+    "addShort": "Hinzuefüege",
     "refreshNow": "Jetzt aktualisiere",
     "enableAutoRefresh": "Auto-Aktualisierig igschalte (30s)",
     "disableAutoRefresh": "Auto-Aktualisierig usschalte",
     "exportData": "Ressurse-Date exportiere",
+    "export": "Export",
+    "refresh": "Aktualisiere",
+    "filters": "Filter",
     "showFilters": "Filter azeige",
     "hideFilters": "Filter verstecke",
     "showOptimization": "AI-Optimisierig azeige",
@@ -510,7 +542,35 @@
     "utilizationDistribution": "Uuslaschtig-Vertyilig",
     "topSkills": "Top-Fähigkeite",
     "roleDistribution": "Rolle-Vertyilig",
-    "errorLoading": "Fähler bim Lade vo Ressurse"
+    "errorLoading": "Fähler bim Lade vo Ressurse",
+    "noRoleSpecified": "Kei Rolle aagee",
+    "availableHours": "Verfüegbari Stunde",
+    "currentProjects": "Aktuelli Projäkt",
+    "viewDetails": "Detail aazeige",
+    "edit": "Bearbeite",
+    "delete": "Lösche",
+    "unassigned": "Nicht zuegwiese",
+    "utilization": "Uuslastig",
+    "skills": "Fähigkeite",
+    "hourlyRate": "Stundesatz",
+    "underUtilized": "Underausglastet",
+    "wellUtilized": "Guet ausglastet",
+    "highlyUtilized": "Stark ausglastet",
+    "overUtilized": "Überausglastet",
+    "underUtilizedRange": "Underausglastet (0–50 %)",
+    "wellUtilizedRange": "Guet ausglastet (51–80 %)",
+    "highlyUtilizedRange": "Stark ausglastet (81–100 %)",
+    "overUtilizedRange": "Überausglastet (>100 %)",
+    "utilizationInsights": "Uuslastigs-Iberblick",
+    "tapCardsForDetails": "Karte tippe für Detail",
+    "mostUtilized": "Am stärkste ausglastet",
+    "moreSkills": "+{count} witeri",
+    "deleteResource": "Ressurs lösche"
+  },
+  "charts": {
+    "landscapeMode": "Querformat – optimiert für besseri Aasicht",
+    "pinchToZoom": "Zum Zoome kneife • Tippe zum Interagiere • Doppeltippe zum Zruggsetze",
+    "loadingChart": "Diagramm wird glade..."
   },
   "reports": {
     "title": "AI-Bricht",

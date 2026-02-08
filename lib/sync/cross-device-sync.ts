@@ -86,8 +86,23 @@ export interface AISettings {
   enableAutoOptimization: boolean
 }
 
-/** Date format preference: browser = use navigator locale, or a specific locale/iso */
-export type DateFormatPreference = 'browser' | 'de-DE' | 'en-US' | 'en-GB' | 'iso'
+/** Date format preference: browser = use app language locale, or a specific locale/iso */
+export type DateFormatPreference =
+  | 'browser'
+  | 'de-DE'
+  | 'en-US'
+  | 'en-GB'
+  | 'fr-FR'
+  | 'es-ES'
+  | 'pl-PL'
+  | 'de-CH'
+  | 'es-MX'
+  | 'zh-CN'
+  | 'hi-IN'
+  | 'ja-JP'
+  | 'ko-KR'
+  | 'vi-VN'
+  | 'iso'
 
 export interface UserPreferences {
   userId: string
@@ -96,7 +111,7 @@ export interface UserPreferences {
   timezone: string
   /** Date display format; default 'browser' uses the browser's locale */
   dateFormat?: DateFormatPreference
-  currency: 'USD' | 'EUR' | 'CHF' | 'GBP'
+  currency: 'USD' | 'EUR' | 'CHF' | 'GBP' | 'PLN' | 'MXN' | 'CNY' | 'INR' | 'JPY' | 'KRW' | 'VND'
   dashboardLayout: {
     widgets: any[]
     layout: 'grid' | 'masonry' | 'list'

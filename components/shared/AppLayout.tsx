@@ -27,7 +27,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   // Mobile navigation state management
   const isMobile = useIsMobile()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
-  
+
   // Toggle function for mobile navigation
   const toggleMobileNav = () => {
     setMobileNavOpen(!mobileNavOpen)
@@ -36,31 +36,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
   useEffect(() => {
     if (!loading && !session) {
       console.log('🔒 No session found, redirecting to login...')
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'AppLayout.tsx:redirect', message: 'app_layout_redirect_no_session', data: { loading, hasSession: !!session }, hypothesisId: 'H5', timestamp: Date.now() }) }).catch(() => {})
-      // #endregion
       router.push('/')
     }
   }, [session, loading, router])
-
-  // #region agent log (only when NEXT_PUBLIC_AGENT_INGEST_URL is set)
-  useEffect(() => {
-    const ingestUrl = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_AGENT_INGEST_URL : undefined
-    if (!ingestUrl) return
-    const el = mainContentRef.current
-    if (!el) return
-    const log = () => {
-      const cs = getComputedStyle(el)
-      fetch(ingestUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'AppLayout.tsx:main', message: 'main content metrics', data: { offsetHeight: el.offsetHeight, clientHeight: el.clientHeight, minHeight: cs.minHeight, flex: cs.flex, contain: cs.contain }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H1' }) }).catch(() => {})
-      fetch(ingestUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'AppLayout.tsx:main', message: 'main content metrics', data: { offsetHeight: el.offsetHeight, clientHeight: el.clientHeight, minHeight: cs.minHeight, flex: cs.flex, contain: cs.contain }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H2' }) }).catch(() => {})
-      fetch(ingestUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'AppLayout.tsx:main', message: 'main content metrics', data: { offsetHeight: el.offsetHeight, clientHeight: el.clientHeight, minHeight: cs.minHeight, flex: cs.flex, contain: cs.contain }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H3' }) }).catch(() => {})
-    }
-    log()
-    const ro = new ResizeObserver(log)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-  // #endregion
 
   if (loading) {
     return (
@@ -90,13 +68,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
         {/* Mobile Navigation Drawer */}
         <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
         
-        {/* Main Content Area */}
+        {/* Main Content Area: min-w-0 + overflow-x-hidden prevent horizontal scroll on tablet (H1/H3 fix) */}
         <main
           data-testid="app-layout-main"
           ref={mainContentRef}
-          className="flex-1 min-h-0"
+          className="flex-1 min-h-0 min-w-0 overflow-x-hidden"
           style={{
-            // CSS containment for better performance isolation and CLS prevention
             contain: 'layout style paint'
           }}
         >
