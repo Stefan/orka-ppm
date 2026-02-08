@@ -810,10 +810,10 @@ async def get_financial_variances(
 COMMITMENTS_CACHE_TTL = 60  # seconds; short TTL since data changes on import
 
 
-def _commitments_cache_key(org_id: str, offset: int, limit: int, project_nr: Optional[str]) -> str:
+def _commitments_cache_key(org_id: str, offset: int, limit: int, project_nr: Optional[str], count_exact: bool) -> str:
     """Build cache key for commitments list (idempotent for same inputs)."""
     pn = project_nr or ""
-    return f"commitments:list:{org_id}:{offset}:{limit}:{pn}"
+    return f"commitments:list:{org_id}:{offset}:{limit}:{pn}:{count_exact}"
 
 
 @router.get("/commitments")
@@ -822,17 +822,19 @@ async def get_commitments(
     limit: int = Query(100, ge=1, le=10000),
     offset: int = Query(0, ge=0),
     project_nr: Optional[str] = None,
+    count_exact: bool = Query(False, description="Request exact total count (expensive on large tables); use only when needed for pagination"),
     current_user = Depends(get_current_user)
 ):
     """
     Get imported commitments data with pagination. Response cached (TTL 60s).
+    Default count_exact=false to avoid slow COUNT; pass count_exact=true only for first page when you need exact total.
     """
     try:
         org_id = (current_user.get("organization_id") or current_user.get("tenant_id") or "default")
         if isinstance(org_id, UUID):
             org_id = str(org_id)
         cache = getattr(request.app.state, "cache_manager", None)
-        cache_key = _commitments_cache_key(org_id, offset, limit, project_nr)
+        cache_key = _commitments_cache_key(org_id, offset, limit, project_nr, count_exact)
         if cache:
             data = await cache.get(cache_key)
             if data is not None:
@@ -840,17 +842,27 @@ async def get_commitments(
         db_client = service_supabase if service_supabase else supabase
         if db_client is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        query = db_client.table("commitments").select("*", count="exact")
+        if count_exact:
+            query = db_client.table("commitments").select("*", count="exact")
+        else:
+            query = db_client.table("commitments").select("*")
         if project_nr:
             query = query.eq("project_nr", project_nr)
         query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
         response = query.execute()
-        total = response.count if hasattr(response, "count") else len(response.data or [])
+        data_list = response.data or []
+        if count_exact and hasattr(response, "count") and response.count is not None:
+            total = response.count
+        else:
+            total = offset + len(data_list)
+        has_more = len(data_list) == limit
         result = {
-            "commitments": response.data or [],
+            "commitments": data_list,
             "total": total,
             "limit": limit,
-            "offset": offset
+            "offset": offset,
+            "count_exact": count_exact,
+            "has_more": has_more,
         }
         if cache:
             await cache.set(cache_key, result, ttl=COMMITMENTS_CACHE_TTL)
@@ -866,10 +878,10 @@ async def get_commitments(
 ACTUALS_CACHE_TTL = 60  # seconds
 
 
-def _actuals_cache_key(org_id: str, offset: int, limit: int, project_nr: Optional[str]) -> str:
+def _actuals_cache_key(org_id: str, offset: int, limit: int, project_nr: Optional[str], count_exact: bool) -> str:
     """Build cache key for actuals list (idempotent for same inputs)."""
     pn = project_nr or ""
-    return f"actuals:list:{org_id}:{offset}:{limit}:{pn}"
+    return f"actuals:list:{org_id}:{offset}:{limit}:{pn}:{count_exact}"
 
 
 @router.get("/actuals")
@@ -878,17 +890,19 @@ async def get_actuals(
     limit: int = Query(100, ge=1, le=10000),
     offset: int = Query(0, ge=0),
     project_nr: Optional[str] = None,
+    count_exact: bool = Query(False, description="Request exact total count (expensive on large tables); use only when needed for pagination"),
     current_user = Depends(get_current_user)
 ):
     """
     Get imported actuals data with pagination. Response cached (TTL 60s).
+    Default count_exact=false to avoid slow COUNT; pass count_exact=true only for first page when you need exact total.
     """
     try:
         org_id = (current_user.get("organization_id") or current_user.get("tenant_id") or "default")
         if isinstance(org_id, UUID):
             org_id = str(org_id)
         cache = getattr(request.app.state, "cache_manager", None)
-        cache_key = _actuals_cache_key(org_id, offset, limit, project_nr)
+        cache_key = _actuals_cache_key(org_id, offset, limit, project_nr, count_exact)
         if cache:
             data = await cache.get(cache_key)
             if data is not None:
@@ -896,17 +910,27 @@ async def get_actuals(
         db_client = service_supabase if service_supabase else supabase
         if db_client is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        query = db_client.table("actuals").select("*", count="exact")
+        if count_exact:
+            query = db_client.table("actuals").select("*", count="exact")
+        else:
+            query = db_client.table("actuals").select("*")
         if project_nr:
             query = query.eq("project_nr", project_nr)
         query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
         response = query.execute()
-        total = response.count if hasattr(response, "count") else len(response.data or [])
+        data_list = response.data or []
+        if count_exact and hasattr(response, "count") and response.count is not None:
+            total = response.count
+        else:
+            total = offset + len(data_list)
+        has_more = len(data_list) == limit
         result = {
-            "actuals": response.data or [],
+            "actuals": data_list,
             "total": total,
             "limit": limit,
-            "offset": offset
+            "offset": offset,
+            "count_exact": count_exact,
+            "has_more": has_more,
         }
         if cache:
             await cache.set(cache_key, result, ttl=ACTUALS_CACHE_TTL)

@@ -53,6 +53,8 @@
     "switchThemeSystem": "시스템으로 전환",
     "switchThemeLight": "라이트로 전환",
     "notifications": "알림",
+    "noNotifications": "새 알림 없음",
+    "markAllAsRead": "모두 읽음으로 표시",
     "userMenu": "사용자 메뉴",
     "searchPlaceholder": "프로젝트, 기능, 문서 검색…",
     "searching": "검색 중…",
@@ -61,7 +63,12 @@
     "searchAria": "검색",
     "voiceSearch": "음성 검색",
     "listening": "듣는 중…",
-    "dismissAlert": "알림 닫기"
+    "dismissAlert": "알림 닫기",
+    "justNow": "방금",
+    "minutesAgo": "{count}분 전",
+    "hoursAgo": "{count}시간 전",
+    "yesterday": "어제",
+    "daysAgo": "{count}일 전"
   },
   "dashboard": {
     "title": "포트폴리오 대시보드",
@@ -93,6 +100,20 @@
       "timelineDelayDesc": "프로젝트 Beta 2주 일정 지연",
       "resourceConflictTitle": "리소스 충돌",
       "resourceConflictDesc": "구성원이 여러 프로젝트에 배정됨"
+    },
+    "schedulesTitle": "일정",
+    "openLink": "열기",
+    "activeSchedules": "활성 일정",
+    "milestonesDueIn14Days": "14일 내 마일스톤 {count}개",
+    "changeOrdersTitle": "변경 지시",
+    "projectsAvailableForChangeOrders": {
+      "one": "변경 지시 가능 프로젝트 1개",
+      "other": "변경 지시 가능 프로젝트 {count}개"
+    },
+    "projectControlsTitle": "프로젝트 통제",
+    "projectsForControls": {
+      "one": "통제 대상 프로젝트 1개",
+      "other": "통제 대상 프로젝트 {count}개"
     }
   },
   "guidedTour": {
@@ -130,7 +151,9 @@
     "importProjects": "프로젝트 가져오기"
   },
   "projects": {
-    "recentProjects": "최근 프로젝트"
+    "recentProjects": "최근 프로젝트",
+    "title": "프로젝트",
+    "pageDescription": "프로젝트 및 워크플로 승인 관리"
   },
   "settings": {
     "title": "설정",
@@ -171,6 +194,25 @@
     "budgetMethod": "예산 성과 계산",
     "resourceMethod": "자원 효율성 계산",
     "dashboardLayout": "대시보드 레이아웃",
+    "successRateHealth": "상태 기반(녹색 프로젝트 비율)",
+    "successRateCompletion": "완료 기반(완료된 프로젝트 비율)",
+    "successRateHealthDesc": "\"녹색\" 상태 프로젝트 비율로 성공률 계산",
+    "successRateCompletionDesc": "완료로 표시된 프로젝트 비율로 성공률 계산",
+    "budgetSpent": "지출/총액(예산 사용률)",
+    "budgetRemaining": "잔여(가용 예산)",
+    "budgetSpentDesc": "지출된 총 예산의 비율 표시",
+    "budgetRemainingDesc": "남은 총 예산의 비율 표시",
+    "resourceAuto": "프로젝트 데이터에서 자동 계산",
+    "resourceFixed": "고정 플레이스홀더 값",
+    "resourceAutoDesc": "프로젝트 및 팀 데이터에서 리소스 효율성 자동 계산",
+    "resourceFixedDesc": "실제 리소스 데이터를 사용할 수 있을 때까지 고정 플레이스홀더 값 사용",
+    "layoutGrid": "그리드",
+    "layoutMasonry": "메이슨리",
+    "layoutList": "목록",
+    "pushNotifications": "푸시 알림",
+    "pushNotificationsEnableDesc": "프로젝트 변경 사항을 받으려면 알림을 사용하세요",
+    "pushNotificationsReceiveDesc": "중요한 프로젝트 업데이트 알림 받기",
+    "pushNotificationsNotSupported": "이 브라우저에서는 푸시 알림을 지원하지 않습니다.",
     "aiFeatures": "AI 기능",
     "aiPrivacyInfo": "AI 기능은 더 효율적인 작업을 돕습니다. 데이터는 안전하게 처리되며 제3자와 절대 공유되지 않습니다.",
     "aiSuggestions": "AI 제안",
@@ -443,6 +485,14 @@
     "commitments": "약정",
     "actuals": "실적",
     "spendRate": "지출 속도",
+    "savedViews": "저장된 보기",
+    "refreshAll": "모두 새로 고침",
+    "refreshing": "새로 고치는 중...",
+    "actualsData": "실적 데이터",
+    "commitmentsData": "약정 데이터",
+    "showingRecords": "{total}개 중 {start}-{end}개 표시",
+    "filtered": "필터링됨",
+    "filteredCount": "({count}개 필터링됨)",
     "onTrack": "정상",
     "showingProjects": "{total}개 프로젝트 중 {shown}개 표시",
     "noDetailedData": "상세 데이터 없음",
@@ -602,7 +652,53 @@
     "send": "보내기",
     "pmrMode": "PMR 모드",
     "pmrModeActive": "PMR 모드 활성",
-    "pmrModeInactive": "PMR 모드 비활성"
+    "pmrModeInactive": "PMR 모드 비활성",
+    "welcomeMessage": "안녕하세요! 프로젝트 포트폴리오 관리를 위한 AI 어시스턴트입니다. 프로젝트, 리소스, 예산, 리스크 분석 및 맞춤형 보고서 작성에 도움을 드립니다. 무엇을 알고 싶으신가요?",
+    "confidence": "신뢰도:",
+    "sources": "소스:",
+    "tryAsking": "다음과 같이 질문해 보세요:",
+    "suggestion1": "모든 프로젝트의 현재 상태는?",
+    "suggestion2": "어떤 리소스가 과부하인가요?",
+    "suggestion3": "모든 프로젝트의 예산 사용률 표시",
+    "suggestion4": "리스크 평가 보고서 작성",
+    "suggestion5": "가장 수요가 많은 기술은?",
+    "pmrSuggestion1": "최신 프로젝트 상태로 경영진 요약 업데이트",
+    "pmrSuggestion2": "예산 변동 인사이트 생성",
+    "pmrSuggestion3": "일정 성과 추세 분석",
+    "pmrSuggestion4": "리스크 섹션 개선 제안",
+    "pmrSuggestion5": "리소스 활용률 차트 추가"
+  },
+  "projectControlsPage": {
+    "title": "프로젝트 통제",
+    "subtitle": "ETC, EAC, 획득가치 및 성과 분석",
+    "projectLabel": "프로젝트",
+    "selectProject": "프로젝트 선택..."
+  },
+  "schedules": {
+    "title": "일정",
+    "pageDescription": "프로젝트 일정, 작업, 의존성을 관리합니다.",
+    "searchPlaceholder": "일정 검색...",
+    "allStatuses": "모든 상태",
+    "allProjects": "모든 프로젝트",
+    "newSchedule": "새 일정",
+    "noSchedulesFound": "일정을 찾을 수 없습니다.",
+    "createOneToGetStarted": "시작하려면 하나를 만드세요.",
+    "loadingSchedules": "일정 로드 중...",
+    "filterByStatus": "상태별 필터",
+    "filterByProject": "프로젝트별 필터",
+    "statusActive": "활성",
+    "statusDraft": "초안",
+    "statusCompleted": "완료",
+    "selectProject": "프로젝트 선택",
+    "projectLabel": "프로젝트",
+    "nameLabel": "이름",
+    "scheduleName": "일정 이름",
+    "descriptionOptional": "설명 (선택)",
+    "startDate": "시작일",
+    "endDate": "종료일",
+    "creating": "만드는 중...",
+    "create": "만들기",
+    "createScheduleTitle": "일정 만들기"
   },
   "scenarios": {
     "title": "시나리오",
@@ -1231,6 +1327,28 @@
     "loadingTimeline": "타임라인 로딩 중...",
     "noEventsToDisplay": "표시할 이벤트 없음"
   },
+  "adminDashboard": {
+    "title": "관리자 대시보드",
+    "subtitle": "시스템 관리 및 운영",
+    "userManagementTitle": "사용자 관리",
+    "userManagementDesc": "사용자, 역할 및 권한 관리",
+    "performanceTitle": "성능",
+    "performanceDesc": "시스템 성능 및 메트릭 모니터링",
+    "navigationStatsTitle": "탐색 통계",
+    "navigationStatsDesc": "탐색 분석 및 통계 보기",
+    "featureCatalogTitle": "기능 카탈로그",
+    "featureCatalogDesc": "기능 개요 및 스크린샷 관리",
+    "featureTogglesTitle": "기능 토글",
+    "featureTogglesDesc": "전역 또는 조직별로 기능 활성화/비활성화",
+    "helpChatAnalyticsTitle": "도움말 채팅 분석",
+    "helpChatAnalyticsDesc": "도움말 채팅 사용량, 만족도 및 인기 쿼리 보기",
+    "organisationsTitle": "조직",
+    "organisationsDesc": "테넌트 및 조직 관리(슈퍼 관리자)",
+    "workflowBuilderTitle": "워크플로 빌더",
+    "workflowBuilderDesc": "노코드 워크플로 편집기(단계, 엣지, 초안으로 저장)",
+    "ssoTitle": "SSO",
+    "ssoDesc": "Single Sign-On 공급자 구성(Google, Microsoft, Okta, Azure AD)"
+  },
   "adminPerformance": {
     "title": "성능 대시보드",
     "subtitle": "API 성능 모니터링 및 최적화",
@@ -1393,6 +1511,23 @@
     }
   },
   "changes": {
+    "title": "변경 관리",
+    "pageDescription": "프로젝트 변경 요청, 승인 및 구현 추적을 관리합니다.",
+    "changeOrders": "변경 지시",
+    "changeOrderIntegration": {
+      "title": "변경 지시",
+      "description": "프로젝트별 비용 영향 및 승인 워크플로가 있는 공식 변경 지시를 관리합니다.",
+      "openChangeOrders": "변경 지시 열기"
+    },
+    "newChangeRequest": "새 변경 요청",
+    "filters": "필터",
+    "searchPlaceholder": "변경 요청 검색...",
+    "showingCount": "총 {total}건 중 {shown}건 표시",
+    "previous": "이전",
+    "next": "다음",
+    "noChangeRequests": "변경 요청이 없습니다",
+    "getStartedByCreating": "새 변경 요청을 만들어 시작하세요.",
+    "loadingChangeRequests": "변경 요청 로드 중...",
     "implementationTracker": {
       "title": "구현 추적",
       "changeRequest": "변경 요청",

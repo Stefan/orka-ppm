@@ -11,29 +11,31 @@ import {
 } from 'lucide-react'
 import { useSettings, type DashboardKPIs } from '@/hooks/useSettings'
 
-const SUCCESS_RATE_METHODS = [
-  { value: 'health', label: 'Health-based (% of green projects)' },
-  { value: 'completion', label: 'Completion-based (% of completed projects)' },
-]
-
-const BUDGET_METHODS = [
-  { value: 'spent', label: 'Spent/Total (budget utilization)' },
-  { value: 'remaining', label: 'Remaining (budget available)' },
-]
-
-const RESOURCE_METHODS = [
-  { value: 'auto', label: 'Auto-calculate from project data' },
-  { value: 'fixed', label: 'Fixed placeholder value' },
-]
-
 const LAYOUT_OPTIONS = [
-  { value: 'grid', label: 'Grid', icon: Grid3X3 },
-  { value: 'masonry', label: 'Masonry', icon: LayoutGrid },
-  { value: 'list', label: 'List', icon: LayoutList },
-]
+  { value: 'grid', icon: Grid3X3 },
+  { value: 'masonry', icon: LayoutGrid },
+  { value: 'list', icon: LayoutList },
+] as const
 
 export function DashboardSettings() {
   const { t } = useTranslations()
+  const SUCCESS_RATE_METHODS = [
+    { value: 'health', label: t('settings.successRateHealth') },
+    { value: 'completion', label: t('settings.successRateCompletion') },
+  ]
+  const BUDGET_METHODS = [
+    { value: 'spent', label: t('settings.budgetSpent') },
+    { value: 'remaining', label: t('settings.budgetRemaining') },
+  ]
+  const RESOURCE_METHODS = [
+    { value: 'auto', label: t('settings.resourceAuto') },
+    { value: 'fixed', label: t('settings.resourceFixed') },
+  ]
+  const layoutOptions = [
+    { value: 'grid', label: t('settings.layoutGrid'), icon: Grid3X3 },
+    { value: 'masonry', label: t('settings.layoutMasonry'), icon: LayoutGrid },
+    { value: 'list', label: t('settings.layoutList'), icon: LayoutList },
+  ]
   const { settings, updateSetting, loading, saving } = useSettings()
   
   const [kpiSettings, setKpiSettings] = useState<DashboardKPIs>({
@@ -113,8 +115,8 @@ export function DashboardSettings() {
           />
           <p className="text-xs text-gray-500 dark:text-slate-400">
             {kpiSettings.successRateMethod === 'health' 
-              ? 'Calculates success as the percentage of projects with "green" health status'
-              : 'Calculates success as the percentage of projects marked as completed'}
+              ? t('settings.successRateHealthDesc')
+              : t('settings.successRateCompletionDesc')}
           </p>
         </div>
 
@@ -134,8 +136,8 @@ export function DashboardSettings() {
           />
           <p className="text-xs text-gray-500 dark:text-slate-400">
             {kpiSettings.budgetMethod === 'spent'
-              ? 'Shows percentage of total budget that has been spent'
-              : 'Shows percentage of total budget that remains available'}
+              ? t('settings.budgetSpentDesc')
+              : t('settings.budgetRemainingDesc')}
           </p>
         </div>
 
@@ -169,8 +171,8 @@ export function DashboardSettings() {
           )}
           <p className="text-xs text-gray-500 dark:text-slate-400">
             {kpiSettings.resourceMethod === 'auto'
-              ? 'Automatically calculates resource efficiency from project and team data'
-              : 'Uses a fixed placeholder value until real resource data is available'}
+              ? t('settings.resourceAutoDesc')
+              : t('settings.resourceFixedDesc')}
           </p>
         </div>
       </div>
@@ -183,7 +185,7 @@ export function DashboardSettings() {
         </div>
 
         <div className="grid grid-cols-3 gap-3">
-          {LAYOUT_OPTIONS.map(({ value, label, icon: Icon }) => (
+          {layoutOptions.map(({ value, label, icon: Icon }) => (
             <button
               key={value}
               onClick={() => {

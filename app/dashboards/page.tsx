@@ -24,7 +24,6 @@ import {
   TrendingUp, TrendingDown, AlertTriangle, DollarSign, Clock, RefreshCw, 
   BarChart3, Users, FileText, ChevronDown, X, Filter, Upload, Sparkles 
 } from 'lucide-react'
-import ProjectImportModal from '@/components/projects/ProjectImportModal'
 import { ChartSkeleton } from '../../components/ui/Skeleton'
 import { GuidedTour, useGuidedTour, TourTriggerButton, dashboardTourSteps } from '@/components/guided-tour'
 import { logger } from '@/lib/monitoring/logger'
@@ -264,7 +263,6 @@ export default function CompactDashboard() {
     { id: '4', titleKey: 'dashboard.alerts.timelineDelayTitle', descKey: 'dashboard.alerts.timelineDelayDesc', severity: 'warning' },
     { id: '3', titleKey: 'dashboard.alerts.resourceConflictTitle', descKey: 'dashboard.alerts.resourceConflictDesc', severity: 'warning' },
   ])
-  const [showImportModal, setShowImportModal] = useState(false)
   const hasCriticalDataRef = useRef(false)
   const { isOpen, startTour, closeTour, completeTour, resetAndStartTour, hasCompletedTour } = useGuidedTour('dashboard-v1')
 
@@ -566,11 +564,11 @@ export default function CompactDashboard() {
                 <Clock size={18} className="shrink-0" aria-hidden />
                 <span className="text-sm font-medium">{t('actions.timeline')}</span>
               </button>
-              <button data-testid="action-analytics" onClick={() => router.push('/dashboards')} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
+              <button data-testid="action-analytics" onClick={() => router.push('/reports')} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
                 <TrendingUp size={18} className="shrink-0" aria-hidden />
                 <span className="text-sm font-medium">{t('actions.analytics')}</span>
               </button>
-              <button data-testid="action-import" onClick={() => setShowImportModal(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-700 dark:border dark:border-blue-600 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-all whitespace-nowrap shadow-md hover:shadow-lg text-white [&_svg]:text-white [&_span]:text-white">
+              <button data-testid="action-import" onClick={() => router.push('/import')} className="flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-700 dark:border dark:border-blue-600 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-all whitespace-nowrap shadow-md hover:shadow-lg text-white [&_svg]:text-white [&_span]:text-white">
                 <Upload size={18} className="shrink-0" aria-hidden />
                 <span className="text-sm font-medium">{t('actions.importProjects')}</span>
               </button>
@@ -586,11 +584,6 @@ export default function CompactDashboard() {
         onClose={closeTour}
         onComplete={completeTour}
         tourId="dashboard-v1"
-      />
-      {/* Project Import Modal */}
-      <ProjectImportModal 
-        isOpen={showImportModal} 
-        onClose={() => setShowImportModal(false)} 
       />
     </AppLayout>
   )

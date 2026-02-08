@@ -263,13 +263,14 @@ class DiagnosticCollector {
         })
       }
 
-      // Core Web Vitals
+      // Core Web Vitals (CLS is unitless 'score', others ms)
       const metrics = performanceMonitor.getMetrics()
       metrics.forEach(metric => {
+        const name = metric.name.toLowerCase()
         this.logPerformanceMetric({
-          name: metric.name.toLowerCase(),
+          name,
           value: metric.value,
-          unit: 'ms',
+          unit: name === 'cls' ? 'score' : 'ms',
           component: 'core-web-vitals',
           context: { rating: metric.rating }
         })
@@ -452,6 +453,11 @@ class DiagnosticCollector {
 
     // Log performance warnings
     if (this.isPerformanceIssue(params.name, params.value)) {
+      // #region agent log
+      if (params.name === 'cls' && typeof fetch !== 'undefined') {
+        fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/diagnostics/diagnostic-collector.ts:logPerformanceMetric',message:'CLS performance issue logged',data:{name:params.name,value:params.value,unit:params.unit},timestamp:Date.now(),hypothesisId:'H4'})}).catch(()=>{});
+      }
+      // #endregion
       logger.warn(`Performance issue detected: ${params.name}`, metric)
     }
 

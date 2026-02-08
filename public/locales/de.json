@@ -53,6 +53,8 @@
     "switchThemeSystem": "Auf System wechseln",
     "switchThemeLight": "Auf hell wechseln",
     "notifications": "Benachrichtigungen",
+    "noNotifications": "Keine neuen Benachrichtigungen",
+    "markAllAsRead": "Alle als gelesen markieren",
     "userMenu": "Benutzermenü",
     "searchPlaceholder": "Projekte, Features, Docs suchen…",
     "searching": "Suche…",
@@ -61,7 +63,12 @@
     "searchAria": "Suche",
     "voiceSearch": "Sprachsuche",
     "listening": "Höre zu…",
-    "dismissAlert": "Hinweis schließen"
+    "dismissAlert": "Hinweis schließen",
+    "justNow": "Gerade eben",
+    "minutesAgo": "vor {count} Min.",
+    "hoursAgo": "vor {count} Std.",
+    "yesterday": "Gestern",
+    "daysAgo": "vor {count} T."
   },
   "dashboard": {
     "title": "Portfolio Dashboard",
@@ -93,6 +100,20 @@
       "timelineDelayDesc": "Projekt Beta liegt 2 Wochen hinter dem Plan",
       "resourceConflictTitle": "Ressourcenkonflikt",
       "resourceConflictDesc": "Mitarbeiter mehreren Projekten zugeordnet"
+    },
+    "schedulesTitle": "Zeitpläne",
+    "openLink": "Öffnen",
+    "activeSchedules": "Aktive Zeitpläne",
+    "milestonesDueIn14Days": "{count} Meilenstein(e) in 14 Tagen fällig",
+    "changeOrdersTitle": "Änderungsanordnungen",
+    "projectsAvailableForChangeOrders": {
+      "one": "1 Projekt für Änderungsanordnungen verfügbar",
+      "other": "{count} Projekte für Änderungsanordnungen verfügbar"
+    },
+    "projectControlsTitle": "Projektsteuerung",
+    "projectsForControls": {
+      "one": "1 Projekt für Steuerung",
+      "other": "{count} Projekte für Steuerung"
     }
   },
   "guidedTour": {
@@ -130,7 +151,9 @@
     "importProjects": "Projekte importieren"
   },
   "projects": {
-    "recentProjects": "Aktuelle Projekte"
+    "recentProjects": "Aktuelle Projekte",
+    "title": "Projekte",
+    "pageDescription": "Verwalten Sie Ihre Projekte und Workflow-Freigaben"
   },
   "settings": {
     "title": "Einstellungen",
@@ -171,6 +194,25 @@
     "budgetMethod": "Budget-Performance-Berechnung",
     "resourceMethod": "Ressourcen-Effizienz-Berechnung",
     "dashboardLayout": "Dashboard-Layout",
+    "successRateHealth": "Gesundheitsbasiert (% grüner Projekte)",
+    "successRateCompletion": "Abschlussbasiert (% abgeschlossener Projekte)",
+    "successRateHealthDesc": "Berechnet den Erfolg als Anteil der Projekte mit „grünem“ Gesundheitsstatus",
+    "successRateCompletionDesc": "Berechnet den Erfolg als Anteil der als abgeschlossen markierten Projekte",
+    "budgetSpent": "Ausgegeben/Gesamt (Budgetauslastung)",
+    "budgetRemaining": "Verbleibend (verfügbares Budget)",
+    "budgetSpentDesc": "Zeigt den Anteil des ausgegebenen Budgets am Gesamtbudget",
+    "budgetRemainingDesc": "Zeigt den Anteil des verbleibenden Budgets am Gesamtbudget",
+    "resourceAuto": "Automatisch aus Projektdaten berechnen",
+    "resourceFixed": "Fester Platzhalterwert",
+    "resourceAutoDesc": "Berechnet die Ressourceneffizienz automatisch aus Projekt- und Teamdaten",
+    "resourceFixedDesc": "Verwendet einen festen Platzhalterwert, bis echte Ressourcendaten verfügbar sind",
+    "layoutGrid": "Raster",
+    "layoutMasonry": "Masonry",
+    "layoutList": "Liste",
+    "pushNotifications": "Push-Benachrichtigungen",
+    "pushNotificationsEnableDesc": "Benachrichtigungen aktivieren, um über Projektänderungen informiert zu bleiben",
+    "pushNotificationsReceiveDesc": "Benachrichtigungen zu wichtigen Projektupdates erhalten",
+    "pushNotificationsNotSupported": "Push-Benachrichtigungen werden in diesem Browser nicht unterstützt.",
     "aiFeatures": "KI-Funktionen",
     "aiPrivacyInfo": "KI-Funktionen helfen Ihnen, effizienter zu arbeiten. Ihre Daten werden sicher verarbeitet und niemals an Dritte weitergegeben.",
     "aiSuggestions": "KI-Vorschläge",
@@ -397,6 +439,7 @@
     "criticalOnly": "Nur Kritisch",
     "warningOnly": "Nur Warnung",
     "resetFilters": "Filter zurücksetzen",
+    "editBudget": "Budget bearbeiten",
     "tabs": {
       "overview": "Übersicht",
       "detailed": "Detailliert",
@@ -404,7 +447,8 @@
       "analysis": "Analyse",
       "poBreakdown": "PO Breakdown",
       "csvImport": "CSV Import",
-      "commitmentsActuals": "Commitments vs Actuals"
+      "commitmentsActuals": "Commitments vs Actuals",
+      "costbook": "Budget- und Kostenverwaltung"
     },
     "descriptions": {
       "overview": "Gesamtüberblick und KPIs",
@@ -413,7 +457,8 @@
       "analysis": "Erweiterte Kostenanalyse",
       "poBreakdown": "SAP Purchase Order Hierarchie",
       "csvImport": "Daten importieren",
-      "commitmentsActuals": "Geplant vs. Ist-Vergleich"
+      "commitmentsActuals": "Geplant vs. Ist-Vergleich",
+      "costbook": "Budgetüberwachung, Kostenverwaltung und Finanzüberblick mit detaillierter Projektanalyse"
     },
     "currentView": "Aktuelle Ansicht",
     "dragDropCSV": "Drag & Drop CSV-Dateien hier",
@@ -454,6 +499,14 @@
     "commitments": "Commitments",
     "actuals": "Ist-Werte",
     "spendRate": "Ausgabenrate",
+    "savedViews": "Gespeicherte Ansichten",
+    "refreshAll": "Alle aktualisieren",
+    "refreshing": "Aktualisiere...",
+    "actualsData": "Ist-Daten",
+    "commitmentsData": "Commitment-Daten",
+    "showingRecords": "Einträge {start}-{end} von {total}",
+    "filtered": "gefiltert",
+    "filteredCount": "({count} gefiltert)",
     "onTrack": "Im Plan",
     "showingProjects": "Zeige {shown} von {total} Projekten",
     "noDetailedData": "Keine detaillierten Daten verfügbar",
@@ -508,7 +561,27 @@
     "currentMonth": "Aktueller Monat",
     "projectEfficiencyAnalysis": "Projekt-Effizienzanalyse",
     "noProjectBudgetData": "Keine Projektbudgetdaten verfügbar",
-    "switchToCommitmentsActuals": "Wechseln Sie zur Ansicht 'Commitments & Ist-Werte' für detaillierte Finanzanalysen"
+    "switchToCommitmentsActuals": "Wechseln Sie zur Ansicht 'Commitments & Ist-Werte' für detaillierte Finanzanalysen",
+    "columns": {
+      "fiDocNo": "FI-Beleg Nr.",
+      "postingDate": "Buchungsdatum",
+      "documentDate": "Belegdatum",
+      "vendor": "Lieferant",
+      "vendorDescription": "Lieferantenbezeichnung",
+      "projectNr": "Projekt Nr.",
+      "wbsElement": "WBS-Element",
+      "amount": "Betrag",
+      "currency": "Währung",
+      "itemText": "Positionstext",
+      "documentType": "Belegart",
+      "poNumber": "Bestellnummer",
+      "line": "Position",
+      "poDate": "Bestelldatum",
+      "netAmount": "Nettobetrag",
+      "totalAmount": "Gesamtbetrag",
+      "status": "Status",
+      "deliveryDate": "Lieferdatum"
+    }
   },
   "resources": {
     "title": "Ressourcenmanagement",
@@ -613,7 +686,53 @@
     "send": "Senden",
     "pmrMode": "PMR-Modus",
     "pmrModeActive": "PMR-Modus aktiv",
-    "pmrModeInactive": "PMR-Modus inaktiv"
+    "pmrModeInactive": "PMR-Modus inaktiv",
+    "welcomeMessage": "Hallo! Ich bin Ihr KI-Assistent für Projekt-Portfolio-Management. Ich kann Ihnen bei der Analyse von Projekten, Ressourcen, Budgets, Risiken helfen und benutzerdefinierte Berichte erstellen. Was möchten Sie wissen?",
+    "confidence": "Konfidenz:",
+    "sources": "Quellen:",
+    "tryAsking": "Versuchen Sie zu fragen:",
+    "suggestion1": "Wie ist der aktuelle Status aller Projekte?",
+    "suggestion2": "Welche Ressourcen sind überbelastet?",
+    "suggestion3": "Zeige mir die Budgetnutzung aller Projekte",
+    "suggestion4": "Erstelle einen Risikobewertungsbericht",
+    "suggestion5": "Welche Fähigkeiten sind am meisten gefragt?",
+    "pmrSuggestion1": "Executive Summary mit aktuellem Projektstatus aktualisieren",
+    "pmrSuggestion2": "Budget-Varianz-Insights erstellen",
+    "pmrSuggestion3": "Terminplan-Performance analysieren",
+    "pmrSuggestion4": "Verbesserungen für Risikoabschnitt vorschlagen",
+    "pmrSuggestion5": "Ressourcenauslastungsdiagramm hinzufügen"
+  },
+  "projectControlsPage": {
+    "title": "Projektsteuerung",
+    "subtitle": "ETC, EAC, Earned Value und Performance-Analysen",
+    "projectLabel": "Projekt",
+    "selectProject": "Projekt auswählen..."
+  },
+  "schedules": {
+    "title": "Zeitpläne",
+    "pageDescription": "Verwalten Sie Projektzeitpläne, Aufgaben und Abhängigkeiten.",
+    "searchPlaceholder": "Zeitpläne suchen...",
+    "allStatuses": "Alle Status",
+    "allProjects": "Alle Projekte",
+    "newSchedule": "Neuer Zeitplan",
+    "noSchedulesFound": "Keine Zeitpläne gefunden.",
+    "createOneToGetStarted": "Erstellen Sie einen, um zu starten.",
+    "loadingSchedules": "Zeitpläne werden geladen...",
+    "filterByStatus": "Nach Status filtern",
+    "filterByProject": "Nach Projekt filtern",
+    "statusActive": "Aktiv",
+    "statusDraft": "Entwurf",
+    "statusCompleted": "Abgeschlossen",
+    "selectProject": "Projekt auswählen",
+    "projectLabel": "Projekt",
+    "nameLabel": "Name",
+    "scheduleName": "Zeitplanname",
+    "descriptionOptional": "Beschreibung (optional)",
+    "startDate": "Startdatum",
+    "endDate": "Enddatum",
+    "creating": "Wird erstellt...",
+    "create": "Erstellen",
+    "createScheduleTitle": "Zeitplan erstellen"
   },
   "scenarios": {
     "title": "Szenarien",
@@ -720,7 +839,32 @@
     "completed": "abgeschlossen",
     "noSimulations": "Noch keine Monte-Carlo-Simulationen",
     "configureRisksMessage": "Konfigurieren Sie Risiken und führen Sie Ihre erste Simulation aus, um statistische Analysen zu sehen",
-    "getStarted": "Erste Schritte"
+    "getStarted": "Erste Schritte",
+    "statisticalVisualizationSubtitle": "Statistische Visualisierung der Simulationsergebnisse",
+    "outcome": "Ergebnis:",
+    "costAnalysis": "Kostenanalyse",
+    "scheduleAnalysis": "Zeitplananalyse",
+    "settings": "Einstellungen",
+    "refresh": "Aktualisieren",
+    "generating": "Wird erstellt...",
+    "noChartsGeneratedYet": "Noch keine Diagramme erstellt",
+    "generateCharts": "Diagramme erstellen",
+    "chartConfiguration": "Diagrammkonfiguration",
+    "chartTypes": "Diagrammtypen",
+    "format": "Format",
+    "theme": "Design",
+    "options": "Optionen",
+    "includeRiskHeatMap": "Risiko-Heatmap einbeziehen",
+    "applySettings": "Einstellungen übernehmen",
+    "chartGenerationIssue": "Problem bei der Diagrammerstellung",
+    "chartUnavailable": "Diagramm nicht verfügbar",
+    "chartUnavailableDesc": "Dieser Diagrammtyp ist für die aktuellen Simulationsdaten vorübergehend nicht verfügbar.",
+    "chartStatistics": "Diagrammstatistik",
+    "download": "Herunterladen",
+    "riskContributionTornado": "Risikobeitrag (Tornado)",
+    "cumulativeDistribution": "Kumulative Verteilung",
+    "distribution": "Verteilung",
+    "probabilityDistribution": "Wahrscheinlichkeitsverteilung"
   },
   "risks": {
     "title": "Risikomanagement",
@@ -1244,6 +1388,28 @@
     "loadingTimeline": "Zeitachse wird geladen...",
     "noEventsToDisplay": "Keine Ereignisse anzuzeigen"
   },
+  "adminDashboard": {
+    "title": "Admin-Dashboard",
+    "subtitle": "Systemverwaltung und -steuerung",
+    "userManagementTitle": "Benutzerverwaltung",
+    "userManagementDesc": "Benutzer, Rollen und Berechtigungen verwalten",
+    "performanceTitle": "Performance",
+    "performanceDesc": "Systemperformance und Metriken überwachen",
+    "navigationStatsTitle": "Navigationsstatistiken",
+    "navigationStatsDesc": "Navigationsanalysen und -statistiken anzeigen",
+    "featureCatalogTitle": "Feature-Katalog",
+    "featureCatalogDesc": "Feature-Übersicht und Screenshots verwalten",
+    "featureTogglesTitle": "Feature-Toggles",
+    "featureTogglesDesc": "Features global oder pro Organisation aktivieren/deaktivieren",
+    "helpChatAnalyticsTitle": "Help-Chat-Analysen",
+    "helpChatAnalyticsDesc": "Help-Chat-Nutzung, Zufriedenheit und Top-Anfragen anzeigen",
+    "organisationsTitle": "Organisationen",
+    "organisationsDesc": "Mandanten und Organisationen verwalten (Super-Admin)",
+    "workflowBuilderTitle": "Workflow-Builder",
+    "workflowBuilderDesc": "No-Code-Workflow-Editor (Schritte, Kanten, als Entwurf speichern)",
+    "ssoTitle": "SSO",
+    "ssoDesc": "Single Sign-On-Anbieter konfigurieren (Google, Microsoft, Okta, Azure AD)"
+  },
   "adminPerformance": {
     "title": "Performance-Dashboard",
     "subtitle": "API-Performance-Überwachung und -Optimierung",
@@ -1259,6 +1425,7 @@
     "endpointPerformance": "Endpoint-Performance",
     "requestVolume": "Anfragevolumen",
     "recentSlowQueries": "Aktuelle langsame Abfragen",
+    "noSlowQueries": "Keine langsamen Abfragen im Schwellenbereich (≥1s).",
     "endpoint": "Endpoint",
     "duration": "Dauer",
     "time": "Zeit",
@@ -1274,6 +1441,7 @@
     "totalRequestsLabel": "Anfragen Gesamt",
     "requestsPerMin": "Anfragen/Min",
     "noTrafficYet": "Noch keine API-Anfragen erfasst. App nutzen (Projekte, Audit usw.) oder Seite neu laden, um Metriken zu sehen.",
+    "statusDegradedHint": "Beeinträchtigt = Fehlerrate >5% oder >10 langsame Abfragen (≥1s). Prüfen: Fehlerrate, Tabelle „Langsame Abfragen“; Details: docs/runbooks/README.md#6.",
     "status": {
       "healthy": "Gesund",
       "degraded": "Beeinträchtigt",
@@ -1406,6 +1574,23 @@
     }
   },
   "changes": {
+    "title": "Änderungsmanagement",
+    "pageDescription": "Verwalten Sie Änderungsanfragen, Freigaben und Umsetzungsverfolgung von Projekten.",
+    "changeOrders": "Änderungsanordnungen",
+    "changeOrderIntegration": {
+      "title": "Änderungsanordnungen",
+      "description": "Formale Änderungsanordnungen mit Kostenauswirkung und Freigabe-Workflows pro Projekt verwalten.",
+      "openChangeOrders": "Änderungsanordnungen öffnen"
+    },
+    "newChangeRequest": "Neue Änderungsanfrage",
+    "filters": "Filter",
+    "searchPlaceholder": "Änderungsanfragen suchen...",
+    "showingCount": "{shown} von {total} Änderungsanfragen",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "noChangeRequests": "Keine Änderungsanfragen",
+    "getStartedByCreating": "Erstellen Sie eine neue Änderungsanfrage, um zu starten.",
+    "loadingChangeRequests": "Änderungsanfragen werden geladen...",
     "implementationTracker": {
       "title": "Implementation Tracking",
       "changeRequest": "Change Request",

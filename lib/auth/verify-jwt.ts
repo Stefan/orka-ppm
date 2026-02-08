@@ -34,6 +34,16 @@ export async function getUserIdFromAuthHeader(authHeader: string | null): Promis
     const sub = payload.sub
     return typeof sub === 'string' ? sub : null
   } catch {
+    // In development, fall back to decode-only so sync works without SUPABASE_JWT_SECRET set
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        const payload = jose.decodeJwt(token)
+        const sub = payload.sub
+        return typeof sub === 'string' ? sub : null
+      } catch {
+        return null
+      }
+    }
     return null
   }
 }

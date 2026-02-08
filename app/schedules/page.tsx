@@ -9,10 +9,12 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
 import AppLayout from '@/components/shared/AppLayout'
 import { ScheduleManager } from '@/components/schedule/ScheduleManager'
+import { useTranslations } from '@/lib/i18n/context'
 import type { ScheduleListItem } from '@/types/schedule'
 
 export default function SchedulesPage() {
   const router = useRouter()
+  const { t } = useTranslations()
   const { session, loading: authLoading } = useAuth()
   const [schedules, setSchedules] = useState<ScheduleListItem[]>([])
   const [projects, setProjects] = useState<{ id: string; name: string }[]>([])
@@ -105,9 +107,9 @@ export default function SchedulesPage() {
   return (
     <AppLayout>
       <div className="p-6 max-w-4xl mx-auto">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100 mb-2">Schedules</h1>
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100 mb-2">{t('schedules.title')}</h1>
         <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
-          Manage project schedules, tasks, and dependencies.
+          {t('schedules.pageDescription')}
         </p>
         {error && (
           <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200 rounded-lg text-sm">

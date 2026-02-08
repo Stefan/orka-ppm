@@ -22,19 +22,21 @@ interface SlowQueriesTableProps {
     endpoint: string
     duration: string
     time: string
+    noSlowQueries?: string
   }
 }
 
 function SlowQueriesTable({ slowQueriesData, translations }: SlowQueriesTableProps) {
-  if (slowQueriesData.length === 0) {
-    return null
-  }
-
   return (
     <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
         {translations.recentSlowQueries}
       </h3>
+      {slowQueriesData.length === 0 ? (
+        <p className="text-sm text-gray-500 dark:text-slate-400 py-4">
+          {translations.noSlowQueries ?? 'No slow queries in threshold (≥1s).'}
+        </p>
+      ) : (
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
           <thead className="bg-gray-50 dark:bg-slate-800/50">
@@ -72,6 +74,7 @@ function SlowQueriesTable({ slowQueriesData, translations }: SlowQueriesTablePro
           </tbody>
         </table>
       </div>
+      )}
     </div>
   )
 }

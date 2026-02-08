@@ -53,6 +53,8 @@
     "switchThemeSystem": "Chuyển theo hệ thống",
     "switchThemeLight": "Chuyển sang sáng",
     "notifications": "Thông báo",
+    "noNotifications": "Chưa có thông báo mới",
+    "markAllAsRead": "Đánh dấu tất cả đã đọc",
     "userMenu": "Menu người dùng",
     "searchPlaceholder": "Tìm dự án, tính năng, tài liệu…",
     "searching": "Đang tìm…",
@@ -61,7 +63,12 @@
     "searchAria": "Tìm kiếm",
     "voiceSearch": "Tìm bằng giọng nói",
     "listening": "Đang nghe…",
-    "dismissAlert": "Đóng thông báo"
+    "dismissAlert": "Đóng thông báo",
+    "justNow": "Vừa xong",
+    "minutesAgo": "{count} phút trước",
+    "hoursAgo": "{count} giờ trước",
+    "yesterday": "Hôm qua",
+    "daysAgo": "{count} ngày trước"
   },
   "dashboard": {
     "title": "Bảng điều khiển Danh mục",
@@ -93,6 +100,20 @@
       "timelineDelayDesc": "Dự án Beta chậm 2 tuần",
       "resourceConflictTitle": "Xung đột nguồn lực",
       "resourceConflictDesc": "Thành viên được giao nhiều dự án"
+    },
+    "schedulesTitle": "Lịch trình",
+    "openLink": "Mở",
+    "activeSchedules": "Lịch trình đang hoạt động",
+    "milestonesDueIn14Days": "{count} cột mốc trong 14 ngày",
+    "changeOrdersTitle": "Lệnh thay đổi",
+    "projectsAvailableForChangeOrders": {
+      "one": "1 dự án có lệnh thay đổi",
+      "other": "{count} dự án có lệnh thay đổi"
+    },
+    "projectControlsTitle": "Kiểm soát dự án",
+    "projectsForControls": {
+      "one": "1 dự án để kiểm soát",
+      "other": "{count} dự án để kiểm soát"
     }
   },
   "guidedTour": {
@@ -130,7 +151,9 @@
     "importProjects": "Nhập dự án"
   },
   "projects": {
-    "recentProjects": "Dự án gần đây"
+    "recentProjects": "Dự án gần đây",
+    "title": "Dự án",
+    "pageDescription": "Quản lý dự án và phê duyệt quy trình của bạn"
   },
   "settings": {
     "title": "Cài đặt",
@@ -171,6 +194,25 @@
     "budgetMethod": "Tính toán Hiệu suất Ngân sách",
     "resourceMethod": "Tính toán Hiệu quả Nguồn lực",
     "dashboardLayout": "Bố cục Bảng điều khiển",
+    "successRateHealth": "Dựa trên trạng thái (% dự án xanh)",
+    "successRateCompletion": "Dựa trên hoàn thành (% dự án đã hoàn thành)",
+    "successRateHealthDesc": "Tính thành công theo tỷ lệ dự án có trạng thái \"xanh\"",
+    "successRateCompletionDesc": "Tính thành công theo tỷ lệ dự án được đánh dấu là đã hoàn thành",
+    "budgetSpent": "Đã chi/Tổng (sử dụng ngân sách)",
+    "budgetRemaining": "Còn lại (ngân sách khả dụng)",
+    "budgetSpentDesc": "Hiển thị phần trăm ngân sách tổng đã được chi",
+    "budgetRemainingDesc": "Hiển thị phần trăm ngân sách tổng còn khả dụng",
+    "resourceAuto": "Tự tính từ dữ liệu dự án",
+    "resourceFixed": "Giá trị giữ chỗ cố định",
+    "resourceAutoDesc": "Tự động tính hiệu quả nguồn lực từ dữ liệu dự án và nhóm",
+    "resourceFixedDesc": "Dùng giá trị giữ chỗ cố định cho đến khi có dữ liệu nguồn lực thực",
+    "layoutGrid": "Lưới",
+    "layoutMasonry": "Masonry",
+    "layoutList": "Danh sách",
+    "pushNotifications": "Thông báo đẩy",
+    "pushNotificationsEnableDesc": "Bật thông báo để cập nhật thay đổi dự án",
+    "pushNotificationsReceiveDesc": "Nhận thông báo cho cập nhật dự án quan trọng",
+    "pushNotificationsNotSupported": "Trình duyệt này không hỗ trợ thông báo đẩy.",
     "aiFeatures": "Tính năng AI",
     "aiPrivacyInfo": "Tính năng AI giúp bạn làm việc hiệu quả hơn. Dữ liệu của bạn được xử lý an toàn và không bao giờ chia sẻ với bên thứ ba.",
     "aiSuggestions": "Gợi ý AI",
@@ -443,6 +485,14 @@
     "commitments": "Cam kết",
     "actuals": "Thực tế",
     "spendRate": "Tỷ lệ chi tiêu",
+    "savedViews": "Chế độ xem đã lưu",
+    "refreshAll": "Làm mới tất cả",
+    "refreshing": "Đang làm mới...",
+    "actualsData": "Dữ liệu thực tế",
+    "commitmentsData": "Dữ liệu cam kết",
+    "showingRecords": "Hiển thị {start}-{end} trong {total} bản ghi",
+    "filtered": "đã lọc",
+    "filteredCount": "({count} đã lọc)",
     "onTrack": "Đúng tiến độ",
     "showingProjects": "Hiển thị {shown} trong {total} dự án",
     "noDetailedData": "Không có dữ liệu chi tiết",
@@ -602,7 +652,53 @@
     "send": "Gửi",
     "pmrMode": "Chế độ PMR",
     "pmrModeActive": "Chế độ PMR Đang hoạt động",
-    "pmrModeInactive": "Chế độ PMR Không hoạt động"
+    "pmrModeInactive": "Chế độ PMR Không hoạt động",
+    "welcomeMessage": "Xin chào! Tôi là trợ lý AI cho quản lý danh mục dự án. Tôi có thể giúp phân tích dự án, nguồn lực, ngân sách, rủi ro và tạo báo cáo tùy chỉnh. Bạn muốn biết điều gì?",
+    "confidence": "Độ tin cậy:",
+    "sources": "Nguồn:",
+    "tryAsking": "Thử hỏi:",
+    "suggestion1": "Tình trạng hiện tại của tất cả dự án?",
+    "suggestion2": "Nguồn lực nào đang quá tải?",
+    "suggestion3": "Hiển thị mức sử dụng ngân sách của tất cả dự án",
+    "suggestion4": "Tạo báo cáo đánh giá rủi ro",
+    "suggestion5": "Kỹ năng nào được yêu cầu nhiều nhất?",
+    "pmrSuggestion1": "Cập nhật tóm tắt điều hành với tình trạng dự án mới nhất",
+    "pmrSuggestion2": "Tạo thông tin chênh lệch ngân sách",
+    "pmrSuggestion3": "Phân tích xu hướng hiệu suất tiến độ",
+    "pmrSuggestion4": "Đề xuất cải thiện cho phần rủi ro",
+    "pmrSuggestion5": "Thêm biểu đồ sử dụng nguồn lực"
+  },
+  "projectControlsPage": {
+    "title": "Kiểm soát dự án",
+    "subtitle": "ETC, EAC, Giá trị đạt được và Phân tích hiệu suất",
+    "projectLabel": "Dự án",
+    "selectProject": "Chọn dự án..."
+  },
+  "schedules": {
+    "title": "Lịch trình",
+    "pageDescription": "Quản lý lịch trình dự án, công việc và phụ thuộc.",
+    "searchPlaceholder": "Tìm lịch trình...",
+    "allStatuses": "Tất cả trạng thái",
+    "allProjects": "Tất cả dự án",
+    "newSchedule": "Lịch trình mới",
+    "noSchedulesFound": "Không tìm thấy lịch trình.",
+    "createOneToGetStarted": "Tạo một cái để bắt đầu.",
+    "loadingSchedules": "Đang tải lịch trình...",
+    "filterByStatus": "Lọc theo trạng thái",
+    "filterByProject": "Lọc theo dự án",
+    "statusActive": "Đang hoạt động",
+    "statusDraft": "Bản nháp",
+    "statusCompleted": "Hoàn thành",
+    "selectProject": "Chọn dự án",
+    "projectLabel": "Dự án",
+    "nameLabel": "Tên",
+    "scheduleName": "Tên lịch trình",
+    "descriptionOptional": "Mô tả (tùy chọn)",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
+    "creating": "Đang tạo...",
+    "create": "Tạo",
+    "createScheduleTitle": "Tạo lịch trình"
   },
   "scenarios": {
     "title": "Kịch bản",
@@ -1231,6 +1327,28 @@
     "loadingTimeline": "Đang tải dòng thời gian...",
     "noEventsToDisplay": "Không có sự kiện để hiển thị"
   },
+  "adminDashboard": {
+    "title": "Bảng điều khiển Quản trị",
+    "subtitle": "Quản trị và quản lý hệ thống",
+    "userManagementTitle": "Quản lý người dùng",
+    "userManagementDesc": "Quản lý người dùng, vai trò và quyền",
+    "performanceTitle": "Hiệu suất",
+    "performanceDesc": "Giám sát hiệu suất hệ thống và số liệu",
+    "navigationStatsTitle": "Thống kê điều hướng",
+    "navigationStatsDesc": "Xem phân tích và thống kê điều hướng",
+    "featureCatalogTitle": "Danh mục tính năng",
+    "featureCatalogDesc": "Quản lý tổng quan tính năng và ảnh chụp màn hình",
+    "featureTogglesTitle": "Công tắc tính năng",
+    "featureTogglesDesc": "Bật hoặc tắt tính năng toàn cục hoặc theo tổ chức",
+    "helpChatAnalyticsTitle": "Phân tích Trợ lý Chat",
+    "helpChatAnalyticsDesc": "Xem mức sử dụng, mức hài lòng và truy vấn hàng đầu của trợ lý chat",
+    "organisationsTitle": "Tổ chức",
+    "organisationsDesc": "Quản lý tenant và tổ chức (Super-Admin)",
+    "workflowBuilderTitle": "Trình tạo quy trình",
+    "workflowBuilderDesc": "Trình chỉnh sửa quy trình no-code (bước, cạnh, lưu nháp)",
+    "ssoTitle": "SSO",
+    "ssoDesc": "Cấu hình nhà cung cấp Đăng nhập một lần (Google, Microsoft, Okta, Azure AD)"
+  },
   "adminPerformance": {
     "title": "Bảng Điều khiển Hiệu suất",
     "subtitle": "Giám sát và tối ưu hóa hiệu suất API",
@@ -1393,6 +1511,23 @@
     }
   },
   "changes": {
+    "title": "Quản lý thay đổi",
+    "pageDescription": "Quản lý yêu cầu thay đổi, phê duyệt và theo dõi triển khai dự án.",
+    "changeOrders": "Lệnh thay đổi",
+    "changeOrderIntegration": {
+      "title": "Lệnh thay đổi",
+      "description": "Quản lý lệnh thay đổi chính thức với tác động chi phí và quy trình phê duyệt theo dự án.",
+      "openChangeOrders": "Mở lệnh thay đổi"
+    },
+    "newChangeRequest": "Yêu cầu thay đổi mới",
+    "filters": "Bộ lọc",
+    "searchPlaceholder": "Tìm yêu cầu thay đổi...",
+    "showingCount": "Hiển thị {shown} trong {total} yêu cầu thay đổi",
+    "previous": "Trước",
+    "next": "Sau",
+    "noChangeRequests": "Không có yêu cầu thay đổi",
+    "getStartedByCreating": "Tạo yêu cầu thay đổi mới để bắt đầu.",
+    "loadingChangeRequests": "Đang tải yêu cầu thay đổi...",
     "implementationTracker": {
       "title": "Theo dõi Triển khai",
       "changeRequest": "Yêu cầu Thay đổi",

@@ -44,13 +44,14 @@ export function useSettings(): UseSettingsReturn {
   const [error, setError] = useState<string | null>(null)
   const [initialized, setInitialized] = useState(false)
 
-  // Initialize sync when user is authenticated
+  // Initialize sync only when user is authenticated and we have an access token (avoids 401 on /api/sync/devices)
   useEffect(() => {
     async function init() {
-      if (session?.user?.id && !initialized) {
+      const hasSession = session?.user?.id && session?.access_token
+      if (hasSession && !initialized) {
         try {
           setLoading(true)
-          await initialize(session.user.id, session.access_token ?? undefined)
+          await initialize(session.user.id, session.access_token)
           setInitialized(true)
         } catch (err) {
           console.error('Failed to initialize settings:', err)
@@ -63,7 +64,7 @@ export function useSettings(): UseSettingsReturn {
       }
     }
     init()
-  }, [session?.user?.id, initialize, initialized])
+  }, [session?.user?.id, session?.access_token, initialize, initialized])
 
   // Update loading state when syncing changes
   useEffect(() => {

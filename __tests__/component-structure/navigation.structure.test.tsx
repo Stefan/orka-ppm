@@ -46,6 +46,18 @@ jest.mock('@/hooks/useLanguage', () => ({
   }),
 }));
 
+jest.mock('@/hooks/useNotifications', () => ({
+  useNotifications: () => ({
+    notifications: [],
+    unreadCount: 0,
+    isLoading: false,
+    error: null,
+    refetch: jest.fn(),
+    markAsRead: jest.fn(),
+    markAllAsRead: jest.fn(),
+  }),
+}));
+
 jest.mock('@/lib/i18n/context', () => ({
   useTranslations: () => ({
     t: (key: string) => key,
@@ -149,13 +161,13 @@ describe('TopBar Component Structure', () => {
       expect(notifications).toBeInTheDocument();
     });
 
-    it('shows notification badge', () => {
+    it('opens notifications panel on click', async () => {
       render(<TopBar onMenuToggle={jest.fn()} />);
 
       const notifications = screen.getByTestId('top-bar-notifications');
-      // Badge is a span with bg-blue-600 class
-      const badge = notifications.querySelector('.bg-blue-600');
-      expect(badge).toBeInTheDocument();
+      fireEvent.click(notifications);
+      // Panel shows title or empty state (badge only appears when unread count > 0)
+      await screen.findByRole('dialog', { name: /notifications/i });
     });
   });
 

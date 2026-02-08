@@ -52,6 +52,8 @@
     "switchThemeSystem": "Uf System wächsle",
     "switchThemeLight": "Uf hell wächsle",
     "notifications": "Benachrichtigige",
+    "noNotifications": "Keini neue Benachrichtigige",
+    "markAllAsRead": "Alli als gläse markiere",
     "userMenu": "Benutzermenü",
     "searchPlaceholder": "Projäkt, Features, Docs sueche…",
     "searching": "Sueche…",
@@ -60,7 +62,12 @@
     "searchAria": "Sueche",
     "voiceSearch": "Stimm sueche",
     "listening": "Lose…",
-    "dismissAlert": "Hiiwis zue mache"
+    "dismissAlert": "Hiiwis zue mache",
+    "justNow": "Grad jetz",
+    "minutesAgo": "vor {count} Min.",
+    "hoursAgo": "vor {count} Std.",
+    "yesterday": "Gester",
+    "daysAgo": "vor {count} T."
   },
   "dashboard": {
     "title": "Portfolio Dashboard",
@@ -92,6 +99,20 @@
       "timelineDelayDesc": "Projäkt Beta ligt 2 Wuche hinder em Plan",
       "resourceConflictTitle": "Ressourchekonflikt",
       "resourceConflictDesc": "Mitarbeiter mehrere Projäkt zuegordnet"
+    },
+    "schedulesTitle": "Zitplän",
+    "openLink": "Öffne",
+    "activeSchedules": "Aktivi Zitplän",
+    "milestonesDueIn14Days": "{count} Meilestei in 14 Täg",
+    "changeOrdersTitle": "Änderigsufdräg",
+    "projectsAvailableForChangeOrders": {
+      "one": "1 Projäkt für Änderigsufdräg verfüegbar",
+      "other": "{count} Projäkt für Änderigsufdräg verfüegbar"
+    },
+    "projectControlsTitle": "Projäktsteuerig",
+    "projectsForControls": {
+      "one": "1 Projäkt für Steuerig",
+      "other": "{count} Projäkt für Steuerig"
     }
   },
   "guidedTour": {
@@ -129,7 +150,9 @@
     "importProjects": "Projäkt importiere"
   },
   "projects": {
-    "recentProjects": "Letschti Projäkt"
+    "recentProjects": "Letschti Projäkt",
+    "title": "Projäkt",
+    "pageDescription": "Verwaltet Ihri Projäkt und Workflow-Freigabe"
   },
   "settings": {
     "title": "Yystellige",
@@ -170,6 +193,25 @@
     "budgetMethod": "Budget-Performance-Berechnig",
     "resourceMethod": "Ressource-Effizienz-Berechnig",
     "dashboardLayout": "Dashboard-Layout",
+    "successRateHealth": "Gsundheitsbasiert (% grüeni Projäkt)",
+    "successRateCompletion": "Abschlussbasiert (% abgschlosseni Projäkt)",
+    "successRateHealthDesc": "Berechnet dr Erfolg als Aateil Projäkt mit „grüem“ Gsundheitsstatus",
+    "successRateCompletionDesc": "Berechnet dr Erfolg als Aateil als abgschlosse markierte Projäkt",
+    "budgetSpent": "Uusgäbe/Gesamt (Budgetuusnutzig)",
+    "budgetRemaining": "Verbleibend (verfüegbars Budget)",
+    "budgetSpentDesc": "Zeigt dr Aateil vom uusgäbene Budget am Gesamtbudget",
+    "budgetRemainingDesc": "Zeigt dr Aateil vom verbleibende Budget am Gesamtbudget",
+    "resourceAuto": "Automatisch us Projäktdate berechne",
+    "resourceFixed": "Feste Platzhalterwert",
+    "resourceAutoDesc": "Berechnet d Ressource-Effizienz automatisch us Projäkt- und Teamdate",
+    "resourceFixedDesc": "Verwendet en feschte Platzhalterwert, bis echti Ressourcedate verfüegbar sind",
+    "layoutGrid": "Raster",
+    "layoutMasonry": "Masonry",
+    "layoutList": "Liste",
+    "pushNotifications": "Push-Benachrichtigunge",
+    "pushNotificationsEnableDesc": "Benachrichtigunge aktiviere zum über Projäktänderige informiert blibe",
+    "pushNotificationsReceiveDesc": "Benachrichtigunge zu wichtige Projäkt-Update erhalte",
+    "pushNotificationsNotSupported": "Push-Benachrichtigunge werde in däm Browser nöd unterstützt.",
     "aiFeatures": "KI-Funktione",
     "aiPrivacyInfo": "KI hilft dir effizienter schaffe. Dini Date wärde sicher verarbeitet.",
     "aiSuggestions": "KI-Vorschläg",
@@ -436,6 +478,14 @@
     "commitments": "Verpflichtige",
     "actuals": "Effektivi",
     "spendRate": "Uusgabe-Rate",
+    "savedViews": "Gspycherti Aasichte",
+    "refreshAll": "Alles aktualisiere",
+    "refreshing": "Aktualisiere...",
+    "actualsData": "Ist-Date",
+    "commitmentsData": "Commitment-Date",
+    "showingRecords": "Einträg {start}-{end} vo {total}",
+    "filtered": "gfilteret",
+    "filteredCount": "({count} gfilteret)",
     "onTrack": "Uf em richtige Wäg",
     "showingProjects": "Zeige {shown} vo {total} Projäkt",
     "noDetailedData": "Kei detaillierti Date verfüegbar",
@@ -587,7 +637,53 @@
     "send": "Schicke",
     "pmrMode": "PMR-Modus",
     "pmrModeActive": "PMR-Modus Aktiv",
-    "pmrModeInactive": "PMR-Modus Inaktiv"
+    "pmrModeInactive": "PMR-Modus Inaktiv",
+    "welcomeMessage": "Hallo! Ich bi Ihri KI-Assistent für Projäkt-Portfolio-Management. Ich cha bi Projäkt, Ressource, Budget, Risike helfe und individuelli Bericht erstelle. Was möchtet Ihr wüsse?",
+    "confidence": "Vertraue:",
+    "sources": "Quelle:",
+    "tryAsking": "Versuechet z frage:",
+    "suggestion1": "Wie isch dr aktuell Status vo alle Projäkt?",
+    "suggestion2": "Welchi Ressource sind überlastet?",
+    "suggestion3": "Zeig mir d Budgetnutzig vo alle Projäkt",
+    "suggestion4": "Erstell en Risikobewertigsbericht",
+    "suggestion5": "Welchi Fähigkeite sind am meiste gfrögt?",
+    "pmrSuggestion1": "Executive Summary mit aktuellem Projäktstatus aktualisiere",
+    "pmrSuggestion2": "Budget-Varianz-Insights erstelle",
+    "pmrSuggestion3": "Zitplan-Performance analysiere",
+    "pmrSuggestion4": "Verbesserige für Risikoabschnitt vorschlage",
+    "pmrSuggestion5": "Ressourcenutzigsdiagramm hinzufüege"
+  },
+  "projectControlsPage": {
+    "title": "Projäktsteuerig",
+    "subtitle": "ETC, EAC, Earned Value und Performance-Analyse",
+    "projectLabel": "Projäkt",
+    "selectProject": "Projäkt uuswähle..."
+  },
+  "schedules": {
+    "title": "Zitplän",
+    "pageDescription": "Projäkt-Zitplän, Ufgabe und Abhängigkeite verwalte.",
+    "searchPlaceholder": "Zitplän suche...",
+    "allStatuses": "Alli Status",
+    "allProjects": "Alli Projäkt",
+    "newSchedule": "Neue Zitplan",
+    "noSchedulesFound": "Keini Zitplän gfunde.",
+    "createOneToGetStarted": "Erstell eine zum Starte.",
+    "loadingSchedules": "Zitplän werde gelade...",
+    "filterByStatus": "Nach Status filtere",
+    "filterByProject": "Nach Projäkt filtere",
+    "statusActive": "Aktiv",
+    "statusDraft": "Entwurf",
+    "statusCompleted": "Abgschlosse",
+    "selectProject": "Projäkt uuswähle",
+    "projectLabel": "Projäkt",
+    "nameLabel": "Name",
+    "scheduleName": "Zitplanname",
+    "descriptionOptional": "Beschrybig (optional)",
+    "startDate": "Startdatum",
+    "endDate": "Enddatum",
+    "creating": "Wird erstellt...",
+    "create": "Erstelle",
+    "createScheduleTitle": "Zitplan erstelle"
   },
   "scenarios": {
     "title": "Szenarie",
@@ -1208,6 +1304,28 @@
     "loadingTimeline": "Zitachse wird glaade...",
     "noEventsToDisplay": "Keini Eräigniss zum Aazeige"
   },
+  "adminDashboard": {
+    "title": "Admin-Dashboard",
+    "subtitle": "Systemverwaltig und -steuerig",
+    "userManagementTitle": "Benutzerverwaltig",
+    "userManagementDesc": "Benutzer, Rolle und Berechtigunge verwalte",
+    "performanceTitle": "Performance",
+    "performanceDesc": "Systemperformance und Metrike überwache",
+    "navigationStatsTitle": "Navigationsstatistik",
+    "navigationStatsDesc": "Navigationsanalüse und -statistik aazeige",
+    "featureCatalogTitle": "Feature-Katalog",
+    "featureCatalogDesc": "Feature-Übersicht und Screenshots verwalte",
+    "featureTogglesTitle": "Feature-Toggles",
+    "featureTogglesDesc": "Features global oder pro Organisation aktiviere/deaktiviere",
+    "helpChatAnalyticsTitle": "Help-Chat-Analüse",
+    "helpChatAnalyticsDesc": "Help-Chat-Nutzig, Zufriidehit und Top-Aafrage aazeige",
+    "organisationsTitle": "Organisatione",
+    "organisationsDesc": "Mandante und Organisatione verwalte (Super-Admin)",
+    "workflowBuilderTitle": "Workflow-Builder",
+    "workflowBuilderDesc": "No-Code-Workflow-Editor (Schritt, Chante, als Entwurf speichere)",
+    "ssoTitle": "SSO",
+    "ssoDesc": "Single Sign-On-Aabieter konfiguriere (Google, Microsoft, Okta, Azure AD)"
+  },
   "adminPerformance": {
     "title": "Performance-Dashboard",
     "subtitle": "API-Performance-Überwachig und -Optimierig",
@@ -1367,6 +1485,23 @@
     }
   },
   "changes": {
+    "title": "Änderigsverwaltig",
+    "pageDescription": "Verwaltet Projäkt-Änderigsafrage, Freigabe und Umsetzigsverfolgig.",
+    "changeOrders": "Änderigsufdräg",
+    "changeOrderIntegration": {
+      "title": "Änderigsufdräg",
+      "description": "Formali Änderigsufdräg mit Koschteuswirkig und Freigabe-Workflows pro Projäkt verwalte.",
+      "openChangeOrders": "Änderigsufdräg öffne"
+    },
+    "newChangeRequest": "Neui Änderigsafrag",
+    "filters": "Filter",
+    "searchPlaceholder": "Änderigsafrage suche...",
+    "showingCount": "{shown} vo {total} Änderigsafrage",
+    "previous": "Zurück",
+    "next": "Witer",
+    "noChangeRequests": "Keini Änderigsafrage",
+    "getStartedByCreating": "Erstell e neui Änderigsafrag zum Starte.",
+    "loadingChangeRequests": "Änderigsafrage werde gelade...",
     "implementationTracker": {
       "title": "Implementation Tracking",
       "changeRequest": "Change Request",

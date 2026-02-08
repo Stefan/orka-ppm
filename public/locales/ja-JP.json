@@ -53,6 +53,8 @@
     "switchThemeSystem": "システムに切り替え",
     "switchThemeLight": "ライトに切り替え",
     "notifications": "通知",
+    "noNotifications": "新しい通知はありません",
+    "markAllAsRead": "すべて既読にする",
     "userMenu": "ユーザーメニュー",
     "searchPlaceholder": "プロジェクト、機能、ドキュメントを検索…",
     "searching": "検索中…",
@@ -61,7 +63,12 @@
     "searchAria": "検索",
     "voiceSearch": "音声検索",
     "listening": "聞いています…",
-    "dismissAlert": "アラートを閉じる"
+    "dismissAlert": "アラートを閉じる",
+    "justNow": "たった今",
+    "minutesAgo": "{count}分前",
+    "hoursAgo": "{count}時間前",
+    "yesterday": "昨日",
+    "daysAgo": "{count}日前"
   },
   "dashboard": {
     "title": "ポートフォリオダッシュボード",
@@ -93,6 +100,20 @@
       "timelineDelayDesc": "プロジェクト Beta が 2 週間遅れ",
       "resourceConflictTitle": "リソース競合",
       "resourceConflictDesc": "メンバーが複数プロジェクトにアサイン"
+    },
+    "schedulesTitle": "スケジュール",
+    "openLink": "開く",
+    "activeSchedules": "アクティブなスケジュール",
+    "milestonesDueIn14Days": "14日以内のマイルストーン {count} 件",
+    "changeOrdersTitle": "変更指示",
+    "projectsAvailableForChangeOrders": {
+      "one": "変更指示対応プロジェクト 1 件",
+      "other": "変更指示対応プロジェクト {count} 件"
+    },
+    "projectControlsTitle": "プロジェクトコントロール",
+    "projectsForControls": {
+      "one": "コントロール対象プロジェクト 1 件",
+      "other": "コントロール対象プロジェクト {count} 件"
     }
   },
   "guidedTour": {
@@ -130,7 +151,9 @@
     "importProjects": "プロジェクトをインポート"
   },
   "projects": {
-    "recentProjects": "最近のプロジェクト"
+    "recentProjects": "最近のプロジェクト",
+    "title": "プロジェクト",
+    "pageDescription": "プロジェクトとワークフロー承認を管理"
   },
   "settings": {
     "title": "設定",
@@ -171,6 +194,25 @@
     "budgetMethod": "予算実績計算",
     "resourceMethod": "リソース効率計算",
     "dashboardLayout": "ダッシュボードレイアウト",
+    "successRateHealth": "健全性ベース（緑プロジェクトの割合）",
+    "successRateCompletion": "完了ベース（完了プロジェクトの割合）",
+    "successRateHealthDesc": "「緑」の健全性ステータスのプロジェクト割合として成功を計算",
+    "successRateCompletionDesc": "完了としてマークされたプロジェクトの割合として成功を計算",
+    "budgetSpent": "支出/合計（予算消化率）",
+    "budgetRemaining": "残り（利用可能予算）",
+    "budgetSpentDesc": "支出済み総予算の割合を表示",
+    "budgetRemainingDesc": "利用可能な総予算の割合を表示",
+    "resourceAuto": "プロジェクトデータから自動計算",
+    "resourceFixed": "固定プレースホルダー値",
+    "resourceAutoDesc": "プロジェクトおよびチームデータからリソース効率を自動計算",
+    "resourceFixedDesc": "実際のリソースデータが利用可能になるまで固定プレースホルダー値を使用",
+    "layoutGrid": "グリッド",
+    "layoutMasonry": "マソンリー",
+    "layoutList": "リスト",
+    "pushNotifications": "プッシュ通知",
+    "pushNotificationsEnableDesc": "プロジェクト変更の最新情報を受け取るために通知を有効にする",
+    "pushNotificationsReceiveDesc": "重要なプロジェクト更新の通知を受け取る",
+    "pushNotificationsNotSupported": "このブラウザではプッシュ通知はサポートされていません。",
     "aiFeatures": "AI機能",
     "aiPrivacyInfo": "AI機能により、より効率的に作業できます。データは安全に処理され、第三者と共有されません。",
     "aiSuggestions": "AI提案",
@@ -443,6 +485,14 @@
     "commitments": "コミットメント",
     "actuals": "実績",
     "spendRate": "支出率",
+    "savedViews": "保存したビュー",
+    "refreshAll": "すべて更新",
+    "refreshing": "更新中...",
+    "actualsData": "実績データ",
+    "commitmentsData": "コミットメントデータ",
+    "showingRecords": "{total}件中{start}-{end}件を表示",
+    "filtered": "フィルター済み",
+    "filteredCount": "（{count}件フィルター済み）",
     "onTrack": "順調",
     "showingProjects": "{total}件中{shown}件のプロジェクトを表示",
     "noDetailedData": "詳細データがありません",
@@ -602,7 +652,53 @@
     "send": "送信",
     "pmrMode": "PMRモード",
     "pmrModeActive": "PMRモード有効",
-    "pmrModeInactive": "PMRモード無効"
+    "pmrModeInactive": "PMRモード無効",
+    "welcomeMessage": "こんにちは！プロジェクトポートフォリオ管理のAIアシスタントです。プロジェクト、リソース、予算、リスクの分析やカスタムレポートの作成をお手伝いします。何をお知りになりたいですか？",
+    "confidence": "信頼度：",
+    "sources": "ソース：",
+    "tryAsking": "次のように聞いてみてください：",
+    "suggestion1": "全プロジェクトの現在のステータスは？",
+    "suggestion2": "どのリソースが過負荷ですか？",
+    "suggestion3": "全プロジェクトの予算使用状況を表示",
+    "suggestion4": "リスク評価レポートを作成",
+    "suggestion5": "最も需要の高いスキルは？",
+    "pmrSuggestion1": "最新のプロジェクト状況でエグゼクティブサマリーを更新",
+    "pmrSuggestion2": "予算差異のインサイトを生成",
+    "pmrSuggestion3": "スケジュールパフォーマンスの傾向を分析",
+    "pmrSuggestion4": "リスクセクションの改善を提案",
+    "pmrSuggestion5": "リソース利用率チャートを追加"
+  },
+  "projectControlsPage": {
+    "title": "プロジェクトコントロール",
+    "subtitle": "ETC、EAC、アーンドバリュー、パフォーマンス分析",
+    "projectLabel": "プロジェクト",
+    "selectProject": "プロジェクトを選択..."
+  },
+  "schedules": {
+    "title": "スケジュール",
+    "pageDescription": "プロジェクトのスケジュール、タスク、依存関係を管理します。",
+    "searchPlaceholder": "スケジュールを検索...",
+    "allStatuses": "すべてのステータス",
+    "allProjects": "すべてのプロジェクト",
+    "newSchedule": "新規スケジュール",
+    "noSchedulesFound": "スケジュールが見つかりません。",
+    "createOneToGetStarted": "作成して開始してください。",
+    "loadingSchedules": "スケジュールを読み込み中...",
+    "filterByStatus": "ステータスでフィルター",
+    "filterByProject": "プロジェクトでフィルター",
+    "statusActive": "アクティブ",
+    "statusDraft": "下書き",
+    "statusCompleted": "完了",
+    "selectProject": "プロジェクトを選択",
+    "projectLabel": "プロジェクト",
+    "nameLabel": "名前",
+    "scheduleName": "スケジュール名",
+    "descriptionOptional": "説明（任意）",
+    "startDate": "開始日",
+    "endDate": "終了日",
+    "creating": "作成中...",
+    "create": "作成",
+    "createScheduleTitle": "スケジュールを作成"
   },
   "scenarios": {
     "title": "シナリオ",
@@ -1231,6 +1327,28 @@
     "loadingTimeline": "タイムラインを読み込み中...",
     "noEventsToDisplay": "表示するイベントがありません"
   },
+  "adminDashboard": {
+    "title": "管理ダッシュボード",
+    "subtitle": "システム管理と運用",
+    "userManagementTitle": "ユーザー管理",
+    "userManagementDesc": "ユーザー、ロール、権限を管理",
+    "performanceTitle": "パフォーマンス",
+    "performanceDesc": "システムパフォーマンスとメトリクスを監視",
+    "navigationStatsTitle": "ナビゲーション統計",
+    "navigationStatsDesc": "ナビゲーション分析と統計を表示",
+    "featureCatalogTitle": "機能カタログ",
+    "featureCatalogDesc": "機能概要とスクリーンショットを管理",
+    "featureTogglesTitle": "機能トグル",
+    "featureTogglesDesc": "グローバルまたは組織ごとに機能を有効/無効",
+    "helpChatAnalyticsTitle": "ヘルプチャット分析",
+    "helpChatAnalyticsDesc": "ヘルプチャット利用、満足度、人気クエリを表示",
+    "organisationsTitle": "組織",
+    "organisationsDesc": "テナントと組織を管理（スーパー管理者）",
+    "workflowBuilderTitle": "ワークフロービルダー",
+    "workflowBuilderDesc": "ノーコードワークフローエディタ（ステップ、エッジ、下書き保存）",
+    "ssoTitle": "SSO",
+    "ssoDesc": "シングルサインオンプロバイダを設定（Google、Microsoft、Okta、Azure AD）"
+  },
   "adminPerformance": {
     "title": "パフォーマンスダッシュボード",
     "subtitle": "APIパフォーマンス監視と最適化",
@@ -1393,6 +1511,23 @@
     }
   },
   "changes": {
+    "title": "変更管理",
+    "pageDescription": "プロジェクトの変更要求、承認、実装追跡を管理します。",
+    "changeOrders": "変更指示",
+    "changeOrderIntegration": {
+      "title": "変更指示",
+      "description": "プロジェクトごとのコスト影響と承認ワークフローで正式な変更指示を管理します。",
+      "openChangeOrders": "変更指示を開く"
+    },
+    "newChangeRequest": "新規変更要求",
+    "filters": "フィルター",
+    "searchPlaceholder": "変更要求を検索...",
+    "showingCount": "{total} 件中 {shown} 件の変更要求を表示",
+    "previous": "前へ",
+    "next": "次へ",
+    "noChangeRequests": "変更要求はありません",
+    "getStartedByCreating": "新しい変更要求を作成して開始してください。",
+    "loadingChangeRequests": "変更要求を読み込み中...",
     "implementationTracker": {
       "title": "導入追跡",
       "changeRequest": "変更依頼",

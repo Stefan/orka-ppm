@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useCallback, useRef } from 'react'
+import { useEffect, useCallback, useRef, useMemo } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
 // Allow environment variables to be overridden for testing
@@ -156,9 +156,8 @@ export function useWorkflowNotifications(userId: string | null) {
     }
   }, [cleanup])
 
-  return {
-    subscribe,
-    cleanup,
-    isConnected: !!channelRef.current
-  }
+  return useMemo(
+    () => ({ subscribe, cleanup, isConnected: !!channelRef.current }),
+    [subscribe, cleanup]
+  )
 }

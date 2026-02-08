@@ -289,8 +289,8 @@ async def get_comprehensive_financial_report(
         projects_response = projects_query.execute()
         projects = projects_response.data or []
         
-        # Build financial entries query (limit when no project filter to avoid huge pull)
-        financial_query = supabase.table("financial_tracking").select("id, project_id, amount, transaction_type, date_incurred")
+        # Build financial entries query (schema: planned_amount, actual_amount, date_incurred; no amount/transaction_type)
+        financial_query = supabase.table("financial_tracking").select("id, project_id, planned_amount, actual_amount, date_incurred")
         if project_id:
             financial_query = financial_query.eq("project_id", str(project_id))
         if start_date:
@@ -302,28 +302,28 @@ async def get_comprehensive_financial_report(
         financial_response = financial_query.execute()
         financial_entries = financial_response.data or []
 
-        # Calculate summary metrics (budget/amount may be None from DB)
+        # Calculate summary metrics (actual_amount = spent; schema has no transaction_type/income)
         total_budget = sum(_to_float(p.get('budget')) for p in projects)
-        total_spent = sum(_to_float(f.get('amount')) for f in financial_entries if f.get('transaction_type') == 'expense')
-        total_income = sum(_to_float(f.get('amount')) for f in financial_entries if f.get('transaction_type') == 'income')
+        total_spent = sum(_to_float(f.get('actual_amount')) for f in financial_entries)
+        total_income = 0.0  # financial_tracking schema has no income/expense type
 
         # Project-level analysis
         project_summaries = []
         for project in projects:
-            project_id_str = project['id']
+            project_id_str = str(project.get('id') or '')
             project_budget = _to_float(project.get('budget'))
 
-            # Get project-specific financial entries
-            project_entries = [f for f in financial_entries if f.get('project_id') == project_id_str]
-            project_spent = sum(_to_float(f.get('amount')) for f in project_entries if f.get('transaction_type') == 'expense')
-            project_income = sum(_to_float(f.get('amount')) for f in project_entries if f.get('transaction_type') == 'income')
-            
+            # Get project-specific financial entries (use actual_amount as spent)
+            project_entries = [f for f in financial_entries if str(f.get('project_id') or '') == project_id_str]
+            project_spent = sum(_to_float(f.get('actual_amount')) for f in project_entries)
+            project_income = 0.0
+
             utilization = (project_spent / project_budget * 100) if project_budget > 0 else 0
             variance = project_spent - project_budget
-            
+
             project_summaries.append({
                 "project_id": project_id_str,
-                "project_name": project['name'],
+                "project_name": project.get('name') or '',
                 "budget": project_budget,
                 "spent": project_spent,
                 "income": project_income,

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { getApiUrl } from '../../../../lib/api'
 import { useDateFormatter } from '@/hooks/useDateFormatter'
+import { useTranslations } from '@/lib/i18n/context'
 import type { SavedViewDefinition } from '@/lib/saved-views-api'
 
 interface Actual {
@@ -44,6 +45,7 @@ type SortDirection = 'asc' | 'desc' | null
 type SortField = keyof Actual | null
 
 const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ accessToken, onProjectClick, initialView, onDefinitionChange }, ref) => {
+  const t = useTranslations('financials')
   const { formatDate } = useDateFormatter()
   const [actuals, setActuals] = useState<Actual[]>([])
   const [loading, setLoading] = useState(true)
@@ -71,8 +73,11 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
     
     try {
       const offset = (currentPage - 1) * pageSize
+      const countExact = currentPage === 1
+      const params = new URLSearchParams({ limit: String(pageSize), offset: String(offset) })
+      if (countExact) params.set('count_exact', 'true')
       const response = await fetch(
-        getApiUrl(`/csv-import/actuals?limit=${pageSize}&offset=${offset}`),
+        getApiUrl(`/csv-import/actuals?${params.toString()}`),
         {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -84,7 +89,7 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
       if (response.ok) {
         const data = await response.json()
         setActuals(data.actuals || [])
-        setTotal(data.total || 0)
+        setTotal(data.total ?? 0)
       } else {
         const errorData = await response.json()
         setError(errorData.detail || 'Failed to fetch actuals')
@@ -184,35 +189,35 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
     }))
   }
 
+  // Column definitions (used for table headers and CSV export)
+  const columns: Array<{
+    key: keyof Actual
+    labelKey: string
+    width?: string
+    format?: (value: any) => string
+  }> = [
+    { key: 'fi_doc_no', labelKey: 'columns.fiDocNo', width: 'w-32' },
+    { key: 'posting_date', labelKey: 'columns.postingDate', width: 'w-28', format: (v) => v ? formatDate(new Date(v)) : '' },
+    { key: 'document_date', labelKey: 'columns.documentDate', width: 'w-28', format: (v) => v ? formatDate(new Date(v)) : '' },
+    { key: 'vendor', labelKey: 'columns.vendor', width: 'w-32' },
+    { key: 'vendor_description', labelKey: 'columns.vendorDescription', width: 'w-48' },
+    { key: 'project_nr', labelKey: 'columns.projectNr', width: 'w-28' },
+    { key: 'wbs_element', labelKey: 'columns.wbsElement', width: 'w-32' },
+    { key: 'amount', labelKey: 'columns.amount', width: 'w-28', format: (v) => v?.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00' },
+    { key: 'currency', labelKey: 'columns.currency', width: 'w-20' },
+    { key: 'item_text', labelKey: 'columns.itemText', width: 'w-48' },
+    { key: 'document_type', labelKey: 'columns.documentType', width: 'w-28' },
+  ]
+
   // Export to CSV
   const exportToCSV = () => {
-    const headers = [
-      'FI Doc No',
-      'Posting Date',
-      'Document Date',
-      'Vendor',
-      'Vendor Description',
-      'Project Nr',
-      'WBS Element',
-      'Amount',
-      'Currency',
-      'Item Text',
-      'Document Type'
-    ]
-    
-    const rows = filteredAndSortedActuals.map(a => [
-      a.fi_doc_no,
-      a.posting_date,
-      a.document_date || '',
-      a.vendor,
-      a.vendor_description || '',
-      a.project_nr,
-      a.wbs_element || '',
-      a.amount,
-      a.currency,
-      a.item_text || '',
-      a.document_type || ''
-    ])
+    const headers = columns.map(c => t(c.labelKey as any))
+    const rows = filteredAndSortedActuals.map(actual =>
+      columns.map(col => {
+        const v = actual[col.key]
+        return col.format ? col.format(v) : (v ?? '')
+      })
+    )
     
     const csvContent = [
       headers.join(','),
@@ -230,26 +235,6 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
   const totalPages = Math.ceil(total / pageSize)
   const startRecord = (currentPage - 1) * pageSize + 1
   const endRecord = Math.min(currentPage * pageSize, total)
-
-  // Column definitions
-  const columns: Array<{
-    key: keyof Actual
-    label: string
-    width?: string
-    format?: (value: any) => string
-  }> = [
-    { key: 'fi_doc_no', label: 'FI Doc No', width: 'w-32' },
-    { key: 'posting_date', label: 'Posting Date', width: 'w-28', format: (v) => v ? formatDate(new Date(v)) : '' },
-    { key: 'document_date', label: 'Document Date', width: 'w-28', format: (v) => v ? formatDate(new Date(v)) : '' },
-    { key: 'vendor', label: 'Vendor', width: 'w-32' },
-    { key: 'vendor_description', label: 'Vendor Description', width: 'w-48' },
-    { key: 'project_nr', label: 'Project Nr', width: 'w-28' },
-    { key: 'wbs_element', label: 'WBS Element', width: 'w-32' },
-    { key: 'amount', label: 'Amount', width: 'w-28', format: (v) => v?.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00' },
-    { key: 'currency', label: 'Currency', width: 'w-20' },
-    { key: 'item_text', label: 'Item Text', width: 'w-48' },
-    { key: 'document_type', label: 'Document Type', width: 'w-28' },
-  ]
 
   // Render sort icon
   const renderSortIcon = (field: keyof Actual) => {
@@ -319,12 +304,12 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
       <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Actuals Data</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{t('actualsData')}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
-              Showing {startRecord}-{endRecord} of {total} records
+              {t('showingRecords', { start: startRecord, end: endRecord, total })}
               {Object.keys(filters).some(k => filters[k]) && (
                 <span className="ml-2 text-blue-600 dark:text-blue-400">
-                  ({filteredAndSortedActuals.length} filtered)
+                  {t('filteredCount', { count: filteredAndSortedActuals.length })}
                 </span>
               )}
             </p>
@@ -340,7 +325,7 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
               }`}
             >
               <Filter className="h-4 w-4 mr-1" />
-              Filters
+              {t('filters')}
             </button>
             
             <button
@@ -348,7 +333,7 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
               className="flex items-center px-3 py-2 bg-green-700 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
             >
               <Download className="h-4 w-4 mr-1" />
-              Export
+              {t('export')}
             </button>
           </div>
         </div>
@@ -369,7 +354,7 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
                       onClick={() => handleSort(column.key)}
                       className="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300"
                     >
-                      <span>{column.label}</span>
+                      <span>{t(column.labelKey as any)}</span>
                       {renderSortIcon(column.key)}
                     </button>
                   </th>
@@ -383,7 +368,7 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
                     <th key={`filter-${String(column.key)}`} className="px-4 py-2">
                       <input
                         type="text"
-                        placeholder={`Filter ${column.label}...`}
+                        placeholder={`${t(column.labelKey as any)}...`}
                         value={filters[String(column.key)] || ''}
                         onChange={(e) => handleFilterChange(String(column.key), e.target.value)}
                         className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-slate-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"

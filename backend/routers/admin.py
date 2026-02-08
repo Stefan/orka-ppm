@@ -88,28 +88,71 @@ async def get_system_health(current_user = Depends(require_admin())):
         raise HTTPException(status_code=500, detail=f"Failed to get system health: {str(e)}")
 
 @router.get("/cache/stats")
-async def get_cache_stats(current_user = Depends(require_admin())):
-    """Get cache performance statistics"""
+async def get_cache_stats(request: Request, current_user=Depends(require_admin())):
+    """Get cache performance statistics. Shape matches admin dashboard CacheStatsCard (type, entries, hit_rate, etc.)."""
     try:
-        # Mock cache stats for development
+        cache_manager = getattr(request.app.state, "cache_manager", None)
+        if cache_manager is not None and getattr(cache_manager, "redis_available", False) and getattr(cache_manager, "redis_client", None):
+            try:
+                rc = cache_manager.redis_client
+                stats_info = await rc.info("stats")
+                hits = int(stats_info.get("keyspace_hits", 0))
+                misses = int(stats_info.get("keyspace_misses", 0))
+                total = hits + misses
+                hit_rate = round((hits / total) * 100, 1) if total else 0
+                entries = await rc.dbsize()
+                used_mem = "N/A"
+                try:
+                    mem_info = await rc.info("memory")
+                    used_mem = f"{int(mem_info.get('used_memory', 0)) // 1024 // 1024}M"
+                except Exception:
+                    pass
+                return {
+                    "type": "redis",
+                    "entries": entries,
+                    "timestamps": 0,
+                    "hit_rate": hit_rate,
+                    "used_memory": used_mem,
+                    "keyspace_hits": hits,
+                    "keyspace_misses": misses,
+                    "timestamp": datetime.now().isoformat(),
+                }
+            except Exception:
+                pass
+        # In-memory / fallback: return shape expected by dashboard; show current memory cache size
+        entries = 0
+        if cache_manager is not None:
+            mem_cache = getattr(cache_manager, "memory_cache", None)
+            if mem_cache is not None:
+                try:
+                    entries = len(mem_cache)
+                except Exception:
+                    pass
         return {
-            "total_keys": 1247,
-            "memory_usage_mb": 45.6,
-            "hit_rate": 85.4,
-            "miss_rate": 14.6,
-            "evictions": 23,
-            "operations_per_second": 342,
-            "average_ttl_seconds": 1800,
-            "top_keys": [
-                {"key": "dashboard:*", "hits": 1234, "size_kb": 12.4},
-                {"key": "user_permissions:*", "hits": 856, "size_kb": 8.2},
-                {"key": "project_data:*", "hits": 645, "size_kb": 15.7}
-            ],
-            "timestamp": datetime.now().isoformat()
+            "type": "memory",
+            "entries": entries,
+            "timestamps": entries,  # same as entries for in-memory (no separate timestamp count)
+            "hit_rate": 0,
+            "used_memory": "N/A",
+            "timestamp": datetime.now().isoformat(),
         }
     except Exception as e:
         print(f"Get cache stats error: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get cache stats: {str(e)}")
+
+
+@router.post("/cache/clear")
+async def clear_cache(request: Request, current_user=Depends(require_admin())):
+    """Clear cache entries. Used by the admin performance dashboard."""
+    try:
+        cache_manager = getattr(request.app.state, "cache_manager", None)
+        if cache_manager is not None and getattr(cache_manager, "clear", None):
+            cache_manager.clear()
+        return {"status": "success", "message": "Cache cleared successfully"}
+    except Exception as e:
+        print(f"Clear cache error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to clear cache: {str(e)}")
+
 
 @router.get("/system/info")
 async def get_system_info(current_user = Depends(require_admin())):
@@ -1048,19 +1091,30 @@ async def list_organizations(current_user=Depends(require_super_admin())):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+ADMIN_ORG_ME_CACHE_TTL = 60  # seconds
+
 @router.get("/organizations/me")
-async def get_my_organization(current_user=Depends(require_org_admin_or_super())):
-    """Get current user's organization (org_admin or super_admin). Org-admin only sees own org."""
+async def get_my_organization(request: Request, current_user=Depends(require_org_admin_or_super())):
+    """Get current user's organization (org_admin or super_admin). Response cached 60s to reduce repeated lookups."""
     if not supabase:
         raise HTTPException(status_code=503, detail="Database service unavailable")
     org_id = current_user.get("organization_id") or current_user.get("tenant_id")
     if not org_id:
         raise HTTPException(status_code=403, detail="No organization assigned")
+    cache = getattr(request.app.state, "cache_manager", None)
+    cache_key = f"admin:organizations_me:{org_id}"
+    if cache:
+        cached = await cache.get(cache_key)
+        if cached is not None:
+            return cached
     try:
         r = supabase.table("organizations").select("*").eq("id", str(org_id)).limit(1).execute()
         if not r.data or len(r.data) == 0:
             raise HTTPException(status_code=404, detail="Organization not found")
-        return r.data[0]
+        result = r.data[0]
+        if cache:
+            await cache.set(cache_key, result, ttl=ADMIN_ORG_ME_CACHE_TTL)
+        return result
     except HTTPException:
         raise
     except Exception as e:

@@ -11,13 +11,16 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from auth.dependencies import get_current_user
-from config.database import supabase
+from config.database import supabase, service_supabase
 from models.saved_views import SavedViewCreate, SavedViewUpdate, SavedViewResponse
 from utils.converters import convert_uuids
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/saved-views", tags=["saved-views"])
+
+# Use service role for saved_views so RLS does not block (auth.uid() is null with anon key). We enforce user_id from JWT.
+_db = service_supabase if service_supabase else supabase
 
 
 def _user_id_from_user(user: Dict[str, Any]) -> str:
@@ -33,11 +36,11 @@ async def list_saved_views(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """List saved views for the current user."""
-    if not supabase:
+    if not _db:
         raise HTTPException(status_code=503, detail="Database unavailable")
     user_id = _user_id_from_user(current_user)
     try:
-        query = supabase.table("saved_views").select("*").eq("user_id", user_id)
+        query = _db.table("saved_views").select("*").eq("user_id", user_id)
         if scope:
             query = query.eq("scope", scope)
         response = query.order("updated_at", desc=True).execute()
@@ -53,7 +56,7 @@ async def create_saved_view(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Create a saved view."""
-    if not supabase:
+    if not _db:
         raise HTTPException(status_code=503, detail="Database unavailable")
     user_id = _user_id_from_user(current_user)
     org_id = current_user.get("organization_id") or current_user.get("tenant_id")
@@ -65,7 +68,7 @@ async def create_saved_view(
         "definition": body.definition,
     }
     try:
-        response = supabase.table("saved_views").insert(row).execute()
+        response = _db.table("saved_views").insert(row).execute()
         if not response.data:
             raise HTTPException(status_code=400, detail="Insert failed")
         return SavedViewResponse(**convert_uuids(response.data[0]))
@@ -82,11 +85,11 @@ async def get_saved_view(
   current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Get one saved view by id."""
-    if not supabase:
+    if not _db:
         raise HTTPException(status_code=503, detail="Database unavailable")
     user_id = _user_id_from_user(current_user)
     response = (
-        supabase.table("saved_views")
+        _db.table("saved_views")
         .select("*")
         .eq("id", str(view_id))
         .eq("user_id", user_id)
@@ -104,7 +107,7 @@ async def update_saved_view(
   current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Update a saved view (name and/or definition)."""
-    if not supabase:
+    if not _db:
         raise HTTPException(status_code=503, detail="Database unavailable")
     user_id = _user_id_from_user(current_user)
     updates: Dict[str, Any] = {}
@@ -117,7 +120,7 @@ async def update_saved_view(
     updates["updated_at"] = datetime.now(timezone.utc).isoformat()
     try:
         response = (
-            supabase.table("saved_views")
+            _db.table("saved_views")
             .update(updates)
             .eq("id", str(view_id))
             .eq("user_id", user_id)
@@ -139,11 +142,11 @@ async def delete_saved_view(
   current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """Delete a saved view."""
-    if not supabase:
+    if not _db:
         raise HTTPException(status_code=503, detail="Database unavailable")
     user_id = _user_id_from_user(current_user)
     response = (
-        supabase.table("saved_views")
+        _db.table("saved_views")
         .delete()
         .eq("id", str(view_id))
         .eq("user_id", user_id)

@@ -53,6 +53,8 @@
     "switchThemeSystem": "Switch to system theme",
     "switchThemeLight": "Switch to light",
     "notifications": "Notifications",
+    "noNotifications": "No new notifications",
+    "markAllAsRead": "Mark all as read",
     "userMenu": "User menu",
     "searchPlaceholder": "Search projects, features, docs…",
     "searching": "Searching…",
@@ -61,7 +63,12 @@
     "searchAria": "Search",
     "voiceSearch": "Voice search",
     "listening": "Listening…",
-    "dismissAlert": "Dismiss alert"
+    "dismissAlert": "Dismiss alert",
+    "justNow": "Just now",
+    "minutesAgo": "{count}m ago",
+    "hoursAgo": "{count}h ago",
+    "yesterday": "Yesterday",
+    "daysAgo": "{count}d ago"
   },
   "dashboard": {
     "title": "Portfolio Dashboard",
@@ -93,6 +100,20 @@
       "timelineDelayDesc": "Project Beta is 2 weeks behind schedule",
       "resourceConflictTitle": "Resource Conflict",
       "resourceConflictDesc": "Team member assigned to multiple projects"
+    },
+    "schedulesTitle": "Schedules",
+    "openLink": "Open",
+    "activeSchedules": "Active schedules",
+    "milestonesDueIn14Days": "{count} milestone(s) due in 14 days",
+    "changeOrdersTitle": "Change Orders",
+    "projectsAvailableForChangeOrders": {
+      "one": "1 project available for change orders",
+      "other": "{count} projects available for change orders"
+    },
+    "projectControlsTitle": "Project Controls",
+    "projectsForControls": {
+      "one": "1 project for controls",
+      "other": "{count} projects for controls"
     }
   },
   "guidedTour": {
@@ -130,7 +151,9 @@
     "importProjects": "Import Projects"
   },
   "projects": {
-    "recentProjects": "Recent Projects"
+    "recentProjects": "Recent Projects",
+    "title": "Projects",
+    "pageDescription": "Manage your projects and workflow approvals"
   },
   "settings": {
     "title": "Settings",
@@ -171,6 +194,25 @@
     "budgetMethod": "Budget Performance Calculation",
     "resourceMethod": "Resource Efficiency Calculation",
     "dashboardLayout": "Dashboard Layout",
+    "successRateHealth": "Health-based (% of green projects)",
+    "successRateCompletion": "Completion-based (% of completed projects)",
+    "successRateHealthDesc": "Calculates success as the percentage of projects with \"green\" health status",
+    "successRateCompletionDesc": "Calculates success as the percentage of projects marked as completed",
+    "budgetSpent": "Spent/Total (budget utilization)",
+    "budgetRemaining": "Remaining (budget available)",
+    "budgetSpentDesc": "Shows percentage of total budget that has been spent",
+    "budgetRemainingDesc": "Shows percentage of total budget that remains available",
+    "resourceAuto": "Auto-calculate from project data",
+    "resourceFixed": "Fixed placeholder value",
+    "resourceAutoDesc": "Automatically calculates resource efficiency from project and team data",
+    "resourceFixedDesc": "Uses a fixed placeholder value until real resource data is available",
+    "layoutGrid": "Grid",
+    "layoutMasonry": "Masonry",
+    "layoutList": "List",
+    "pushNotifications": "Push Notifications",
+    "pushNotificationsEnableDesc": "Enable notifications to stay updated on project changes",
+    "pushNotificationsReceiveDesc": "Receive notifications for important project updates",
+    "pushNotificationsNotSupported": "Push notifications are not supported in this browser.",
     "aiFeatures": "AI Features",
     "aiPrivacyInfo": "AI features help you work more efficiently. Your data is processed securely and never shared with third parties.",
     "aiSuggestions": "AI Suggestions",
@@ -397,6 +439,7 @@
     "criticalOnly": "Critical Only",
     "warningOnly": "Warning Only",
     "resetFilters": "Reset Filters",
+    "editBudget": "Edit Budget",
     "tabs": {
       "overview": "Overview",
       "detailed": "Detailed",
@@ -404,7 +447,8 @@
       "analysis": "Analysis",
       "poBreakdown": "PO Breakdown",
       "csvImport": "CSV Import",
-      "commitmentsActuals": "Commitments vs Actuals"
+      "commitmentsActuals": "Commitments vs Actuals",
+      "costbook": "Budget & Cost Management"
     },
     "descriptions": {
       "overview": "Overall view and KPIs",
@@ -413,7 +457,8 @@
       "analysis": "Advanced cost analysis",
       "poBreakdown": "SAP Purchase Order Hierarchy",
       "csvImport": "Import data",
-      "commitmentsActuals": "Planned vs. Actual comparison"
+      "commitmentsActuals": "Planned vs. Actual comparison",
+      "costbook": "Comprehensive budget tracking, cost management, and financial oversight with detailed project analysis"
     },
     "currentView": "Current View",
     "dragDropCSV": "Drag & Drop CSV files here",
@@ -455,6 +500,14 @@
     "commitments": "Commitments",
     "actuals": "Actuals",
     "spendRate": "Spend Rate",
+    "savedViews": "Saved views",
+    "refreshAll": "Refresh All",
+    "refreshing": "Refreshing...",
+    "actualsData": "Actuals Data",
+    "commitmentsData": "Commitments Data",
+    "showingRecords": "Showing {start}-{end} of {total} records",
+    "filtered": "filtered",
+    "filteredCount": "({count} filtered)",
     "onTrack": "On Track",
     "showingProjects": "Showing {shown} of {total} projects",
     "noDetailedData": "No detailed data available",
@@ -509,7 +562,27 @@
     "currentMonth": "Current Month",
     "projectEfficiencyAnalysis": "Project Efficiency Analysis",
     "noProjectBudgetData": "No project budget data available",
-    "switchToCommitmentsActuals": "Switch to 'Commitments & Actuals' view for detailed financial analysis"
+    "switchToCommitmentsActuals": "Switch to 'Commitments & Actuals' view for detailed financial analysis",
+    "columns": {
+      "fiDocNo": "FI Doc No",
+      "postingDate": "Posting Date",
+      "documentDate": "Document Date",
+      "vendor": "Vendor",
+      "vendorDescription": "Vendor Description",
+      "projectNr": "Project Nr",
+      "wbsElement": "WBS Element",
+      "amount": "Amount",
+      "currency": "Currency",
+      "itemText": "Item Text",
+      "documentType": "Document Type",
+      "poNumber": "PO Number",
+      "line": "Line",
+      "poDate": "PO Date",
+      "netAmount": "Net Amount",
+      "totalAmount": "Total Amount",
+      "status": "Status",
+      "deliveryDate": "Delivery Date"
+    }
   },
   "resources": {
     "title": "Resource Management",
@@ -616,7 +689,53 @@
     "send": "Send",
     "pmrMode": "PMR Mode",
     "pmrModeActive": "PMR Mode Active",
-    "pmrModeInactive": "PMR Mode Inactive"
+    "pmrModeInactive": "PMR Mode Inactive",
+    "welcomeMessage": "Hello! I'm your AI assistant for project portfolio management. I can help you analyze projects, resources, budgets, risks and create custom reports. What would you like to know?",
+    "confidence": "Confidence:",
+    "sources": "Sources:",
+    "tryAsking": "Try asking:",
+    "suggestion1": "What is the current status of all projects?",
+    "suggestion2": "Which resources are overloaded?",
+    "suggestion3": "Show me budget utilization across all projects",
+    "suggestion4": "Create a risk assessment report",
+    "suggestion5": "Which skills are most in demand?",
+    "pmrSuggestion1": "Update executive summary with latest project status",
+    "pmrSuggestion2": "Generate budget variance insights",
+    "pmrSuggestion3": "Analyze schedule performance trends",
+    "pmrSuggestion4": "Suggest improvements for risk section",
+    "pmrSuggestion5": "Add resource utilization chart"
+  },
+  "projectControlsPage": {
+    "title": "Project Controls",
+    "subtitle": "ETC, EAC, Earned Value, and Performance Analytics",
+    "projectLabel": "Project",
+    "selectProject": "Select project..."
+  },
+  "schedules": {
+    "title": "Schedules",
+    "pageDescription": "Manage project schedules, tasks, and dependencies.",
+    "searchPlaceholder": "Search schedules...",
+    "allStatuses": "All statuses",
+    "allProjects": "All projects",
+    "newSchedule": "New schedule",
+    "noSchedulesFound": "No schedules found.",
+    "createOneToGetStarted": "Create one to get started.",
+    "loadingSchedules": "Loading schedules...",
+    "filterByStatus": "Filter by status",
+    "filterByProject": "Filter by project",
+    "statusActive": "Active",
+    "statusDraft": "Draft",
+    "statusCompleted": "Completed",
+    "selectProject": "Select project",
+    "projectLabel": "Project",
+    "nameLabel": "Name",
+    "scheduleName": "Schedule name",
+    "descriptionOptional": "Description (optional)",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "creating": "Creating...",
+    "create": "Create",
+    "createScheduleTitle": "Create schedule"
   },
   "scenarios": {
     "title": "Scenarios",
@@ -710,7 +829,6 @@
     "approximateExecutionTime": "Approximate execution time",
     "meanCostImpact": "Mean Cost Impact",
     "meanScheduleImpact": "Mean Schedule Impact",
-    "iterations": "Iterations",
     "converged": "Converged",
     "notConverged": "Not converged",
     "executionTime": "Execution Time",
@@ -725,7 +843,32 @@
     "completed": "completed",
     "noSimulations": "No Monte Carlo simulations yet",
     "configureRisksMessage": "Configure risks and run your first simulation to see statistical analysis",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "statisticalVisualizationSubtitle": "Statistical visualization of simulation results",
+    "outcome": "Outcome:",
+    "costAnalysis": "Cost Analysis",
+    "scheduleAnalysis": "Schedule Analysis",
+    "settings": "Settings",
+    "refresh": "Refresh",
+    "generating": "Generating...",
+    "noChartsGeneratedYet": "No charts generated yet",
+    "generateCharts": "Generate Charts",
+    "chartConfiguration": "Chart Configuration",
+    "chartTypes": "Chart Types",
+    "format": "Format",
+    "theme": "Theme",
+    "options": "Options",
+    "includeRiskHeatMap": "Include Risk Heat Map",
+    "applySettings": "Apply Settings",
+    "chartGenerationIssue": "Chart Generation Issue",
+    "chartUnavailable": "Chart Unavailable",
+    "chartUnavailableDesc": "This chart type is temporarily unavailable for the current simulation data.",
+    "chartStatistics": "Chart Statistics",
+    "download": "Download",
+    "riskContributionTornado": "Risk Contribution (Tornado)",
+    "cumulativeDistribution": "Cumulative Distribution",
+    "distribution": "Distribution",
+    "probabilityDistribution": "Probability Distribution"
   },
   "risks": {
     "title": "Risk Management",
@@ -1249,6 +1392,28 @@
     "loadingTimeline": "Loading timeline...",
     "noEventsToDisplay": "No events to display"
   },
+  "adminDashboard": {
+    "title": "Admin Dashboard",
+    "subtitle": "System administration and management",
+    "userManagementTitle": "User Management",
+    "userManagementDesc": "Manage users, roles, and permissions",
+    "performanceTitle": "Performance",
+    "performanceDesc": "Monitor system performance and metrics",
+    "navigationStatsTitle": "Navigation Stats",
+    "navigationStatsDesc": "View navigation analytics and statistics",
+    "featureCatalogTitle": "Feature catalog",
+    "featureCatalogDesc": "Manage features overview and screenshots",
+    "featureTogglesTitle": "Feature toggles",
+    "featureTogglesDesc": "Enable or disable features globally or per organization",
+    "helpChatAnalyticsTitle": "Help Chat Analytics",
+    "helpChatAnalyticsDesc": "View help chat usage, satisfaction, and top queries",
+    "organisationsTitle": "Organisations",
+    "organisationsDesc": "Manage tenants and organisations (Super-Admin)",
+    "workflowBuilderTitle": "Workflow Builder",
+    "workflowBuilderDesc": "No-code workflow editor (steps, edges, save as draft)",
+    "ssoTitle": "SSO",
+    "ssoDesc": "Configure Single Sign-On providers (Google, Microsoft, Okta, Azure AD)"
+  },
   "adminPerformance": {
     "title": "Performance Dashboard",
     "subtitle": "API performance monitoring and optimization",
@@ -1264,6 +1429,7 @@
     "endpointPerformance": "Endpoint Performance",
     "requestVolume": "Request Volume",
     "recentSlowQueries": "Recent Slow Queries",
+    "noSlowQueries": "No slow queries in threshold (≥1s).",
     "endpoint": "Endpoint",
     "duration": "Duration",
     "time": "Time",
@@ -1279,6 +1445,7 @@
     "totalRequestsLabel": "Total Requests",
     "requestsPerMin": "Requests/Min",
     "noTrafficYet": "No API traffic recorded yet. Use the app (projects, audit, etc.) or refresh this page to see metrics.",
+    "statusDegradedHint": "Degraded = error rate >5% or >10 slow queries (≥1s). Check: error rate, slow queries table; details: docs/runbooks/README.md#6.",
     "status": {
       "healthy": "Healthy",
       "degraded": "Degraded",
@@ -1411,6 +1578,23 @@
     }
   },
   "changes": {
+    "title": "Change Management",
+    "pageDescription": "Manage project change requests, approvals, and implementation tracking",
+    "changeOrders": "Change Orders",
+    "changeOrderIntegration": {
+      "title": "Change Orders",
+      "description": "Manage formal change orders with cost impact and approval workflows per project.",
+      "openChangeOrders": "Open Change Orders"
+    },
+    "newChangeRequest": "New Change Request",
+    "filters": "Filters",
+    "searchPlaceholder": "Search change requests...",
+    "showingCount": "Showing {shown} of {total} change requests",
+    "previous": "Previous",
+    "next": "Next",
+    "noChangeRequests": "No change requests",
+    "getStartedByCreating": "Get started by creating a new change request.",
+    "loadingChangeRequests": "Loading change requests...",
     "implementationTracker": {
       "title": "Implementation Tracking",
       "changeRequest": "Change Request",

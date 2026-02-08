@@ -53,6 +53,8 @@
     "switchThemeSystem": "切换到系统",
     "switchThemeLight": "切换到浅色",
     "notifications": "通知",
+    "noNotifications": "暂无新通知",
+    "markAllAsRead": "全部标为已读",
     "userMenu": "用户菜单",
     "searchPlaceholder": "搜索项目、功能、文档…",
     "searching": "搜索中…",
@@ -61,7 +63,12 @@
     "searchAria": "搜索",
     "voiceSearch": "语音搜索",
     "listening": "正在听…",
-    "dismissAlert": "关闭提示"
+    "dismissAlert": "关闭提示",
+    "justNow": "刚刚",
+    "minutesAgo": "{count} 分钟前",
+    "hoursAgo": "{count} 小时前",
+    "yesterday": "昨天",
+    "daysAgo": "{count} 天前"
   },
   "dashboard": {
     "title": "投资组合仪表板",
@@ -93,6 +100,20 @@
       "timelineDelayDesc": "项目 Beta 落后计划 2 周",
       "resourceConflictTitle": "资源冲突",
       "resourceConflictDesc": "成员被分配至多个项目"
+    },
+    "schedulesTitle": "进度计划",
+    "openLink": "打开",
+    "activeSchedules": "活动进度计划",
+    "milestonesDueIn14Days": "14 天内 {count} 个里程碑",
+    "changeOrdersTitle": "变更指令",
+    "projectsAvailableForChangeOrders": {
+      "one": "1 个项目可进行变更指令",
+      "other": "{count} 个项目可进行变更指令"
+    },
+    "projectControlsTitle": "项目控制",
+    "projectsForControls": {
+      "one": "1 个项目可控制",
+      "other": "{count} 个项目可控制"
     }
   },
   "guidedTour": {
@@ -130,7 +151,9 @@
     "importProjects": "导入项目"
   },
   "projects": {
-    "recentProjects": "最近项目"
+    "recentProjects": "最近项目",
+    "title": "项目",
+    "pageDescription": "管理您的项目和流程审批"
   },
   "settings": {
     "title": "设置",
@@ -171,6 +194,25 @@
     "budgetMethod": "预算绩效计算",
     "resourceMethod": "资源效率计算",
     "dashboardLayout": "仪表板布局",
+    "successRateHealth": "基于健康度（绿色项目占比）",
+    "successRateCompletion": "基于完成度（已完成项目占比）",
+    "successRateHealthDesc": "将“绿色”健康状态的项目占比计为成功率",
+    "successRateCompletionDesc": "将已标记为完成的项目占比计为成功率",
+    "budgetSpent": "已花费/总额（预算使用率）",
+    "budgetRemaining": "剩余（可用预算）",
+    "budgetSpentDesc": "显示已花费预算占总预算的百分比",
+    "budgetRemainingDesc": "显示剩余可用预算占总预算的百分比",
+    "resourceAuto": "根据项目数据自动计算",
+    "resourceFixed": "固定占位值",
+    "resourceAutoDesc": "根据项目和团队数据自动计算资源效率",
+    "resourceFixedDesc": "在获得真实资源数据前使用固定占位值",
+    "layoutGrid": "网格",
+    "layoutMasonry": "瀑布流",
+    "layoutList": "列表",
+    "pushNotifications": "推送通知",
+    "pushNotificationsEnableDesc": "开启通知以获取项目变更更新",
+    "pushNotificationsReceiveDesc": "接收重要项目更新的通知",
+    "pushNotificationsNotSupported": "此浏览器不支持推送通知。",
     "aiFeatures": "AI 功能",
     "aiPrivacyInfo": "AI 功能帮助您更高效地工作。您的数​​据得到安全处理，绝不与第三方共享。",
     "aiSuggestions": "AI 建议",
@@ -386,6 +428,7 @@
     "criticalOnly": "仅严重",
     "warningOnly": "仅警告",
     "resetFilters": "重置筛选器",
+    "editBudget": "编辑预算",
     "tabs": {
       "overview": "概览",
       "detailed": "详细",
@@ -393,7 +436,8 @@
       "analysis": "分析",
       "poBreakdown": "采购订单明细",
       "csvImport": "CSV 导入",
-      "commitmentsActuals": "承诺 vs 实际"
+      "commitmentsActuals": "承诺 vs 实际",
+      "costbook": "预算与成本管理"
     },
     "descriptions": {
       "overview": "整体视图和KPI",
@@ -402,7 +446,8 @@
       "analysis": "高级成本分析",
       "poBreakdown": "SAP采购订单层级",
       "csvImport": "导入数据",
-      "commitmentsActuals": "计划与实际对比"
+      "commitmentsActuals": "计划与实际对比",
+      "costbook": "全面的预算跟踪、成本管理和财务监督，含详细项目分析"
     },
     "currentView": "当前视图",
     "dragDropCSV": "在此拖放CSV文件",
@@ -443,6 +488,14 @@
     "commitments": "承诺",
     "actuals": "实际",
     "spendRate": "支出率",
+    "savedViews": "已保存的视图",
+    "refreshAll": "全部刷新",
+    "refreshing": "刷新中...",
+    "actualsData": "实际数据",
+    "commitmentsData": "承诺数据",
+    "showingRecords": "显示第 {start}-{end} 条，共 {total} 条",
+    "filtered": "已筛选",
+    "filteredCount": "（{count} 条已筛选）",
     "onTrack": "正常轨道",
     "showingProjects": "显示 {shown} / {total} 个项目",
     "noDetailedData": "无详细数据",
@@ -497,7 +550,27 @@
     "currentMonth": "本月",
     "projectEfficiencyAnalysis": "项目效率分析",
     "noProjectBudgetData": "无项目预算数据",
-    "switchToCommitmentsActuals": "切换到“承诺与实际”视图以进行详细财务分析"
+    "switchToCommitmentsActuals": "切换到“承诺与实际”视图以进行详细财务分析",
+    "columns": {
+      "fiDocNo": "FI 凭证号",
+      "postingDate": "过账日期",
+      "documentDate": "凭证日期",
+      "vendor": "供应商",
+      "vendorDescription": "供应商描述",
+      "projectNr": "项目编号",
+      "wbsElement": "WBS 元素",
+      "amount": "金额",
+      "currency": "货币",
+      "itemText": "项目文本",
+      "documentType": "凭证类型",
+      "poNumber": "采购订单号",
+      "line": "行",
+      "poDate": "订单日期",
+      "netAmount": "净额",
+      "totalAmount": "总金额",
+      "status": "状态",
+      "deliveryDate": "交货日期"
+    }
   },
   "resources": {
     "title": "资源管理",
@@ -602,7 +675,53 @@
     "send": "发送",
     "pmrMode": "PMR 模式",
     "pmrModeActive": "PMR 模式已激活",
-    "pmrModeInactive": "PMR 模式未激活"
+    "pmrModeInactive": "PMR 模式未激活",
+    "welcomeMessage": "您好！我是您的项目组合管理 AI 助手。我可以帮助您分析项目、资源、预算、风险并创建自定义报告。您想了解什么？",
+    "confidence": "置信度：",
+    "sources": "来源：",
+    "tryAsking": "尝试询问：",
+    "suggestion1": "所有项目的当前状态如何？",
+    "suggestion2": "哪些资源已超负荷？",
+    "suggestion3": "显示所有项目的预算使用情况",
+    "suggestion4": "创建风险评估报告",
+    "suggestion5": "哪些技能最紧缺？",
+    "pmrSuggestion1": "用最新项目状态更新执行摘要",
+    "pmrSuggestion2": "生成预算差异洞察",
+    "pmrSuggestion3": "分析进度绩效趋势",
+    "pmrSuggestion4": "为风险部分提出改进建议",
+    "pmrSuggestion5": "添加资源利用率图表"
+  },
+  "projectControlsPage": {
+    "title": "项目控制",
+    "subtitle": "ETC、EAC、挣值与绩效分析",
+    "projectLabel": "项目",
+    "selectProject": "选择项目..."
+  },
+  "schedules": {
+    "title": "进度计划",
+    "pageDescription": "管理项目进度、任务与依赖。",
+    "searchPlaceholder": "搜索进度计划...",
+    "allStatuses": "全部状态",
+    "allProjects": "全部项目",
+    "newSchedule": "新建进度计划",
+    "noSchedulesFound": "未找到进度计划。",
+    "createOneToGetStarted": "创建一个以开始。",
+    "loadingSchedules": "正在加载进度计划...",
+    "filterByStatus": "按状态筛选",
+    "filterByProject": "按项目筛选",
+    "statusActive": "进行中",
+    "statusDraft": "草稿",
+    "statusCompleted": "已完成",
+    "selectProject": "选择项目",
+    "projectLabel": "项目",
+    "nameLabel": "名称",
+    "scheduleName": "进度计划名称",
+    "descriptionOptional": "描述（可选）",
+    "startDate": "开始日期",
+    "endDate": "结束日期",
+    "creating": "创建中...",
+    "create": "创建",
+    "createScheduleTitle": "创建进度计划"
   },
   "scenarios": {
     "title": "场景",
@@ -709,7 +828,32 @@
     "completed": "已完成",
     "noSimulations": "尚未有蒙特卡洛模拟",
     "configureRisksMessage": "配置风险并运行首次模拟以查看统计分析",
-    "getStarted": "开始"
+    "getStarted": "开始",
+    "statisticalVisualizationSubtitle": "模拟结果的统计可视化",
+    "outcome": "结果：",
+    "costAnalysis": "成本分析",
+    "scheduleAnalysis": "进度分析",
+    "settings": "设置",
+    "refresh": "刷新",
+    "generating": "生成中...",
+    "noChartsGeneratedYet": "尚未生成图表",
+    "generateCharts": "生成图表",
+    "chartConfiguration": "图表配置",
+    "chartTypes": "图表类型",
+    "format": "格式",
+    "theme": "主题",
+    "options": "选项",
+    "includeRiskHeatMap": "包含风险热力图",
+    "applySettings": "应用设置",
+    "chartGenerationIssue": "图表生成问题",
+    "chartUnavailable": "图表不可用",
+    "chartUnavailableDesc": "该图表类型当前模拟数据暂时不可用。",
+    "chartStatistics": "图表统计",
+    "download": "下载",
+    "riskContributionTornado": "风险贡献（龙卷风图）",
+    "cumulativeDistribution": "累积分布",
+    "distribution": "分布",
+    "probabilityDistribution": "概率分布"
   },
   "risks": {
     "title": "风险管理",
@@ -1231,6 +1375,28 @@
     "loadingTimeline": "正在加载时间线...",
     "noEventsToDisplay": "无事件可显示"
   },
+  "adminDashboard": {
+    "title": "管理后台",
+    "subtitle": "系统管理与维护",
+    "userManagementTitle": "用户管理",
+    "userManagementDesc": "管理用户、角色与权限",
+    "performanceTitle": "性能",
+    "performanceDesc": "监控系统性能与指标",
+    "navigationStatsTitle": "导航统计",
+    "navigationStatsDesc": "查看导航分析与统计",
+    "featureCatalogTitle": "功能目录",
+    "featureCatalogDesc": "管理功能概览与截图",
+    "featureTogglesTitle": "功能开关",
+    "featureTogglesDesc": "全局或按组织启用/禁用功能",
+    "helpChatAnalyticsTitle": "帮助聊天分析",
+    "helpChatAnalyticsDesc": "查看帮助聊天使用、满意度与热门问题",
+    "organisationsTitle": "组织",
+    "organisationsDesc": "管理租户与组织（超级管理员）",
+    "workflowBuilderTitle": "工作流构建器",
+    "workflowBuilderDesc": "无代码工作流编辑器（步骤、边、另存为草稿）",
+    "ssoTitle": "SSO",
+    "ssoDesc": "配置单点登录提供商（Google、Microsoft、Okta、Azure AD）"
+  },
   "adminPerformance": {
     "title": "性能仪表板",
     "subtitle": "API 性能监控和优化",
@@ -1393,6 +1559,23 @@
     }
   },
   "changes": {
+    "title": "变更管理",
+    "pageDescription": "管理项目变更请求、审批与实施跟踪。",
+    "changeOrders": "变更指令",
+    "changeOrderIntegration": {
+      "title": "变更指令",
+      "description": "按项目管理正式变更指令，含成本影响与审批流程。",
+      "openChangeOrders": "打开变更指令"
+    },
+    "newChangeRequest": "新建变更请求",
+    "filters": "筛选",
+    "searchPlaceholder": "搜索变更请求...",
+    "showingCount": "显示 {shown} / {total} 条变更请求",
+    "previous": "上一页",
+    "next": "下一页",
+    "noChangeRequests": "暂无变更请求",
+    "getStartedByCreating": "创建新的变更请求以开始。",
+    "loadingChangeRequests": "正在加载变更请求...",
     "implementationTracker": {
       "title": "实施跟踪",
       "changeRequest": "变更请求",

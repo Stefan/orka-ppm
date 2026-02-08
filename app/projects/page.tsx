@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import AppLayout from '@/components/shared/AppLayout'
+import { useTranslations } from '@/lib/i18n/context'
 import WorkflowStatusBadge from '@/components/workflow/WorkflowStatusBadge'
 import WorkflowApprovalModal from '@/components/workflow/WorkflowApprovalModal'
 import { getApiUrl } from '@/lib/api'
@@ -16,6 +17,7 @@ type Project = ProjectListItem & { description?: string }
 
 export default function ProjectsPage() {
   const router = useRouter()
+  const { t } = useTranslations()
   const { session, loading: authLoading } = useAuth()
   const [selectedWorkflow, setSelectedWorkflow] = useState<string | null>(null)
   const [notification, setNotification] = useState<string | null>(null)
@@ -135,8 +137,8 @@ export default function ProjectsPage() {
       <div data-testid="projects-page" className="p-8">
         <div className="max-w-7xl mx-auto">
           <div data-testid="projects-header" className="mb-8">
-            <h1 data-testid="projects-title" className="text-3xl font-bold text-gray-900 dark:text-slate-100">Projects</h1>
-            <p className="text-gray-700 dark:text-slate-300 mt-2">Manage your projects and workflow approvals</p>
+            <h1 data-testid="projects-title" className="text-3xl font-bold text-gray-900 dark:text-slate-100">{t('projects.title')}</h1>
+            <p className="text-gray-700 dark:text-slate-300 mt-2">{t('projects.pageDescription')}</p>
           </div>
 
           {/* Realtime Notification Banner */}

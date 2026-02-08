@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react'
 import { RefreshCw } from 'lucide-react'
+import { useTranslations } from '@/lib/i18n/context'
 import SubTabNavigation, { SubTabType } from './SubTabNavigation'
 import VarianceAnalysisView from './views/VarianceAnalysisView'
 import CommitmentsTable from './tables/CommitmentsTable'
@@ -25,14 +26,17 @@ export default function CommitmentsActualsView({
   selectedCurrency, 
   onRefresh 
 }: CommitmentsActualsViewProps) {
+  const t = useTranslations('financials')
   const [activeSubTab, setActiveSubTab] = useState<SubTabType>('variance-analysis')
   const [projectFilter, setProjectFilter] = useState<string>('')
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [appliedView, setAppliedView] = useState<SavedViewDefinition | null>(null)
+  const [appliedViewName, setAppliedViewName] = useState<string | null>(null)
   const [currentDefinition, setCurrentDefinition] = useState<SavedViewDefinition>({})
 
   const handleDefinitionChange = useCallback((def: SavedViewDefinition) => {
     setCurrentDefinition(def)
+    setAppliedViewName(null) // user changed filters/sort manually; clear "applied view" label
   }, [])
 
   // Refs for child components
@@ -124,8 +128,12 @@ export default function CommitmentsActualsView({
             scope="financials"
             accessToken={session?.access_token}
             currentDefinition={currentDefinition}
-            onApply={(def) => setAppliedView(def)}
-            label="Saved views"
+            onApply={(def, view) => {
+              setAppliedView(def)
+              setAppliedViewName(view?.name ?? null)
+            }}
+            appliedViewName={appliedViewName}
+            label={t('savedViews')}
           />
             <button
             onClick={handleUnifiedRefresh}
@@ -133,7 +141,7 @@ export default function CommitmentsActualsView({
             className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            {isRefreshing ? 'Refreshing...' : 'Refresh All'}
+            {isRefreshing ? t('refreshing') : t('refreshAll')}
           </button>
         </div>
       </div>

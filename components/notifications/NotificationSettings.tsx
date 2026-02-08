@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Bell, BellOff, Settings, TestTube, Clock, Shield, AlertTriangle, Users, Monitor } from 'lucide-react';
+import { useTranslations } from '@/lib/i18n/context';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 interface NotificationSettingsProps {
@@ -10,6 +11,7 @@ interface NotificationSettingsProps {
 }
 
 export default function NotificationSettings({ userId, className = '' }: NotificationSettingsProps) {
+  const { t } = useTranslations();
   const [showSettings, setShowSettings] = useState(false);
   const [isTestingNotification, setIsTestingNotification] = useState(false);
   
@@ -55,7 +57,7 @@ export default function NotificationSettings({ userId, className = '' }: Notific
         <div className="flex items-center">
           <BellOff className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mr-2" aria-hidden />
           <span className="text-sm text-yellow-800 dark:text-yellow-200">
-            Push notifications are not supported in this browser.
+            {t('settings.pushNotificationsNotSupported')}
           </span>
         </div>
       </div>
@@ -75,12 +77,12 @@ export default function NotificationSettings({ userId, className = '' }: Notific
             )}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-                Push Notifications
+                {t('settings.pushNotifications')}
               </h3>
               <p className="text-sm text-gray-600 dark:text-slate-400">
                 {isSubscribed 
-                  ? 'Receive notifications for important project updates'
-                  : 'Enable notifications to stay updated on project changes'
+                  ? t('settings.pushNotificationsReceiveDesc')
+                  : t('settings.pushNotificationsEnableDesc')
                 }
               </p>
             </div>

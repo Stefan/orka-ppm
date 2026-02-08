@@ -395,12 +395,12 @@ async def assign_bug_report(
 # Notification Endpoints
 @notifications_router.get("/")
 async def get_user_notifications(
-    is_read: Optional[bool] = Query(None),
+    is_read: Optional[bool] = Query(None, description="Filter by read status; API uses DB column 'read'"),
     limit: int = Query(50, le=100),
     offset: int = Query(0, ge=0),
     current_user = Depends(get_current_user)
 ):
-    """Get user notifications"""
+    """Get user notifications. DB column is 'read'; is_read query param maps to it."""
     try:
         if supabase is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
@@ -408,7 +408,7 @@ async def get_user_notifications(
         user_id = current_user.get("user_id")
         query = supabase.table("notifications").select("*").eq("user_id", user_id)
         if is_read is not None:
-            query = query.eq("is_read", is_read)
+            query = query.eq("read", is_read)
         response = query.order("created_at", desc=True).range(offset, offset + limit - 1).execute()
         return convert_uuids(response.data or [])
         
@@ -428,7 +428,7 @@ async def mark_notification_as_read(
         
         user_id = current_user.get("user_id")
         update_data = {
-            "is_read": True,
+            "read": True,
             "read_at": datetime.now().isoformat()
         }
         
@@ -454,11 +454,11 @@ async def mark_all_notifications_as_read(current_user = Depends(get_current_user
         
         user_id = current_user.get("user_id")
         update_data = {
-            "is_read": True,
+            "read": True,
             "read_at": datetime.now().isoformat()
         }
         
-        response = supabase.table("notifications").update(update_data).eq("user_id", user_id).eq("is_read", False).execute()
+        response = supabase.table("notifications").update(update_data).eq("user_id", user_id).eq("read", False).execute()
         
         return {"message": f"Marked {len(response.data or [])} notifications as read"}
         

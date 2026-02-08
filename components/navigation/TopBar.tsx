@@ -40,11 +40,30 @@ import { useTheme } from '@/app/providers/ThemeProvider'
 import { prefetchDashboardData } from '@/lib/api/dashboard-loader'
 import { prefetchFinancials } from '@/lib/api/prefetch'
 import { useHelpChat } from '@/hooks/useHelpChat'
+import { useNotifications } from '@/hooks/useNotifications'
 import { GlobalLanguageSelector } from './GlobalLanguageSelector'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useTranslations } from '@/lib/i18n/context'
 import TopbarSearch from './TopbarSearch'
 import { cn } from '@/lib/utils/design-system'
+import { useWorkflowNotifications } from '@/hooks/useWorkflowRealtime'
+
+type TTopbar = (key: string, params?: Record<string, unknown>) => string
+
+function formatNotificationTime(iso: string, t: TTopbar): string {
+  const d = new Date(iso)
+  const now = new Date()
+  const diffMs = now.getTime() - d.getTime()
+  const diffM = Math.floor(diffMs / 60000)
+  const diffH = Math.floor(diffMs / 3600000)
+  const diffD = Math.floor(diffMs / 86400000)
+  if (diffM < 1) return t('topbar.justNow')
+  if (diffM < 60) return t('topbar.minutesAgo', { count: diffM })
+  if (diffH < 24) return t('topbar.hoursAgo', { count: diffH })
+  if (diffD === 1) return t('topbar.yesterday')
+  if (diffD < 7) return t('topbar.daysAgo', { count: diffD })
+  return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: d.getFullYear() !== now.getFullYear() ? 'numeric' : undefined })
+}
 
 export interface TopBarProps {
   onMenuToggle?: () => void
@@ -57,7 +76,28 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   const { currentLanguage } = useLanguage()
   const { t } = useTranslations()
   const { state: helpState, toggleChat, hasUnreadTips, getToggleButtonText } = useHelpChat()
-  
+  const {
+    notifications,
+    unreadCount,
+    isLoading: notificationsLoading,
+    refetch: refetchNotifications,
+    markAsRead,
+    markAllAsRead,
+  } = useNotifications(session?.access_token)
+  const workflowNotifications = useWorkflowNotifications(session?.user?.id ?? null)
+
+  // Realtime: when a new notification is inserted, refresh list and badge
+  const refetchRef = useRef(refetchNotifications)
+  refetchRef.current = refetchNotifications
+  const userId = session?.user?.id ?? null
+  useEffect(() => {
+    if (!userId) return
+    workflowNotifications.subscribe(() => {
+      refetchRef.current()
+    })
+    return () => workflowNotifications.cleanup()
+  }, [userId, workflowNotifications])
+
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [moreMenuOpen, setMoreMenuOpen] = useState(false)
   const [projectsMenuOpen, setProjectsMenuOpen] = useState(false)
@@ -65,7 +105,9 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   const [analysisMenuOpen, setAnalysisMenuOpen] = useState(false)
   const [managementMenuOpen, setManagementMenuOpen] = useState(false)
   const [adminMenuOpen, setAdminMenuOpen] = useState(false)
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
+  const notificationsRef = useRef<HTMLDivElement>(null)
   const moreMenuRef = useRef<HTMLDivElement>(null)
   const projectsMenuRef = useRef<HTMLDivElement>(null)
   const financialsMenuRef = useRef<HTMLDivElement>(null)
@@ -107,19 +149,22 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setUserMenuOpen(false)
       }
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setNotificationsOpen(false)
+      }
       if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
         setMoreMenuOpen(false)
       }
     }
 
-    if (projectsMenuOpen || financialsMenuOpen || analysisMenuOpen || managementMenuOpen || adminMenuOpen || userMenuOpen || moreMenuOpen) {
+    if (projectsMenuOpen || financialsMenuOpen || analysisMenuOpen || managementMenuOpen || adminMenuOpen || userMenuOpen || notificationsOpen || moreMenuOpen) {
       document.addEventListener('click', handleClickOutside)
     }
 
     return () => {
       document.removeEventListener('click', handleClickOutside)
     }
-  }, [projectsMenuOpen, financialsMenuOpen, analysisMenuOpen, managementMenuOpen, adminMenuOpen, userMenuOpen, moreMenuOpen])
+  }, [projectsMenuOpen, financialsMenuOpen, analysisMenuOpen, managementMenuOpen, adminMenuOpen, userMenuOpen, notificationsOpen, moreMenuOpen])
 
   const userEmail = session?.user?.email || 'User'
   const userName = session?.user?.user_metadata?.full_name || userEmail.split('@')[0]
@@ -141,6 +186,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
     setManagementMenuOpen(false)
     setAdminMenuOpen(false)
     setUserMenuOpen(false)
+    setNotificationsOpen(false)
     setMoreMenuOpen(false)
   }
 
@@ -275,7 +321,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             <button
               onClick={(e) => { e.stopPropagation(); toggleDropdown(setAnalysisMenuOpen, analysisMenuOpen) }}
               className={`flex items-center space-x-1 ${navLinkBase} ${
-                ['/risks', '/scenarios', '/monte-carlo', '/audit', '/schedules'].includes(pathname) || pathname.startsWith('/schedules/')
+                ['/risks', '/registers', '/scenarios', '/monte-carlo', '/audit', '/schedules'].includes(pathname) || pathname.startsWith('/schedules/')
                   ? navLinkActive
                   : analysisMenuOpen
                     ? navLinkOpen
@@ -370,6 +416,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                   <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.riskAnalysis')}</h3>
                 </div>
                 <Link href="/risks" className={`${dropdownItemBase} ${pathname === '/risks' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setAnalysisMenuOpen(false)}><AlertTriangle className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.riskManagement')}</span></Link>
+                <Link href="/registers" className={`${dropdownItemBase} ${pathname === '/registers' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setAnalysisMenuOpen(false)}><BookOpen className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">Registers</span></Link>
                 <Link href="/scenarios" className={`${dropdownItemBase} ${pathname === '/scenarios' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setAnalysisMenuOpen(false)}><Layers className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.whatIfScenarios')}</span></Link>
                 <Link href="/monte-carlo" className={`${dropdownItemBase} ${pathname === '/monte-carlo' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setAnalysisMenuOpen(false)}><BarChart3 className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.monteCarloAnalysis')}</span></Link>
                 <Link href="/audit" className={`${dropdownItemBase} ${pathname === '/audit' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setAnalysisMenuOpen(false)}><FileText className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.auditTrail')}</span></Link>
@@ -422,14 +469,88 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           <GlobalLanguageSelector variant="topbar" />
 
           {/* Notifications */}
-          <button
-            data-testid="top-bar-notifications"
-            className="p-2.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-200 relative group"
-            aria-label={t('topbar.notifications')}
-          >
-            <Bell className="h-5 w-5 text-gray-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full shadow-sm animate-pulse"></span>
-          </button>
+          <div className="relative" ref={notificationsRef}>
+            <button
+              data-testid="top-bar-notifications"
+              type="button"
+              onClick={() => {
+                if (!notificationsOpen) refetchNotifications()
+                setNotificationsOpen(!notificationsOpen)
+              }}
+              className={cn(
+                'p-2.5 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-200 relative group',
+                notificationsOpen && 'bg-blue-50 dark:bg-slate-700'
+              )}
+              aria-label={t('topbar.notifications')}
+              aria-expanded={notificationsOpen}
+            >
+              <Bell className="h-5 w-5 text-gray-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[10px] font-semibold text-white bg-gradient-to-br from-blue-500 to-blue-600 rounded-full shadow-sm" aria-hidden>
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </button>
+            {notificationsOpen && (
+              <div
+                className="absolute right-0 mt-3 w-80 max-h-[min(24rem,70vh)] bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200 flex flex-col"
+                style={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+                role="dialog"
+                aria-label={t('topbar.notifications')}
+              >
+                <div className="px-4 py-2 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between flex-shrink-0">
+                  <span className="text-sm font-semibold text-gray-900 dark:text-slate-100">{t('topbar.notifications')}</span>
+                  {unreadCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => markAllAsRead()}
+                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      {t('topbar.markAllAsRead')}
+                    </button>
+                  )}
+                </div>
+                <div className="overflow-y-auto flex-1 min-h-0">
+                  {notificationsLoading ? (
+                    <p className="px-4 py-6 text-sm text-gray-500 dark:text-slate-400">{t('topbar.searching')}</p>
+                  ) : notifications.length === 0 ? (
+                    <p className="px-4 py-6 text-sm text-gray-500 dark:text-slate-400">{t('topbar.noNotifications')}</p>
+                  ) : (
+                    <ul className="py-1">
+                      {notifications.map((n) => {
+                        const isUnread = !(n.is_read ?? n.read)
+                        return (
+                          <li key={n.id}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (isUnread) markAsRead(n.id)
+                                const url = n.data?.url as string | undefined
+                                if (url) router.push(url)
+                                setNotificationsOpen(false)
+                              }}
+                              className={cn(
+                                'w-full text-left px-4 py-3 border-b border-gray-50 dark:border-slate-700/50 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors',
+                                isUnread && 'bg-blue-50/50 dark:bg-slate-700/50'
+                              )}
+                            >
+                              <p className={cn('text-sm truncate', isUnread ? 'font-semibold text-gray-900 dark:text-slate-100' : 'text-gray-700 dark:text-slate-300')}>
+                                {n.title}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5 line-clamp-2">{n.message}</p>
+                              <p className="text-[10px] text-gray-400 dark:text-slate-500 mt-1">
+                                {formatNotificationTime(n.created_at, t)}
+                              </p>
+                            </button>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* AI Help Chat */}
           <button

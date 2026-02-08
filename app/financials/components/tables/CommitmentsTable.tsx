@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { getApiUrl } from '../../../../lib/api'
 import { useDateFormatter } from '@/hooks/useDateFormatter'
+import { useTranslations } from '@/lib/i18n/context'
 import type { SavedViewDefinition } from '@/lib/saved-views-api'
 
 interface Commitment {
@@ -47,6 +48,7 @@ type SortDirection = 'asc' | 'desc' | null
 type SortField = keyof Commitment | null
 
 const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTableProps>(({ accessToken, onProjectClick, initialView, onDefinitionChange }, ref) => {
+  const t = useTranslations('financials')
   const { formatDate } = useDateFormatter()
   const [commitments, setCommitments] = useState<Commitment[]>([])
   const [loading, setLoading] = useState(true)
@@ -74,8 +76,11 @@ const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTablePro
     
     try {
       const offset = (currentPage - 1) * pageSize
+      const countExact = currentPage === 1
+      const params = new URLSearchParams({ limit: String(pageSize), offset: String(offset) })
+      if (countExact) params.set('count_exact', 'true')
       const response = await fetch(
-        getApiUrl(`/csv-import/commitments?limit=${pageSize}&offset=${offset}`),
+        getApiUrl(`/csv-import/commitments?${params.toString()}`),
         {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -87,7 +92,7 @@ const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTablePro
       if (response.ok) {
         const data = await response.json()
         setCommitments(data.commitments || [])
-        setTotal(data.total || 0)
+        setTotal(data.total ?? 0)
       } else {
         const errorData = await response.json()
         setError(errorData.detail || 'Failed to fetch commitments')
@@ -189,37 +194,36 @@ const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTablePro
     }))
   }
 
+  // Column definitions (used for table headers and CSV export)
+  const columns: Array<{
+    key: keyof Commitment
+    labelKey: string
+    width?: string
+    format?: (value: any) => string
+  }> = [
+    { key: 'po_number', labelKey: 'columns.poNumber', width: 'w-32' },
+    { key: 'po_line_nr', labelKey: 'columns.line', width: 'w-16' },
+    { key: 'po_date', labelKey: 'columns.poDate', width: 'w-28', format: (v) => v ? formatDate(new Date(v)) : '' },
+    { key: 'vendor', labelKey: 'columns.vendor', width: 'w-32' },
+    { key: 'vendor_description', labelKey: 'columns.vendorDescription', width: 'w-48' },
+    { key: 'project_nr', labelKey: 'columns.projectNr', width: 'w-28' },
+    { key: 'wbs_element', labelKey: 'columns.wbsElement', width: 'w-32' },
+    { key: 'po_net_amount', labelKey: 'columns.netAmount', width: 'w-28', format: (v) => v?.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00' },
+    { key: 'total_amount', labelKey: 'columns.totalAmount', width: 'w-28', format: (v) => v?.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00' },
+    { key: 'currency', labelKey: 'columns.currency', width: 'w-20' },
+    { key: 'po_status', labelKey: 'columns.status', width: 'w-24' },
+    { key: 'delivery_date', labelKey: 'columns.deliveryDate', width: 'w-28', format: (v) => v ? formatDate(new Date(v)) : '' },
+  ]
+
   // Export to CSV
   const exportToCSV = () => {
-    const headers = [
-      'PO Number',
-      'PO Date',
-      'Vendor',
-      'Vendor Description',
-      'Project Nr',
-      'WBS Element',
-      'PO Net Amount',
-      'Total Amount',
-      'Currency',
-      'PO Status',
-      'PO Line Nr',
-      'Delivery Date'
-    ]
-    
-    const rows = filteredAndSortedCommitments.map(c => [
-      c.po_number,
-      c.po_date,
-      c.vendor,
-      c.vendor_description || '',
-      c.project_nr,
-      c.wbs_element || '',
-      c.po_net_amount,
-      c.total_amount,
-      c.currency,
-      c.po_status || '',
-      c.po_line_nr,
-      c.delivery_date || ''
-    ])
+    const headers = columns.map(c => t(c.labelKey as any))
+    const rows = filteredAndSortedCommitments.map(commitment =>
+      columns.map(col => {
+        const v = commitment[col.key]
+        return col.format ? col.format(v) : (v ?? '')
+      })
+    )
     
     const csvContent = [
       headers.join(','),
@@ -237,27 +241,6 @@ const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTablePro
   const totalPages = Math.ceil(total / pageSize)
   const startRecord = (currentPage - 1) * pageSize + 1
   const endRecord = Math.min(currentPage * pageSize, total)
-
-  // Column definitions
-  const columns: Array<{
-    key: keyof Commitment
-    label: string
-    width?: string
-    format?: (value: any) => string
-  }> = [
-    { key: 'po_number', label: 'PO Number', width: 'w-32' },
-    { key: 'po_line_nr', label: 'Line', width: 'w-16' },
-    { key: 'po_date', label: 'PO Date', width: 'w-28', format: (v) => v ? formatDate(new Date(v)) : '' },
-    { key: 'vendor', label: 'Vendor', width: 'w-32' },
-    { key: 'vendor_description', label: 'Vendor Description', width: 'w-48' },
-    { key: 'project_nr', label: 'Project Nr', width: 'w-28' },
-    { key: 'wbs_element', label: 'WBS Element', width: 'w-32' },
-    { key: 'po_net_amount', label: 'Net Amount', width: 'w-28', format: (v) => v?.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00' },
-    { key: 'total_amount', label: 'Total Amount', width: 'w-28', format: (v) => v?.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00' },
-    { key: 'currency', label: 'Currency', width: 'w-20' },
-    { key: 'po_status', label: 'Status', width: 'w-24' },
-    { key: 'delivery_date', label: 'Delivery Date', width: 'w-28', format: (v) => v ? formatDate(new Date(v)) : '' },
-  ]
 
   // Render sort icon
   const renderSortIcon = (field: keyof Commitment) => {
@@ -327,12 +310,12 @@ const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTablePro
       <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Commitments Data</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{t('commitmentsData')}</h3>
             <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
-              Showing {startRecord}-{endRecord} of {total} records
+              {t('showingRecords', { start: startRecord, end: endRecord, total })}
               {Object.keys(filters).some(k => filters[k]) && (
                 <span className="ml-2 text-blue-600 dark:text-blue-400">
-                  ({filteredAndSortedCommitments.length} filtered)
+                  {t('filteredCount', { count: filteredAndSortedCommitments.length })}
                 </span>
               )}
             </p>
@@ -348,7 +331,7 @@ const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTablePro
               }`}
             >
               <Filter className="h-4 w-4 mr-1" />
-              Filters
+              {t('filters')}
             </button>
             
             <button
@@ -356,7 +339,7 @@ const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTablePro
               className="flex items-center px-3 py-2 bg-green-700 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
             >
               <Download className="h-4 w-4 mr-1" />
-              Export
+              {t('export')}
             </button>
           </div>
         </div>
@@ -377,7 +360,7 @@ const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTablePro
                       onClick={() => handleSort(column.key)}
                       className="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-slate-300 dark:text-slate-300"
                     >
-                      <span>{column.label}</span>
+                      <span>{t(column.labelKey as any)}</span>
                       {renderSortIcon(column.key)}
                     </button>
                   </th>
@@ -391,7 +374,7 @@ const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTablePro
                     <th key={`filter-${String(column.key)}`} className="px-4 py-2">
                       <input
                         type="text"
-                        placeholder={`Filter ${column.label}...`}
+                        placeholder={`${t(column.labelKey as any)}...`}
                         value={filters[String(column.key)] || ''}
                         onChange={(e) => handleFilterChange(String(column.key), e.target.value)}
                         className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-slate-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"

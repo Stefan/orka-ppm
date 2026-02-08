@@ -87,6 +87,29 @@ Step-by-step actions for common incidents. See also [audit-deployment-checklist.
 
 ---
 
+## 6. Performance-Dashboard: Systemstatus „Beeinträchtigt“
+
+**Symptom:** Im Admin-Bereich unter „API-Performance-Überwachung“ steht **Systemstatus: Beeinträchtigt** (degraded).
+
+**Bedeutung:** Der Status wird aus den aktuellen API-Metriken berechnet (Backend `performance_tracker`):
+- **Gesund:** Fehlerrate ≤ 5 % und ≤ 10 langsame Abfragen (≥1 s).
+- **Beeinträchtigt:** Fehlerrate > 5 % **oder** > 10 langsame Abfragen.
+- **Nicht gesund:** Fehlerrate > 10 % **oder** > 20 langsame Abfragen.
+
+**Checks:**
+1. Im gleichen Dashboard: **Fehlerrate** und **Langsame Abfragen** ansehen.
+2. Tabelle **Aktuelle langsame Abfragen**: welche Endpoints dauern ≥1 s?
+3. Backend-Logs und ggf. Sentry: welche Requests liefern 4xx/5xx?
+
+**Maßnahmen:**
+1. **Hohe Fehlerrate:** Ursache der Fehler beheben (siehe Runbook [2. High error rate](#2-high-error-rate--5xx)); danach sinkt die Fehlerrate mit neuem Traffic oder nach **Statistiken zurücksetzen** (siehe unten).
+2. **Viele langsame Abfragen:** Langsame Endpoints optimieren (DB-Queries, Indizes, Timeouts) oder Last reduzieren; Schwellwert für „langsam“ ist 1 s (Backend `performance_tracker`). Häufige Kandidaten: **GET /csv-import/commitments** und **GET /csv-import/actuals** – bei großen Limits (z. B. Dashboard) Query-Parameter `count_exact=false` setzen, um die teure COUNT-Abfrage zu vermeiden (Frontend nutzt das bereits für Dashboard- und Listen-Aufrufe ohne Pagination).
+3. **Statistiken zurücksetzen:** Wenn das Problem behoben ist und der Status sich erst mit der Zeit erholen soll, kann ein System-Admin die Performance-Statistiken zurücksetzen (Endpoint `POST /api/admin/performance/reset` mit Permission `system_admin`). Danach ist der Status wieder „Gesund“, bis neue Fehler oder langsame Requests anfallen.
+
+**Referenz:** Backend-Logik: `backend/middleware/performance_tracker.py` → `get_health_status()`.
+
+---
+
 ## Links
 
 - [Deployment procedures](../DEPLOYMENT_PROCEDURES.md)

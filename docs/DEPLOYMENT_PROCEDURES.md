@@ -13,6 +13,7 @@ This document outlines the deployment procedures for the PPM SaaS application wi
 - [Health Check Integration](#health-check-integration)
 - [Rollback Procedures](#rollback-procedures)
 - [Environment-Specific Instructions](#environment-specific-instructions)
+- [Nach Repo-Umbenennung (GitHub)](#nach-repo-umbenennung-github)
 
 **Incident response:** For step-by-step actions during incidents (API down, high error rate, DB issues, frontend white screen), see [docs/runbooks/README.md](runbooks/README.md).
 
@@ -468,6 +469,32 @@ echo "Weekly maintenance completed"
    # Verify environment variables
    # Test database connectivity
    ```
+
+### Nach Repo-Umbenennung (GitHub)
+
+Wenn das Repository auf GitHub umbenannt wurde, stellen Render und Vercel oft keine Builds mehr aus, weil die Integration noch auf den alten Repo-Namen zeigt. **Lösung:** Verbindung in beiden Diensten neu auf das umbenannte Repo setzen.
+
+**Render**
+
+1. [Render Dashboard](https://dashboard.render.com) → deinen Service öffnen (z. B. **orka-ppm-backend**).
+2. **Settings** → **Build & Deploy** → **Build**.
+3. Unter **Repository**:
+   - Entweder **„Clear and reconnect“** / Repo trennen und erneut verbinden, dann das **neue** Repo (z. B. `owner/orka-ppm`) auswählen.
+   - Oder prüfen, ob es eine Option **„Update repository“** / **„Change repository“** gibt und dort das umbenannte Repo auswählen.
+4. Branch bleibt in der Regel `main`; bei Blueprint (`render.yaml`) wird das Repo aus der Verbindung gelesen.
+5. Optional: einen **Manual Deploy** auslösen, um zu prüfen, ob Builds wieder laufen.
+
+**Vercel**
+
+1. [Vercel Dashboard](https://vercel.com/dashboard) → das betroffene Projekt öffnen.
+2. **Settings** → **Git**.
+3. **Connected Git Repository**:
+   - **Disconnect** und danach erneut **Connect** mit dem **umbenannten** Repository (z. B. `owner/orka-ppm`), **oder**
+   - Falls angeboten: **„Update“** / **„Reconnect“**, damit Vercel das neue Repo erkennt.
+4. Danach sollten Push/PR auf `main` wieder Deployments auslösen.
+5. Optional: unter **Deployments** → **Deploy** einen manuellen Deploy starten.
+
+**Hinweis:** In diesem Repo sind keine Repo-URLs in `render.yaml` oder `vercel.json` hinterlegt – die Verbindung liegt nur in den Dashboards von Render und Vercel. Nach der Neuverbindung des Repos sind keine Code-Änderungen nötig.
 
 ### Support Contacts
 

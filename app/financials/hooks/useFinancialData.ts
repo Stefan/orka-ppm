@@ -156,13 +156,13 @@ export function useFinancialData({ accessToken, selectedCurrency }: UseFinancial
       // Fetch commitments and actuals (capped for faster cost analysis; we only need top 8 categories)
       const limit = 2000
       const [commitmentsRes, actualsRes] = await Promise.all([
-        fetch(getApiUrl(`/csv-import/commitments?limit=${limit}`), {
+        fetch(getApiUrl(`/csv-import/commitments?limit=${limit}&count_exact=false`), {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           }
         }),
-        fetch(getApiUrl(`/csv-import/actuals?limit=${limit}`), {
+        fetch(getApiUrl(`/csv-import/actuals?limit=${limit}&count_exact=false`), {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',

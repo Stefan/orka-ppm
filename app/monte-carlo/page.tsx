@@ -423,7 +423,7 @@ export default function MonteCarloPage() {
             <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-slate-300">Mean Cost Impact</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('monteCarlo.meanCostImpact')}</p>
                   <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                     {formatCurrency(activeSimulation.summary.cost_statistics.mean)}
                   </p>
@@ -438,7 +438,7 @@ export default function MonteCarloPage() {
             <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-slate-300">Mean Schedule Impact</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('monteCarlo.meanScheduleImpact')}</p>
                   <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                     {formatDuration(activeSimulation.summary.schedule_statistics.mean)}
                   </p>
@@ -453,12 +453,12 @@ export default function MonteCarloPage() {
             <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-slate-300">Iterations</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('monteCarlo.iterations')}</p>
                   <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                     {activeSimulation.iteration_count.toLocaleString()}
                   </p>
                   <p className="text-xs text-gray-700 dark:text-slate-300 mt-1">
-                    {activeSimulation.convergence_status ? 'Converged' : 'Not converged'}
+                    {activeSimulation.convergence_status ? t('monteCarlo.converged') : t('monteCarlo.notConverged')}
                   </p>
                 </div>
                 <Activity className="h-8 w-8 text-purple-600 dark:text-purple-400" />
@@ -468,7 +468,7 @@ export default function MonteCarloPage() {
             <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-slate-300">Execution Time</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('monteCarlo.executionTime')}</p>
                   <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                     {activeSimulation.execution_time.toFixed(1)}s
                   </p>
@@ -497,32 +497,32 @@ export default function MonteCarloPage() {
         {simulationHistory.length > 0 && (
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Simulation History</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{t('monteCarlo.simulationHistory')}</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
                 <thead className="bg-gray-50 dark:bg-slate-700">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wider">
-                      Simulation ID
+                      {t('monteCarlo.simulationId')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wider">
-                      Date
+                      {t('monteCarlo.date')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wider">
-                      Iterations
+                      {t('monteCarlo.iterations')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wider">
-                      Mean Cost
+                      {t('monteCarlo.meanCost')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wider">
-                      Mean Schedule
+                      {t('monteCarlo.meanSchedule')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wider">
-                      Status
+                      {t('monteCarlo.status')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wider">
-                      Actions
+                      {t('monteCarlo.actions')}
                     </th>
                   </tr>
                 </thead>
@@ -556,7 +556,7 @@ export default function MonteCarloPage() {
                             ? 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300' 
                             : 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300'
                         }`}>
-                          {simulation.status}
+                          {simulation.status === 'completed' ? t('monteCarlo.completed') : simulation.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-slate-300">
@@ -567,7 +567,7 @@ export default function MonteCarloPage() {
                           }}
                           className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                         >
-                          View
+                          {t('monteCarlo.view')}
                         </button>
                       </td>
                     </tr>
@@ -582,16 +582,16 @@ export default function MonteCarloPage() {
         {!activeSimulation && simulationHistory.length === 0 && !loading && (
           <div className="text-center py-12">
             <BarChart3 className="h-12 w-12 text-gray-400 dark:text-slate-500 mx-auto mb-4" />
-            <p className="text-gray-700 dark:text-slate-300 mb-4">No Monte Carlo simulations yet</p>
+            <p className="text-gray-700 dark:text-slate-300 mb-4">{t('monteCarlo.noSimulations')}</p>
             <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">
-              Configure risks and run your first simulation to see statistical analysis
+              {t('monteCarlo.configureRisksMessage')}
             </p>
             <button
               onClick={() => setShowConfig(true)}
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <Settings className="h-4 w-4 mr-2" />
-              Get Started
+              {t('monteCarlo.getStarted')}
             </button>
           </div>
         )}

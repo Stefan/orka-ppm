@@ -14,7 +14,7 @@ Requirements: 4.1, 4.4
 from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from auth.dependencies import get_current_user
@@ -373,20 +373,29 @@ async def get_user_effective_permissions(
         )
 
 
+RBAC_USER_PERMISSIONS_CACHE_TTL = 60  # seconds
+
 @router.get("/user-permissions", response_model=UserPermissionsResponse)
 async def get_current_user_permissions(
+    request: Request,
     context: Optional[str] = Query(None, description="JSON-encoded permission context"),
     current_user = Depends(get_current_user)
 ):
     """
     Get effective permissions for the current authenticated user.
-    
-    This endpoint is used by the frontend to load user permissions.
+    Response cached briefly (60s) to reduce load on permission/role lookups.
     
     Requirements: 3.2 - Real-time permission loading
     """
     try:
         user_id = UUID(current_user.get("user_id"))
+        context_key = (context or "").strip() or "none"
+        cache = getattr(request.app.state, "cache_manager", None)
+        cache_key = f"rbac:user_permissions:{user_id}:{context_key}"
+        if cache:
+            cached = await cache.get(cache_key)
+            if cached is not None:
+                return UserPermissionsResponse.model_validate(cached)
         
         # Parse context if provided
         permission_context = None
@@ -401,12 +410,15 @@ async def get_current_user_permissions(
         # Get aggregated permissions
         permissions = await permission_checker.get_user_permissions(user_id, permission_context)
         
-        return UserPermissionsResponse(
+        response = UserPermissionsResponse(
             user_id=user_id,
             effective_roles=effective_roles,
             permissions=[p.value for p in permissions],
             context=permission_context
         )
+        if cache:
+            await cache.set(cache_key, response.model_dump(mode="json"), ttl=RBAC_USER_PERMISSIONS_CACHE_TTL)
+        return response
         
     except Exception as e:
         print(f"Error fetching user permissions: {e}")

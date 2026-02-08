@@ -53,6 +53,8 @@
     "switchThemeSystem": "सिस्टम पर स्विच करें",
     "switchThemeLight": "लाइट पर स्विच करें",
     "notifications": "सूचनाएं",
+    "noNotifications": "कोई नई सूचना नहीं",
+    "markAllAsRead": "सभी को पढ़ा हुआ मार्क करें",
     "userMenu": "उपयोगकर्ता मेन्यू",
     "searchPlaceholder": "परियोजनाएँ, फ़ीचर, डॉक्स खोजें…",
     "searching": "खोज रहे हैं…",
@@ -61,7 +63,12 @@
     "searchAria": "खोजें",
     "voiceSearch": "वॉयस खोज",
     "listening": "सुन रहे हैं…",
-    "dismissAlert": "अलर्ट बंद करें"
+    "dismissAlert": "अलर्ट बंद करें",
+    "justNow": "अभी",
+    "minutesAgo": "{count} मिनट पहले",
+    "hoursAgo": "{count} घंटे पहले",
+    "yesterday": "कल",
+    "daysAgo": "{count} दिन पहले"
   },
   "dashboard": {
     "title": "पोर्टफोलियो डैशबोर्ड",
@@ -93,6 +100,20 @@
       "timelineDelayDesc": "प्रोजेक्ट बीटा 2 सप्ताह पीछे",
       "resourceConflictTitle": "संसाधन संघर्ष",
       "resourceConflictDesc": "सदस्य कई परियोजनाओं में नियुक्त"
+    },
+    "schedulesTitle": "अनुसूचियाँ",
+    "openLink": "खोलें",
+    "activeSchedules": "सक्रिय अनुसूचियाँ",
+    "milestonesDueIn14Days": "14 दिनों में {count} माइलस्टोन",
+    "changeOrdersTitle": "परिवर्तन आदेश",
+    "projectsAvailableForChangeOrders": {
+      "one": "परिवर्तन आदेश के लिए 1 परियोजना उपलब्ध",
+      "other": "परिवर्तन आदेश के लिए {count} परियोजनाएं उपलब्ध"
+    },
+    "projectControlsTitle": "परियोजना नियंत्रण",
+    "projectsForControls": {
+      "one": "नियंत्रण के लिए 1 परियोजना",
+      "other": "नियंत्रण के लिए {count} परियोजनाएं"
     }
   },
   "guidedTour": {
@@ -130,7 +151,9 @@
     "importProjects": "प्रोजेक्ट आयात करें"
   },
   "projects": {
-    "recentProjects": "हाल के प्रोजेक्ट्स"
+    "recentProjects": "हाल के प्रोजेक्ट्स",
+    "title": "परियोजनाएं",
+    "pageDescription": "अपनी परियोजनाओं और वर्कफ़्लो अनुमोदन प्रबंधित करें"
   },
   "settings": {
     "title": "सेटिंग्स",
@@ -171,6 +194,25 @@
     "budgetMethod": "बजट प्रदर्शन गणना",
     "resourceMethod": "संसाधन दक्षता गणना",
     "dashboardLayout": "डैशबोर्ड लेआउट",
+    "successRateHealth": "स्वास्थ्य-आधारित (% हरी परियोजनाएं)",
+    "successRateCompletion": "पूर्णता-आधारित (% पूर्ण परियोजनाएं)",
+    "successRateHealthDesc": "सफलता की गणना \"हरे\" स्वास्थ्य स्थिति वाली परियोजनाओं के प्रतिशत के रूप में",
+    "successRateCompletionDesc": "पूर्ण के रूप में चिह्नित परियोजनाओं के प्रतिशत के रूप में सफलता की गणना",
+    "budgetSpent": "खर्च/कुल (बजट उपयोग)",
+    "budgetRemaining": "शेष (उपलब्ध बजट)",
+    "budgetSpentDesc": "कुल बजट का वह प्रतिशत दिखाता है जो खर्च हो चुका है",
+    "budgetRemainingDesc": "कुल बजट का वह प्रतिशत दिखाता है जो उपलब्ध है",
+    "resourceAuto": "परियोजना डेटा से स्वचालित गणना",
+    "resourceFixed": "निश्चित प्लेसहोल्डर मान",
+    "resourceAutoDesc": "परियोजना और टीम डेटा से स्वचालित रूप से संसाधन दक्षता की गणना करता है",
+    "resourceFixedDesc": "वास्तविक संसाधन डेटा उपलब्ध होने तक निश्चित प्लेसहोल्डर मान का उपयोग करता है",
+    "layoutGrid": "ग्रिड",
+    "layoutMasonry": "मेसनरी",
+    "layoutList": "सूची",
+    "pushNotifications": "पुश नोटिफिकेशन",
+    "pushNotificationsEnableDesc": "परियोजना परिवर्तनों पर अपडेट रहने के लिए नोटिफिकेशन सक्षम करें",
+    "pushNotificationsReceiveDesc": "महत्वपूर्ण परियोजना अपडेट के लिए नोटिफिकेशन प्राप्त करें",
+    "pushNotificationsNotSupported": "इस ब्राउज़र में पुश नोटिफिकेशन समर्थित नहीं हैं।",
     "aiFeatures": "AI सुविधाएँ",
     "aiPrivacyInfo": "AI सुविधाएँ आपको अधिक कुशलता से काम करने में मदद करती हैं। आपका डेटा सुरक्षित रूप से प्रोसेस किया जाता है और कभी तीसरे पक्षों के साथ साझा नहीं किया जाता।",
     "aiSuggestions": "AI सुझाव",
@@ -443,6 +485,14 @@
     "commitments": "प्रतिबद्धताएँ",
     "actuals": "वास्तविक लागतें",
     "spendRate": "खर्च दर",
+    "savedViews": "सहेजे गए दृश्य",
+    "refreshAll": "सभी रिफ़्रेश करें",
+    "refreshing": "रिफ़्रेश हो रहा है...",
+    "actualsData": "वास्तविक डेटा",
+    "commitmentsData": "कमिटमेंट डेटा",
+    "showingRecords": "{total} रिकॉर्ड में {start}-{end} दिख रहा है",
+    "filtered": "फ़िल्टर किया गया",
+    "filteredCount": "({count} फ़िल्टर किया गया)",
     "onTrack": "ट्रैक पर",
     "showingProjects": "{total} में से {shown} प्रोजेक्ट दिखाए जा रहे हैं",
     "noDetailedData": "कोई विस्तृत डेटा उपलब्ध नहीं",
@@ -602,7 +652,53 @@
     "send": "भेजें",
     "pmrMode": "पीएमआर मोड",
     "pmrModeActive": "पीएमआर मोड सक्रिय",
-    "pmrModeInactive": "पीएमआर मोड निष्क्रिय"
+    "pmrModeInactive": "पीएमआर मोड निष्क्रिय",
+    "welcomeMessage": "नमस्ते! मैं परियोजना पोर्टफोलियो प्रबंधन के लिए आपका AI सहायक हूं। मैं परियोजनाओं, संसाधनों, बजट, जोखिमों का विश्लेषण करने और कस्टम रिपोर्ट बनाने में मदद कर सकता हूं। आप क्या जानना चाहेंगे?",
+    "confidence": "विश्वास:",
+    "sources": "स्रोत:",
+    "tryAsking": "पूछने का प्रयास करें:",
+    "suggestion1": "सभी परियोजनाओं की वर्तमान स्थिति क्या है?",
+    "suggestion2": "कौन से संसाधन अधिभारित हैं?",
+    "suggestion3": "सभी परियोजनाओं का बजट उपयोग दिखाएं",
+    "suggestion4": "जोखिम मूल्यांकन रिपोर्ट बनाएं",
+    "suggestion5": "कौन से कौशल सबसे अधिक मांग में हैं?",
+    "pmrSuggestion1": "नवीनतम परियोजना स्थिति के साथ कार्यकारी सारांश अपडेट करें",
+    "pmrSuggestion2": "बजट विचरण अंतर्दृष्टि उत्पन्न करें",
+    "pmrSuggestion3": "अनुसूची प्रदर्शन रुझानों का विश्लेषण करें",
+    "pmrSuggestion4": "जोखिम अनुभाग के लिए सुधार सुझाएं",
+    "pmrSuggestion5": "संसाधन उपयोग चार्ट जोड़ें"
+  },
+  "projectControlsPage": {
+    "title": "परियोजना नियंत्रण",
+    "subtitle": "ETC, EAC, अर्जित मूल्य और प्रदर्शन विश्लेषण",
+    "projectLabel": "परियोजना",
+    "selectProject": "परियोजना चुनें..."
+  },
+  "schedules": {
+    "title": "अनुसूचियाँ",
+    "pageDescription": "परियोजना अनुसूचियाँ, कार्य और निर्भरताएँ प्रबंधित करें।",
+    "searchPlaceholder": "अनुसूचियाँ खोजें...",
+    "allStatuses": "सभी स्थिति",
+    "allProjects": "सभी परियोजनाएं",
+    "newSchedule": "नई अनुसूचि",
+    "noSchedulesFound": "कोई अनुसूचि नहीं मिली।",
+    "createOneToGetStarted": "शुरू करने के लिए एक बनाएं।",
+    "loadingSchedules": "अनुसूचियाँ लोड हो रही हैं...",
+    "filterByStatus": "स्थिति के अनुसार फ़िल्टर करें",
+    "filterByProject": "परियोजना के अनुसार फ़िल्टर करें",
+    "statusActive": "सक्रिय",
+    "statusDraft": "ड्राफ्ट",
+    "statusCompleted": "पूर्ण",
+    "selectProject": "परियोजना चुनें",
+    "projectLabel": "परियोजना",
+    "nameLabel": "नाम",
+    "scheduleName": "अनुसूचि का नाम",
+    "descriptionOptional": "विवरण (वैकल्पिक)",
+    "startDate": "आरंभ तिथि",
+    "endDate": "समाप्ति तिथि",
+    "creating": "बन रहा है...",
+    "create": "बनाएं",
+    "createScheduleTitle": "अनुसूचि बनाएं"
   },
   "scenarios": {
     "title": "परिदृश्य",
@@ -1231,6 +1327,28 @@
     "loadingTimeline": "टाइमलाइन लोड हो रही है...",
     "noEventsToDisplay": "दिखाने के लिए कोई घटना नहीं"
   },
+  "adminDashboard": {
+    "title": "व्यवस्थापक डैशबोर्ड",
+    "subtitle": "सिस्टम प्रशासन और प्रबंधन",
+    "userManagementTitle": "उपयोगकर्ता प्रबंधन",
+    "userManagementDesc": "उपयोगकर्ताओं, भूमिकाओं और अनुमतियों को प्रबंधित करें",
+    "performanceTitle": "प्रदर्शन",
+    "performanceDesc": "सिस्टम प्रदर्शन और मेट्रिक्स की निगरानी करें",
+    "navigationStatsTitle": "नेविगेशन आंकड़े",
+    "navigationStatsDesc": "नेविगेशन विश्लेषण और आंकड़े देखें",
+    "featureCatalogTitle": "फ़ीचर कैटलॉग",
+    "featureCatalogDesc": "फ़ीचर अवलोकन और स्क्रीनशॉट प्रबंधित करें",
+    "featureTogglesTitle": "फ़ीचर टॉगल",
+    "featureTogglesDesc": "वैश्विक या प्रति संगठन फ़ीचर सक्षम/अक्षम करें",
+    "helpChatAnalyticsTitle": "हेल्प चैट एनालिटिक्स",
+    "helpChatAnalyticsDesc": "हेल्प चैट उपयोग, संतुष्टि और शीर्ष प्रश्न देखें",
+    "organisationsTitle": "संगठन",
+    "organisationsDesc": "टेनेंट और संगठन प्रबंधित करें (सुपर-एडमिन)",
+    "workflowBuilderTitle": "वर्कफ़्लो बिल्डर",
+    "workflowBuilderDesc": "नो-कोड वर्कफ़्लो संपादक (चरण, किनारे, ड्राफ्ट के रूप में सहेजें)",
+    "ssoTitle": "SSO",
+    "ssoDesc": "सिंगल साइन-ऑन प्रदाता कॉन्फ़िगर करें (Google, Microsoft, Okta, Azure AD)"
+  },
   "adminPerformance": {
     "title": "प्रदर्शन डैशबोर्ड",
     "subtitle": "API प्रदर्शन निगरानी और अनुकूलन",
@@ -1393,6 +1511,23 @@
     }
   },
   "changes": {
+    "title": "परिवर्तन प्रबंधन",
+    "pageDescription": "परियोजना परिवर्तन अनुरोध, अनुमोदन और कार्यान्वयन ट्रैकिंग प्रबंधित करें।",
+    "changeOrders": "परिवर्तन आदेश",
+    "changeOrderIntegration": {
+      "title": "परिवर्तन आदेश",
+      "description": "प्रति परियोजना लागत प्रभाव और अनुमोदन वर्कफ़्लो के साथ औपचारिक परिवर्तन आदेश प्रबंधित करें।",
+      "openChangeOrders": "परिवर्तन आदेश खोलें"
+    },
+    "newChangeRequest": "नया परिवर्तन अनुरोध",
+    "filters": "फ़िल्टर",
+    "searchPlaceholder": "परिवर्तन अनुरोध खोजें...",
+    "showingCount": "{shown} में से {total} परिवर्तन अनुरोध दिख रहे हैं",
+    "previous": "पिछला",
+    "next": "अगला",
+    "noChangeRequests": "कोई परिवर्तन अनुरोध नहीं",
+    "getStartedByCreating": "शुरू करने के लिए एक नया परिवर्तन अनुरोध बनाएं।",
+    "loadingChangeRequests": "परिवर्तन अनुरोध लोड हो रहे हैं...",
     "implementationTracker": {
       "title": "कार्यान्वयन ट्रैकिंग",
       "changeRequest": "परिवर्तन अनुरोध",

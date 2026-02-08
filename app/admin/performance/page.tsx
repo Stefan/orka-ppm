@@ -147,7 +147,9 @@ export default function PerformanceDashboard() {
       ])
 
       const fetchDuration = performance.now() - fetchStart
-      
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'performance/page.tsx:fetch',message:'stats+health response',data:{statsStatus:statsResponse.status,healthStatus:healthResponse.status,statsOk:statsResponse.ok},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+      // #endregion
       // Record API call metrics
       performanceMonitoring.recordCustomMetric('api_fetch_duration', fetchDuration)
       performanceMonitoring.recordAPICall('/api/admin/performance/stats', fetchDuration, statsResponse.status)
@@ -156,6 +158,9 @@ export default function PerformanceDashboard() {
       // Process critical responses immediately; set error when backend returns 403/500
       if (statsResponse.ok) {
         const statsData = await statsResponse.json()
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'performance/page.tsx:statsParsed',message:'stats body',data:{total_requests:statsData?.total_requests,endpointCount:statsData?.endpoint_stats?Object.keys(statsData.endpoint_stats).length:0,hasStats:!!(statsData&&typeof statsData==='object')},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+        // #endregion
         if (statsData && typeof statsData === 'object') {
           startTransition(() => {
             setStats(statsData)
@@ -444,6 +449,13 @@ export default function PerformanceDashboard() {
                 </div>
               </div>
             </div>
+            {(health?.status === 'degraded' || health?.status === 'unhealthy') && (
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-slate-600">
+                <p className="text-sm text-gray-600 dark:text-slate-400">
+                  {t('statusDegradedHint')}
+                </p>
+              </div>
+            )}
           </div>
         )}
 
@@ -524,9 +536,8 @@ export default function PerformanceDashboard() {
           </Suspense>
         </LazyComponentErrorBoundary>
 
-        {/* Slow Queries - Lazy Loaded */}
-        {slowQueriesData.length > 0 && (
-          <LazyComponentErrorBoundary 
+        {/* Slow Queries - always show section (empty state when none) */}
+        <LazyComponentErrorBoundary 
             componentName="SlowQueriesTable"
             fallbackMessage={t('errors.tableLoadFailed') || 'Unable to load slow queries table'}
           >
@@ -537,12 +548,12 @@ export default function PerformanceDashboard() {
                   recentSlowQueries: t('recentSlowQueries'),
                   endpoint: t('endpoint'),
                   duration: t('duration'),
-                  time: t('time')
+                  time: t('time'),
+                  noSlowQueries: t('noSlowQueries') || 'No slow queries in threshold (≥1s).'
                 }}
               />
             </Suspense>
           </LazyComponentErrorBoundary>
-        )}
 
         {/* Cache Statistics - Lazy Loaded */}
         {cacheStats && (

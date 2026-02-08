@@ -67,9 +67,10 @@ async def list_projects(
     offset: int = Query(0, ge=0, description="Number of projects to skip"),
     portfolio_id: Optional[UUID] = Query(None),
     status: Optional[ProjectStatus] = Query(None),
+    count_exact: bool = Query(False, description="Request exact total count (expensive); use only when needed for pagination"),
     current_user = Depends(require_permission(Permission.project_read))
 ):
-    """Get projects with optional filtering and pagination. Uses cache (TTL 120s); invalidated on project create/update/delete."""
+    """Get projects with optional filtering and pagination. Uses cache (TTL 120s); invalidated on project create/update/delete. Default count_exact=false for faster response."""
     try:
         if not supabase:
             raise HTTPException(status_code=503, detail="Database service unavailable")
@@ -77,34 +78,35 @@ async def list_projects(
         if isinstance(org_id, UUID):
             org_id = str(org_id)
         cache = getattr(request.app.state, "cache_manager", None)
-        cache_key = _projects_cache_key(org_id, offset, limit)
+        cache_key = f"{_projects_cache_key(org_id, offset, limit)}:{count_exact}"
         data = None
         if cache:
             data = await cache.get(cache_key)
         if data is None:
-            query = supabase.table("projects").select(
-                "id", "name", "status", "portfolio_id", "health", "budget", "actual_cost",
-                "start_date", "end_date", "created_at", "updated_at", "description",
-                count="exact"
-            )
+            select_cols = "id", "name", "status", "portfolio_id", "health", "budget", "actual_cost", "start_date", "end_date", "created_at", "updated_at", "description"
+            if count_exact:
+                query = supabase.table("projects").select(*select_cols, count="exact")
+            else:
+                query = supabase.table("projects").select(*select_cols)
             if portfolio_id is not None:
                 query = query.eq("portfolio_id", str(portfolio_id))
             if status is not None:
                 query = query.eq("status", status.value)
             response = query.order("updated_at", desc=True).range(offset, offset + limit - 1).execute()
-            data = convert_uuids(response.data)
-            total = getattr(response, "count", None)
-            if total is None and data is not None:
-                total = len(data)
+            items = convert_uuids(response.data)
+            if count_exact and hasattr(response, "count") and response.count is not None:
+                total = response.count
+            else:
+                total = offset + len(items) if items else 0
             if cache:
-                await cache.set(cache_key, {"items": data, "total": total}, ttl=PROJECTS_CACHE_TTL)
+                await cache.set(cache_key, {"items": items, "total": total}, ttl=PROJECTS_CACHE_TTL)
+            data = {"items": items, "total": total}
         if isinstance(data, dict):
-            # Cached payload with items + total
             items = data.get("items", data)
             total = data.get("total")
         else:
             items = data
-            total = total if total is not None else (len(items) if items else 0)
+            total = len(items) if items else 0
         return {"items": items, "total": total, "limit": limit, "offset": offset}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

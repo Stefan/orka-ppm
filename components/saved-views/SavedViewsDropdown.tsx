@@ -14,7 +14,10 @@ export interface SavedViewsDropdownProps {
   scope: string
   accessToken: string | undefined
   currentDefinition?: SavedViewDefinition
-  onApply?: (definition: SavedViewDefinition) => void
+  /** Called when a view is applied; second arg is the full view (for showing name in UI). */
+  onApply?: (definition: SavedViewDefinition, view?: SavedView) => void
+  /** Name of the currently applied view (shown on the button). */
+  appliedViewName?: string | null
   label?: string
 }
 
@@ -23,6 +26,7 @@ export function SavedViewsDropdown({
   accessToken,
   currentDefinition,
   onApply,
+  appliedViewName,
   label = 'Saved views',
 }: SavedViewsDropdownProps) {
   const [views, setViews] = useState<SavedView[]>([])
@@ -82,8 +86,10 @@ export function SavedViewsDropdown({
         onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-700 dark:text-slate-300"
       >
-        <Bookmark className="h-4 w-4" />
-        {label}
+        <Bookmark className="h-4 w-4 shrink-0" />
+        <span className="truncate max-w-[12rem]">
+          {appliedViewName ? `${label}: ${appliedViewName}` : label}
+        </span>
       </button>
       {open && (
         <>
@@ -109,7 +115,7 @@ export function SavedViewsDropdown({
                       type="button"
                       className="flex-1 text-left text-sm text-slate-900 dark:text-slate-100"
                       onClick={() => {
-                        onApply?.(v.definition)
+                        onApply?.(v.definition, v)
                         setOpen(false)
                       }}
                     >

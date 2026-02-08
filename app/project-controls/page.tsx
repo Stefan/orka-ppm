@@ -3,10 +3,12 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import AppLayout from '@/components/shared/AppLayout'
+import { useTranslations } from '@/lib/i18n/context'
 import { ResponsiveContainer } from '@/components/ui/molecules/ResponsiveContainer'
 import ProjectControlsDashboard from '@/components/project-controls/ProjectControlsDashboard'
 
 export default function ProjectControlsPage() {
+  const { t } = useTranslations()
   const [projects, setProjects] = useState<{ id: string; name: string }[]>([])
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
   const headerRef = useRef<HTMLDivElement>(null)
@@ -40,17 +42,17 @@ export default function ProjectControlsPage() {
       <ResponsiveContainer padding="md" className="min-w-0 overflow-x-hidden">
         <div className="space-y-4 min-w-0" ref={headerRef}>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Project Controls</h1>
-            <p className="text-gray-600 dark:text-slate-400 mt-1">ETC, EAC, Earned Value, and Performance Analytics</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">{t('projectControlsPage.title')}</h1>
+            <p className="text-gray-600 dark:text-slate-400 mt-1">{t('projectControlsPage.subtitle')}</p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Project</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('projectControlsPage.projectLabel')}</label>
             <select
               value={selectedProjectId ?? ''}
               onChange={(e) => setSelectedProjectId(e.target.value || null)}
               className="px-3 py-2 border rounded-lg"
             >
-              <option value="">Select project...</option>
+              <option value="">{t('projectControlsPage.selectProject')}</option>
               {projects.map((p) => (
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}

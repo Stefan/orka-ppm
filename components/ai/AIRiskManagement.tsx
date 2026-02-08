@@ -248,8 +248,8 @@ export default function AIRiskManagement({
               onClick={() => setAutoRefresh(!autoRefresh)}
               className={`p-2 rounded-md transition-colors ${
                 autoRefresh 
-                  ? 'bg-white dark:bg-slate-800 bg-opacity-20 text-white' 
-                  : 'bg-white dark:bg-slate-800 bg-opacity-10 text-purple-100 hover:bg-white dark:bg-slate-800 hover:bg-opacity-20'
+                  ? 'bg-white/20 dark:bg-slate-800/20 text-white' 
+                  : 'bg-white/10 dark:bg-slate-800/10 text-purple-700 dark:text-purple-100 hover:bg-white/20 dark:hover:bg-slate-800/20'
               }`}
               title={autoRefresh ? 'Disable auto-refresh' : 'Enable auto-refresh'}
             >
@@ -259,7 +259,7 @@ export default function AIRiskManagement({
             <button
               onClick={loadAIData}
               disabled={loading}
-              className="p-2 bg-white dark:bg-slate-800 bg-opacity-10 text-purple-100 rounded-md hover:bg-white dark:bg-slate-800 hover:bg-opacity-20 disabled:opacity-50"
+              className="p-2 bg-white/10 dark:bg-slate-800/10 text-purple-700 dark:text-purple-100 rounded-md hover:bg-white/20 dark:hover:bg-slate-800/20 disabled:opacity-50 transition-colors"
             >
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             </button>

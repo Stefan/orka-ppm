@@ -52,6 +52,8 @@
     "switchThemeSystem": "Przełącz na system",
     "switchThemeLight": "Przełącz na jasny",
     "notifications": "Powiadomienia",
+    "noNotifications": "Brak nowych powiadomień",
+    "markAllAsRead": "Oznacz wszystkie jako przeczytane",
     "userMenu": "Menu użytkownika",
     "searchPlaceholder": "Szukaj projektów, funkcji, dokumentacji…",
     "searching": "Szukam…",
@@ -60,7 +62,12 @@
     "searchAria": "Szukaj",
     "voiceSearch": "Wyszukiwanie głosowe",
     "listening": "Słucham…",
-    "dismissAlert": "Zamknij powiadomienie"
+    "dismissAlert": "Zamknij powiadomienie",
+    "justNow": "Właśnie teraz",
+    "minutesAgo": "{count} min temu",
+    "hoursAgo": "{count} godz. temu",
+    "yesterday": "Wczoraj",
+    "daysAgo": "{count} dni temu"
   },
   "dashboard": {
     "title": "Pulpit Portfela",
@@ -92,6 +99,20 @@
       "timelineDelayDesc": "Projekt Beta ma 2 tygodnie opóźnienia",
       "resourceConflictTitle": "Konflikt zasobów",
       "resourceConflictDesc": "Członek zespołu przypisany do wielu projektów"
+    },
+    "schedulesTitle": "Harmonogramy",
+    "openLink": "Otwórz",
+    "activeSchedules": "Aktywne harmonogramy",
+    "milestonesDueIn14Days": "{count} kamień milowy w 14 dni",
+    "changeOrdersTitle": "Zamówienia zmiany",
+    "projectsAvailableForChangeOrders": {
+      "one": "1 projekt dostępny do zamówień zmiany",
+      "other": "{count} projektów dostępnych do zamówień zmiany"
+    },
+    "projectControlsTitle": "Kontrola projektu",
+    "projectsForControls": {
+      "one": "1 projekt do kontroli",
+      "other": "{count} projektów do kontroli"
     }
   },
   "guidedTour": {
@@ -129,7 +150,9 @@
     "importProjects": "Importuj projekty"
   },
   "projects": {
-    "recentProjects": "Ostatnie Projekty"
+    "recentProjects": "Ostatnie Projekty",
+    "title": "Projekty",
+    "pageDescription": "Zarządzaj projektami i zatwierdzeniami workflow"
   },
   "settings": {
     "title": "Ustawienia",
@@ -170,6 +193,25 @@
     "budgetMethod": "Obliczanie wydajności budżetu",
     "resourceMethod": "Obliczanie efektywności zasobów",
     "dashboardLayout": "Układ pulpitu",
+    "successRateHealth": "Na podstawie zdrowia (% projektów zielonych)",
+    "successRateCompletion": "Na podstawie ukończenia (% projektów ukończonych)",
+    "successRateHealthDesc": "Oblicza sukces jako odsetek projektów ze statusem zdrowia „zielony”",
+    "successRateCompletionDesc": "Oblicza sukces jako odsetek projektów oznaczonych jako ukończone",
+    "budgetSpent": "Wydane/Razem (wykorzystanie budżetu)",
+    "budgetRemaining": "Pozostałe (dostępny budżet)",
+    "budgetSpentDesc": "Pokazuje procent wydanego budżetu od całości",
+    "budgetRemainingDesc": "Pokazuje procent budżetu pozostałego do wykorzystania",
+    "resourceAuto": "Oblicz automatycznie z danych projektu",
+    "resourceFixed": "Stała wartość zastępcza",
+    "resourceAutoDesc": "Automatycznie oblicza efektywność zasobów z danych projektu i zespołu",
+    "resourceFixedDesc": "Używa stałej wartości zastępczej do czasu dostępności rzeczywistych danych",
+    "layoutGrid": "Siatka",
+    "layoutMasonry": "Masonry",
+    "layoutList": "Lista",
+    "pushNotifications": "Powiadomienia push",
+    "pushNotificationsEnableDesc": "Włącz powiadomienia, aby być na bieżąco ze zmianami w projektach",
+    "pushNotificationsReceiveDesc": "Otrzymuj powiadomienia o ważnych aktualizacjach projektów",
+    "pushNotificationsNotSupported": "Powiadomienia push nie są obsługiwane w tej przeglądarce.",
     "aiFeatures": "Funkcje AI",
     "aiPrivacyInfo": "AI pomaga pracować wydajniej. Twoje dane są przetwarzane bezpiecznie.",
     "aiSuggestions": "Sugestie AI",
@@ -436,6 +478,14 @@
     "commitments": "Zobowiązania",
     "actuals": "Rzeczywiste",
     "spendRate": "Stopa Wydatków",
+    "savedViews": "Zapisane widoki",
+    "refreshAll": "Odśwież wszystko",
+    "refreshing": "Odświeżanie...",
+    "actualsData": "Dane rzeczywiste",
+    "commitmentsData": "Dane zobowiązań",
+    "showingRecords": "Wyświetlanie {start}-{end} z {total} rekordów",
+    "filtered": "przefiltrowane",
+    "filteredCount": "({count} przefiltrowanych)",
     "onTrack": "Na Dobrej Drodze",
     "showingProjects": "Pokazywanie {shown} z {total} projektów",
     "noDetailedData": "Brak szczegółowych danych",
@@ -587,7 +637,53 @@
     "send": "Wyślij",
     "pmrMode": "Tryb PMR",
     "pmrModeActive": "Tryb PMR Aktywny",
-    "pmrModeInactive": "Tryb PMR Nieaktywny"
+    "pmrModeInactive": "Tryb PMR Nieaktywny",
+    "welcomeMessage": "Cześć! Jestem asystentem AI do zarządzania portfelem projektów. Mogę pomóc w analizie projektów, zasobów, budżetów, ryzyk i tworzeniu raportów. O co chciałbyś zapytać?",
+    "confidence": "Pewność:",
+    "sources": "Źródła:",
+    "tryAsking": "Spróbuj zapytać:",
+    "suggestion1": "Jaki jest aktualny status wszystkich projektów?",
+    "suggestion2": "Które zasoby są przeciążone?",
+    "suggestion3": "Pokaż wykorzystanie budżetu we wszystkich projektach",
+    "suggestion4": "Utwórz raport oceny ryzyka",
+    "suggestion5": "Które umiejętności są najbardziej poszukiwane?",
+    "pmrSuggestion1": "Zaktualizuj podsumowanie wykonawcze o ostatni status projektu",
+    "pmrSuggestion2": "Generuj analizy wariancji budżetu",
+    "pmrSuggestion3": "Analizuj trendy wydajności harmonogramu",
+    "pmrSuggestion4": "Zaproponuj ulepszenia sekcji ryzyk",
+    "pmrSuggestion5": "Dodaj wykres wykorzystania zasobów"
+  },
+  "projectControlsPage": {
+    "title": "Kontrola projektu",
+    "subtitle": "ETC, EAC, Wartość wypracowana i analityka wydajności",
+    "projectLabel": "Projekt",
+    "selectProject": "Wybierz projekt..."
+  },
+  "schedules": {
+    "title": "Harmonogramy",
+    "pageDescription": "Zarządzaj harmonogramami projektów, zadaniami i zależnościami.",
+    "searchPlaceholder": "Szukaj harmonogramów...",
+    "allStatuses": "Wszystkie statusy",
+    "allProjects": "Wszystkie projekty",
+    "newSchedule": "Nowy harmonogram",
+    "noSchedulesFound": "Nie znaleziono harmonogramów.",
+    "createOneToGetStarted": "Utwórz pierwszy, aby rozpocząć.",
+    "loadingSchedules": "Ładowanie harmonogramów...",
+    "filterByStatus": "Filtruj według statusu",
+    "filterByProject": "Filtruj według projektu",
+    "statusActive": "Aktywny",
+    "statusDraft": "Szkic",
+    "statusCompleted": "Zakończony",
+    "selectProject": "Wybierz projekt",
+    "projectLabel": "Projekt",
+    "nameLabel": "Nazwa",
+    "scheduleName": "Nazwa harmonogramu",
+    "descriptionOptional": "Opis (opcjonalnie)",
+    "startDate": "Data rozpoczęcia",
+    "endDate": "Data zakończenia",
+    "creating": "Tworzenie...",
+    "create": "Utwórz",
+    "createScheduleTitle": "Utwórz harmonogram"
   },
   "scenarios": {
     "title": "Scenariusze",
@@ -1208,6 +1304,28 @@
     "loadingTimeline": "Ładowanie osi czasu...",
     "noEventsToDisplay": "Brak zdarzeń do wyświetlenia"
   },
+  "adminDashboard": {
+    "title": "Panel administracyjny",
+    "subtitle": "Administracja i zarządzanie systemem",
+    "userManagementTitle": "Zarządzanie użytkownikami",
+    "userManagementDesc": "Zarządzaj użytkownikami, rolami i uprawnieniami",
+    "performanceTitle": "Wydajność",
+    "performanceDesc": "Monitoruj wydajność systemu i metryki",
+    "navigationStatsTitle": "Statystyki nawigacji",
+    "navigationStatsDesc": "Przeglądaj analitykę i statystyki nawigacji",
+    "featureCatalogTitle": "Katalog funkcji",
+    "featureCatalogDesc": "Zarządzaj przeglądem funkcji i zrzutami ekranu",
+    "featureTogglesTitle": "Przełączniki funkcji",
+    "featureTogglesDesc": "Włączaj lub wyłączaj funkcje globalnie lub per organizacja",
+    "helpChatAnalyticsTitle": "Analityka czatu pomocy",
+    "helpChatAnalyticsDesc": "Przeglądaj użycie czatu pomocy, satysfakcję i popularne zapytania",
+    "organisationsTitle": "Organizacje",
+    "organisationsDesc": "Zarządzaj tenantami i organizacjami (Super-Admin)",
+    "workflowBuilderTitle": "Konstruktor workflow",
+    "workflowBuilderDesc": "Edytor workflow no-code (kroki, krawędzie, zapisz jako szkic)",
+    "ssoTitle": "SSO",
+    "ssoDesc": "Konfiguruj dostawców logowania jednokrotnego (Google, Microsoft, Okta, Azure AD)"
+  },
   "adminPerformance": {
     "title": "Panel Wydajności",
     "subtitle": "Monitorowanie i optymalizacja wydajności API",
@@ -1367,6 +1485,23 @@
     }
   },
   "changes": {
+    "title": "Zarządzanie zmianami",
+    "pageDescription": "Zarządzaj wnioskami o zmiany, zatwierdzeniami i śledzeniem wdrożeń projektów.",
+    "changeOrders": "Zamówienia zmiany",
+    "changeOrderIntegration": {
+      "title": "Zamówienia zmiany",
+      "description": "Zarządzaj formalnymi zamówieniami zmiany z wpływem na koszty i workflow zatwierdzeń per projekt.",
+      "openChangeOrders": "Otwórz zamówienia zmiany"
+    },
+    "newChangeRequest": "Nowy wniosek o zmianę",
+    "filters": "Filtry",
+    "searchPlaceholder": "Szukaj wniosków o zmianę...",
+    "showingCount": "Wyświetlanie {shown} z {total} wniosków o zmianę",
+    "previous": "Poprzednia",
+    "next": "Następna",
+    "noChangeRequests": "Brak wniosków o zmianę",
+    "getStartedByCreating": "Utwórz nowy wniosek o zmianę, aby rozpocząć.",
+    "loadingChangeRequests": "Ładowanie wniosków o zmianę...",
     "implementationTracker": {
       "title": "Implementation Tracking",
       "changeRequest": "Change Request",

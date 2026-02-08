@@ -140,6 +140,7 @@ class Permission(str, Enum):
 DEFAULT_ROLE_PERMISSIONS = {
     UserRole.admin: [
         # Full access to everything
+        Permission.admin_read,
         Permission.portfolio_create, Permission.portfolio_read, Permission.portfolio_update, Permission.portfolio_delete,
         Permission.project_create, Permission.project_read, Permission.project_update, Permission.project_delete,
         Permission.resource_create, Permission.resource_read, Permission.resource_update, Permission.resource_delete, Permission.resource_allocate,
@@ -312,11 +313,13 @@ class RoleBasedAccessControl:
             
             # Collect all permissions from all roles
             all_permissions = set()
+            role_names = set()
             for assignment in response.data:
-                role_data = assignment.get("roles", {})
+                role_data = assignment.get("roles", {}) or {}
+                role_name = (role_data.get("name") or "").strip().lower()
+                if role_name:
+                    role_names.add(role_name)
                 role_permissions = role_data.get("permissions", [])
-                
-                # Convert string permissions to Permission enum
                 for perm_str in role_permissions:
                     try:
                         permission = Permission(perm_str)
@@ -324,7 +327,9 @@ class RoleBasedAccessControl:
                     except ValueError:
                         print(f"Warning: Invalid permission '{perm_str}' found in role")
                         continue
-            
+            # Ensure admin/super_admin roles always have admin_read (e.g. Performance Dashboard)
+            if role_names & {"admin", "super_admin"}:
+                all_permissions.add(Permission.admin_read)
             permissions = list(all_permissions)
             self._update_cache(cache_key, permissions)
             return permissions

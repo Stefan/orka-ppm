@@ -52,6 +52,8 @@
     "switchThemeSystem": "Passer au thème système",
     "switchThemeLight": "Passer au mode clair",
     "notifications": "Notifications",
+    "noNotifications": "Aucune nouvelle notification",
+    "markAllAsRead": "Tout marquer comme lu",
     "userMenu": "Menu utilisateur",
     "searchPlaceholder": "Rechercher projets, fonctions, docs…",
     "searching": "Recherche…",
@@ -60,7 +62,12 @@
     "searchAria": "Rechercher",
     "voiceSearch": "Recherche vocale",
     "listening": "Écoute…",
-    "dismissAlert": "Fermer l'alerte"
+    "dismissAlert": "Fermer l'alerte",
+    "justNow": "À l'instant",
+    "minutesAgo": "il y a {count} min",
+    "hoursAgo": "il y a {count} h",
+    "yesterday": "Hier",
+    "daysAgo": "il y a {count} j"
   },
   "dashboard": {
     "title": "Tableau de bord du portefeuille",
@@ -92,6 +99,20 @@
       "timelineDelayDesc": "Le projet Beta a 2 semaines de retard",
       "resourceConflictTitle": "Conflit de ressources",
       "resourceConflictDesc": "Membre affecté à plusieurs projets"
+    },
+    "schedulesTitle": "Plannings",
+    "openLink": "Ouvrir",
+    "activeSchedules": "Plannings actifs",
+    "milestonesDueIn14Days": "{count} jalon(s) à échéance sous 14 jours",
+    "changeOrdersTitle": "Ordres de modification",
+    "projectsAvailableForChangeOrders": {
+      "one": "1 projet disponible pour ordres de modification",
+      "other": "{count} projets disponibles pour ordres de modification"
+    },
+    "projectControlsTitle": "Contrôle de projet",
+    "projectsForControls": {
+      "one": "1 projet pour contrôles",
+      "other": "{count} projets pour contrôles"
     }
   },
   "guidedTour": {
@@ -129,7 +150,9 @@
     "importProjects": "Importer des projets"
   },
   "projects": {
-    "recentProjects": "Projets récents"
+    "recentProjects": "Projets récents",
+    "title": "Projets",
+    "pageDescription": "Gérez vos projets et les approbations de flux"
   },
   "settings": {
     "title": "Paramètres",
@@ -170,6 +193,25 @@
     "budgetMethod": "Calcul de la performance budgétaire",
     "resourceMethod": "Calcul de l'efficacité des ressources",
     "dashboardLayout": "Disposition du tableau de bord",
+    "successRateHealth": "Basé sur la santé (% de projets verts)",
+    "successRateCompletion": "Basé sur l'achèvement (% de projets terminés)",
+    "successRateHealthDesc": "Calcule le succès comme le pourcentage de projets avec statut santé « vert »",
+    "successRateCompletionDesc": "Calcule le succès comme le pourcentage de projets marqués comme terminés",
+    "budgetSpent": "Dépensé/Total (utilisation du budget)",
+    "budgetRemaining": "Restant (budget disponible)",
+    "budgetSpentDesc": "Affiche le pourcentage du budget total qui a été dépensé",
+    "budgetRemainingDesc": "Affiche le pourcentage du budget total restant disponible",
+    "resourceAuto": "Calcul automatique à partir des données projet",
+    "resourceFixed": "Valeur de substitution fixe",
+    "resourceAutoDesc": "Calcule automatiquement l'efficacité des ressources à partir des données projet et équipe",
+    "resourceFixedDesc": "Utilise une valeur de substitution fixe jusqu'à ce que les données réelles soient disponibles",
+    "layoutGrid": "Grille",
+    "layoutMasonry": "Masonry",
+    "layoutList": "Liste",
+    "pushNotifications": "Notifications push",
+    "pushNotificationsEnableDesc": "Activer les notifications pour rester informé des changements projet",
+    "pushNotificationsReceiveDesc": "Recevoir des notifications pour les mises à jour projet importantes",
+    "pushNotificationsNotSupported": "Les notifications push ne sont pas prises en charge dans ce navigateur.",
     "aiFeatures": "Fonctionnalités IA",
     "aiPrivacyInfo": "L'IA vous aide à travailler plus efficacement. Vos données sont traitées de manière sécurisée.",
     "aiSuggestions": "Suggestions IA",
@@ -440,6 +482,14 @@
     "commitments": "Engagements",
     "actuals": "Réels",
     "spendRate": "Taux de dépense",
+    "savedViews": "Vues enregistrées",
+    "refreshAll": "Tout actualiser",
+    "refreshing": "Actualisation...",
+    "actualsData": "Données réelles",
+    "commitmentsData": "Données d'engagements",
+    "showingRecords": "Affichage de {start}-{end} sur {total} enregistrements",
+    "filtered": "filtré",
+    "filteredCount": "({count} filtré(s))",
     "onTrack": "Sur la bonne voie",
     "showingProjects": "Affichage de {shown} sur {total} projets",
     "noDetailedData": "Aucune donnée détaillée disponible",
@@ -486,7 +536,27 @@
     "monthlyCostTrends": "Tendances des Coûts Mensuels",
     "previousMonth": "Mois Précédent",
     "currentMonth": "Mois Actuel",
-    "projectEfficiencyAnalysis": "Analyse de l'Efficacité des Projets"
+    "projectEfficiencyAnalysis": "Analyse de l'Efficacité des Projets",
+    "columns": {
+      "fiDocNo": "N° doc. FI",
+      "postingDate": "Date de comptabilisation",
+      "documentDate": "Date du document",
+      "vendor": "Fournisseur",
+      "vendorDescription": "Description fournisseur",
+      "projectNr": "N° projet",
+      "wbsElement": "Élément WBS",
+      "amount": "Montant",
+      "currency": "Devise",
+      "itemText": "Texte d'article",
+      "documentType": "Type de document",
+      "poNumber": "N° bon de commande",
+      "line": "Ligne",
+      "poDate": "Date de commande",
+      "netAmount": "Montant net",
+      "totalAmount": "Montant total",
+      "status": "Statut",
+      "deliveryDate": "Date de livraison"
+    }
   },
   "resources": {
     "title": "Gestion des ressources",
@@ -591,7 +661,53 @@
     "send": "Envoyer",
     "pmrMode": "Mode PMR",
     "pmrModeActive": "Mode PMR actif",
-    "pmrModeInactive": "Mode PMR inactif"
+    "pmrModeInactive": "Mode PMR inactif",
+    "welcomeMessage": "Bonjour ! Je suis votre assistant IA pour la gestion de portefeuille de projets. Je peux vous aider à analyser les projets, ressources, budgets, risques et créer des rapports personnalisés. Que souhaitez-vous savoir ?",
+    "confidence": "Confiance :",
+    "sources": "Sources :",
+    "tryAsking": "Essayez de demander :",
+    "suggestion1": "Quel est l'état actuel de tous les projets ?",
+    "suggestion2": "Quelles ressources sont surchargées ?",
+    "suggestion3": "Affichez l'utilisation du budget de tous les projets",
+    "suggestion4": "Créer un rapport d'évaluation des risques",
+    "suggestion5": "Quelles compétences sont les plus demandées ?",
+    "pmrSuggestion1": "Mettre à jour le résumé avec le dernier état du projet",
+    "pmrSuggestion2": "Générer des analyses de variance budgétaire",
+    "pmrSuggestion3": "Analyser les tendances de performance du planning",
+    "pmrSuggestion4": "Suggérer des améliorations pour la section risques",
+    "pmrSuggestion5": "Ajouter un graphique d'utilisation des ressources"
+  },
+  "projectControlsPage": {
+    "title": "Contrôle de projet",
+    "subtitle": "ETC, EAC, Valeur acquise et analytique de performance",
+    "projectLabel": "Projet",
+    "selectProject": "Sélectionner un projet..."
+  },
+  "schedules": {
+    "title": "Plannings",
+    "pageDescription": "Gérez les plannings, tâches et dépendances des projets.",
+    "searchPlaceholder": "Rechercher des plannings...",
+    "allStatuses": "Tous les statuts",
+    "allProjects": "Tous les projets",
+    "newSchedule": "Nouveau planning",
+    "noSchedulesFound": "Aucun planning trouvé.",
+    "createOneToGetStarted": "Créez-en un pour commencer.",
+    "loadingSchedules": "Chargement des plannings...",
+    "filterByStatus": "Filtrer par statut",
+    "filterByProject": "Filtrer par projet",
+    "statusActive": "Actif",
+    "statusDraft": "Brouillon",
+    "statusCompleted": "Terminé",
+    "selectProject": "Sélectionner un projet",
+    "projectLabel": "Projet",
+    "nameLabel": "Nom",
+    "scheduleName": "Nom du planning",
+    "descriptionOptional": "Description (optionnel)",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "creating": "Création...",
+    "create": "Créer",
+    "createScheduleTitle": "Créer un planning"
   },
   "scenarios": {
     "title": "Scénarios",
@@ -1212,6 +1328,28 @@
     "loadingTimeline": "Chargement de la chronologie...",
     "noEventsToDisplay": "Aucun événement à afficher"
   },
+  "adminDashboard": {
+    "title": "Tableau de bord Admin",
+    "subtitle": "Administration et gestion du système",
+    "userManagementTitle": "Gestion des utilisateurs",
+    "userManagementDesc": "Gérer utilisateurs, rôles et permissions",
+    "performanceTitle": "Performance",
+    "performanceDesc": "Surveiller les performances système et les métriques",
+    "navigationStatsTitle": "Statistiques de navigation",
+    "navigationStatsDesc": "Voir les analyses et statistiques de navigation",
+    "featureCatalogTitle": "Catalogue de fonctionnalités",
+    "featureCatalogDesc": "Gérer la vue d'ensemble des fonctionnalités et captures d'écran",
+    "featureTogglesTitle": "Interrupteurs de fonctionnalités",
+    "featureTogglesDesc": "Activer ou désactiver des fonctionnalités globalement ou par organisation",
+    "helpChatAnalyticsTitle": "Analytiques du chat d'aide",
+    "helpChatAnalyticsDesc": "Voir l'utilisation du chat d'aide, la satisfaction et les requêtes principales",
+    "organisationsTitle": "Organisations",
+    "organisationsDesc": "Gérer les tenants et organisations (Super-Admin)",
+    "workflowBuilderTitle": "Constructeur de workflows",
+    "workflowBuilderDesc": "Éditeur de workflows no-code (étapes, arêtes, enregistrer en brouillon)",
+    "ssoTitle": "SSO",
+    "ssoDesc": "Configurer les fournisseurs d'authentification unique (Google, Microsoft, Okta, Azure AD)"
+  },
   "adminPerformance": {
     "title": "Tableau de Bord des Performances",
     "subtitle": "Surveillance et optimisation des performances de l'API",
@@ -1371,6 +1509,23 @@
     }
   },
   "changes": {
+    "title": "Gestion des changements",
+    "pageDescription": "Gérer les demandes de changement, approbations et suivi de mise en œuvre des projets.",
+    "changeOrders": "Ordres de modification",
+    "changeOrderIntegration": {
+      "title": "Ordres de modification",
+      "description": "Gérer les ordres de modification formels avec impact coût et workflows d'approbation par projet.",
+      "openChangeOrders": "Ouvrir les ordres de modification"
+    },
+    "newChangeRequest": "Nouvelle demande de changement",
+    "filters": "Filtres",
+    "searchPlaceholder": "Rechercher des demandes de changement...",
+    "showingCount": "Affichage de {shown} sur {total} demandes de changement",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "noChangeRequests": "Aucune demande de changement",
+    "getStartedByCreating": "Commencez par créer une nouvelle demande de changement.",
+    "loadingChangeRequests": "Chargement des demandes de changement...",
     "implementationTracker": {
       "title": "Implementation Tracking",
       "changeRequest": "Change Request",

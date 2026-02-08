@@ -15,6 +15,7 @@ import {
   AlertCircle,
   FileText
 } from 'lucide-react'
+import { useTranslations } from '@/lib/i18n/context'
 import ChangeRequestForm from './ChangeRequestForm'
 import { ChangeRequest, mockDataService } from '../lib/mockData'
 import { useAsyncData, LoadingState, SkeletonTable } from '../lib/loadingStates'
@@ -91,6 +92,7 @@ const PRIORITY_LEVELS = [
 
 export default function ChangeRequestManager() {
   const router = useRouter()
+  const { t } = useTranslations()
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [showFilters, setShowFilters] = useState(false)
   const [showCreateForm, setShowCreateForm] = useState(false)
@@ -235,7 +237,7 @@ export default function ChangeRequestManager() {
   return (
     <LoadingState
       state={isLoading ? 'loading' : isError ? 'error' : 'success'}
-      message="Loading change requests..."
+      message={t('changes.loadingChangeRequests')}
       {...(error && { error })}
       fallback={<SkeletonTable rows={5} columns={6} />}
     >
@@ -248,7 +250,7 @@ export default function ChangeRequestManager() {
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shrink-0"
           >
             <Plus className="h-4 w-4 shrink-0" />
-            <span className="whitespace-nowrap">New Change Request</span>
+            <span className="whitespace-nowrap">{t('changes.newChangeRequest')}</span>
           </button>
           
           {selectedItems.size > 0 && (
@@ -278,7 +280,7 @@ export default function ChangeRequestManager() {
             className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 whitespace-nowrap"
           >
             <Filter className="h-4 w-4" />
-            Filters
+            {t('changes.filters')}
           </button>
         </div>
       </div>
@@ -289,7 +291,7 @@ export default function ChangeRequestManager() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
           <input
             type="text"
-            placeholder="Search change requests..."
+            placeholder={t('changes.searchPlaceholder')}
             value={filters.search}
             onChange={(e) => handleFilterChange('search', e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -538,9 +540,9 @@ export default function ChangeRequestManager() {
         {filteredChangeRequests.length === 0 && (
           <div className="text-center py-12">
             <FileText className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-slate-100">No change requests</h3>
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-slate-100">{t('changes.noChangeRequests')}</h3>
             <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
-              Get started by creating a new change request.
+              {t('changes.getStartedByCreating')}
             </p>
             <div className="mt-6">
               <button
@@ -548,7 +550,7 @@ export default function ChangeRequestManager() {
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 mx-auto"
               >
                 <Plus className="h-4 w-4" />
-                New Change Request
+                {t('changes.newChangeRequest')}
               </button>
             </div>
           </div>
@@ -559,15 +561,15 @@ export default function ChangeRequestManager() {
       {filteredChangeRequests.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
           <div className="text-sm text-gray-700 dark:text-slate-300 min-w-0">
-            Showing {filteredChangeRequests.length} of {changeRequests?.length || 0} change requests
+            {t('changes.showingCount', { shown: filteredChangeRequests.length, total: changeRequests?.length || 0 })}
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button className="px-3 py-1 border border-gray-300 dark:border-slate-600 rounded hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 disabled:opacity-50">
-              Previous
+              {t('changes.previous')}
             </button>
             <span className="px-3 py-1 bg-blue-600 text-white rounded">1</span>
             <button className="px-3 py-1 border border-gray-300 dark:border-slate-600 rounded hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 disabled:opacity-50">
-              Next
+              {t('changes.next')}
             </button>
           </div>
         </div>

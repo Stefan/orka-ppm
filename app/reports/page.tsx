@@ -107,7 +107,7 @@ export default function Reports() {
     {
       id: '1',
       type: 'assistant',
-      content: 'Hallo! Ich bin Ihr KI-Assistent für Projekt-Portfolio-Management. Ich kann Ihnen bei der Analyse von Projekten, Ressourcen, Budgets, Risiken helfen und benutzerdefinierte Berichte erstellen. Was möchten Sie wissen?',
+      content: '',
       timestamp: new Date(),
       confidence: 1.0
     }
@@ -772,7 +772,7 @@ export default function Reports() {
                         : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700'
                     }`}
                   >
-                    <div className="whitespace-pre-wrap break-words text-sm sm:text-base text-gray-900 dark:text-slate-100">{message.content}</div>
+                    <div className="whitespace-pre-wrap break-words text-sm sm:text-base text-gray-900 dark:text-slate-100">{(message.id === '1' && message.type === 'assistant') ? t('reports.welcomeMessage') : message.content}</div>
                     
                     {/* AI Agent Visualizations */}
                     {message.optimizerResults && (
@@ -842,13 +842,13 @@ export default function Reports() {
                       <div className="mt-3 pt-3 border-t border-gray-100 dark:border-slate-700">
                         {message.confidence !== undefined && (
                           <div className="flex items-center space-x-2 text-xs mb-2">
-                            <span className="text-gray-700 dark:text-slate-300">Confidence:</span>
+                            <span className="text-gray-700 dark:text-slate-300">{t('reports.confidence')}</span>
                             <ConfidenceBadge confidence={message.confidence} />
                           </div>
                         )}
                         {message.sources && message.sources.length > 0 && (
                           <div className="mt-2">
-                            <span className="text-xs text-gray-700 dark:text-slate-300">Sources:</span>
+                            <span className="text-xs text-gray-700 dark:text-slate-300">{t('reports.sources')}</span>
                             <div className="flex flex-wrap gap-1 mt-1">
                               {message.sources.map((source, index) => (
                                 <span
@@ -921,20 +921,20 @@ export default function Reports() {
         
         {/* Quick Examples */}
         <div className="mt-4">
-          <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">Versuchen Sie zu fragen:</p>
+          <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">{t('reports.tryAsking')}</p>
           <div className="flex flex-wrap gap-2">
             {(isPMRMode ? [
-              "Update executive summary with latest project status",
-              "Generate budget variance insights",
-              "Analyze schedule performance trends",
-              "Suggest improvements for risk section",
-              "Add resource utilization chart"
+              t('reports.pmrSuggestion1'),
+              t('reports.pmrSuggestion2'),
+              t('reports.pmrSuggestion3'),
+              t('reports.pmrSuggestion4'),
+              t('reports.pmrSuggestion5')
             ] : [
-              "Wie ist der aktuelle Status aller Projekte?",
-              "Welche Ressourcen sind überbelastet?",
-              "Zeige mir die Budgetnutzung aller Projekte",
-              "Erstelle einen Risikobewertungsbericht",
-              "Welche Fähigkeiten sind am meisten gefragt?"
+              t('reports.suggestion1'),
+              t('reports.suggestion2'),
+              t('reports.suggestion3'),
+              t('reports.suggestion4'),
+              t('reports.suggestion5')
             ]).map((example, index) => (
               <button
                 key={index}
