@@ -11,6 +11,13 @@ import type { AuditEvent } from '@/components/audit/Timeline'
 
 jest.mock('@/lib/i18n/context', () => ({
   useTranslations: () => ({ t: (key: string) => key }),
+  useI18n: () => ({
+    locale: 'en',
+    localeFormat: { dateLocale: 'en-US', timeZone: undefined },
+    setLocale: () => {},
+    t: (key: string) => key,
+    isLoading: false,
+  }),
 }))
 
 jest.mock('recharts', () => ({

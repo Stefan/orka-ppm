@@ -564,9 +564,9 @@ export default function Risks() {
 
   if (loading) return (
     <AppLayout>
-      <div className="p-8 space-y-6">
-        {/* Header Skeleton */}
-        <div className="animate-pulse">
+      <div data-testid="risks-page" className="p-8 space-y-6">
+        {/* Header Skeleton - same testid as loaded header for e2e/visual regression */}
+        <div data-testid="risks-header" className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
           <div className="h-4 bg-gray-200 rounded w-1/4"></div>
         </div>

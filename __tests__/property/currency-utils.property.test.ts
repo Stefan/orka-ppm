@@ -208,14 +208,20 @@ describe('Currency Utils - Property Tests', () => {
   // ============================================
   describe('Currency Utility Functions', () => {
     describe('getAllCurrencies', () => {
-      it('should return all 5 supported currencies', () => {
+      it('should return all supported currencies', () => {
         const currencies = getAllCurrencies()
-        expect(currencies).toHaveLength(5)
+        expect(currencies).toHaveLength(11)
         expect(currencies).toContain(Currency.USD)
         expect(currencies).toContain(Currency.EUR)
         expect(currencies).toContain(Currency.GBP)
         expect(currencies).toContain(Currency.CHF)
         expect(currencies).toContain(Currency.JPY)
+        expect(currencies).toContain(Currency.PLN)
+        expect(currencies).toContain(Currency.MXN)
+        expect(currencies).toContain(Currency.CNY)
+        expect(currencies).toContain(Currency.INR)
+        expect(currencies).toContain(Currency.KRW)
+        expect(currencies).toContain(Currency.VND)
       })
     })
 
