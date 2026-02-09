@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { changeOrdersApi, type ChangeOrder, type ChangeOrderCreate } from '@/lib/change-orders-api'
+import { projectControlsApi } from '@/lib/project-controls-api'
+import type { WorkPackage } from '@/types/project-controls'
 
 const CATEGORIES = [
   { value: 'owner_directed', label: 'Owner Directed' },
@@ -36,6 +38,7 @@ interface LineItem {
   contingency_percentage: number
   cost_category: string
   is_add: boolean
+  work_package_id?: string | null
 }
 
 interface ChangeOrderWizardProps {
@@ -55,6 +58,7 @@ const emptyLineItem: LineItem = {
   contingency_percentage: 0,
   cost_category: 'labor',
   is_add: true,
+  work_package_id: null,
 }
 
 export default function ChangeOrderWizard({
@@ -81,6 +85,13 @@ export default function ChangeOrderWizard({
   })
 
   const [lineItems, setLineItems] = useState<LineItem[]>([{ ...emptyLineItem }])
+  const [workPackages, setWorkPackages] = useState<WorkPackage[]>([])
+
+  useEffect(() => {
+    projectControlsApi.listWorkPackages(projectId, false).then((data) => {
+      setWorkPackages(Array.isArray(data) ? (data as WorkPackage[]) : [])
+    }).catch(() => setWorkPackages([]))
+  }, [projectId])
 
   const addLineItem = () => {
     setLineItems((prev) => [...prev, { ...emptyLineItem }])
@@ -136,6 +147,7 @@ export default function ChangeOrderWizard({
             contingency_percentage: li.contingency_percentage,
             cost_category: li.cost_category,
             is_add: li.is_add,
+            work_package_id: li.work_package_id ?? null,
           })),
       }
       const order = await changeOrdersApi.create(payload)
@@ -309,6 +321,19 @@ export default function ChangeOrderWizard({
                       onChange={(e) => updateLineItem(idx, 'description', e.target.value)}
                       className="w-full px-2 py-1 text-sm border rounded"
                     />
+                    <div className="flex gap-2 items-center">
+                      <label className="text-sm text-gray-600 dark:text-slate-400 whitespace-nowrap">Work package</label>
+                      <select
+                        value={li.work_package_id ?? ''}
+                        onChange={(e) => updateLineItem(idx, 'work_package_id', e.target.value || null)}
+                        className="text-sm border rounded px-2 py-1 flex-1"
+                      >
+                        <option value="">— None —</option>
+                        {workPackages.map((wp) => (
+                          <option key={wp.id} value={wp.id}>{wp.name}</option>
+                        ))}
+                      </select>
+                    </div>
                     <div className="grid grid-cols-4 gap-2">
                       <input
                         type="text"

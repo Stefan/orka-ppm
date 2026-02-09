@@ -10,6 +10,7 @@ jest.mock('@/lib/change-orders-api', () => ({
   changeOrdersApi: {
     getWorkflowStatus: jest.fn().mockResolvedValue(null),
     getPendingApprovals: jest.fn().mockResolvedValue([]),
+    getAIRecommendations: jest.fn().mockResolvedValue({ recommendations: [] }),
   },
 }))
 

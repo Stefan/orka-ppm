@@ -36,10 +36,10 @@ const NAV_ITEMS = [
   // Overview
   { href: '/dashboards', label: 'Portfolio Dashboards', icon: LayoutDashboard, group: 'Overview' },
 
-  // Projects & Resources
-  { href: '/projects', label: 'All Projects', icon: GitBranch, group: 'Projects' },
-  { href: '/portfolios', label: 'Portfolios', icon: FolderOpen, group: 'Projects' },
-  { href: '/resources', label: 'Resource Management', icon: Users, group: 'Projects' },
+  // Portfolios & Projekte (PPM-Hierarchie; Programme sind auf der Portfolios-Seite integriert)
+  { href: '/portfolios', label: 'Portfolios', icon: FolderOpen, group: 'Portfolios & Projekte' },
+  { href: '/projects', label: 'All Projects', icon: GitBranch, group: 'Portfolios & Projekte' },
+  { href: '/resources', label: 'Resource Management', icon: Users, group: 'Portfolios & Projekte' },
 
   // Financial Management
   { href: '/financials', label: 'Budget & Cost Tracking', icon: DollarSign, group: 'Financials' },

@@ -1523,6 +1523,13 @@ async def get_my_workflow_instances(
 
     Requirements: 7.2, 7.4
     """
+    # #region agent log
+    import json, time
+    _t0 = time.perf_counter()
+    try:
+        with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "workflows.py:my-workflows:entry", "message": "my_workflows_start", "data": {}, "hypothesisId": "A"}) + "\n")
+    except Exception: pass
+    # #endregion
     user_id_raw = current_user.get("user_id") or current_user.get("id")
     if not user_id_raw:
         return {"workflows": []}
@@ -1535,7 +1542,13 @@ async def get_my_workflow_instances(
     if cache:
         cached = await cache.get(cache_key)
         if cached is not None:
+            try:
+                with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "workflows.py:my-workflows:exit", "message": "my_workflows_cache_hit", "data": {"total_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "C"}) + "\n")
+            except Exception: pass
             return cached
+    try:
+        with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "workflows.py:my-workflows:cache_miss", "message": "my_workflows_cache_miss", "data": {"elapsed_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "C"}) + "\n")
+    except Exception: pass
     try:
         engine = get_workflow_engine()
         instances = await engine.repository.list_workflow_instances(
@@ -1543,9 +1556,15 @@ async def get_my_workflow_instances(
             limit=100,
             offset=0
         )
+        try:
+            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "workflows.py:my-workflows:after_db", "message": "my_workflows_after_list", "data": {"elapsed_ms": round((time.perf_counter()-_t0)*1000), "count": len(instances)}, "hypothesisId": "A"}) + "\n")
+        except Exception: pass
         result = {"workflows": instances}
         if cache:
             await cache.set(cache_key, result, ttl=MY_WORKFLOWS_CACHE_TTL)
+        try:
+            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "workflows.py:my-workflows:exit", "message": "my_workflows_done", "data": {"total_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "A"}) + "\n")
+        except Exception: pass
         return result
     except HTTPException:
         raise

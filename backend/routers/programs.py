@@ -2,10 +2,12 @@
 Program management endpoints (Portfolio > Program > Project).
 """
 
+import hashlib
 import logging
+import time
 from fastapi import APIRouter, HTTPException, Depends, Query
 from uuid import UUID
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Tuple
 
 from auth.rbac import require_permission, Permission
 from config.database import supabase, service_supabase
@@ -192,6 +194,12 @@ async def delete_program(
 # --- AI suggest: thematic grouping ---
 from pydantic import BaseModel as PydanticBase
 
+# In-memory cache for suggest results (same portfolio + project set) to avoid repeated slow OpenAI calls.
+_SUGGEST_CACHE: dict[str, Tuple[list, float]] = {}
+_SUGGEST_CACHE_TTL_SEC = 60
+_SUGGEST_CACHE_MAX_ENTRIES = 50
+OPENAI_SUGGEST_TIMEOUT_SEC = 8
+
 
 class SuggestRequest(PydanticBase):
     portfolio_id: UUID
@@ -218,7 +226,25 @@ def _heuristic_group_projects(projects: List[dict]) -> List[dict]:
     return [{"program_name": k, "project_ids": v} for k, v in groups.items()]
 
 
-async def _ai_group_projects(projects: List[dict], openai_available: bool) -> List[dict]:
+def _suggest_cache_key(portfolio_id: str, project_ids: List[str]) -> str:
+    ids = sorted(project_ids) if project_ids else []
+    raw = f"{portfolio_id}:{','.join(ids)}"
+    return hashlib.sha256(raw.encode()).hexdigest()
+
+
+def _suggest_cache_evict_if_needed():
+    if len(_SUGGEST_CACHE) <= _SUGGEST_CACHE_MAX_ENTRIES:
+        return
+    now = time.time()
+    expired = [k for k, (_, exp) in _SUGGEST_CACHE.items() if exp <= now]
+    for k in expired:
+        _SUGGEST_CACHE.pop(k, None)
+    if len(_SUGGEST_CACHE) > _SUGGEST_CACHE_MAX_ENTRIES:
+        for k in list(_SUGGEST_CACHE.keys())[:_SUGGEST_CACHE_MAX_ENTRIES // 2]:
+            _SUGGEST_CACHE.pop(k, None)
+
+
+async def _ai_group_projects(projects: List[dict], openai_available: bool, timeout_sec: float = OPENAI_SUGGEST_TIMEOUT_SEC) -> List[dict]:
     """Use OpenAI to suggest thematic groups if available; else heuristic."""
     if not openai_available or not projects:
         return _heuristic_group_projects(projects)
@@ -228,7 +254,11 @@ async def _ai_group_projects(projects: List[dict], openai_available: bool) -> Li
             from openai import AsyncOpenAI
         except ImportError:
             return _heuristic_group_projects(projects)
-        client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY, base_url=settings.OPENAI_BASE_URL or None)
+        client = AsyncOpenAI(
+            api_key=settings.OPENAI_API_KEY,
+            base_url=settings.OPENAI_BASE_URL or None,
+            timeout=timeout_sec,
+        )
         names_descs = [
             f"- {p.get('name', '')}: {p.get('description', '') or 'no description'}"
             for p in projects[:50]
@@ -274,19 +304,37 @@ async def suggest_programs(
     """Suggest thematic program groupings for projects in a portfolio (AI or heuristic)."""
     db = _db()
     try:
-        query = db.table("projects").select("id, name, description").eq("portfolio_id", str(payload.portfolio_id))
+        t0 = time.perf_counter()
+        query = db.table("projects").select("id, name, description").eq("portfolio_id", str(payload.portfolio_id)).limit(100)
         if payload.project_ids:
             query = query.in_("id", [str(x) for x in payload.project_ids])
         r = query.execute()
         projects = list(r.data or [])
         for p in projects:
             p["id"] = str(p["id"])
+        db_ms = (time.perf_counter() - t0) * 1000
+
+        cache_key = _suggest_cache_key(str(payload.portfolio_id), [p["id"] for p in projects])
+        now = time.time()
+        if cache_key in _SUGGEST_CACHE:
+            cached, exp = _SUGGEST_CACHE[cache_key]
+            if exp > now:
+                logger.info("programs/suggest cache hit, db_ms=%.0f", db_ms)
+                return SuggestResponse(suggestions=cached)
+            _SUGGEST_CACHE.pop(cache_key, None)
+        _suggest_cache_evict_if_needed()
+
         from config.settings import settings
         openai_ok = bool(getattr(settings, "OPENAI_API_KEY", None))
+        ai_start = time.perf_counter()
         suggestions = await _ai_group_projects(projects, openai_ok)
-        return SuggestResponse(
-            suggestions=[SuggestGroup(program_name=s["program_name"], project_ids=[str(x) for x in s["project_ids"]]) for s in suggestions]
-        )
+        ai_ms = (time.perf_counter() - ai_start) * 1000
+        total_ms = (time.perf_counter() - t0) * 1000
+        logger.info("programs/suggest db_ms=%.0f ai_ms=%.0f total_ms=%.0f", db_ms, ai_ms, total_ms)
+
+        out = [SuggestGroup(program_name=s["program_name"], project_ids=[str(x) for x in s["project_ids"]]) for s in suggestions]
+        _SUGGEST_CACHE[cache_key] = (out, now + _SUGGEST_CACHE_TTL_SEC)
+        return SuggestResponse(suggestions=out)
     except HTTPException:
         raise
     except Exception as e:

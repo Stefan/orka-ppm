@@ -1590,6 +1590,21 @@
       "description": "Gérer les ordres de modification formels avec impact coût et workflows d'approbation par projet.",
       "openChangeOrders": "Ouvrir les ordres de modification"
     },
+    "changeOrdersDashboard": {
+      "title": "Ordres de modification",
+      "subtitle": "Gestion formelle des ordres de modification pour {{projectName}}",
+      "newChangeOrder": "Nouvel ordre de modification",
+      "total": "Total",
+      "approved": "Approuvé",
+      "rejected": "Rejeté",
+      "totalCostImpact": "Impact coût total",
+      "tabList": "Ordres de modification",
+      "tabAnalytics": "Analytiques",
+      "searchPlaceholder": "Rechercher par titre ou numéro...",
+      "allStatuses": "Tous les statuts",
+      "noChangeOrders": "Aucun ordre de modification. Créez-en un pour commencer.",
+      "loadError": "Impossible de charger les ordres de modification"
+    },
     "newChangeRequest": "Nouvelle demande de changement",
     "filters": "Filtres",
     "searchPlaceholder": "Rechercher des demandes de changement...",

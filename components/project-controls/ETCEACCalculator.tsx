@@ -18,27 +18,32 @@ const EAC_OPTIONS = [
 
 interface ETCEACCalculatorProps {
   projectId: string
+  onSwitchToWorkPackages?: () => void
 }
 
-export default function ETCEACCalculator({ projectId }: ETCEACCalculatorProps) {
+export default function ETCEACCalculator({ projectId, onSwitchToWorkPackages }: ETCEACCalculatorProps) {
   const [etcMethod, setEtcMethod] = useState('bottom_up')
   const [eacMethod, setEacMethod] = useState('current_performance')
   const [etc, setEtc] = useState<Record<string, unknown> | null>(null)
   const [eac, setEac] = useState<Record<string, unknown> | null>(null)
+  const [summary, setSummary] = useState<{ work_package_count: number } | null>(null)
   const [loading, setLoading] = useState(false)
 
   const load = async () => {
     setLoading(true)
     try {
-      const [e1, e2] = await Promise.all([
+      const [e1, e2, s] = await Promise.all([
         projectControlsApi.getETC(projectId, etcMethod),
         projectControlsApi.getEAC(projectId, eacMethod),
+        etcMethod === 'bottom_up' ? projectControlsApi.getWorkPackageSummary(projectId).catch(() => null) : Promise.resolve(null),
       ])
       setEtc(e1)
       setEac(e2)
+      setSummary(s ? { work_package_count: s.work_package_count } : null)
     } catch (e) {
       setEtc(null)
       setEac(null)
+      setSummary(null)
     } finally {
       setLoading(false)
     }
@@ -66,6 +71,14 @@ export default function ETCEACCalculator({ projectId }: ETCEACCalculatorProps) {
             <div className="mt-2 p-2 bg-gray-50 dark:bg-slate-800/50 rounded">
               <p className="font-medium">ETC: ${(etc.result_value as number)?.toLocaleString() ?? '-'}</p>
               <p className="text-xs text-gray-500 dark:text-slate-400">Confidence: {((etc.confidence_level as number) ?? 0) * 100}%</p>
+              {etcMethod === 'bottom_up' && summary != null && onSwitchToWorkPackages && (
+                <p className="text-xs mt-1">
+                  Based on {summary.work_package_count} work package{summary.work_package_count !== 1 ? 's' : ''}.{' '}
+                  <button type="button" onClick={onSwitchToWorkPackages} className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                    Manage work packages
+                  </button>
+                </p>
+              )}
             </div>
           ) : (
             <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">No data</p>

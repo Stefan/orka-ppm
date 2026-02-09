@@ -829,6 +829,13 @@ async def get_commitments(
     Get imported commitments data with pagination. Response cached (TTL 60s).
     Default count_exact=false to avoid slow COUNT; pass count_exact=true only for first page when you need exact total.
     """
+    # #region agent log
+    import json, time
+    _t0 = time.perf_counter()
+    try:
+        with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:commitments:entry", "message": "commitments_start", "data": {"limit": limit}, "hypothesisId": "A"}) + "\n")
+    except Exception: pass
+    # #endregion
     try:
         org_id = (current_user.get("organization_id") or current_user.get("tenant_id") or "default")
         if isinstance(org_id, UUID):
@@ -838,7 +845,17 @@ async def get_commitments(
         if cache:
             data = await cache.get(cache_key)
             if data is not None:
+                # #region agent log
+                try:
+                    with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:commitments:exit", "message": "commitments_cache_hit", "data": {"total_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "C"}) + "\n")
+                except Exception: pass
+                # #endregion
                 return data
+        # #region agent log
+        try:
+            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:commitments:after_cache", "message": "commitments_cache_miss", "data": {"elapsed_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "C"}) + "\n")
+        except Exception: pass
+        # #endregion
         db_client = service_supabase if service_supabase else supabase
         if db_client is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
@@ -850,6 +867,11 @@ async def get_commitments(
             query = query.eq("project_nr", project_nr)
         query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
         response = query.execute()
+        # #region agent log
+        try:
+            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:commitments:after_db", "message": "commitments_after_db", "data": {"elapsed_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "A"}) + "\n")
+        except Exception: pass
+        # #endregion
         data_list = response.data or []
         if count_exact and hasattr(response, "count") and response.count is not None:
             total = response.count
@@ -866,6 +888,11 @@ async def get_commitments(
         }
         if cache:
             await cache.set(cache_key, result, ttl=COMMITMENTS_CACHE_TTL)
+        # #region agent log
+        try:
+            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:commitments:exit", "message": "commitments_done", "data": {"total_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "A"}) + "\n")
+        except Exception: pass
+        # #endregion
         return result
     except Exception as e:
         print(f"Get commitments error: {e}")
@@ -897,6 +924,13 @@ async def get_actuals(
     Get imported actuals data with pagination. Response cached (TTL 60s).
     Default count_exact=false to avoid slow COUNT; pass count_exact=true only for first page when you need exact total.
     """
+    # #region agent log
+    import json, time
+    _t0 = time.perf_counter()
+    try:
+        with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:actuals:entry", "message": "actuals_start", "data": {"limit": limit}, "hypothesisId": "A"}) + "\n")
+    except Exception: pass
+    # #endregion
     try:
         org_id = (current_user.get("organization_id") or current_user.get("tenant_id") or "default")
         if isinstance(org_id, UUID):
@@ -906,7 +940,13 @@ async def get_actuals(
         if cache:
             data = await cache.get(cache_key)
             if data is not None:
+                try:
+                    with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:actuals:exit", "message": "actuals_cache_hit", "data": {"total_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "C"}) + "\n")
+                except Exception: pass
                 return data
+        try:
+            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:actuals:after_cache", "message": "actuals_cache_miss", "data": {"elapsed_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "C"}) + "\n")
+        except Exception: pass
         db_client = service_supabase if service_supabase else supabase
         if db_client is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
@@ -918,6 +958,9 @@ async def get_actuals(
             query = query.eq("project_nr", project_nr)
         query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
         response = query.execute()
+        try:
+            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:actuals:after_db", "message": "actuals_after_db", "data": {"elapsed_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "A"}) + "\n")
+        except Exception: pass
         data_list = response.data or []
         if count_exact and hasattr(response, "count") and response.count is not None:
             total = response.count
@@ -934,6 +977,9 @@ async def get_actuals(
         }
         if cache:
             await cache.set(cache_key, result, ttl=ACTUALS_CACHE_TTL)
+        try:
+            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:actuals:exit", "message": "actuals_done", "data": {"total_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "A"}) + "\n")
+        except Exception: pass
         return result
     except Exception as e:
         print(f"Get actuals error: {e}")

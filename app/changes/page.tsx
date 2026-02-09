@@ -24,13 +24,21 @@ export default function ChangesPage() {
                   {t('changes.pageDescription')}
                 </p>
               </div>
-              <Link
-                href="/changes/orders"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 self-start"
-              >
-                <FileText className="w-4 h-4" />
-                {t('changes.changeOrders')}
-              </Link>
+              <div className="flex flex-wrap gap-2 self-start">
+                <Link
+                  href="/changes/pending"
+                  className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700"
+                >
+                  My Pending Approvals
+                </Link>
+                <Link
+                  href="/changes/orders"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                >
+                  <FileText className="w-4 h-4" />
+                  {t('changes.changeOrders')}
+                </Link>
+              </div>
             </div>
           </div>
           <div className="mb-6">

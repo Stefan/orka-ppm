@@ -212,10 +212,17 @@ class WorkPackageResponse(BaseResponse):
     is_active: bool
 
 class WorkPackageUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    budget: Optional[float] = Field(default=None, ge=0)
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
     percent_complete: Optional[float] = Field(default=None, ge=0.0, le=100.0)
     actual_cost: Optional[float] = Field(default=None, ge=0)
-    description: Optional[str] = None
-    end_date: Optional[date] = None
+    earned_value: Optional[float] = Field(default=None, ge=0)
+    responsible_manager: Optional[UUID] = None
+    parent_package_id: Optional[UUID] = None
+    is_active: Optional[bool] = None
 
 # Performance Prediction Models
 class PerformancePredictionCreate(BaseModel):

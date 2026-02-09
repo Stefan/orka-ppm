@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { changeOrdersApi } from '@/lib/change-orders-api'
 import WorkflowProgress from './WorkflowProgress'
 import ApprovalActions from './ApprovalActions'
+import { Sparkles } from 'lucide-react'
 
 interface ApprovalWorkflowTrackerProps {
   changeOrderId: string
@@ -22,21 +23,24 @@ export default function ApprovalWorkflowTracker({
     is_complete: boolean
   } | null>(null)
   const [pendingApproval, setPendingApproval] = useState<{ id: string } | null>(null)
+  const [aiRecommendations, setAiRecommendations] = useState<Array<{ text: string; type: string }>>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const load = async () => {
       setLoading(true)
       try {
-        const [status, pending] = await Promise.all([
+        const [status, pending, recs] = await Promise.all([
           changeOrdersApi.getWorkflowStatus(changeOrderId).catch(() => null),
           changeOrdersApi.getPendingApprovals(currentUserId).catch(() => []),
+          changeOrdersApi.getAIRecommendations(changeOrderId, true).catch(() => ({ recommendations: [] })),
         ])
         setWorkflow(status)
         const mine = Array.isArray(pending)
           ? pending.find((p: { change_order_id: string }) => p.change_order_id === changeOrderId)
           : null
         setPendingApproval(mine ? { id: (mine as { id: string }).id } : null)
+        setAiRecommendations(recs.recommendations || [])
       } finally {
         setLoading(false)
       }
@@ -44,16 +48,29 @@ export default function ApprovalWorkflowTracker({
     load()
   }, [changeOrderId, currentUserId])
 
-  const handleApprove = async (id: string, comments?: string) => {
-    await changeOrdersApi.approve(id, comments)
+  const handleApprove = async (id: string, payload?: { comments?: string; conditions?: string[] }) => {
+    await changeOrdersApi.approve(id, payload)
     onStatusChange?.()
     setPendingApproval(null)
+    const [status] = await Promise.all([
+      changeOrdersApi.getWorkflowStatus(changeOrderId).catch(() => null),
+    ])
+    if (status) setWorkflow(status)
   }
 
-  const handleReject = async (id: string, comments: string) => {
-    await changeOrdersApi.reject(id, comments)
+  const handleReject = async (id: string, payload: { comments: string; conditions?: string[] }) => {
+    await changeOrdersApi.reject(id, payload)
     onStatusChange?.()
     setPendingApproval(null)
+    const status = await changeOrdersApi.getWorkflowStatus(changeOrderId).catch(() => null)
+    if (status) setWorkflow(status)
+  }
+
+  const handleDelegate = async (id: string, delegateToUserId: string) => {
+    await changeOrdersApi.delegate(id, delegateToUserId)
+    setPendingApproval(null)
+    const status = await changeOrdersApi.getWorkflowStatus(changeOrderId).catch(() => null)
+    if (status) setWorkflow(status)
   }
 
   if (loading) {
@@ -74,6 +91,19 @@ export default function ApprovalWorkflowTracker({
 
   return (
     <div className="space-y-4">
+      {aiRecommendations.length > 0 && (
+        <div className="p-3 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-900/20">
+          <h4 className="text-sm font-medium text-indigo-800 dark:text-indigo-200 mb-2 flex items-center gap-2">
+            <Sparkles className="w-4 h-4" />
+            AI recommendations (hints only)
+          </h4>
+          <ul className="text-xs space-y-1 list-disc list-inside text-indigo-700 dark:text-indigo-300">
+            {aiRecommendations.map((r, i) => (
+              <li key={i}>{r.text}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       <WorkflowProgress
         approvalLevels={workflow.approval_levels}
         isComplete={workflow.is_complete}
@@ -85,6 +115,7 @@ export default function ApprovalWorkflowTracker({
             approvalId={pendingApproval.id}
             onApprove={handleApprove}
             onReject={handleReject}
+            onDelegate={handleDelegate}
             onComplete={onStatusChange}
           />
         </div>

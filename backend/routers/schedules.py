@@ -135,12 +135,25 @@ async def get_schedule_notifications(
     current_user: dict = Depends(get_current_user),
 ):
     """Get milestone deadline alerts and task assignment notifications (Task 13.2)."""
+    # #region agent log
+    import json, time
+    _t0 = time.perf_counter()
+    try:
+        with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "schedules.py:notifications:entry", "message": "schedule_notifications_start", "data": {}, "hypothesisId": "D"}) + "\n")
+    except Exception: pass
+    # #endregion
     try:
         uid = current_user.get("user_id") or current_user.get("id")
         user_id = UUID(uid) if uid else None
-        return await schedule_notifications_service.get_schedule_notifications(
+        out = await schedule_notifications_service.get_schedule_notifications(
             user_id=user_id, schedule_id=schedule_id, days_ahead=days_ahead
         )
+        # #region agent log
+        try:
+            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "schedules.py:notifications:exit", "message": "schedule_notifications_done", "data": {"total_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "D"}) + "\n")
+        except Exception: pass
+        # #endregion
+        return out
     except Exception as e:
         logger.error(f"Error getting notifications: {e}")
         raise HTTPException(status_code=500, detail="Failed to get notifications")

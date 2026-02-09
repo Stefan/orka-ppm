@@ -63,6 +63,7 @@ from routers.change.change_analytics import router as change_analytics_router
 from routers.project_controls import router as project_controls_router
 from routers.forecasts import router as forecasts_router
 from routers.earned_value import router as earned_value_router
+from routers.work_packages import router as work_packages_router
 from routers.performance_analytics import router as performance_analytics_router
 from routers.search import router as search_router
 from routers.distribution import router as distribution_router
@@ -255,6 +256,7 @@ app.include_router(change_analytics_router)
 app.include_router(project_controls_router)
 app.include_router(forecasts_router)
 app.include_router(earned_value_router)
+app.include_router(work_packages_router)
 app.include_router(performance_analytics_router)
 app.include_router(search_router)
 app.include_router(distribution_router)

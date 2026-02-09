@@ -19,14 +19,21 @@ from models.change_orders import (
     CostImpactAnalysisResponse,
     CostScenarioRequest,
     CostScenarioResponse,
+    AIEstimateRequest,
+    AIEstimateResponse,
 )
 from services.change_order_manager_service import ChangeOrderManagerService
 from services.cost_impact_analyzer_service import CostImpactAnalyzerService
+from services.change_order_ai_impact_service import ChangeOrderAIImpactService
+from services.change_order_approval_workflow_service import ChangeOrderApprovalWorkflowService
+from models.change_orders import ApprovalWorkflowConfig
 
 router = APIRouter(prefix="/change-orders", tags=["Change Orders"])
 
 change_order_manager = ChangeOrderManagerService()
 cost_analyzer = CostImpactAnalyzerService()
+ai_impact_service = ChangeOrderAIImpactService()
+approval_workflow_service = ChangeOrderApprovalWorkflowService()
 
 
 @router.post("/", response_model=ChangeOrderResponse)
@@ -43,6 +50,15 @@ async def create_change_order(
         raise HTTPException(status_code=400, detail=str(e))
     except RuntimeError as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/ai-estimate", response_model=AIEstimateResponse)
+async def ai_estimate_cost_impact(
+    request: AIEstimateRequest,
+    current_user=Depends(require_permission(Permission.change_read)),
+):
+    """AI-assisted cost impact estimation from description and line items (rule-based)."""
+    return ai_impact_service.estimate_cost_impact(request)
 
 
 @router.get("/{project_id}", response_model=List[ChangeOrderResponse])
@@ -92,9 +108,32 @@ async def submit_change_order(
     change_order_id: UUID,
     current_user=Depends(require_permission(Permission.change_update)),
 ):
-    """Submit change order for approval."""
+    """Submit change order for approval: sets submitted, initiates workflow, sets under_review."""
     try:
         result = change_order_manager.submit_change_order(change_order_id)
+        if not result:
+            raise HTTPException(status_code=404, detail="Change order not found")
+        approval_workflow_service.initiate_workflow(change_order_id, ApprovalWorkflowConfig())
+        result = change_order_manager.update_change_order_status(change_order_id, "under_review")
+        if not result:
+            raise HTTPException(status_code=500, detail="Failed to set under_review")
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.put("/{change_order_id}/status", response_model=ChangeOrderResponse)
+async def update_change_order_status(
+    change_order_id: UUID,
+    body: dict,
+    current_user=Depends(require_permission(Permission.change_update)),
+):
+    """Explicit status transition (validated). Body: { \"status\": \"under_review\" }."""
+    new_status = body.get("status")
+    if not new_status or not isinstance(new_status, str):
+        raise HTTPException(status_code=400, detail="Body must contain status")
+    try:
+        result = change_order_manager.update_change_order_status(change_order_id, new_status)
         if not result:
             raise HTTPException(status_code=404, detail="Change order not found")
         return result

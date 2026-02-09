@@ -4,6 +4,9 @@ interface Level {
   level: number
   role: string
   status: string
+  approval_date?: string
+  comments?: string | null
+  conditions?: string[] | unknown
 }
 
 interface WorkflowProgressProps {
@@ -17,23 +20,36 @@ export default function WorkflowProgress({ approvalLevels, isComplete }: Workflo
   return (
     <div className="space-y-2">
       <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300">Approval Progress</h4>
-      <div className="flex flex-wrap gap-2">
+      <div className="space-y-2">
         {approvalLevels.map((lvl) => (
           <div
             key={lvl.level}
-            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm ${
+            className={`rounded-lg border p-3 text-sm ${
               lvl.status === 'approved'
-                ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+                ? 'border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/20'
                 : lvl.status === 'rejected'
-                ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
+                ? 'border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/20'
                 : lvl.status === 'pending'
-                ? 'bg-amber-100 text-amber-800'
-                : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200'
+                ? 'border-amber-200 dark:border-amber-800 bg-amber-50/50'
+                : 'border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50'
             }`}
           >
-            <span className="font-medium">L{lvl.level}</span>
-            <span className="capitalize">{lvl.role.replace(/_/g, ' ')}</span>
-            <span className="text-xs">({lvl.status})</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-medium">L{lvl.level}</span>
+              <span className="capitalize">{lvl.role.replace(/_/g, ' ')}</span>
+              <span className="text-xs opacity-80">({lvl.status})</span>
+              {lvl.approval_date && (
+                <span className="text-xs text-gray-600 dark:text-slate-400">
+                  {new Date(lvl.approval_date).toLocaleString()}
+                </span>
+              )}
+            </div>
+            {lvl.comments && (
+              <p className="mt-1 text-xs text-gray-600 dark:text-slate-400">Comments: {lvl.comments}</p>
+            )}
+            {Array.isArray(lvl.conditions) && lvl.conditions.length > 0 && (
+              <p className="mt-1 text-xs text-gray-600 dark:text-slate-400">Conditions: {lvl.conditions.join(', ')}</p>
+            )}
           </div>
         ))}
       </div>

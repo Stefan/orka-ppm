@@ -12,6 +12,7 @@ import {
   ChevronRight,
 } from 'lucide-react'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
+import { useTranslations } from '@/lib/i18n/context'
 import { changeOrdersApi, type ChangeOrder, type ChangeOrderCreate } from '@/lib/change-orders-api'
 import ChangeOrderWizard from './ChangeOrderWizard'
 import CostImpactCalculator from './CostImpactCalculator'
@@ -38,6 +39,7 @@ export default function ChangeOrdersDashboard({
   projectId,
   projectName = 'Project',
 }: ChangeOrdersDashboardProps) {
+  const { t } = useTranslations()
   const [changeOrders, setChangeOrders] = useState<ChangeOrder[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -63,7 +65,7 @@ export default function ChangeOrdersDashboard({
       setChangeOrders(orders)
       if (dash) setDashboard(dash)
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load change orders')
+      setError(e instanceof Error ? e.message : t('changes.changeOrdersDashboard.loadError'))
     } finally {
       setLoading(false)
     }
@@ -95,9 +97,9 @@ export default function ChangeOrdersDashboard({
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Change Orders</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">{t('changes.changeOrdersDashboard.title')}</h1>
               <p className="text-gray-600 dark:text-slate-400 mt-1">
-                Formal change order management for {projectName}
+                {t('changes.changeOrdersDashboard.subtitle', { projectName })}
               </p>
             </div>
             <button
@@ -105,7 +107,7 @@ export default function ChangeOrdersDashboard({
               className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
             >
               <Plus className="w-4 h-4" />
-              New Change Order
+              {t('changes.changeOrdersDashboard.newChangeOrder')}
             </button>
           </div>
 
@@ -114,28 +116,28 @@ export default function ChangeOrdersDashboard({
               <div className="bg-white dark:bg-slate-800 rounded-lg border p-4">
                 <div className="flex items-center gap-2 text-gray-600 dark:text-slate-400">
                   <FileText className="w-4 h-4" />
-                  <span className="text-sm font-medium">Total</span>
+                  <span className="text-sm font-medium">{t('changes.changeOrdersDashboard.total')}</span>
                 </div>
                 <p className="text-2xl font-bold mt-1">{summary.total_change_orders ?? 0}</p>
               </div>
               <div className="bg-white dark:bg-slate-800 rounded-lg border p-4">
                 <div className="flex items-center gap-2 text-gray-600 dark:text-slate-400">
                   <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
-                  <span className="text-sm font-medium">Approved</span>
+                  <span className="text-sm font-medium">{t('changes.changeOrdersDashboard.approved')}</span>
                 </div>
                 <p className="text-2xl font-bold mt-1">{summary.approved_change_orders ?? 0}</p>
               </div>
               <div className="bg-white dark:bg-slate-800 rounded-lg border p-4">
                 <div className="flex items-center gap-2 text-gray-600 dark:text-slate-400">
                   <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-                  <span className="text-sm font-medium">Rejected</span>
+                  <span className="text-sm font-medium">{t('changes.changeOrdersDashboard.rejected')}</span>
                 </div>
                 <p className="text-2xl font-bold mt-1">{summary.rejected_change_orders ?? 0}</p>
               </div>
               <div className="bg-white dark:bg-slate-800 rounded-lg border p-4">
                 <div className="flex items-center gap-2 text-gray-600 dark:text-slate-400">
                   <DollarSign className="w-4 h-4" />
-                  <span className="text-sm font-medium">Total Cost Impact</span>
+                  <span className="text-sm font-medium">{t('changes.changeOrdersDashboard.totalCostImpact')}</span>
                 </div>
                 <p className="text-2xl font-bold mt-1">
                   ${(summary.total_cost_impact ?? 0).toLocaleString()}
@@ -149,14 +151,14 @@ export default function ChangeOrdersDashboard({
               onClick={() => setActiveTab('list')}
               className={`px-4 py-2 -mb-px ${activeTab === 'list' ? 'border-b-2 border-indigo-600 font-medium' : 'text-gray-600 dark:text-slate-400'}`}
             >
-              Change Orders
+              {t('changes.changeOrdersDashboard.tabList')}
             </button>
             <button
               onClick={() => setActiveTab('analytics')}
               className={`flex items-center gap-1 px-4 py-2 -mb-px ${activeTab === 'analytics' ? 'border-b-2 border-indigo-600 font-medium' : 'text-gray-600 dark:text-slate-400'}`}
             >
               <BarChart3 className="w-4 h-4" />
-              Analytics
+              {t('changes.changeOrdersDashboard.tabAnalytics')}
             </button>
           </div>
 
@@ -169,7 +171,7 @@ export default function ChangeOrdersDashboard({
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500" />
               <input
                 type="text"
-                placeholder="Search by title or number..."
+                placeholder={t('changes.changeOrdersDashboard.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border rounded-lg"
@@ -180,7 +182,7 @@ export default function ChangeOrdersDashboard({
               onChange={(e) => setFilterStatus(e.target.value)}
               className="px-4 py-2 border rounded-lg"
             >
-              <option value="">All Statuses</option>
+              <option value="">{t('changes.changeOrdersDashboard.allStatuses')}</option>
               <option value="draft">Draft</option>
               <option value="submitted">Submitted</option>
               <option value="under_review">Under Review</option>
@@ -202,7 +204,7 @@ export default function ChangeOrdersDashboard({
             <div className="bg-white dark:bg-slate-800 rounded-lg border overflow-hidden">
               {filteredOrders.length === 0 ? (
                 <div className="py-12 text-center text-gray-500 dark:text-slate-400">
-                  No change orders found. Create one to get started.
+                  {t('changes.changeOrdersDashboard.noChangeOrders')}
                 </div>
               ) : (
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">

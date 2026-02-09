@@ -81,6 +81,7 @@ export interface ChangeOrderLineItem {
   change_order_id: string
   line_number: number
   description: string
+  work_package_id?: string | null
   trade_category: string
   unit_of_measure: string
   quantity: number
@@ -114,6 +115,7 @@ export interface ChangeOrderCreate {
     contingency_percentage?: number
     cost_category: string
     is_add?: boolean
+    work_package_id?: string | null
   }>
 }
 
@@ -140,6 +142,7 @@ export interface PendingApproval {
   change_order_title: string
   approval_level: number
   proposed_cost_impact: number
+  due_date?: string | null
 }
 
 export const changeOrdersApi = {
@@ -186,20 +189,49 @@ export const changeOrdersApi = {
     fetchWithAuth(`/change-approvals/workflow/${changeOrderId}`, { method: 'POST' }) as Promise<unknown>,
   getPendingApprovals: (userId: string) =>
     fetchWithAuth(`/change-approvals/pending/${userId}`) as Promise<PendingApproval[]>,
-  approve: (approvalId: string, comments?: string) =>
+  approve: (approvalId: string, payload?: { comments?: string; conditions?: string[] }) =>
     fetchWithAuth(`/change-approvals/approve/${approvalId}`, {
       method: 'POST',
-      body: JSON.stringify({ comments }),
+      body: JSON.stringify(payload ?? {}),
     }) as Promise<unknown>,
-  reject: (approvalId: string, comments: string) =>
+  reject: (approvalId: string, payload: { comments: string; conditions?: string[] }) =>
     fetchWithAuth(`/change-approvals/reject/${approvalId}`, {
       method: 'POST',
-      body: JSON.stringify({ comments }),
+      body: JSON.stringify(payload),
+    }) as Promise<unknown>,
+  delegate: (approvalId: string, delegateToUserId: string) =>
+    fetchWithAuth(`/change-approvals/delegate/${approvalId}`, {
+      method: 'POST',
+      body: JSON.stringify({ delegate_to_user_id: delegateToUserId }),
     }) as Promise<unknown>,
   getWorkflowStatus: (changeOrderId: string) =>
     fetchWithAuth(`/change-approvals/workflow-status/${changeOrderId}`) as Promise<{
       status: string
       approval_levels: Array<{ level: number; role: string; status: string }>
       is_complete: boolean
+    }>,
+  /** AI-assisted cost impact estimate from description and line items (rule-based). */
+  aiEstimate: (body: {
+    description: string
+    line_items?: Array<{ description?: string; quantity: number; unit_rate: number; cost_category?: string }>
+    change_category?: string
+  }) =>
+    fetchWithAuth(`/change-orders/ai-estimate`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }) as Promise<{
+      estimated_min: number
+      estimated_max: number
+      confidence: number
+      method: string
+      notes?: string[]
+    }>,
+  /** AI approval recommendations (hints only). */
+  getAIRecommendations: (changeOrderId: string, includeVarianceAudit: boolean = true) =>
+    fetchWithAuth(
+      `/change-approvals/change-orders/${changeOrderId}/ai-recommendations?include_variance_audit=${includeVarianceAudit}`
+    ) as Promise<{
+      recommendations: Array<{ text: string; type: string }>
+      variance_audit_context?: Record<string, unknown>
     }>,
 }

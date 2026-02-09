@@ -316,7 +316,7 @@ function AdminHierarchyContent() {
             <button type="button" onClick={() => setModal('program')} className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm text-white hover:bg-emerald-700">
               <Plus className="h-4 w-4" /> Program
             </button>
-            <button type="button" onClick={() => setModal('project')} className="inline-flex items-center gap-1 rounded-lg bg-amber-600 px-3 py-1.5 text-sm text-white hover:bg-amber-700">
+            <button type="button" onClick={() => setModal('project')} className="inline-flex items-center gap-1 rounded-lg bg-amber-700 px-3 py-1.5 text-sm text-white hover:bg-amber-800">
               <Plus className="h-4 w-4" /> Project
             </button>
           </div>
@@ -517,7 +517,7 @@ function NewProjectModal({
         <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-gray-900 dark:text-slate-100 mb-4" placeholder="Project name" />
         <div className="flex justify-end gap-2">
           <button type="button" onClick={onClose} className="rounded-lg border border-gray-300 dark:border-slate-600 px-4 py-2 text-sm">Cancel</button>
-          <button type="button" onClick={handle} disabled={submitting || !name.trim() || !portfolioId} className="rounded-lg bg-amber-600 px-4 py-2 text-sm text-white disabled:opacity-50">{submitting ? <Loader2 className="h-4 w-4 animate-spin inline" /> : null} Create</button>
+          <button type="button" onClick={handle} disabled={submitting || !name.trim() || !portfolioId} className="rounded-lg bg-amber-700 px-4 py-2 text-sm text-white hover:bg-amber-800 disabled:opacity-50">{submitting ? <Loader2 className="h-4 w-4 animate-spin inline" /> : null} Create</button>
         </div>
       </div>
     </div>

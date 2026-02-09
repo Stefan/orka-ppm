@@ -1789,6 +1789,21 @@
       "description": "Manage formal change orders with cost impact and approval workflows per project.",
       "openChangeOrders": "Open Change Orders"
     },
+    "changeOrdersDashboard": {
+      "title": "Change Orders",
+      "subtitle": "Formal change order management for {{projectName}}",
+      "newChangeOrder": "New Change Order",
+      "total": "Total",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "totalCostImpact": "Total Cost Impact",
+      "tabList": "Change Orders",
+      "tabAnalytics": "Analytics",
+      "searchPlaceholder": "Search by title or number...",
+      "allStatuses": "All Statuses",
+      "noChangeOrders": "No change orders found. Create one to get started.",
+      "loadError": "Failed to load change orders"
+    },
     "newChangeRequest": "New Change Request",
     "filters": "Filters",
     "searchPlaceholder": "Search change requests...",

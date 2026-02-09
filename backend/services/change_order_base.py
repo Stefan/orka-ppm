@@ -15,6 +15,7 @@ from models.change_orders import (
     ChangeOrderResponse,
     ChangeOrderStatus,
 )
+from workflow_validation import validate_status_transition
 
 
 def _to_response(record: Dict[str, Any]) -> ChangeOrderResponse:
@@ -61,15 +62,4 @@ def calculate_line_item_costs(item: ChangeOrderLineItemCreate) -> Dict[str, floa
     }
 
 
-def validate_status_transition(current: str, new: str) -> bool:
-    """Validate status transition per workflow: draft -> submitted -> under_review -> approved/rejected -> implemented."""
-    valid_transitions = {
-        "draft": ["submitted"],
-        "submitted": ["under_review", "rejected"],
-        "under_review": ["approved", "rejected"],
-        "approved": ["implemented"],
-        "rejected": [],
-        "implemented": [],
-    }
-    allowed = valid_transitions.get(current, [])
-    return new in allowed
+# validate_status_transition from workflow_validation (single source of truth for R1.2, R1.3)

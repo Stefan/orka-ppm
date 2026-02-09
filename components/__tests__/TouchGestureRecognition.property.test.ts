@@ -231,9 +231,14 @@ describe('Touch Gesture Recognition System - Property Tests', () => {
 
             // Use more lenient comparison for floating point precision
             const tolerance = 0.01
-            
-            // Scale should be approximately 1 if distances are approximately equal
-            if (Math.abs(finalDistance - initialDistance) < tolerance) {
+            const minMeaningfulDistance = 0.1
+
+            // Scale should be approximately 1 if distances are approximately equal (only when both are in a meaningful range to avoid tiny-number ratio instability)
+            if (
+              initialDistance >= minMeaningfulDistance &&
+              finalDistance >= minMeaningfulDistance &&
+              Math.abs(finalDistance - initialDistance) < tolerance
+            ) {
               expect(scale).toBeCloseTo(1, 1) // Less strict precision
             }
 

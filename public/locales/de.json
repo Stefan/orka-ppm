@@ -1785,6 +1785,21 @@
       "description": "Formale Änderungsanordnungen mit Kostenauswirkung und Freigabe-Workflows pro Projekt verwalten.",
       "openChangeOrders": "Änderungsanordnungen öffnen"
     },
+    "changeOrdersDashboard": {
+      "title": "Änderungsanordnungen",
+      "subtitle": "Formales Änderungsanordnungs-Management für {{projectName}}",
+      "newChangeOrder": "Neue Änderungsanordnung",
+      "total": "Gesamt",
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt",
+      "totalCostImpact": "Gesamtkostenauswirkung",
+      "tabList": "Änderungsanordnungen",
+      "tabAnalytics": "Auswertung",
+      "searchPlaceholder": "Nach Titel oder Nummer suchen...",
+      "allStatuses": "Alle Status",
+      "noChangeOrders": "Keine Änderungsanordnungen. Erstellen Sie eine, um zu starten.",
+      "loadError": "Änderungsanordnungen konnten nicht geladen werden"
+    },
     "newChangeRequest": "Neue Änderungsanfrage",
     "filters": "Filter",
     "searchPlaceholder": "Änderungsanfragen suchen...",

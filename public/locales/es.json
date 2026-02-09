@@ -1591,6 +1591,21 @@
       "description": "Gestione órdenes de cambio formales con impacto en costes y flujos de aprobación por proyecto.",
       "openChangeOrders": "Abrir órdenes de cambio"
     },
+    "changeOrdersDashboard": {
+      "title": "Órdenes de cambio",
+      "subtitle": "Gestión formal de órdenes de cambio para {{projectName}}",
+      "newChangeOrder": "Nueva orden de cambio",
+      "total": "Total",
+      "approved": "Aprobado",
+      "rejected": "Rechazado",
+      "totalCostImpact": "Impacto en costes total",
+      "tabList": "Órdenes de cambio",
+      "tabAnalytics": "Análisis",
+      "searchPlaceholder": "Buscar por título o número...",
+      "allStatuses": "Todos los estados",
+      "noChangeOrders": "No hay órdenes de cambio. Cree una para empezar.",
+      "loadError": "Error al cargar las órdenes de cambio"
+    },
     "newChangeRequest": "Nueva solicitud de cambio",
     "filters": "Filtros",
     "searchPlaceholder": "Buscar solicitudes de cambio...",

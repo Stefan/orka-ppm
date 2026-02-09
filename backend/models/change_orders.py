@@ -497,3 +497,44 @@ class ChangeOrderReportResponse(BaseModel):
     report_type: str
     generated_at: datetime
     content: Dict[str, Any]
+
+
+# =============================================================================
+# AI Estimate and Recommendations (Phase 8)
+# =============================================================================
+
+
+class AIEstimateLineItemInput(BaseModel):
+    """Minimal line item input for AI cost estimate."""
+    description: str = ""
+    quantity: float = Field(1.0, ge=0)
+    unit_rate: float = Field(0.0, ge=0)
+    cost_category: Optional[str] = None
+
+
+class AIEstimateRequest(BaseModel):
+    """Request for AI-assisted cost impact estimation."""
+    description: str = Field(..., min_length=1, description="Change order description")
+    line_items: List[AIEstimateLineItemInput] = Field(default_factory=list)
+    change_category: Optional[ChangeOrderCategory] = None
+
+
+class AIEstimateResponse(BaseModel):
+    """Response for AI cost impact estimate."""
+    estimated_min: float = Field(..., ge=0)
+    estimated_max: float = Field(..., ge=0)
+    confidence: float = Field(..., ge=0, le=1.0)
+    method: str = "rule_based"
+    notes: Optional[List[str]] = None
+
+
+class AIRecommendationItem(BaseModel):
+    """Single AI recommendation for approval workflow."""
+    text: str
+    type: str = Field(..., description="hint | risk | checkpoint")
+
+
+class AIRecommendationsResponse(BaseModel):
+    """Response for AI approval recommendations."""
+    recommendations: List[AIRecommendationItem] = Field(default_factory=list)
+    variance_audit_context: Optional[Dict[str, Any]] = None

@@ -9,7 +9,8 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Share2, BookOpen } from 'lucide-react'
+import { ArrowLeft, Share2, BookOpen, Package } from 'lucide-react'
+import { projectControlsApi } from '@/lib/project-controls-api'
 import { Button } from '@/components/ui/Button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import ShareLinkManager from '@/components/projects/ShareLinkManager'
@@ -36,12 +37,24 @@ export default function ProjectDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [userPermissions, setUserPermissions] = useState<string[]>([])
   const [activeTab, setActiveTab] = useState<'overview' | 'shares'>('overview')
+  const [wpSummary, setWpSummary] = useState<{ work_package_count: number; total_budget: number; average_percent_complete: number } | null>(null)
 
   useEffect(() => {
     if (projectId) {
       fetchProject()
       fetchCurrentUser()
     }
+  }, [projectId])
+
+  useEffect(() => {
+    if (!projectId) return
+    projectControlsApi.getWorkPackageSummary(projectId)
+      .then((s) => setWpSummary({
+        work_package_count: s.work_package_count,
+        total_budget: s.total_budget,
+        average_percent_complete: s.average_percent_complete,
+      }))
+      .catch(() => setWpSummary(null))
   }, [projectId])
 
   const fetchCurrentUser = async () => {
@@ -231,6 +244,45 @@ export default function ProjectDetailPage() {
                     </div>
                   )}
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Work packages */}
+            <Card>
+              <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Package className="h-5 w-5" />
+                    Work Packages
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {wpSummary != null && wpSummary.work_package_count > 0 ? (
+                    <>
+                      <p className="text-sm text-gray-600 dark:text-slate-400 mb-3">
+                        {wpSummary.work_package_count} work package{wpSummary.work_package_count !== 1 ? 's' : ''}, total budget ${wpSummary.total_budget.toLocaleString()}, avg. progress {wpSummary.average_percent_complete.toFixed(1)}%.
+                      </p>
+                      <Link
+                        href={`/project-controls?project=${projectId}&tab=work-packages`}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                      >
+                        <Package className="h-4 w-4" />
+                        Manage work packages
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm text-gray-600 dark:text-slate-400 mb-3">
+                        Define work packages for bottom-up ETC/EAC and earned value.
+                      </p>
+                      <Link
+                        href={`/project-controls?project=${projectId}&tab=work-packages`}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                      >
+                        <Package className="h-4 w-4" />
+                        Manage work packages
+                      </Link>
+                    </>
+                  )}
               </CardContent>
             </Card>
 

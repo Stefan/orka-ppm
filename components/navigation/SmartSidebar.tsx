@@ -20,7 +20,8 @@ import {
   Clock,
   Star,
   FileText,
-  Shield
+  Shield,
+  FolderOpen
 } from 'lucide-react'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
 import { useNavigationAnalytics } from '../../hooks/useNavigationAnalytics'
@@ -41,6 +42,14 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
     href: '/dashboards',
     category: 'primary',
     description: 'Overview of all your projects and portfolios'
+  },
+  {
+    id: 'structure',
+    label: 'Portfolios & Projekte',
+    icon: FolderOpen,
+    href: '/portfolios',
+    category: 'primary',
+    description: 'Portfolios, Programme und Projekte verwalten'
   },
   {
     id: 'scenarios',

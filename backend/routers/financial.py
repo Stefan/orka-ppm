@@ -207,12 +207,24 @@ async def get_financial_tracking_budget_alerts(
     current_user = Depends(get_current_user)
 ):
     """Get budget alerts for projects exceeding specified threshold"""
+    # #region agent log
+    import json, time
+    _t0 = time.perf_counter()
+    try:
+        with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "financial.py:budget-alerts:entry", "message": "budget_alerts_start", "data": {}, "hypothesisId": "A"}) + "\n")
+    except Exception: pass
+    # #endregion
     try:
         if supabase is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
         # Get all projects with budget information
         projects_response = supabase.table("projects").select("id, name, budget").execute()
+        # #region agent log
+        try:
+            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "financial.py:budget-alerts:after_projects", "message": "after_projects_query", "data": {"elapsed_ms": round((time.perf_counter()-_t0)*1000), "projects_count": len(projects_response.data or [])}, "hypothesisId": "A"}) + "\n")
+        except Exception: pass
+        # #endregion
         projects = projects_response.data or []
         if not projects:
             return {
@@ -225,6 +237,11 @@ async def get_financial_tracking_budget_alerts(
         project_ids = [p["id"] for p in projects]
         # Single query for all spending (avoids N+1)
         expenses_response = supabase.table("financial_tracking").select("project_id, actual_amount").in_("project_id", project_ids).execute()
+        # #region agent log
+        try:
+            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "financial.py:budget-alerts:after_expenses", "message": "after_financial_tracking_query", "data": {"elapsed_ms": round((time.perf_counter()-_t0)*1000), "expenses_count": len(expenses_response.data or [])}, "hypothesisId": "B"}) + "\n")
+        except Exception: pass
+        # #endregion
         expenses = expenses_response.data or []
         spent_by_project: dict = {}
         for e in expenses:
@@ -256,6 +273,11 @@ async def get_financial_tracking_budget_alerts(
                     "alert_level": "critical" if current_percentage >= 100 else "warning"
                 })
 
+        # #region agent log
+        try:
+            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "financial.py:budget-alerts:exit", "message": "budget_alerts_done", "data": {"total_ms": round((time.perf_counter()-_t0)*1000), "alerts_count": len(alerts)}, "hypothesisId": "A"}) + "\n")
+        except Exception: pass
+        # #endregion
         return {
             "threshold_percentage": threshold_percentage,
             "total_alerts": len(alerts),

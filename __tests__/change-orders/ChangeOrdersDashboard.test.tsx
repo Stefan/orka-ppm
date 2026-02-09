@@ -3,12 +3,35 @@
  */
 
 import React from 'react'
+import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ChangeOrdersDashboard from '@/components/change-orders/ChangeOrdersDashboard'
 
 jest.mock('@/app/providers/SupabaseAuthProvider', () => ({
   useAuth: () => ({ user: { id: 'test-user-1' } }),
+}))
+
+const mockT = (key: string, params?: Record<string, string>) => {
+  const map: Record<string, string> = {
+    'changes.changeOrdersDashboard.title': 'Change Orders',
+    'changes.changeOrdersDashboard.subtitle': `Formal change order management for ${params?.projectName ?? 'Project'}`,
+    'changes.changeOrdersDashboard.newChangeOrder': 'New Change Order',
+    'changes.changeOrdersDashboard.total': 'Total',
+    'changes.changeOrdersDashboard.approved': 'Approved',
+    'changes.changeOrdersDashboard.rejected': 'Rejected',
+    'changes.changeOrdersDashboard.totalCostImpact': 'Total Cost Impact',
+    'changes.changeOrdersDashboard.tabList': 'Change Orders',
+    'changes.changeOrdersDashboard.tabAnalytics': 'Analytics',
+    'changes.changeOrdersDashboard.searchPlaceholder': 'Search by title or number...',
+    'changes.changeOrdersDashboard.allStatuses': 'All Statuses',
+    'changes.changeOrdersDashboard.noChangeOrders': 'No change orders found. Create one to get started.',
+    'changes.changeOrdersDashboard.loadError': 'Failed to load change orders',
+  }
+  return map[key] ?? key
+}
+jest.mock('@/lib/i18n/context', () => ({
+  useTranslations: () => ({ t: mockT }),
 }))
 
 jest.mock('@/lib/change-orders-api', () => ({
@@ -49,13 +72,10 @@ describe('ChangeOrdersDashboard', () => {
   it('renders dashboard title and project name', async () => {
     render(<ChangeOrdersDashboard projectId={projectId} projectName={projectName} />)
 
-    await waitFor(
-      () => {
-        expect(screen.getAllByText(/Change Orders/).length).toBeGreaterThan(0)
-        expect(screen.getByText(/Test Project/)).toBeInTheDocument()
-      },
-      { timeout: 3000 }
-    )
+    await waitFor(() => {
+      expect(screen.getAllByText(/Change Orders/).length).toBeGreaterThan(0)
+      expect(screen.getByText(/Test Project/)).toBeInTheDocument()
+    })
   })
 
   it('shows New Change Order button', async () => {

@@ -107,6 +107,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [moreMenuOpen, setMoreMenuOpen] = useState(false)
   const [portfolioMenuOpen, setPortfolioMenuOpen] = useState(false)
+  const [structureMenuOpen, setStructureMenuOpen] = useState(false)
   const [projectsMenuOpen, setProjectsMenuOpen] = useState(false)
   const [financialsMenuOpen, setFinancialsMenuOpen] = useState(false)
   const [analysisMenuOpen, setAnalysisMenuOpen] = useState(false)
@@ -116,6 +117,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   const userMenuRef = useRef<HTMLDivElement>(null)
   const notificationsRef = useRef<HTMLDivElement>(null)
   const portfolioMenuRef = useRef<HTMLDivElement>(null)
+  const structureMenuRef = useRef<HTMLDivElement>(null)
   const moreMenuRef = useRef<HTMLDivElement>(null)
   const projectsMenuRef = useRef<HTMLDivElement>(null)
   const financialsMenuRef = useRef<HTMLDivElement>(null)
@@ -206,6 +208,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   // Close all dropdown menus
   const closeAllDropdowns = () => {
     setPortfolioMenuOpen(false)
+    setStructureMenuOpen(false)
     setProjectsMenuOpen(false)
     setFinancialsMenuOpen(false)
     setAnalysisMenuOpen(false)
@@ -247,7 +250,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
 
   // Position portaled dropdown under the open menu's trigger (so it isn't clipped by topbar overflow)
   useEffect(() => {
-    const ref = portfolioMenuOpen ? portfolioMenuRef : moreMenuOpen ? moreMenuRef : projectsMenuOpen ? projectsMenuRef : financialsMenuOpen ? financialsMenuRef : analysisMenuOpen ? analysisMenuRef : managementMenuOpen ? managementMenuRef : adminMenuOpen ? adminMenuRef : null
+    const ref = portfolioMenuOpen ? portfolioMenuRef : structureMenuOpen ? structureMenuRef : moreMenuOpen ? moreMenuRef : projectsMenuOpen ? projectsMenuRef : financialsMenuOpen ? financialsMenuRef : analysisMenuOpen ? analysisMenuRef : managementMenuOpen ? managementMenuRef : adminMenuOpen ? adminMenuRef : null
     if (!ref?.current) {
       setDropdownAnchor(null)
       return
@@ -265,7 +268,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
       window.removeEventListener('scroll', update, true)
       window.removeEventListener('resize', update)
     }
-  }, [portfolioMenuOpen, moreMenuOpen, projectsMenuOpen, financialsMenuOpen, analysisMenuOpen, managementMenuOpen, adminMenuOpen])
+  }, [portfolioMenuOpen, structureMenuOpen, moreMenuOpen, projectsMenuOpen, financialsMenuOpen, analysisMenuOpen, managementMenuOpen, adminMenuOpen])
 
   return (
     <header ref={headerRef} data-testid="top-bar" className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 w-full max-w-full overflow-visible" style={{ position: 'sticky', top: 0, zIndex: 9999, flexShrink: 0, minHeight: '64px', boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06)' }}>
@@ -328,22 +331,21 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
             {t('nav.dashboards')}
           </Link>
 
-          {/* Projects Dropdown */}
-          <div className="relative" ref={projectsMenuRef}>
+          {/* Portfolios & Projekte: Portfolios, Programme, Projekte, Ressourcen (one top-level menu) */}
+          <div className="relative" ref={structureMenuRef}>
             <button
-              onClick={(e) => { e.stopPropagation(); toggleDropdown(setProjectsMenuOpen, projectsMenuOpen) }}
+              onClick={(e) => { e.stopPropagation(); toggleDropdown(setStructureMenuOpen, structureMenuOpen) }}
               className={`flex items-center space-x-1 ${navLinkBase} ${
-                pathname === '/projects' || pathname.startsWith('/projects/') || pathname === '/resources'
+                pathname === '/portfolios' || pathname.startsWith('/portfolios/') || pathname === '/projects' || pathname.startsWith('/projects/') || pathname === '/admin/hierarchy'
                   ? navLinkActive
-                  : projectsMenuOpen
+                  : structureMenuOpen
                     ? navLinkOpen
                     : navLinkInactive
               }`}
             >
-              <span className="text-inherit">{t('nav.projects')}</span>
+              <span className="text-inherit">Portfolios & Projekte</span>
               <ChevronDown className="h-4 w-4" />
             </button>
-
           </div>
 
           {/* Financials Dropdown */}
@@ -436,7 +438,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
         </div>
 
         {/* Portaled dropdown panels (so they are not clipped by topbar overflow) */}
-        {(portfolioMenuOpen || moreMenuOpen || projectsMenuOpen || financialsMenuOpen || analysisMenuOpen || managementMenuOpen || adminMenuOpen) && dropdownAnchor && typeof document !== 'undefined' && createPortal(
+        {(portfolioMenuOpen || structureMenuOpen || moreMenuOpen || projectsMenuOpen || financialsMenuOpen || analysisMenuOpen || managementMenuOpen || adminMenuOpen) && dropdownAnchor && typeof document !== 'undefined' && createPortal(
           <div
             className="w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 animate-in fade-in slide-in-from-top-2 duration-200"
             style={{ position: 'fixed', top: dropdownAnchor.top, left: dropdownAnchor.left, zIndex: 10050, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
@@ -465,6 +467,25 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 )}
               </>
             )}
+            {structureMenuOpen && (
+              <>
+                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Portfolios & Projekte</h3>
+                </div>
+                <Link href="/portfolios" className={`${dropdownItemBase} ${pathname === '/portfolios' || pathname.startsWith('/portfolios/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setStructureMenuOpen(false)}>
+                  <FolderOpen className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.portfolios')}</span>
+                </Link>
+                <Link href="/projects" className={`${dropdownItemBase} ${pathname === '/projects' || pathname.startsWith('/projects/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setStructureMenuOpen(false)}>
+                  <GitBranch className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.allProjects')}</span>
+                </Link>
+                <Link href="/resources" className={`${dropdownItemBase} ${pathname === '/resources' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setStructureMenuOpen(false)}>
+                  <Users className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.resourceManagement')}</span>
+                </Link>
+                <Link href="/admin/hierarchy" className={`${dropdownItemBase} ${pathname === '/admin/hierarchy' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setStructureMenuOpen(false)}>
+                  <Shield className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">Hierarchie (Baum)</span>
+                </Link>
+              </>
+            )}
             {moreMenuOpen && (
               <>
                 <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
@@ -473,14 +494,12 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 <Link href="/dashboards" className={`${dropdownItemBase} ${pathname === '/dashboards' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setMoreMenuOpen(false)}>
                   <BarChart3 className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.dashboards')}</span>
                 </Link>
+                <Link href="/portfolios" className={`${dropdownItemBase} ${pathname === '/portfolios' || pathname.startsWith('/portfolios/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setMoreMenuOpen(false)}>
+                  <FolderOpen className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.portfolios')}</span>
+                </Link>
                 <Link href="/projects" className={`${dropdownItemBase} ${pathname === '/projects' || pathname.startsWith('/projects/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setMoreMenuOpen(false)}>
                   <GitBranch className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.allProjects')}</span>
                 </Link>
-                {canReadPortfolios && (
-                  <Link href="/portfolios" className={`${dropdownItemBase} ${pathname === '/portfolios' || pathname.startsWith('/portfolios/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setMoreMenuOpen(false)}>
-                    <FolderOpen className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.portfolios')}</span>
-                  </Link>
-                )}
                 <Link href="/resources" className={`${dropdownItemBase} ${pathname === '/resources' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setMoreMenuOpen(false)}>
                   <Users className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.resourceManagement')}</span>
                 </Link>
@@ -498,24 +517,6 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </Link>
                 <Link href="/admin" className={`${dropdownItemBase} ${pathname === '/admin' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setMoreMenuOpen(false)}>
                   <Shield className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.systemAdmin')}</span>
-                </Link>
-              </>
-            )}
-            {projectsMenuOpen && (
-              <>
-                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.projects')}</h3>
-                </div>
-                <Link href="/projects" className={`${dropdownItemBase} ${pathname === '/projects' || pathname.startsWith('/projects/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setProjectsMenuOpen(false)}>
-                  <GitBranch className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.allProjects')}</span>
-                </Link>
-                {canReadPortfolios && (
-                  <Link href="/portfolios" className={`${dropdownItemBase} ${pathname === '/portfolios' || pathname.startsWith('/portfolios/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setProjectsMenuOpen(false)}>
-                    <FolderOpen className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.portfolios')}</span>
-                  </Link>
-                )}
-                <Link href="/resources" className={`${dropdownItemBase} ${pathname === '/resources' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setProjectsMenuOpen(false)}>
-                  <Users className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.resourceManagement')}</span>
                 </Link>
               </>
             )}

@@ -74,6 +74,13 @@ async def list_projects(
     current_user = Depends(require_permission(Permission.project_read))
 ):
     """Get projects with optional filtering and pagination. Uses cache (TTL 120s); invalidated on project create/update/delete. Default count_exact=false for faster response."""
+    # #region agent log
+    import json, time
+    _t0 = time.perf_counter()
+    try:
+        with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "projects.py:list_projects:entry", "message": "list_projects_start", "data": {"limit": limit, "offset": offset}, "hypothesisId": "A"}) + "\n")
+    except Exception: pass
+    # #endregion
     try:
         if not supabase:
             raise HTTPException(status_code=503, detail="Database service unavailable")
@@ -85,6 +92,11 @@ async def list_projects(
         data = None
         if cache:
             data = await cache.get(cache_key)
+        # #region agent log
+        try:
+            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "projects.py:list_projects:after_cache", "message": "after_cache_get", "data": {"elapsed_ms": round((time.perf_counter()-_t0)*1000), "cache_hit": data is not None}, "hypothesisId": "C"}) + "\n")
+        except Exception: pass
+        # #endregion
         if data is None:
             select_cols = "id", "name", "status", "portfolio_id", "program_id", "health", "budget", "actual_cost", "start_date", "end_date", "created_at", "updated_at", "description"
             if count_exact:
@@ -104,12 +116,22 @@ async def list_projects(
             if cache:
                 await cache.set(cache_key, {"items": items, "total": total}, ttl=PROJECTS_CACHE_TTL)
             data = {"items": items, "total": total}
+            # #region agent log
+            try:
+                with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "projects.py:list_projects:after_db", "message": "after_db_query", "data": {"elapsed_ms": round((time.perf_counter()-_t0)*1000), "items_count": len(items)}, "hypothesisId": "A"}) + "\n")
+            except Exception: pass
+            # #endregion
         if isinstance(data, dict):
             items = data.get("items", data)
             total = data.get("total")
         else:
             items = data
             total = len(items) if items else 0
+        # #region agent log
+        try:
+            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "projects.py:list_projects:exit", "message": "list_projects_done", "data": {"total_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "A"}) + "\n")
+        except Exception: pass
+        # #endregion
         return {"items": items, "total": total, "limit": limit, "offset": offset}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
