@@ -5,6 +5,7 @@ import { BarChart3, Download, RefreshCw, Settings, AlertTriangle } from 'lucide-
 import { getApiUrl } from '../lib/api/client'
 import { ImageWithStabilizedLayout } from './ui/LayoutStabilizer'
 import { useTranslations } from '@/lib/i18n/context'
+import { debugIngest } from '@/lib/debug-ingest'
 
 interface MonteCarloChart {
   title: string
@@ -57,7 +58,7 @@ export default function MonteCarloVisualization({
     try {
       // #region agent log
       const vizUrl = getApiUrl(`/api/v1/monte-carlo/simulations/${simulationId}/visualizations/generate`)
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'MonteCarloVisualization.tsx:generateCharts',message:'Monte Carlo viz request',data:{url:vizUrl,simulationId,chartTypes:config.chart_types},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{})
+      debugIngest({ location: 'MonteCarloVisualization.tsx:generateCharts', message: 'Monte Carlo viz request', data: { url: vizUrl, simulationId, chartTypes: config.chart_types }, sessionId: 'debug-session', hypothesisId: 'H3' })
       // #endregion
       const response = await fetch(
         vizUrl,
@@ -74,7 +75,7 @@ export default function MonteCarloVisualization({
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'MonteCarloVisualization.tsx:generateCharts',message:'Monte Carlo viz error response',data:{status:response.status,errorData,hasDetail:!!(errorData&&errorData.detail)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H4'})}).catch(()=>{})
+        debugIngest({ location: 'MonteCarloVisualization.tsx:generateCharts', message: 'Monte Carlo viz error response', data: { status: response.status, errorData, hasDetail: !!(errorData && errorData.detail) }, sessionId: 'debug-session', hypothesisId: 'H4' })
         // #endregion
         console.error('Monte Carlo visualization error:', response.status, errorData)
 

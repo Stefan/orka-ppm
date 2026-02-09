@@ -1,12 +1,22 @@
 'use client'
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import AppLayout from '@/components/shared/AppLayout'
-import { PageFeatureTree, FeatureDetailCard, FeatureSearchBar, PageDetailCard } from '@/components/features'
+import {
+  FeatureDetailCard,
+  FeatureSearchBar,
+  PageDetailCard,
+  VirtualizedPageFeatureTree,
+  FeatureHoverPreview,
+  InlineEditFeatureModal,
+} from '@/components/features'
 import { buildPageTree, findPageOrFeatureNode, flattenPageTree, searchFeatures } from '@/lib/features'
 import { supabase } from '@/lib/api/supabase'
-import type { Feature, FeatureSearchResult, PageOrFeatureNode, DocItem } from '@/types/features'
+import type { Feature, FeatureSearchResult, PageOrFeatureNode } from '@/types/features'
 import { Layers } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+
+const STALE_TIME_MS = 5 * 60 * 1000 // 5 min
 
 const DEFAULT_FEATURES: Feature[] = [
   {
@@ -67,15 +77,77 @@ const DEFAULT_FEATURES: Feature[] = [
   },
 ]
 
+async function fetchFeatureCatalog(): Promise<Feature[]> {
+  const { data, error } = await supabase
+    .from('feature_catalog')
+    .select('*')
+    .order('name')
+  if (error || !data || data.length === 0) return DEFAULT_FEATURES
+  return data as Feature[]
+}
+
+async function fetchFeaturesDocs(): Promise<{ routes: unknown[] }> {
+  const res = await fetch('/api/features/docs')
+  if (!res.ok) throw new Error('Failed to load docs')
+  const json = await res.json()
+  return { routes: Array.isArray(json.routes) ? json.routes : [] }
+}
+
+function collectAncestorIds(
+  nodes: PageOrFeatureNode[],
+  targetId: string,
+  path: Set<string> = new Set()
+): Set<string> | null {
+  for (const node of nodes) {
+    if (node.id === targetId) return new Set(path)
+    path.add(node.id)
+    const found = collectAncestorIds(node.children, targetId, path)
+    if (found) return found
+    path.delete(node.id)
+  }
+  return null
+}
+
 function FeaturesContent() {
-  const [features, setFeatures] = useState<Feature[]>(DEFAULT_FEATURES)
-  const [routes, setRoutes] = useState<DocItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [routesLoading, setRoutesLoading] = useState(true)
+  const treeContainerRef = useRef<HTMLDivElement>(null)
+  const [treeHeight, setTreeHeight] = useState(400)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [treeOpen, setTreeOpen] = useState(true)
   const [searchResults, setSearchResults] = useState<FeatureSearchResult[]>([])
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set())
+  const [hoveredNode, setHoveredNode] = useState<PageOrFeatureNode | null>(null)
+  const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editingFeature, setEditingFeature] = useState<Feature | null>(null)
+
+  const featuresQuery = useQuery({
+    queryKey: ['features', 'catalog'],
+    queryFn: fetchFeatureCatalog,
+    staleTime: STALE_TIME_MS,
+    placeholderData: DEFAULT_FEATURES,
+  })
+
+  const docsQuery = useQuery({
+    queryKey: ['features', 'docs'],
+    queryFn: fetchFeaturesDocs,
+    staleTime: STALE_TIME_MS,
+    placeholderData: { routes: [] },
+  })
+
+  const features = featuresQuery.data ?? DEFAULT_FEATURES
+  const routes = (docsQuery.data?.routes ?? []) as { id: string; name: string; description?: string | null; link?: string | null; source?: string; sourcePath?: string; parentId?: string | null; icon?: string | null; screenshot_url?: string | null }[]
+
+  useEffect(() => {
+    const el = treeContainerRef.current
+    if (!el) return
+    const ro = new ResizeObserver((entries) => {
+      const { height } = entries[0]?.contentRect ?? {}
+      if (typeof height === 'number' && height > 0) setTreeHeight(height)
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -91,75 +163,16 @@ function FeaturesContent() {
     }
   }, [features, searchQuery])
 
-  useEffect(() => {
-    let cancelled = false
-    async function load() {
-      try {
-        const { data, error } = await supabase
-          .from('feature_catalog')
-          .select('*')
-          .order('name')
-
-        if (!cancelled && !error && data && data.length > 0) {
-          setFeatures(data as Feature[])
-        }
-      } catch {
-        // Keep DEFAULT_FEATURES on error
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-    load()
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  useEffect(() => {
-    let cancelled = false
-    setRoutesLoading(true)
-    fetch('/api/features/docs')
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('Failed to load docs'))))
-      .then((json) => {
-        // #region agent log (only when NEXT_PUBLIC_AGENT_INGEST_URL is set to avoid ERR_CONNECTION_REFUSED in Lighthouse)
-        const ingestUrl = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_AGENT_INGEST_URL : undefined
-        const firstRoute = Array.isArray(json.routes) ? json.routes[0] : null
-        if (ingestUrl && typeof fetch !== 'undefined') {
-          fetch(ingestUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              location: 'app/features/page.tsx:docs fetch',
-              message: 'Client received docs response',
-              data: {
-                routesLen: json.routes?.length ?? 0,
-                firstRouteId: firstRoute?.id,
-                firstRouteDescLen: firstRoute?.description?.length ?? 0,
-                hasFeatureDescriptionsKey: 'featureDescriptions' in json,
-                featureDescriptionsCount: json.featureDescriptions ? Object.keys(json.featureDescriptions).length : 0,
-              },
-              timestamp: Date.now(),
-              sessionId: 'debug-session',
-              hypothesisId: 'H3,H4,H5',
-            }),
-          }).catch(() => {})
-        }
-        // #endregion
-        if (!cancelled && Array.isArray(json.routes)) setRoutes(json.routes)
-      })
-      .catch(() => {
-        if (!cancelled) setRoutes([])
-      })
-      .finally(() => {
-        if (!cancelled) setRoutesLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
   const pageTree = useMemo(() => buildPageTree(routes, features), [routes, features])
   const flatNodes = useMemo(() => flattenPageTree(pageTree), [pageTree])
+
+  useEffect(() => {
+    if (pageTree.length === 0) return
+    setExpandedIds((prev) => {
+      if (prev.size > 0) return prev
+      return new Set(pageTree.map((n) => n.id))
+    })
+  }, [pageTree])
   const highlightIds = useMemo(() => {
     const ids = new Set<string>()
     searchResults.forEach((r) => ids.add(r.feature.id))
@@ -169,6 +182,18 @@ function FeaturesContent() {
     })
     return ids
   }, [searchResults, flatNodes, searchQuery])
+
+  useEffect(() => {
+    if (highlightIds.size === 0) return
+    setExpandedIds((prev) => {
+      const next = new Set(prev)
+      for (const id of highlightIds) {
+        const found = collectAncestorIds(pageTree, id)
+        if (found) found.forEach((a) => next.add(a))
+      }
+      return next
+    })
+  }, [highlightIds, pageTree])
 
   const selectedNode = useMemo(
     () => (selectedId ? findPageOrFeatureNode(pageTree, selectedId) ?? null : null),
@@ -182,18 +207,24 @@ function FeaturesContent() {
 
   const handleAISuggest = useCallback(async (query: string) => {
     try {
-      const res = await fetch(`/api/features/search?q=${encodeURIComponent(query)}`)
+      const res = await fetch(`/api/features/search?q=${encodeURIComponent(query)}&rag=1`)
       if (!res.ok) return
       const json = await res.json()
       const ids = json.ids as string[] | undefined
       if (ids && ids.length > 0) {
         setSelectedId(ids[0])
+        setExpandedIds((prev) => {
+          const next = new Set(prev)
+          const found = collectAncestorIds(pageTree, ids[0])
+          if (found) found.forEach((a) => next.add(a))
+          return next
+        })
         setSearchQuery('')
       }
     } catch {
       // Ignore
     }
-  }, [])
+  }, [pageTree])
 
   const handleExplain = useCallback((feature: Feature) => {
     if (typeof window !== 'undefined' && (window as unknown as { openHelpChat?: (msg: string) => void }).openHelpChat) {
@@ -203,7 +234,24 @@ function FeaturesContent() {
     }
   }, [])
 
-  const isLoading = loading || routesLoading
+  const handleHoverNode = useCallback((node: PageOrFeatureNode | null, rect: DOMRect | null) => {
+    setHoveredNode(node)
+    setAnchorRect(rect)
+  }, [])
+
+  const handleEdit = useCallback((feature: Feature) => {
+    setEditingFeature(feature)
+    setEditModalOpen(true)
+  }, [])
+
+  const handleEditSaved = useCallback((updated: Feature) => {
+    featuresQuery.refetch()
+    setEditingFeature(null)
+    setEditModalOpen(false)
+    if (selectedId === updated.id) setSelectedId(updated.id)
+  }, [featuresQuery, selectedId])
+
+  const isLoading = featuresQuery.isLoading || docsQuery.isLoading
 
   if (isLoading) {
     return (
@@ -248,33 +296,56 @@ function FeaturesContent() {
       <div className="flex flex-1 min-h-0">
         <aside
           className={`
-            flex-shrink-0 w-80 border-r border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 overflow-y-auto
+            flex-shrink-0 w-80 border-r border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 flex flex-col
             lg:block
             ${treeOpen ? 'block' : 'hidden'}
           `}
           data-testid="features-tree-sidebar"
         >
-          <div className="p-3">
-            <PageFeatureTree
+          <div ref={treeContainerRef} className="flex-1 min-h-0 p-3">
+            <VirtualizedPageFeatureTree
               nodes={pageTree}
               selectedId={selectedId}
               onSelect={handleSelect}
               highlightIds={highlightIds}
+              expandedIds={expandedIds}
+              onExpandedIdsChange={setExpandedIds}
+              onHoverNode={handleHoverNode}
+              height={treeHeight}
             />
           </div>
         </aside>
+
+        <FeatureHoverPreview
+          node={hoveredNode}
+          anchorRect={anchorRect ? { left: anchorRect.left, top: anchorRect.top, width: anchorRect.width, height: anchorRect.height } : null}
+          onClose={() => { setHoveredNode(null); setAnchorRect(null) }}
+        />
 
         <main
           className="flex-1 min-w-0 overflow-y-auto p-4 lg:p-6 bg-white dark:bg-slate-900"
           data-testid="features-detail-main"
         >
           {selectedNode?.feature ? (
-            <FeatureDetailCard feature={selectedFeature!} onExplain={handleExplain} />
+            <FeatureDetailCard
+              feature={selectedFeature!}
+              onExplain={handleExplain}
+              onEdit={handleEdit}
+            />
           ) : (
             <PageDetailCard node={selectedNode} />
           )}
         </main>
       </div>
+
+      {editingFeature && (
+        <InlineEditFeatureModal
+          feature={editingFeature}
+          open={editModalOpen}
+          onClose={() => { setEditModalOpen(false); setEditingFeature(null) }}
+          onSaved={handleEditSaved}
+        />
+      )}
     </div>
   )
 }

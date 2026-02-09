@@ -8,6 +8,7 @@ import TopBar from '../navigation/TopBar'
 import MobileNav from '../navigation/MobileNav'
 import { useIsMobile } from '@/hooks/useMediaQuery'
 import { useTranslations } from '@/lib/i18n/context'
+import { debugIngest } from '@/lib/debug-ingest'
 
 // Import HelpChat directly to prevent CLS (layout shift)
 import HelpChat from '../HelpChat'
@@ -21,7 +22,7 @@ export interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppLayout.tsx:AppLayout','message':'AppLayout render',data:{},timestamp:Date.now(),hypothesisId:'H3'})}).catch(()=>{});
+  debugIngest({ location: 'AppLayout.tsx:AppLayout', message: 'AppLayout render', data: {}, hypothesisId: 'H3' })
   // #endregion
   const { session, loading } = useAuth()
   const router = useRouter()

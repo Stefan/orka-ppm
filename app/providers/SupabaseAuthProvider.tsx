@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../../lib/api/supabase-minimal'
 import { useOrganizationContext, useInvalidateOrganizationContext } from '@/hooks/useOrganizationContext'
+import { debugIngest } from '@/lib/debug-ingest'
 import type { Session, User, AuthError } from '@supabase/supabase-js'
 
 export interface OrganizationContextValue {
@@ -78,7 +79,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         if (error) {
           console.error('❌ Error getting session:', error)
           // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'SupabaseAuthProvider.tsx:getSession', message: 'getSession_error', data: { msg: error?.message }, hypothesisId: 'H2', timestamp: Date.now() }) }).catch(() => {})
+          debugIngest({ location: 'SupabaseAuthProvider.tsx:getSession', message: 'getSession_error', data: { msg: error?.message }, hypothesisId: 'H2' })
           // #endregion
           // If it's a refresh token error, clear the session
           if (error.message?.includes('refresh') || error.message?.includes('Refresh Token')) {
@@ -91,7 +92,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
           console.log('✅ Session check complete:', session ? 'Session found' : 'No session')
           // #region agent log
           if (!session) {
-            fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'SupabaseAuthProvider.tsx:getSession', message: 'getSession_no_session', data: {}, hypothesisId: 'H3', timestamp: Date.now() }) }).catch(() => {})
+            debugIngest({ location: 'SupabaseAuthProvider.tsx:getSession', message: 'getSession_no_session', data: {}, hypothesisId: 'H3' })
           }
           // #endregion
           setSession(session)
@@ -100,7 +101,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         console.error('🚨 Unexpected error getting session:', err)
         const isTimeout = err instanceof Error && err.message === 'Auth timeout'
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'SupabaseAuthProvider.tsx:getSession', message: 'getSession_catch', data: { isTimeout, msg: err instanceof Error ? err.message : String(err) }, hypothesisId: 'H4', timestamp: Date.now() }) }).catch(() => {})
+        debugIngest({ location: 'SupabaseAuthProvider.tsx:getSession', message: 'getSession_catch', data: { isTimeout, msg: err instanceof Error ? err.message : String(err) }, hypothesisId: 'H4' })
         // #endregion
         if (isTimeout) {
           console.warn('⏱️ Auth check timed out - showing login form. Supabase may be unreachable.')
@@ -123,7 +124,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       console.log('🔐 Auth state change:', event, session ? 'Session exists' : 'No session')
       // #region agent log
       if (!session) {
-        fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'SupabaseAuthProvider.tsx:onAuthStateChange', message: 'auth_state_change_session_null', data: { event }, hypothesisId: 'H1', timestamp: Date.now() }) }).catch(() => {})
+        debugIngest({ location: 'SupabaseAuthProvider.tsx:onAuthStateChange', message: 'auth_state_change_session_null', data: { event }, hypothesisId: 'H1' })
       }
       // #endregion
       // Avoid overwriting a valid session with null on INITIAL_SESSION (Supabase can emit null before getSession() result is applied)

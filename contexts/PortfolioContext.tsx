@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useCallback, useState, useEffect } from 'react'
+import { debugIngest } from '@/lib/debug-ingest'
 
 const STORAGE_KEY = 'orka-ppm-current-portfolio-id'
 
@@ -25,7 +26,7 @@ export function usePortfolio(): PortfolioContextType {
   const ctx = useContext(PortfolioContext)
   // #region agent log
   if (ctx === undefined) {
-    fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'PortfolioContext.tsx:usePortfolio','message':'usePortfolio called but context undefined',data:{hasContext:false},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+    debugIngest({ location: 'PortfolioContext.tsx:usePortfolio', message: 'usePortfolio called but context undefined', data: { hasContext: false }, hypothesisId: 'H1' })
     throw new Error('usePortfolio must be used within a PortfolioProvider')
   }
   // #endregion

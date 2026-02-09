@@ -359,7 +359,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
         if (typeof key === 'string' && key.includes('noSlowQueries')) {
           const tAny = translations as Record<string, unknown>;
           const adminPerf = tAny?.adminPerformance as Record<string, unknown> | undefined;
-          fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:noSlowQueriesNotFound',message:'adminPerformance.noSlowQueries key not found',data:{key,locale,hasAdminPerformance:!!adminPerf,adminPerfKeys:adminPerf?Object.keys(adminPerf):[],topLevelKeys:Object.keys(translations).slice(0,12)},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+          if (ingestUrl) { fetch(ingestUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/i18n/context.tsx:noSlowQueriesNotFound',message:'adminPerformance.noSlowQueries key not found',data:{key,locale,hasAdminPerformance:!!adminPerf,adminPerfKeys:adminPerf?Object.keys(adminPerf):[],topLevelKeys:Object.keys(translations).slice(0,12)},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{}); }
         }
         // #endregion
         // Key not found - log warning in development

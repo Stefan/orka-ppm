@@ -11,6 +11,7 @@ import {
   Calculator,
   Upload,
   ImageIcon,
+  Edit,
   type LucideIcon,
 } from 'lucide-react'
 import type { Feature } from '@/types/features'
@@ -32,12 +33,14 @@ function getIcon(iconName: string | null): LucideIcon {
 export interface FeatureDetailCardProps {
   feature: Feature | null
   onExplain?: (feature: Feature) => void
+  onEdit?: (feature: Feature) => void
   className?: string
 }
 
 export function FeatureDetailCard({
   feature,
   onExplain,
+  onEdit,
   className = '',
 }: FeatureDetailCardProps) {
   const [imageError, setImageError] = useState(false)
@@ -119,6 +122,18 @@ export function FeatureDetailCard({
 
         {/* Actions */}
         <div className="mt-5 pt-4 border-t border-gray-100 dark:border-slate-700 flex flex-wrap items-center gap-3">
+          {onEdit && (
+            <button
+              type="button"
+              onClick={() => onEdit(feature)}
+              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
+              data-testid="feature-edit-button"
+              aria-label="Edit feature"
+            >
+              <Edit className="h-4 w-4" />
+              Edit
+            </button>
+          )}
           {feature.link && (
             <>
               {isInternal ? (

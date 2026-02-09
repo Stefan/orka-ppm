@@ -10,6 +10,7 @@ import { useAuth } from '@/app/providers/SupabaseAuthProvider'
 import AppLayout from '@/components/shared/AppLayout'
 import { ScheduleManager } from '@/components/schedule/ScheduleManager'
 import { useTranslations } from '@/lib/i18n/context'
+import { debugIngest } from '@/lib/debug-ingest'
 import type { ScheduleListItem } from '@/types/schedule'
 
 export default function SchedulesPage() {
@@ -76,8 +77,7 @@ export default function SchedulesPage() {
         end_date: data.end_date,
       }
       // #region agent log
-      const ingestUrl = 'http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1'
-      fetch(ingestUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'app/schedules/page.tsx:handleCreateSchedule', message: 'before create', data: { hasProjectIdInBody: true, bodyKeys: Object.keys(body) }, timestamp: Date.now(), hypothesisId: 'H1' }) }).catch(() => {})
+      debugIngest({ location: 'app/schedules/page.tsx:handleCreateSchedule', message: 'before create', data: { hasProjectIdInBody: true, bodyKeys: Object.keys(body) }, hypothesisId: 'H1' })
       // #endregion
       const res = await fetch(`/api/schedules?project_id=${encodeURIComponent(data.project_id)}`, {
         method: 'POST',
@@ -90,7 +90,7 @@ export default function SchedulesPage() {
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         // #region agent log
-        fetch(ingestUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'app/schedules/page.tsx:handleCreateSchedule', message: 'create failed', data: { status: res.status, err }, timestamp: Date.now(), hypothesisId: 'H2' }) }).catch(() => {})
+        debugIngest({ location: 'app/schedules/page.tsx:handleCreateSchedule', message: 'create failed', data: { status: res.status, err }, hypothesisId: 'H2' })
         // #endregion
         const detail = err.detail
         const detailStr = typeof detail === 'string' ? detail : Array.isArray(detail) ? detail.map((d: { msg?: string }) => d.msg).join(', ') : detail ? String(detail) : undefined

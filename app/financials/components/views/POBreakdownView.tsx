@@ -8,6 +8,7 @@ import {
 import { POBreakdown, POBreakdownSummary, POImportResult } from '../../types'
 import { getApiUrl } from '../../../../lib/api'
 import { logger } from '@/lib/monitoring/logger'
+import { debugIngest } from '@/lib/debug-ingest'
 
 interface POBreakdownViewProps {
   accessToken?: string
@@ -34,7 +35,7 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
       const cw = el.clientWidth
       const sw = el.scrollWidth
       const main = document.querySelector('[data-testid="app-layout-main"]')
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'POBreakdownView.tsx:toolbar', message: 'toolbar_metrics', data: { toolbarClientWidth: cw, toolbarScrollWidth: sw, overflow: sw > cw, mainClientWidth: main?.clientWidth }, hypothesisId: 'H2', timestamp: Date.now() }) }).catch(() => {})
+      debugIngest({ location: 'POBreakdownView.tsx:toolbar', message: 'toolbar_metrics', data: { toolbarClientWidth: cw, toolbarScrollWidth: sw, overflow: sw > cw, mainClientWidth: main?.clientWidth }, hypothesisId: 'H2' })
     }
     log()
     const ro = new ResizeObserver(log)

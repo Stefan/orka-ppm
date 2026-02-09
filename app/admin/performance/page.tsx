@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { getApiUrl } from '../../../lib/api'
 import { useTranslations } from '@/lib/i18n/context'
+import { debugIngest } from '@/lib/debug-ingest'
 import ChartSkeleton from '../../../components/admin/ChartSkeleton'
 import TableSkeleton from '../../../components/admin/TableSkeleton'
 import StatsSkeleton from '../../../components/admin/StatsSkeleton'
@@ -148,7 +149,7 @@ export default function PerformanceDashboard() {
 
       const fetchDuration = performance.now() - fetchStart
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'performance/page.tsx:fetch',message:'stats+health response',data:{statsStatus:statsResponse.status,healthStatus:healthResponse.status,statsOk:statsResponse.ok},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+      debugIngest({ location: 'performance/page.tsx:fetch', message: 'stats+health response', data: { statsStatus: statsResponse.status, healthStatus: healthResponse.status, statsOk: statsResponse.ok }, hypothesisId: 'H1' })
       // #endregion
       // Record API call metrics
       performanceMonitoring.recordCustomMetric('api_fetch_duration', fetchDuration)
@@ -159,7 +160,7 @@ export default function PerformanceDashboard() {
       if (statsResponse.ok) {
         const statsData = await statsResponse.json()
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'performance/page.tsx:statsParsed',message:'stats body',data:{total_requests:statsData?.total_requests,endpointCount:statsData?.endpoint_stats?Object.keys(statsData.endpoint_stats).length:0,hasStats:!!(statsData&&typeof statsData==='object')},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+        debugIngest({ location: 'performance/page.tsx:statsParsed', message: 'stats body', data: { total_requests: statsData?.total_requests, endpointCount: statsData?.endpoint_stats ? Object.keys(statsData.endpoint_stats).length : 0, hasStats: !!(statsData && typeof statsData === 'object') }, hypothesisId: 'H1' })
         // #endregion
         if (statsData && typeof statsData === 'object') {
           startTransition(() => {

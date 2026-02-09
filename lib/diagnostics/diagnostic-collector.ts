@@ -5,6 +5,7 @@
 
 import { logger } from '../monitoring/logger'
 import { performanceMonitor } from '../monitoring/performance-utils'
+import { debugIngest } from '../debug-ingest'
 
 export interface ErrorLog {
   id: string
@@ -454,8 +455,8 @@ class DiagnosticCollector {
     // Log performance warnings
     if (this.isPerformanceIssue(params.name, params.value)) {
       // #region agent log
-      if (params.name === 'cls' && typeof fetch !== 'undefined') {
-        fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/diagnostics/diagnostic-collector.ts:logPerformanceMetric',message:'CLS performance issue logged',data:{name:params.name,value:params.value,unit:params.unit},timestamp:Date.now(),hypothesisId:'H4'})}).catch(()=>{});
+      if (params.name === 'cls') {
+        debugIngest({ location: 'lib/diagnostics/diagnostic-collector.ts:logPerformanceMetric', message: 'CLS performance issue logged', data: { name: params.name, value: params.value, unit: params.unit }, hypothesisId: 'H4' })
       }
       // #endregion
       logger.warn(`Performance issue detected: ${params.name}`, metric)

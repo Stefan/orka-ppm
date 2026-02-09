@@ -3,6 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { debugIngest } from '@/lib/debug-ingest'
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL || 'http://localhost:8000'
 // Avoid double /api when BACKEND_URL already ends with /api
@@ -12,7 +13,7 @@ async function proxy(request: NextRequest, pathSegments: string[]) {
   const path = pathSegments.join('/')
   const backendUrl = `${BACKEND_BASE}/api/registers/${path}`
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'registers/route.ts:proxy',message:'proxy to backend',data:{pathSegments:pathSegments,path,backendUrl,method:request.method},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
+  debugIngest({ location: 'registers/route.ts:proxy', message: 'proxy to backend', data: { pathSegments, path, backendUrl, method: request.method }, hypothesisId: 'A' })
   // #endregion
   const { searchParams } = new URL(request.url)
   const queryString = searchParams.toString()
@@ -36,7 +37,7 @@ async function proxy(request: NextRequest, pathSegments: string[]) {
   })
 
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'registers/route.ts:proxy',message:'backend response',data:{backendStatus:response.status,requestUrl:url},timestamp:Date.now(),hypothesisId:'B'})}).catch(()=>{});
+  debugIngest({ location: 'registers/route.ts:proxy', message: 'backend response', data: { backendStatus: response.status, requestUrl: url }, hypothesisId: 'B' })
   // #endregion
 
   if (response.status === 204) {
@@ -71,7 +72,7 @@ async function handle(
   const resolved = await params
   const pathSegments = normalizePathSegments(resolved?.path)
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'registers/route.ts:handle',message:'handle',data:{pathSegments:pathSegments,hasLength:!!pathSegments.length},timestamp:Date.now(),hypothesisId:'H2'})}).catch(()=>{});
+  debugIngest({ location: 'registers/route.ts:handle', message: 'handle', data: { pathSegments, hasLength: !!pathSegments.length }, hypothesisId: 'H2' })
   // #endregion
   if (!pathSegments.length) {
     return NextResponse.json({ error: 'Register type required' }, { status: 404 })

@@ -6,6 +6,7 @@ import {
 import { ViewMode } from '../types'
 import { useTranslations } from '../../../lib/i18n/context'
 import { useFeatureFlag } from '../../../contexts/FeatureFlagContext'
+import { debugIngest } from '@/lib/debug-ingest'
 
 interface TabConfig {
   key: ViewMode
@@ -76,7 +77,7 @@ export default function TabNavigation({ viewMode, onViewModeChange }: TabNavigat
       const pw = el.parentElement?.clientWidth
       const cw = el.clientWidth
       const sw = el.scrollWidth
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'TabNavigation.tsx:tabs', message: 'tab_row_metrics', data: { parentWidth: pw, clientWidth: cw, scrollWidth: sw, overflow: sw > cw }, hypothesisId: 'H1', timestamp: Date.now() }) }).catch(() => {})
+      debugIngest({ location: 'TabNavigation.tsx:tabs', message: 'tab_row_metrics', data: { parentWidth: pw, clientWidth: cw, scrollWidth: sw, overflow: sw > cw }, hypothesisId: 'H1' })
     }
     log()
     const ro = new ResizeObserver(log)

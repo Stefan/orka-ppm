@@ -13,6 +13,7 @@ import { useAuth } from '../providers/SupabaseAuthProvider'
 import { usePortfolio } from '@/contexts/PortfolioContext'
 import AppLayout from '../../components/shared/AppLayout'
 import { useTranslations } from '@/lib/i18n/context'
+import { debugIngest } from '@/lib/debug-ingest'
 import type { TranslationKey } from '@/lib/i18n/types'
 import { 
   loadDashboardData, 
@@ -253,7 +254,7 @@ function FilterDropdown({ value, onChange, t }: { value: string; onChange: (val:
 // Main Dashboard Component
 export default function CompactDashboard() {
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dashboards/page.tsx:CompactDashboard','message':'CompactDashboard render start',data:{},timestamp:Date.now(),hypothesisId:'H5'})}).catch(()=>{});
+  debugIngest({ location: 'dashboards/page.tsx:CompactDashboard', message: 'CompactDashboard render start', data: {}, hypothesisId: 'H5' })
   // #endregion
   const { session } = useAuth()
   const { currentPortfolioId } = usePortfolio()

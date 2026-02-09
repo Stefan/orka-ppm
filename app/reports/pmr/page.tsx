@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../../providers/SupabaseAuthProvider'
 import { useTranslations } from '../../../lib/i18n/context'
+import { debugIngest } from '@/lib/debug-ingest'
 import AppLayout from '../../../components/shared/AppLayout'
 import AIInsightsPanel from '../../../components/pmr/AIInsightsPanel'
 import CollaborationPanel from '../../../components/pmr/CollaborationPanel'
@@ -114,8 +115,8 @@ export default function EnhancedPMRPage() {
       if (!c) return
       const data: Record<string, unknown> = { containerOffsetHeight: c.offsetHeight, containerScrollHeight: c.scrollHeight, isMobile, activePanel }
       if (m) { data.mainAreaOffsetHeight = m.offsetHeight; data.mainAreaScrollHeight = m.scrollHeight }
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'app/reports/pmr/page.tsx:container', message: 'PMR layout metrics', data, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H4' }) }).catch(() => {})
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'app/reports/pmr/page.tsx:container', message: 'PMR layout metrics', data, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H5' }) }).catch(() => {})
+      debugIngest({ location: 'app/reports/pmr/page.tsx:container', message: 'PMR layout metrics', data, sessionId: 'debug-session', hypothesisId: 'H4' })
+      debugIngest({ location: 'app/reports/pmr/page.tsx:container', message: 'PMR layout metrics', data, sessionId: 'debug-session', hypothesisId: 'H5' })
     }
     const t = setTimeout(log, 100)
     const ro = mainArea ? new ResizeObserver(log) : null
@@ -502,7 +503,7 @@ export default function EnhancedPMRPage() {
                       : section.title
                 // #region agent log
                 const sectionKey = section.section_id === 'executive-summary' ? 'pmr.sections.executive-summary' : section.section_id === 'budget-status' ? 'pmr.sections.budget-status' : null;
-                if (sectionKey) { fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/reports/pmr/page.tsx:sectionTitle',message:'PMR section title',data:{section_id:section.section_id,key:sectionKey,sectionTitle},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{}); }
+                if (sectionKey) { debugIngest({ location: 'app/reports/pmr/page.tsx:sectionTitle', message: 'PMR section title', data: { section_id: section.section_id, key: sectionKey, sectionTitle }, sessionId: 'debug-session', hypothesisId: 'H3' }); }
                 // #endregion
                 const sectionContent =
                   section.section_id === 'executive-summary'

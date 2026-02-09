@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import AppLayout from '@/components/shared/AppLayout'
 import { useTranslations } from '@/lib/i18n/context'
+import { debugIngest } from '@/lib/debug-ingest'
 import { ResponsiveContainer } from '@/components/ui/molecules/ResponsiveContainer'
 import ProjectControlsDashboard from '@/components/project-controls/ProjectControlsDashboard'
 
@@ -18,7 +19,7 @@ export default function ProjectControlsPage() {
     const el = headerRef.current
     if (!el || typeof window === 'undefined') return
     const clientWidth = el.clientWidth
-    fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'project-controls/page.tsx:header', message: 'controls_header_width', data: { clientWidth, innerWidth: window.innerWidth }, hypothesisId: 'H2', timestamp: Date.now() }) }).catch(() => {})
+    debugIngest({ location: 'project-controls/page.tsx:header', message: 'controls_header_width', data: { clientWidth, innerWidth: window.innerWidth }, hypothesisId: 'H2' })
   }, [])
   // #endregion
 

@@ -9,6 +9,7 @@ import { Sun, Moon, Monitor, Clock, DollarSign, Check, Calendar } from 'lucide-r
 import { useSettings } from '@/hooks/useSettings'
 import { useTheme } from '@/app/providers/ThemeProvider'
 import { logger } from '@/lib/monitoring/logger'
+import { debugIngest } from '@/lib/debug-ingest'
 
 // Base order: UTC, then Europe, Americas, Asia (by city name)
 const TIMEZONES_BASE = [
@@ -111,12 +112,12 @@ export function GeneralSettings() {
 
   const handleThemeChange = async (newTheme: Theme) => {
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GeneralSettings.tsx:handleThemeChange:before',message:'handleThemeChange BEFORE setGlobalTheme',data:{newTheme,currentTheme:currentTheme,htmlClass:document.documentElement.className,dataTheme:document.documentElement.getAttribute('data-theme')},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1,H5'})}).catch(()=>{});
+    debugIngest({ location: 'GeneralSettings.tsx:handleThemeChange:before', message: 'handleThemeChange BEFORE setGlobalTheme', data: { newTheme, currentTheme, htmlClass: document.documentElement.className, dataTheme: document.documentElement.getAttribute('data-theme') }, sessionId: 'debug-session', hypothesisId: 'H1,H5' })
     // #endregion
     // Apply theme immediately via ThemeProvider
     setGlobalTheme(newTheme)
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GeneralSettings.tsx:handleThemeChange:after',message:'handleThemeChange AFTER setGlobalTheme',data:{newTheme,htmlClass:document.documentElement.className,dataTheme:document.documentElement.getAttribute('data-theme'),bodyBg:document.body.style.backgroundColor},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1,H4,H5'})}).catch(()=>{});
+    debugIngest({ location: 'GeneralSettings.tsx:handleThemeChange:after', message: 'handleThemeChange AFTER setGlobalTheme', data: { newTheme, htmlClass: document.documentElement.className, dataTheme: document.documentElement.getAttribute('data-theme'), bodyBg: document.body.style.backgroundColor }, sessionId: 'debug-session', hypothesisId: 'H1,H4,H5' })
     // #endregion
     // Also save to preferences (non-blocking)
     try {
@@ -125,7 +126,7 @@ export function GeneralSettings() {
       logger.warn('Theme preference sync failed, using local setting', undefined, 'GeneralSettings')
     }
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GeneralSettings.tsx:handleThemeChange:done',message:'handleThemeChange COMPLETED (after sync attempt)',data:{htmlClass:document.documentElement.className,dataTheme:document.documentElement.getAttribute('data-theme'),bodyBg:document.body.style.backgroundColor,hasDarkClass:document.documentElement.classList.contains('dark')},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H5'})}).catch(()=>{});
+    debugIngest({ location: 'GeneralSettings.tsx:handleThemeChange:done', message: 'handleThemeChange COMPLETED (after sync attempt)', data: { htmlClass: document.documentElement.className, dataTheme: document.documentElement.getAttribute('data-theme'), bodyBg: document.body.style.backgroundColor, hasDarkClass: document.documentElement.classList.contains('dark') }, sessionId: 'debug-session', hypothesisId: 'H5' })
     // #endregion
   }
 

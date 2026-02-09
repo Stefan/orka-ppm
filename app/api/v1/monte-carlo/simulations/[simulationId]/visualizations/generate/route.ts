@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { debugIngest } from '@/lib/debug-ingest'
 
 function getBackendUrl(): string {
   // In development, prefer local backend so the proxy hits the correct server
@@ -20,7 +21,7 @@ export async function POST(
   try {
     const { simulationId } = await params
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'route.ts:POST',message:'Monte Carlo viz proxy entry',data:{simulationId},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{})
+    debugIngest({ location: 'route.ts:POST', message: 'Monte Carlo viz proxy entry', data: { simulationId }, sessionId: 'debug-session', hypothesisId: 'H3' })
     // #endregion
     const authHeader = request.headers.get('authorization')
     let body: unknown = {}
@@ -64,7 +65,7 @@ export async function POST(
     if (!response.ok) {
       const errorText = await response.text()
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'route.ts:POST',message:'Backend returned !ok',data:{status:response.status,errorTextLength:errorText?.length,errorTextPreview:errorText?.slice(0,200)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{})
+      debugIngest({ location: 'route.ts:POST', message: 'Backend returned !ok', data: { status: response.status, errorTextLength: errorText?.length, errorTextPreview: errorText?.slice(0, 200) }, sessionId: 'debug-session', hypothesisId: 'H1' })
       // #endregion
       console.error('Backend Monte Carlo visualization error:', response.status, errorText)
 
@@ -89,7 +90,7 @@ export async function POST(
     return NextResponse.json(data)
   } catch (error) {
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'route.ts:POST',message:'Proxy catch',data:{errorMsg:error instanceof Error ? error.message : String(error)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{})
+    debugIngest({ location: 'route.ts:POST', message: 'Proxy catch', data: { errorMsg: error instanceof Error ? error.message : String(error) }, sessionId: 'debug-session', hypothesisId: 'H3' })
     // #endregion
     console.error('Error proxying Monte Carlo visualization request:', error)
     return NextResponse.json(

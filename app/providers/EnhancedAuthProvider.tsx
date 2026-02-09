@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
 import { useAuth } from './SupabaseAuthProvider'
 import { supabase } from '../../lib/api/supabase-minimal'
+import { debugIngest } from '@/lib/debug-ingest'
 import type { Permission, PermissionContext, UserRole } from '@/types/rbac'
 
 /**
@@ -112,7 +113,7 @@ export function EnhancedAuthProvider({ children }: { children: React.ReactNode }
     const startTime = Date.now()
     let timeoutId: ReturnType<typeof setTimeout> | null = null
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'EnhancedAuthProvider.tsx:fetchUserRolesAndPermissions',message:'entry',data:{userId},timestamp:startTime,hypothesisId:'H3'})}).catch(()=>{});
+    debugIngest({ location: 'EnhancedAuthProvider.tsx:fetchUserRolesAndPermissions', message: 'entry', data: { userId }, hypothesisId: 'H3' })
     // #endregion
     try {
       setLoading(true)
@@ -136,7 +137,7 @@ export function EnhancedAuthProvider({ children }: { children: React.ReactNode }
         `)
         .eq('user_id', userId)
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'EnhancedAuthProvider.tsx:fetchPromise',message:'created',data:{isThenable:typeof (fetchPromise as any)?.then==='function'},timestamp:Date.now(),hypothesisId:'H4'})}).catch(()=>{});
+      debugIngest({ location: 'EnhancedAuthProvider.tsx:fetchPromise', message: 'created', data: { isThenable: typeof (fetchPromise as any)?.then === 'function' }, hypothesisId: 'H4' })
       // #endregion
 
       const result = await Promise.race([
@@ -147,7 +148,7 @@ export function EnhancedAuthProvider({ children }: { children: React.ReactNode }
       if (timeoutId != null) clearTimeout(timeoutId)
       const elapsed = Date.now() - startTime
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'EnhancedAuthProvider.tsx:afterRace',message:'race settled',data:{elapsed,isTimeoutError:result instanceof Error&&result?.message==='Permission fetch timeout',hasData:!!result?.data,hasError:!!result?.error,resultMessage:result?.message},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+      debugIngest({ location: 'EnhancedAuthProvider.tsx:afterRace', message: 'race settled', data: { elapsed, isTimeoutError: result instanceof Error && result?.message === 'Permission fetch timeout', hasData: !!result?.data, hasError: !!result?.error, resultMessage: result?.message }, hypothesisId: 'H1' })
       // #endregion
 
       if (!result || result.error) {
@@ -197,7 +198,7 @@ export function EnhancedAuthProvider({ children }: { children: React.ReactNode }
     } catch (err) {
       const elapsed = Date.now() - startTime
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'EnhancedAuthProvider.tsx:catch',message:'catch',data:{elapsed,message:err instanceof Error?err.message:String(err)},timestamp:Date.now(),hypothesisId:'H2'})}).catch(()=>{});
+      debugIngest({ location: 'EnhancedAuthProvider.tsx:catch', message: 'catch', data: { elapsed, message: err instanceof Error ? err.message : String(err) }, hypothesisId: 'H2' })
       // #endregion
       console.error('Error fetching user roles and permissions:', err)
       setError(err instanceof Error ? err : new Error('Unknown error'))
