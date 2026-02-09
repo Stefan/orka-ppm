@@ -16,7 +16,7 @@ import { useTranslations } from '../../lib/i18n/context'
 import { ExportJob, PMRReport, PMRTemplate } from './types'
 
 // Export format options
-export type ExportFormat = 'pdf' | 'excel' | 'powerpoint' | 'word'
+export type ExportFormat = 'pdf' | 'excel' | 'powerpoint' | 'slides' | 'word'
 
 // Export configuration interface
 export interface ExportConfig {
@@ -101,10 +101,11 @@ export const PMRExportManager: React.FC<PMRExportManagerProps> = ({
 
   // Get format icon
   const getFormatIcon = (format: ExportFormat): string => {
-    const icons = {
+    const icons: Record<ExportFormat, string> = {
       pdf: '📄',
       excel: '📊',
       powerpoint: '📽️',
+      slides: '📽️',
       word: '📝'
     }
     return icons[format] || '📄'

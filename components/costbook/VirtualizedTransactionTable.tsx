@@ -2,7 +2,7 @@
 
 import React, { useMemo, useCallback } from 'react'
 import { useTranslations } from '@/lib/i18n/context'
-import { FixedSizeList as List, ListChildComponentProps } from 'react-window'
+import { List } from 'react-window'
 import { ArrowUpDown, ArrowUp, ArrowDown, FileText, Receipt, Calendar, Building2, DollarSign } from 'lucide-react'
 import { Transaction, Currency, POStatus, ActualStatus, CURRENCY_SYMBOLS } from '@/types/costbook'
 import { TransactionSortField, SortDirection } from '@/lib/costbook/transaction-queries'
@@ -130,10 +130,11 @@ const DEFAULT_COLUMNS: TransactionColumn[] = [
         [POStatus.RECEIVED]: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
         [POStatus.CANCELLED]: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
         [ActualStatus.PENDING]: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-        [ActualStatus.APPROVED]: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
         [ActualStatus.REJECTED]: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-        [ActualStatus.CANCELLED]: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
       }
+      // PO and Actual share 'approved' and 'cancelled' - use same styles
+      statusColors[ActualStatus.APPROVED] = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+      statusColors[ActualStatus.CANCELLED] = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
       const colorClass = statusColors[t.status] || 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200'
       return (
         <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium capitalize ${colorClass}`}>
@@ -200,34 +201,50 @@ export function VirtualizedTransactionTable({
       : <ArrowDown className="w-3 h-3 text-blue-500 dark:text-blue-400" />
   }
 
-  // Row renderer for react-window
-  const Row = useCallback(({ index, style }: ListChildComponentProps) => {
-    const transaction = transactions[index]
-    
+  // Row renderer for react-window v2
+  const Row = useCallback(function TransactionRow ({
+    index,
+    style,
+    ariaAttributes,
+    transactions: txList,
+    columns: cols,
+    currency: curr,
+    onRowClick: onRowClickHandler,
+  }: {
+    index: number
+    style: React.CSSProperties
+    ariaAttributes: { 'aria-posinset': number; 'aria-setsize': number; role: 'listitem' }
+    transactions: Transaction[]
+    columns: TransactionColumn[]
+    currency: Currency
+    onRowClick?: (t: Transaction) => void
+  }) {
+    const transaction = txList[index]
     return (
       <div
+        {...ariaAttributes}
         style={style}
         className={`flex items-center border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-gray-800/50 transition-colors ${
-          onRowClick ? 'cursor-pointer' : ''
+          onRowClickHandler ? 'cursor-pointer' : ''
         }`}
-        onClick={() => onRowClick?.(transaction)}
+        onClick={() => onRowClickHandler?.(transaction)}
         data-testid={`transaction-row-${index}`}
       >
-        {columns.map(column => (
+        {cols.map(column => (
           <div
             key={column.id}
             style={{ width: column.width }}
             className="px-3 py-2 flex items-center overflow-hidden"
           >
-            {column.render 
-              ? column.render(transaction, currency)
-              : (transaction as Record<string, any>)[column.id]
+            {column.render
+              ? column.render(transaction, curr)
+              : String((transaction as unknown as Record<string, unknown>)[column.id] ?? '')
             }
           </div>
         ))}
       </div>
     )
-  }, [transactions, columns, currency, onRowClick])
+  }, [])
 
   // Empty state
   if (transactions.length === 0) {
@@ -270,16 +287,19 @@ export function VirtualizedTransactionTable({
         ))}
       </div>
 
-      {/* Virtualized list */}
-      <List
-        height={height}
-        itemCount={transactions.length}
-        itemSize={rowHeight}
-        width="100%"
-        className="scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600"
-      >
-        {Row}
-      </List>
+      {/* Virtualized list (react-window v2) */}
+      <List<{
+        transactions: Transaction[]
+        columns: TransactionColumn[]
+        currency: Currency
+        onRowClick?: (t: Transaction) => void
+      }>
+        rowCount={transactions.length}
+        rowHeight={rowHeight}
+        rowComponent={Row}
+        rowProps={{ transactions, columns, currency, onRowClick }}
+        style={{ height, width: '100%' }}
+      />
 
       {/* Footer with count */}
       <div data-testid="virtualized-transaction-table-footer" className="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-sm text-gray-500 dark:text-gray-400">

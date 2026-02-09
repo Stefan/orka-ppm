@@ -5,18 +5,25 @@ import Link from 'next/link'
 import AppLayout from '@/components/shared/AppLayout'
 import { ResponsiveContainer } from '@/components/ui/molecules/ResponsiveContainer'
 import { loadDashboardData, type Project } from '@/lib/api/dashboard-loader'
+import { useAuth } from '@/app/providers/SupabaseAuthProvider'
 import { FileText } from 'lucide-react'
 
 export default function ChangeOrdersPage() {
+  const { session } = useAuth()
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadDashboardData()
+    if (!session?.access_token) {
+      setProjects([])
+      setLoading(false)
+      return
+    }
+    loadDashboardData(session.access_token)
       .then((data) => setProjects(data.projects || []))
       .catch(() => setProjects([]))
       .finally(() => setLoading(false))
-  }, [])
+  }, [session?.access_token])
 
   return (
     <AppLayout>

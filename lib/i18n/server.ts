@@ -74,7 +74,7 @@ export async function getTranslations() {
    * @param params - Optional parameters for interpolation
    * @returns Translated string
    */
-  const t = (key: TranslationKey, params?: InterpolationParams): string => {
+  const t = (key: TranslationKey | string, params?: InterpolationParams): string => {
     // Navigate nested object using dot notation
     const keys = key.split('.');
     let value: any = translations;

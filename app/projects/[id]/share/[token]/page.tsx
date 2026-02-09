@@ -13,7 +13,7 @@ import { AlertCircle, Clock, XCircle, Loader2 } from 'lucide-react'
 import GuestProjectView from '@/components/projects/GuestProjectView'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
-import type { FilteredProjectData, SharePermissionLevel } from '@/types/share-links'
+import { SharePermissionLevel, type FilteredProjectData } from '@/types/share-links'
 
 interface ShareAccessResponse {
   success: boolean
@@ -39,7 +39,7 @@ export default function GuestProjectAccessPage() {
     message: string
   } | null>(null)
   const [projectData, setProjectData] = useState<FilteredProjectData | null>(null)
-  const [permissionLevel, setPermissionLevel] = useState<SharePermissionLevel>('view_only')
+  const [permissionLevel, setPermissionLevel] = useState<SharePermissionLevel>(SharePermissionLevel.VIEW_ONLY)
   const [customMessage, setCustomMessage] = useState<string | undefined>()
 
   useEffect(() => {

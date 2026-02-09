@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { AnomalyResult, AnomalyType } from '@/lib/costbook/anomaly-detection'
 import { formatCurrency } from '@/lib/currency-utils'
+import { Currency } from '@/types/costbook'
 
 export interface AnomalyDetailDialogProps {
   /** Anomaly to display */
@@ -260,7 +261,7 @@ export function AnomalyDetailDialog({
                     <div className="text-sm text-gray-600 dark:text-slate-400">Actual Value</div>
                     <div className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                       {typeof anomaly.details.actualValue === 'number'
-                        ? formatCurrency(anomaly.details.actualValue)
+                        ? formatCurrency(anomaly.details.actualValue, Currency.USD)
                         : anomaly.details.actualValue
                       }
                     </div>
@@ -271,7 +272,7 @@ export function AnomalyDetailDialog({
                   <div className="bg-gray-50 dark:bg-slate-800/50 p-3 rounded-lg">
                     <div className="text-sm text-gray-600 dark:text-slate-400">Expected Value</div>
                     <div className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-                      {formatCurrency(anomaly.details.expectedValue)}
+                      {formatCurrency(anomaly.details.expectedValue, Currency.USD)}
                     </div>
                   </div>
                 )}
@@ -280,7 +281,7 @@ export function AnomalyDetailDialog({
                   <div className="bg-gray-50 dark:bg-slate-800/50 p-3 rounded-lg">
                     <div className="text-sm text-gray-600 dark:text-slate-400">Deviation</div>
                     <div className={`text-lg font-semibold ${anomaly.details.deviation > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
-                      {formatCurrency(Math.abs(anomaly.details.deviation))}
+                      {formatCurrency(Math.abs(anomaly.details.deviation), Currency.USD)}
                     </div>
                   </div>
                 )}

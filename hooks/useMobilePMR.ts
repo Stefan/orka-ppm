@@ -57,8 +57,11 @@ export function useMobilePMR(options: UseMobilePMROptions = {}) {
     state: pmrState,
     updateSection,
     hasUnsavedChanges,
-    saveReport
+    updateReport,
   } = usePMRContext()
+  const saveReport = useCallback(async () => {
+    if (pmrState.currentReport) await updateReport(pmrState.currentReport)
+  }, [pmrState.currentReport, updateReport])
 
   // Offline support
   const {

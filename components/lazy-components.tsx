@@ -233,7 +233,7 @@ export const LazyDatePicker = dynamic(
 
 // Excel/CSV handling (heavy with xlsx)
 export const LazyCSVImport = dynamic(
-  () => import('./shared/CSVImport'),
+  () => import('@/app/financials/components/views/CSVImportView'),
   {
     loading: () => <LoadingFallback />,
     ssr: false

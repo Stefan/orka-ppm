@@ -31,7 +31,7 @@ export default function ProjectControlsPage() {
       try {
         const { apiRequest } = await import('@/lib/api/client')
         const data = await apiRequest('/projects')
-        const list = Array.isArray(data) ? data : (data?.projects ?? [])
+        const list = Array.isArray(data) ? data : ((data as { projects?: unknown[] })?.projects ?? [])
         setProjects(list.slice(0, 20).map((p: { id: string; name: string }) => ({ id: p.id, name: p.name })))
         if (list.length > 0) {
           const fromUrl = searchParams.get('project')

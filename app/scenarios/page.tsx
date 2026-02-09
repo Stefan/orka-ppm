@@ -341,7 +341,7 @@ export default function ScenariosPage() {
                 <VirtualizedProjectSelector
                   projects={projects}
                   selectedProject={selectedProject}
-                  onSelectProject={setSelectedProject}
+                  onSelectProject={(project) => setSelectedProject(project as Project)}
                   formatCurrency={formatCurrency}
                   height={350}
                   itemHeight={70}

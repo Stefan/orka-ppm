@@ -9,13 +9,13 @@
  * Button variant types
  * Defines the supported button styles
  */
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'destructive' | 'default'
 
 /**
  * Component size types
  * Used across multiple components (Button, Input, etc.)
  */
-export type ComponentSize = 'sm' | 'md' | 'lg'
+export type ComponentSize = 'sm' | 'md' | 'lg' | 'icon'
 
 /**
  * Shadow size types

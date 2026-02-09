@@ -77,7 +77,7 @@ export function TemplateLibrary({
               <div className="flex items-center gap-2 min-w-0">
                 <FileText className="w-4 h-4 text-gray-500 dark:text-slate-400 flex-shrink-0" />
                 <span className="text-sm font-medium text-gray-900 dark:text-slate-100 truncate">{t.name}</span>
-                {t.isShared && <Share2 className="w-3 h-3 text-blue-500 dark:text-blue-400 flex-shrink-0" title="Shared" />}
+                {t.isShared && <Share2 className="w-3 h-3 text-blue-500 dark:text-blue-400 flex-shrink-0" aria-label="Shared" />}
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
                 <button

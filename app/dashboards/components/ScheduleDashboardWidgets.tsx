@@ -30,7 +30,7 @@ export default function ScheduleDashboardWidgets({ accessToken }: ScheduleDashbo
         .then((d) => (cancelled ? null : setScheduleCount((d.schedules ?? []).length))),
       fetch('/api/schedules/notifications?days_ahead=14', { headers: { Authorization: `Bearer ${accessToken}` } })
         .then((r) => (r.ok ? r.json() : {}))
-        .then((d) => (cancelled ? null : setMilestoneAlerts(d.milestone_alerts ?? []))),
+        .then((d) => (cancelled ? null : setMilestoneAlerts((d as { milestone_alerts?: unknown[] }).milestone_alerts ?? []))),
     ]).finally(() => {
       if (!cancelled) setLoading(false)
     })

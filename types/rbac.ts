@@ -78,6 +78,15 @@ export type Permission =
   // What-If scenario permissions
   | 'scenario_create'
   | 'scenario_read'
+  | 'scenario_update'
+  | 'scenario_delete'
+  | 'scenario_compare'
+  // Report & analytics
+  | 'report_read'
+  | 'analytics_read'
+  | 'change_read'
+  | 'audit_read'
+  | 'user_management'
 
 /**
  * Permission context for scoped permission checking

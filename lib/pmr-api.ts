@@ -123,7 +123,7 @@ function handlePMRError(error: any): never {
 // Request Helpers
 // ============================================================================
 
-interface PMRRequestConfig extends RequestConfig {
+interface PMRRequestConfig extends Omit<RequestConfig, 'cache'> {
   cache?: boolean
   cacheKey?: string
   cacheTTL?: number

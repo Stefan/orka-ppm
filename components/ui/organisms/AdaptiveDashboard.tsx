@@ -365,7 +365,6 @@ export const AdaptiveDashboard: React.FC<AdaptiveDashboardProps> = ({
         data-widget-id={widget.id || 'widget'}
       >
         <Card
-          variant={widget.aiRecommended ? 'interactive' : 'default'}
           className={cn(
             sizeClasses[widget.size],
             'relative group transition-all duration-200',

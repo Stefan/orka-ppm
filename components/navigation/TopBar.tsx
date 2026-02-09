@@ -51,7 +51,7 @@ import TopbarSearch from './TopbarSearch'
 import { cn } from '@/lib/utils/design-system'
 import { useWorkflowNotifications } from '@/hooks/useWorkflowRealtime'
 
-type TTopbar = (key: string, params?: Record<string, unknown>) => string
+type TTopbar = (key: string, params?: string | Record<string, unknown>) => string
 
 function formatNotificationTime(iso: string, t: TTopbar): string {
   const d = new Date(iso)

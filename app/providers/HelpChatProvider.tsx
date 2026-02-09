@@ -19,7 +19,8 @@ import type {
   HelpQueryResponse,
   HelpFeedbackRequest,
   HelpChatStorage,
-  HelpChatError
+  HelpChatError,
+  SupportedLanguage
 } from '../../types/help-chat'
 
 // Default preferences
@@ -288,7 +289,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
         console.log('🔄 [HelpChat] setState callback - prevState.language:', prevState.language, '-> newLanguage:', currentLanguage)
         return {
           ...prevState,
-          language: currentLanguage
+          language: (currentLanguage || prevState.language) as SupportedLanguage
         }
       })
     }
@@ -391,7 +392,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
         query: message.trim(),
         sessionId: state.sessionId,
         context: state.currentContext,
-        language: effectiveLanguage,
+        language: effectiveLanguage as SupportedLanguage,
         includeProactiveTips: state.proactiveTipsEnabled
       }
 

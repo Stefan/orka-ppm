@@ -64,7 +64,7 @@ export const PanelLoader = () => (
  * Heavy component with rich text editing capabilities
  */
 export const LazyPMREditor = dynamic(
-  () => import('./PMREditor').then(mod => mod.PMREditor),
+  () => import('./PMREditor').then(mod => mod.default),
   {
     loading: () => <DefaultLoader />,
     ssr: false // Disable SSR for editor
@@ -76,7 +76,7 @@ export const LazyPMREditor = dynamic(
  * Loaded on-demand when user opens insights panel
  */
 export const LazyAIInsightsPanel = dynamic(
-  () => import('./AIInsightsPanel').then(mod => mod.AIInsightsPanel),
+  () => import('./AIInsightsPanel').then(mod => mod.default),
   {
     loading: () => <PanelLoader />,
     ssr: true
@@ -88,7 +88,7 @@ export const LazyAIInsightsPanel = dynamic(
  * Loaded when collaboration is enabled
  */
 export const LazyCollaborationPanel = dynamic(
-  () => import('./CollaborationPanel').then(mod => mod.CollaborationPanel),
+  () => import('./CollaborationPanel').then(mod => mod.default),
   {
     loading: () => <PanelLoader />,
     ssr: false // Real-time features don't need SSR
@@ -100,7 +100,7 @@ export const LazyCollaborationPanel = dynamic(
  * Heavy component with complex visualizations
  */
 export const LazyMonteCarloAnalysis = dynamic(
-  () => import('./MonteCarloAnalysisComponent').then(mod => mod.MonteCarloAnalysisComponent),
+  () => import('./MonteCarloAnalysisComponent').then(mod => mod.default),
   {
     loading: () => <ChartLoader />,
     ssr: false // Complex calculations don't need SSR
@@ -124,7 +124,7 @@ export const LazyPMRExportManager = dynamic(
  * Loaded during report creation
  */
 export const LazyPMRTemplateSelector = dynamic(
-  () => import('./PMRTemplateSelector').then(mod => mod.PMRTemplateSelector),
+  () => import('./PMRTemplateSelector').then(mod => mod.default),
   {
     loading: () => <DefaultLoader />,
     ssr: true
@@ -136,7 +136,7 @@ export const LazyPMRTemplateSelector = dynamic(
  * Loaded per section as needed
  */
 export const LazyInteractiveChart = dynamic(
-  () => import('../charts/InteractiveChart').then(mod => mod.InteractiveChart),
+  () => import('../charts/InteractiveChart').then(mod => mod.default),
   {
     loading: () => <ChartLoader />,
     ssr: false // Charts don't need SSR

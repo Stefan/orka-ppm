@@ -28,7 +28,7 @@ export const SimulationCard: React.FC<SimulationCardProps> = ({
   actions
 }) => {
   return (
-    <Card variant="default" padding="md" className={cn('relative', className)}>
+    <Card padding="md" className={cn('relative', className)}>
       <CardHeader className="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-slate-700">
         <div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{title}</h3>

@@ -12,7 +12,8 @@ import {
   AlertCircle
 } from 'lucide-react'
 
-import type { ActiveUser, Comment, Conflict } from '@/hooks/useRealtimePMR'
+import type { ActiveUser } from '@/hooks/useRealtimePMR'
+import type { Comment, Conflict } from '@/components/pmr/types'
 
 export interface MobileCollaborationPanelProps {
   activeUsers: ActiveUser[]

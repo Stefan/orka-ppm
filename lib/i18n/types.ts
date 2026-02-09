@@ -66,11 +66,12 @@ export interface PluralRules {
 
 /**
  * Translation function type
- * Function signature for the t() translation function
+ * Function signature for the t() translation function.
+ * Accepts TranslationKey | string so base keys used with pluralization (e.g. 'common.approvals' with { count }) type-check.
  */
 export type TranslationFunction = (
-  key: TranslationKey,
-  params?: InterpolationParams
+  key: TranslationKey | string,
+  params?: InterpolationParams | string
 ) => string;
 
 /**

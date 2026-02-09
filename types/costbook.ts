@@ -434,6 +434,8 @@ export type DistributionRuleScope = 'project' | 'line'
 
 export interface DistributionRule {
   id: string
+  /** Optional display name for the rule */
+  name?: string
   type: DistributionRuleType
   profile: DistributionProfile
   settings: DistributionSettings

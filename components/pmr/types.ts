@@ -58,6 +58,8 @@ export interface MonteCarloResults {
   recommendations: Array<Record<string, any>>
   processing_time_ms: number
   generated_at: string
+  /** Confidence level used (e.g. 0.95). Optional for backwards compatibility. */
+  confidence_level?: number
 }
 
 export interface CollaborationSession {

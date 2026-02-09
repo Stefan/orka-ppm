@@ -1,6 +1,6 @@
 'use client'
 
-import { memo } from 'react'
+import React, { memo } from 'react'
 import { List } from 'react-window'
 import ProjectCard from '../../app/dashboards/components/ProjectCard'
 import type { Project } from '../../lib/api/dashboard-loader'
@@ -13,7 +13,7 @@ interface VirtualizedProjectListProps {
 }
 
 interface RowProps {
-  project: Project
+  projects: Project[]
 }
 
 const VirtualizedProjectList = memo(function VirtualizedProjectList({
@@ -22,10 +22,11 @@ const VirtualizedProjectList = memo(function VirtualizedProjectList({
   itemHeight = 120,
   className = ''
 }: VirtualizedProjectListProps) {
-  // Row component for react-window
-  const RowComponent = ({ project }: RowProps) => {
+  // Row component for react-window (receives index from List + rowProps)
+  const RowComponent = ({ index, style, ...rest }: { index: number; style: React.CSSProperties } & RowProps) => {
+    const project = rest.projects[index]
     return (
-      <div className="px-2">
+      <div className="px-2" style={style}>
         <ProjectCard project={project} />
       </div>
     )
@@ -43,12 +44,12 @@ const VirtualizedProjectList = memo(function VirtualizedProjectList({
   }
 
   return (
-    <List
+    <List<RowProps>
       defaultHeight={height}
       rowCount={projects.length}
       rowHeight={itemHeight}
       rowComponent={RowComponent}
-      rowProps={(index) => ({ project: projects[index] })}
+      rowProps={{ projects }}
       className={className}
     />
   )

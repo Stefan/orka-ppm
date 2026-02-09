@@ -12,9 +12,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { 
@@ -231,20 +231,17 @@ export default function AuditTrailViewer() {
                 <Label htmlFor="action-filter">Action Type</Label>
                 <Select
                   value={filters.action}
-                  onValueChange={(value) => setFilters({ ...filters, action: value })}
-                >
-                  <SelectTrigger id="action-filter">
-                    <SelectValue placeholder="All actions" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">All actions</SelectItem>
-                    <SelectItem value="role_assignment_created">Role Assigned</SelectItem>
-                    <SelectItem value="role_assignment_removed">Role Removed</SelectItem>
-                    <SelectItem value="custom_role_created">Custom Role Created</SelectItem>
-                    <SelectItem value="custom_role_updated">Custom Role Updated</SelectItem>
-                    <SelectItem value="custom_role_deleted">Custom Role Deleted</SelectItem>
-                  </SelectContent>
-                </Select>
+                  onChange={(value) => setFilters({ ...filters, action: value })}
+                  placeholder="All actions"
+                  options={[
+                    { value: '', label: 'All actions' },
+                    { value: 'role_assignment_created', label: 'Role Assigned' },
+                    { value: 'role_assignment_removed', label: 'Role Removed' },
+                    { value: 'custom_role_created', label: 'Custom Role Created' },
+                    { value: 'custom_role_updated', label: 'Custom Role Updated' },
+                    { value: 'custom_role_deleted', label: 'Custom Role Deleted' },
+                  ]}
+                />
               </div>
               
               <div className="space-y-2">

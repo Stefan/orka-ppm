@@ -78,7 +78,7 @@ const RiskCharts = React.memo(function RiskCharts({
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ status, count }) => `${status}: ${count}`}
+                label={((payload: { status?: string; count?: number }) => `${payload.status ?? ''}: ${payload.count ?? 0}`) as React.ComponentProps<typeof Pie>['label']}
                 outerRadius={100}
                 fill="#8884d8"
                 dataKey="count"

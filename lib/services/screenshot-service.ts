@@ -457,6 +457,7 @@ export class ScreenshotService {
 
     // Fallback: try to import dynamically
     try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const html2canvas = await import('html2canvas')
       return html2canvas.default
     } catch (error) {
@@ -559,7 +560,7 @@ export class VisualGuideBuilder {
       title,
       description,
       targetElement: options?.targetElement || options?.element,
-      action: options?.action,
+      action: options?.action as VisualGuideStep['action'] | undefined,
       actionData: options?.actionData,
       annotations: options?.annotations || []
     })

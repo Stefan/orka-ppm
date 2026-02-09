@@ -19,7 +19,8 @@
 # Feature: property-based-testing
 
 set -e
-cd "$(git rev-parse --show-toplevel)"
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
 
 echo "Running pre-push checks..."
 echo ""
@@ -67,11 +68,19 @@ if [ "$PUSHING_MAIN" = "1" ]; then
     echo ""
 fi
 
-# 1. Health check (syntax, optional deps, type-check)
-echo "▶ Health check (syntax, optional deps, type-check)"
+# 1. Health check (syntax, optional deps; type-check runs via health-check:full / CI)
+# #region agent log
+LOG="$REPO_ROOT/.cursor/debug.log"
+mkdir -p "$(dirname "$LOG")"
+echo "{\"location\":\"pre-push\",\"message\":\"health-check start\",\"data\":{\"step\":\"health-check\"},\"timestamp\":$(date +%s)000,\"hypothesisId\":\"H1\"}" >> "$LOG"
+# #endregion
+echo "▶ Health check (syntax, optional deps)"
 if ! npm run health-check; then
+    # #region agent log
+    echo "{\"location\":\"pre-push\",\"message\":\"health-check failed\",\"data\":{\"step\":\"health-check\"},\"timestamp\":$(date +%s)000,\"hypothesisId\":\"H1\"}" >> "$LOG"
+    # #endregion
     echo ""
-    echo "❌ Health check failed (syntax / optional deps / type-check)."
+    echo "❌ Health check failed (syntax / optional deps)."
     echo "   Build number was bumped; fix the errors above and push again."
     echo "   Bypass: git push --no-verify"
     exit 1

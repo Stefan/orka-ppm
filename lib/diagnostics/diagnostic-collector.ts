@@ -17,7 +17,7 @@ export interface ErrorLog {
   url: string
   userId?: string
   sessionId: string
-  errorType: 'javascript' | 'authentication' | 'api' | 'component' | 'network' | 'validation'
+  errorType: 'javascript' | 'authentication' | 'api' | 'component' | 'network' | 'validation' | 'lazy-load' | 'lazy-load-max-retries'
   severity: 'low' | 'medium' | 'high' | 'critical'
   context?: Record<string, any>
   breadcrumbs: BreadcrumbEntry[]

@@ -576,9 +576,9 @@ export class HelpChatAPIService {
       while (true) {
         result = await generator.next()
         if (result.done) {
-          return result.value
+          return result.value as HelpQueryResponse
         }
-        yield result.value
+        yield result.value as string
       }
     } catch (error) {
       console.error('Streaming help query failed:', error)

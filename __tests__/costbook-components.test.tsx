@@ -15,18 +15,35 @@ import { renderWithI18n, screen, fireEvent, waitFor } from '@/__tests__/utils/te
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 
-// Mock react-window
-jest.mock('react-window', () => ({
-  FixedSizeList: ({ children, itemCount, height }: any) => (
-    <div data-testid="virtual-list" style={{ height }}>
-      {Array.from({ length: Math.min(itemCount, 10) }).map((_, index) => (
-        <div key={index}>
-          {children({ index, style: {} })}
-        </div>
-      ))}
-    </div>
-  )
-}))
+// Mock react-window (v2 uses List with rowComponent/rowProps; legacy uses FixedSizeList)
+jest.mock('react-window', () => {
+  const RowRenderer = ({ rowComponent: RowComponent, rowProps, index }: any) => {
+    if (!RowComponent) return null
+    return (
+      <div key={index}>
+        <RowComponent index={index} style={{}} ariaAttributes={{ 'aria-posinset': index, 'aria-setsize': 0, role: 'listitem' }} {...rowProps} />
+      </div>
+    )
+  }
+  return {
+    List: ({ rowCount, rowHeight, rowComponent, rowProps, style }: any) => (
+      <div data-testid="virtual-list" style={style}>
+        {Array.from({ length: Math.min(rowCount ?? 0, 10) }).map((_, index) => (
+          <RowRenderer key={index} rowComponent={rowComponent} rowProps={rowProps} index={index} />
+        ))}
+      </div>
+    ),
+    FixedSizeList: ({ children, itemCount, height }: any) => (
+      <div data-testid="virtual-list" style={{ height }}>
+        {Array.from({ length: Math.min(itemCount, 10) }).map((_, index) => (
+          <div key={index}>
+            {children({ index, style: {} })}
+          </div>
+        ))}
+      </div>
+    )
+  }
+})
 
 // Import components
 import { VirtualizedTransactionTable, VirtualizedTransactionTableSkeleton } from '@/components/costbook/VirtualizedTransactionTable'

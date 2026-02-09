@@ -194,12 +194,12 @@ function rowToExtendedComment(row: CostbookCommentRow, replyCount = 0): Extended
 /**
  * Get Supabase client and current user id for comments. Returns null if not authenticated.
  */
-async function getSupabaseAuth(): Promise<{ supabase: Awaited<ReturnType<typeof import('@/lib/api/supabase')['supabase']>>; userId: string } | null> {
+async function getSupabaseAuth(): Promise<{ supabase: import('@supabase/supabase-js').SupabaseClient; userId: string } | null> {
   try {
     const { supabase } = await import('@/lib/api/supabase')
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { session } } = await (supabase as import('@supabase/supabase-js').SupabaseClient).auth.getSession()
     if (!session?.user?.id) return null
-    return { supabase, userId: session.user.id }
+    return { supabase: supabase as import('@supabase/supabase-js').SupabaseClient, userId: session.user.id }
   } catch {
     return null
   }

@@ -85,7 +85,26 @@ export function HelpChat({ className, onOpenModal }: HelpChatProps) {
 
   const startVoiceInput = useCallback(() => {
     if (typeof window === 'undefined') return
-    const win = window as unknown as { webkitSpeechRecognition?: new () => { start: () => void; onresult: (e: { results: Array<Array<{ transcript: string }>> }) => void; onerror: () => void; onend: () => void }; SpeechRecognition?: new () => { start: () => void; onresult: (e: { results: Array<Array<{ transcript: string }>> }) => void; onerror: () => void; onend: () => void } }
+    const win = window as unknown as {
+      webkitSpeechRecognition?: new () => {
+        start: () => void
+        onresult: (e: { results: Array<Array<{ transcript: string }>> }) => void
+        onerror: () => void
+        onend: () => void
+        continuous?: boolean
+        interimResults?: boolean
+        lang?: string
+      }
+      SpeechRecognition?: new () => {
+        start: () => void
+        onresult: (e: { results: Array<Array<{ transcript: string }>> }) => void
+        onerror: () => void
+        onend: () => void
+        continuous?: boolean
+        interimResults?: boolean
+        lang?: string
+      }
+    }
     const Rec = win.webkitSpeechRecognition ?? win.SpeechRecognition
     if (!Rec) return
     try {

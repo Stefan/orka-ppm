@@ -65,7 +65,7 @@ export default function TabNavigation({ viewMode, onViewModeChange }: TabNavigat
       tabs.splice(1, 0, { key: 'costbook', label: 'Budget & Cost Management', icon: BookOpen, description: 'Comprehensive budget tracking, cost management, and financial oversight with detailed project analysis' })
     }
 
-    return tabs
+    return tabs as TabConfig[]
   }, [t, costbookEnabled])
 
   // #region agent log

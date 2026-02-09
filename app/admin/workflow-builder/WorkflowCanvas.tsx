@@ -66,7 +66,7 @@ export const WorkflowCanvas = forwardRef<
   WorkflowCanvasRef,
   { readOnly?: boolean; onNodeSelect?: (nodeId: string | null) => void }
 >(function WorkflowCanvas({ readOnly = false, onNodeSelect }, ref) {
-  const [nodes, setNodes, onNodesChange] = useNodesState<StepNodeData>(initialNodes)
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node<StepNodeData>>(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
   const nodesRef = useRef(nodes)
   const edgesRef = useRef(edges)
@@ -77,7 +77,7 @@ export const WorkflowCanvas = forwardRef<
     getNodes: () => nodesRef.current,
     getEdges: () => edgesRef.current,
     setNodeData: (nodeId: string, data: Partial<StepNodeData>) => {
-      setNodes((nds) =>
+      setNodes((nds: Node<StepNodeData>[]) =>
         nds.map((n) =>
           n.id === nodeId ? { ...n, data: { ...n.data, ...data } } : n
         )
@@ -89,7 +89,7 @@ export const WorkflowCanvas = forwardRef<
       const position = last
         ? { x: last.position.x + 180, y: last.position.y }
         : { x: 100, y: 100 }
-      setNodes((nds) => [
+      setNodes((nds: Node<StepNodeData>[]) => [
         ...nds,
         { id, type: 'step', position, data: { ...data } },
       ])

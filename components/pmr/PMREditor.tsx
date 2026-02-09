@@ -21,15 +21,15 @@ import Highlight from '@tiptap/extension-highlight'
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
 import {
-  Bold,
-  Italic,
+  Bold as BoldIcon,
+  Italic as ItalicIcon,
+  Code as CodeIcon,
   List,
   ListOrdered,
   Heading1,
   Heading2,
   Heading3,
   Quote,
-  Code,
   Undo,
   Redo,
   Save,
@@ -133,19 +133,19 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
             <ToolbarButton
               onClick={() => editor.chain().focus().toggleBold().run()}
               isActive={editor.isActive('bold')}
-              icon={Bold}
+              icon={BoldIcon}
               title="Bold (Ctrl+B)"
             />
             <ToolbarButton
               onClick={() => editor.chain().focus().toggleItalic().run()}
               isActive={editor.isActive('italic')}
-              icon={Italic}
+              icon={ItalicIcon}
               title="Italic (Ctrl+I)"
             />
             <ToolbarButton
               onClick={() => editor.chain().focus().toggleCode().run()}
               isActive={editor.isActive('code')}
-              icon={Code}
+              icon={CodeIcon}
               title="Code"
             />
           </div>

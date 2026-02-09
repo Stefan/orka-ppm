@@ -144,7 +144,7 @@ function CostbookInner({
   // Integration sync (ERP)
   const [isSyncing, setIsSyncing] = useState(false)
   const { session } = useAuth()
-  const { addToast } = useToast()
+  const toast = useToast()
 
   // Performance tracking
   const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetrics>({
@@ -366,7 +366,7 @@ function CostbookInner({
   const handleIntegrationSync = useCallback(async () => {
     const token = session?.access_token
     if (!token) {
-      addToast({ type: 'warning', title: 'Sync', message: 'Sign in to sync from ERP.' })
+      toast.custom({ type: 'warning', title: 'Sync', message: 'Sign in to sync from ERP.' })
       return
     }
     setIsSyncing(true)
@@ -374,13 +374,13 @@ function CostbookInner({
       const result = await triggerSync({ adapter: 'sap', entity: 'commitments' }, token)
       const added = (result.inserted ?? 0) + (result.updated ?? 0)
       if (result.errors?.length) {
-        addToast({
+        toast.custom({
           type: 'warning',
           title: 'Sync completed with issues',
           message: `${added} records; ${result.errors.length} error(s).`,
         })
       } else {
-        addToast({
+        toast.custom({
           type: 'success',
           title: 'Sync erfolgreich',
           message: added > 0 ? `${added} neue/aktualisierte Commitments.` : 'Keine Änderungen.',
@@ -388,7 +388,7 @@ function CostbookInner({
       }
       fetchData()
     } catch (e) {
-      addToast({
+      toast.custom({
         type: 'error',
         title: 'Sync fehlgeschlagen',
         message: e instanceof Error ? e.message : 'Sync failed.',
@@ -396,7 +396,7 @@ function CostbookInner({
     } finally {
       setIsSyncing(false)
     }
-  }, [session?.access_token, addToast, fetchData])
+  }, [session?.access_token, toast, fetchData])
 
   const handleProjectClick = useCallback((project: ProjectWithFinancials) => {
     setSelectedProjectId(project.id)
@@ -566,7 +566,7 @@ function CostbookInner({
   // Hierarchy handlers
   const handleHierarchyNodeSelect = useCallback((node: HierarchyNode) => {
     setSelectedHierarchyNode(node)
-    console.log('Selected hierarchy node:', node.label, node.total)
+    console.log('Selected hierarchy node:', node.name, node.total_budget)
   }, [])
 
   // Distribution handlers (Phase 2 & 3)

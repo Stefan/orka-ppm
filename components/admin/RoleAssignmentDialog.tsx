@@ -13,13 +13,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/Button'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select } from '@/components/ui/Select'
 import { Alert, AlertDescription } from '@/components/ui/Alert'
 import { Loader2, AlertCircle, Info } from 'lucide-react'
 
@@ -274,23 +268,12 @@ export function RoleAssignmentDialog({
           {/* Role Selection */}
           <div className="space-y-2">
             <Label htmlFor="role">Role</Label>
-            <Select value={selectedRole} onValueChange={setSelectedRole}>
-              <SelectTrigger id="role">
-                <SelectValue placeholder="Select a role" />
-              </SelectTrigger>
-              <SelectContent>
-                {roles.map(role => (
-                  <SelectItem key={role.role} value={role.role}>
-                    <div className="flex flex-col">
-                      <span className="font-medium">{role.role}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {role.description}
-                      </span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Select
+              value={selectedRole}
+              onChange={setSelectedRole}
+              placeholder="Select a role"
+              options={roles.map(role => ({ value: role.role, label: `${role.role} – ${role.description}` }))}
+            />
 
             {/* Role Permissions Info */}
             {selectedRoleInfo && (
@@ -312,45 +295,16 @@ export function RoleAssignmentDialog({
           {/* Scope Type Selection */}
           <div className="space-y-2">
             <Label htmlFor="scope-type">Scope</Label>
-            <Select value={scopeType} onValueChange={(value) => setScopeType(value as ScopeType)}>
-              <SelectTrigger id="scope-type">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="global">
-                  <div className="flex flex-col">
-                    <span className="font-medium">Global</span>
-                    <span className="text-xs text-muted-foreground">
-                      Access across all resources
-                    </span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="organization">
-                  <div className="flex flex-col">
-                    <span className="font-medium">Organization</span>
-                    <span className="text-xs text-muted-foreground">
-                      Limited to specific organization
-                    </span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="portfolio">
-                  <div className="flex flex-col">
-                    <span className="font-medium">Portfolio</span>
-                    <span className="text-xs text-muted-foreground">
-                      Limited to specific portfolio
-                    </span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="project">
-                  <div className="flex flex-col">
-                    <span className="font-medium">Project</span>
-                    <span className="text-xs text-muted-foreground">
-                      Limited to specific project
-                    </span>
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <Select
+              value={scopeType}
+              onChange={(value) => setScopeType(value as ScopeType)}
+              options={[
+                { value: 'global', label: 'Global – Access across all resources' },
+                { value: 'organization', label: 'Organization – Limited to specific organization' },
+                { value: 'portfolio', label: 'Portfolio – Limited to specific portfolio' },
+                { value: 'project', label: 'Project – Limited to specific project' },
+              ]}
+            />
           </div>
 
           {/* Scope Selection (if not global) */}
@@ -367,18 +321,12 @@ export function RoleAssignmentDialog({
                   </span>
                 </div>
               ) : (
-                <Select value={selectedScopeId} onValueChange={setSelectedScopeId}>
-                  <SelectTrigger id="scope-id">
-                    <SelectValue placeholder={`Select a ${scopeType}`} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {scopeOptions.map(option => (
-                      <SelectItem key={option.id} value={option.id}>
-                        {option.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Select
+                  value={selectedScopeId}
+                  onChange={setSelectedScopeId}
+                  placeholder={`Select a ${scopeType}`}
+                  options={scopeOptions.map(option => ({ value: option.id, label: option.name }))}
+                />
               )}
             </div>
           )}

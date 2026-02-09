@@ -81,6 +81,9 @@ interface RAGResponse {
   conversation_id: string
   response_time_ms: number
   status?: string
+  action?: string
+  actionData?: unknown
+  suggestedChanges?: Array<{ summary?: string; [key: string]: unknown }>
 }
 
 interface ChatError {
@@ -295,14 +298,30 @@ export default function Reports() {
         confidence: data.confidence_score,
         action: data.action,
         actionData: data.actionData,
-        suggestedChanges: data.suggestedChanges
+        suggestedChanges: data.suggestedChanges?.map((sc: Record<string, unknown>) => ({
+          id: String(sc.id ?? ''),
+          section: String(sc.section ?? ''),
+          changeType: String(sc.changeType ?? ''),
+          content: String(sc.content ?? ''),
+          reason: String(sc.reason ?? ''),
+          confidence: Number(sc.confidence ?? 0),
+          applied: false
+        }))
       }
 
       setMessages(prev => [...prev, assistantMessage])
       
       // Handle PMR-specific suggested changes
       if (data.suggestedChanges && data.suggestedChanges.length > 0) {
-        setPendingChanges(prev => [...prev, ...data.suggestedChanges])
+        setPendingChanges(prev => [...prev, ...data.suggestedChanges.map((sc: Record<string, unknown>) => ({
+          id: String(sc.id ?? ''),
+          section: String(sc.section ?? ''),
+          changeType: String(sc.changeType ?? ''),
+          content: String(sc.content ?? ''),
+          reason: String(sc.reason ?? ''),
+          confidence: Number(sc.confidence ?? 0),
+          applied: false
+        }))])
         toast.info(
           'Suggestions Available',
           `${data.suggestedChanges.length} content suggestions are ready for review`,
@@ -472,7 +491,15 @@ export default function Reports() {
         timestamp: new Date(),
         action: data.action,
         actionData: data.actionData,
-        suggestedChanges: data.suggestedChanges,
+        suggestedChanges: data.suggestedChanges?.map((sc: Record<string, unknown>) => ({
+          id: String(sc.id ?? ''),
+          section: String(sc.section ?? ''),
+          changeType: String(sc.changeType ?? ''),
+          content: String(sc.content ?? ''),
+          reason: String(sc.reason ?? ''),
+          confidence: Number(sc.confidence ?? 0),
+          applied: false
+        })),
         confidence: data.confidence_score,
         sources: data.sources?.map((s: any) => ({
           type: s.type,
@@ -484,7 +511,15 @@ export default function Reports() {
       setMessages(prev => [...prev, assistantMessage])
 
       if (data.suggestedChanges && data.suggestedChanges.length > 0) {
-        setPendingChanges(prev => [...prev, ...data.suggestedChanges])
+        setPendingChanges(prev => [...prev, ...data.suggestedChanges.map((sc: Record<string, unknown>) => ({
+          id: String(sc.id ?? ''),
+          section: String(sc.section ?? ''),
+          changeType: String(sc.changeType ?? ''),
+          content: String(sc.content ?? ''),
+          reason: String(sc.reason ?? ''),
+          confidence: Number(sc.confidence ?? 0),
+          applied: false
+        }))])
       }
 
       resetErrorState()

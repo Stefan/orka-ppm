@@ -12,7 +12,9 @@ import { NextRequest, NextResponse } from 'next/server'
 const DEEPL_API_KEY = process.env.DEEPL_API_KEY
 const DEEPL_API_URL = process.env.DEEPL_API_URL ?? 'https://api-free.deepl.com/v2/translate'
 
-type NestedRecord = Record<string, string | NestedRecord>
+interface NestedRecord {
+  [key: string]: string | NestedRecord;
+}
 
 function isPlainObject (v: unknown): v is NestedRecord {
   return typeof v === 'object' && v !== null && !Array.isArray(v)

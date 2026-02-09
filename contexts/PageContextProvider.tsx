@@ -33,13 +33,13 @@ const PageContext = createContext<PageContextType | undefined>(undefined)
 
 export function PageContextProvider({ children }: PageContextProviderProps) {
   const pathname = usePathname()
-  const { user } = useAuth()
+  const { user, organizationContext } = useAuth()
   
   const [context, setContext] = useState<PageContextData>({
     route: pathname || '/',
     pageTitle: 'Dashboard',
-    userRole: user?.role || 'viewer',
-    organizationId: user?.organization_id,
+    userRole: (user as { role?: string } | null)?.role || 'viewer',
+    organizationId: organizationContext?.organizationId ?? undefined,
     relevantData: {}
   })
 
@@ -65,10 +65,10 @@ export function PageContextProvider({ children }: PageContextProviderProps) {
       ...prev,
       route: pathname,
       pageTitle,
-      userRole: user?.role || prev.userRole,
-      organizationId: user?.organization_id || prev.organizationId
+      userRole: (user as { role?: string } | null)?.role || prev.userRole,
+      organizationId: organizationContext?.organizationId ?? prev.organizationId
     }))
-  }, [pathname, user])
+  }, [pathname, user, organizationContext])
 
   const updateContext = useCallback((updates: Partial<PageContextData>) => {
     setContext(prev => ({ ...prev, ...updates }))

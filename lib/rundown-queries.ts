@@ -8,7 +8,8 @@ import {
   RundownProfileSummary,
   GenerateProfilesInput,
   RundownProfilesQuery,
-  RundownStatus
+  RundownStatus,
+  ProfileType
 } from '@/types/rundown'
 
 // Query keys for cache management
@@ -170,7 +171,7 @@ export function useRundownProfiles(
     queryKey: rundownKeys.profilesByScenario(projectId, scenarioName),
     queryFn: () => fetchRundownProfiles({
       project_id: projectId,
-      profile_type: profileType,
+      profile_type: profileType as ProfileType,
       scenario_name: scenarioName,
     }),
     enabled: enabled && !!projectId,

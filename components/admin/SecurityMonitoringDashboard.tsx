@@ -27,13 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/Table';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select } from '@/components/ui/Select';
 import {
   Dialog,
   DialogContent,
@@ -42,7 +36,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
+import { Textarea } from '@/components/ui/Input';
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 import {
   Shield,
@@ -310,17 +304,15 @@ export default function SecurityMonitoringDashboard({
         </div>
         <Select
           value={dashboardDays.toString()}
-          onValueChange={(value) => setDashboardDays(parseInt(value))}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select period" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="7">Last 7 days</SelectItem>
-            <SelectItem value="14">Last 14 days</SelectItem>
-            <SelectItem value="30">Last 30 days</SelectItem>
-          </SelectContent>
-        </Select>
+          onChange={(value) => setDashboardDays(parseInt(value, 10))}
+          placeholder="Select period"
+          className="w-[180px]"
+          options={[
+            { value: '7', label: 'Last 7 days' },
+            { value: '14', label: 'Last 14 days' },
+            { value: '30', label: 'Last 30 days' },
+          ]}
+        />
       </div>
 
       {error && (
@@ -405,31 +397,33 @@ export default function SecurityMonitoringDashboard({
               </CardDescription>
             </div>
             <div className="flex gap-2">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="pending_review">Pending Review</SelectItem>
-                  <SelectItem value="under_review">Under Review</SelectItem>
-                  <SelectItem value="resolved">Resolved</SelectItem>
-                  <SelectItem value="dismissed">Dismissed</SelectItem>
-                </SelectContent>
-              </Select>
+              <Select
+                value={statusFilter}
+                onChange={setStatusFilter}
+                placeholder="Filter by status"
+                className="w-[180px]"
+                options={[
+                  { value: 'all', label: 'All Statuses' },
+                  { value: 'pending_review', label: 'Pending Review' },
+                  { value: 'under_review', label: 'Under Review' },
+                  { value: 'resolved', label: 'Resolved' },
+                  { value: 'dismissed', label: 'Dismissed' },
+                ]}
+              />
 
-              <Select value={severityFilter} onValueChange={setSeverityFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by severity" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Severities</SelectItem>
-                  <SelectItem value="critical">Critical</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                </SelectContent>
-              </Select>
+              <Select
+                value={severityFilter}
+                onChange={setSeverityFilter}
+                placeholder="Filter by severity"
+                className="w-[180px]"
+                options={[
+                  { value: 'all', label: 'All Severities' },
+                  { value: 'critical', label: 'Critical' },
+                  { value: 'high', label: 'High' },
+                  { value: 'medium', label: 'Medium' },
+                  { value: 'low', label: 'Low' },
+                ]}
+              />
             </div>
           </div>
         </CardHeader>
@@ -554,25 +548,25 @@ export default function SecurityMonitoringDashboard({
                 <Textarea
                   placeholder="Describe how this alert was resolved..."
                   value={resolution}
-                  onChange={(e) => setResolution(e.target.value)}
+                  onChange={(value) => setResolution(value)}
                   rows={3}
                 />
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Action Taken</label>
-                <Select value={actionTaken} onValueChange={setActionTaken}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select action taken" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="false_positive">False Positive</SelectItem>
-                    <SelectItem value="link_suspended">Link Suspended</SelectItem>
-                    <SelectItem value="ip_blocked">IP Blocked</SelectItem>
-                    <SelectItem value="monitoring">Under Monitoring</SelectItem>
-                    <SelectItem value="no_action">No Action Required</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Select
+                  value={actionTaken}
+                  onChange={setActionTaken}
+                  placeholder="Select action taken"
+                  options={[
+                    { value: 'false_positive', label: 'False Positive' },
+                    { value: 'link_suspended', label: 'Link Suspended' },
+                    { value: 'ip_blocked', label: 'IP Blocked' },
+                    { value: 'monitoring', label: 'Under Monitoring' },
+                    { value: 'no_action', label: 'No Action Required' },
+                  ]}
+                />
               </div>
             </div>
           )}

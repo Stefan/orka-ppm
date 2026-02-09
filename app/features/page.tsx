@@ -163,7 +163,7 @@ function FeaturesContent() {
     }
   }, [features, searchQuery])
 
-  const pageTree = useMemo(() => buildPageTree(routes, features), [routes, features])
+  const pageTree = useMemo(() => buildPageTree(routes as import('@/types/features').DocItem[], features), [routes, features])
   const flatNodes = useMemo(() => flattenPageTree(pageTree), [pageTree])
 
   useEffect(() => {

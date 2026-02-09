@@ -38,7 +38,7 @@ export const ContextualHelp: React.FC<ContextualHelpProps> = ({
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 })
   const triggerRef = useRef<HTMLButtonElement>(null)
   const tooltipRef = useRef<HTMLDivElement>(null)
-  const timeoutRef = useRef<NodeJS.Timeout>()
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   // Calculate tooltip position
   useEffect(() => {

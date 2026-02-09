@@ -20,6 +20,12 @@ const LOCALE_MAP: Record<SupportedLocale, string> = {
   es: 'es-ES',
   pl: 'pl-PL',
   gsw: 'de-CH', // Swiss German uses Swiss formatting conventions
+  'es-MX': 'es-MX',
+  'zh-CN': 'zh-CN',
+  'hi-IN': 'hi-IN',
+  'ja-JP': 'ja-JP',
+  'ko-KR': 'ko-KR',
+  'vi-VN': 'vi-VN',
 };
 
 /**

@@ -84,7 +84,7 @@ export async function fetchNestedGridData(
       .from('projects')
       .select('*')
       .eq('id', parentRowId)
-    return data ? [data] : []
+    return (data ? [data] : []) as unknown as Record<string, unknown>[]
   }
   return []
 }

@@ -80,10 +80,11 @@ export const FormField: React.FC<FormFieldProps> = ({
           <Input
             type={type}
             value={value}
-            onChange={onChange}
+            onChange={(e) => onChange(type === 'number' ? (e.target.valueAsNumber ?? 0) : e.target.value)}
             placeholder={placeholder}
             disabled={disabled}
-            error={error}
+            error={!!error}
+            errorMessage={error}
           />
         )
     }

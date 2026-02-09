@@ -125,7 +125,7 @@ export const LazyPMRSection: React.FC<LazyPMRSectionProps> = ({
   const [isLoaded, setIsLoaded] = useState(false);
   
   // Use intersection observer for lazy loading
-  const { ref, isIntersecting } = useIntersectionObserver({
+  const [ref, isIntersecting] = useIntersectionObserver({
     threshold: 0.1,
     rootMargin: '200px' // Start loading 200px before section enters viewport
   });
@@ -166,7 +166,7 @@ export const LazyPMRSection: React.FC<LazyPMRSectionProps> = ({
   };
 
   return (
-    <div ref={ref} id={sectionId} className="pmr-section mb-6">
+    <div ref={ref as React.Ref<HTMLDivElement>} id={sectionId} className="pmr-section mb-6">
       {shouldLoad ? (
         <SectionErrorBoundary fallback={errorFallback} onError={onError}>
           <Suspense fallback={loadingPlaceholder || <DefaultLoadingPlaceholder title={title} />}>

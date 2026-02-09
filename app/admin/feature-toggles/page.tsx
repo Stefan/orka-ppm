@@ -172,7 +172,7 @@ export default function AdminFeatureTogglesPage() {
   }, [flags])
 
   const filteredFlags = useMemo(
-    () => filterFlagsBySearch(mergedFlags, searchInput),
+    () => filterFlagsBySearch(mergedFlags as { name: string }[], searchInput) as FlagRow[],
     [mergedFlags, searchInput]
   )
 
@@ -288,8 +288,9 @@ export default function AdminFeatureTogglesPage() {
             <tbody className="divide-y divide-gray-200 dark:divide-slate-700 bg-white dark:bg-slate-800">
               {filteredFlags.map((flag) => {
                 const placeholder = isPlaceholder(flag)
-                  return (
-                    <tr key={placeholder ? `predefined-${flag.name}` : flag.id} className="hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700">
+                const rowKey: string = placeholder ? `predefined-${flag.name}` : (flag as FeatureFlag).id
+                return (
+                    <tr key={rowKey} className="hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700">
                     <td className="whitespace-nowrap px-6 py-3 text-sm font-medium text-gray-900 dark:text-slate-100">
                       {'displayName' in flag ? flag.displayName : flag.name}
                     </td>
@@ -305,14 +306,14 @@ export default function AdminFeatureTogglesPage() {
                       ) : (
                         <button
                           type="button"
-                          onClick={() => toggleEnabled(flag)}
-                          disabled={togglingId === flag.id}
+                          onClick={() => toggleEnabled(flag as FeatureFlag)}
+                          disabled={togglingId === (flag as FeatureFlag).id}
                           className="focus:outline-none hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700 rounded p-1 transition-colors"
-                          aria-label={flag.enabled ? 'Disable' : 'Enable'}
+                          aria-label={(flag as FeatureFlag).enabled ? 'Disable' : 'Enable'}
                         >
-                          {togglingId === flag.id ? (
+                          {togglingId === (flag as FeatureFlag).id ? (
                             <Loader2 className="h-6 w-6 animate-spin text-blue-600 dark:text-blue-400" />
-                          ) : flag.enabled ? (
+                          ) : (flag as FeatureFlag).enabled ? (
                             <ToggleRight className="h-6 w-6 text-green-600 dark:text-green-400" />
                           ) : (
                             <ToggleLeft className="h-6 w-6 text-gray-400 dark:text-slate-500" />
@@ -321,14 +322,14 @@ export default function AdminFeatureTogglesPage() {
                       )}
                     </td>
                     <td className="whitespace-nowrap px-6 py-3 text-sm text-gray-500 dark:text-slate-400">
-                      {placeholder ? '—' : formatTimestamp(flag.updated_at)}
+                      {placeholder ? '—' : formatTimestamp((flag as FeatureFlag).updated_at)}
                     </td>
                     <td className="whitespace-nowrap px-6 py-3 text-right">
                       {placeholder ? (
                         <button
                           type="button"
                           onClick={() => {
-                            setCreatePrefill({ name: flag.name, displayName: 'displayName' in flag ? flag.displayName : flag.name, description: flag.description })
+                            setCreatePrefill({ name: (flag as { name: string; displayName: string; description: string }).name, displayName: (flag as { name: string; displayName: string; description: string }).displayName, description: (flag as { name: string; displayName: string; description: string }).description })
                             setShowCreateModal(true)
                           }}
                           className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"

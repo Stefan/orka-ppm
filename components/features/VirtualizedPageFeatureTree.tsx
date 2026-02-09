@@ -45,6 +45,16 @@ function flattenVisible(
 
 const ROW_HEIGHT = 40
 
+type TreeRowProps = {
+  visibleRows: VisibleRow[]
+  expandedIds: Set<string>
+  selectedId: string | null
+  highlightIds: Set<string>
+  onSelect: (node: PageOrFeatureNode) => void
+  onHoverNode?: (node: PageOrFeatureNode | null, rect: DOMRect | null) => void
+  toggleExpand: (node: PageOrFeatureNode) => void
+}
+
 export interface VirtualizedPageFeatureTreeProps {
   nodes: PageOrFeatureNode[]
   selectedId: string | null
@@ -177,7 +187,7 @@ export function VirtualizedPageFeatureTree({
 
   return (
     <div className={className} data-testid="virtualized-page-feature-tree">
-      <List
+      <List<TreeRowProps>
         rowCount={visibleRows.length}
         rowHeight={ROW_HEIGHT}
         rowComponent={rowComponent}

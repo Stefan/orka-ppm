@@ -124,7 +124,7 @@ const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTablePro
   useEffect(() => {
     onDefinitionChange?.({
       filters: Object.keys(filters).length ? filters : undefined,
-      sortBy: sortField ?? undefined,
+      sortBy: (sortField ?? undefined) as string | undefined,
       sortOrder: sortDirection ?? undefined,
       pageSize,
     })

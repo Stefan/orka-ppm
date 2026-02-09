@@ -218,8 +218,8 @@ export function RoleCreation({
   /**
    * Handle description change
    */
-  const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setRoleData(prev => ({ ...prev, description: e.target.value }))
+  const handleDescriptionChange = useCallback((value: string) => {
+    setRoleData(prev => ({ ...prev, description: value }))
     setValidationErrors([])
   }, [])
 

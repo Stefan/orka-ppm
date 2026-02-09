@@ -56,6 +56,18 @@ const buttonVariants: Record<ButtonVariant, string> = {
     'active:bg-red-800',
     'shadow-sm hover:shadow-md',
   ].join(' '),
+  destructive: [
+    'bg-red-600 text-white',
+    'hover:bg-red-700',
+    'active:bg-red-800',
+    'shadow-sm hover:shadow-md',
+  ].join(' '),
+  default: [
+    'bg-blue-600 text-white',
+    'hover:bg-blue-700',
+    'active:bg-blue-800',
+    'shadow-sm hover:shadow-md',
+  ].join(' '),
 }
 
 /**
@@ -65,6 +77,7 @@ const buttonSizes: Record<ComponentSize, string> = {
   sm: 'px-3 py-1.5 text-sm min-h-[32px]',
   md: 'px-4 py-2 text-sm min-h-[40px]',
   lg: 'px-6 py-3 text-base min-h-[48px]',
+  icon: 'p-2 min-h-[40px] min-w-[40px]',
 }
 
 /**

@@ -9,7 +9,7 @@ import React, { useState, useEffect } from 'react'
 import { RegisterGrid } from './index'
 import { useNestedGridConfig } from '@/lib/register-nested-grids/hooks'
 import { fetchNestedGridConfig } from '@/lib/register-nested-grids/api'
-import type { NestedGridConfig } from './types'
+import type { NestedGridConfig, Section } from './types'
 
 interface ProjectRow {
   id: string
@@ -42,8 +42,8 @@ export default function CostbookRegisterGrid({
   const { data } = useNestedGridConfig(registerId)
 
   useEffect(() => {
-    if (data) setConfig({ sections: data.sections, enableLinkedItems: data.enableLinkedItems })
-    else fetchNestedGridConfig(registerId).then((c) => c && setConfig({ sections: c.sections, enableLinkedItems: c.enableLinkedItems }))
+    if (data) setConfig({ sections: data.sections as unknown as Section[], enableLinkedItems: data.enableLinkedItems })
+    else fetchNestedGridConfig(registerId).then((c) => c && setConfig({ sections: c.sections as unknown as Section[], enableLinkedItems: c.enableLinkedItems }))
   }, [registerId, data])
 
   const getLinkedCount = () => 1

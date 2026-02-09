@@ -41,8 +41,8 @@ export function VoiceSimButton({
   const startListening = useCallback(() => {
     if (!supported || disabled) return
     const SpeechRecognition =
-      (window as unknown as { SpeechRecognition?: new () => SpeechRecognition }).SpeechRecognition ||
-      (window as unknown as { webkitSpeechRecognition?: new () => SpeechRecognition }).webkitSpeechRecognition
+      (window as unknown as { SpeechRecognition?: new () => import('@/types/speech-recognition').SpeechRecognitionInstance }).SpeechRecognition ||
+      (window as unknown as { webkitSpeechRecognition?: new () => import('@/types/speech-recognition').SpeechRecognitionInstance }).webkitSpeechRecognition
     if (!SpeechRecognition) return
 
     const rec = new SpeechRecognition()
@@ -52,7 +52,7 @@ export function VoiceSimButton({
 
     rec.onstart = () => setListening(true)
     rec.onend = () => setListening(false)
-    rec.onresult = (event: SpeechRecognitionEvent) => {
+    rec.onresult = (event: import('@/types/speech-recognition').SpeechRecognitionEvent) => {
       const transcript = event.results?.[0]?.[0]?.transcript ?? ''
       if (transcript) handleResult(transcript)
     }

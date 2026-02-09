@@ -12,7 +12,7 @@ import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import fc from 'fast-check'
 import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/input'
+import { Input } from '@/components/ui/Input'
 
 /**
  * WCAG 2.1 Success Criterion 2.5.5 (AAA) recommends a minimum target size of 44x44 CSS pixels.

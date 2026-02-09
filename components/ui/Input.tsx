@@ -18,6 +18,7 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
 }
 
 export interface TextareaProps {
+  id?: string
   value: string
   onChange: (value: string) => void
   placeholder?: string
@@ -31,6 +32,7 @@ const inputSizes: Record<ComponentSize, string> = {
   sm: 'px-3 py-1.5 text-sm min-h-[32px]',
   md: 'px-4 py-2.5 text-sm min-h-[40px]',
   lg: 'px-4 py-3 text-base min-h-[48px]',
+  icon: 'p-2 min-h-[40px] min-w-[40px]',
 }
 
 const inputBaseStyles = [

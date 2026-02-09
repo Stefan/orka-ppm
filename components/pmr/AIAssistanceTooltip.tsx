@@ -34,7 +34,7 @@ export const AIAssistanceTooltip: React.FC<AIAssistanceTooltipProps> = ({
   className = ''
 }) => {
   const [show, setShow] = useState(isVisible)
-  const timeoutRef = useRef<NodeJS.Timeout>()
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   useEffect(() => {
     setShow(isVisible)

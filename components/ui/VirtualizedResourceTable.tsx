@@ -1,6 +1,6 @@
 'use client'
 
-import { memo } from 'react'
+import React, { memo } from 'react'
 import { List } from 'react-window'
 import { useTranslations } from '@/lib/i18n/context'
 
@@ -24,7 +24,7 @@ interface VirtualizedResourceTableProps {
 }
 
 interface RowProps {
-  resource: Resource
+  resources: Resource[]
   onViewDetails?: (resource: Resource) => void
 }
 
@@ -35,10 +35,12 @@ const VirtualizedResourceTable = memo(function VirtualizedResourceTable({
   onViewDetails
 }: VirtualizedResourceTableProps) {
   const { t } = useTranslations()
-  // Row component for react-window
-  const RowComponent = ({ resource, onViewDetails: onView }: RowProps) => {
+  // Row component for react-window (receives index from List + rowProps)
+  const RowComponent = ({ index, style, ...rest }: { index: number; style: React.CSSProperties } & RowProps) => {
+    const resource = rest.resources[index]
+    const onView = rest.onViewDetails
     return (
-      <div className="border-b border-gray-200 dark:border-slate-700">
+      <div className="border-b border-gray-200 dark:border-slate-700" style={style}>
         <div
           className={`px-6 py-4 flex items-center ${onView ? 'hover:bg-gray-50 dark:hover:bg-slate-700 dark:bg-slate-800/50 cursor-pointer' : ''}`}
           role={onView ? 'button' : undefined}
@@ -240,12 +242,12 @@ const VirtualizedResourceTable = memo(function VirtualizedResourceTable({
             </tr>
           </thead>
         </table>
-        <List
+        <List<RowProps>
           defaultHeight={height}
           rowCount={resources.length}
           rowHeight={itemHeight}
           rowComponent={RowComponent}
-          rowProps={(index) => ({ resource: resources[index], onViewDetails })}
+          rowProps={{ resources, onViewDetails }}
         />
       </div>
     </div>

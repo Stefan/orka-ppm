@@ -121,7 +121,7 @@ export function GeneralSettings() {
     // #endregion
     // Also save to preferences (non-blocking)
     try {
-      await updateSetting('theme', newTheme)
+      await updateSetting('theme', newTheme === 'system' ? 'auto' : newTheme)
     } catch {
       logger.warn('Theme preference sync failed, using local setting', undefined, 'GeneralSettings')
     }
@@ -235,7 +235,7 @@ export function GeneralSettings() {
         <Select
           value={currency}
           onChange={(value) => {
-            setCurrency(value)
+            setCurrency(value as typeof currency)
             setHasChanges(true)
           }}
           options={currencyOptions}

@@ -181,12 +181,12 @@ export function RundownSparkline({
       )}
       
       {/* Chart */}
-      <ResponsiveContainer width={width} height={height}>
+      <ResponsiveContainer width={width as number | `${number}%`} height={height}>
         <ComposedChart data={chartData} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
           {/* Current month reference line */}
           {showCurrentMonth && currentMonthData && (
             <ReferenceLine
-              x={currentMonthData.label}
+              x={Number(currentMonthData.label)}
               stroke="#9ca3af"
               strokeDasharray="3 3"
               strokeWidth={1}

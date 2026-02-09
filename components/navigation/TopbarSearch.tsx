@@ -138,8 +138,8 @@ export default function TopbarSearch() {
   const startVoice = useCallback(() => {
     if (!voiceSupported) return
     const SpeechRecognition =
-      (window as unknown as { SpeechRecognition?: new () => SpeechRecognition }).SpeechRecognition ||
-      (window as unknown as { webkitSpeechRecognition?: new () => SpeechRecognition }).webkitSpeechRecognition
+      (window as unknown as { SpeechRecognition?: new () => import('@/types/speech-recognition').SpeechRecognitionInstance }).SpeechRecognition ||
+      (window as unknown as { webkitSpeechRecognition?: new () => import('@/types/speech-recognition').SpeechRecognitionInstance }).webkitSpeechRecognition
     if (!SpeechRecognition) return
     const rec = new SpeechRecognition()
     rec.continuous = false
@@ -147,7 +147,7 @@ export default function TopbarSearch() {
     rec.lang = 'de-DE'
     rec.onstart = () => setListening(true)
     rec.onend = () => setListening(false)
-    rec.onresult = (event: SpeechRecognitionEvent) => {
+    rec.onresult = (event: import('@/types/speech-recognition').SpeechRecognitionEvent) => {
       const transcript = event.results?.[0]?.[0]?.transcript ?? ''
       if (transcript) {
         setQuery(transcript)

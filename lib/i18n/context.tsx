@@ -48,7 +48,7 @@ interface I18nContextValue {
   /** Function to change the current locale */
   setLocale: (locale: string) => Promise<void>;
   /** Translation function - converts keys to translated strings */
-  t: (key: TranslationKey, params?: InterpolationParams) => string;
+  t: (key: TranslationKey | string, params?: InterpolationParams | string) => string;
   /** Date locale, default currency, and time zone for the current language */
   localeFormat: LocaleFormatConfig;
 }
@@ -318,8 +318,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
    * ```
    */
   const t = useCallback((
-    key: TranslationKey,
-    params?: InterpolationParams
+    key: TranslationKey | string,
+    params?: InterpolationParams | string
   ): string => {
     // #region agent log (only when NEXT_PUBLIC_AGENT_INGEST_URL is set)
     const ingestUrl = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_AGENT_INGEST_URL : undefined;
@@ -340,7 +340,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     if (isLoading || Object.keys(translations).length === 0) {
       return key;
     }
-    
+    const interpolationParams = params && typeof params === 'object' ? params as InterpolationParams : undefined;
+
     // Navigate nested object using dot notation
     const keys = key.split('.');
     let value: any = translations;
@@ -366,8 +367,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
         if (process.env.NODE_ENV === 'development') {
           console.warn(`Translation key not found: ${key} (locale: ${locale})`);
         }
-        
-        // Return the key itself as fallback
+        // If second arg is a string, use as fallback
+        if (typeof params === 'string') return params;
         return key;
       }
     }
@@ -385,7 +386,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       // Check if value is a plural rules object
       if (isPluralRules(value)) {
         // Handle pluralization
-        const count = params?.count;
+        const count = interpolationParams?.count;
         
         if (typeof count !== 'number') {
           if (process.env.NODE_ENV === 'development') {
@@ -398,8 +399,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
           const formatted = formatPlural(value, count, locale as SupportedLocale);
           
           // Handle any additional interpolation parameters (besides count)
-          if (params && Object.keys(params).length > 1) {
-            return Object.entries(params).reduce((str, [paramKey, paramValue]) => {
+          if (interpolationParams && Object.keys(interpolationParams).length > 1) {
+            return Object.entries(interpolationParams).reduce((str, [paramKey, paramValue]) => {
               // Skip 'count' as it's already handled by formatPlural
               if (paramKey === 'count') return str;
               
@@ -437,8 +438,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
 
     // Handle interpolation
-    if (params) {
-      return Object.entries(params).reduce((str, [paramKey, paramValue]) => {
+    if (interpolationParams) {
+      return Object.entries(interpolationParams).reduce((str, [paramKey, paramValue]) => {
         // Escape HTML in parameter values to prevent XSS
         const escapedValue = String(paramValue)
           .replace(/&/g, '&amp;')
@@ -549,7 +550,7 @@ export function useI18nOptional(): I18nContextValue | null {
  * ```
  */
 export function useTranslations(): {
-  t: (key: TranslationKey, params?: InterpolationParams) => string;
+  t: (key: TranslationKey | string, params?: InterpolationParams | string) => string;
   locale: string;
   isLoading: boolean;
 };
@@ -563,7 +564,7 @@ export function useTranslations(namespace?: string) {
   // If namespace is provided, return a scoped translation function
   if (namespace) {
     const scopedT = (key: string, params?: Record<string, unknown>) => {
-      return baseT(`${namespace}.${key}` as TranslationKey, params);
+      return baseT(`${namespace}.${key}` as TranslationKey, params as InterpolationParams | string | undefined);
     };
     return scopedT;
   }

@@ -45,6 +45,7 @@ const cardPadding: Record<ComponentSize, string> = {
   sm: 'p-4',
   md: 'p-6',
   lg: 'p-8',
+  icon: 'p-2',
 }
 
 const cardShadow: Record<ShadowSize, string> = {

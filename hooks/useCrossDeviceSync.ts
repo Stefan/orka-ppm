@@ -42,7 +42,7 @@ export interface UseCrossDeviceSyncReturn {
   hasOfflineChanges: boolean
   
   // Utilities
-  initialize: (userId: string) => Promise<void>
+  initialize: (userId: string, accessToken?: string | null) => Promise<void>
   forceSync: () => Promise<void>
 }
 

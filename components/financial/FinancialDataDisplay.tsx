@@ -121,7 +121,7 @@ export const FinancialDataDisplay: React.FC<FinancialDataDisplayProps> = ({
 
         // For summary access, filter the data
         const filterResponse = await fetch(
-          `${apiUrl}/api/rbac/filter-financial-data${contextParam}`,
+          getApiUrl('/api/rbac/filter-financial-data') + contextParam,
           {
             method: 'POST',
             headers: {
@@ -273,7 +273,7 @@ export function useFinancialDataFilter() {
 
       // Filter for summary access
       const filterResponse = await fetch(
-        `${apiUrl}/api/rbac/filter-financial-data${contextParam}`,
+        getApiUrl('/api/rbac/filter-financial-data') + contextParam,
         {
           method: 'POST',
           headers: {

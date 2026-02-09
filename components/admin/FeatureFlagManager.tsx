@@ -6,15 +6,9 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 import {
   Dialog,
   DialogContent,
@@ -22,7 +16,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Flag, Plus, Edit, Trash2, Users, Percent, List, Globe } from 'lucide-react';
 
@@ -157,13 +150,11 @@ export default function FeatureFlagManager() {
             Manage feature rollout and user access control
           </p>
         </div>
+        <Button onClick={() => setIsCreateDialogOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Create Feature Flag
+        </Button>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Create Feature Flag
-            </Button>
-          </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <FeatureFlagForm
               onSuccess={() => {
@@ -193,22 +184,13 @@ export default function FeatureFlagManager() {
                     checked={flag.status === 'enabled'}
                     onCheckedChange={() => handleToggleStatus(flag)}
                   />
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
-                      <FeatureFlagForm
-                        flag={flag}
-                        onSuccess={() => {
-                          loadFeatureFlags();
-                        }}
-                        onCancel={() => {}}
-                      />
-                    </DialogContent>
-                  </Dialog>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setEditingFlag(flag)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -255,6 +237,18 @@ export default function FeatureFlagManager() {
           </CardContent>
         </Card>
       )}
+
+      <Dialog open={editingFlag !== null} onOpenChange={(open) => !open && setEditingFlag(null)}>
+        <DialogContent className="max-w-2xl">
+          {editingFlag && (
+            <FeatureFlagForm
+              flag={editingFlag}
+              onSuccess={() => { setEditingFlag(null); loadFeatureFlags(); }}
+              onCancel={() => setEditingFlag(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -266,7 +260,14 @@ interface FeatureFlagFormProps {
 }
 
 function FeatureFlagForm({ flag, onSuccess, onCancel }: FeatureFlagFormProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    description: string;
+    status: 'enabled' | 'disabled' | 'beta' | 'deprecated';
+    rollout_strategy: 'all_users' | 'percentage' | 'user_list' | 'role_based';
+    rollout_percentage: number;
+    allowed_roles: string;
+  }>({
     name: flag?.name || '',
     description: flag?.description || '',
     status: flag?.status || 'disabled',
@@ -330,11 +331,9 @@ function FeatureFlagForm({ flag, onSuccess, onCancel }: FeatureFlagFormProps) {
         <div className="space-y-2">
           <Label htmlFor="description">Description</Label>
           <Textarea
-            id="description"
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            onChange={(value) => setFormData({ ...formData, description: value })}
             placeholder="Describe what this feature does"
-            required
           />
         </div>
 
@@ -342,36 +341,28 @@ function FeatureFlagForm({ flag, onSuccess, onCancel }: FeatureFlagFormProps) {
           <Label htmlFor="status">Status</Label>
           <Select
             value={formData.status}
-            onValueChange={(value) => setFormData({ ...formData, status: value })}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="enabled">Enabled</SelectItem>
-              <SelectItem value="disabled">Disabled</SelectItem>
-              <SelectItem value="beta">Beta</SelectItem>
-              <SelectItem value="deprecated">Deprecated</SelectItem>
-            </SelectContent>
-          </Select>
+            onChange={(value) => setFormData({ ...formData, status: value as 'enabled' | 'disabled' | 'beta' | 'deprecated' })}
+            options={[
+              { value: 'enabled', label: 'Enabled' },
+              { value: 'disabled', label: 'Disabled' },
+              { value: 'beta', label: 'Beta' },
+              { value: 'deprecated', label: 'Deprecated' },
+            ]}
+          />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="rollout_strategy">Rollout Strategy</Label>
           <Select
             value={formData.rollout_strategy}
-            onValueChange={(value) => setFormData({ ...formData, rollout_strategy: value })}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all_users">All Users</SelectItem>
-              <SelectItem value="percentage">Percentage Rollout</SelectItem>
-              <SelectItem value="user_list">User List</SelectItem>
-              <SelectItem value="role_based">Role-Based</SelectItem>
-            </SelectContent>
-          </Select>
+            onChange={(value) => setFormData({ ...formData, rollout_strategy: value as 'all_users' | 'percentage' | 'user_list' | 'role_based' })}
+            options={[
+              { value: 'all_users', label: 'All Users' },
+              { value: 'percentage', label: 'Percentage Rollout' },
+              { value: 'user_list', label: 'User List' },
+              { value: 'role_based', label: 'Role-Based' },
+            ]}
+          />
         </div>
 
         {formData.rollout_strategy === 'percentage' && (

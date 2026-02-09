@@ -859,9 +859,9 @@ export default function Resources() {
                 <ResourceCard
                   key={resource.id}
                   resource={resource}
-                  onViewDetails={(r) => setDetailResource(r)}
-                  onEdit={(r) => { setEditError(null); setEditResource(r) }}
-                  onDelete={(r) => { setDeleteError(null); setResourceToDelete(r) }}
+                  onViewDetails={(r) => setDetailResource(r as Resource | null)}
+                  onEdit={(r) => { setEditError(null); setEditResource(r as Resource | null) }}
+                  onDelete={(r) => { setDeleteError(null); setResourceToDelete(r as Resource | null) }}
                 />
               ))}
             </div>
@@ -873,7 +873,7 @@ export default function Resources() {
                 resources={filteredResources}
                 height={600}
                 itemHeight={80}
-                onViewDetails={(r) => setDetailResource(r)}
+                onViewDetails={(r) => setDetailResource(r as Resource | null)}
               />
             </Suspense>
           )}

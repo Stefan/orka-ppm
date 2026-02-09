@@ -147,11 +147,17 @@ function AdminOrgsContent() {
   const [showModal, setShowModal] = useState(false)
   const [editing, setEditing] = useState<OrgNode | null>(null)
   const [parentOptions, setParentOptions] = useState<OrgNode[]>([])
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    name: string
+    type: typeof ORG_TYPES[number]
+    slug: string
+    parent_id: string | null
+    is_active: boolean
+  }>({
     name: '',
-    type: 'Company' as const,
+    type: 'Company',
     slug: '',
-    parent_id: '' as string | null,
+    parent_id: null,
     is_active: true,
   })
   const [submitLoading, setSubmitLoading] = useState(false)
@@ -182,7 +188,7 @@ function AdminOrgsContent() {
       const data = await res.json()
       const list = Array.isArray(data) ? data : []
       setParentOptions(list)
-      setTree(buildTree(list.map((o: Record<string, unknown>) => ({ ...o, children: [] }))))
+      setTree(buildTree(list.map((o: Record<string, unknown>) => ({ ...o, children: [] })) as OrgNode[]))
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load organizations')
     } finally {
