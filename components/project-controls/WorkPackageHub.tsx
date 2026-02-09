@@ -11,7 +11,7 @@ import {
 import type { WorkPackage, WorkPackageCreate, WorkPackageUpdate } from '@/types/project-controls'
 import { Plus, Pencil, Trash2, ChevronRight, ChevronDown, Loader2, GripVertical, Copy, FileUp, Layers } from 'lucide-react'
 import { DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors, useDraggable, useDroppable } from '@dnd-kit/core'
-import { FixedSizeList as List } from 'react-window'
+import { List } from 'react-window'
 import { CopyFromProjectModal, BulkEditModal, ImportCsvModal, ApplyTemplateModal } from './WorkPackageModals'
 
 interface TreeNode {
@@ -418,8 +418,10 @@ export default function WorkPackageHub({ projectId }: WorkPackageHubProps) {
                 <tr>
                   <td colSpan={11} className="p-0">
                     <div style={{ height: 400 }}>
-                      <List height={400} itemCount={flat.length} itemSize={40} width="100%">
-                        {({ index, style }) => {
+                      <List
+                        rowCount={flat.length}
+                        rowHeight={40}
+                        rowComponent={function WPListRow ({ index, style, ariaAttributes, flat, expanded, list, toggle, editingCell, setSelectedId, openEdit, setDeleteConfirm }) {
                           const { node, depth } = flat[index]
                           const wp = node.wp
                           const hasChildren = node.children.length > 0
@@ -427,7 +429,7 @@ export default function WorkPackageHub({ projectId }: WorkPackageHubProps) {
                           const rollup = computeRollup(wp, list)
                           const isEditing = editingCell?.wpId === wp.id && editingCell?.field
                           return (
-                            <div style={style} className="flex items-center border-b border-gray-100 dark:border-slate-700/50 text-sm">
+                            <div {...ariaAttributes} style={style} className="flex items-center border-b border-gray-100 dark:border-slate-700/50 text-sm">
                               <div className="p-2 w-8 flex-shrink-0">
                                 <button type="button" onClick={() => hasChildren && toggle(wp.id)} className="p-0.5">
                                   {hasChildren ? (isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />) : <span className="w-4 inline-block" />}
@@ -449,7 +451,18 @@ export default function WorkPackageHub({ projectId }: WorkPackageHubProps) {
                             </div>
                           )
                         }}
-                      </List>
+                        rowProps={{
+                          flat,
+                          expanded,
+                          list,
+                          toggle,
+                          editingCell: editingCell ?? null,
+                          setSelectedId,
+                          openEdit,
+                          setDeleteConfirm,
+                        }}
+                        style={{ height: 400, width: '100%' }}
+                      />
                     </div>
                   </td>
                 </tr>

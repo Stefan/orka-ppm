@@ -9,7 +9,7 @@ import React from 'react'
 import { cn } from '@/lib/design-system'
 import type { ComponentSize } from '@/types/components'
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   size?: ComponentSize
   error?: boolean
   errorMessage?: string

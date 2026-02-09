@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Alert, AlertDescription } from '@/components/ui/Alert'
 import { Loader2, Search, UserPlus, Shield, AlertCircle } from 'lucide-react'
 import { RoleAssignmentDialog } from './RoleAssignmentDialog'
 import { EffectivePermissionsDisplay } from './EffectivePermissionsDisplay'

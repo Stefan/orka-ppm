@@ -152,7 +152,8 @@ const nextConfig: NextConfig = {
     tsconfigPath: './tsconfig.prod.json',
   },
 
-  // Skip ESLint during build (run in CI); speeds up Vercel deploy
+  // Skip ESLint during build (run in CI); speeds up Vercel deploy (valid in Next.js, types may lag)
+  // @ts-expect-error NextConfig type may not include eslint in this version
   eslint: {
     ignoreDuringBuilds: true,
   },

@@ -47,7 +47,9 @@ if [ "$REF_COUNT" -eq 0 ]; then
     fi
 fi
 
-# When pushing main: bump build number first so the push includes it (rollback on failure)
+# When pushing main: bump build number first so it increments on every push attempt.
+# We do not roll back the bump when health-check fails (so build number still goes up);
+# we only roll back when PBT fails.
 DID_BUMP=0
 if [ "$PUSHING_MAIN" = "1" ]; then
     echo "▶ Bump build number (main)"
@@ -65,13 +67,12 @@ if [ "$PUSHING_MAIN" = "1" ]; then
     echo ""
 fi
 
-# 1. Health check (syntax, optional-deps, type-check)
+# 1. Health check (syntax, optional deps, type-check)
 echo "▶ Health check (syntax, optional deps, type-check)"
 if ! npm run health-check; then
     echo ""
     echo "❌ Health check failed (syntax / optional deps / type-check)."
-    [ "$DID_BUMP" = "1" ] && git reset --hard HEAD~1
-    echo "   Fix the errors above before pushing."
+    echo "   Build number was bumped; fix the errors above and push again."
     echo "   Bypass: git push --no-verify"
     exit 1
 fi
