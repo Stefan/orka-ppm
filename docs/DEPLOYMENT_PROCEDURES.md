@@ -319,13 +319,23 @@ If users cannot access the application:
 
 ## Environment-Specific Instructions
 
-### Vercel Deployment
+### Vercel Deployment (Frontend)
+
+Required environment variables so API proxy routes work (portfolios, notifications, RBAC):
+
+- **NEXT_PUBLIC_BACKEND_URL** – Backend base URL (e.g. `https://orka-ppm.onrender.com`). Used by Next.js API routes to proxy `/api/portfolios`, `/api/notifications`, `/api/rbac/*`. If unset, defaults to `https://orka-ppm.onrender.com` for rewrites only; proxy routes need this set.
+- **NEXT_PUBLIC_API_URL** – Same as backend URL for same-origin API calls (optional if same as above).
+- **NEXT_PUBLIC_SUPABASE_URL**, **NEXT_PUBLIC_SUPABASE_ANON_KEY** – Supabase project URL and anon key for auth.
+
+In Vercel: **Project → Settings → Environment Variables**. Add for Production (and Preview if needed).
 
 ```bash
-# Set environment variables
-vercel env add SUPABASE_URL
-vercel env add SUPABASE_SERVICE_ROLE_KEY
-vercel env add DISABLE_BOOTSTRAP true
+# Example: set backend URL so /api/portfolios, /api/notifications, /api/rbac/user-permissions proxy correctly
+vercel env add NEXT_PUBLIC_BACKEND_URL production
+# Enter e.g. https://orka-ppm.onrender.com
+
+vercel env add NEXT_PUBLIC_SUPABASE_URL production
+vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production
 
 # Deploy
 vercel --prod
