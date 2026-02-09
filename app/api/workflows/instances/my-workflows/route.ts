@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL || 'http://localhost:8000'
 
 /**
  * GET /api/workflows/instances/my-workflows
@@ -34,8 +34,8 @@ export async function GET(request: NextRequest) {
     queryParams.append('limit', limit)
     queryParams.append('offset', offset)
 
-    // First, get pending approvals for the user
-    const pendingApprovalsUrl = `${BACKEND_URL}/workflows/approvals/pending?${queryParams.toString()}`
+    // First, get pending approvals for the user (backend prefix is /api/workflows)
+    const pendingApprovalsUrl = `${BACKEND_URL}/api/workflows/approvals/pending?${queryParams.toString()}`
     
     const pendingResponse = await fetch(pendingApprovalsUrl, {
       method: 'GET',
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
     // Fetch details for each workflow instance
     const workflowPromises = Array.from(workflowInstanceIds).map(async (instanceId) => {
       try {
-        const instanceUrl = `${BACKEND_URL}/workflows/instances/${instanceId}`
+        const instanceUrl = `${BACKEND_URL}/api/workflows/instances/${instanceId}`
         const instanceResponse = await fetch(instanceUrl, {
           method: 'GET',
           headers: {

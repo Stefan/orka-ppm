@@ -251,12 +251,14 @@ const nextConfig: NextConfig = {
           source: '/api/registers/:path*',
           destination: '/api/registers/:path*',
         },
-        // Portfolios, notifications, RBAC: handled by Next.js API routes (correct backend paths)
+        // Portfolios, notifications, RBAC, schedules: handled by Next.js API routes (correct backend paths)
         { source: '/api/portfolios', destination: '/api/portfolios' },
         { source: '/api/portfolios/:path*', destination: '/api/portfolios/:path*' },
         { source: '/api/notifications', destination: '/api/notifications' },
         { source: '/api/notifications/:path*', destination: '/api/notifications/:path*' },
         { source: '/api/rbac/:path*', destination: '/api/rbac/:path*' },
+        { source: '/api/schedules', destination: '/api/schedules' },
+        { source: '/api/schedules/:path*', destination: '/api/schedules/:path*' },
       // Rewrite all other /api calls to local backend (no /api prefix on backend)
         {
           source: '/api/:path*',
@@ -290,12 +292,14 @@ const nextConfig: NextConfig = {
         source: '/api/registers/:path*',
         destination: '/api/registers/:path*',
       },
-      // Portfolios, notifications, RBAC: handled by Next.js API routes (proxy with correct backend paths; avoids 404 from wrong rewrite paths)
+      // Portfolios, notifications, RBAC, schedules: handled by Next.js API routes (proxy with correct backend paths; avoids 404 from wrong rewrite paths)
       { source: '/api/portfolios', destination: '/api/portfolios' },
       { source: '/api/portfolios/:path*', destination: '/api/portfolios/:path*' },
       { source: '/api/notifications', destination: '/api/notifications' },
       { source: '/api/notifications/:path*', destination: '/api/notifications/:path*' },
       { source: '/api/rbac/:path*', destination: '/api/rbac/:path*' },
+      { source: '/api/schedules', destination: '/api/schedules' },
+      { source: '/api/schedules/:path*', destination: '/api/schedules/:path*' },
       // Rewrite all other /api calls to backend (no /api prefix on backend)
       {
         source: '/api/:path*',

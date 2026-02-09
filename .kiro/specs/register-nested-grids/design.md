@@ -288,7 +288,7 @@ const [{ isOver }, drop] = useDrop({
 
 ```typescript
 // State management using Zustand + React Query
-import create from 'zustand';
+import { create } from 'zustand';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface NestedGridStore {

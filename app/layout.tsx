@@ -96,8 +96,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href={process.env.NEXT_PUBLIC_API_URL || 'https://orka-ppm.onrender.com'} crossOrigin="anonymous" />
         
         {/* Next.js automatically handles JavaScript chunk preloading - no manual preload needed */}
-        {/* Preload critical fonts - Inter is loaded via next/font/google with automatic optimization */}
-        {/* Next.js automatically inlines and optimizes Google Fonts, no manual preload needed */}
+        {/* Fonts: system stack only (--font-inter in html). No next/font or woff2 to avoid 404 on Vercel. */}
         
         {/* Icons with proper dimensions - removed preload as they're not critical for LCP */}
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
