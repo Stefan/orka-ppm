@@ -2,7 +2,7 @@
 // Statistical analysis for detecting spending pattern anomalies
 
 import { ProjectWithFinancials } from '@/types/costbook'
-import { roundToDecimal } from './costbook-calculations'
+import { roundToDecimal } from '../costbook-calculations'
 
 export interface AnomalyResult {
   projectId: string

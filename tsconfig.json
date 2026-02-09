@@ -130,6 +130,10 @@
     "**/*.test.tsx",
     "**/*.spec.ts",
     "**/*.spec.tsx",
+    "**/*.example.ts",
+    "**/*.example.tsx",
+    "scripts/**",
+    "lib/testing/**",
     "playwright.config.ts",
     "jest.config.js",
     "jest.setup.js"

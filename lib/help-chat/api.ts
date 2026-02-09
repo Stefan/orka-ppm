@@ -1126,9 +1126,9 @@ export class HelpChatAPIService {
   }
 
   /**
-   * Clear help chat cache (Admin only)
+   * Clear help chat cache on server (Admin only)
    */
-  async clearCache(pattern: string = '*'): Promise<any> {
+  async clearServerCache(pattern: string = '*'): Promise<any> {
     try {
       return await apiRequest('/ai/help/performance/cache/clear', {
         method: 'POST',

@@ -54,7 +54,7 @@ export interface RecommendationConfig {
   userContext?: RecommendationUserContext
 }
 
-const DEFAULT_CONFIG: Required<RecommendationConfig> = {
+const DEFAULT_CONFIG: RecommendationConfig = {
   minConfidence: 0.5,
   maxRecommendations: 10,
   includeLowPriority: false,

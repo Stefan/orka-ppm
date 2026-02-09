@@ -9,7 +9,7 @@ import React from 'react'
 import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import fc from 'fast-check'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 
 describe('Button Disabled State Property Tests', () => {
   /**

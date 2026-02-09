@@ -8,7 +8,7 @@
 import React from 'react'
 import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 
 describe('Button Component Unit Tests', () => {
   /**

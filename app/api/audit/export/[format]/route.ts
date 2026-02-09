@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { format: string } }
+  { params }: { params: Promise<{ format: string }> }
 ) {
   try {
+    const { format } = await params
     const authHeader = request.headers.get('authorization')
     if (!authHeader) {
       return NextResponse.json(
@@ -12,8 +13,6 @@ export async function POST(
         { status: 401 }
       )
     }
-
-    const format = params.format
     const body = await request.json()
 
     // Temporary mock file generation until backend is properly connected

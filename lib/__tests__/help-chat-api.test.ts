@@ -780,7 +780,7 @@ describe('HelpChatAPIService', () => {
 
     it('should clear admin cache', async () => {
       mockApiRequest.mockResolvedValue({ data: { cleared: true } })
-      const result = await apiService.clearCache('*')
+      const result = await apiService.clearServerCache('*')
       expect(result).toHaveProperty('data')
       expect((result as { data: { cleared: boolean } }).data.cleared).toBe(true)
     })

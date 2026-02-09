@@ -9,7 +9,7 @@ import React from 'react'
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import fc from 'fast-check'
-import { Card, CardHeader, CardContent } from '@/components/ui/card'
+import { Card, CardHeader, CardContent } from '@/components/ui/Card'
 
 describe('CardHeader Component Property Tests', () => {
   /**

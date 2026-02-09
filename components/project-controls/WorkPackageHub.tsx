@@ -386,7 +386,7 @@ export default function WorkPackageHub({ projectId }: WorkPackageHubProps) {
       )}
       <div className="overflow-x-auto border border-gray-200 dark:border-slate-700 rounded-lg" ref={tableRef} onKeyDown={handleKeyDown} tabIndex={0}>
         {inlineError && editingCell && (
-          <div className="px-2 py-1 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20">
+          <div className="px-2 py-1 text-xs text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/20">
             {inlineError}
           </div>
         )}
