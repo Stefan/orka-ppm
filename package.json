@@ -1,7 +1,7 @@
 {
   "name": "orka-ppm",
   "version": "0.0.1",
-  "buildNumber": 3,
+  "buildNumber": 4,
   "private": true,
   "description": "AI-powered Project Portfolio Management System",
   "author": "Stefan",
