@@ -28,18 +28,30 @@ echo ""
 REFS_FILE=$(mktemp)
 trap "rm -f '$REFS_FILE'" EXIT
 PUSHING_MAIN=0
+REF_COUNT=0
 while read local_ref local_sha remote_ref remote_sha; do
     echo "$local_ref $local_sha $remote_ref $remote_sha" >> "$REFS_FILE"
+    REF_COUNT=$((REF_COUNT + 1))
     if [ "$local_ref" = "refs/heads/main" ]; then
         PUSHING_MAIN=1
     fi
 done
+# Husky v7+ does not forward stdin to the hook, so refs are often empty. If we have no refs, treat current branch as pushed (e.g. "git push origin main").
+if [ "$REF_COUNT" -eq 0 ]; then
+    CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    if [ "$CURRENT_BRANCH" = "main" ]; then
+        PUSHING_MAIN=1
+        LOCAL_SHA=$(git rev-parse HEAD)
+        REMOTE_SHA=$(git rev-parse origin/main 2>/dev/null || echo "$LOCAL_SHA")
+        echo "refs/heads/main $LOCAL_SHA refs/heads/main $REMOTE_SHA" >> "$REFS_FILE"
+    fi
+fi
 
 # When pushing main: bump build number first so the push includes it (rollback on failure)
 DID_BUMP=0
 if [ "$PUSHING_MAIN" = "1" ]; then
     echo "▶ Bump build number (main)"
-    NEW_BUILD=$(node scripts/bump-patch-version.js)
+    NEW_BUILD=$(node scripts/bump-patch-version.js 2>/dev/null) || true
     if [ -n "$NEW_BUILD" ]; then
         git add package.json
         if ! git diff --staged --quiet; then

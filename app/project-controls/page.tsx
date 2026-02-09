@@ -35,7 +35,7 @@ export default function ProjectControlsPage() {
         setProjects(list.slice(0, 20).map((p: { id: string; name: string }) => ({ id: p.id, name: p.name })))
         if (list.length > 0) {
           const fromUrl = searchParams.get('project')
-          setSelectedProjectId((prev) => prev ?? (fromUrl && list.some((p: { id: string }) => p.id === fromUrl) ? fromUrl : list[0].id)
+          setSelectedProjectId((prev) => prev ?? (fromUrl && list.some((p: { id: string }) => p.id === fromUrl) ? fromUrl : list[0].id))
         }
       } catch {
         setProjects([])

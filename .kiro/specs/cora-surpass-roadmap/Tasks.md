@@ -97,3 +97,13 @@
 | Proaktive Compliance-Toasts | Toasts bei Anomalien (Audit-Seite: „Anomalien erkannt – Vorschlag: Überprüfe Einträge“) | Phase 2 | [Toast.tsx](components/shared/Toast.tsx) | ✅ |
 | AI-Benefits in Reports | Kurzfassung/Empfehlungs-Karte auf Dashboard (AI Insights Card) | Phase 2 | Recharts, OpenAI | ✅ |
 | Copilot-Chat-Integration | Help-Chat mit Kontext (pathname, entityType, entityId) in [help-chat/context](app/api/help-chat/context/route.ts) | Phase 2 | OpenAI API | ✅ |
+
+---
+
+## Summary
+
+| Phase | Inhalt | Status |
+|-------|--------|--------|
+| **Phase 1** | Caching (projects, commitments, actuals), Pagination, Adapter-Registry, Suspense | ✅ Abgeschlossen |
+| **Phase 2** | Workflow-Builder (No-Code), AI-Mapping (CSV-Import), Saved Views (No-Code-Views) | ✅ Umgesetzt |
+| **Phase 3** | AI-Audit-Insights, Compliance-Toasts, AI-Benefits in Reports, Copilot-Chat-Integration | ✅ Umgesetzt |

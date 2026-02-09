@@ -88,7 +88,15 @@ Only draft change orders can be updated.
 
 **Endpoint:** `POST /change-orders/{change_order_id}/submit`
 
-Transitions status from draft to submitted.
+Transitions status from draft to submitted, initiates the approval workflow (creates approval rows per configured levels), and sets status to `under_review`. No separate "initiate workflow" call is required.
+
+### Update Status (Explicit)
+
+**Endpoint:** `PUT /change-orders/{change_order_id}/status`
+
+**Request Body:** `{ "status": "draft" | "submitted" | "under_review" | "approved" | "rejected" | "implemented" }`
+
+Only allowed status transitions are accepted (e.g. `approved` → `implemented`). Invalid transitions return `400` with a clear message. Status validation is centralized in `backend/workflow_validation.py`.
 
 ### Cost Impact Analysis
 
