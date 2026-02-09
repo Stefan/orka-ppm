@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
             ragSuggestions.push({
               id: f.id,
               name: f.name ?? '',
-              snippet: (f.description ?? '').slice(0, 120) || f.link ?? '',
+              snippet: ((f.description ?? '').slice(0, 120) || (f.link ?? '')),
             })
           }
         })
