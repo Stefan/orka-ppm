@@ -11,7 +11,7 @@ import {
   InlineEditFeatureModal,
 } from '@/components/features'
 import { buildPageTree, findPageOrFeatureNode, flattenPageTree, searchFeatures } from '@/lib/features'
-import { supabase } from '@/lib/api/supabase'
+import { supabase } from '@/lib/api/supabase-minimal'
 import type { Feature, FeatureSearchResult, PageOrFeatureNode } from '@/types/features'
 import { Layers } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'

@@ -13,7 +13,7 @@ import {
   Layers,
 } from 'lucide-react'
 import type { Feature } from '@/types/features'
-import { supabase } from '@/lib/api/supabase'
+import { supabase } from '@/lib/api/supabase-minimal'
 import Link from 'next/link'
 
 export default function AdminFeaturesPage() {

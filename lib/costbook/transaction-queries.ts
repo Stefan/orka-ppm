@@ -2,7 +2,7 @@
 // Transforms commitments and actuals into a unified Transaction format
 
 import { Commitment, Actual, Transaction, Currency, POStatus, ActualStatus } from '@/types/costbook'
-import { supabase } from '@/lib/api/supabase'
+import { supabase } from '@/lib/api/supabase-minimal'
 
 /**
  * Transforms a Commitment into a Transaction

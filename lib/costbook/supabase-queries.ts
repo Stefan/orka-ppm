@@ -1,7 +1,7 @@
 // Costbook Supabase Data Fetching Functions
 // Handles all data access for projects, commitments, and actuals
 
-import { supabase } from '@/lib/api/supabase'
+import { supabase } from '@/lib/api/supabase-minimal'
 import {
   Project,
   Commitment,

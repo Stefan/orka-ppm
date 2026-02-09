@@ -1,13 +1,7 @@
 'use client'
 
 import { useEffect, useCallback, useRef, useMemo } from 'react'
-import { createClient } from '@supabase/supabase-js'
-
-// Allow environment variables to be overridden for testing
-const getSupabaseConfig = () => ({
-  url: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-})
+import { supabase } from '@/lib/api/supabase-minimal'
 
 interface WorkflowRealtimeOptions {
   onWorkflowUpdate?: (payload: any) => void
@@ -19,7 +13,6 @@ export function useWorkflowRealtime(
   workflowInstanceId: string | null,
   options: WorkflowRealtimeOptions = {}
 ) {
-  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null)
   const channelRef = useRef<any>(null)
 
   const { onWorkflowUpdate, onApprovalUpdate, onNotification } = options
@@ -32,24 +25,12 @@ export function useWorkflowRealtime(
   }, [])
 
   useEffect(() => {
-    const config = getSupabaseConfig()
-    
-    if (!config.url || !config.anonKey) {
-      console.warn('Supabase credentials not configured')
-      return
-    }
-
     if (!workflowInstanceId) {
       cleanup()
       return
     }
 
-    // Initialize Supabase client if not already done
-    if (!supabaseRef.current) {
-      supabaseRef.current = createClient(config.url, config.anonKey)
-    }
-
-    const supabase = supabaseRef.current
+    // Use shared singleton client to avoid multiple GoTrueClient instances (same storage key)
 
     // Subscribe to workflow_instances changes
     const channel = supabase
@@ -103,7 +84,6 @@ export function useWorkflowRealtime(
 
 // Hook for user-specific notifications
 export function useWorkflowNotifications(userId: string | null) {
-  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null)
   const channelRef = useRef<any>(null)
 
   const cleanup = useCallback(() => {
@@ -114,18 +94,9 @@ export function useWorkflowNotifications(userId: string | null) {
   }, [])
 
   const subscribe = useCallback((onNotification: (payload: any) => void) => {
-    const config = getSupabaseConfig()
-    
-    if (!config.url || !config.anonKey || !userId) {
-      return
-    }
+    if (!userId) return
 
-    // Initialize Supabase client if not already done
-    if (!supabaseRef.current) {
-      supabaseRef.current = createClient(config.url, config.anonKey)
-    }
-
-    const supabase = supabaseRef.current
+    // Use shared singleton client to avoid multiple GoTrueClient instances (same storage key)
 
     // Subscribe to notifications for this user
     const channel = supabase

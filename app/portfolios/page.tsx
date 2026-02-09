@@ -563,10 +563,12 @@ export default function PortfoliosPage() {
                   const projectsByProgram = (programId: string) => projects.filter((proj) => proj.program_id === programId)
                   return (
                     <li key={p.id} className="rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
-                      <button
-                        type="button"
+                      <div
+                        role="button"
+                        tabIndex={0}
                         onClick={() => toggleExpand(p.id)}
-                        className="w-full flex items-center gap-2 p-4 text-left hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleExpand(p.id); } }}
+                        className="w-full flex items-center gap-2 p-4 text-left hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
                       >
                         {isExpanded ? <ChevronDown className="h-5 w-5 text-gray-500" /> : <ChevronRight className="h-5 w-5 text-gray-500" />}
                         <FolderOpen className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
@@ -585,7 +587,7 @@ export default function PortfoliosPage() {
                         >
                           <Sparkles className="h-3.5 w-3.5" /> Gruppier thematisch
                         </button>
-                      </button>
+                      </div>
                       {isExpanded && (
                         <div className="border-t border-gray-200 dark:border-slate-700 pb-4">
                           <div className="pt-2 px-4 space-y-4">

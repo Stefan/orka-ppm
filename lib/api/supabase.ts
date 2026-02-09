@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
 // PRODUCTION FORCE OVERRIDE - Completely hardcoded values
 // This bypasses ALL Vercel environment variables entirely
@@ -8,55 +8,69 @@ const PRODUCTION_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc
 // For local development, use environment variable if available, otherwise use production
 const PRODUCTION_API_URL = 'https://orka-ppm.onrender.com' // Force correct URL for production
 
-// Production-ready Supabase client with hardcoded values for stability
-if (process.env.NODE_ENV === 'development') {
-  console.log('✅ Creating Supabase client with minimal config - Production Ready')
-  console.log('🔧 Force Override Active: Bypassing ALL environment variables')
-  console.log('🌐 Using hardcoded production values for stability')
+/** Global key so multiple chunks sharing the same storage key use one GoTrueClient instance */
+const BROWSER_SINGLETON_KEY = '__ORKA_PPM_SUPABASE_CLIENT__'
+
+function createSupabaseClient(): SupabaseClient {
+  return createClient(
+    PRODUCTION_SUPABASE_URL,
+    PRODUCTION_SUPABASE_ANON_KEY,
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storageKey: 'supabase.auth.token',
+        storage: {
+          getItem: (key: string) => {
+            try {
+              return typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null
+            } catch {
+              return null
+            }
+          },
+          setItem: (key: string, value: string) => {
+            try {
+              if (typeof localStorage !== 'undefined') localStorage.setItem(key, value)
+            } catch {
+              // Ignore storage errors
+            }
+          },
+          removeItem: (key: string) => {
+            try {
+              if (typeof localStorage !== 'undefined') localStorage.removeItem(key)
+            } catch {
+              // Ignore storage errors
+            }
+          },
+        },
+      },
+      global: {
+        headers: {
+          'X-Client-Info': 'ppm-saas-frontend-production',
+        },
+      },
+    }
+  )
 }
 
-// Create client with hardcoded values - NO environment variable dependency
-export const supabase = createClient(
-  PRODUCTION_SUPABASE_URL,
-  PRODUCTION_SUPABASE_ANON_KEY,
-  {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      // Handle refresh token errors gracefully
-      storageKey: 'ppm-auth-token',
-      storage: {
-        getItem: (key: string) => {
-          try {
-            return localStorage.getItem(key)
-          } catch {
-            return null
-          }
-        },
-        setItem: (key: string, value: string) => {
-          try {
-            localStorage.setItem(key, value)
-          } catch {
-            // Ignore storage errors
-          }
-        },
-        removeItem: (key: string) => {
-          try {
-            localStorage.removeItem(key)
-          } catch {
-            // Ignore storage errors
-          }
-        },
-      },
-    },
-    global: {
-      headers: {
-        'X-Client-Info': 'ppm-saas-frontend-production',
-      },
-    },
+/** Single Supabase client: use window singleton in browser so all chunks share one GoTrueClient. */
+function getSupabaseClient(): SupabaseClient {
+  if (typeof window !== 'undefined') {
+    const g = window as Window & { [key: string]: SupabaseClient | undefined }
+    if (g[BROWSER_SINGLETON_KEY]) return g[BROWSER_SINGLETON_KEY]
+    g[BROWSER_SINGLETON_KEY] = createSupabaseClient()
+    return g[BROWSER_SINGLETON_KEY]
   }
-)
+  return createSupabaseClient()
+}
+
+// Production-ready Supabase client - single instance in browser (avoids "Multiple GoTrueClient" warning)
+if (process.env.NODE_ENV === 'development') {
+  console.log('✅ Supabase client (singleton) - Production Ready')
+}
+
+export const supabase = getSupabaseClient()
 
 export const ENV_CONFIG = {
   url: PRODUCTION_SUPABASE_URL,
@@ -71,10 +85,3 @@ export const ENV_CONFIG = {
 }
 
 export const API_URL = PRODUCTION_API_URL
-
-if (process.env.NODE_ENV === 'development') {
-  console.log('✅ Supabase client created successfully (minimal) - Ready for production')
-  console.log('🎯 Configuration: URL length:', PRODUCTION_SUPABASE_URL.length, 'Key length:', PRODUCTION_SUPABASE_ANON_KEY.length)
-  console.log('🔗 API URL:', PRODUCTION_API_URL)
-  console.log('🚀 Production mode: Environment variables completely bypassed')
-}

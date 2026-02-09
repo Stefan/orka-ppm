@@ -196,7 +196,7 @@ function rowToExtendedComment(row: CostbookCommentRow, replyCount = 0): Extended
  */
 async function getSupabaseAuth(): Promise<{ supabase: import('@supabase/supabase-js').SupabaseClient; userId: string } | null> {
   try {
-    const { supabase } = await import('@/lib/api/supabase')
+    const { supabase } = await import('@/lib/api/supabase-minimal')
     const { data: { session } } = await (supabase as import('@supabase/supabase-js').SupabaseClient).auth.getSession()
     if (!session?.user?.id) return null
     return { supabase: supabase as import('@supabase/supabase-js').SupabaseClient, userId: session.user.id }

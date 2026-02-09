@@ -20,7 +20,7 @@ export async function fetchProjectFinancialsAggregate(
 ): Promise<ProjectFinancialsRow[]> {
   if (projectIds.length === 0) return []
   try {
-    const { supabase } = await import('@/lib/api/supabase')
+    const { supabase } = await import('@/lib/api/supabase-minimal')
     const { data, error } = await supabase.rpc('get_project_financials_aggregate', {
       project_ids: projectIds
     })

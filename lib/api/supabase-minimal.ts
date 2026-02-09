@@ -1,10 +1,11 @@
 /**
  * Minimal Supabase Configuration
- * Provides basic Supabase client setup and environment configuration
+ * Re-exports the single Supabase client from ./supabase to avoid multiple GoTrueClient instances.
+ * Provides ENV_CONFIG getters, Database types, and auth utility functions.
  */
 
-import { createClient } from '@supabase/supabase-js'
-import type { SupabaseClient } from '@supabase/supabase-js'
+import { supabase } from './supabase'
+export { supabase }
 
 // Environment configuration - use getters for runtime evaluation
 export const ENV_CONFIG = {
@@ -38,48 +39,6 @@ if (typeof window !== 'undefined' && !getValidConfig()) {
     keyLength: ENV_CONFIG.supabaseAnonKey?.length || 0
   })
 }
-
-// Create Supabase client factory function
-const createSupabaseClient = (): SupabaseClient => {
-  const hasValidConfig = getValidConfig()
-  
-  if (hasValidConfig) {
-    return createClient(
-      ENV_CONFIG.supabaseUrl,
-      ENV_CONFIG.supabaseAnonKey,
-      {
-        auth: {
-          autoRefreshToken: true,
-          persistSession: true,
-          detectSessionInUrl: true,
-          storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-          storageKey: 'supabase.auth.token',
-        },
-        realtime: {
-          params: {
-            eventsPerSecond: 10
-          }
-        }
-      }
-    )
-  }
-  
-  // Fallback client for missing configuration
-  return createClient(
-    'https://placeholder.supabase.co',
-    'placeholder-anon-key',
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-        detectSessionInUrl: false
-      }
-    }
-  )
-}
-
-// Create and export Supabase client
-export const supabase: SupabaseClient = createSupabaseClient()
 
 // Database types (basic)
 export interface Database {

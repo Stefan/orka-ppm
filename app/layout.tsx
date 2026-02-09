@@ -1,7 +1,6 @@
 import React from 'react'
 import type { Metadata } from 'next'
 import dynamic from 'next/dynamic'
-import { Inter } from 'next/font/google'
 import { ThemeScript } from './ThemeScript'
 
 const RootClientContent = dynamic(() => import('./RootClientContent'), { ssr: true })
@@ -12,13 +11,8 @@ import './critical.css'
 // Import globals.css - Next.js will handle optimization
 import './globals.css'
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap', // Optimizes font loading to prevent layout shifts
-  // Font preloading disabled to prevent unused preload warnings
-  preload: false,
-})
+// Use system font stack only (no next/font) to avoid woff2 404 and "preloaded but not used" warnings on Vercel.
+// --font-inter is set in globals.css @theme to the same stack so --font-sans works unchanged.
 
 export const metadata: Metadata = {
   title: 'Orka PPM',
@@ -60,7 +54,7 @@ export const viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de" className={`${inter.variable} chrome-optimized`} suppressHydrationWarning>
+    <html lang="de" className="chrome-optimized" suppressHydrationWarning style={{ '--font-inter': 'ui-sans-serif, system-ui, sans-serif' } as React.CSSProperties}>
       <head>
         {/* Theme script to prevent flash of incorrect theme */}
         <ThemeScript />
