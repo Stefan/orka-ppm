@@ -1,7 +1,7 @@
 {
   "name": "orka-ppm",
   "version": "0.0.1",
-  "buildNumber": 4,
+  "buildNumber": 5,
   "private": true,
   "description": "AI-powered Project Portfolio Management System",
   "author": "Stefan",
@@ -49,7 +49,8 @@
     "test:bundle": "node scripts/check-bundle-size.js",
     "test:syntax": "node scripts/syntax-check.js",
     "test:optional-deps": "node scripts/check-optional-deps.js",
-    "health-check": "npm run test:syntax && npm run test:optional-deps && npm run type-check",
+    "health-check": "npm run test:syntax && npm run test:optional-deps",
+    "health-check:full": "npm run test:syntax && npm run test:optional-deps && npm run type-check",
     "test:readability": "node scripts/test-input-readability.js",
     "test:structure": "npm run test:structure:unit && npm run test:structure:e2e",
     "test:structure:unit": "jest --testPathPatterns='(structure|test-id|manifest)' --passWithNoTests",
