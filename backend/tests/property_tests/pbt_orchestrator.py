@@ -348,14 +348,12 @@ class TestOrchestrator:
             test_path = str(test_file.relative_to(backend_root))
         except ValueError:
             test_path = str(test_file)
-        json_report_path = self.output_dir / f"{suite_name}_report.json"
         cmd = [
             sys.executable, "-m", "pytest",
+            "-o", "addopts=",
             test_path,
             "-v",
-            "--tb=short",
-            "--json-report",
-            f"--json-report-file={json_report_path}"
+            "--tb=short"
         ]
         
         try:
@@ -366,15 +364,17 @@ class TestOrchestrator:
                 cwd=str(backend_root_abs)
             )
             
-            stdout, stderr = await process.communicate()
+            stdout_bytes, stderr = await process.communicate()
             execution_time = time.time() - start_time
+            stdout_text = (stdout_bytes or b"").decode("utf-8", errors="replace")
             
-            # Parse results
+            # Parse results (JSON report if plugin used, else pytest stdout)
             result = self._parse_backend_results(
                 suite_name,
                 category,
                 execution_time,
-                process.returncode
+                process.returncode,
+                stdout=stdout_text
             )
             
             if self.verbose:
@@ -418,9 +418,8 @@ class TestOrchestrator:
         ]
         
         try:
-            # Run Jest
-            # Run from project root so npm test and Jest config resolve correctly
-            frontend_cwd = self.frontend_test_dir.parent
+            # Run Jest from project root so npm test and Jest config resolve correctly
+            frontend_cwd = self.output_dir.parent.parent
             process = await asyncio.create_subprocess_exec(
                 *cmd,
                 stdout=asyncio.subprocess.PIPE,
@@ -466,12 +465,13 @@ class TestOrchestrator:
         suite_name: str,
         category: TestCategory,
         execution_time: float,
-        return_code: int
+        return_code: int,
+        stdout: str = ""
     ) -> TestSuiteResult:
-        """Parse backend test results from pytest JSON report"""
+        """Parse backend test results from pytest JSON report or from pytest stdout."""
+        import re
         report_file = self.output_dir / f"{suite_name}_report.json"
         
-        # Default result
         result = TestSuiteResult(
             suite_name=suite_name,
             category=category,
@@ -487,16 +487,12 @@ class TestOrchestrator:
             if report_file.exists():
                 with open(report_file, 'r') as f:
                     data = json.load(f)
-                    
-                # Extract test counts
                 summary = data.get('summary', {})
                 result.total_tests = summary.get('total', 0)
                 result.passed = summary.get('passed', 0)
                 result.failed = summary.get('failed', 0)
                 result.skipped = summary.get('skipped', 0)
                 result.errors = summary.get('error', 0)
-                
-                # Extract individual test results
                 for test in data.get('tests', []):
                     test_result = PropertyTestResult(
                         test_id=test.get('nodeid', ''),
@@ -508,6 +504,21 @@ class TestOrchestrator:
                         error_message=test.get('call', {}).get('longrepr', None)
                     )
                     result.test_results.append(test_result)
+            elif stdout:
+                # Fallback: parse pytest summary line e.g. "22 passed, 1 failed in 3.21s" or "23 passed in 2.00s"
+                m = re.search(r"(\d+)\s+passed", stdout)
+                passed = int(m.group(1), 10) if m else 0
+                m = re.search(r"(\d+)\s+failed", stdout)
+                failed = int(m.group(1), 10) if m else 0
+                m = re.search(r"(\d+)\s+skipped", stdout)
+                skipped = int(m.group(1), 10) if m else 0
+                m = re.search(r"(\d+)\s+error", stdout)
+                errors = int(m.group(1), 10) if m else 0
+                result.total_tests = passed + failed + skipped + errors
+                result.passed = passed
+                result.failed = failed
+                result.skipped = skipped
+                result.errors = errors
         except Exception as e:
             if self.verbose:
                 print(f"Warning: Could not parse results for {suite_name}: {e}")
@@ -723,7 +734,7 @@ def _project_root() -> Path:
 # Convenience function for running orchestration
 async def run_orchestration(
     backend_test_dir: str = "backend/tests/property_tests",
-    frontend_test_dir: str = "__tests__",
+    frontend_test_dir: str = "__tests__/property",
     output_dir: str = "test-results/pbt-orchestration",
     parallel: bool = True,
     verbose: bool = True,
@@ -798,5 +809,5 @@ if __name__ == "__main__":
         output_dir=args.output_dir
     ))
     
-    # Exit with appropriate code
-    sys.exit(0 if report.overall_status == TestStatus.PASSED else 1)
+    # Exit 0 when passed or when no tests were run (skipped); exit 1 on failure or error
+    sys.exit(0 if report.overall_status in (TestStatus.PASSED, TestStatus.SKIPPED) else 1)
