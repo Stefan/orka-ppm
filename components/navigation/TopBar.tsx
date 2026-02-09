@@ -37,6 +37,7 @@ import {
   FolderOpen,
 } from 'lucide-react'
 import { usePortfolio } from '@/contexts/PortfolioContext'
+import { usePermissions } from '@/hooks/usePermissions'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
 import { useTheme } from '@/app/providers/ThemeProvider'
 import { prefetchDashboardData } from '@/lib/api/dashboard-loader'
@@ -101,6 +102,8 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   }, [userId, workflowNotifications])
 
   const { currentPortfolioId, currentPortfolio, setCurrentPortfolioId, portfolios, setPortfolios } = usePortfolio()
+  const { hasPermission } = usePermissions()
+  const canReadPortfolios = hasPermission('portfolio_read')
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [moreMenuOpen, setMoreMenuOpen] = useState(false)
   const [portfolioMenuOpen, setPortfolioMenuOpen] = useState(false)
@@ -221,6 +224,11 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
     }
   }
 
+  const openMoreMenu = () => {
+    closeAllDropdowns()
+    setMoreMenuOpen(true)
+  }
+
   // Navigation link styles (first-level menu items)
   const navLinkBase = 'px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200'
   const navLinkActive = 'bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-blue-900/50'
@@ -239,7 +247,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
 
   // Position portaled dropdown under the open menu's trigger (so it isn't clipped by topbar overflow)
   useEffect(() => {
-    const ref = portfolioMenuOpen ? portfolioMenuRef : projectsMenuOpen ? projectsMenuRef : financialsMenuOpen ? financialsMenuRef : analysisMenuOpen ? analysisMenuRef : managementMenuOpen ? managementMenuRef : adminMenuOpen ? adminMenuRef : null
+    const ref = portfolioMenuOpen ? portfolioMenuRef : moreMenuOpen ? moreMenuRef : projectsMenuOpen ? projectsMenuRef : financialsMenuOpen ? financialsMenuRef : analysisMenuOpen ? analysisMenuRef : managementMenuOpen ? managementMenuRef : adminMenuOpen ? adminMenuRef : null
     if (!ref?.current) {
       setDropdownAnchor(null)
       return
@@ -257,7 +265,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
       window.removeEventListener('scroll', update, true)
       window.removeEventListener('resize', update)
     }
-  }, [portfolioMenuOpen, projectsMenuOpen, financialsMenuOpen, analysisMenuOpen, managementMenuOpen, adminMenuOpen])
+  }, [portfolioMenuOpen, moreMenuOpen, projectsMenuOpen, financialsMenuOpen, analysisMenuOpen, managementMenuOpen, adminMenuOpen])
 
   return (
     <header ref={headerRef} data-testid="top-bar" className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 w-full max-w-full overflow-visible" style={{ position: 'sticky', top: 0, zIndex: 9999, flexShrink: 0, minHeight: '64px', boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06)' }}>
@@ -288,8 +296,8 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           </Link>
         </div>
 
-        {/* Portfolio selector – current context */}
-        {portfolios.length > 0 && (
+        {/* Portfolio selector – only when user has portfolio_read */}
+        {canReadPortfolios && (
           <div className="relative hidden sm:block flex-shrink-0" ref={portfolioMenuRef}>
             <button
               type="button"
@@ -298,13 +306,15 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
               title={t('topbar.currentPortfolio')}
             >
               <FolderOpen className="h-4 w-4 text-gray-500 dark:text-slate-400" />
-              <span className="max-w-[140px] truncate">{currentPortfolio?.name ?? t('topbar.allPortfolios')}</span>
+              <span className="max-w-[140px] truncate">
+                {portfolios.length > 0 ? (currentPortfolio?.name ?? t('topbar.allPortfolios')) : t('nav.portfolios')}
+              </span>
               <ChevronDown className="h-4 w-4" />
             </button>
           </div>
         )}
 
-        {/* Left-aligned Navigation Links – min-w-0 so nav can shrink in landscape */}
+        {/* Left-aligned Navigation Links – visible from lg; below lg use the "Menü" dropdown (see after nav) */}
         <nav
           data-testid="top-bar-nav"
           className="hidden lg:flex items-center space-x-1 flex-1 min-w-0"
@@ -411,27 +421,83 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           </div>
         </nav>
 
+        {/* Below lg: "Menü" dropdown with all nav links so user can reach every page */}
+        <div className="relative flex lg:hidden flex-shrink-0" ref={moreMenuRef}>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); if (moreMenuOpen) closeAllDropdowns(); else openMoreMenu() }}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${moreMenuOpen ? 'bg-blue-50 dark:bg-slate-700 text-blue-700 dark:text-blue-300 ring-1 ring-blue-200 dark:ring-slate-600' : 'text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
+            title={t('nav.projects')}
+          >
+            <Layers className="h-4 w-4 text-gray-500 dark:text-slate-400" />
+            <span>{t('nav.projects')}</span>
+            <ChevronDown className="h-4 w-4" />
+          </button>
+        </div>
+
         {/* Portaled dropdown panels (so they are not clipped by topbar overflow) */}
-        {(portfolioMenuOpen || projectsMenuOpen || financialsMenuOpen || analysisMenuOpen || managementMenuOpen || adminMenuOpen) && dropdownAnchor && typeof document !== 'undefined' && createPortal(
+        {(portfolioMenuOpen || moreMenuOpen || projectsMenuOpen || financialsMenuOpen || analysisMenuOpen || managementMenuOpen || adminMenuOpen) && dropdownAnchor && typeof document !== 'undefined' && createPortal(
           <div
             className="w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 animate-in fade-in slide-in-from-top-2 duration-200"
             style={{ position: 'fixed', top: dropdownAnchor.top, left: dropdownAnchor.left, zIndex: 10050, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
           >
-            {portfolioMenuOpen && (
+            {portfolioMenuOpen && canReadPortfolios && (
               <>
                 <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
                   <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('topbar.currentPortfolio')}</h3>
                 </div>
-                <button type="button" className={`${dropdownItemBase} w-full text-left ${!currentPortfolioId ? dropdownItemActive : dropdownItemInactive}`} onClick={() => { setCurrentPortfolioId(null); setPortfolioMenuOpen(false) }}>
-                  <FolderOpen className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('topbar.allPortfolios')}</span>
-                </button>
-                {portfolios.map((p) => (
-                  <button key={p.id} type="button" className={`${dropdownItemBase} w-full text-left ${currentPortfolioId === p.id ? dropdownItemActive : dropdownItemInactive}`} onClick={() => { setCurrentPortfolioId(p.id); setPortfolioMenuOpen(false) }}>
-                    <FolderOpen className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium truncate block">{p.name}</span>
+                {portfolios.length > 0 && (
+                  <>
+                    <button type="button" className={`${dropdownItemBase} w-full text-left ${!currentPortfolioId ? dropdownItemActive : dropdownItemInactive}`} onClick={() => { setCurrentPortfolioId(null); setPortfolioMenuOpen(false); router.push('/portfolios') }}>
+                      <FolderOpen className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('topbar.allPortfolios')}</span>
+                    </button>
+                    {portfolios.map((p) => (
+                      <button key={p.id} type="button" className={`${dropdownItemBase} w-full text-left ${currentPortfolioId === p.id ? dropdownItemActive : dropdownItemInactive}`} onClick={() => { setCurrentPortfolioId(p.id); setPortfolioMenuOpen(false); router.push(`/portfolios/${p.id}`) }}>
+                        <FolderOpen className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium truncate block">{p.name}</span>
+                      </button>
+                    ))}
+                  </>
+                )}
+                {portfolios.length === 0 && (
+                  <button type="button" className={`${dropdownItemBase} w-full text-left`} onClick={() => { setPortfolioMenuOpen(false); router.push('/portfolios') }}>
+                    <Layers className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.portfolios')}</span>
                   </button>
-                ))}
-                <Link href="/portfolios" className={`${dropdownItemBase} block border-t border-gray-100 dark:border-slate-700 mt-2 pt-2`} onClick={() => setPortfolioMenuOpen(false)}>
-                  <Layers className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.portfolios')}</span>
+                )}
+              </>
+            )}
+            {moreMenuOpen && (
+              <>
+                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('nav.projects')}</h3>
+                </div>
+                <Link href="/dashboards" className={`${dropdownItemBase} ${pathname === '/dashboards' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setMoreMenuOpen(false)}>
+                  <BarChart3 className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.dashboards')}</span>
+                </Link>
+                <Link href="/projects" className={`${dropdownItemBase} ${pathname === '/projects' || pathname.startsWith('/projects/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setMoreMenuOpen(false)}>
+                  <GitBranch className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.allProjects')}</span>
+                </Link>
+                {canReadPortfolios && (
+                  <Link href="/portfolios" className={`${dropdownItemBase} ${pathname === '/portfolios' || pathname.startsWith('/portfolios/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setMoreMenuOpen(false)}>
+                    <FolderOpen className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.portfolios')}</span>
+                  </Link>
+                )}
+                <Link href="/resources" className={`${dropdownItemBase} ${pathname === '/resources' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setMoreMenuOpen(false)}>
+                  <Users className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.resourceManagement')}</span>
+                </Link>
+                <Link href="/financials" className={`${dropdownItemBase} ${pathname === '/financials' || pathname.startsWith('/financials/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setMoreMenuOpen(false)}>
+                  <DollarSign className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.budgetCostTracking')}</span>
+                </Link>
+                <Link href="/reports" className={`${dropdownItemBase} ${(pathname === '/reports' || pathname.startsWith('/reports/')) && !pathname.startsWith('/reports/pmr') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setMoreMenuOpen(false)}>
+                  <FileText className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.reportsAnalytics')}</span>
+                </Link>
+                <Link href="/risks" className={`${dropdownItemBase} ${pathname === '/risks' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setMoreMenuOpen(false)}>
+                  <AlertTriangle className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.riskManagement')}</span>
+                </Link>
+                <Link href="/changes" className={`${dropdownItemBase} ${pathname === '/changes' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setMoreMenuOpen(false)}>
+                  <GitPullRequest className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.changeManagement')}</span>
+                </Link>
+                <Link href="/admin" className={`${dropdownItemBase} ${pathname === '/admin' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setMoreMenuOpen(false)}>
+                  <Shield className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.systemAdmin')}</span>
                 </Link>
               </>
             )}
@@ -443,9 +509,11 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 <Link href="/projects" className={`${dropdownItemBase} ${pathname === '/projects' || pathname.startsWith('/projects/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setProjectsMenuOpen(false)}>
                   <GitBranch className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.allProjects')}</span>
                 </Link>
-                <Link href="/portfolios" className={`${dropdownItemBase} ${pathname === '/portfolios' || pathname.startsWith('/portfolios/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setProjectsMenuOpen(false)}>
-                  <FolderOpen className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.portfolios')}</span>
-                </Link>
+                {canReadPortfolios && (
+                  <Link href="/portfolios" className={`${dropdownItemBase} ${pathname === '/portfolios' || pathname.startsWith('/portfolios/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setProjectsMenuOpen(false)}>
+                    <FolderOpen className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.portfolios')}</span>
+                  </Link>
+                )}
                 <Link href="/resources" className={`${dropdownItemBase} ${pathname === '/resources' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setProjectsMenuOpen(false)}>
                   <Users className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.resourceManagement')}</span>
                 </Link>

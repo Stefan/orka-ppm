@@ -161,7 +161,7 @@ CREATE TABLE IF NOT EXISTS wbs_elements (
 
 -- Enhanced milestones table (extends existing milestones table)
 -- First check if we need to enhance the existing milestones table
-DO $
+DO $$
 BEGIN
     -- Add schedule_id column if it doesn't exist
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'milestones' AND column_name = 'schedule_id') THEN
@@ -193,11 +193,22 @@ BEGIN
     
     -- Update status column to use milestone_status enum if it's currently text
     IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'milestones' AND column_name = 'status' AND data_type = 'character varying') THEN
+        -- Drop partial indexes that use status::text in predicate (not immutable); they will be recreated below
+        DROP INDEX IF EXISTS idx_milestones_target_date_status;
+        DROP INDEX IF EXISTS idx_milestones_due_date_status;
         -- First update existing values to match enum
         UPDATE milestones SET status = 'planned' WHERE status = 'pending';
         UPDATE milestones SET status = 'achieved' WHERE status = 'completed';
-        -- Then change the column type
+        -- Drop default so type change can run, then change type, then restore default
+        ALTER TABLE milestones ALTER COLUMN status DROP DEFAULT;
         ALTER TABLE milestones ALTER COLUMN status TYPE milestone_status USING status::milestone_status;
+        ALTER TABLE milestones ALTER COLUMN status SET DEFAULT 'planned'::milestone_status;
+        -- Recreate partial index with enum predicate (immutable)
+        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'milestones' AND column_name = 'target_date') THEN
+            CREATE INDEX IF NOT EXISTS idx_milestones_target_date_status ON milestones(target_date, status) WHERE status IN ('planned', 'at_risk');
+        ELSIF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'milestones' AND column_name = 'due_date') THEN
+            CREATE INDEX IF NOT EXISTS idx_milestones_due_date_status ON milestones(due_date, status) WHERE status IN ('planned', 'at_risk');
+        END IF;
     ELSIF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'milestones' AND column_name = 'status') THEN
         ALTER TABLE milestones ADD COLUMN status milestone_status DEFAULT 'planned';
     END IF;
@@ -229,7 +240,7 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'milestones' AND column_name = 'approved_at') THEN
         ALTER TABLE milestones ADD COLUMN approved_at TIMESTAMP WITH TIME ZONE;
     END IF;
-END $;
+END $$;
 
 -- Schedule baselines for version control
 CREATE TABLE IF NOT EXISTS schedule_baselines (
@@ -334,13 +345,18 @@ CREATE TRIGGER update_task_resource_assignments_updated_at BEFORE UPDATE ON task
 -- AUDIT TRIGGERS FOR SCHEDULE MANAGEMENT
 -- =====================================================
 
--- Apply audit triggers to schedule management tables
-CREATE TRIGGER audit_schedules AFTER INSERT OR UPDATE OR DELETE ON schedules FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
-CREATE TRIGGER audit_tasks AFTER INSERT OR UPDATE OR DELETE ON tasks FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
-CREATE TRIGGER audit_task_dependencies AFTER INSERT OR UPDATE OR DELETE ON task_dependencies FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
-CREATE TRIGGER audit_wbs_elements AFTER INSERT OR UPDATE OR DELETE ON wbs_elements FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
-CREATE TRIGGER audit_schedule_baselines AFTER INSERT OR UPDATE OR DELETE ON schedule_baselines FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
-CREATE TRIGGER audit_task_resource_assignments AFTER INSERT OR UPDATE OR DELETE ON task_resource_assignments FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
+-- Apply audit triggers only if audit_trigger_function exists (from 001 or similar)
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'public' AND p.proname = 'audit_trigger_function') THEN
+        CREATE TRIGGER audit_schedules AFTER INSERT OR UPDATE OR DELETE ON schedules FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
+        CREATE TRIGGER audit_tasks AFTER INSERT OR UPDATE OR DELETE ON tasks FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
+        CREATE TRIGGER audit_task_dependencies AFTER INSERT OR UPDATE OR DELETE ON task_dependencies FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
+        CREATE TRIGGER audit_wbs_elements AFTER INSERT OR UPDATE OR DELETE ON wbs_elements FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
+        CREATE TRIGGER audit_schedule_baselines AFTER INSERT OR UPDATE OR DELETE ON schedule_baselines FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
+        CREATE TRIGGER audit_task_resource_assignments AFTER INSERT OR UPDATE OR DELETE ON task_resource_assignments FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
+    END IF;
+END $$;
 
 -- =====================================================
 -- SCHEDULE MANAGEMENT FUNCTIONS
@@ -348,7 +364,7 @@ CREATE TRIGGER audit_task_resource_assignments AFTER INSERT OR UPDATE OR DELETE 
 
 -- Function to calculate task progress rollup
 CREATE OR REPLACE FUNCTION calculate_task_progress_rollup(parent_task_id UUID)
-RETURNS INTEGER AS $
+RETURNS INTEGER AS $$
 DECLARE
     total_effort DECIMAL(10,2) := 0;
     completed_effort DECIMAL(10,2) := 0;
@@ -372,14 +388,14 @@ BEGIN
     
     RETURN LEAST(100, GREATEST(0, rollup_progress));
 END;
-$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- Function to detect circular dependencies
 CREATE OR REPLACE FUNCTION detect_circular_dependency(
     new_predecessor_id UUID,
     new_successor_id UUID
 )
-RETURNS BOOLEAN AS $
+RETURNS BOOLEAN AS $$
 DECLARE
     visited_tasks UUID[] := ARRAY[]::UUID[];
     current_task UUID;
@@ -413,14 +429,14 @@ BEGIN
     
     RETURN FALSE;
 END;
-$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- Function to generate WBS codes
 CREATE OR REPLACE FUNCTION generate_wbs_code(
     schedule_id UUID,
     parent_code VARCHAR(50) DEFAULT NULL
 )
-RETURNS VARCHAR(50) AS $
+RETURNS VARCHAR(50) AS $$
 DECLARE
     next_number INTEGER;
     new_code VARCHAR(50);
@@ -449,11 +465,11 @@ BEGIN
     
     RETURN new_code;
 END;
-$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- Function to validate task dependency creation
 CREATE OR REPLACE FUNCTION validate_task_dependency()
-RETURNS TRIGGER AS $
+RETURNS TRIGGER AS $$
 BEGIN
     -- Check for circular dependencies
     IF detect_circular_dependency(NEW.predecessor_task_id, NEW.successor_task_id) THEN
@@ -473,7 +489,7 @@ BEGIN
     
     RETURN NEW;
 END;
-$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- Apply dependency validation trigger
 CREATE TRIGGER validate_task_dependency_trigger
@@ -482,7 +498,7 @@ CREATE TRIGGER validate_task_dependency_trigger
 
 -- Function to update parent task progress when child tasks change
 CREATE OR REPLACE FUNCTION update_parent_task_progress()
-RETURNS TRIGGER AS $
+RETURNS TRIGGER AS $$
 DECLARE
     parent_id UUID;
 BEGIN
@@ -507,7 +523,7 @@ BEGIN
         RETURN NEW;
     END IF;
 END;
-$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- Apply parent progress update trigger
 CREATE TRIGGER update_parent_task_progress_trigger
@@ -557,13 +573,13 @@ WITH RECURSIVE task_tree AS (
         t.progress_percentage,
         t.status,
         t.is_critical,
-        0 as level,
-        t.wbs_code as path
+        0::integer as level,
+        t.wbs_code::text as path
     FROM tasks t
     WHERE t.parent_task_id IS NULL
-    
+
     UNION ALL
-    
+
     -- Child tasks
     SELECT 
         t.id,
@@ -577,7 +593,7 @@ WITH RECURSIVE task_tree AS (
         t.status,
         t.is_critical,
         tt.level + 1,
-        tt.path || '.' || t.wbs_code
+        (tt.path || '.' || t.wbs_code)::text
     FROM tasks t
     JOIN task_tree tt ON t.parent_task_id = tt.id
 )

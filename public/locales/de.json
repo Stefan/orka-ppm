@@ -78,7 +78,23 @@
     "empty": "Noch keine Portfolios. Legen Sie Portfolios in Ihrer Organisation an.",
     "loadError": "Portfolios konnten nicht geladen werden.",
     "projectsInPortfolio": "Projekte in diesem Portfolio",
-    "noProjects": "Keine Projekte in diesem Portfolio."
+    "noProjects": "Keine Projekte in diesem Portfolio.",
+    "create": "Portfolio anlegen",
+    "createTitle": "Neues Portfolio",
+    "edit": "Bearbeiten",
+    "editTitle": "Portfolio bearbeiten",
+    "delete": "Löschen",
+    "deleteConfirm": "Dieses Portfolio löschen? Projekte werden nicht gelöscht, müssen aber zuerst einem anderen Portfolio zugeordnet werden.",
+    "deleteBlocked": "Löschen nicht möglich: In diesem Portfolio sind noch Projekte. Bitte zuerst verschieben oder löschen.",
+    "nameLabel": "Name",
+    "descriptionLabel": "Beschreibung (optional)",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "createSuccess": "Portfolio angelegt.",
+    "updateSuccess": "Portfolio aktualisiert.",
+    "deleteSuccess": "Portfolio gelöscht.",
+    "tabOverview": "Übersicht",
+    "tabDashboard": "Dashboard"
   },
   "dashboard": {
     "title": "Portfolio Dashboard",
@@ -167,7 +183,8 @@
   "projects": {
     "recentProjects": "Aktuelle Projekte",
     "title": "Projekte",
-    "pageDescription": "Verwalten Sie Ihre Projekte und Workflow-Freigaben"
+    "pageDescription": "Verwalten Sie Ihre Projekte und Workflow-Freigaben",
+    "import": "Projekte importieren"
   },
   "settings": {
     "title": "Einstellungen",

@@ -11,8 +11,9 @@ from auth.rbac import require_permission, Permission
 
 logger = logging.getLogger(__name__)
 from auth.dependencies import get_current_user
-from config.database import supabase
-from models.projects import ProjectCreate, ProjectResponse, ProjectStatus
+from config.database import supabase, service_supabase
+from models.projects import ProjectCreate, ProjectUpdate, ProjectResponse, ProjectStatus
+from services.project_sync import run_sync
 from models.base import HealthIndicator
 from utils.converters import convert_uuids
 
@@ -50,6 +51,8 @@ async def create_project(
         
         project_data = project.dict()
         project_data['health'] = HealthIndicator.green.value
+        if project_data.get('program_id') is not None:
+            project_data['program_id'] = str(project_data['program_id'])
         
         response = supabase.table("projects").insert(project_data).execute()
         if not response.data:
@@ -83,7 +86,7 @@ async def list_projects(
         if cache:
             data = await cache.get(cache_key)
         if data is None:
-            select_cols = "id", "name", "status", "portfolio_id", "health", "budget", "actual_cost", "start_date", "end_date", "created_at", "updated_at", "description"
+            select_cols = "id", "name", "status", "portfolio_id", "program_id", "health", "budget", "actual_cost", "start_date", "end_date", "created_at", "updated_at", "description"
             if count_exact:
                 query = supabase.table("projects").select(*select_cols, count="exact")
             else:
@@ -111,22 +114,92 @@ async def list_projects(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+from pydantic import BaseModel as PydanticBase
+
+
+class SyncRequest(PydanticBase):
+    source: str = "mock"
+    portfolio_id: UUID
+    program_id: Optional[UUID] = None
+    dry_run: bool = True
+
+
+@router.post("/sync")
+async def projects_sync(
+    payload: SyncRequest,
+    current_user=Depends(require_permission(Permission.project_create)),
+):
+    """Sync projects from external source (e.g. Roche); AI-matching for commitments/actuals. Returns created + matched with score."""
+    db = service_supabase if service_supabase else supabase
+    if not db:
+        raise HTTPException(status_code=503, detail="Database service unavailable")
+    try:
+        result = await run_sync(
+            db,
+            source=payload.source,
+            portfolio_id=str(payload.portfolio_id),
+            program_id=str(payload.program_id) if payload.program_id else None,
+            dry_run=payload.dry_run,
+        )
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Projects sync failed: %s", e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/{project_id}", response_model=ProjectResponse)
 async def get_project(
-    project_id: UUID, 
-    current_user = Depends(require_permission(Permission.project_read))
+    project_id: UUID,
+    current_user=Depends(require_permission(Permission.project_read))
 ):
     """Get a specific project"""
     try:
         if not supabase:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        
         response = supabase.table("projects").select("*").eq("id", str(project_id)).execute()
         if not response.data:
             raise HTTPException(status_code=404, detail="Project not found")
         return convert_uuids(response.data[0])
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.patch("/{project_id}", response_model=ProjectResponse)
+async def update_project(
+    request: Request,
+    project_id: UUID,
+    payload: ProjectUpdate,
+    current_user=Depends(require_permission(Permission.project_update))
+):
+    """Partial update (e.g. program_id for drag-drop)."""
+    try:
+        if not supabase:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
+        data = payload.dict(exclude_unset=True)
+        if not data:
+            response = supabase.table("projects").select("*").eq("id", str(project_id)).execute()
+            if not response.data:
+                raise HTTPException(status_code=404, detail="Project not found")
+            return convert_uuids(response.data[0])
+        for key in ("program_id", "manager_id"):
+            if key in data and data[key] is not None:
+                data[key] = str(data[key])
+        if "team_members" in data and data["team_members"] is not None:
+            data["team_members"] = [str(u) for u in data["team_members"]]
+        response = supabase.table("projects").update(data).eq("id", str(project_id)).execute()
+        if not response.data:
+            raise HTTPException(status_code=404, detail="Project not found")
+        _invalidate_projects_cache(request)
+        return convert_uuids(response.data[0])
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/{project_id}/scenarios")
 async def get_project_scenarios(

@@ -9,9 +9,11 @@ import {
 
 const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV === 'development'
 
-export async function fetchProjects(accessToken: string): Promise<Project[]> {
+export async function fetchProjects(accessToken: string, portfolioId?: string | null): Promise<Project[]> {
   try {
-    const url = '/api/projects'
+    const params = new URLSearchParams()
+    if (portfolioId) params.set('portfolio_id', portfolioId)
+    const url = params.toString() ? `/api/projects?${params.toString()}` : '/api/projects'
     if (isDev) console.log('Fetching projects from:', url)
 
     const controller = new AbortController()

@@ -110,8 +110,11 @@ async def create_schedule(
 ):
     """Create a new project schedule. Invalidates list cache."""
     try:
+        user_id = current_user.get("user_id") or current_user.get("id")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="User ID not found")
         schedule = await schedule_manager.create_schedule(
-            project_id, schedule_data, UUID(current_user["id"])
+            project_id, schedule_data, UUID(user_id)
         )
         cache = getattr(request.app.state, "cache_manager", None)
         if cache and getattr(cache, "clear_pattern", None):
@@ -119,9 +122,11 @@ async def create_schedule(
         return schedule
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error creating schedule: {e}")
-        raise HTTPException(status_code=500, detail="Failed to create schedule")
+        logger.error(f"Error creating schedule: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/notifications", response_model=Dict[str, Any])
 async def get_schedule_notifications(
@@ -131,7 +136,8 @@ async def get_schedule_notifications(
 ):
     """Get milestone deadline alerts and task assignment notifications (Task 13.2)."""
     try:
-        user_id = UUID(current_user["id"]) if current_user.get("id") else None
+        uid = current_user.get("user_id") or current_user.get("id")
+        user_id = UUID(uid) if uid else None
         return await schedule_notifications_service.get_schedule_notifications(
             user_id=user_id, schedule_id=schedule_id, days_ahead=days_ahead
         )
@@ -171,7 +177,7 @@ async def update_schedule(
     """Update an existing schedule. Invalidates list and single-schedule cache."""
     try:
         schedule = await schedule_manager.update_schedule(
-            schedule_id, updates, UUID(current_user["id"])
+            schedule_id, updates, UUID(current_user.get("user_id") or current_user.get("id"))
         )
         invalidate_schedule(schedule_id)
         cache = getattr(request.app.state, "cache_manager", None)
@@ -216,7 +222,7 @@ async def create_task(
     """Create a new task in the schedule."""
     try:
         task = await schedule_manager.create_task(
-            schedule_id, task_data, UUID(current_user["id"])
+            schedule_id, task_data, UUID(current_user.get("user_id") or current_user.get("id"))
         )
         return task
     except ValueError as e:
@@ -234,7 +240,7 @@ async def update_task(
     """Update an existing task."""
     try:
         task = await schedule_manager.update_task(
-            task_id, updates, UUID(current_user["id"])
+            task_id, updates, UUID(current_user.get("user_id") or current_user.get("id"))
         )
         return task
     except ValueError as e:
@@ -252,7 +258,7 @@ async def update_task_progress(
     """Update task progress with actual dates and percentage completion."""
     try:
         task = await schedule_manager.update_task_progress(
-            task_id, progress_data, UUID(current_user["id"])
+            task_id, progress_data, UUID(current_user.get("user_id") or current_user.get("id"))
         )
         return task
     except ValueError as e:
@@ -312,7 +318,7 @@ async def create_dependency(
                 detail="One of predecessor_task_id or successor_task_id must equal the path task_id",
             )
         dep = await dependency_engine.create_dependency(
-            pred_id, succ_id, body.dependency_type, body.lag_days, UUID(current_user["id"])
+            pred_id, succ_id, body.dependency_type, body.lag_days, UUID(current_user.get("user_id") or current_user.get("id"))
         )
         return dep
     except ValueError as e:
@@ -394,7 +400,7 @@ async def create_wbs_element(
     """Create a WBS element in the schedule."""
     try:
         return await wbs_manager.create_wbs_element(
-            schedule_id, wbs_data, UUID(current_user["id"])
+            schedule_id, wbs_data, UUID(current_user.get("user_id") or current_user.get("id"))
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -426,7 +432,7 @@ async def create_milestone(
     """Create a milestone in the schedule."""
     try:
         return await milestone_tracker.create_milestone(
-            schedule_id, milestone_data, UUID(current_user["id"])
+            schedule_id, milestone_data, UUID(current_user.get("user_id") or current_user.get("id"))
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -463,7 +469,7 @@ async def assign_resource_to_task(
     """Assign a resource to a task."""
     try:
         return await resource_assignment_service.assign_resource_to_task(
-            task_id, assignment_data, UUID(current_user["id"])
+            task_id, assignment_data, UUID(current_user.get("user_id") or current_user.get("id"))
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -587,7 +593,7 @@ async def create_baseline(
     """Create a new baseline for the schedule."""
     try:
         baseline = await baseline_manager.create_baseline(
-            schedule_id, baseline_data, UUID(current_user["id"])
+            schedule_id, baseline_data, UUID(current_user.get("user_id") or current_user.get("id"))
         )
         return baseline
     except ValueError as e:
@@ -632,7 +638,7 @@ async def approve_baseline(
     """Approve a baseline and set it as the official project baseline."""
     try:
         baseline = await baseline_manager.approve_baseline(
-            baseline_id, UUID(current_user["id"])
+            baseline_id, UUID(current_user.get("user_id") or current_user.get("id"))
         )
         return baseline
     except ValueError as e:
@@ -724,7 +730,7 @@ async def bulk_update_task_progress(
     """Update progress for multiple tasks in a single operation."""
     try:
         result = await schedule_manager.bulk_update_task_progress(
-            progress_updates, UUID(current_user["id"])
+            progress_updates, UUID(current_user.get("user_id") or current_user.get("id"))
         )
         return result
     except Exception as e:

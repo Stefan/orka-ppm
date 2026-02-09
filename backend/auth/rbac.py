@@ -26,6 +26,11 @@ class Permission(str, Enum):
     portfolio_update = "portfolio_update"
     portfolio_delete = "portfolio_delete"
     
+    program_create = "program_create"
+    program_read = "program_read"
+    program_update = "program_update"
+    program_delete = "program_delete"
+    
     # Project permissions
     project_create = "project_create"
     project_read = "project_read"
@@ -142,6 +147,7 @@ DEFAULT_ROLE_PERMISSIONS = {
         # Full access to everything
         Permission.admin_read,
         Permission.portfolio_create, Permission.portfolio_read, Permission.portfolio_update, Permission.portfolio_delete,
+        Permission.program_create, Permission.program_read, Permission.program_update, Permission.program_delete,
         Permission.project_create, Permission.project_read, Permission.project_update, Permission.project_delete,
         Permission.resource_create, Permission.resource_read, Permission.resource_update, Permission.resource_delete, Permission.resource_allocate,
         Permission.financial_read, Permission.financial_create, Permission.financial_update, Permission.financial_delete, Permission.budget_alert_manage,
@@ -170,6 +176,7 @@ DEFAULT_ROLE_PERMISSIONS = {
     UserRole.portfolio_manager: [
         # Portfolio and project management
         Permission.portfolio_create, Permission.portfolio_read, Permission.portfolio_update,
+        Permission.program_create, Permission.program_read, Permission.program_update,
         Permission.project_create, Permission.project_read, Permission.project_update,
         Permission.resource_read, Permission.resource_allocate,
         Permission.financial_read, Permission.financial_create, Permission.financial_update, Permission.budget_alert_manage,

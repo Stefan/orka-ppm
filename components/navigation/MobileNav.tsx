@@ -1,8 +1,9 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { usePermissions } from '@/hooks/usePermissions'
 import { 
   X, 
   LayoutDashboard,
@@ -69,6 +70,12 @@ const NAV_ITEMS = [
 export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
   const pathname = usePathname()
   const navRef = useRef<HTMLDivElement>(null)
+  const { hasPermission } = usePermissions()
+  const canReadPortfolios = hasPermission('portfolio_read')
+  const navItems = useMemo(
+    () => (canReadPortfolios ? NAV_ITEMS : NAV_ITEMS.filter((item) => item.href !== '/portfolios')),
+    [canReadPortfolios]
+  )
 
   // Close on escape key
   useEffect(() => {
@@ -139,8 +146,8 @@ export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
         {/* Navigation Links */}
         <nav data-testid="mobile-nav-links" className="p-3">
           {(() => {
-            // Group items by their group property
-            const groups = NAV_ITEMS.reduce((acc, item) => {
+            // Group items by their group property (filtered by RBAC, e.g. portfolios)
+            const groups = navItems.reduce((acc, item) => {
               const group = item.group || 'Other'
               if (!acc[group]) acc[group] = []
               acc[group].push(item)

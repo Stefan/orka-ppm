@@ -4,6 +4,7 @@ import { Suspense, useState, useCallback, useMemo, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useSearchParams } from 'next/navigation'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
+import { usePortfolio } from '@/contexts/PortfolioContext'
 import AppLayout from '@/components/shared/AppLayout'
 import { getApiUrl } from '@/lib/api/client'
 import {
@@ -34,6 +35,7 @@ const REGISTER_TYPES_ARR: RegisterType[] = ['risk', 'change', 'cost', 'issue', '
 function RegistersContent() {
   const searchParams = useSearchParams()
   const { session } = useAuth()
+  const { currentPortfolioId } = usePortfolio()
   const accessToken = session?.access_token ?? undefined
   const userId = session?.user?.id
   const [registerType, setRegisterType] = useState<RegisterType>('risk')
@@ -46,7 +48,11 @@ function RegistersContent() {
   const [editingEntry, setEditingEntry] = useState<RegisterEntry | null>(null)
   const [aiSuggestLoading, setAiSuggestLoading] = useState(false)
 
-  // Prefill from URL (e.g. /registers?project_id=xxx&task_id=yyy or from project/schedule links)
+  // Portfolio scope: URL ?portfolio_id= overrides context (for deep links)
+  const portfolioIdFromUrl = searchParams.get('portfolio_id')
+  const portfolioIdForQuery = portfolioIdFromUrl || currentPortfolioId || null
+
+  // Prefill from URL (e.g. /registers?project_id=xxx&task_id=yyy&portfolio_id= or from project/schedule links)
   const taskIdFromUrl = searchParams.get('task_id')
   const [taskFilter, setTaskFilter] = useState<string>('')
   useEffect(() => {
@@ -58,7 +64,7 @@ function RegistersContent() {
     if (typeParam && REGISTER_TYPES_ARR.includes(typeParam as RegisterType)) setRegisterType(typeParam as RegisterType)
   }, [searchParams])
 
-  const { data: projectsList } = useProjectsQuery(accessToken, userId)
+  const { data: projectsList } = useProjectsQuery(accessToken, userId, portfolioIdForQuery)
   useEffect(() => { setOffset(0) }, [registerType])
 
   useEffect(() => {

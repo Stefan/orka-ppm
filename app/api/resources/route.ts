@@ -10,8 +10,10 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:800
 export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization')
-    
-    const response = await fetch(`${BACKEND_URL}/resources/`, {
+    const { searchParams } = new URL(request.url)
+    const query = searchParams.toString()
+    const url = query ? `${BACKEND_URL}/resources/?${query}` : `${BACKEND_URL}/resources/`
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

@@ -3,6 +3,7 @@
 import React, { lazy, Suspense, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useAuth } from '../providers/SupabaseAuthProvider'
+import { usePortfolio } from '@/contexts/PortfolioContext'
 import { AlertTriangle } from 'lucide-react'
 import AppLayout from '../../components/shared/AppLayout'
 import { ResponsiveContainer } from '../../components/ui/molecules/ResponsiveContainer'
@@ -51,13 +52,20 @@ function FinancialsFallback() {
 
 function FinancialsContent() {
   const { session } = useAuth()
+  const { currentPortfolioId, portfolios } = usePortfolio()
   const searchParams = useSearchParams()
   const { t } = useTranslations()
   const [selectedCurrency, setSelectedCurrency] = React.useState('USD')
   const [dateRange, setDateRange] = React.useState('all')
   const [showFilters, setShowFilters] = React.useState(false)
+  const [portfolioFilterId, setPortfolioFilterId] = React.useState<string | null>(null)
   const [viewMode, setViewMode] = React.useState<ViewMode>(() => getInitialViewMode(searchParams))
   const { isOpen, startTour, closeTour, completeTour, resetAndStartTour, hasCompletedTour } = useGuidedTour('financials-v1')
+
+  const effectivePortfolioId =
+    portfolioFilterId === ''
+      ? undefined
+      : (portfolioFilterId || currentPortfolioId || undefined)
 
   // Feature flag checks
   const { enabled: costbookEnabled } = useFeatureFlag('costbook_phase1')
@@ -77,7 +85,7 @@ function FinancialsContent() {
     }
   }, [viewMode, costbookEnabled])
 
-  // Use custom hooks for data management
+  // Use custom hooks for data management (optional portfolio scope)
   const {
     projects,
     budgetVariances,
@@ -91,7 +99,8 @@ function FinancialsContent() {
     refetch
   } = useFinancialData({
     accessToken: session?.access_token || undefined,
-    selectedCurrency
+    selectedCurrency,
+    portfolioId: effectivePortfolioId
   })
 
   const analyticsData = useAnalytics({
@@ -162,6 +171,20 @@ function FinancialsContent() {
             onExport={exportFinancialData}
             onEditBudget={() => setViewMode('detailed')}
           />
+          <div className="mt-2 flex items-center gap-2">
+            <label htmlFor="financials-portfolio-filter" className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('financials.portfolio') || 'Portfolio'}:</label>
+            <select
+              id="financials-portfolio-filter"
+              value={portfolioFilterId !== null ? portfolioFilterId : (currentPortfolioId ?? '')}
+              onChange={(e) => setPortfolioFilterId(e.target.value === '' ? '' : e.target.value)}
+              className="px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm text-gray-900 dark:text-slate-100 bg-white dark:bg-slate-800"
+            >
+              <option value="">{t('financials.allPortfolios') || 'All portfolios'}</option>
+              {portfolios.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Navigation Tabs */}

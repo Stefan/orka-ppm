@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useMemo, useDeferredValue, useReducer, lazy, Suspense } from 'react'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { Users, Plus, Search, Filter, TrendingUp, AlertCircle, BarChart3, PieChart as PieChartIcon, Target, Zap, RefreshCw, Download, MapPin, RotateCcw } from 'lucide-react'
+import { usePortfolio } from '@/contexts/PortfolioContext'
+import { Users, Plus, Search, Filter, TrendingUp, AlertCircle, BarChart3, PieChart as PieChartIcon, Target, Zap, RefreshCw, Download, MapPin, RotateCcw, FolderOpen } from 'lucide-react'
 import AppLayout from '../../components/shared/AppLayout'
 import ResourceCard from './components/ResourceCard'
 import { getApiUrl } from '../../lib/api/client'
@@ -74,12 +75,14 @@ function filterReducer(state: ResourceFilters, action: FilterAction): ResourceFi
 
 export default function Resources() {
   const { session } = useAuth()
+  const { currentPortfolioId } = usePortfolio()
   const { t } = useTranslations()
   const [resources, setResources] = useState<Resource[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'cards' | 'table' | 'heatmap'>('cards')
   const [showFilters, setShowFilters] = useState(false)
+  const [portfolioFilter, setPortfolioFilter] = useState<boolean>(false)
   const [showOptimization, setShowOptimization] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
@@ -215,15 +218,17 @@ export default function Resources() {
 
   useEffect(() => {
     if (session) fetchResources()
-  }, [session])
+  }, [session, portfolioFilter, currentPortfolioId])
 
   async function fetchResources() {
     setLoading(true)
     setError(null)
     try {
       if (!session?.access_token) throw new Error('Not authenticated')
-      
-      const response = await fetch(getApiUrl('/resources'), {
+      const params = new URLSearchParams()
+      if (portfolioFilter && currentPortfolioId) params.set('portfolio_id', currentPortfolioId)
+      const url = params.toString() ? getApiUrl(`/resources?${params.toString()}`) : getApiUrl('/resources')
+      const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${session?.access_token || ''}`,
           'Content-Type': 'application/json',
@@ -658,6 +663,21 @@ export default function Resources() {
         {showFilters && (
           <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+              <div className="sm:col-span-2 lg:col-span-1 flex flex-col justify-end">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={portfolioFilter}
+                    onChange={(e) => setPortfolioFilter(e.target.checked)}
+                    className="rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
+                  />
+                  <FolderOpen className="h-4 w-4 text-gray-500 dark:text-slate-400" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('resources.currentPortfolioOnly') || 'Current portfolio only'}</span>
+                </label>
+                {portfolioFilter && !currentPortfolioId && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">{t('resources.selectPortfolioHint') || 'Select a portfolio in the top bar.'}</p>
+                )}
+              </div>
               <div className="sm:col-span-2 lg:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Search</label>
                 <div className="relative">

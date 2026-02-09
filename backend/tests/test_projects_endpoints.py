@@ -4,6 +4,7 @@ Dedicated API endpoint tests for projects router (P0).
 Covers GET/POST /projects so route ordering and basic availability are asserted.
 See docs/backend-api-route-coverage.md.
 Cora-Surpass Phase 1: paginated list response and cache key idempotency.
+Entity-hierarchy: POST /projects/sync (80% coverage target).
 """
 
 import pytest
@@ -12,6 +13,7 @@ from fastapi.testclient import TestClient
 
 from main import app
 from routers.projects import _projects_cache_key
+from auth.dependencies import get_current_user
 
 
 @pytest.fixture
@@ -78,3 +80,63 @@ def test_projects_list_cache_hit_with_mock(client: TestClient) -> None:
         client.app.dependency_overrides.pop(get_current_user, None)
         if hasattr(client.app.state, "cache_manager"):
             del client.app.state.cache_manager
+
+
+# ---- POST /projects/sync (entity-hierarchy) ----
+@pytest.mark.regression
+def test_projects_sync_returns_422_when_body_invalid(client: TestClient) -> None:
+    """POST /projects/sync requires portfolio_id (UUID)."""
+    r = client.post("/projects/sync", json={})
+    assert r.status_code == 422
+
+
+def test_projects_sync_returns_200_with_mocked_run_sync(client: TestClient) -> None:
+    """POST /projects/sync returns created + matched when auth and run_sync succeed."""
+    async def fake_user():
+        return {"user_id": "11111111-1111-1111-1111-111111111111", "organization_id": "org-1"}
+
+    sync_result = {"created": [{"id": "id-1", "name": "P1"}], "matched": []}
+    with patch("routers.projects.run_sync", new_callable=AsyncMock, return_value=sync_result), \
+         patch("auth.rbac.rbac") as mock_rbac:
+        mock_rbac.has_permission = AsyncMock(return_value=True)
+        try:
+            client.app.dependency_overrides[get_current_user] = fake_user
+            r = client.post(
+                "/projects/sync",
+                json={
+                    "source": "mock",
+                    "portfolio_id": "11111111-1111-1111-1111-111111111111",
+                    "dry_run": True,
+                },
+            )
+            assert r.status_code == 200
+            data = r.json()
+            assert data.get("created") == sync_result["created"]
+            assert data.get("matched") == sync_result["matched"]
+        finally:
+            client.app.dependency_overrides.pop(get_current_user, None)
+
+
+def test_projects_sync_accepts_program_id(client: TestClient) -> None:
+    """POST /projects/sync accepts optional program_id."""
+    async def fake_user():
+        return {"user_id": "11111111-1111-1111-1111-111111111111", "organization_id": "org-1"}
+
+    sync_result = {"created": [], "matched": []}
+    with patch("routers.projects.run_sync", new_callable=AsyncMock, return_value=sync_result), \
+         patch("auth.rbac.rbac") as mock_rbac:
+        mock_rbac.has_permission = AsyncMock(return_value=True)
+        try:
+            client.app.dependency_overrides[get_current_user] = fake_user
+            r = client.post(
+                "/projects/sync",
+                json={
+                    "source": "mock",
+                    "portfolio_id": "11111111-1111-1111-1111-111111111111",
+                    "program_id": "22222222-2222-2222-2222-222222222222",
+                    "dry_run": True,
+                },
+            )
+            assert r.status_code == 200
+        finally:
+            client.app.dependency_overrides.pop(get_current_user, None)

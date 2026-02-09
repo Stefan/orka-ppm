@@ -22,9 +22,10 @@ import { getApiUrl } from '../../../lib/api'
 interface UseFinancialDataProps {
   accessToken: string | undefined
   selectedCurrency: string
+  portfolioId?: string | null
 }
 
-export function useFinancialData({ accessToken, selectedCurrency }: UseFinancialDataProps) {
+export function useFinancialData({ accessToken, selectedCurrency, portfolioId }: UseFinancialDataProps) {
   const [projects, setProjects] = useState<Project[]>([])
   const [budgetVariances, setBudgetVariances] = useState<BudgetVariance[]>([])
   const [financialAlerts, setFinancialAlerts] = useState<FinancialAlert[]>([])
@@ -70,7 +71,7 @@ export function useFinancialData({ accessToken, selectedCurrency }: UseFinancial
     }
 
     try {
-      const projectsData = await fetchProjects(accessToken)
+      const projectsData = await fetchProjects(accessToken, portfolioId ?? undefined)
       setProjects(projectsData)
       return projectsData
     } catch (error: unknown) {
@@ -78,7 +79,7 @@ export function useFinancialData({ accessToken, selectedCurrency }: UseFinancial
       setError(error instanceof Error ? error.message : 'Failed to fetch projects')
       return []
     }
-  }, [accessToken])
+  }, [accessToken, portfolioId])
 
   /** Derive variances from project list (budget/actual_cost). Avoids N per-project API calls. */
   const variancesFromProjects = useCallback((projectsList: Project[]): BudgetVariance[] => {

@@ -4,9 +4,9 @@ Resource management endpoints
 
 import logging
 from datetime import datetime
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Query
 from uuid import UUID
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 from auth.rbac import require_permission, Permission
 from config.database import supabase, service_supabase
@@ -159,16 +159,33 @@ async def create_resource(
         raise HTTPException(status_code=400, detail=f"Failed to create resource: {str(e)}")
 
 @router.get("/")
-async def list_resources(current_user = Depends(require_permission(Permission.resource_read))):
-    """Get all resources with utilization data"""
+async def list_resources(
+    portfolio_id: Optional[UUID] = Query(None, description="Filter to resources assigned to projects in this portfolio"),
+    current_user=Depends(require_permission(Permission.resource_read)),
+):
+    """Get all resources with utilization data. Optional portfolio_id filters to resources in that portfolio's projects."""
     try:
         if _db is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
 
         resources_response = _db.table("resources").select("*").execute()
-        resources = convert_uuids(resources_response.data)
-        # If no resources exist, return mock data for development
+        resources = convert_uuids(resources_response.data or [])
+        if portfolio_id is not None and resources:
+            proj_response = _db.table("projects").select("id").eq("portfolio_id", str(portfolio_id)).execute()
+            portfolio_project_ids = {str(r["id"]) for r in (proj_response.data or [])}
+            if not portfolio_project_ids:
+                resources = []
+            else:
+                def in_portfolio(r):
+                    cp = r.get("current_projects") or []
+                    if isinstance(cp, list):
+                        return any(pid in portfolio_project_ids for pid in [str(x) for x in cp])
+                    return False
+                resources = [r for r in resources if in_portfolio(r)]
+        # If no resources exist, return mock data for development (unless filtering by portfolio)
         if not resources:
+            if portfolio_id is not None:
+                return []
             mock_resources = [
                 {
                     "id": "1",

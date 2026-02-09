@@ -78,7 +78,23 @@
     "empty": "No portfolios yet. Create portfolios in your organization to get started.",
     "loadError": "Failed to load portfolios.",
     "projectsInPortfolio": "Projects in this portfolio",
-    "noProjects": "No projects in this portfolio."
+    "noProjects": "No projects in this portfolio.",
+    "create": "Create portfolio",
+    "createTitle": "New portfolio",
+    "edit": "Edit",
+    "editTitle": "Edit portfolio",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this portfolio? Projects will not be deleted, but must be moved to another portfolio first.",
+    "deleteBlocked": "Cannot delete: this portfolio still has projects. Move or delete them first.",
+    "nameLabel": "Name",
+    "descriptionLabel": "Description (optional)",
+    "save": "Save",
+    "cancel": "Cancel",
+    "createSuccess": "Portfolio created.",
+    "updateSuccess": "Portfolio updated.",
+    "deleteSuccess": "Portfolio deleted.",
+    "tabOverview": "Overview",
+    "tabDashboard": "Dashboard"
   },
   "dashboard": {
     "title": "Portfolio Dashboard",
@@ -167,7 +183,8 @@
   "projects": {
     "recentProjects": "Recent Projects",
     "title": "Projects",
-    "pageDescription": "Manage your projects and workflow approvals"
+    "pageDescription": "Manage your projects and workflow approvals",
+    "import": "Import projects"
   },
   "settings": {
     "title": "Settings",

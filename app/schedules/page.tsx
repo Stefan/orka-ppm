@@ -68,22 +68,37 @@ export default function SchedulesPage() {
 
   const handleCreateSchedule = useCallback(
     async (data: { project_id: string; name: string; description?: string; start_date: string; end_date: string }) => {
+      const body = {
+        project_id: data.project_id,
+        name: data.name,
+        description: data.description ?? null,
+        start_date: data.start_date,
+        end_date: data.end_date,
+      }
+      // #region agent log
+      const ingestUrl = 'http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1'
+      fetch(ingestUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'app/schedules/page.tsx:handleCreateSchedule', message: 'before create', data: { hasProjectIdInBody: true, bodyKeys: Object.keys(body) }, timestamp: Date.now(), hypothesisId: 'H1' }) }).catch(() => {})
+      // #endregion
       const res = await fetch(`/api/schedules?project_id=${encodeURIComponent(data.project_id)}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: data.name,
-          description: data.description ?? null,
-          start_date: data.start_date,
-          end_date: data.end_date,
-        }),
+        body: JSON.stringify(body),
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
-        throw new Error(err.error ?? 'Failed to create schedule')
+        // #region agent log
+        fetch(ingestUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'app/schedules/page.tsx:handleCreateSchedule', message: 'create failed', data: { status: res.status, err }, timestamp: Date.now(), hypothesisId: 'H2' }) }).catch(() => {})
+        // #endregion
+        const detail = err.detail
+        const detailStr = typeof detail === 'string' ? detail : Array.isArray(detail) ? detail.map((d: { msg?: string }) => d.msg).join(', ') : detail ? String(detail) : undefined
+        let msg = detailStr ?? err.error ?? 'Failed to create schedule'
+        if (msg.includes("table 'public.schedules'") || msg.includes('PGRST205')) {
+          msg = "Schedule tables are not set up. Run the migration: Supabase Dashboard → SQL Editor → execute backend/migrations/017_integrated_master_schedule.sql (see docs/SCHEDULE_MIGRATION.md)."
+        }
+        throw new Error(msg)
       }
     },
     [session?.access_token]

@@ -79,10 +79,16 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Backend schedules create error:', response.status, errorText)
-      return NextResponse.json(
-        { error: 'Failed to create schedule' },
-        { status: response.status }
-      )
+      let body: { error?: string; detail?: unknown } = {}
+      try {
+        const parsed = JSON.parse(errorText)
+        if (parsed.detail != null) body.detail = parsed.detail
+        if (parsed.error != null) body.error = parsed.error
+      } catch {
+        if (errorText) body.detail = errorText
+      }
+      if (!body.error && body.detail == null) body.error = 'Failed to create schedule'
+      return NextResponse.json(body, { status: response.status })
     }
 
     const data = await response.json()

@@ -63,6 +63,26 @@ describe('GET /api/resources', () => {
     )
   })
 
+  it('forwards portfolio_id query to backend when present', async () => {
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ([]),
+      text: async () => '[]',
+    })
+
+    const { GET } = await import('@/app/api/resources/route')
+    const request = createAuthenticatedRequest(
+      'http://localhost:3000/api/resources?portfolio_id=pf-123'
+    )
+    await GET(request as any)
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('portfolio_id=pf-123'),
+      expect.objectContaining({ method: 'GET' })
+    )
+  })
+
   it('returns backend status when backend returns error', async () => {
     global.fetch = jest.fn().mockResolvedValueOnce({
       ok: false,

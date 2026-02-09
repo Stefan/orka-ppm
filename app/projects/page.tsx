@@ -10,6 +10,8 @@ import WorkflowApprovalModal from '@/components/workflow/WorkflowApprovalModal'
 import { getApiUrl } from '@/lib/api'
 import ShareButton from '@/components/projects/ShareButton'
 import ProjectActionButtons from '@/components/projects/ProjectActionButtons'
+import ProjectImportModal from '@/components/projects/ProjectImportModal'
+import { Upload } from 'lucide-react'
 import { useWorkflowNotifications } from '@/hooks/useWorkflowRealtime'
 import { usePortfolio } from '@/contexts/PortfolioContext'
 import { useProjectsQuery, useInvalidateProjects, type ProjectListItem } from '@/lib/projects-queries'
@@ -23,6 +25,7 @@ export default function ProjectsPage() {
   const [selectedWorkflow, setSelectedWorkflow] = useState<string | null>(null)
   const [notification, setNotification] = useState<string | null>(null)
   const [userPermissions, setUserPermissions] = useState<string[]>([])
+  const [importModalOpen, setImportModalOpen] = useState(false)
 
   const currentUserId = session?.user?.id ?? undefined
   const accessToken = session?.access_token ?? undefined
@@ -138,10 +141,26 @@ export default function ProjectsPage() {
     <AppLayout>
       <div data-testid="projects-page" className="p-8">
         <div className="max-w-7xl mx-auto">
-          <div data-testid="projects-header" className="mb-8">
-            <h1 data-testid="projects-title" className="text-3xl font-bold text-gray-900 dark:text-slate-100">{t('projects.title')}</h1>
-            <p className="text-gray-700 dark:text-slate-300 mt-2">{t('projects.pageDescription')}</p>
+          <div data-testid="projects-header" className="mb-8 flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h1 data-testid="projects-title" className="text-3xl font-bold text-gray-900 dark:text-slate-100">{t('projects.title')}</h1>
+              <p className="text-gray-700 dark:text-slate-300 mt-2">{t('projects.pageDescription')}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setImportModalOpen(true)}
+              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-slate-600 px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
+              data-testid="projects-import-button"
+            >
+              <Upload className="h-4 w-4" />
+              {t('projects.import')}
+            </button>
           </div>
+          <ProjectImportModal
+            isOpen={importModalOpen}
+            onClose={() => { setImportModalOpen(false); invalidateProjects() }}
+            portfolioId={currentPortfolioId ?? undefined}
+          />
 
           {/* Realtime Notification Banner */}
           {notification && (

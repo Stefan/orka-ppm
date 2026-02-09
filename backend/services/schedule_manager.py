@@ -18,7 +18,7 @@ import logging
 import json
 from decimal import Decimal
 
-from config.database import supabase
+from config.database import supabase, service_supabase
 from models.schedule import (
     ScheduleCreate, ScheduleUpdate, ScheduleResponse,
     TaskCreate, TaskUpdate, TaskResponse, TaskProgressUpdate,
@@ -40,7 +40,7 @@ class ScheduleManager:
     """
     
     def __init__(self):
-        self.db = supabase
+        self.db = service_supabase if service_supabase else supabase
         if not self.db:
             raise RuntimeError("Database connection not available")
     
@@ -107,8 +107,10 @@ class ScheduleManager:
                 updated_at=datetime.fromisoformat(created_schedule["updated_at"].replace('Z', '+00:00'))
             )
             
+        except ValueError:
+            raise
         except Exception as e:
-            logger.error(f"Error creating schedule: {e}")
+            logger.error(f"Error creating schedule: {e}", exc_info=True)
             raise RuntimeError(f"Failed to create schedule: {str(e)}")
 
     async def list_schedules(
