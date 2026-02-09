@@ -428,19 +428,18 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
-  # Deploy to staging
+  # Deploy to staging (runs on every push to develop when CI passes)
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
     needs: [detect-changes, ci-status]
-    if: github.ref == 'refs/heads/develop' && needs.ci-status.result == 'success'
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push' && needs.ci-status.result == 'success'
     environment: staging
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Deploy frontend to Vercel (staging)
-        if: needs.detect-changes.outputs.frontend == 'true'
         run: |
           npm i -g vercel
           vercel --prod=false --yes --token=${{ secrets.VERCEL_TOKEN }}
@@ -449,7 +448,6 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_STAGING }}
 
       - name: Deploy backend to Render (staging)
-        if: needs.detect-changes.outputs.backend == 'true'
         run: |
           curl -X POST \
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
@@ -485,19 +483,18 @@ jobs:
               body: body
             })
 
-  # Deploy to production
+  # Deploy to production (runs on every push to main when CI passes)
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
     needs: [detect-changes, ci-status]
-    if: github.ref == 'refs/heads/main' && needs.ci-status.result == 'success'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && needs.ci-status.result == 'success'
     environment: production
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Deploy frontend to Vercel (production)
-        if: needs.detect-changes.outputs.frontend == 'true'
         run: |
           npm i -g vercel
           vercel --prod=true --yes --token=${{ secrets.VERCEL_TOKEN }}
@@ -506,7 +503,6 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_PRODUCTION }}
 
       - name: Deploy backend to Render (production)
-        if: needs.detect-changes.outputs.backend == 'true'
         run: |
           curl -X POST \
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \

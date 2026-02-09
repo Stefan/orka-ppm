@@ -83,13 +83,22 @@ export default function AppLayout({ children }: AppLayoutProps) {
           {children}
         </main>
 
-        {/* Footer: legal links */}
+        {/* Footer: legal links + app version (dezent, auffindbar) */}
         <footer className="border-t border-gray-200 dark:border-slate-700 py-3 px-4 text-center text-sm text-gray-500 dark:text-slate-400">
           <a href="/legal/impressum" className="hover:underline mx-2">Impressum</a>
           <span aria-hidden>·</span>
           <a href="/legal/datenschutz" className="hover:underline mx-2">Datenschutz</a>
           <span aria-hidden>·</span>
           <a href="/legal/agb" className="hover:underline mx-2">AGB</a>
+          {(process.env.NEXT_PUBLIC_APP_VERSION != null || process.env.NEXT_PUBLIC_APP_BUILD != null) && (
+            <>
+              <span aria-hidden>·</span>
+              <span title="App-Version · Build (Production)" className="mx-2 select-none tabular-nums">
+                v{process.env.NEXT_PUBLIC_APP_VERSION ?? '0.0.0'}
+                {process.env.NEXT_PUBLIC_APP_BUILD ? ` (${process.env.NEXT_PUBLIC_APP_BUILD})` : ''}
+              </span>
+            </>
+          )}
         </footer>
 
         {/* Help Chat: toggle is in TopBar (right of notifications, left of user menu); panel always rendered to prevent CLS */}

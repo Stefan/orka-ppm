@@ -39,8 +39,13 @@ echo ""
 remote="$1"
 url="$2"
 
+PUSHING_MAIN=0
+
 # Read stdin to get the list of refs being pushed
 while read local_ref local_sha remote_ref remote_sha; do
+    if [ "$local_ref" = "refs/heads/main" ]; then
+        PUSHING_MAIN=1
+    fi
     if [ "$local_sha" = "0000000000000000000000000000000000000000" ]; then
         # Branch is being deleted, skip tests
         continue
@@ -67,6 +72,21 @@ while read local_ref local_sha remote_ref remote_sha; do
         exit 1
     fi
 done
+
+# When pushing main: bump build number and commit so the push includes it (version stays manual)
+if [ "$PUSHING_MAIN" = "1" ]; then
+    echo "▶ Bump build number (main)"
+    NEW_BUILD=$(node scripts/bump-patch-version.js)
+    if [ -n "$NEW_BUILD" ]; then
+        git add package.json
+        if git diff --staged --quiet; then
+            echo "   (build unchanged)"
+        else
+            git commit -m "chore: bump build to $NEW_BUILD"
+            echo "   Build number $NEW_BUILD committed."
+        fi
+    fi
+fi
 
 echo "✅ Property-based tests passed!"
 exit 0

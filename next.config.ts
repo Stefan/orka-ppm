@@ -1,6 +1,19 @@
 import type { NextConfig } from "next";
 import withPWA from 'next-pwa';
 import withBundleAnalyzer from '@next/bundle-analyzer';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+function getAppVersionInfo(): { version: string; buildNumber: string } {
+  try {
+    const pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf-8'));
+    const version = pkg?.version ?? '0.0.0';
+    const buildNumber = pkg?.buildNumber != null ? String(pkg.buildNumber) : '';
+    return { version, buildNumber };
+  } catch {
+    return { version: '0.0.0', buildNumber: '' };
+  }
+}
 
 const nextConfig: NextConfig = {
   // Performance optimizations
@@ -129,6 +142,8 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_APP_VERSION: getAppVersionInfo().version,
+    NEXT_PUBLIC_APP_BUILD: getAppVersionInfo().buildNumber,
   },
 
   // TypeScript configuration (type-check in CI; skip here for faster Vercel build)
