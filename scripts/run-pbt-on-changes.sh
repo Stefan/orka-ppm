@@ -15,6 +15,7 @@ BACKEND_DIR="backend"
 FRONTEND_DIR="."
 TEST_DIR="backend/tests/property_tests"
 OUTPUT_DIR="test-results/pbt-auto"
+PYTHON_CMD=$(command -v python3 2>/dev/null || command -v python 2>/dev/null || echo "python3")
 
 # Colors for output
 RED='\033[0;31m'
@@ -139,7 +140,7 @@ run_pbt() {
     mkdir -p "$OUTPUT_DIR"
     
     # Build orchestrator command
-    local cmd="python $TEST_DIR/pbt_orchestrator.py --output-dir $OUTPUT_DIR"
+    local cmd="$PYTHON_CMD $TEST_DIR/pbt_orchestrator.py --output-dir $OUTPUT_DIR"
     
     case "$scope" in
         backend)
@@ -188,7 +189,7 @@ analyze_results() {
     fi
     
     # Run analysis
-    python "$TEST_DIR/pbt_analysis.py" "$latest_report" \
+    $PYTHON_CMD "$TEST_DIR/pbt_analysis.py" "$latest_report" \
         --reports-dir "$OUTPUT_DIR" \
         --output "$OUTPUT_DIR/analysis.json"
     
