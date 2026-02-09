@@ -15,9 +15,13 @@ const REGISTERS_QUERY_KEY = 'registers'
 function getRegistersUrl(type: RegisterType, filters?: RegisterFilters): string {
   const params = new URLSearchParams()
   if (filters?.project_id) params.set('project_id', filters.project_id)
+  if (filters?.task_id) params.set('task_id', filters.task_id)
   if (filters?.status) params.set('status', filters.status)
   if (filters?.limit != null) params.set('limit', String(filters.limit))
   if (filters?.offset != null) params.set('offset', String(filters.offset))
+  // Request exact total only on first page for faster subsequent pages
+  const isFirstPage = (filters?.offset ?? 0) === 0
+  if (isFirstPage) params.set('count_exact', 'true')
   const q = params.toString()
   return getApiUrl(`/api/registers/${type}${q ? `?${q}` : ''}`)
 }
@@ -79,7 +83,7 @@ export function useRegister(
 export function useCreateRegister(type: RegisterType, accessToken: string | undefined) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (body: { project_id?: string; data: Record<string, unknown>; status?: string }) => {
+    mutationFn: async (body: { project_id?: string; task_id?: string; data: Record<string, unknown>; status?: string }) => {
       const url = getApiUrl(`/api/registers/${type}`)
       const res = await fetch(url, {
         method: 'POST',
@@ -109,11 +113,13 @@ export function useUpdateRegister(type: RegisterType, accessToken: string | unde
       data,
       status,
       project_id,
+      task_id,
     }: {
       id: string
       data?: Record<string, unknown>
       status?: string
       project_id?: string | null
+      task_id?: string | null
     }) => {
       const url = getApiUrl(`/api/registers/${type}/${id}`)
       const res = await fetch(url, {
@@ -122,7 +128,7 @@ export function useUpdateRegister(type: RegisterType, accessToken: string | unde
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ data, status, project_id }),
+        body: JSON.stringify({ data, status, project_id, task_id }),
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))

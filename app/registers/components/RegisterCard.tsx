@@ -9,6 +9,7 @@ export interface RegisterCardProps {
   onAISuggest?: (entry: RegisterEntry) => void
   onEdit?: (entry: RegisterEntry) => void
   onDelete?: (entry: RegisterEntry) => void
+  projectName?: string
 }
 
 function statusColor(status: string): string {
@@ -29,6 +30,7 @@ export default function RegisterCard({
   onAISuggest,
   onEdit,
   onDelete,
+  projectName,
 }: RegisterCardProps) {
   const [showDetails, setShowDetails] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -112,7 +114,7 @@ export default function RegisterCard({
         <div className="border-t border-gray-100 px-3 py-2 text-xs text-gray-500 dark:border-slate-700 dark:text-slate-400">
           <div>Status: {entry.status}</div>
           <div>Updated: {new Date(entry.updated_at).toLocaleDateString()}</div>
-          {entry.project_id && <div>Project: {entry.project_id}</div>}
+          {entry.project_id && <div>Project: {projectName ?? entry.project_id}</div>}
         </div>
       )}
     </div>

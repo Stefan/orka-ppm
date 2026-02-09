@@ -1,6 +1,7 @@
 import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
+import { renderWithI18n } from '@/__tests__/utils/test-wrapper'
 import PMRChart, { PMRChartDataPoint } from '../PMRChart'
 import { AIInsight } from '../types'
 
@@ -52,7 +53,7 @@ describe('PMRChart', () => {
   ]
 
   it('renders budget variance chart', () => {
-    render(
+    renderWithI18n(
       <PMRChart
         type="budget-variance"
         data={mockData}
@@ -70,7 +71,7 @@ describe('PMRChart', () => {
       { name: 'Q2 2024', value: 0.90, baseline: 1.0, status: 'critical' }
     ]
 
-    render(
+    renderWithI18n(
       <PMRChart
         type="schedule-performance"
         data={scheduleData}
@@ -87,7 +88,7 @@ describe('PMRChart', () => {
       { name: 'Schedule', value: 45, status: 'on-track' }
     ]
 
-    render(
+    renderWithI18n(
       <PMRChart
         type="risk-heatmap"
         data={riskData}
@@ -99,7 +100,7 @@ describe('PMRChart', () => {
   })
 
   it('shows AI insights indicator when insights are available', () => {
-    render(
+    renderWithI18n(
       <PMRChart
         type="budget-variance"
         data={mockData}
@@ -111,7 +112,7 @@ describe('PMRChart', () => {
   })
 
   it('hides AI insights indicator when showAIInsights is false', () => {
-    render(
+    renderWithI18n(
       <PMRChart
         type="budget-variance"
         data={mockData}
@@ -123,7 +124,7 @@ describe('PMRChart', () => {
   })
 
   it('shows alert indicators for data points with critical insights', () => {
-    render(
+    renderWithI18n(
       <PMRChart
         type="budget-variance"
         data={mockData}
@@ -135,7 +136,7 @@ describe('PMRChart', () => {
   })
 
   it('opens insight overlay when alert is clicked', async () => {
-    render(
+    renderWithI18n(
       <PMRChart
         type="budget-variance"
         data={mockData}
@@ -153,7 +154,7 @@ describe('PMRChart', () => {
   })
 
   it('displays data point details in insight overlay', async () => {
-    render(
+    renderWithI18n(
       <PMRChart
         type="budget-variance"
         data={mockData}
@@ -172,7 +173,7 @@ describe('PMRChart', () => {
   })
 
   it('shows recommended actions in insight overlay', async () => {
-    render(
+    renderWithI18n(
       <PMRChart
         type="budget-variance"
         data={mockData}
@@ -190,7 +191,7 @@ describe('PMRChart', () => {
   })
 
   it('closes insight overlay when close button is clicked', async () => {
-    render(
+    renderWithI18n(
       <PMRChart
         type="budget-variance"
         data={mockData}
@@ -216,7 +217,7 @@ describe('PMRChart', () => {
   it('calls onDataPointClick when provided', async () => {
     const handleClick = jest.fn()
 
-    render(
+    renderWithI18n(
       <PMRChart
         type="budget-variance"
         data={mockData}
@@ -244,7 +245,7 @@ describe('PMRChart', () => {
   it('calls onExport when export is triggered', async () => {
     const handleExport = jest.fn()
 
-    render(
+    renderWithI18n(
       <PMRChart
         type="budget-variance"
         data={mockData}
@@ -268,7 +269,7 @@ describe('PMRChart', () => {
   })
 
   it('opens expanded view when expand button is clicked', () => {
-    render(
+    renderWithI18n(
       <PMRChart
         type="budget-variance"
         data={mockData}
@@ -287,7 +288,7 @@ describe('PMRChart', () => {
   })
 
   it('applies custom className', () => {
-    const { container } = render(
+    const { container } = renderWithI18n(
       <PMRChart
         type="budget-variance"
         data={mockData}
@@ -300,7 +301,7 @@ describe('PMRChart', () => {
   })
 
   it('uses default height when not specified', () => {
-    render(
+    renderWithI18n(
       <PMRChart
         type="budget-variance"
         data={mockData}
@@ -311,7 +312,7 @@ describe('PMRChart', () => {
   })
 
   it('handles empty data gracefully', () => {
-    render(
+    renderWithI18n(
       <PMRChart
         type="budget-variance"
         data={[]}
@@ -328,7 +329,7 @@ describe('PMRChart', () => {
       { name: 'Category 2', value: 200, status: 'on-track' }
     ]
 
-    render(
+    renderWithI18n(
       <PMRChart
         type="budget-variance"
         data={dataWithoutInsights}

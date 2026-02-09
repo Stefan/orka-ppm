@@ -131,21 +131,29 @@ export interface DashboardData {
 
 /**
  * Load critical dashboard data in parallel
- * This loads QuickStats and KPIs simultaneously
+ * This loads QuickStats and KPIs simultaneously.
+ * Optional portfolioId scopes data to that portfolio.
  */
 export async function loadCriticalData(
-  accessToken: string
+  accessToken: string,
+  options?: { portfolioId?: string | null }
 ): Promise<{ quickStats: QuickStats; kpis: KPIs }> {
+  const portfolioId = options?.portfolioId ?? null
   const headers = {
     'Authorization': `Bearer ${accessToken}`,
     'Content-Type': 'application/json',
   }
 
+  const cacheKey = portfolioId ? `dashboard:critical:${portfolioId}` : 'dashboard:critical'
+
   // Try optimized endpoint first
   try {
+    const url = portfolioId
+      ? `/optimized/dashboard/quick-stats?portfolio_id=${encodeURIComponent(portfolioId)}`
+      : '/optimized/dashboard/quick-stats'
     const data = await deduplicatedRequest(
-      'dashboard:critical',
-      () => apiRequest('/optimized/dashboard/quick-stats', { headers })
+      cacheKey,
+      () => apiRequest(url, { headers })
     ) as any
 
     return {
@@ -155,11 +163,13 @@ export async function loadCriticalData(
   } catch (error) {
     console.log('Optimized endpoint failed, using parallel fallback...')
     
-    // Fallback: Load projects and metrics in parallel
+    const projectsUrl = portfolioId
+      ? `/projects?portfolio_id=${encodeURIComponent(portfolioId)}`
+      : '/projects'
     const [projectsData, metricsData] = await Promise.all([
       deduplicatedRequest(
-        'dashboard:projects',
-        () => apiRequest('/projects', { headers })
+        portfolioId ? `dashboard:projects:${portfolioId}` : 'dashboard:projects',
+        () => apiRequest(projectsUrl, { headers })
       ),
       deduplicatedRequest(
         'dashboard:metrics',
@@ -198,7 +208,7 @@ export async function loadCriticalData(
     }
 
     // Cache the computed results
-    setCache('dashboard:critical', { quickStats, kpis })
+    setCache(cacheKey, { quickStats, kpis })
 
     return { quickStats, kpis }
   }
@@ -206,30 +216,37 @@ export async function loadCriticalData(
 
 /**
  * Load secondary data (projects list)
- * This is loaded after critical data to improve initial paint
+ * This is loaded after critical data to improve initial paint.
+ * Optional portfolioId scopes to that portfolio.
  */
 export async function loadSecondaryData(
   accessToken: string,
-  limit: number = 5
+  limit: number = 5,
+  options?: { portfolioId?: string | null }
 ): Promise<Project[]> {
+  const portfolioId = options?.portfolioId ?? null
   const headers = {
     'Authorization': `Bearer ${accessToken}`,
     'Content-Type': 'application/json',
   }
 
+  const baseUrl = '/optimized/dashboard/projects-summary'
+  const params = new URLSearchParams({ limit: String(limit) })
+  if (portfolioId) params.set('portfolio_id', portfolioId)
+  const url = `${baseUrl}?${params.toString()}`
+
+  const fallbackUrl = portfolioId
+    ? `/projects?limit=${limit}&portfolio_id=${encodeURIComponent(portfolioId)}`
+    : `/projects?limit=${limit}`
+
   try {
-    const data = await deduplicatedRequest(
-      `dashboard:projects:${limit}`,
-      () => apiRequest(`/optimized/dashboard/projects-summary?limit=${limit}`, { headers })
-    ) as any
+    const cacheKey = portfolioId ? `dashboard:projects:${limit}:${portfolioId}` : `dashboard:projects:${limit}`
+    const data = await deduplicatedRequest(cacheKey, () => apiRequest(url, { headers })) as any
 
     return data?.projects || data?.slice?.(0, limit) || []
   } catch (error) {
-    // Fallback to regular projects endpoint
-    const data = await deduplicatedRequest(
-      `dashboard:projects-fallback:${limit}`,
-      () => apiRequest(`/projects?limit=${limit}`, { headers })
-    ) as any
+    const fallbackKey = portfolioId ? `dashboard:projects-fallback:${limit}:${portfolioId}` : `dashboard:projects-fallback:${limit}`
+    const data = await deduplicatedRequest(fallbackKey, () => apiRequest(fallbackUrl, { headers })) as any
 
     return data?.projects || data?.slice?.(0, limit) || []
   }
@@ -237,30 +254,29 @@ export async function loadSecondaryData(
 
 /**
  * Load all dashboard data with progressive loading
- * Returns critical data immediately, then loads secondary data
+ * Returns critical data immediately, then loads secondary data.
+ * Optional portfolioId scopes all data to that portfolio.
  */
 export async function loadDashboardData(
   accessToken: string,
   onCriticalDataLoaded?: (data: { quickStats: QuickStats; kpis: KPIs }) => void,
-  onSecondaryDataLoaded?: (projects: Project[]) => void
+  onSecondaryDataLoaded?: (projects: Project[]) => void,
+  options?: { portfolioId?: string | null }
 ): Promise<DashboardData> {
-  // Load critical data first
-  const criticalData = await loadCriticalData(accessToken)
-  
-  // Notify caller that critical data is ready
+  const opts = { portfolioId: options?.portfolioId ?? null }
+
+  const criticalData = await loadCriticalData(accessToken, opts)
+
   if (onCriticalDataLoaded) {
     onCriticalDataLoaded(criticalData)
   }
 
-  // Load secondary data in background
-  const projectsPromise = loadSecondaryData(accessToken)
-  
-  // If callback provided, notify when secondary data is ready
+  const projectsPromise = loadSecondaryData(accessToken, 5, opts)
+
   if (onSecondaryDataLoaded) {
     projectsPromise.then(onSecondaryDataLoaded).catch(console.error)
   }
 
-  // Wait for secondary data
   const projects = await projectsPromise
 
   return {
@@ -271,13 +287,18 @@ export async function loadDashboardData(
 
 /**
  * Prefetch dashboard data
- * Useful for preloading data before navigation
+ * Useful for preloading data before navigation.
+ * Optional portfolioId scopes prefetch to that portfolio.
  */
-export async function prefetchDashboardData(accessToken: string): Promise<void> {
+export async function prefetchDashboardData(
+  accessToken: string,
+  options?: { portfolioId?: string | null }
+): Promise<void> {
   try {
+    const opts = options?.portfolioId ? { portfolioId: options.portfolioId } : undefined
     await Promise.all([
-      loadCriticalData(accessToken),
-      loadSecondaryData(accessToken)
+      loadCriticalData(accessToken, opts),
+      loadSecondaryData(accessToken, 5, opts)
     ])
   } catch (error) {
     console.error('Prefetch failed:', error)

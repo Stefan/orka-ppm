@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import { MessageSquare, MessageCircle, AlertCircle } from 'lucide-react'
 
 export interface CommentIndicatorProps {
@@ -36,6 +37,7 @@ export function CommentIndicator({
   className = '',
   'data-testid': testId = 'comment-indicator'
 }: CommentIndicatorProps) {
+  const { t } = useTranslations()
   const sizeClasses = {
     sm: 'text-xs gap-0.5',
     md: 'text-sm gap-1',
@@ -95,7 +97,7 @@ export function CommentIndicator({
         ${onClick ? 'cursor-pointer hover:shadow-sm' : 'cursor-default'}
         ${className}
       `}
-      title={`${count} comment${count !== 1 ? 's' : ''}${hasImportant ? ' (important)' : ''}${recentCount > 0 ? ` (${recentCount} new)` : ''}`}
+      title={`${t('common.comments', { count })}${hasImportant ? t('common.importantSuffix') : ''}${recentCount > 0 ? ' ' + t('common.recentNewSuffix', { count: recentCount }) : ''}`}
       data-testid={testId}
     >
       <MessageCircle className={iconSizes[size]} />

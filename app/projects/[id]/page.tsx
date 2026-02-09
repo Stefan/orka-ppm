@@ -8,7 +8,8 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { ArrowLeft, Share2 } from 'lucide-react'
+import Link from 'next/link'
+import { ArrowLeft, Share2, BookOpen } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import ShareLinkManager from '@/components/projects/ShareLinkManager'
@@ -230,6 +231,28 @@ export default function ProjectDetailPage() {
                     </div>
                   )}
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Registers for this project */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5" />
+                  Risks, Issues & Changes
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600 dark:text-slate-400 mb-3">
+                  View and manage risks, issues, changes and other register entries for this project.
+                </p>
+                <Link
+                  href={`/registers?project_id=${projectId}`}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  <BookOpen className="h-4 w-4" />
+                  Open Registers for this project
+                </Link>
               </CardContent>
             </Card>
           </div>

@@ -119,13 +119,17 @@ class ScheduleManager:
         page_size: int = 50,
         sort_by: Optional[str] = "created_at",
         sort_order: str = "desc",
+        count_exact: bool = False,
     ) -> Tuple[List[ScheduleResponse], int]:
         """
         List schedules with optional filtering and pagination.
-        Returns (list of schedules, total count).
+        Returns (list of schedules, total count). Use count_exact=True only when you need exact total (slower).
         """
         try:
-            query = self.db.table("schedules").select("*", count="exact")
+            if count_exact:
+                query = self.db.table("schedules").select("*", count="exact")
+            else:
+                query = self.db.table("schedules").select("*")
             if project_id:
                 query = query.eq("project_id", str(project_id))
             if status:
@@ -135,8 +139,11 @@ class ScheduleManager:
             offset = (page - 1) * page_size
             query = query.range(offset, offset + page_size - 1)
             result = query.execute()
-            total = result.count if hasattr(result, "count") and result.count is not None else len(result.data or [])
             items = result.data or []
+            if count_exact and hasattr(result, "count") and result.count is not None:
+                total = result.count
+            else:
+                total = offset + len(items)
             schedules = [
                 ScheduleResponse(
                     id=s["id"],

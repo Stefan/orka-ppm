@@ -10,6 +10,7 @@ import { createPortal } from 'react-dom'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../providers/SupabaseAuthProvider'
+import { usePortfolio } from '@/contexts/PortfolioContext'
 import AppLayout from '../../components/shared/AppLayout'
 import { useTranslations } from '@/lib/i18n/context'
 import type { TranslationKey } from '@/lib/i18n/types'
@@ -56,6 +57,10 @@ const ChangeOrderWidgets = dynamic(() => import('./components/ChangeOrderWidgets
   loading: () => <div className="h-24 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
 })
 const ProjectControlsWidgets = dynamic(() => import('./components/ProjectControlsWidgets'), {
+  ssr: false,
+  loading: () => <div className="h-24 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
+})
+const RegistersDashboardWidget = dynamic(() => import('./components/RegistersDashboardWidget'), {
   ssr: false,
   loading: () => <div className="h-24 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" style={{ contain: 'layout style paint' }}></div>
 })
@@ -247,7 +252,11 @@ function FilterDropdown({ value, onChange, t }: { value: string; onChange: (val:
 
 // Main Dashboard Component
 export default function CompactDashboard() {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dashboards/page.tsx:CompactDashboard','message':'CompactDashboard render start',data:{},timestamp:Date.now(),hypothesisId:'H5'})}).catch(()=>{});
+  // #endregion
   const { session } = useAuth()
+  const { currentPortfolioId } = usePortfolio()
   const { t } = useTranslations()
   
   const router = useRouter()
@@ -283,7 +292,8 @@ export default function CompactDashboard() {
         },
         (projects) => {
           setRecentProjects(projects)
-        }
+        },
+        { portfolioId: currentPortfolioId ?? undefined }
       )
     } catch (err) {
       logger.error('Dashboard load error', { err }, 'dashboards/page')
@@ -304,7 +314,7 @@ export default function CompactDashboard() {
       })
       setLoading(false)
     }
-  }, [session?.access_token])
+  }, [session?.access_token, currentPortfolioId])
 
   useEffect(() => {
     if (session?.access_token) {
@@ -483,11 +493,16 @@ export default function CompactDashboard() {
           </div>
         </div>
 
-        {/* Schedule, Change Orders, Project Controls, Health – one row on desktop to use space */}
+        {/* Schedule, Registers, Change Orders, Project Controls, Health – one row on desktop to use space */}
         <div data-testid="dashboard-widgets-row" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
           {session?.access_token && (
             <Suspense fallback={<div className="h-32 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" />}>
               <ScheduleDashboardWidgets accessToken={session.access_token} />
+            </Suspense>
+          )}
+          {session?.access_token && (
+            <Suspense fallback={<div className="h-24 bg-gray-100 dark:bg-slate-700 rounded-lg animate-pulse" />}>
+              <RegistersDashboardWidget accessToken={session.access_token} />
             </Suspense>
           )}
           {recentProjects.length > 0 && (

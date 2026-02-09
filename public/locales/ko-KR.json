@@ -261,7 +261,76 @@
     "alerts": {
       "one": "{count}개 경고",
       "other": "{count}개 경고"
-    }
+    },
+    "errors": {
+      "one": "{count}개 오류",
+      "other": "{count}개 오류"
+    },
+    "warnings": {
+      "one": "{count}개 경고",
+      "other": "{count}개 경고"
+    },
+    "conflicts": {
+      "one": "{count}개 충돌",
+      "other": "{count}개 충돌"
+    },
+    "approvals": {
+      "one": "{count}건 승인 대기",
+      "other": "{count}건 승인 대기"
+    },
+    "approvalsFromYou": {
+      "one": "{count}건 귀하의 승인 대기",
+      "other": "{count}건 귀하의 승인 대기"
+    },
+    "approvers": {
+      "one": "{count}명 승인자",
+      "other": "{count}명 승인자"
+    },
+    "changes": {
+      "one": "{count}개 변경",
+      "other": "{count}개 변경"
+    },
+    "vendors": {
+      "one": "{count}개 공급업체",
+      "other": "{count}개 공급업체"
+    },
+    "transactions": {
+      "one": "{count}건 거래",
+      "other": "{count}건 거래"
+    },
+    "comments": { "one": "{count}개 댓글", "other": "{count}개 댓글" },
+    "guides": { "one": "{count}개 가이드", "other": "{count}개 가이드" },
+    "fields": { "one": "{count}개 필드", "other": "{count}개 필드" },
+    "typesSelected": { "one": "{count}개 유형 선택됨", "other": "{count}개 유형 선택됨" },
+    "replies": { "one": "{count}개 답글", "other": "{count}개 답글" },
+    "permissions": { "one": "{count}개 권한", "other": "{count}개 권한" },
+    "activities": { "one": "{count}개 활동", "other": "{count}개 활동" },
+    "anomalies": { "one": "{count}개 이상", "other": "{count}개 이상" },
+    "tasks": { "one": "{count}개 작업", "other": "{count}개 작업" },
+    "widgets": { "one": "{count}개 위젯", "other": "{count}개 위젯" },
+    "showingVendors": { "one": "1개 공급업체 표시", "other": "{count}개 공급업체 표시" },
+    "showingTransactions": { "one": "1건 거래 표시", "other": "{count}건 거래 표시" },
+    "changesPending": { "one": "1개 변경 대기 중", "other": "{count}개 변경 대기 중" },
+    "errorsFound": { "one": "1개 오류 발견", "other": "{count}개 오류 발견" },
+    "warningsFound": { "one": "1개 경고", "other": "{count}개 경고" },
+    "conflictsNeedResolution": { "one": "1개 충돌 해결 필요", "other": "{count}개 충돌 해결 필요" },
+    "fieldsAffected": { "one": "1개 필드 영향받음", "other": "{count}개 필드 영향받음" },
+    "projectsImportedSuccessfully": { "one": "1개 프로젝트 가져오기 성공.", "other": "{count}개 프로젝트 가져오기 성공." },
+    "changesWaitingToSync": { "one": "동기화 대기 중인 변경 1개.", "other": "동기화 대기 중인 변경 {count}개." },
+    "activeTasks": { "one": "1개 활성 작업", "other": "{count}개 활성 작업" },
+    "newItemsSinceLastView": { "one": "마지막 보기 이후 1개 새 항목", "other": "마지막 보기 이후 {count}개 새 항목" },
+    "guidesAvailable": { "one": "1개 가이드 사용 가능", "other": "{count}개 가이드 사용 가능" },
+    "anomaliesDetected": { "one": "1개 이상 감지됨", "other": "{count}개 이상 감지됨" },
+    "suspiciousActivitiesDetected": { "one": "1개 의심 활동 감지됨", "other": "{count}개 의심 활동 감지됨" },
+    "justNow": "방금",
+    "minutesAgo": { "one": "{count}분 전", "other": "{count}분 전" },
+    "hoursAgo": { "one": "{count}시간 전", "other": "{count}시간 전" },
+    "daysAgo": { "one": "{count}일 전", "other": "{count}일 전" },
+    "weeksAgo": { "one": "{count}주 전", "other": "{count}주 전" },
+    "monthsAgo": { "one": "{count}개월 전", "other": "{count}개월 전" },
+    "yearsAgo": { "one": "{count}년 전", "other": "{count}년 전" },
+    "days": { "one": "{count}일", "other": "{count}일" },
+    "weeks": { "one": "{count}주", "other": "{count}주" }
   },
   "dataImport": {
     "title": "데이터 가져오기",
@@ -368,6 +437,7 @@
     "title": "AI 도움말 어시스턴트"
   },
   "helpChat": {
+    "sendButtonLabel": "메시지 보내기",
     "placeholder": "PPM에 대해 물어보세요...",
     "welcome": "AI 도움말 어시스턴트에 오신 것을 환영합니다!",
     "welcomeMessage": "PPM 플랫폼 기능에 대해 궁금한 점을 물어보세요. 도와드리겠습니다.",

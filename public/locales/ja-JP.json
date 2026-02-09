@@ -261,7 +261,76 @@
     "alerts": {
       "one": "{count} アラート",
       "other": "{count} アラート"
-    }
+    },
+    "errors": {
+      "one": "{count} 件のエラー",
+      "other": "{count} 件のエラー"
+    },
+    "warnings": {
+      "one": "{count} 件の警告",
+      "other": "{count} 件の警告"
+    },
+    "conflicts": {
+      "one": "{count} 件の競合",
+      "other": "{count} 件の競合"
+    },
+    "approvals": {
+      "one": "{count} 件の承認待ち",
+      "other": "{count} 件の承認待ち"
+    },
+    "approvalsFromYou": {
+      "one": "{count} 件の承認待ち（あなた）",
+      "other": "{count} 件の承認待ち（あなた）"
+    },
+    "approvers": {
+      "one": "{count} 人の承認者",
+      "other": "{count} 人の承認者"
+    },
+    "changes": {
+      "one": "{count} 件の変更",
+      "other": "{count} 件の変更"
+    },
+    "vendors": {
+      "one": "{count} 社のベンダー",
+      "other": "{count} 社のベンダー"
+    },
+    "transactions": {
+      "one": "{count} 件の取引",
+      "other": "{count} 件の取引"
+    },
+    "comments": { "one": "{count} 件のコメント", "other": "{count} 件のコメント" },
+    "guides": { "one": "{count} 件のガイド", "other": "{count} 件のガイド" },
+    "fields": { "one": "{count} 個のフィールド", "other": "{count} 個のフィールド" },
+    "typesSelected": { "one": "{count} 種類選択済み", "other": "{count} 種類選択済み" },
+    "replies": { "one": "{count} 件の返信", "other": "{count} 件の返信" },
+    "permissions": { "one": "{count} 件の権限", "other": "{count} 件の権限" },
+    "activities": { "one": "{count} 件のアクティビティ", "other": "{count} 件のアクティビティ" },
+    "anomalies": { "one": "{count} 件の異常", "other": "{count} 件の異常" },
+    "tasks": { "one": "{count} 件のタスク", "other": "{count} 件のタスク" },
+    "widgets": { "one": "{count} 個のウィジェット", "other": "{count} 個のウィジェット" },
+    "showingVendors": { "one": "1 社のベンダーを表示", "other": "{count} 社のベンダーを表示" },
+    "showingTransactions": { "one": "1 件の取引を表示", "other": "{count} 件の取引を表示" },
+    "changesPending": { "one": "1 件の変更保留中", "other": "{count} 件の変更保留中" },
+    "errorsFound": { "one": "1 件のエラーが見つかりました", "other": "{count} 件のエラーが見つかりました" },
+    "warningsFound": { "one": "1 件の警告", "other": "{count} 件の警告" },
+    "conflictsNeedResolution": { "one": "1 件の競合を解決する必要があります", "other": "{count} 件の競合を解決する必要があります" },
+    "fieldsAffected": { "one": "1 個のフィールドが影響を受けました", "other": "{count} 個のフィールドが影響を受けました" },
+    "projectsImportedSuccessfully": { "one": "1 件のプロジェクトを正常にインポートしました。", "other": "{count} 件のプロジェクトを正常にインポートしました。" },
+    "changesWaitingToSync": { "one": "同期待ちの変更が 1 件あります。", "other": "同期待ちの変更が {count} 件あります。" },
+    "activeTasks": { "one": "1 件のアクティブなタスク", "other": "{count} 件のアクティブなタスク" },
+    "newItemsSinceLastView": { "one": "前回の表示以降 1 件の新規項目", "other": "前回の表示以降 {count} 件の新規項目" },
+    "guidesAvailable": { "one": "1 件のガイドが利用可能", "other": "{count} 件のガイドが利用可能" },
+    "anomaliesDetected": { "one": "1 件の異常を検出しました", "other": "{count} 件の異常を検出しました" },
+    "suspiciousActivitiesDetected": { "one": "1 件の不審なアクティビティを検出しました", "other": "{count} 件の不審なアクティビティを検出しました" },
+    "justNow": "たった今",
+    "minutesAgo": { "one": "{count} 分前", "other": "{count} 分前" },
+    "hoursAgo": { "one": "{count} 時間前", "other": "{count} 時間前" },
+    "daysAgo": { "one": "{count} 日前", "other": "{count} 日前" },
+    "weeksAgo": { "one": "{count} 週間前", "other": "{count} 週間前" },
+    "monthsAgo": { "one": "{count} か月前", "other": "{count} か月前" },
+    "yearsAgo": { "one": "{count} 年前", "other": "{count} 年前" },
+    "days": { "one": "{count} 日", "other": "{count} 日" },
+    "weeks": { "one": "{count} 週間", "other": "{count} 週間" }
   },
   "dataImport": {
     "title": "データインポート",
@@ -368,6 +437,7 @@
     "title": "AIヘルプアシスタント"
   },
   "helpChat": {
+    "sendButtonLabel": "メッセージを送信",
     "placeholder": "PPMについて質問してください...",
     "welcome": "AIヘルプアシスタントへようこそ！",
     "welcomeMessage": "PPMプラットフォームの機能について何でも質問してください。お手伝いします。",

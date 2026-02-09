@@ -384,7 +384,7 @@ const AnomalyDashboard: React.FC<AnomalyDashboardProps> = ({
               Anomaly Detection
             </h2>
             <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
-              {anomalies.length} anomal{anomalies.length !== 1 ? 'ies' : 'y'} detected
+              {t('common.anomaliesDetected', { count: anomalies.length })}
             </p>
           </div>
           

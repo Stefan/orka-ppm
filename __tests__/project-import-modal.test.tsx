@@ -16,7 +16,7 @@
  */
 
 import React from 'react'
-import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react'
+import { renderWithI18n, screen, fireEvent, waitFor, cleanup } from '@/__tests__/utils/test-wrapper'
 import '@testing-library/jest-dom'
 import ProjectImportModal from '@/components/projects/ProjectImportModal'
 
@@ -59,20 +59,20 @@ describe('ProjectImportModal - Unit Tests', () => {
 
   describe('Modal Open and Close - Req 6.2', () => {
     test('should render modal when isOpen is true', () => {
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       expect(screen.getByRole('button', { name: 'Import Projects' })).toBeInTheDocument()
     })
 
     test('should not render modal when isOpen is false', () => {
-      render(<ProjectImportModal isOpen={false} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={false} onClose={jest.fn()} />)
       
       expect(screen.queryByText('Import Projects')).not.toBeInTheDocument()
     })
 
     test('should call onClose when close button is clicked', () => {
       const onClose = jest.fn()
-      render(<ProjectImportModal isOpen={true} onClose={onClose} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={onClose} />)
       
       const closeButton = screen.getByText('Cancel')
       fireEvent.click(closeButton)
@@ -82,7 +82,7 @@ describe('ProjectImportModal - Unit Tests', () => {
 
     test('should reset state when modal closes', () => {
       const onClose = jest.fn()
-      const { rerender } = render(<ProjectImportModal isOpen={true} onClose={onClose} />)
+      const { rerender } = renderWithI18n(<ProjectImportModal isOpen={true} onClose={onClose} />)
       
       // Add some JSON input
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
@@ -95,21 +95,22 @@ describe('ProjectImportModal - Unit Tests', () => {
       // Reopen modal
       rerender(<ProjectImportModal isOpen={true} onClose={onClose} />)
       
-      // Input should be cleared
-      expect(textarea).toHaveValue('')
+      // Input should be cleared (re-query after rerender)
+      const textareaAfter = screen.getByPlaceholderText(/Project Alpha/i)
+      expect(textareaAfter).toHaveValue('')
     })
   })
 
   describe('Method Selection - Req 6.2, 6.3, 6.4', () => {
     test('should display JSON and CSV method tabs', () => {
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       expect(screen.getByText('JSON Input')).toBeInTheDocument()
       expect(screen.getByText('CSV Upload')).toBeInTheDocument()
     })
 
     test('should default to JSON method', () => {
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       // JSON textarea should be visible
       expect(screen.getByPlaceholderText(/Project Alpha/i)).toBeInTheDocument()
@@ -117,7 +118,7 @@ describe('ProjectImportModal - Unit Tests', () => {
     })
 
     test('should switch to CSV method when CSV tab is clicked', () => {
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       const csvTab = screen.getByText('CSV Upload')
       fireEvent.click(csvTab)
@@ -128,7 +129,7 @@ describe('ProjectImportModal - Unit Tests', () => {
     })
 
     test('should switch back to JSON method when JSON tab is clicked', () => {
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       // Switch to CSV
       const csvTab = screen.getByText('CSV Upload')
@@ -154,7 +155,7 @@ describe('ProjectImportModal - Unit Tests', () => {
         })
       })
 
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       // Add JSON and import
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
@@ -178,7 +179,7 @@ describe('ProjectImportModal - Unit Tests', () => {
 
   describe('File Upload - Req 6.4', () => {
     test('should accept CSV files only', () => {
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       // Switch to CSV method
       const csvTab = screen.getByText('CSV Upload')
@@ -190,7 +191,7 @@ describe('ProjectImportModal - Unit Tests', () => {
     })
 
     test('should display selected CSV file name and size', async () => {
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       // Switch to CSV method
       const csvTab = screen.getByText('CSV Upload')
@@ -213,7 +214,7 @@ describe('ProjectImportModal - Unit Tests', () => {
     })
 
     test('should allow removing selected file', async () => {
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       // Switch to CSV method
       const csvTab = screen.getByText('CSV Upload')
@@ -241,7 +242,7 @@ describe('ProjectImportModal - Unit Tests', () => {
     })
 
     test('should disable import button when no file is selected', () => {
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       // Switch to CSV method
       const csvTab = screen.getByText('CSV Upload')
@@ -252,7 +253,7 @@ describe('ProjectImportModal - Unit Tests', () => {
     })
 
     test('should enable import button when file is selected', async () => {
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       // Switch to CSV method
       const csvTab = screen.getByText('CSV Upload')
@@ -290,7 +291,7 @@ describe('ProjectImportModal - Unit Tests', () => {
         })
       )
 
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       // Add JSON input
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
@@ -323,7 +324,7 @@ describe('ProjectImportModal - Unit Tests', () => {
         })
       )
 
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       // Switch to CSV and select file
       const csvTab = screen.getByText('CSV Upload')
@@ -363,7 +364,7 @@ describe('ProjectImportModal - Unit Tests', () => {
         })
       )
 
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
       fireEvent.change(textarea, { target: { value: '[{"name": "Test", "budget": 1000, "status": "planning"}]' } })
@@ -393,7 +394,7 @@ describe('ProjectImportModal - Unit Tests', () => {
         })
       )
 
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
       fireEvent.change(textarea, { target: { value: '[{"name": "Test", "budget": 1000, "status": "planning"}]' } })
@@ -419,7 +420,7 @@ describe('ProjectImportModal - Unit Tests', () => {
         })
       })
 
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
       fireEvent.change(textarea, { target: { value: '[{"name": "Test", "budget": 1000, "status": "planning"}]' } })
@@ -444,7 +445,7 @@ describe('ProjectImportModal - Unit Tests', () => {
         })
       })
 
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
       fireEvent.change(textarea, { target: { value: '[{"name": "Test", "budget": 1000, "status": "planning"}]' } })
@@ -468,7 +469,7 @@ describe('ProjectImportModal - Unit Tests', () => {
         })
       })
 
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
       fireEvent.change(textarea, { target: { value: '[{"name": "Test", "budget": 1000, "status": "planning"}]' } })
@@ -493,7 +494,7 @@ describe('ProjectImportModal - Unit Tests', () => {
         })
       })
 
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
       fireEvent.change(textarea, { target: { value: '[{"name": "Test", "budget": 1000, "status": "planning"}]' } })
@@ -533,7 +534,7 @@ describe('ProjectImportModal - Unit Tests', () => {
         })
       })
 
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
       fireEvent.change(textarea, { target: { value: '[{"name": "", "budget": "invalid"}]' } })
@@ -564,7 +565,7 @@ describe('ProjectImportModal - Unit Tests', () => {
         })
       })
 
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
       fireEvent.change(textarea, { target: { value: '[{}]' } })
@@ -591,7 +592,7 @@ describe('ProjectImportModal - Unit Tests', () => {
         })
       })
 
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
       fireEvent.change(textarea, { target: { value: '[{}]' } })
@@ -618,7 +619,7 @@ describe('ProjectImportModal - Unit Tests', () => {
         })
       })
 
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
       fireEvent.change(textarea, { target: { value: '[{}]' } })
@@ -652,7 +653,7 @@ describe('ProjectImportModal - Unit Tests', () => {
         }
       })
 
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
       fireEvent.change(textarea, { target: { value: '[{}]' } })
@@ -686,7 +687,7 @@ describe('ProjectImportModal - Unit Tests', () => {
         }
       })
 
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
       fireEvent.change(textarea, { target: { value: '[{}]' } })
@@ -710,7 +711,7 @@ describe('ProjectImportModal - Unit Tests', () => {
     test.skip('should handle network errors gracefully', async () => {
       ;(global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
 
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
       fireEvent.change(textarea, { target: { value: '[{"name": "Test", "budget": 1000, "status": "planning"}]' } })
@@ -725,7 +726,7 @@ describe('ProjectImportModal - Unit Tests', () => {
     })
 
     test('should validate JSON format before sending', async () => {
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
       fireEvent.change(textarea, { target: { value: 'invalid json' } })
@@ -743,7 +744,7 @@ describe('ProjectImportModal - Unit Tests', () => {
     })
 
     test('should validate JSON is an array', async () => {
-      render(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
+      renderWithI18n(<ProjectImportModal isOpen={true} onClose={jest.fn()} />)
       
       const textarea = screen.getByPlaceholderText(/Project Alpha/i)
       fireEvent.change(textarea, { target: { value: '{"name": "Test"}' } })

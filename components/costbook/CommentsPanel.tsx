@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import {
   X,
   Send,
@@ -331,6 +332,7 @@ function CommentItem({
   onReply,
   submitting
 }: CommentItemProps) {
+  const { t } = useTranslations()
   const [showMenu, setShowMenu] = useState(false)
   
   const reactionCounts = {
@@ -479,7 +481,7 @@ function CommentItem({
       {/* Reply count */}
       {comment.reply_count > 0 && (
         <div className="mt-2 text-xs text-blue-600 dark:text-blue-400">
-          {comment.reply_count} {comment.reply_count === 1 ? 'reply' : 'replies'}
+          {t('common.replies', { count: comment.reply_count })}
         </div>
       )}
     </div>

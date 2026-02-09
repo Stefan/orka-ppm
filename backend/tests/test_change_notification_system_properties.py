@@ -27,7 +27,7 @@ from services.change_notification_system import (
     ReminderResult,
     EscalationResult
 )
-from models.change_management import NotificationPreferences
+from models.workflow_notification import NotificationPreferences
 
 
 class TestChangeNotificationSystemProperties:

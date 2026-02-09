@@ -11,6 +11,7 @@ import { getApiUrl } from '@/lib/api'
 import ShareButton from '@/components/projects/ShareButton'
 import ProjectActionButtons from '@/components/projects/ProjectActionButtons'
 import { useWorkflowNotifications } from '@/hooks/useWorkflowRealtime'
+import { usePortfolio } from '@/contexts/PortfolioContext'
 import { useProjectsQuery, useInvalidateProjects, type ProjectListItem } from '@/lib/projects-queries'
 
 type Project = ProjectListItem & { description?: string }
@@ -25,7 +26,8 @@ export default function ProjectsPage() {
 
   const currentUserId = session?.user?.id ?? undefined
   const accessToken = session?.access_token ?? undefined
-  const { data: projectsData, isLoading: loading, error: queryError, refetch } = useProjectsQuery(accessToken, currentUserId)
+  const { currentPortfolioId } = usePortfolio()
+  const { data: projectsData, isLoading: loading, error: queryError, refetch } = useProjectsQuery(accessToken, currentUserId, currentPortfolioId)
   const invalidateProjects = useInvalidateProjects()
   const projects: Project[] = (projectsData ?? []).map((p) => ({ ...p, description: p.description ?? '' }))
   const error = queryError ? (queryError instanceof Error ? queryError.message : 'An error occurred') : null

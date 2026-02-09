@@ -42,6 +42,11 @@ PRE_STARTUP_TEST_TIMEOUT=30
 # Set NEXT_PUBLIC_SENTRY_DSN for client/server error reporting. Get DSN from sentry.io.
 # If not set, errors are only logged locally. For full setup run: npx @sentry/wizard@latest -i nextjs
 NEXT_PUBLIC_SENTRY_DSN=
+
+# Production: Redis for 60s response caches (commitments, actuals, my-workflows).
+# Without REDIS_URL the cache_manager is disabled and every request hits the DB (slower, more load).
+# Example: redis://localhost:6379/0 or your Redis Cloud URL. See docs/API_PERFORMANCE_AND_CACHING.md.
+REDIS_URL=
 ```
 
 ### 2. Database Backup

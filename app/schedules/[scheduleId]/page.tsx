@@ -12,7 +12,7 @@ import { GanttChart } from '@/components/schedule/GanttChart'
 import { ResourceAssignmentDialog } from '@/components/schedule/ResourceAssignmentDialog'
 import { Button } from '@/components/ui/Button'
 import type { ScheduleWithTasks, ScheduleTask, ScheduleDependency, ScheduleMilestone } from '@/types/schedule'
-import { ArrowLeft, Calendar, Users } from 'lucide-react'
+import { ArrowLeft, Calendar, Users, BookOpen, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 
 export default function ScheduleDetailPage() {
@@ -144,13 +144,21 @@ export default function ScheduleDetailPage() {
   return (
     <AppLayout>
       <div className="p-6 max-w-7xl mx-auto">
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex items-center gap-4 mb-4 flex-wrap">
           <Link
             href="/schedules"
             className="flex items-center gap-1 text-gray-600 hover:text-gray-900 dark:hover:text-slate-100 dark:text-slate-100"
           >
             <ArrowLeft className="w-4 h-4" /> Schedules
           </Link>
+          {schedule.project_id && (
+            <Link
+              href={`/registers?project_id=${schedule.project_id}`}
+              className="flex items-center gap-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              <BookOpen className="w-4 h-4" /> Registers for this project
+            </Link>
+          )}
         </div>
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -222,6 +230,9 @@ export default function ScheduleDetailPage() {
                   <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-slate-300">End</th>
                   <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-slate-300">Progress</th>
                   <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-slate-300">Status</th>
+                  {schedule.project_id && (
+                    <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-slate-300">Risks</th>
+                  )}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -233,6 +244,17 @@ export default function ScheduleDetailPage() {
                     <td className="px-4 py-2 text-gray-600 dark:text-slate-400">{t.planned_end_date}</td>
                     <td className="px-4 py-2">{t.progress_percentage}%</td>
                     <td className="px-4 py-2">{t.status}</td>
+                    {schedule.project_id && (
+                      <td className="px-4 py-2">
+                        <Link
+                          href={`/registers?task_id=${t.id}&project_id=${schedule.project_id}&type=risk`}
+                          className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                        >
+                          <AlertTriangle className="w-3.5 h-3.5" />
+                          Risks
+                        </Link>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

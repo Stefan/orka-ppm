@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useCallback, useMemo } from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import {
@@ -144,6 +145,7 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
   className = '',
   showAdvancedFilters = true
 }) => {
+  const { t } = useTranslations()
   const [isExpanded, setIsExpanded] = useState(false)
   const [userSearchQuery, setUserSearchQuery] = useState('')
   const [showUserDropdown, setShowUserDropdown] = useState(false)
@@ -419,7 +421,7 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({
           </div>
           {filters.eventTypes && filters.eventTypes.length > 0 && (
             <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">
-              {filters.eventTypes.length} type{filters.eventTypes.length !== 1 ? 's' : ''} selected
+              {t('common.typesSelected', { count: filters.eventTypes.length })}
             </p>
           )}
         </div>

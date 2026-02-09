@@ -518,6 +518,15 @@ export function useI18n(): I18nContextValue {
 }
 
 /**
+ * Optional I18n context for use in components that may render outside I18nProvider
+ * (e.g. root shell, ErrorBoundary fallbacks, or when inspected by DevTools).
+ * Returns null when not within I18nProvider instead of throwing.
+ */
+export function useI18nOptional(): I18nContextValue | null {
+  return useContext(I18nContext) ?? null;
+}
+
+/**
  * Convenience hook that returns just the translation function and metadata
  * 
  * Simpler alternative to useI18n when you only need the translation function.

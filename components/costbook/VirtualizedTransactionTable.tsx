@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useMemo, useCallback } from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import { FixedSizeList as List, ListChildComponentProps } from 'react-window'
 import { ArrowUpDown, ArrowUp, ArrowDown, FileText, Receipt, Calendar, Building2, DollarSign } from 'lucide-react'
 import { Transaction, Currency, POStatus, ActualStatus, CURRENCY_SYMBOLS } from '@/types/costbook'
@@ -160,6 +161,7 @@ export function VirtualizedTransactionTable({
   className = '',
   'data-testid': testId = 'virtualized-transaction-table'
 }: VirtualizedTransactionTableProps) {
+  const { t } = useTranslations()
   // Filter columns based on visibility
   const columns = useMemo(() => {
     if (!visibleColumns || visibleColumns.length === 0) {
@@ -280,8 +282,8 @@ export function VirtualizedTransactionTable({
       </List>
 
       {/* Footer with count */}
-      <div className="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-sm text-gray-500 dark:text-gray-400">
-        Showing {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}
+      <div data-testid="virtualized-transaction-table-footer" className="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-sm text-gray-500 dark:text-gray-400">
+        {t('common.showingTransactions', { count: transactions.length })}
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import {
   BarChart,
   Bar,
@@ -66,6 +67,7 @@ export default function ShareAnalyticsDashboard({
   onRefresh,
   onExport
 }: ShareAnalyticsDashboardProps) {
+  const { t } = useTranslations()
   const [analyticsData, setAnalyticsData] = useState<ShareAnalytics | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isError, setIsError] = useState(false)
@@ -375,7 +377,7 @@ export default function ShareAnalyticsDashboard({
             <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
             <div>
               <p className="font-medium text-red-900">
-                {analyticsData.suspicious_activity_count} suspicious {analyticsData.suspicious_activity_count === 1 ? 'activity' : 'activities'} detected
+                {t('common.suspiciousActivitiesDetected', { count: analyticsData.suspicious_activity_count })}
               </p>
               <p className="text-sm text-red-700 mt-1">
                 Review access logs for unusual patterns or geographic anomalies

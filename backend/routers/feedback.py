@@ -2,7 +2,7 @@
 Feedback system endpoints - feature requests, bug reports, notifications
 """
 
-from fastapi import APIRouter, HTTPException, Depends, status, Query
+from fastapi import APIRouter, HTTPException, Depends, status, Query, Request
 from uuid import UUID
 from typing import Optional, List
 from datetime import datetime, timedelta
@@ -392,36 +392,47 @@ async def assign_bug_report(
         print(f"Assign bug report error: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to assign bug: {str(e)}")
 
+NOTIFICATIONS_CACHE_TTL = 45  # seconds
+
 # Notification Endpoints
 @notifications_router.get("/")
 async def get_user_notifications(
+    request: Request,
     is_read: Optional[bool] = Query(None, description="Filter by read status; API uses DB column 'read'"),
     limit: int = Query(50, le=100),
     offset: int = Query(0, ge=0),
     current_user = Depends(get_current_user)
 ):
-    """Get user notifications. DB column is 'read'; is_read query param maps to it."""
+    """Get user notifications. Response cached 45s to reduce load. DB column is 'read'; is_read query param maps to it."""
     try:
         if supabase is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        
         user_id = current_user.get("user_id")
+        cache = getattr(request.app.state, "cache_manager", None)
+        cache_key = f"feedback:notifications:{user_id}:{is_read}:{limit}:{offset}"
+        if cache:
+            cached = await cache.get(cache_key)
+            if cached is not None:
+                return cached
         query = supabase.table("notifications").select("*").eq("user_id", user_id)
         if is_read is not None:
             query = query.eq("read", is_read)
         response = query.order("created_at", desc=True).range(offset, offset + limit - 1).execute()
-        return convert_uuids(response.data or [])
-        
+        result = convert_uuids(response.data or [])
+        if cache:
+            await cache.set(cache_key, result, ttl=NOTIFICATIONS_CACHE_TTL)
+        return result
     except Exception as e:
         print(f"Get user notifications error: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get notifications: {str(e)}")
 
 @notifications_router.put("/{notification_id}/read")
 async def mark_notification_as_read(
-    notification_id: UUID, 
+    request: Request,
+    notification_id: UUID,
     current_user = Depends(get_current_user)
 ):
-    """Mark a notification as read"""
+    """Mark a notification as read. Invalidates notifications cache for user."""
     try:
         if supabase is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
@@ -437,6 +448,10 @@ async def mark_notification_as_read(
         if not response.data:
             raise HTTPException(status_code=404, detail="Notification not found")
         
+        cache = getattr(request.app.state, "cache_manager", None)
+        if cache and getattr(cache, "clear_pattern", None):
+            await cache.clear_pattern(f"feedback:notifications:{user_id}:*")
+        
         return convert_uuids(response.data[0])
         
     except HTTPException:
@@ -446,8 +461,11 @@ async def mark_notification_as_read(
         raise HTTPException(status_code=500, detail=f"Failed to mark notification as read: {str(e)}")
 
 @notifications_router.put("/mark-all-read")
-async def mark_all_notifications_as_read(current_user = Depends(get_current_user)):
-    """Mark all user notifications as read"""
+async def mark_all_notifications_as_read(
+    request: Request,
+    current_user = Depends(get_current_user)
+):
+    """Mark all user notifications as read. Invalidates notifications cache for user."""
     try:
         if supabase is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
@@ -459,6 +477,10 @@ async def mark_all_notifications_as_read(current_user = Depends(get_current_user
         }
         
         response = supabase.table("notifications").update(update_data).eq("user_id", user_id).eq("read", False).execute()
+        
+        cache = getattr(request.app.state, "cache_manager", None)
+        if cache and getattr(cache, "clear_pattern", None):
+            await cache.clear_pattern(f"feedback:notifications:{user_id}:*")
         
         return {"message": f"Marked {len(response.data or [])} notifications as read"}
         

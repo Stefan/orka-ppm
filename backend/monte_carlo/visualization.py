@@ -1464,3 +1464,7 @@ def create_color_gradient(start_color: str, end_color: str, steps: int) -> List[
         gradient.append(f"#{r:02x}{g:02x}{b:02x}")
     
     return gradient
+
+
+# Alias for backward compatibility (e.g. test_complete_monte_carlo_integration)
+VisualizationGenerator = VisualizationManager

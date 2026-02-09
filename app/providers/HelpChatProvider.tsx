@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { useAuth } from './SupabaseAuthProvider'
+import { usePortfolio } from '@/contexts/PortfolioContext'
 import { useLanguage } from '../../hooks/useLanguage'
 import { useTranslations } from '../../lib/i18n/context'
 import { helpChatAPI } from '../../lib/help-chat/api'
@@ -66,6 +67,7 @@ interface HelpChatProviderProps {
 
 export function HelpChatProvider({ children }: HelpChatProviderProps) {
   const { user, session } = useAuth()
+  const { currentPortfolioId } = usePortfolio()
   const pathname = usePathname()
   const { 
     currentLanguage, 
@@ -182,6 +184,15 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
           relevantData = { page: 'projects', hint: 'User is on project list.' }
         }
         break
+      case 'portfolios':
+        pageTitle = t('nav.portfolios')
+        if (pathSegments[1]) {
+          currentPortfolio = pathSegments[1]
+          relevantData = { page: 'portfolio', portfolioId: pathSegments[1], hint: 'User is viewing a portfolio detail.' }
+        } else {
+          relevantData = { page: 'portfolios', hint: 'User is on portfolio list.' }
+        }
+        break
       case 'resources':
         pageTitle = t('resources.title')
         relevantData = { page: 'resources', hint: 'User is on resource planning – utilization and allocation are relevant.' }
@@ -219,18 +230,19 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
         relevantData = { page: 'dashboard', hint: 'User is on main dashboard.' }
     }
 
-    // Add user role context
+    // Add user role context; prefer global portfolio context over path-derived
     const userRole = user?.role || 'user'
+    const portfolioContext = currentPortfolioId || currentPortfolio || ''
 
     return {
       route: pathname,
       pageTitle,
       userRole,
       currentProject: currentProject || '',
-      currentPortfolio: currentPortfolio || '',
+      currentPortfolio: portfolioContext,
       relevantData
     }
-  }, [pathname, user, t])
+  }, [pathname, user, t, currentPortfolioId])
 
   // Sync language preference TO server (one-way: client -> server)
   // DISABLED: Server sync causes HTTP 400 errors, local preference is sufficient
@@ -287,7 +299,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
     console.log('🌐 [HelpChat] currentLanguage from useLanguage changed to:', currentLanguage)
   }, [currentLanguage])
 
-  // Update context when route changes
+  // Update context when route or portfolio changes
   useEffect(() => {
     const newContext = detectPageContext()
     setState(prevState => ({
@@ -297,7 +309,7 @@ export function HelpChatProvider({ children }: HelpChatProviderProps) {
     
     // Save last active time
     saveToStorage({ lastActiveTime: new Date() })
-  }, [pathname, user?.role]) // Simplified dependencies
+  }, [pathname, user?.role, currentPortfolioId, detectPageContext])
 
   // Session timeout management
   useEffect(() => {

@@ -22,6 +22,17 @@ jest.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }))
 
+jest.mock('../../../contexts/PortfolioContext', () => ({
+  usePortfolio: () => ({
+    currentPortfolioId: null,
+    currentPortfolio: null,
+    setCurrentPortfolioId: jest.fn(),
+    portfolios: [],
+    setPortfolios: jest.fn(),
+  }),
+  PortfolioProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}))
+
 jest.mock('../../../hooks/useLanguage', () => ({
   useLanguage: () => ({
     currentLanguage: 'en',

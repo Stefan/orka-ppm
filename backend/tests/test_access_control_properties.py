@@ -15,14 +15,14 @@ from datetime import datetime
 import uuid
 import asyncio
 
-# Import access control components from main.py
-from main import (
+# Import access control components from auth
+from auth.rbac import (
     RoleBasedAccessControl,
     Permission,
     UserRole,
     DEFAULT_ROLE_PERMISSIONS,
     require_permission,
-    require_any_permission
+    require_any_permission,
 )
 
 # Test data strategies for property-based testing

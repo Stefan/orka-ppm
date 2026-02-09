@@ -594,7 +594,28 @@ if (typeof global.fetch === 'undefined') {
 
   global.fetch = jest.fn((url, options) => {
     const urlString = typeof url === 'string' ? url : url.toString()
-    const path = urlString.replace(/^https?:\/\/[^/]+/, '')
+    const path = urlString.replace(/^https?:\/\/[^/]+/, '').split('?')[0]
+    
+    // Minimal translations for I18nProvider in tests (loadTranslations)
+    if (path === '/locales/en.json' || path.match(/^\/locales\/[a-z]{2}(-[A-Z]{2})?\.json$/)) {
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        json: () => Promise.resolve({
+          nav: {},
+          dashboard: {},
+          topbar: {},
+          common: {
+            alerts: { one: '{count} alert', other: '{count} alerts' },
+            showingTransactions: { one: 'Showing 1 transaction', other: 'Showing {count} transactions' },
+            typesSelected: { one: '1 type selected', other: '{count} types selected' },
+          },
+        }),
+        text: () => Promise.resolve('{}'),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+      })
+    }
     
     // Find matching mock response
     let response = mockResponses[path] || { success: true, data: null }

@@ -258,7 +258,76 @@
     "alerts": {
       "one": "{count} Alarm",
       "other": "{count} Aläärm"
-    }
+    },
+    "errors": {
+      "one": "{count} Fähler",
+      "other": "{count} Fähler"
+    },
+    "warnings": {
+      "one": "{count} Warnig",
+      "other": "{count} Warnige"
+    },
+    "conflicts": {
+      "one": "{count} Konflikt",
+      "other": "{count} Konflikt"
+    },
+    "approvals": {
+      "one": "{count} uuschtehendi Freigab",
+      "other": "{count} uuschtehendi Freigabe"
+    },
+    "approvalsFromYou": {
+      "one": "{count} uuschtehendi Freigab vo dir",
+      "other": "{count} uuschtehendi Freigabe vo dir"
+    },
+    "approvers": {
+      "one": "{count} Genehmiger",
+      "other": "{count} Genehmiger"
+    },
+    "changes": {
+      "one": "{count} Änderig",
+      "other": "{count} Änderige"
+    },
+    "vendors": {
+      "one": "{count} Aabieter",
+      "other": "{count} Aabieter"
+    },
+    "transactions": {
+      "one": "{count} Transaktion",
+      "other": "{count} Transaktione"
+    },
+    "comments": { "one": "{count} Kommentar", "other": "{count} Kommentar" },
+    "guides": { "one": "{count} Aaleitig", "other": "{count} Aaleitige" },
+    "fields": { "one": "{count} Fäld", "other": "{count} Fälder" },
+    "typesSelected": { "one": "{count} Typ uusgwählt", "other": "{count} Typen uusgwählt" },
+    "replies": { "one": "{count} Antwort", "other": "{count} Antworte" },
+    "permissions": { "one": "{count} Berechtigig", "other": "{count} Berechtigige" },
+    "activities": { "one": "{count} Aktivität", "other": "{count} Aktivitäte" },
+    "anomalies": { "one": "{count} Anomalie", "other": "{count} Anomalie" },
+    "tasks": { "one": "{count} Ufgab", "other": "{count} Ufgabe" },
+    "widgets": { "one": "{count} Widget", "other": "{count} Widgets" },
+    "showingVendors": { "one": "1 Aabieter aazeigt", "other": "{count} Aabieter aazeigt" },
+    "showingTransactions": { "one": "1 Transaktion aazeigt", "other": "{count} Transaktione aazeigt" },
+    "changesPending": { "one": "1 Änderig uuschtehend", "other": "{count} Änderige uuschtehend" },
+    "errorsFound": { "one": "1 Fähler gfunde", "other": "{count} Fähler gfunde" },
+    "warningsFound": { "one": "1 Warnig", "other": "{count} Warnige" },
+    "conflictsNeedResolution": { "one": "1 Konflikt mues glöst wärde", "other": "{count} Konflikt münd glöst wärde" },
+    "fieldsAffected": { "one": "1 Fäld betroffe", "other": "{count} Fälder betroffe" },
+    "projectsImportedSuccessfully": { "one": "1 Projekt erfolgriich importiert.", "other": "{count} Projekt erfolgriich importiert." },
+    "changesWaitingToSync": { "one": "Du häsch 1 Änderig zum Synchronisiere.", "other": "Du häsch {count} Änderige zum Synchronisiere." },
+    "activeTasks": { "one": "1 aktivi Ufgab", "other": "{count} aktivi Ufgabe" },
+    "newItemsSinceLastView": { "one": "1 neus Element sit letzter Aasicht", "other": "{count} neui Element sit letzter Aasicht" },
+    "guidesAvailable": { "one": "1 Aaleitig verfüegbar", "other": "{count} Aaleitige verfüegbar" },
+    "anomaliesDetected": { "one": "1 Anomalie erkannt", "other": "{count} Anomalie erkannt" },
+    "suspiciousActivitiesDetected": { "one": "1 verdächtigi Aktivität erkannt", "other": "{count} verdächtigi Aktivitäte erkannt" },
+    "justNow": "grad eben",
+    "minutesAgo": { "one": "vor {count} Minuute", "other": "vor {count} Minute" },
+    "hoursAgo": { "one": "vor {count} Stund", "other": "vor {count} Stunde" },
+    "daysAgo": { "one": "vor {count} Tag", "other": "vor {count} Täg" },
+    "weeksAgo": { "one": "vor {count} Wuch", "other": "vor {count} Wuche" },
+    "monthsAgo": { "one": "vor {count} Monet", "other": "vor {count} Mönet" },
+    "yearsAgo": { "one": "vor {count} Jahr", "other": "vor {count} Jahr" },
+    "days": { "one": "{count} Tag", "other": "{count} Täg" },
+    "weeks": { "one": "{count} Wuch", "other": "{count} Wuche" }
   },
   "shared": {
     "shareableUrl": {
@@ -311,6 +380,7 @@
     "title": "AI Hilf-Assischtänt"
   },
   "helpChat": {
+    "sendButtonLabel": "Nachricht schicke",
     "placeholder": "Froog mi öbbis über PPM...",
     "welcome": "Willkomme bim AI Hilf-Assischtänt!",
     "welcomeMessage": "Froog mi alles über d'PPM-Plattform-Funktione und ich hilf dir gärn wiiter.",

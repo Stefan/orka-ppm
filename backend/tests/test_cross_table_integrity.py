@@ -12,7 +12,7 @@ from datetime import datetime
 # Add the backend directory to the Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
-from data_integrity_service import DataIntegrityService
+from services.data_integrity_service import DataIntegrityService
 
 def test_cross_table_integrity():
     """

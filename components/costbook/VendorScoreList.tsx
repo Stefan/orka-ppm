@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import {
   Search,
   Filter,
@@ -123,6 +124,7 @@ export function VendorScoreList({
   const [showFilters, setShowFilters] = useState(false)
   const [filter, setFilter] = useState<VendorFilter>({})
   const [sort, setSort] = useState<VendorSortOption>({ field: 'overall_score', direction: 'desc' })
+  const { t } = useTranslations()
   
   // Load vendors
   const loadVendors = useCallback(async () => {
@@ -410,7 +412,7 @@ export function VendorScoreList({
       {/* Footer */}
       {!loading && filteredVendors.length > 0 && (
         <div className="px-4 py-2 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 text-xs text-gray-500 dark:text-slate-400">
-          Showing {filteredVendors.length} vendor{filteredVendors.length !== 1 ? 's' : ''}
+          {t('common.showingVendors', { count: filteredVendors.length })}
         </div>
       )}
     </div>

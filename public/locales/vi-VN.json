@@ -261,7 +261,76 @@
     "alerts": {
       "one": "{count} cảnh báo",
       "other": "{count} cảnh báo"
-    }
+    },
+    "errors": {
+      "one": "{count} lỗi",
+      "other": "{count} lỗi"
+    },
+    "warnings": {
+      "one": "{count} cảnh báo",
+      "other": "{count} cảnh báo"
+    },
+    "conflicts": {
+      "one": "{count} xung đột",
+      "other": "{count} xung đột"
+    },
+    "approvals": {
+      "one": "{count} chờ phê duyệt",
+      "other": "{count} chờ phê duyệt"
+    },
+    "approvalsFromYou": {
+      "one": "{count} chờ bạn phê duyệt",
+      "other": "{count} chờ bạn phê duyệt"
+    },
+    "approvers": {
+      "one": "{count} người phê duyệt",
+      "other": "{count} người phê duyệt"
+    },
+    "changes": {
+      "one": "{count} thay đổi",
+      "other": "{count} thay đổi"
+    },
+    "vendors": {
+      "one": "{count} nhà cung cấp",
+      "other": "{count} nhà cung cấp"
+    },
+    "transactions": {
+      "one": "{count} giao dịch",
+      "other": "{count} giao dịch"
+    },
+    "comments": { "one": "{count} bình luận", "other": "{count} bình luận" },
+    "guides": { "one": "{count} hướng dẫn", "other": "{count} hướng dẫn" },
+    "fields": { "one": "{count} trường", "other": "{count} trường" },
+    "typesSelected": { "one": "{count} loại đã chọn", "other": "{count} loại đã chọn" },
+    "replies": { "one": "{count} phản hồi", "other": "{count} phản hồi" },
+    "permissions": { "one": "{count} quyền", "other": "{count} quyền" },
+    "activities": { "one": "{count} hoạt động", "other": "{count} hoạt động" },
+    "anomalies": { "one": "{count} bất thường", "other": "{count} bất thường" },
+    "tasks": { "one": "{count} tác vụ", "other": "{count} tác vụ" },
+    "widgets": { "one": "{count} tiện ích", "other": "{count} tiện ích" },
+    "showingVendors": { "one": "Hiển thị 1 nhà cung cấp", "other": "Hiển thị {count} nhà cung cấp" },
+    "showingTransactions": { "one": "Hiển thị 1 giao dịch", "other": "Hiển thị {count} giao dịch" },
+    "changesPending": { "one": "1 thay đổi đang chờ", "other": "{count} thay đổi đang chờ" },
+    "errorsFound": { "one": "Tìm thấy 1 lỗi", "other": "Tìm thấy {count} lỗi" },
+    "warningsFound": { "one": "1 cảnh báo", "other": "{count} cảnh báo" },
+    "conflictsNeedResolution": { "one": "1 xung đột cần giải quyết", "other": "{count} xung đột cần giải quyết" },
+    "fieldsAffected": { "one": "1 trường bị ảnh hưởng", "other": "{count} trường bị ảnh hưởng" },
+    "projectsImportedSuccessfully": { "one": "Đã nhập 1 dự án thành công.", "other": "Đã nhập {count} dự án thành công." },
+    "changesWaitingToSync": { "one": "Bạn có 1 thay đổi đang chờ đồng bộ.", "other": "Bạn có {count} thay đổi đang chờ đồng bộ." },
+    "activeTasks": { "one": "1 tác vụ đang hoạt động", "other": "{count} tác vụ đang hoạt động" },
+    "newItemsSinceLastView": { "one": "1 mục mới kể từ lần xem trước", "other": "{count} mục mới kể từ lần xem trước" },
+    "guidesAvailable": { "one": "1 hướng dẫn có sẵn", "other": "{count} hướng dẫn có sẵn" },
+    "anomaliesDetected": { "one": "Phát hiện 1 bất thường", "other": "Phát hiện {count} bất thường" },
+    "suspiciousActivitiesDetected": { "one": "Phát hiện 1 hoạt động đáng ngờ", "other": "Phát hiện {count} hoạt động đáng ngờ" },
+    "justNow": "vừa xong",
+    "minutesAgo": { "one": "{count} phút trước", "other": "{count} phút trước" },
+    "hoursAgo": { "one": "{count} giờ trước", "other": "{count} giờ trước" },
+    "daysAgo": { "one": "{count} ngày trước", "other": "{count} ngày trước" },
+    "weeksAgo": { "one": "{count} tuần trước", "other": "{count} tuần trước" },
+    "monthsAgo": { "one": "{count} tháng trước", "other": "{count} tháng trước" },
+    "yearsAgo": { "one": "{count} năm trước", "other": "{count} năm trước" },
+    "days": { "one": "{count} ngày", "other": "{count} ngày" },
+    "weeks": { "one": "{count} tuần", "other": "{count} tuần" }
   },
   "dataImport": {
     "title": "Nhập dữ liệu",
@@ -368,6 +437,7 @@
     "title": "Trợ Lý Giúp Đỡ AI"
   },
   "helpChat": {
+    "sendButtonLabel": "Gửi tin nhắn",
     "placeholder": "Hỏi tôi điều gì đó về PPM...",
     "welcome": "Chào mừng đến với Trợ Lý Giúp Đỡ AI!",
     "welcomeMessage": "Hỏi tôi bất cứ điều gì về tính năng nền tảng PPM và tôi sẽ giúp bạn.",

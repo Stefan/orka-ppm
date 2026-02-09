@@ -5,6 +5,7 @@
  */
 
 import React, { useState } from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import { 
   Wifi, 
   WifiOff, 
@@ -26,6 +27,7 @@ export interface OfflineSyncStatusProps {
 export const OfflineSyncStatus: React.FC<OfflineSyncStatusProps> = ({
   className = ''
 }) => {
+  const { t } = useTranslations()
   const { 
     isOnline, 
     isSyncing, 
@@ -205,7 +207,7 @@ export const OfflineSyncStatus: React.FC<OfflineSyncStatusProps> = ({
           <div className="flex items-center space-x-2 text-blue-800 dark:text-blue-300">
             <Upload className="h-4 w-4" />
             <span className="text-sm">
-              You have {offlineChanges.length} change{offlineChanges.length !== 1 ? 's' : ''} waiting to sync.
+              {t('common.changesWaitingToSync', { count: offlineChanges.length })}
             </span>
           </div>
         </div>

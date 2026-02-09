@@ -20,6 +20,9 @@ export interface AppLayoutProps {
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/a1af679c-bb9d-43c7-9ee8-d70e9c7bbea1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppLayout.tsx:AppLayout','message':'AppLayout render',data:{},timestamp:Date.now(),hypothesisId:'H3'})}).catch(()=>{});
+  // #endregion
   const { session, loading } = useAuth()
   const router = useRouter()
   const mainContentRef = useRef<HTMLElement>(null)

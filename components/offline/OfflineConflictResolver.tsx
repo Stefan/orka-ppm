@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useCallback } from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import { 
   AlertTriangle, 
   GitMerge, 
@@ -27,6 +28,7 @@ export const OfflineConflictResolver: React.FC<OfflineConflictResolverProps> = (
   isOpen,
   onClose
 }) => {
+  const { t } = useTranslations()
   const { pendingConflicts, resolveConflict, isSyncing } = useOfflineSync()
   const [selectedConflict, setSelectedConflict] = useState<MergeConflict | null>(null)
   const [isResolving, setIsResolving] = useState(false)
@@ -134,7 +136,7 @@ export const OfflineConflictResolver: React.FC<OfflineConflictResolverProps> = (
                 Sync Conflicts Detected
               </h2>
               <p className="text-sm text-gray-600 dark:text-slate-400">
-                {pendingConflicts.length} conflict{pendingConflicts.length !== 1 ? 's' : ''} need resolution
+                {t('common.conflictsNeedResolution', { count: pendingConflicts.length })}
               </p>
             </div>
           </div>

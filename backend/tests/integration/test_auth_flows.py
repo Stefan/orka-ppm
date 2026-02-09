@@ -12,7 +12,7 @@ from unittest.mock import patch, AsyncMock
 @pytest.mark.asyncio
 async def test_token_extraction_fallback():
     """Token extraction falls back to JWT decode when bridge unavailable."""
-    with patch("auth.dependencies.get_supabase_rbac_bridge", side_effect=ImportError):
+    with patch("auth.supabase_rbac_bridge.get_supabase_rbac_bridge", side_effect=ImportError):
         from auth.dependencies import get_current_user
         from fastapi.security import HTTPAuthorizationCredentials
         with patch("auth.dependencies.jwt.decode") as mock_decode:

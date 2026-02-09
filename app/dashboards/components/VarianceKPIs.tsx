@@ -79,10 +79,11 @@ function VarianceKPIs({ session, selectedCurrency = 'USD', showDetailedMetrics, 
     setError(null)
     
     try {
-      // Fetch commitments and actuals directly instead of pre-calculated variances
+      // Fetch commitments and actuals (capped for dashboard performance; KPIs based on most recent records)
+      const dashboardLimit = 2000
       const [commitmentsRes, actualsRes] = await Promise.all([
         resilientFetch<{ commitments: any[] }>(
-          getApiUrl('/csv-import/commitments?limit=10000&count_exact=false'),
+          getApiUrl(`/csv-import/commitments?limit=${dashboardLimit}&count_exact=false`),
           {
             headers: {
               'Authorization': `Bearer ${session.access_token}`,
@@ -95,7 +96,7 @@ function VarianceKPIs({ session, selectedCurrency = 'USD', showDetailedMetrics, 
           }
         ),
         resilientFetch<{ actuals: any[] }>(
-          getApiUrl('/csv-import/actuals?limit=10000&count_exact=false'),
+          getApiUrl(`/csv-import/actuals?limit=${dashboardLimit}&count_exact=false`),
           {
             headers: {
               'Authorization': `Bearer ${session.access_token}`,

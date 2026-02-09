@@ -41,31 +41,37 @@ def _org_id(current_user: dict) -> str:
 async def list_registers(
     type: str,
     project_id: Optional[UUID] = Query(None),
+    task_id: Optional[UUID] = Query(None),
     status: Optional[str] = Query(None),
     limit: int = Query(100, ge=1, le=500),
     offset: int = Query(0, ge=0),
+    count_exact: bool = Query(False, description="Request exact total (slower)"),
     current_user: dict = Depends(get_current_user),
 ):
-    """List register entries for the given type. Filter by project_id, status."""
+    """List register entries for the given type. Default count_exact=False for faster response."""
     _validate_register_type(type)
     org_id = _org_id(current_user)
     if not supabase:
         raise HTTPException(status_code=503, detail="Database service unavailable")
     try:
-        query = (
-            supabase.table("registers")
-            .select("*", count="exact")
-            .eq("type", type)
-            .eq("organization_id", org_id)
-        )
+        if count_exact:
+            query = supabase.table("registers").select("*", count="exact")
+        else:
+            query = supabase.table("registers").select("*")
+        query = query.eq("type", type).eq("organization_id", org_id)
         if project_id is not None:
             query = query.eq("project_id", str(project_id))
+        if task_id is not None:
+            query = query.eq("task_id", str(task_id))
         if status:
             query = query.eq("status", status)
         query = query.order("updated_at", desc=True).range(offset, offset + limit - 1)
         response = query.execute()
         items = [convert_uuids(row) for row in (response.data or [])]
-        total = getattr(response, "count", None) or len(items)
+        if count_exact and hasattr(response, "count") and response.count is not None:
+            total = response.count
+        else:
+            total = offset + len(items)
         return RegisterListResponse(items=items, total=total, limit=limit, offset=offset)
     except HTTPException:
         raise
@@ -89,6 +95,7 @@ async def create_register(
             "type": type,
             "organization_id": org_id,
             "project_id": str(body.project_id) if body.project_id else None,
+            "task_id": str(body.task_id) if body.task_id else None,
             "data": body.data,
             "status": body.status or "open",
         }
@@ -146,6 +153,8 @@ async def update_register(
         payload = body.model_dump(exclude_unset=True)
         if "project_id" in payload:
             payload["project_id"] = str(payload["project_id"]) if payload["project_id"] else None
+        if "task_id" in payload:
+            payload["task_id"] = str(payload["task_id"]) if payload["task_id"] else None
         response = (
             supabase.table("registers")
             .update(payload)

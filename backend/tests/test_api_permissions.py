@@ -9,7 +9,9 @@ import os
 from unittest.mock import Mock, AsyncMock
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from main import app, rbac, Permission
+from main import app
+from routers.rbac import router as rbac
+from auth.rbac import Permission
 from fastapi.testclient import TestClient
 from fastapi import HTTPException
 
@@ -70,7 +72,7 @@ def test_api_permissions():
     # Test 3: Verify permission hierarchy
     print("\n3. Testing permission hierarchy...")
     
-    from main import DEFAULT_ROLE_PERMISSIONS, UserRole
+    from auth.rbac import DEFAULT_ROLE_PERMISSIONS, UserRole
     
     # Admin should have all permissions
     admin_perms = set(DEFAULT_ROLE_PERMISSIONS[UserRole.admin])

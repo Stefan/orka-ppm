@@ -1,13 +1,41 @@
 /**
  * Test Wrapper Component
- * 
+ *
  * Provides all necessary context providers for testing components
- * that depend on Auth, HelpChat, Language, and other contexts.
+ * that depend on Auth, HelpChat, Language, I18n, and other contexts.
+ *
+ * For components that use useI18n() or useTranslations() (from lib/i18n/context),
+ * use renderWithI18n(ui) or wrap with <I18nTestWrapper> so they run inside I18nProvider.
  */
 
 import React from 'react'
 import { render, RenderOptions } from '@testing-library/react'
+import { I18nProvider } from '@/lib/i18n/context'
 import { mockData } from '../fixtures/mockData'
+
+/** Wraps children with I18nProvider so useI18n/useTranslations work. Use when a component needs t() or locale. */
+export function I18nTestWrapper({ children }: { children: React.ReactNode }) {
+  return <I18nProvider>{children}</I18nProvider>
+}
+
+/**
+ * Renders ui with I18nProvider as wrapper. Use for any test whose component (or a child) calls useI18n() or useTranslations().
+ *
+ * Usage: replace `render(...)` with `renderWithI18n(...)` and import from this file instead of @testing-library/react.
+ * @example
+ *   import { renderWithI18n, screen, fireEvent } from '@/__tests__/utils/test-wrapper'
+ *   renderWithI18n(<PMRChart type="budget-variance" data={data} title="Test" />)
+ *   // Or with destructuring: const { container } = renderWithI18n(<MyComponent />)
+ */
+export function renderWithI18n(
+  ui: React.ReactElement,
+  options?: Omit<RenderOptions, 'wrapper'>
+) {
+  return render(ui, {
+    ...options,
+    wrapper: ({ children }) => <I18nTestWrapper>{children}</I18nTestWrapper>,
+  })
+}
 
 // Mock context values
 interface MockContextValues {
@@ -119,9 +147,9 @@ export function renderWithProviders(
     formatNumber: jest.fn((num) => num.toLocaleString()),
   }
 
-  // Wrapper component that provides all contexts
+  // Wrapper component that provides all contexts (including I18n for useTranslations/useI18n)
   function Wrapper({ children }: { children: React.ReactNode }) {
-    return <>{children}</>
+    return <I18nTestWrapper>{children}</I18nTestWrapper>
   }
 
   return {

@@ -590,6 +590,7 @@ class WorkflowRepository:
         entity_type: Optional[str] = None,
         entity_id: Optional[UUID] = None,
         status: Optional[WorkflowStatus] = None,
+        started_by: Optional[UUID] = None,
         limit: int = 100,
         offset: int = 0
     ) -> List[Dict[str, Any]]:
@@ -601,6 +602,7 @@ class WorkflowRepository:
             entity_type: Optional entity type filter
             entity_id: Optional entity ID filter
             status: Optional status filter
+            started_by: Optional filter by initiator user ID (for "my workflows")
             limit: Maximum number of results
             offset: Offset for pagination
             
@@ -618,6 +620,8 @@ class WorkflowRepository:
                 query = query.eq("entity_id", str(entity_id))
             if status:
                 query = query.eq("status", status.value)
+            if started_by:
+                query = query.eq("started_by", str(started_by))
             
             result = query.order("created_at", desc=True).range(
                 offset, offset + limit - 1

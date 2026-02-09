@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import { 
   BookOpen, 
   Camera, 
@@ -48,6 +49,7 @@ export function VisualGuideManager({
   currentContext,
   className
 }: VisualGuideManagerProps) {
+  const { t } = useTranslations()
   const [guides, setGuides] = useState<VisualGuide[]>([])
   const [selectedGuide, setSelectedGuide] = useState<VisualGuide | null>(null)
   const [isCreating, setIsCreating] = useState(false)
@@ -261,7 +263,7 @@ export function VisualGuideManager({
           <div>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Visual Guides</h2>
             <p className="text-sm text-gray-600 dark:text-slate-400">
-              {filteredGuides.length} guide{filteredGuides.length !== 1 ? 's' : ''} available
+              {t('common.guidesAvailable', { count: filteredGuides.length })}
             </p>
           </div>
         </div>

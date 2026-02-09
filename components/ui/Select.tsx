@@ -1,11 +1,12 @@
 /**
  * Select Component
- * 
+ *
  * A professional select/dropdown component with custom styling.
+ * Optional searchable mode: filter options by typing in the dropdown.
  */
 
-import React, { useState, useEffect } from 'react'
-import { ChevronDown, Check } from 'lucide-react'
+import React, { useState, useEffect, useMemo } from 'react'
+import { ChevronDown, Check, Search } from 'lucide-react'
 import { cn } from '@/lib/design-system'
 import { useClickOutside } from '@/hooks'
 
@@ -25,6 +26,10 @@ interface SelectProps {
   className?: string
   multiple?: boolean
   children?: React.ReactNode
+  /** When true, show a filter input in the dropdown to filter options by label */
+  searchable?: boolean
+  /** Placeholder for the search input when searchable (e.g. "Filter projects...") */
+  searchPlaceholder?: string
 }
 
 const selectBaseStyles = [
@@ -51,8 +56,11 @@ export const Select: React.FC<SelectProps> = ({
   className,
   multiple = false,
   children,
+  searchable = false,
+  searchPlaceholder = 'Filter...',
 }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [filterQuery, setFilterQuery] = useState('')
   const [selectedValues, setSelectedValues] = useState<string[]>(
     multiple ? (value ? value.split(',') : []) : (value ? [value] : [])
   )
@@ -63,7 +71,16 @@ export const Select: React.FC<SelectProps> = ({
     setSelectedValues(newValues)
   }, [value, multiple])
 
-  const selectRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false))
+  const selectRef = useClickOutside<HTMLDivElement>(() => {
+    setIsOpen(false)
+    setFilterQuery('')
+  })
+
+  const filteredOptions = useMemo(() => {
+    if (!searchable || !filterQuery.trim()) return options
+    const q = filterQuery.trim().toLowerCase()
+    return options.filter((opt) => opt.label.toLowerCase().includes(q))
+  }, [options, searchable, filterQuery])
 
   // If children are provided, render native select
   if (children) {
@@ -144,30 +161,51 @@ export const Select: React.FC<SelectProps> = ({
       </div>
 
       {isOpen && !disabled && (
-        <div className="absolute left-0 right-0 z-50 w-full min-w-0 mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg shadow-lg max-h-60 overflow-auto">
-          {options.length === 0 ? (
-            <div className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400">No options available</div>
-          ) : (
-            options.map((option) => (
-              <div
-                key={option.value}
-                className={cn(
-                  'px-4 py-2.5 text-sm cursor-pointer flex items-center justify-between',
-                  'transition-colors duration-100',
-                  option.disabled
-                    ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed'
-                    : 'text-gray-900 dark:text-slate-100 hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700',
-                  selectedValues.includes(option.value) && 'bg-blue-50 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300'
-                )}
-                onClick={() => !option.disabled && handleSelect(option.value)}
-              >
-                <span className="truncate">{option.label}</span>
-                {selectedValues.includes(option.value) && (
-                  <Check className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0 ml-2" />
-                )}
+        <div className="absolute left-0 right-0 z-50 w-full min-w-0 mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg shadow-lg max-h-60 overflow-hidden flex flex-col">
+          {searchable && (
+            <div className="p-2 border-b border-gray-100 dark:border-slate-600 flex-shrink-0">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500 pointer-events-none" aria-hidden />
+                <input
+                  type="text"
+                  value={filterQuery}
+                  onChange={(e) => setFilterQuery(e.target.value)}
+                  placeholder={searchPlaceholder}
+                  className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 dark:border-slate-600 rounded-md bg-gray-50 dark:bg-slate-700/50 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  onKeyDown={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label={searchPlaceholder}
+                />
               </div>
-            ))
+            </div>
           )}
+          <div className="overflow-auto min-h-0">
+            {filteredOptions.length === 0 ? (
+              <div className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400">
+                {options.length === 0 ? 'No options available' : 'No matches'}
+              </div>
+            ) : (
+              filteredOptions.map((option) => (
+                <div
+                  key={option.value}
+                  className={cn(
+                    'px-4 py-2.5 text-sm cursor-pointer flex items-center justify-between',
+                    'transition-colors duration-100',
+                    option.disabled
+                      ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed'
+                      : 'text-gray-900 dark:text-slate-100 hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-700',
+                    selectedValues.includes(option.value) && 'bg-blue-50 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300'
+                  )}
+                  onClick={() => !option.disabled && handleSelect(option.value)}
+                >
+                  <span className="truncate">{option.label}</span>
+                  {selectedValues.includes(option.value) && (
+                    <Check className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0 ml-2" />
+                  )}
+                </div>
+              ))
+            )}
+          </div>
         </div>
       )}
 

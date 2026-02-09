@@ -12,7 +12,7 @@
  */
 
 import React, { useState } from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { renderWithI18n, screen, fireEvent, waitFor } from '@/__tests__/utils/test-wrapper'
 import '@testing-library/jest-dom'
 
 // Mock react-dropzone
@@ -102,7 +102,7 @@ describe('Dashboard Import Button', () => {
 
   describe('Button Renders in Dashboard', () => {
     test('should render Import Projects button in Quick Actions section', () => {
-      render(<TestDashboardWithImportButton />)
+      renderWithI18n(<TestDashboardWithImportButton />)
 
       // Find the Import Projects button
       const importButton = screen.getByTestId('import-button')
@@ -111,7 +111,7 @@ describe('Dashboard Import Button', () => {
     })
 
     test('should render Import Projects button with correct styling', () => {
-      render(<TestDashboardWithImportButton />)
+      renderWithI18n(<TestDashboardWithImportButton />)
 
       // Find the button and verify it has the expected styling
       const importButton = screen.getByTestId('import-button')
@@ -119,7 +119,7 @@ describe('Dashboard Import Button', () => {
     })
 
     test('should render Import Projects button in the Quick Actions bar', () => {
-      render(<TestDashboardWithImportButton />)
+      renderWithI18n(<TestDashboardWithImportButton />)
 
       // Verify Quick Actions section exists
       const quickActions = screen.getByTestId('quick-actions')
@@ -134,7 +134,7 @@ describe('Dashboard Import Button', () => {
 
   describe('Button Click Opens Modal', () => {
     test('should open ProjectImportModal when Import Projects button is clicked', async () => {
-      render(<TestDashboardWithImportButton />)
+      renderWithI18n(<TestDashboardWithImportButton />)
 
       // Modal should not be visible initially
       expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
@@ -150,7 +150,7 @@ describe('Dashboard Import Button', () => {
     })
 
     test('should display modal with Import Projects title when opened', async () => {
-      render(<TestDashboardWithImportButton />)
+      renderWithI18n(<TestDashboardWithImportButton />)
 
       // Click the Import Projects button
       const importButton = screen.getByTestId('import-button')

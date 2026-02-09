@@ -22,7 +22,8 @@ import {
   Target,
   Calendar,
   BookOpen,
-  Upload
+  Upload,
+  FolderOpen
 } from 'lucide-react'
 
 export interface MobileNavProps {
@@ -36,6 +37,7 @@ const NAV_ITEMS = [
 
   // Projects & Resources
   { href: '/projects', label: 'All Projects', icon: GitBranch, group: 'Projects' },
+  { href: '/portfolios', label: 'Portfolios', icon: FolderOpen, group: 'Projects' },
   { href: '/resources', label: 'Resource Management', icon: Users, group: 'Projects' },
 
   // Financial Management

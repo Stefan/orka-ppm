@@ -18,7 +18,7 @@ from datetime import datetime
 # Add the backend directory to the Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
-from data_integrity_service import DataIntegrityService, IntegrityValidationResult
+from services.data_integrity_service import DataIntegrityService, IntegrityValidationResult
 
 class TestDataIntegrityProperties:
     """Property-based tests for data integrity validation"""

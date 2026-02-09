@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Clock, CheckCircle, XCircle, AlertCircle, ChevronRight } from 'lucide-react'
+import { useTranslations } from '@/lib/i18n/context'
 import WorkflowStatusBadge from './WorkflowStatusBadge'
 import WorkflowApprovalModal from './WorkflowApprovalModal'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
@@ -43,6 +44,7 @@ export default function WorkflowDashboard({
   compact = false 
 }: WorkflowDashboardProps) {
   const { session } = useAuth()
+  const { t } = useTranslations()
   const [workflows, setWorkflows] = useState<WorkflowInstance[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -258,7 +260,7 @@ export default function WorkflowDashboard({
             <div className="flex items-center gap-2">
               <AlertCircle className="text-yellow-600 dark:text-yellow-400" size={20} aria-hidden />
               <span className="font-semibold text-yellow-800 dark:text-yellow-200">
-                {pendingCount} pending approval{pendingCount !== 1 ? 's' : ''}
+                {t('common.approvals', { count: pendingCount })}
               </span>
             </div>
           </div>
@@ -373,7 +375,7 @@ export default function WorkflowDashboard({
                         <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded px-3 py-2 inline-flex items-center gap-2">
                           <AlertCircle className="text-yellow-600 dark:text-yellow-400" size={16} aria-hidden />
                           <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                            {pendingApprovals} pending approval{pendingApprovals !== 1 ? 's' : ''} from you
+                            {t('common.approvalsFromYou', { count: pendingApprovals })}
                           </span>
                         </div>
                       )}

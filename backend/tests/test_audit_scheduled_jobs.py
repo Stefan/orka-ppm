@@ -8,6 +8,9 @@ Requirements: 1.1, 1.6, 4.11, 5.9, 5.10
 """
 
 import pytest
+
+pytest.importorskip("apscheduler")
+
 import asyncio
 from datetime import datetime, timedelta
 from unittest.mock import Mock, AsyncMock, patch, MagicMock

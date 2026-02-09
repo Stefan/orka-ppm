@@ -7,7 +7,7 @@ in the AI-Empowered PPM Features system.
 Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 7.1, 7.2, 7.3, 7.4, 7.5
 """
 
-from fastapi import APIRouter, HTTPException, Depends, status, Query
+from fastapi import APIRouter, HTTPException, Depends, status, Query, Request
 from typing import Dict, Any, List, Optional
 from uuid import UUID
 from datetime import datetime, timedelta
@@ -1507,25 +1507,51 @@ async def approve_project(
 # Must be declared before /instances/{id} so "my-workflows" is not matched as UUID.
 
 
+MY_WORKFLOWS_CACHE_TTL = 60  # seconds
+
 @router.get("/instances/my-workflows")
-async def get_my_workflow_instances():
+async def get_my_workflow_instances(
+    request: Request,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
     """
     Get workflow instances where the current user is involved.
+    Response cached 60s to reduce repeated load.
 
     Returns workflows where the user is either the initiator or an approver.
     This endpoint supports the dashboard workflow display.
 
-    Args:
-        current_user: Authenticated user
-
-    Returns:
-        Dict containing list of workflow instances
-
     Requirements: 7.2, 7.4
     """
-    # For now, return empty workflows list to avoid database queries
-    # TODO: Implement proper workflow instance retrieval
-    return {"workflows": []}
+    user_id_raw = current_user.get("user_id") or current_user.get("id")
+    if not user_id_raw:
+        return {"workflows": []}
+    try:
+        user_uuid = UUID(user_id_raw)
+    except (ValueError, TypeError):
+        return {"workflows": []}
+    cache = getattr(request.app.state, "cache_manager", None)
+    cache_key = f"workflows:my-workflows:{user_id_raw}"
+    if cache:
+        cached = await cache.get(cache_key)
+        if cached is not None:
+            return cached
+    try:
+        engine = get_workflow_engine()
+        instances = await engine.repository.list_workflow_instances(
+            started_by=user_uuid,
+            limit=100,
+            offset=0
+        )
+        result = {"workflows": instances}
+        if cache:
+            await cache.set(cache_key, result, ttl=MY_WORKFLOWS_CACHE_TTL)
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in get_my_workflow_instances: {e}")
+        return {"workflows": []}
 
 
 # ==================== Single Instance Endpoints ====================

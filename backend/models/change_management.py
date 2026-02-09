@@ -10,6 +10,22 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 
+class ImplementationStatus(str, Enum):
+    """Status of an implementation task or plan."""
+    PLANNED = "planned"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+
+class TaskType(str, Enum):
+    """Type of implementation task."""
+    IMPLEMENTATION = "implementation"
+    REVIEW = "review"
+    APPROVAL = "approval"
+    DELIVERY = "delivery"
+
+
 class ChangeType(str, Enum):
     SCOPE = "scope"
     SCHEDULE = "schedule"
@@ -269,6 +285,27 @@ class ImplementationPlan(BaseModel):
     milestones: List[Dict[str, Any]]
     dependencies: List[str] = Field(default_factory=list)
     risks: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+class ImplementationTask(BaseModel):
+    """Single implementation task within a plan."""
+    id: Optional[str] = None
+    implementation_plan_id: Optional[str] = None
+    task_number: Optional[int] = None
+    title: str = ""
+    description: Optional[str] = None
+    task_type: str = TaskType.IMPLEMENTATION.value
+    status: str = ImplementationStatus.PLANNED.value
+    assigned_to: Optional[str] = None
+    planned_start_date: Optional[date] = None
+    planned_end_date: Optional[date] = None
+    actual_start_date: Optional[date] = None
+    actual_end_date: Optional[date] = None
+    progress_percentage: int = 0
+    estimated_effort_hours: Optional[Decimal] = None
+    actual_effort_hours: Optional[Decimal] = None
+    dependencies: List[str] = Field(default_factory=list)
+    deliverables: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 class ImplementationProgress(BaseModel):

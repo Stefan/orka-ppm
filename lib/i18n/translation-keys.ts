@@ -922,9 +922,19 @@ export type TranslationKey =
   | 'charts.pinchToZoom'
   | 'common.actions'
   | 'common.add'
+  | 'common.alerts'
   | 'common.alerts.one'
   | 'common.alerts.other'
+  | 'common.approvals'
+  | 'common.approvalsFromYou'
+  | 'common.approvers'
   | 'common.cancel'
+  | 'common.changes'
+  | 'common.conflicts'
+  | 'common.errors'
+  | 'common.transactions'
+  | 'common.vendors'
+  | 'common.warnings'
   | 'common.clearFilters'
   | 'common.close'
   | 'common.configure'
@@ -1355,6 +1365,7 @@ export type TranslationKey =
   | 'help.title'
   | 'helpChat.confidence'
   | 'helpChat.placeholder'
+  | 'helpChat.sendButtonLabel'
   | 'helpChat.referencedDocuments'
   | 'helpChat.sources'
   | 'helpChat.tryAgain'
@@ -1438,6 +1449,7 @@ export type TranslationKey =
   | 'nav.admin'
   | 'nav.administration'
   | 'nav.allProjects'
+  | 'nav.portfolios'
   | 'nav.analysis'
   | 'nav.audit'
   | 'nav.auditTrail'
@@ -1632,6 +1644,11 @@ export type TranslationKey =
   | 'projects.pageDescription'
   | 'projects.recentProjects'
   | 'projects.title'
+  | 'portfolios.pageDescription'
+  | 'portfolios.empty'
+  | 'portfolios.loadError'
+  | 'portfolios.projectsInPortfolio'
+  | 'portfolios.noProjects'
   | 'reports.chart'
   | 'reports.close'
   | 'reports.confidence'
@@ -1990,6 +2007,8 @@ export type TranslationKey =
   | 'topbar.noResults'
   | 'topbar.notifications'
   | 'topbar.portfolioManagement'
+  | 'topbar.currentPortfolio'
+  | 'topbar.allPortfolios'
   | 'topbar.searchAria'
   | 'topbar.searchPlaceholder'
   | 'topbar.searching'
@@ -2938,10 +2957,20 @@ export const ALL_TRANSLATION_KEYS: TranslationKey[] = [
   'charts.pinchToZoom',
   'common.actions',
   'common.add',
+  'common.alerts',
   'common.alerts.one',
   'common.alerts.other',
+  'common.approvals',
+  'common.approvalsFromYou',
+  'common.approvers',
   'common.cancel',
+  'common.changes',
   'common.clearFilters',
+  'common.conflicts',
+  'common.errors',
+  'common.transactions',
+  'common.vendors',
+  'common.warnings',
   'common.close',
   'common.configure',
   'common.delete',
@@ -3371,6 +3400,7 @@ export const ALL_TRANSLATION_KEYS: TranslationKey[] = [
   'help.title',
   'helpChat.confidence',
   'helpChat.placeholder',
+  'helpChat.sendButtonLabel',
   'helpChat.referencedDocuments',
   'helpChat.sources',
   'helpChat.tryAgain',
@@ -3454,6 +3484,7 @@ export const ALL_TRANSLATION_KEYS: TranslationKey[] = [
   'nav.admin',
   'nav.administration',
   'nav.allProjects',
+  'nav.portfolios',
   'nav.analysis',
   'nav.audit',
   'nav.auditTrail',
@@ -3648,6 +3679,11 @@ export const ALL_TRANSLATION_KEYS: TranslationKey[] = [
   'projects.pageDescription',
   'projects.recentProjects',
   'projects.title',
+  'portfolios.pageDescription',
+  'portfolios.empty',
+  'portfolios.loadError',
+  'portfolios.projectsInPortfolio',
+  'portfolios.noProjects',
   'reports.chart',
   'reports.close',
   'reports.confidence',
@@ -4006,6 +4042,8 @@ export const ALL_TRANSLATION_KEYS: TranslationKey[] = [
   'topbar.noResults',
   'topbar.notifications',
   'topbar.portfolioManagement',
+  'topbar.currentPortfolio',
+  'topbar.allPortfolios',
   'topbar.searchAria',
   'topbar.searchPlaceholder',
   'topbar.searching',

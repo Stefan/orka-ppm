@@ -6,6 +6,7 @@
  */
 
 import React from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import { AlertCircle } from 'lucide-react'
 import type { ChangeHighlight } from './types'
 
@@ -15,6 +16,7 @@ interface AIChangeHighlightProps {
 }
 
 export default function AIChangeHighlight({ changes, newCount }: AIChangeHighlightProps) {
+  const { t } = useTranslations()
   const added = changes.filter((c) => c.changeType === 'added').length
   const modified = changes.filter((c) => c.changeType === 'modified').length
   const count = newCount ?? added
@@ -29,7 +31,7 @@ export default function AIChangeHighlight({ changes, newCount }: AIChangeHighlig
       <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
       {count > 0 && (
         <span className="font-medium">
-          {count} new item{count !== 1 ? 's' : ''} since last view
+          {t('common.newItemsSinceLastView', { count })}
         </span>
       )}
       {modified > 0 && (

@@ -3,6 +3,7 @@
     "dashboards": "Dashboards",
     "projects": "Projekte",
     "allProjects": "Alle Projekte",
+    "portfolios": "Portfolios",
     "scenarios": "Szenarien",
     "resources": "Ressourcen",
     "resourceManagement": "Ressourcenverwaltung",
@@ -46,6 +47,8 @@
   "topbar": {
     "toggleMenu": "Menü umschalten",
     "portfolioManagement": "Portfolio-Management",
+    "currentPortfolio": "Aktuelles Portfolio",
+    "allPortfolios": "Alle Portfolios",
     "themeDark": "Dunkelmodus",
     "themeSystem": "Systemdesign",
     "themeLight": "Hellmodus",
@@ -69,6 +72,13 @@
     "hoursAgo": "vor {count} Std.",
     "yesterday": "Gestern",
     "daysAgo": "vor {count} T."
+  },
+  "portfolios": {
+    "pageDescription": "Portfolios anzeigen und verwalten. Wählen Sie ein Portfolio, um dessen Projekte zu sehen.",
+    "empty": "Noch keine Portfolios. Legen Sie Portfolios in Ihrer Organisation an.",
+    "loadError": "Portfolios konnten nicht geladen werden.",
+    "projectsInPortfolio": "Projekte in diesem Portfolio",
+    "noProjects": "Keine Projekte in diesem Portfolio."
   },
   "dashboard": {
     "title": "Portfolio Dashboard",
@@ -103,6 +113,10 @@
     },
     "schedulesTitle": "Zeitpläne",
     "openLink": "Öffnen",
+    "registersTitle": "Risiken & Issues",
+    "open": "offen",
+    "risks": "Risiken",
+    "issues": "Issues",
     "activeSchedules": "Aktive Zeitpläne",
     "milestonesDueIn14Days": "{count} Meilenstein(e) in 14 Tagen fällig",
     "changeOrdersTitle": "Änderungsanordnungen",
@@ -261,6 +275,177 @@
     "alerts": {
       "one": "{count} Warnung",
       "other": "{count} Warnungen"
+    },
+    "errors": {
+      "one": "{count} Fehler",
+      "other": "{count} Fehler"
+    },
+    "warnings": {
+      "one": "{count} Warnung",
+      "other": "{count} Warnungen"
+    },
+    "conflicts": {
+      "one": "{count} Konflikt",
+      "other": "{count} Konflikte"
+    },
+    "approvals": {
+      "one": "{count} ausstehende Freigabe",
+      "other": "{count} ausstehende Freigaben"
+    },
+    "approvalsFromYou": {
+      "one": "{count} ausstehende Freigabe von Ihnen",
+      "other": "{count} ausstehende Freigaben von Ihnen"
+    },
+    "approvers": {
+      "one": "{count} Genehmiger",
+      "other": "{count} Genehmiger"
+    },
+    "changes": {
+      "one": "{count} Änderung",
+      "other": "{count} Änderungen"
+    },
+    "vendors": {
+      "one": "{count} Anbieter",
+      "other": "{count} Anbieter"
+    },
+    "transactions": {
+      "one": "{count} Transaktion",
+      "other": "{count} Transaktionen"
+    },
+    "comments": {
+      "one": "{count} Kommentar",
+      "other": "{count} Kommentare"
+    },
+    "guides": {
+      "one": "{count} Anleitung",
+      "other": "{count} Anleitungen"
+    },
+    "fields": {
+      "one": "{count} Feld",
+      "other": "{count} Felder"
+    },
+    "typesSelected": {
+      "one": "{count} Typ ausgewählt",
+      "other": "{count} Typen ausgewählt"
+    },
+    "replies": {
+      "one": "{count} Antwort",
+      "other": "{count} Antworten"
+    },
+    "permissions": {
+      "one": "{count} Berechtigung",
+      "other": "{count} Berechtigungen"
+    },
+    "activities": {
+      "one": "{count} Aktivität",
+      "other": "{count} Aktivitäten"
+    },
+    "anomalies": {
+      "one": "{count} Anomalie",
+      "other": "{count} Anomalien"
+    },
+    "tasks": {
+      "one": "{count} Aufgabe",
+      "other": "{count} Aufgaben"
+    },
+    "widgets": {
+      "one": "{count} Widget",
+      "other": "{count} Widgets"
+    },
+    "showingVendors": {
+      "one": "1 Anbieter angezeigt",
+      "other": "{count} Anbieter angezeigt"
+    },
+    "showingTransactions": {
+      "one": "1 Transaktion angezeigt",
+      "other": "{count} Transaktionen angezeigt"
+    },
+    "changesPending": {
+      "one": "1 Änderung ausstehend",
+      "other": "{count} Änderungen ausstehend"
+    },
+    "errorsFound": {
+      "one": "1 Fehler gefunden",
+      "other": "{count} Fehler gefunden"
+    },
+    "warningsFound": {
+      "one": "1 Warnung",
+      "other": "{count} Warnungen"
+    },
+    "conflictsNeedResolution": {
+      "one": "1 Konflikt muss gelöst werden",
+      "other": "{count} Konflikte müssen gelöst werden"
+    },
+    "fieldsAffected": {
+      "one": "1 Feld betroffen",
+      "other": "{count} Felder betroffen"
+    },
+    "projectsImportedSuccessfully": {
+      "one": "1 Projekt erfolgreich importiert.",
+      "other": "{count} Projekte erfolgreich importiert."
+    },
+    "changesWaitingToSync": {
+      "one": "Sie haben 1 Änderung zum Synchronisieren.",
+      "other": "Sie haben {count} Änderungen zum Synchronisieren."
+    },
+    "activeTasks": {
+      "one": "1 aktive Aufgabe",
+      "other": "{count} aktive Aufgaben"
+    },
+    "newItemsSinceLastView": {
+      "one": "1 neues Element seit letzter Ansicht",
+      "other": "{count} neue Elemente seit letzter Ansicht"
+    },
+    "guidesAvailable": {
+      "one": "1 Anleitung verfügbar",
+      "other": "{count} Anleitungen verfügbar"
+    },
+    "anomaliesDetected": {
+      "one": "1 Anomalie erkannt",
+      "other": "{count} Anomalien erkannt"
+    },
+    "suspiciousActivitiesDetected": {
+      "one": "1 verdächtige Aktivität erkannt",
+      "other": "{count} verdächtige Aktivitäten erkannt"
+    },
+    "justNow": "gerade eben",
+    "minutesAgo": {
+      "one": "vor {count} Minute",
+      "other": "vor {count} Minuten"
+    },
+    "hoursAgo": {
+      "one": "vor {count} Stunde",
+      "other": "vor {count} Stunden"
+    },
+    "daysAgo": {
+      "one": "vor {count} Tag",
+      "other": "vor {count} Tagen"
+    },
+    "weeksAgo": {
+      "one": "vor {count} Woche",
+      "other": "vor {count} Wochen"
+    },
+    "monthsAgo": {
+      "one": "vor {count} Monat",
+      "other": "vor {count} Monaten"
+    },
+    "yearsAgo": {
+      "one": "vor {count} Jahr",
+      "other": "vor {count} Jahren"
+    },
+    "days": {
+      "one": "{count} Tag",
+      "other": "{count} Tage"
+    },
+    "weeks": {
+      "one": "{count} Woche",
+      "other": "{count} Wochen"
+    },
+    "importantSuffix": " (wichtig)",
+    "recentNewSuffix": " ({count} neu)",
+    "severityAnomaliesDetected": {
+      "one": "{count} {severity}-Anomalie erkannt",
+      "other": "{count} {severity}-Anomalien erkannt"
     }
   },
   "dataImport": {
@@ -379,6 +564,7 @@
     "title": "KI-Hilfe-Assistent"
   },
   "helpChat": {
+    "sendButtonLabel": "Nachricht senden",
     "placeholder": "Frage mich etwas über PPM...",
     "welcome": "Willkommen beim KI-Hilfe-Assistenten!",
     "welcomeMessage": "Fragen Sie mich alles über die PPM-Plattform-Funktionen und ich helfe Ihnen gerne weiter.",

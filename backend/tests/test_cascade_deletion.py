@@ -13,7 +13,7 @@ from datetime import datetime
 # Add the backend directory to the Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
-from data_integrity_service import DataIntegrityService
+from services.data_integrity_service import DataIntegrityService
 from config.database import supabase, service_supabase
 
 def test_cascade_deletion_configuration():

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import {
   RefreshCw,
   CheckCircle,
@@ -70,6 +71,7 @@ export function SyncStatusIndicator({
     overallStatus: SyncStatus
     pendingChanges: number
   } | null>(null)
+  const { t } = useTranslations()
   
   // Fetch status
   const fetchStatus = useCallback(async () => {
@@ -280,7 +282,7 @@ export function SyncStatusIndicator({
           <div className="px-4 py-2 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 flex items-center justify-between">
             {status.pendingChanges > 0 && (
               <span className="text-xs text-orange-600 dark:text-orange-400">
-                {status.pendingChanges} change{status.pendingChanges !== 1 ? 's' : ''} pending
+                {t('common.changesPending', { count: status.pendingChanges })}
               </span>
             )}
             <button className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center gap-1">

@@ -14,14 +14,14 @@ import pytest
 # Add the current directory to the path to import from main.py
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Import the functions from main.py
+# Import from main (app), models, and test helpers
 try:
-    from main import (
+    from main import app
+    from models.financial import BudgetAlert
+    from test_budget_alerts import (
         calculate_budget_variance,
         check_budget_thresholds,
         send_budget_alert_notification,
-        monitor_all_project_budgets,
-        BudgetAlert
     )
     IMPORTS_AVAILABLE = True
 except ImportError as e:

@@ -57,10 +57,19 @@ const SEARCH_DATA: SearchResult[] = [
     id: 'nav-risks',
     title: 'Risk/Issue Registers',
     description: 'Manage project risks and issues',
-    href: '/risks',
+    href: '/registers',
     category: 'navigation',
     relevanceScore: 0,
     keywords: ['risk', 'issue', 'register', 'mitigation', 'problems']
+  },
+  {
+    id: 'nav-registers',
+    title: 'Registers',
+    description: 'Unified registers: risks, issues, changes, benefits, lessons learned, decisions, opportunities',
+    href: '/registers',
+    category: 'navigation',
+    relevanceScore: 0,
+    keywords: ['registers', 'benefits', 'lessons learned', 'decision', 'opportunities', 'change register', 'cost register']
   },
   {
     id: 'nav-monte-carlo',
@@ -112,7 +121,7 @@ const SEARCH_DATA: SearchResult[] = [
     id: 'feature-risk-analysis',
     title: 'Risk Analysis',
     description: 'Automated risk detection and analysis',
-    href: '/risks?tab=analysis',
+    href: '/registers?type=risk',
     category: 'feature',
     relevanceScore: 0,
     keywords: ['risk', 'analysis', 'detection', 'automated', 'ai']

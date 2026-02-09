@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
 import { getApiUrl } from '@/lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
@@ -41,6 +42,7 @@ interface CustomRole {
  * Requirements: 4.2, 4.3 - Custom role creation and management
  */
 export function RoleManagement() {
+  const { t } = useTranslations()
   const { session } = useAuth()
   const [roles, setRoles] = useState<CustomRole[]>([])
   const [filteredRoles, setFilteredRoles] = useState<CustomRole[]>([])
@@ -181,8 +183,7 @@ export function RoleManagement() {
    * Format permission count
    */
   const formatPermissionCount = (count: number): string => {
-    if (count === 1) return '1 permission'
-    return `${count} permissions`
+    return t('common.permissions', { count })
   }
 
   /**

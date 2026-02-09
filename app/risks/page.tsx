@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useState, useMemo, useDeferredValue, useReducer, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import dynamic from 'next/dynamic'
 import { useAuth } from '../providers/SupabaseAuthProvider'
 import AppLayout from '../../components/shared/AppLayout'
-import { AlertTriangle, Shield, TrendingUp, Activity, Clock, User, Calendar, Target, Filter, Download, RefreshCw, BarChart3, Plus, Search, SortAsc, SortDesc, Zap } from 'lucide-react'
+import { AlertTriangle, Shield, TrendingUp, Activity, Clock, User, Calendar, Target, Filter, Download, RefreshCw, BarChart3, Plus, Search, SortAsc, SortDesc, Zap, X } from 'lucide-react'
 import { getApiUrl } from '../../lib/api/client'
 import { SkeletonCard, SkeletonChart, SkeletonTable } from '../../components/ui/skeletons'
 import { useDebounce } from '@/hooks/useDebounce'
@@ -128,6 +129,13 @@ export default function Risks() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [showMonteCarloModal, setShowMonteCarloModal] = useState(false)
   const [showAIAnalysis, setShowAIAnalysis] = useState(true)
+
+  useEffect(() => {
+    if (showAddModal || showMonteCarloModal) {
+      document.body.style.overflow = 'hidden'
+      return () => { document.body.style.overflow = '' }
+    }
+  }, [showAddModal, showMonteCarloModal])
 
   // Debounce search term to reduce update frequency (300ms delay)
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
@@ -640,7 +648,7 @@ export default function Risks() {
                   {alerts.length > 0 && (
                     <div className="flex items-center px-3 py-1 bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200 rounded-full text-sm font-medium ring-1 ring-red-200 dark:ring-red-800/60">
                       <AlertTriangle className="h-4 w-4 mr-1 flex-shrink-0" aria-hidden />
-                      <span>{alerts.length} {t('risks.alert')}{alerts.length !== 1 ? 's' : ''}</span>
+                      <span>{t('common.alerts', { count: alerts.length })}</span>
                     </div>
                   )}
                 </div>
@@ -783,7 +791,7 @@ export default function Risks() {
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-red-900 dark:text-red-300">{t('risks.riskAlerts')}</h3>
-              <span className="text-sm text-red-700 dark:text-red-400">{alerts.length} {t('risks.alert')}{alerts.length !== 1 ? 's' : ''}</span>
+              <span className="text-sm text-red-700 dark:text-red-400">{t('common.alerts', { count: alerts.length })}</span>
             </div>
             <div className="space-y-3">
               {alerts.map((alert, index) => (
@@ -1230,10 +1238,11 @@ export default function Risks() {
           </div>
         </div>
 
-        {/* Monte Carlo Analysis Modal */}
-        {showMonteCarloModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        {/* Monte Carlo Analysis Modal - portaled to body for correct centering */}
+        {showMonteCarloModal && typeof document !== 'undefined' && createPortal(
+          <div className="fixed inset-0 z-[100] flex min-h-full min-w-full items-center justify-center p-4" role="dialog" aria-modal="true">
+            <div className="absolute inset-0 bg-neutral-900/50 dark:bg-black/40 backdrop-blur-sm" aria-hidden onClick={() => setShowMonteCarloModal(false)} />
+            <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg bg-white p-6 shadow-2xl dark:bg-slate-800">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Monte Carlo Risk Analysis</h3>
               
               <div className="space-y-4">
@@ -1328,15 +1337,20 @@ export default function Risks() {
                 </button>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
-        {/* Enhanced Mobile-First Add Risk Modal */}
-        {showAddModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-slate-800 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 p-4 sm:p-6">
+        {/* Add Risk Modal - portaled to body for correct centering and lighter backdrop */}
+        {showAddModal && typeof document !== 'undefined' && createPortal(
+          <div className="fixed inset-0 z-[100] flex min-h-full min-w-full items-center justify-center p-4" role="dialog" aria-modal="true">
+            <div className="absolute inset-0 bg-neutral-900/50 dark:bg-black/40 backdrop-blur-sm" aria-hidden onClick={() => setShowAddModal(false)} />
+            <div className="relative z-10 w-full max-w-md max-h-[90vh] overflow-y-auto rounded-lg bg-white shadow-2xl dark:bg-slate-800">
+              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white dark:border-slate-700 dark:bg-slate-800 p-4 sm:p-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Add New Risk</h3>
+                <button type="button" onClick={() => setShowAddModal(false)} className="rounded-lg p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-slate-400 dark:hover:bg-slate-600 dark:hover:text-slate-200" aria-label="Close">
+                  <X className="h-5 w-5" />
+                </button>
               </div>
               <form onSubmit={async (e) => {
                 e.preventDefault()
@@ -1489,7 +1503,8 @@ export default function Risks() {
                 </div>
               </form>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </AppLayout>

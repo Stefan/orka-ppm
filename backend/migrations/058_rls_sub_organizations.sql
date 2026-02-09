@@ -2,9 +2,24 @@
 -- Migration 058: RLS + Sub-Organizations (ltree hierarchy)
 -- Spec: .kiro/specs/rls-sub-organizations/ Tasks 1 + 2
 -- Same content as lib/supabase/policies.sql for backend/Postgres.
+-- Ensures user_roles has scope_type/scope_id/is_active (from 030) so this migration can run standalone.
 -- =============================================================================
 
 CREATE EXTENSION IF NOT EXISTS ltree;
+
+-- Ensure user_roles has columns required by get_user_primary_org_id / is_org_admin (else add them)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user_roles' AND column_name = 'scope_type') THEN
+    ALTER TABLE user_roles ADD COLUMN scope_type VARCHAR(50);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user_roles' AND column_name = 'scope_id') THEN
+    ALTER TABLE user_roles ADD COLUMN scope_id UUID;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user_roles' AND column_name = 'is_active') THEN
+    ALTER TABLE user_roles ADD COLUMN is_active BOOLEAN DEFAULT true;
+  END IF;
+END $$;
 
 DO $$
 BEGIN

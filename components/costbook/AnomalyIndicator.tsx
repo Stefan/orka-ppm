@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import { AlertTriangle, Zap, TrendingUp, Users, FileText } from 'lucide-react'
 import { AnomalyResult, AnomalyType } from '@/lib/costbook/anomaly-detection'
 
@@ -187,6 +188,7 @@ export function AnomalySummaryBadge({
   severity: 'low' | 'medium' | 'high' | 'critical'
   className?: string
 }) {
+  const { t } = useTranslations()
   if (count === 0) return null
 
   const colors = getSeverityColors(severity)
@@ -203,7 +205,7 @@ export function AnomalySummaryBadge({
         rounded-full
         ${className}
       `}
-      title={`${count} ${severity} severity anomal${count === 1 ? 'y' : 'ies'} detected`}
+      title={t('common.severityAnomaliesDetected', { count, severity })}
     >
       <span className={colors.icon}>
         {icon}

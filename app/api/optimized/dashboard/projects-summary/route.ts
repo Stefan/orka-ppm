@@ -8,13 +8,18 @@ export async function GET(request: NextRequest) {
     const authHeader = request.headers.get('authorization')
     const limit = searchParams.get('limit') || '10'
     const offset = searchParams.get('offset') || '0'
-    
+    const portfolioId = searchParams.get('portfolio_id')
+
+    const params = new URLSearchParams({ limit, offset })
+    if (portfolioId) params.set('portfolio_id', portfolioId)
+    const backendUrl = `${BACKEND_URL}/projects?${params.toString()}`
+
     // Forward request to backend
-    const response = await fetch(`${BACKEND_URL}/projects?limit=${limit}&offset=${offset}`, {
+    const response = await fetch(backendUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        ...(authHeader && { 'Authorization': authHeader }),
+        ...(authHeader && { Authorization: authHeader }),
       },
     })
     

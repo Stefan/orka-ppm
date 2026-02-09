@@ -9,20 +9,19 @@ import os
 # Add backend to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-# Mock environment variables before importing main
+# Mock environment so main can load for tests that patch main.supabase
 with patch.dict(os.environ, {
     'SUPABASE_URL': 'https://test.supabase.co',
     'SUPABASE_ANON_KEY': 'test_key',
     'SUPABASE_JWT_SECRET': 'test_secret',
     'OPENAI_API_KEY': 'test_openai_key'
 }):
-    from main import (
-        calculate_advanced_skill_match_score,
-        calculate_enhanced_resource_availability,
-        ResourceCreate,
-        ResourceUpdate,
-        ResourceResponse
-    )
+    import main  # noqa: F401 - needed so main.supabase exists for patches
+from utils.resource_calculations import (
+    calculate_advanced_skill_match_score,
+    calculate_enhanced_resource_availability,
+)
+from models.resources import ResourceCreate, ResourceUpdate, ResourceResponse
 
 
 class TestSkillMatching:

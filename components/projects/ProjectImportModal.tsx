@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import { useDropzone } from 'react-dropzone'
 import { Upload, FileText, Copy, Check, AlertCircle, CheckCircle, X, Loader2 } from 'lucide-react'
 import { Modal, ModalFooter } from '@/components/ui/Modal'
@@ -41,6 +42,7 @@ export default function ProjectImportModal({
   onClose,
   portfolioId = ''
 }: ProjectImportModalProps) {
+  const { t } = useTranslations()
   const [method, setMethod] = useState<ImportMethod>('json')
   const [jsonInput, setJsonInput] = useState('')
   const [csvFile, setCsvFile] = useState<File | null>(null)
@@ -350,7 +352,7 @@ export default function ProjectImportModal({
             <AlertDescription>
               <span className="font-medium">Import successful!</span>
               <br />
-              {result.count} project{result.count !== 1 ? 's' : ''} imported successfully.
+              {t('common.projectsImportedSuccessfully', { count: result.count })}
             </AlertDescription>
           </Alert>
         )}
@@ -371,7 +373,7 @@ export default function ProjectImportModal({
             <div className="border border-red-200 dark:border-red-800 rounded-lg overflow-hidden">
               <div className="flex items-center justify-between px-4 py-2 bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800">
                 <span className="text-sm font-medium text-red-800 dark:text-red-300">
-                  {result.errors.length} error{result.errors.length !== 1 ? 's' : ''} found
+                  {t('common.errorsFound', { count: result.errors.length })}
                 </span>
                 <button
                   onClick={handleCopyErrors}

@@ -148,8 +148,12 @@ def test_currency_functions():
     # Import functions from main.py
     import sys
     sys.path.append('.')
-    from main import get_exchange_rate, convert_currency, EXCHANGE_RATES
-    
+    from services.financial_calculations import (
+        get_exchange_rate,
+        convert_currency,
+        BASE_EXCHANGE_RATES as EXCHANGE_RATES,
+    )
+
     print(f"\n📊 Available currencies: {list(EXCHANGE_RATES.keys())}")
     
     # Test exchange rates

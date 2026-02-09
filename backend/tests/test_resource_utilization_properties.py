@@ -23,7 +23,10 @@ with patch.dict(os.environ, {
     'SUPABASE_JWT_SECRET': 'test_secret',
     'OPENAI_API_KEY': 'test_openai_key'
 }):
-    from main import calculate_enhanced_resource_availability, calculate_advanced_skill_match_score
+    from utils.resource_calculations import (
+    calculate_enhanced_resource_availability,
+    calculate_advanced_skill_match_score,
+)
 
 
 # Test data strategies for property-based testing

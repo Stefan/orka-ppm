@@ -15,12 +15,12 @@ from datetime import date, datetime, timedelta
 import uuid
 import json
 
-# Import budget alert functions from main.py
-from main import (
+# Import budget alert helpers and model
+from models.financial import BudgetAlert
+from test_budget_alerts import (
     check_budget_thresholds,
     send_budget_alert_notification,
-    BudgetAlert,
-    calculate_budget_variance
+    calculate_budget_variance,
 )
 
 # Test data strategies for property-based testing

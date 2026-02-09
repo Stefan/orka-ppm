@@ -139,13 +139,19 @@ function calculateKPIs(
 export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization')
-    
+    const { searchParams } = new URL(request.url)
+    const portfolioId = searchParams.get('portfolio_id')
+
     // Get user ID and their KPI preferences
     const userId = await getUserIdFromAuthHeader(authHeader)
     const kpiSettings = await getUserKPISettings(userId)
-    
+
+    const projectsUrl = portfolioId
+      ? `${BACKEND_URL}/projects?portfolio_id=${encodeURIComponent(portfolioId)}`
+      : `${BACKEND_URL}/projects`
+
     // Fetch projects from backend
-    const response = await fetch(`${BACKEND_URL}/projects`, {
+    const response = await fetch(projectsUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

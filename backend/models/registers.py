@@ -17,6 +17,7 @@ REGISTER_TYPES = (
 class RegisterCreate(BaseModel):
     """Create a register entry. type is set by path."""
     project_id: Optional[UUID] = None
+    task_id: Optional[UUID] = None
     data: Dict[str, Any] = Field(default_factory=dict, description="Type-specific fields")
     status: str = "open"
 
@@ -24,6 +25,7 @@ class RegisterCreate(BaseModel):
 class RegisterUpdate(BaseModel):
     """Update a register entry (partial)."""
     project_id: Optional[UUID] = None
+    task_id: Optional[UUID] = None
     data: Optional[Dict[str, Any]] = None
     status: Optional[str] = None
 
@@ -33,6 +35,7 @@ class RegisterResponse(BaseModel):
     id: UUID
     type: str
     project_id: Optional[UUID] = None
+    task_id: Optional[UUID] = None
     organization_id: UUID
     data: Dict[str, Any]
     status: str

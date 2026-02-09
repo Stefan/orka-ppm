@@ -261,7 +261,76 @@
     "alerts": {
       "one": "{count} अलर्ट",
       "other": "{count} अलर्ट"
-    }
+    },
+    "errors": {
+      "one": "{count} त्रुटि",
+      "other": "{count} त्रुटियाँ"
+    },
+    "warnings": {
+      "one": "{count} चेतावनी",
+      "other": "{count} चेतावनियाँ"
+    },
+    "conflicts": {
+      "one": "{count} संघर्ष",
+      "other": "{count} संघर्ष"
+    },
+    "approvals": {
+      "one": "{count} स्वीकृति लंबित",
+      "other": "{count} स्वीकृतियाँ लंबित"
+    },
+    "approvalsFromYou": {
+      "one": "{count} आपकी स्वीकृति लंबित",
+      "other": "{count} आपकी स्वीकृतियाँ लंबित"
+    },
+    "approvers": {
+      "one": "{count} स्वीकर्ता",
+      "other": "{count} स्वीकर्ता"
+    },
+    "changes": {
+      "one": "{count} परिवर्तन",
+      "other": "{count} परिवर्तन"
+    },
+    "vendors": {
+      "one": "{count} विक्रेता",
+      "other": "{count} विक्रेता"
+    },
+    "transactions": {
+      "one": "{count} लेनदेन",
+      "other": "{count} लेनदेन"
+    },
+    "comments": { "one": "{count} टिप्पणी", "other": "{count} टिप्पणियाँ" },
+    "guides": { "one": "{count} गाइड", "other": "{count} गाइड" },
+    "fields": { "one": "{count} फ़ील्ड", "other": "{count} फ़ील्ड" },
+    "typesSelected": { "one": "{count} प्रकार चयनित", "other": "{count} प्रकार चयनित" },
+    "replies": { "one": "{count} जवाब", "other": "{count} जवाब" },
+    "permissions": { "one": "{count} अनुमति", "other": "{count} अनुमतियाँ" },
+    "activities": { "one": "{count} गतिविधि", "other": "{count} गतिविधियाँ" },
+    "anomalies": { "one": "{count} विसंगति", "other": "{count} विसंगतियाँ" },
+    "tasks": { "one": "{count} कार्य", "other": "{count} कार्य" },
+    "widgets": { "one": "{count} विजेट", "other": "{count} विजेट" },
+    "showingVendors": { "one": "1 विक्रेता दिख रहा है", "other": "{count} विक्रेता दिख रहे हैं" },
+    "showingTransactions": { "one": "1 लेनदेन दिख रहा है", "other": "{count} लेनदेन दिख रहे हैं" },
+    "changesPending": { "one": "1 परिवर्तन लंबित", "other": "{count} परिवर्तन लंबित" },
+    "errorsFound": { "one": "1 त्रुटि मिली", "other": "{count} त्रुटियाँ मिलीं" },
+    "warningsFound": { "one": "1 चेतावनी", "other": "{count} चेतावनियाँ" },
+    "conflictsNeedResolution": { "one": "1 संघर्ष का समाधान आवश्यक", "other": "{count} संघर्षों का समाधान आवश्यक" },
+    "fieldsAffected": { "one": "1 फ़ील्ड प्रभावित", "other": "{count} फ़ील्ड प्रभावित" },
+    "projectsImportedSuccessfully": { "one": "1 परियोजना सफलतापूर्वक आयात की गई।", "other": "{count} परियोजनाएँ सफलतापूर्वक आयात की गईं।" },
+    "changesWaitingToSync": { "one": "आपके पास 1 परिवर्तन सिंक की प्रतीक्षा में है।", "other": "आपके पास {count} परिवर्तन सिंक की प्रतीक्षा में हैं।" },
+    "activeTasks": { "one": "1 सक्रिय कार्य", "other": "{count} सक्रिय कार्य" },
+    "newItemsSinceLastView": { "one": "पिछले दृश्य के बाद 1 नया आइटम", "other": "पिछले दृश्य के बाद {count} नए आइटम" },
+    "guidesAvailable": { "one": "1 गाइड उपलब्ध", "other": "{count} गाइड उपलब्ध" },
+    "anomaliesDetected": { "one": "1 विसंगति का पता चला", "other": "{count} विसंगतियों का पता चला" },
+    "suspiciousActivitiesDetected": { "one": "1 संदिग्ध गतिविधि का पता चला", "other": "{count} संदिग्ध गतिविधियों का पता चला" },
+    "justNow": "अभी-अभी",
+    "minutesAgo": { "one": "{count} मिनट पहले", "other": "{count} मिनट पहले" },
+    "hoursAgo": { "one": "{count} घंटे पहले", "other": "{count} घंटे पहले" },
+    "daysAgo": { "one": "{count} दिन पहले", "other": "{count} दिन पहले" },
+    "weeksAgo": { "one": "{count} सप्ताह पहले", "other": "{count} सप्ताह पहले" },
+    "monthsAgo": { "one": "{count} महीने पहले", "other": "{count} महीने पहले" },
+    "yearsAgo": { "one": "{count} साल पहले", "other": "{count} साल पहले" },
+    "days": { "one": "{count} दिन", "other": "{count} दिन" },
+    "weeks": { "one": "{count} सप्ताह", "other": "{count} सप्ताह" }
   },
   "dataImport": {
     "title": "डेटा आयात",
@@ -368,6 +437,7 @@
     "title": "AI सहायता सहायक"
   },
   "helpChat": {
+    "sendButtonLabel": "संदेश भेजें",
     "placeholder": "PPM के बारे में कुछ पूछें...",
     "welcome": "AI सहायता सहायक में आपका स्वागत है!",
     "welcomeMessage": "PPM प्लेटफ़ॉर्म सुविधाओं के बारे में कुछ भी पूछें और मैं आपकी सहायता करूँगा।",

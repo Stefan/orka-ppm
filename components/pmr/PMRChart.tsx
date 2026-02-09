@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useCallback, useMemo } from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import InteractiveChart from '../charts/InteractiveChart'
 import { AIInsight } from './types'
 import { 
@@ -86,6 +87,7 @@ const PMRChart: React.FC<PMRChartProps> = ({
   onDataPointClick,
   onExport
 }) => {
+  const { t } = useTranslations()
   const [selectedDataPoint, setSelectedDataPoint] = useState<PMRChartDataPoint | null>(null)
   const [showInsightOverlay, setShowInsightOverlay] = useState(false)
   const [expandedView, setExpandedView] = useState(false)
@@ -446,7 +448,7 @@ const PMRChart: React.FC<PMRChartProps> = ({
                   className="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 text-xs rounded-full hover:bg-orange-200 flex items-center space-x-1"
                 >
                   <AlertTriangle className="h-3 w-3" />
-                  <span>{point.name}: {criticalInsights.length} alert{criticalInsights.length > 1 ? 's' : ''}</span>
+                  <span>{point.name}: {t('common.alerts', { count: criticalInsights.length })}</span>
                 </button>
               )
             })}

@@ -103,7 +103,10 @@ Step-by-step actions for common incidents. See also [audit-deployment-checklist.
 
 **Maßnahmen:**
 1. **Hohe Fehlerrate:** Ursache der Fehler beheben (siehe Runbook [2. High error rate](#2-high-error-rate--5xx)); danach sinkt die Fehlerrate mit neuem Traffic oder nach **Statistiken zurücksetzen** (siehe unten).
-2. **Viele langsame Abfragen:** Langsame Endpoints optimieren (DB-Queries, Indizes, Timeouts) oder Last reduzieren; Schwellwert für „langsam“ ist 1 s (Backend `performance_tracker`). Häufige Kandidaten: **GET /csv-import/commitments** und **GET /csv-import/actuals** – bei großen Limits (z. B. Dashboard) Query-Parameter `count_exact=false` setzen, um die teure COUNT-Abfrage zu vermeiden (Frontend nutzt das bereits für Dashboard- und Listen-Aufrufe ohne Pagination).
+2. **Viele langsame Abfragen:** Schwellwert „langsam“ ist 1 s (Backend `performance_tracker`). Häufige Kandidaten:
+   - **GET /csv-import/commitments** und **GET /csv-import/actuals:** Frontend nutzt `count_exact=false` und begrenzt das Dashboard auf 2000 Zeilen (VarianceKPIs). Bei weiterer Langsamkeit: Limit in `VarianceKPIs.tsx` prüfen oder Backend-Cache (Redis) sicherstellen.
+   - **GET /api/workflows/instances/my-workflows:** Response wird 60 s gecacht; ohne `REDIS_URL` gibt es keinen Cache (jeder Request trifft die DB). In Produktion `REDIS_URL` setzen, damit `cache_manager` aktiv ist.
+   - Allgemein: DB-Indizes prüfen (z. B. Migration `055_performance_indexes_audit_financial.sql`), Timeouts anpassen, Last reduzieren.
 3. **Statistiken zurücksetzen:** Wenn das Problem behoben ist und der Status sich erst mit der Zeit erholen soll, kann ein System-Admin die Performance-Statistiken zurücksetzen (Endpoint `POST /api/admin/performance/reset` mit Permission `system_admin`). Danach ist der Status wieder „Gesund“, bis neue Fehler oder langsame Requests anfallen.
 
 **Referenz:** Backend-Logik: `backend/middleware/performance_tracker.py` → `get_health_status()`.

@@ -7,7 +7,7 @@ import { Users, Activity, Settings, Layers, ToggleLeft, MessageCircle, Building2
 
 export default function AdminPage() {
   const router = useRouter()
-  const t = useTranslations()
+  const { t } = useTranslations()
 
   return (
     <AppLayout>

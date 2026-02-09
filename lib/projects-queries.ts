@@ -24,8 +24,14 @@ export interface ProjectListItem {
   }
 }
 
-async function fetchProjects(accessToken: string): Promise<ProjectListItem[]> {
-  const response = await fetch('/api/projects', {
+async function fetchProjects(
+  accessToken: string,
+  portfolioId?: string | null
+): Promise<ProjectListItem[]> {
+  const url = portfolioId
+    ? `/api/projects?portfolio_id=${encodeURIComponent(portfolioId)}`
+    : '/api/projects'
+  const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
@@ -40,12 +46,16 @@ const PROJECTS_QUERY_KEY = ['projects'] as const
 
 /**
  * Fetches projects list with React Query (deduplication + client cache).
- * Keyed by userId so cache is per-user; staleTime from QueryProvider (5 min).
+ * Keyed by userId and optional portfolioId; when portfolioId is set, list is scoped to that portfolio.
  */
-export function useProjectsQuery(accessToken: string | undefined, userId: string | undefined) {
+export function useProjectsQuery(
+  accessToken: string | undefined,
+  userId: string | undefined,
+  portfolioId?: string | null
+) {
   return useQuery({
-    queryKey: [...PROJECTS_QUERY_KEY, userId ?? ''],
-    queryFn: () => fetchProjects(accessToken!),
+    queryKey: [...PROJECTS_QUERY_KEY, userId ?? '', portfolioId ?? ''],
+    queryFn: () => fetchProjects(accessToken!, portfolioId),
     enabled: Boolean(accessToken && userId),
     staleTime: 60 * 1000, // 1 min for projects list
   })

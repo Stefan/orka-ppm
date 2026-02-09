@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import { useDropzone } from 'react-dropzone'
 import { 
   Upload, 
@@ -86,6 +87,7 @@ export const POImportExportInterface: React.FC<POImportExportInterfaceProps> = (
   onExportComplete,
   className = ''
 }) => {
+  const { t } = useTranslations()
   const [mode, setMode] = useState<'import' | 'export'>('import')
   const [importFile, setImportFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
@@ -407,7 +409,7 @@ export const POImportExportInterface: React.FC<POImportExportInterfaceProps> = (
                 <div className="border border-red-200 dark:border-red-800 rounded-lg overflow-hidden">
                   <div className="flex items-center justify-between px-4 py-3 bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800">
                     <span className="text-sm font-medium text-red-800 dark:text-red-300">
-                      {result.errors.length} error{result.errors.length !== 1 ? 's' : ''} found
+                      {t('common.errorsFound', { count: result.errors.length })}
                     </span>
                     <button
                       onClick={handleCopyErrors}
@@ -465,7 +467,7 @@ export const POImportExportInterface: React.FC<POImportExportInterfaceProps> = (
               <Alert variant="default" className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-300">
                 <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
                 <AlertDescription>
-                  <span className="font-medium">{result.warnings.length} warning{result.warnings.length !== 1 ? 's' : ''}</span>
+                  <span className="font-medium">{t('common.warningsFound', { count: result.warnings.length })}</span>
                   <ul className="mt-2 space-y-1 text-sm">
                     {result.warnings.slice(0, 3).map((warning, idx) => (
                       <li key={idx}>Row {warning.row_number}: {warning.error}</li>

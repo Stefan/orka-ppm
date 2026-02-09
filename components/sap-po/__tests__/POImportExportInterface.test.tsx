@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { renderWithI18n, screen, fireEvent, waitFor } from '@/__tests__/utils/test-wrapper'
 import '@testing-library/jest-dom'
 import { POImportExportInterface } from '../POImportExportInterface'
 
@@ -12,14 +12,14 @@ describe('POImportExportInterface', () => {
   })
 
   it('renders import mode by default', () => {
-    render(<POImportExportInterface projectId="test-project" />)
+    renderWithI18n(<POImportExportInterface projectId="test-project" />)
     
     expect(screen.getByText('Import SAP Data')).toBeInTheDocument()
     expect(screen.getByText('Import PO Breakdown Data')).toBeInTheDocument()
   })
 
   it('switches between import and export modes', () => {
-    render(<POImportExportInterface projectId="test-project" />)
+    renderWithI18n(<POImportExportInterface projectId="test-project" />)
     
     // Click export tab
     const exportButton = screen.getByText('Export Data')
@@ -30,14 +30,14 @@ describe('POImportExportInterface', () => {
   })
 
   it('displays file upload area in import mode', () => {
-    render(<POImportExportInterface projectId="test-project" />)
+    renderWithI18n(<POImportExportInterface projectId="test-project" />)
     
     expect(screen.getByText(/Drag & drop a file here/i)).toBeInTheDocument()
     expect(screen.getByText(/Supported formats: CSV, XLS, XLSX/i)).toBeInTheDocument()
   })
 
   it('shows export format options in export mode', () => {
-    render(<POImportExportInterface projectId="test-project" />)
+    renderWithI18n(<POImportExportInterface projectId="test-project" />)
     
     // Switch to export mode
     fireEvent.click(screen.getByText('Export Data'))
@@ -48,7 +48,7 @@ describe('POImportExportInterface', () => {
   })
 
   it('displays export configuration options', () => {
-    render(<POImportExportInterface projectId="test-project" />)
+    renderWithI18n(<POImportExportInterface projectId="test-project" />)
     
     // Switch to export mode
     fireEvent.click(screen.getByText('Export Data'))
@@ -79,7 +79,7 @@ describe('POImportExportInterface', () => {
     })
 
     const onImportComplete = jest.fn()
-    render(
+    renderWithI18n(
       <POImportExportInterface 
         projectId="test-project" 
         onImportComplete={onImportComplete}
@@ -119,14 +119,14 @@ describe('POImportExportInterface', () => {
       json: async () => mockResult
     })
 
-    render(<POImportExportInterface projectId="test-project" />)
+    renderWithI18n(<POImportExportInterface projectId="test-project" />)
 
     // The error display would be shown after import completes
     // This is a simplified test - full implementation would need file upload simulation
   })
 
   it('shows progress during import', () => {
-    render(<POImportExportInterface projectId="test-project" />)
+    renderWithI18n(<POImportExportInterface projectId="test-project" />)
     
     // Progress bar would be shown during loading state
     // This test verifies the component structure
@@ -134,7 +134,7 @@ describe('POImportExportInterface', () => {
   })
 
   it('allows filter configuration in export mode', () => {
-    render(<POImportExportInterface projectId="test-project" />)
+    renderWithI18n(<POImportExportInterface projectId="test-project" />)
     
     // Switch to export mode
     fireEvent.click(screen.getByText('Export Data'))

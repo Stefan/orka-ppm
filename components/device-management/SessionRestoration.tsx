@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import { 
   Smartphone, 
   Monitor, 
@@ -31,6 +32,7 @@ export const SessionRestoration: React.FC<SessionRestorationProps> = ({
   onClose,
   onRestore
 }) => {
+  const { t } = useTranslations()
   const { 
     availableSnapshots, 
     restoreFromDevice, 
@@ -220,10 +222,10 @@ export const SessionRestoration: React.FC<SessionRestorationProps> = ({
                       
                       <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-slate-400">
                         {snapshot.activeTasks.length > 0 && (
-                          <span>{snapshot.activeTasks.length} active task{snapshot.activeTasks.length !== 1 ? 's' : ''}</span>
+                          <span>{t('common.activeTasks', { count: snapshot.activeTasks.length })}</span>
                         )}
                         {snapshot.workspaceState.activeWidgets.length > 0 && (
-                          <span>{snapshot.workspaceState.activeWidgets.length} widget{snapshot.workspaceState.activeWidgets.length !== 1 ? 's' : ''}</span>
+                          <span>{t('common.widgets', { count: snapshot.workspaceState.activeWidgets.length })}</span>
                         )}
                       </div>
                     </button>
@@ -328,7 +330,7 @@ export const SessionRestoration: React.FC<SessionRestorationProps> = ({
                             <div key={formId} className="text-sm">
                               <span className="text-gray-600 dark:text-slate-400">Form {formId}:</span>
                               <span className="ml-2 text-gray-700 dark:text-slate-300">
-                                {Object.keys(data as any).length} field{Object.keys(data as any).length !== 1 ? 's' : ''}
+                                {t('common.fields', { count: Object.keys(data as any).length })}
                               </span>
                             </div>
                           ))}

@@ -4,7 +4,7 @@ Phase 2 & 3: Distribution Settings and Rules
 """
 import pytest
 from datetime import datetime, timedelta
-from backend.services.distribution_rules_engine import (
+from services.distribution_rules_engine import (
     DistributionRulesEngine,
     DistributionProfile,
     DistributionRuleType,

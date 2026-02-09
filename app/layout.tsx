@@ -1,19 +1,10 @@
 import React from 'react'
 import type { Metadata } from 'next'
+import dynamic from 'next/dynamic'
 import { Inter } from 'next/font/google'
-import { QueryProvider } from './providers/QueryProvider'
-import { SupabaseAuthProvider } from './providers/SupabaseAuthProvider'
-import { FeatureFlagProvider } from '@/contexts/FeatureFlagContext'
-import { EnhancedAuthProvider } from './providers/EnhancedAuthProvider'
-import { ThemeProvider, ThemeScript } from './providers/ThemeProvider'
-import { ErrorBoundary } from '../components/shared/ErrorBoundary'
-import { ToastProvider } from '../components/shared/Toast'
-import PerformanceOptimizer from '../components/performance/PerformanceOptimizer'
-import { ResourcePreloader } from '../components/performance/ResourcePreloader'
-import PredictivePrefetcher from '../components/performance/PredictivePrefetcher'
-import FirefoxSidebarFix from '../components/navigation/FirefoxSidebarFix'
-import { I18nProvider } from '@/lib/i18n/context'
-import { RtlDirection } from '../components/navigation/RtlDirection'
+import { ThemeScript } from './ThemeScript'
+
+const RootClientContent = dynamic(() => import('./RootClientContent'), { ssr: true })
 
 // Import critical CSS directly - Next.js will optimize and inline it automatically
 import './critical.css'
@@ -141,30 +132,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             Orka PPM – Please enable JavaScript to use this app.
           </div>
         </noscript>
-        {/* Root loading removed - was causing dark mode issues */}
-        <FirefoxSidebarFix />
-        <ResourcePreloader />
-        <PredictivePrefetcher enabled={true} />
-        <PerformanceOptimizer>
-          <ErrorBoundary>
-            <QueryProvider>
-            <SupabaseAuthProvider>
-              <ThemeProvider>
-                <EnhancedAuthProvider>
-                  <FeatureFlagProvider>
-                    <I18nProvider>
-                      <RtlDirection />
-                      <ToastProvider>
-                        {children}
-                      </ToastProvider>
-                    </I18nProvider>
-                  </FeatureFlagProvider>
-                </EnhancedAuthProvider>
-              </ThemeProvider>
-            </SupabaseAuthProvider>
-            </QueryProvider>
-          </ErrorBoundary>
-        </PerformanceOptimizer>
+        <RootClientContent>{children}</RootClientContent>
       </body>
     </html>
   )

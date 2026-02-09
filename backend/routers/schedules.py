@@ -8,7 +8,7 @@ Provides REST API endpoints for:
 - Schedule performance metrics
 """
 
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, Request
 from fastapi.responses import Response
 from typing import List, Optional, Dict, Any
 from uuid import UUID
@@ -60,18 +60,29 @@ schedule_notifications_service = ScheduleNotificationsService()
 # SCHEDULE CRUD ENDPOINTS
 # =====================================================
 
+SCHEDULES_LIST_CACHE_TTL = 60  # seconds
+
 @router.get("/", response_model=Dict[str, Any])
 async def list_schedules(
+    request: Request,
     project_id: Optional[UUID] = Query(None, description="Filter by project ID"),
     status: Optional[str] = Query(None, description="Filter by status"),
     page: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1, le=1000),
     sort_by: Optional[str] = Query("created_at"),
     sort_order: str = Query("desc", pattern="^(asc|desc)$"),
+    count_exact: bool = Query(False, description="Request exact total count (slower)"),
     current_user: dict = Depends(get_current_user),
 ):
-    """List schedules with filtering and pagination."""
+    """List schedules with filtering and pagination. Response cached 60s. Default count_exact=False for faster response."""
     try:
+        cache = getattr(request.app.state, "cache_manager", None)
+        org_id = (current_user.get("organization_id") or current_user.get("tenant_id") or "") or ""
+        cache_key = f"schedules:list:{org_id}:{project_id}:{status}:{page}:{page_size}:{sort_by}:{sort_order}:{count_exact}"
+        if cache:
+            cached = await cache.get(cache_key)
+            if cached is not None:
+                return cached
         schedules, total = await schedule_manager.list_schedules(
             project_id=project_id,
             status=status,
@@ -79,23 +90,32 @@ async def list_schedules(
             page_size=page_size,
             sort_by=sort_by,
             sort_order=sort_order,
+            count_exact=count_exact,
         )
-        return {"schedules": schedules, "total": total, "page": page, "page_size": page_size}
+        result = {"schedules": schedules, "total": total, "page": page, "page_size": page_size}
+        if cache:
+            cache_value = {"schedules": [s.model_dump() if hasattr(s, "model_dump") else s for s in schedules], "total": total, "page": page, "page_size": page_size}
+            await cache.set(cache_key, cache_value, ttl=SCHEDULES_LIST_CACHE_TTL)
+        return result
     except Exception as e:
         logger.error(f"Error listing schedules: {e}")
         raise HTTPException(status_code=500, detail="Failed to list schedules")
 
 @router.post("/", response_model=ScheduleResponse)
 async def create_schedule(
+    request: Request,
     project_id: UUID,
     schedule_data: ScheduleCreate,
     current_user: dict = Depends(get_current_user)
 ):
-    """Create a new project schedule."""
+    """Create a new project schedule. Invalidates list cache."""
     try:
         schedule = await schedule_manager.create_schedule(
             project_id, schedule_data, UUID(current_user["id"])
         )
+        cache = getattr(request.app.state, "cache_manager", None)
+        if cache and getattr(cache, "clear_pattern", None):
+            await cache.clear_pattern("schedules:list:*")
         return schedule
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -143,16 +163,20 @@ async def get_schedule_with_tasks(
 
 @router.put("/{schedule_id}", response_model=ScheduleResponse)
 async def update_schedule(
+    request: Request,
     schedule_id: UUID,
     updates: ScheduleUpdate,
     current_user: dict = Depends(get_current_user)
 ):
-    """Update an existing schedule."""
+    """Update an existing schedule. Invalidates list and single-schedule cache."""
     try:
         schedule = await schedule_manager.update_schedule(
             schedule_id, updates, UUID(current_user["id"])
         )
         invalidate_schedule(schedule_id)
+        cache = getattr(request.app.state, "cache_manager", None)
+        if cache and getattr(cache, "clear_pattern", None):
+            await cache.clear_pattern("schedules:list:*")
         return schedule
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -162,14 +186,18 @@ async def update_schedule(
 
 @router.delete("/{schedule_id}")
 async def delete_schedule(
+    request: Request,
     schedule_id: UUID,
     current_user: dict = Depends(get_current_user)
 ):
-    """Delete a schedule and all its tasks."""
+    """Delete a schedule and all its tasks. Invalidates list cache."""
     try:
         success = await schedule_manager.delete_schedule(schedule_id)
         if not success:
             raise HTTPException(status_code=404, detail="Schedule not found")
+        cache = getattr(request.app.state, "cache_manager", None)
+        if cache and getattr(cache, "clear_pattern", None):
+            await cache.clear_pattern("schedules:list:*")
         return {"message": "Schedule deleted successfully"}
     except Exception as e:
         logger.error(f"Error deleting schedule: {e}")

@@ -172,16 +172,16 @@ export default function TopbarSearch() {
   }
 
   return (
-    <div ref={containerRef} className="relative flex-1 min-w-0 max-w-48 lg:max-w-xs xl:max-w-md mx-2 md:mx-4">
-      <div className="relative flex items-center">
-        <Search className="absolute left-3 h-4 w-4 text-gray-400 dark:text-slate-500 pointer-events-none" />
+    <div ref={containerRef} className="relative flex-shrink-0 w-56 sm:w-64 lg:w-72 xl:w-80 mx-2 md:mx-4 self-center">
+      <div className="relative flex items-center h-10 min-h-10">
+        <Search className="absolute left-3 h-4 w-4 text-gray-400 dark:text-slate-500 pointer-events-none shrink-0" aria-hidden />
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query.trim() && setOpen(true)}
           placeholder={t('topbar.searchPlaceholder')}
-          className="w-full min-w-0 pl-10 pr-10 py-2 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder-gray-500 dark:placeholder-slate-400 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 focus:shadow outline-none transition-all"
+          className="w-full min-w-0 h-10 min-h-10 pl-10 pr-10 rounded-lg border-2 border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder-gray-500 dark:placeholder-slate-400 text-sm shadow-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors box-border"
           aria-label={t('topbar.searchAria')}
         />
         {voiceSupported && (

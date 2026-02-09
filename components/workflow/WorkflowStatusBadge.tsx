@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react'
+import { useTranslations } from '@/lib/i18n/context'
 
 interface WorkflowStatusBadgeProps {
   status: string
@@ -17,6 +18,7 @@ export default function WorkflowStatusBadge({
   pendingApprovals,
   onClick
 }: WorkflowStatusBadgeProps) {
+  const { t } = useTranslations()
   const getStatusConfig = () => {
     switch (status) {
       case 'pending':
@@ -102,7 +104,7 @@ export default function WorkflowStatusBadge({
             <div className="mt-2 pt-2 border-t border-current/20">
               <div className="flex items-center gap-1 font-medium text-xs">
                 <AlertCircle size={14} />
-                <span>{pendingApprovals} pending approval{pendingApprovals !== 1 ? 's' : ''}</span>
+                <span>{t('common.approvals', { count: pendingApprovals })}</span>
               </div>
             </div>
           )}

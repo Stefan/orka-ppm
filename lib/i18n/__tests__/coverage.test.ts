@@ -318,13 +318,10 @@ describe('Translation Coverage Report', () => {
       expect(output).toContain('Total Keys:');
       expect(output).toContain('Overall Coverage:');
 
-      // Verify all languages are mentioned
-      expect(output).toContain('English');
-      expect(output).toContain('German');
-      expect(output).toContain('French');
-      expect(output).toContain('Spanish');
-      expect(output).toContain('Polish');
-      expect(output).toContain('Swiss German');
+      // Verify all supported languages are mentioned in output
+      for (const lang of SUPPORTED_LANGUAGES) {
+        expect(output).toContain(lang.name);
+      }
 
       consoleSpy.mockRestore();
     });

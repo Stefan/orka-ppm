@@ -1,6 +1,7 @@
 'use client'
 
 import { CheckCircle, XCircle, Clock, AlertCircle, ArrowRight, User } from 'lucide-react'
+import { useTranslations } from '@/lib/i18n/context'
 
 interface WorkflowApproval {
   id: string
@@ -35,6 +36,7 @@ export default function WorkflowStatus({
   workflowInstance, 
   showDetails = false 
 }: WorkflowStatusProps) {
+  const { t } = useTranslations()
   const getStatusConfig = () => {
     switch (workflowInstance.status) {
       case 'pending':
@@ -238,7 +240,7 @@ export default function WorkflowStatus({
                         )}
                       </h5>
                       <span className="text-xs text-gray-600 dark:text-slate-400">
-                        {approvals.length} approver{approvals.length !== 1 ? 's' : ''}
+                        {t('common.approvers', { count: approvals.length })}
                       </span>
                     </div>
                     

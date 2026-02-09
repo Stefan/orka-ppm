@@ -862,12 +862,26 @@ async def dismiss_proactive_tip(
             detail=f"Failed to dismiss tip: {str(e)}"
         )
 
+HELP_LANGUAGES_CACHE_TTL = 300  # 5 min
+
 @router.get("/languages", response_model=List[Dict[str, Any]])
 async def get_supported_languages(
-    current_user = Depends(get_current_user)
+    request: Request,
+    current_user = Depends(get_current_user),
 ):
-    """Get list of supported languages (cached 5 min at client)."""
+    """Get list of supported languages (cached 5 min server-side and at client)."""
+    cache = getattr(request.app.state, "cache_manager", None)
+    cache_key = "ai:help:languages"
+    if cache:
+        cached = await cache.get(cache_key)
+        if cached is not None:
+            return JSONResponse(
+                content=cached,
+                headers={"Cache-Control": "public, max-age=300"},
+            )
     try:
+        if cache:
+            await cache.set(cache_key, SUPPORTED_LANGUAGES, ttl=HELP_LANGUAGES_CACHE_TTL)
         return JSONResponse(
             content=SUPPORTED_LANGUAGES,
             headers={"Cache-Control": "public, max-age=300"},

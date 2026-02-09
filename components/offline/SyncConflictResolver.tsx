@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useCallback } from 'react'
+import { useTranslations } from '@/lib/i18n/context'
 import { AlertTriangle, Smartphone, Monitor, Tablet, X, GitMerge } from 'lucide-react'
 import { useCrossDeviceSync } from '../../hooks/useCrossDeviceSync'
 import { SyncConflict } from '../../lib/sync/cross-device-sync'
@@ -18,6 +19,7 @@ export const SyncConflictResolver: React.FC<SyncConflictResolverProps> = ({
   isOpen,
   onClose
 }) => {
+  const { t } = useTranslations()
   const { conflicts, resolveConflict } = useCrossDeviceSync()
   const [selectedConflict, setSelectedConflict] = useState<SyncConflict | null>(null)
   const [isResolving, setIsResolving] = useState(false)
@@ -110,7 +112,7 @@ export const SyncConflictResolver: React.FC<SyncConflictResolverProps> = ({
                 Sync Conflicts Detected
               </h2>
               <p className="text-sm text-gray-600 dark:text-slate-400">
-                {conflicts.length} conflict{conflicts.length !== 1 ? 's' : ''} need{conflicts.length === 1 ? 's' : ''} resolution
+                {t('common.conflictsNeedResolution', { count: conflicts.length })}
               </p>
             </div>
           </div>
@@ -147,7 +149,7 @@ export const SyncConflictResolver: React.FC<SyncConflictResolverProps> = ({
                       </span>
                     </div>
                     <div className="text-xs text-gray-600 dark:text-slate-400">
-                      {conflict.conflictFields.length} field{conflict.conflictFields.length !== 1 ? 's' : ''} affected
+                      {t('common.fieldsAffected', { count: conflict.conflictFields.length })}
                     </div>
                   </button>
                 ))}

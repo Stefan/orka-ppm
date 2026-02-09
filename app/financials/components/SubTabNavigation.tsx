@@ -53,7 +53,7 @@ const SubTabButton = React.memo(({
 SubTabButton.displayName = 'SubTabButton'
 
 export default function SubTabNavigation({ activeTab, onTabChange }: SubTabNavigationProps) {
-  const t = useTranslations()
+  const { t } = useTranslations()
   return (
     <div className="bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-1 mb-6">
       <div className="flex gap-1">

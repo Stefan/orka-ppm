@@ -22,7 +22,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fastapi.testclient import TestClient
 from fastapi import status
 
-# Import application components
+# Skip entire module if optional context_analyzer service is not installed
+pytest.importorskip("services.context_analyzer")
+
 from main import app
 from models.help_content import HelpContentCreate, ContentType
 from services.help_rag_agent import HelpRAGAgent

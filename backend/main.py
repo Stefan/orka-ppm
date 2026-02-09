@@ -604,6 +604,17 @@ async def shutdown_event():
         except Exception as e:
             logger.warning("Error stopping rundown scheduler: %s", e)
 
+# #region agent log
+try:
+    import json as _json
+    _logpath = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".cursor", "debug.log"))
+    _public = [n for n in dir() if not n.startswith("_")]
+    with open(_logpath, "a") as _f:
+        _f.write(_json.dumps({"id":"main_exports","timestamp":int(__import__("time").time()*1000),"location":"main.py","message":"main exports","data":{"exported":_public},"runId":"pytest","hypothesisId":"H1"}) + "\n")
+except Exception:
+    pass
+# #endregion
+
 # For deployment - Vercel serverless function handler
 handler = app
 

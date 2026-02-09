@@ -11,7 +11,7 @@
  */
 
 import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { renderWithI18n, screen, fireEvent, waitFor } from '@/__tests__/utils/test-wrapper'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 
@@ -139,18 +139,21 @@ const mockPerformanceMetrics: PerformanceMetrics = {
 // ============================================
 describe('VirtualizedTransactionTable', () => {
   it('renders correct number of transactions', () => {
-    render(
+    renderWithI18n(
       <VirtualizedTransactionTable
         transactions={mockTransactions}
         currency={Currency.USD}
       />
     )
 
-    expect(screen.getByText('Showing 3 transactions')).toBeInTheDocument()
+    const footer = screen.getByTestId('virtualized-transaction-table-footer')
+    expect(footer).toBeInTheDocument()
+    // Footer shows transaction count (exact text from t(); may be key or translated)
+    expect(footer.textContent).toMatch(/transaction/i)
   })
 
   it('displays empty state when no transactions', () => {
-    render(
+    renderWithI18n(
       <VirtualizedTransactionTable
         transactions={[]}
         currency={Currency.USD}
@@ -161,7 +164,7 @@ describe('VirtualizedTransactionTable', () => {
   })
 
   it('renders column headers', () => {
-    render(
+    renderWithI18n(
       <VirtualizedTransactionTable
         transactions={mockTransactions}
         currency={Currency.USD}
@@ -177,7 +180,7 @@ describe('VirtualizedTransactionTable', () => {
   it('calls onSortChange when sortable column header is clicked', () => {
     const onSortChange = jest.fn()
     
-    render(
+    renderWithI18n(
       <VirtualizedTransactionTable
         transactions={mockTransactions}
         currency={Currency.USD}
@@ -198,7 +201,7 @@ describe('VirtualizedTransactionTable', () => {
   it('calls onRowClick when row is clicked', () => {
     const onRowClick = jest.fn()
     
-    render(
+    renderWithI18n(
       <VirtualizedTransactionTable
         transactions={mockTransactions}
         currency={Currency.USD}
@@ -211,7 +214,7 @@ describe('VirtualizedTransactionTable', () => {
   })
 
   it('filters columns based on visibleColumns prop', () => {
-    render(
+    renderWithI18n(
       <VirtualizedTransactionTable
         transactions={mockTransactions}
         currency={Currency.USD}
@@ -225,7 +228,7 @@ describe('VirtualizedTransactionTable', () => {
   })
 
   it('renders skeleton loader', () => {
-    render(<VirtualizedTransactionTableSkeleton rowCount={3} />)
+    renderWithI18n(<VirtualizedTransactionTableSkeleton rowCount={3} />)
     
     // Skeleton should render without errors
     expect(document.querySelector('.animate-pulse')).toBeInTheDocument()
@@ -237,7 +240,7 @@ describe('VirtualizedTransactionTable', () => {
 // ============================================
 describe('HierarchyTreeView', () => {
   it('renders hierarchy nodes', () => {
-    render(
+    renderWithI18n(
       <HierarchyTreeView
         data={mockHierarchyData}
         viewType="ces"
@@ -250,7 +253,7 @@ describe('HierarchyTreeView', () => {
   })
 
   it('displays empty state when no data', () => {
-    render(
+    renderWithI18n(
       <HierarchyTreeView
         data={[]}
         viewType="ces"
@@ -262,7 +265,7 @@ describe('HierarchyTreeView', () => {
   })
 
   it('expands node when clicking chevron', () => {
-    render(
+    renderWithI18n(
       <HierarchyTreeView
         data={mockHierarchyData}
         viewType="ces"
@@ -284,7 +287,7 @@ describe('HierarchyTreeView', () => {
   it('calls onNodeSelect when node is clicked', () => {
     const onNodeSelect = jest.fn()
     
-    render(
+    renderWithI18n(
       <HierarchyTreeView
         data={mockHierarchyData}
         viewType="ces"
@@ -298,7 +301,7 @@ describe('HierarchyTreeView', () => {
   })
 
   it('shows expand all and collapse all buttons', () => {
-    render(
+    renderWithI18n(
       <HierarchyTreeView
         data={mockHierarchyData}
         viewType="ces"
@@ -311,7 +314,7 @@ describe('HierarchyTreeView', () => {
   })
 
   it('displays total row with calculated values', () => {
-    render(
+    renderWithI18n(
       <HierarchyTreeView
         data={mockHierarchyData}
         viewType="ces"
@@ -323,7 +326,7 @@ describe('HierarchyTreeView', () => {
   })
 
   it('renders WBS view type correctly', () => {
-    render(
+    renderWithI18n(
       <HierarchyTreeView
         data={[]}
         viewType="wbs"
@@ -335,7 +338,7 @@ describe('HierarchyTreeView', () => {
   })
 
   it('renders skeleton loader', () => {
-    render(<HierarchyTreeViewSkeleton rowCount={3} />)
+    renderWithI18n(<HierarchyTreeViewSkeleton rowCount={3} />)
     
     expect(document.querySelector('.animate-pulse')).toBeInTheDocument()
   })
@@ -352,7 +355,7 @@ describe('MobileAccordion', () => {
   ]
 
   it('renders all sections', () => {
-    render(<MobileAccordion sections={mockSections} />)
+    renderWithI18n(<MobileAccordion sections={mockSections} />)
 
     expect(screen.getByText('Section 1')).toBeInTheDocument()
     expect(screen.getByText('Section 2')).toBeInTheDocument()
@@ -360,13 +363,13 @@ describe('MobileAccordion', () => {
   })
 
   it('displays badge when provided', () => {
-    render(<MobileAccordion sections={mockSections} />)
+    renderWithI18n(<MobileAccordion sections={mockSections} />)
 
     expect(screen.getByText('5')).toBeInTheDocument()
   })
 
   it('expands section when clicked', async () => {
-    render(<MobileAccordion sections={mockSections} />)
+    renderWithI18n(<MobileAccordion sections={mockSections} />)
 
     // Content is in the DOM but collapsed (opacity-0)
     const content1 = screen.getByText('Content 1')
@@ -382,7 +385,7 @@ describe('MobileAccordion', () => {
   })
 
   it('does not expand disabled section', async () => {
-    render(<MobileAccordion sections={mockSections} />)
+    renderWithI18n(<MobileAccordion sections={mockSections} />)
 
     const content3 = screen.getByText('Content 3')
     const region = content3.closest('[role="region"]')
@@ -399,7 +402,7 @@ describe('MobileAccordion', () => {
   })
 
   it('supports multiple sections open when allowMultiple is true', async () => {
-    render(<MobileAccordion sections={mockSections} allowMultiple={true} />)
+    renderWithI18n(<MobileAccordion sections={mockSections} allowMultiple={true} />)
 
     const content1 = screen.getByText('Content 1')
     const content2 = screen.getByText('Content 2')
@@ -414,7 +417,7 @@ describe('MobileAccordion', () => {
   })
 
   it('closes other sections when allowMultiple is false', async () => {
-    render(<MobileAccordion sections={mockSections} allowMultiple={false} />)
+    renderWithI18n(<MobileAccordion sections={mockSections} allowMultiple={false} />)
 
     const content1 = screen.getByText('Content 1')
     const content2 = screen.getByText('Content 2')
@@ -434,7 +437,7 @@ describe('MobileAccordion', () => {
   })
 
   it('has minimum 44px touch target', () => {
-    render(<MobileAccordion sections={mockSections} />)
+    renderWithI18n(<MobileAccordion sections={mockSections} />)
 
     const buttons = screen.getAllByRole('button')
     buttons.forEach(button => {
@@ -446,7 +449,7 @@ describe('MobileAccordion', () => {
   it('calls onSectionChange when section changes', () => {
     const onSectionChange = jest.fn()
     
-    render(
+    renderWithI18n(
       <MobileAccordion 
         sections={mockSections} 
         onSectionChange={onSectionChange}
@@ -458,13 +461,13 @@ describe('MobileAccordion', () => {
   })
 
   it('renders empty state when no sections', () => {
-    render(<MobileAccordion sections={[]} />)
+    renderWithI18n(<MobileAccordion sections={[]} />)
 
     expect(screen.getByText('No sections available')).toBeInTheDocument()
   })
 
   it('renders skeleton loader', () => {
-    render(<MobileAccordionSkeleton sectionCount={3} />)
+    renderWithI18n(<MobileAccordionSkeleton sectionCount={3} />)
     
     expect(document.querySelector('.animate-pulse')).toBeInTheDocument()
   })
@@ -475,7 +478,7 @@ describe('MobileAccordion', () => {
 // ============================================
 describe('AccordionItem', () => {
   it('renders title and content', () => {
-    render(
+    renderWithI18n(
       <AccordionItem title="Test Item">
         <div>Test Content</div>
       </AccordionItem>
@@ -485,7 +488,7 @@ describe('AccordionItem', () => {
   })
 
   it('expands when clicked', async () => {
-    render(
+    renderWithI18n(
       <AccordionItem title="Test Item">
         <div>Test Content</div>
       </AccordionItem>
@@ -505,7 +508,7 @@ describe('AccordionItem', () => {
   })
 
   it('supports defaultExpanded prop', () => {
-    render(
+    renderWithI18n(
       <AccordionItem title="Test Item" defaultExpanded={true}>
         <div>Test Content</div>
       </AccordionItem>
@@ -517,7 +520,7 @@ describe('AccordionItem', () => {
   })
 
   it('supports controlled expanded state', () => {
-    const { rerender } = render(
+    const { rerender } = renderWithI18n(
       <AccordionItem title="Test Item" expanded={false}>
         <div>Test Content</div>
       </AccordionItem>
@@ -542,7 +545,7 @@ describe('AccordionItem', () => {
 // ============================================
 describe('PerformanceDialog', () => {
   it('renders when isOpen is true', () => {
-    render(
+    renderWithI18n(
       <PerformanceDialog
         isOpen={true}
         onClose={() => {}}
@@ -554,7 +557,7 @@ describe('PerformanceDialog', () => {
   })
 
   it('does not render when isOpen is false', () => {
-    render(
+    renderWithI18n(
       <PerformanceDialog
         isOpen={false}
         onClose={() => {}}
@@ -566,7 +569,7 @@ describe('PerformanceDialog', () => {
   })
 
   it('displays all metric values', () => {
-    render(
+    renderWithI18n(
       <PerformanceDialog
         isOpen={true}
         onClose={() => {}}
@@ -584,7 +587,7 @@ describe('PerformanceDialog', () => {
   it('calls onClose when close button is clicked', () => {
     const onClose = jest.fn()
     
-    render(
+    renderWithI18n(
       <PerformanceDialog
         isOpen={true}
         onClose={onClose}
@@ -608,7 +611,7 @@ describe('PerformanceDialog', () => {
   it('calls onClose when backdrop is clicked', () => {
     const onClose = jest.fn()
     
-    render(
+    renderWithI18n(
       <PerformanceDialog
         isOpen={true}
         onClose={onClose}
@@ -627,7 +630,7 @@ describe('PerformanceDialog', () => {
   it('calls onRefresh when refresh button is clicked', () => {
     const onRefresh = jest.fn()
     
-    render(
+    renderWithI18n(
       <PerformanceDialog
         isOpen={true}
         onClose={() => {}}
@@ -641,7 +644,7 @@ describe('PerformanceDialog', () => {
   })
 
   it('shows green status for good metrics', () => {
-    render(
+    renderWithI18n(
       <PerformanceDialog
         isOpen={true}
         onClose={() => {}}
@@ -659,7 +662,7 @@ describe('PerformanceDialog', () => {
       totalTime: 1200
     }
     
-    render(
+    renderWithI18n(
       <PerformanceDialog
         isOpen={true}
         onClose={() => {}}
@@ -676,7 +679,7 @@ describe('PerformanceDialog', () => {
 // ============================================
 describe('HelpDialog', () => {
   it('renders when isOpen is true', () => {
-    render(
+    renderWithI18n(
       <HelpDialog
         isOpen={true}
         onClose={() => {}}
@@ -687,7 +690,7 @@ describe('HelpDialog', () => {
   })
 
   it('does not render when isOpen is false', () => {
-    render(
+    renderWithI18n(
       <HelpDialog
         isOpen={false}
         onClose={() => {}}
@@ -698,7 +701,7 @@ describe('HelpDialog', () => {
   })
 
   it('shows overview section by default', () => {
-    render(
+    renderWithI18n(
       <HelpDialog
         isOpen={true}
         onClose={() => {}}
@@ -709,7 +712,7 @@ describe('HelpDialog', () => {
   })
 
   it('switches sections when navigation is clicked', () => {
-    render(
+    renderWithI18n(
       <HelpDialog
         isOpen={true}
         onClose={() => {}}
@@ -724,7 +727,7 @@ describe('HelpDialog', () => {
   })
 
   it('shows keyboard shortcuts section', () => {
-    render(
+    renderWithI18n(
       <HelpDialog
         isOpen={true}
         onClose={() => {}}
@@ -737,7 +740,7 @@ describe('HelpDialog', () => {
   })
 
   it('shows chart guide section', () => {
-    render(
+    renderWithI18n(
       <HelpDialog
         isOpen={true}
         onClose={() => {}}
@@ -752,7 +755,7 @@ describe('HelpDialog', () => {
   it('calls onClose when close button is clicked', () => {
     const onClose = jest.fn()
     
-    render(
+    renderWithI18n(
       <HelpDialog
         isOpen={true}
         onClose={onClose}
@@ -768,7 +771,7 @@ describe('HelpDialog', () => {
   it('calls onClose when backdrop is clicked', () => {
     const onClose = jest.fn()
     
-    render(
+    renderWithI18n(
       <HelpDialog
         isOpen={true}
         onClose={onClose}

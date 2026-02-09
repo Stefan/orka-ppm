@@ -110,10 +110,10 @@ export default function WhatIfScenarioPanel({
 
   const formatDuration = (days: number) => {
     if (Math.abs(days) < 7) {
-      return `${days} day${Math.abs(days) !== 1 ? 's' : ''}`;
+      return t('common.days', { count: Math.abs(days) });
     }
     const weeks = Math.round(days / 7);
-    return `${weeks} week${Math.abs(weeks) !== 1 ? 's' : ''}`;
+    return t('common.weeks', { count: Math.abs(weeks) });
   };
 
   const renderImpactBadge = (scenario: Scenario) => {

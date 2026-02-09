@@ -294,7 +294,7 @@ class RiskRegisterSynchronizer:
         simulation_source: bool = True
     ) -> bool:
         """
-        Add a new risk to the risk register (bidirectional sync).
+        Add a new risk to the unified registers table (type='risk').
         
         Args:
             project_id: ID of the project
@@ -309,38 +309,52 @@ class RiskRegisterSynchronizer:
                 logger.error("Database service unavailable")
                 return False
             
-            # Prepare risk data for insertion
-            insert_data = {
-                'project_id': project_id,
-                'title': risk_data.get('title', 'Risk identified during simulation'),
-                'description': risk_data.get('description', 'Risk identified through Monte Carlo analysis'),
-                'category': risk_data.get('category', 'technical'),
-                'probability': risk_data.get('probability', 0.5),
-                'impact': risk_data.get('impact', 0.5),
-                'status': 'identified',
-                'mitigation': risk_data.get('mitigation'),
-                'owner_id': risk_data.get('owner_id')
+            # Resolve organization_id from project
+            proj = (
+                supabase.table("projects")
+                .select("organization_id")
+                .eq("id", project_id)
+                .limit(1)
+                .execute()
+            )
+            if not proj.data or len(proj.data) == 0:
+                logger.error(f"Project {project_id} not found for register insert")
+                return False
+            org_id = proj.data[0].get("organization_id")
+            if not org_id:
+                logger.error(f"Project {project_id} has no organization_id")
+                return False
+            
+            description = risk_data.get("description", "Risk identified through Monte Carlo analysis")
+            if simulation_source:
+                description += f" (Identified via Monte Carlo simulation on {datetime.now().isoformat()})"
+            
+            data = {
+                "title": risk_data.get("title", "Risk identified during simulation"),
+                "description": description,
+                "category": risk_data.get("category", "technical"),
+                "probability": risk_data.get("probability", 0.5),
+                "impact": risk_data.get("impact", 0.5),
+                "mitigation": risk_data.get("mitigation"),
+                "owner_id": risk_data.get("owner_id"),
             }
             
-            # Add simulation metadata if from simulation
-            if simulation_source:
-                insert_data['description'] += f" (Identified via Monte Carlo simulation on {datetime.now().isoformat()})"
-            
-            # Insert into risk register
-            response = supabase.table("risks").insert(insert_data).execute()
+            row = {
+                "type": "risk",
+                "project_id": project_id,
+                "organization_id": str(org_id),
+                "data": data,
+                "status": "identified",
+            }
+            response = supabase.table("registers").insert(row).execute()
             
             if response.data:
-                logger.info(f"Added new risk to register for project {project_id}: {insert_data['title']}")
-                
-                # Trigger sync to update simulations with new risk
+                logger.info(f"Added new risk to register for project {project_id}: {data['title']}")
                 if self.config.auto_sync_enabled:
                     self._schedule_immediate_sync(project_id)
-                
                 return True
-            else:
-                logger.error(f"Failed to add risk to register: {response}")
-                return False
-                
+            logger.error(f"Failed to add risk to register: {response}")
+            return False
         except Exception as e:
             logger.error(f"Failed to add risk to register: {str(e)}")
             return False

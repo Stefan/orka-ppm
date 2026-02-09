@@ -95,14 +95,15 @@ describe('SlowQueriesTable', () => {
     expect(rows).toHaveLength(2)
   })
 
-  it('returns null when slowQueriesData is empty', () => {
-    const { container } = render(
+  it('shows empty state when slowQueriesData is empty', () => {
+    const mockWithEmpty = { ...mockTranslations, noSlowQueries: 'No slow queries in threshold (≥1s).' }
+    render(
       <SlowQueriesTable 
         slowQueriesData={[]}
-        translations={mockTranslations}
+        translations={mockWithEmpty}
       />
     )
-    expect(container.firstChild).toBeNull()
+    expect(screen.getByText('No slow queries in threshold (≥1s).')).toBeInTheDocument()
   })
 
   it('has proper table structure', () => {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { renderWithI18n, screen, fireEvent, waitFor } from '@/__tests__/utils/test-wrapper'
 import '@testing-library/jest-dom'
 import AuditFilters, { AuditFilters as AuditFiltersType, UserOption } from '../AuditFilters'
 
@@ -30,20 +30,20 @@ describe('AuditFilters', () => {
   })
 
   it('renders the filter component', () => {
-    render(<AuditFilters {...defaultProps} />)
+    renderWithI18n(<AuditFilters {...defaultProps} />)
     expect(screen.getByTestId('audit-filters')).toBeInTheDocument()
     expect(screen.getByText('Filters')).toBeInTheDocument()
   })
 
   it('displays date range pickers', () => {
-    render(<AuditFilters {...defaultProps} />)
+    renderWithI18n(<AuditFilters {...defaultProps} />)
     expect(screen.getByPlaceholderText('Select start date')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Select end date')).toBeInTheDocument()
   })
 
   it('displays event type checkboxes', () => {
     const eventTypes = ['user_login', 'budget_change']
-    render(<AuditFilters {...defaultProps} availableEventTypes={eventTypes} />)
+    renderWithI18n(<AuditFilters {...defaultProps} availableEventTypes={eventTypes} />)
     
     expect(screen.getByText('user login')).toBeInTheDocument()
     expect(screen.getByText('budget change')).toBeInTheDocument()
@@ -51,7 +51,7 @@ describe('AuditFilters', () => {
 
   it('handles event type selection', () => {
     const eventTypes = ['user_login', 'budget_change']
-    render(<AuditFilters {...defaultProps} availableEventTypes={eventTypes} />)
+    renderWithI18n(<AuditFilters {...defaultProps} availableEventTypes={eventTypes} />)
     
     const checkbox = screen.getByLabelText('user login')
     fireEvent.click(checkbox)
@@ -63,7 +63,7 @@ describe('AuditFilters', () => {
   })
 
   it('expands advanced filters when button is clicked', () => {
-    render(<AuditFilters {...defaultProps} showAdvancedFilters={true} />)
+    renderWithI18n(<AuditFilters {...defaultProps} showAdvancedFilters={true} />)
     
     // Advanced filters should not be visible initially
     expect(screen.queryByText('Entity Types')).not.toBeInTheDocument()
@@ -77,7 +77,7 @@ describe('AuditFilters', () => {
   })
 
   it('displays severity filter options', () => {
-    render(<AuditFilters {...defaultProps} showAdvancedFilters={true} />)
+    renderWithI18n(<AuditFilters {...defaultProps} showAdvancedFilters={true} />)
     
     // Expand advanced filters
     const expandButton = screen.getByTitle('Expand filters')
@@ -92,7 +92,7 @@ describe('AuditFilters', () => {
   })
 
   it('displays category filter options', () => {
-    render(<AuditFilters {...defaultProps} showAdvancedFilters={true} />)
+    renderWithI18n(<AuditFilters {...defaultProps} showAdvancedFilters={true} />)
     
     // Expand advanced filters
     const expandButton = screen.getByTitle('Expand filters')
@@ -106,7 +106,7 @@ describe('AuditFilters', () => {
   })
 
   it('displays risk level filter options', () => {
-    render(<AuditFilters {...defaultProps} showAdvancedFilters={true} />)
+    renderWithI18n(<AuditFilters {...defaultProps} showAdvancedFilters={true} />)
     
     // Expand advanced filters
     const expandButton = screen.getByTitle('Expand filters')
@@ -119,7 +119,7 @@ describe('AuditFilters', () => {
   })
 
   it('handles category selection', () => {
-    render(<AuditFilters {...defaultProps} showAdvancedFilters={true} />)
+    renderWithI18n(<AuditFilters {...defaultProps} showAdvancedFilters={true} />)
     
     // Expand advanced filters
     const expandButton = screen.getByTitle('Expand filters')
@@ -135,7 +135,7 @@ describe('AuditFilters', () => {
   })
 
   it('handles risk level selection', () => {
-    render(<AuditFilters {...defaultProps} showAdvancedFilters={true} />)
+    renderWithI18n(<AuditFilters {...defaultProps} showAdvancedFilters={true} />)
     
     // Expand advanced filters
     const expandButton = screen.getByTitle('Expand filters')
@@ -151,7 +151,7 @@ describe('AuditFilters', () => {
   })
 
   it('handles anomalies only toggle', () => {
-    render(<AuditFilters {...defaultProps} showAdvancedFilters={true} />)
+    renderWithI18n(<AuditFilters {...defaultProps} showAdvancedFilters={true} />)
     
     // Expand advanced filters
     const expandButton = screen.getByTitle('Expand filters')
@@ -176,7 +176,7 @@ describe('AuditFilters', () => {
       showAnomaliesOnly: true
     }
     
-    render(<AuditFilters filters={filtersWithData} onChange={mockOnChange} />)
+    renderWithI18n(<AuditFilters filters={filtersWithData} onChange={mockOnChange} />)
     
     const resetButton = screen.getByTitle('Reset all filters')
     fireEvent.click(resetButton)
@@ -198,13 +198,13 @@ describe('AuditFilters', () => {
       eventTypes: ['user_login']
     }
     
-    render(<AuditFilters filters={filtersWithData} onChange={mockOnChange} />)
+    renderWithI18n(<AuditFilters filters={filtersWithData} onChange={mockOnChange} />)
     
     expect(screen.getByText('Active')).toBeInTheDocument()
   })
 
   it('displays user autocomplete when users are provided', () => {
-    render(
+    renderWithI18n(
       <AuditFilters
         {...defaultProps}
         availableUsers={mockUsers}
@@ -220,7 +220,7 @@ describe('AuditFilters', () => {
   })
 
   it('filters users based on search query', async () => {
-    render(
+    renderWithI18n(
       <AuditFilters
         {...defaultProps}
         availableUsers={mockUsers}
@@ -244,7 +244,7 @@ describe('AuditFilters', () => {
 
   it('displays entity type checkboxes', () => {
     const entityTypes = ['project', 'resource', 'risk']
-    render(
+    renderWithI18n(
       <AuditFilters
         {...defaultProps}
         availableEntityTypes={entityTypes}
@@ -263,7 +263,7 @@ describe('AuditFilters', () => {
 
   it('handles entity type selection', () => {
     const entityTypes = ['project', 'resource']
-    render(
+    renderWithI18n(
       <AuditFilters
         {...defaultProps}
         availableEntityTypes={entityTypes}
@@ -284,13 +284,15 @@ describe('AuditFilters', () => {
     })
   })
 
-  it('shows selected event types count', () => {
+  it('shows selected event types count', async () => {
     const filtersWithData: AuditFiltersType = {
       eventTypes: ['user_login', 'budget_change', 'permission_change']
     }
     
-    render(<AuditFilters filters={filtersWithData} onChange={mockOnChange} />)
+    renderWithI18n(<AuditFilters filters={filtersWithData} onChange={mockOnChange} />)
     
-    expect(screen.getByText('3 types selected')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('3 types selected')).toBeInTheDocument()
+    })
   })
 })

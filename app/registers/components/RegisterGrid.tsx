@@ -1,16 +1,24 @@
 'use client'
 
 import { Fragment, useState } from 'react'
-import type { RegisterEntry } from '@/types/registers'
+import type { RegisterEntry, RegisterType } from '@/types/registers'
+import { REGISTER_TYPE_SCHEMAS } from '@/types/registers'
 import { ChevronRight, ChevronDown, Sparkles, Pencil, Trash2 } from 'lucide-react'
+import RegisterInlinePanel from './RegisterInlinePanel'
+import RegisterNestedGrid from './RegisterNestedGrid'
 
 export interface RegisterGridProps {
+  registerType: RegisterType
   entries: RegisterEntry[]
   loading?: boolean
   onAISuggest?: (entry: RegisterEntry) => void
   onEdit?: (entry: RegisterEntry) => void
   onDelete?: (entry: RegisterEntry) => void
   onExpand?: (entry: RegisterEntry) => void
+  /** Save from inline panel in expanded row. Spec: Inline-Panels für Detail/Edit */
+  onSaveEntry?: (entry: RegisterEntry, data: Record<string, unknown>, status: string) => void | Promise<void>
+  saveEntryPending?: boolean
+  projectNameById?: Record<string, string>
 }
 
 function statusDot(status: string): string {
@@ -21,14 +29,19 @@ function statusDot(status: string): string {
 }
 
 export default function RegisterGrid({
+  registerType,
   entries,
   loading,
   onAISuggest,
   onEdit,
   onDelete,
   onExpand,
+  onSaveEntry,
+  saveEntryPending = false,
+  projectNameById,
 }: RegisterGridProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const schema = REGISTER_TYPE_SCHEMAS[registerType]
 
   const toggleExpand = (entry: RegisterEntry) => {
     setExpandedId((id) => (id === entry.id ? null : entry.id))
@@ -61,6 +74,9 @@ export default function RegisterGrid({
                 Title
               </th>
               <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-slate-400">
+                Project
+              </th>
+              <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-slate-400">
                 Status
               </th>
               <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-slate-400">
@@ -72,7 +88,7 @@ export default function RegisterGrid({
           <tbody className="divide-y divide-gray-200 bg-white dark:divide-slate-600 dark:bg-slate-900">
             {entries.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-3 py-8 text-center text-sm text-gray-500 dark:text-slate-400">
+                <td colSpan={6} className="px-3 py-8 text-center text-sm text-gray-500 dark:text-slate-400">
                   No entries yet. Add one or use AI Suggest.
                 </td>
               </tr>
@@ -99,6 +115,9 @@ export default function RegisterGrid({
                     </td>
                     <td className="px-3 py-2 text-sm font-medium text-gray-900 dark:text-slate-100">
                       {getTitle(entry)}
+                    </td>
+                    <td className="px-3 py-2 text-xs text-gray-600 dark:text-slate-400">
+                      {entry.project_id ? (projectNameById?.[entry.project_id] ?? entry.project_id) : '—'}
                     </td>
                     <td className="px-3 py-2">
                       <span className={`inline-block h-2 w-2 rounded-full ${statusDot(entry.status)}`} />
@@ -146,14 +165,32 @@ export default function RegisterGrid({
                   </tr>
                   {expandedId === entry.id && (
                     <tr className="bg-gray-50 dark:bg-slate-800/50">
-                      <td colSpan={5} className="px-3 py-3">
-                        <div className="rounded border border-gray-200 bg-white p-3 text-sm dark:border-slate-600 dark:bg-slate-900">
-                          <div className="mb-2 font-medium text-gray-700 dark:text-slate-300">
-                            Details (data)
-                          </div>
-                          <pre className="max-h-48 overflow-auto rounded bg-gray-100 p-2 text-xs dark:bg-slate-800">
-                            {JSON.stringify(entry.data, null, 2)}
-                          </pre>
+                      <td colSpan={6} className="px-3 py-3">
+                        <div className="space-y-3">
+                          {onSaveEntry ? (
+                            <RegisterInlinePanel
+                              type={registerType}
+                              entry={entry}
+                              onSave={(data, status) => {
+                                const p = onSaveEntry(entry, data, status)
+                                if (p && typeof (p as Promise<unknown>).then === 'function') (p as Promise<void>).then(() => setExpandedId(null))
+                              }}
+                              onCancel={() => setExpandedId(null)}
+                              isPending={saveEntryPending}
+                            />
+                          ) : (
+                            <div className="rounded border border-gray-200 bg-white p-3 text-sm dark:border-slate-600 dark:bg-slate-900">
+                              <pre className="max-h-48 overflow-auto rounded bg-gray-100 p-2 text-xs dark:bg-slate-800">
+                                {JSON.stringify(entry.data, null, 2)}
+                              </pre>
+                            </div>
+                          )}
+                          {schema.nested && Array.isArray(entry.data?.[schema.nested.key]) && (
+                            <RegisterNestedGrid
+                              schema={schema.nested}
+                              items={entry.data[schema.nested.key] as Record<string, unknown>[]}
+                            />
+                          )}
                         </div>
                       </td>
                     </tr>

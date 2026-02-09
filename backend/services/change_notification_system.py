@@ -17,9 +17,8 @@ import json
 from pydantic import BaseModel
 
 from config.database import supabase
-from models.change_management import (
-    ChangeStatus, ChangeType, PriorityLevel, NotificationPreferences
-)
+from models.change_management import ChangeStatus, ChangeType, PriorityLevel
+from models.workflow_notification import NotificationPreferences
 
 logger = logging.getLogger(__name__)
 
@@ -1507,7 +1506,6 @@ class ChangeNotificationSystem:
             
             if result.data:
                 prefs_data = result.data[0]
-                from models.change_management import NotificationPreferences
                 return NotificationPreferences(
                     user_id=user_id,
                     email_notifications=prefs_data.get("email_notifications", True),
@@ -1518,14 +1516,10 @@ class ChangeNotificationSystem:
                     reminder_frequency_hours=prefs_data.get("reminder_frequency_hours", 24)
                 )
             else:
-                # Return default preferences
-                from models.change_management import NotificationPreferences
                 return NotificationPreferences(user_id=user_id)
                 
         except Exception as e:
             logger.error(f"Error getting user notification preferences: {e}")
-            # Return default preferences on error
-            from models.change_management import NotificationPreferences
             return NotificationPreferences(user_id=user_id)
     
     async def _get_project_stakeholders(self, project_id: UUID) -> Set[UUID]:

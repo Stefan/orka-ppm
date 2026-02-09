@@ -3,6 +3,7 @@
     "dashboards": "Dashboards",
     "projects": "Projects",
     "allProjects": "All Projects",
+    "portfolios": "Portfolios",
     "scenarios": "Scenarios",
     "resources": "Resources",
     "resourceManagement": "Resource Management",
@@ -46,6 +47,8 @@
   "topbar": {
     "toggleMenu": "Toggle menu",
     "portfolioManagement": "Portfolio Management",
+    "currentPortfolio": "Current portfolio",
+    "allPortfolios": "All portfolios",
     "themeDark": "Dark mode",
     "themeSystem": "System theme",
     "themeLight": "Light mode",
@@ -69,6 +72,13 @@
     "hoursAgo": "{count}h ago",
     "yesterday": "Yesterday",
     "daysAgo": "{count}d ago"
+  },
+  "portfolios": {
+    "pageDescription": "View and manage your portfolios. Select a portfolio to see its projects.",
+    "empty": "No portfolios yet. Create portfolios in your organization to get started.",
+    "loadError": "Failed to load portfolios.",
+    "projectsInPortfolio": "Projects in this portfolio",
+    "noProjects": "No projects in this portfolio."
   },
   "dashboard": {
     "title": "Portfolio Dashboard",
@@ -103,6 +113,10 @@
     },
     "schedulesTitle": "Schedules",
     "openLink": "Open",
+    "registersTitle": "Risks & Issues",
+    "open": "open",
+    "risks": "risks",
+    "issues": "issues",
     "activeSchedules": "Active schedules",
     "milestonesDueIn14Days": "{count} milestone(s) due in 14 days",
     "changeOrdersTitle": "Change Orders",
@@ -261,6 +275,177 @@
     "alerts": {
       "one": "{count} alert",
       "other": "{count} alerts"
+    },
+    "errors": {
+      "one": "{count} error",
+      "other": "{count} errors"
+    },
+    "warnings": {
+      "one": "{count} warning",
+      "other": "{count} warnings"
+    },
+    "conflicts": {
+      "one": "{count} conflict",
+      "other": "{count} conflicts"
+    },
+    "approvals": {
+      "one": "{count} pending approval",
+      "other": "{count} pending approvals"
+    },
+    "approvalsFromYou": {
+      "one": "{count} pending approval from you",
+      "other": "{count} pending approvals from you"
+    },
+    "approvers": {
+      "one": "{count} approver",
+      "other": "{count} approvers"
+    },
+    "changes": {
+      "one": "{count} change",
+      "other": "{count} changes"
+    },
+    "vendors": {
+      "one": "{count} vendor",
+      "other": "{count} vendors"
+    },
+    "transactions": {
+      "one": "{count} transaction",
+      "other": "{count} transactions"
+    },
+    "comments": {
+      "one": "{count} comment",
+      "other": "{count} comments"
+    },
+    "guides": {
+      "one": "{count} guide",
+      "other": "{count} guides"
+    },
+    "fields": {
+      "one": "{count} field",
+      "other": "{count} fields"
+    },
+    "typesSelected": {
+      "one": "{count} type selected",
+      "other": "{count} types selected"
+    },
+    "replies": {
+      "one": "{count} reply",
+      "other": "{count} replies"
+    },
+    "permissions": {
+      "one": "{count} permission",
+      "other": "{count} permissions"
+    },
+    "activities": {
+      "one": "{count} activity",
+      "other": "{count} activities"
+    },
+    "anomalies": {
+      "one": "{count} anomaly",
+      "other": "{count} anomalies"
+    },
+    "tasks": {
+      "one": "{count} task",
+      "other": "{count} tasks"
+    },
+    "widgets": {
+      "one": "{count} widget",
+      "other": "{count} widgets"
+    },
+    "showingVendors": {
+      "one": "Showing 1 vendor",
+      "other": "Showing {count} vendors"
+    },
+    "showingTransactions": {
+      "one": "Showing 1 transaction",
+      "other": "Showing {count} transactions"
+    },
+    "changesPending": {
+      "one": "1 change pending",
+      "other": "{count} changes pending"
+    },
+    "errorsFound": {
+      "one": "1 error found",
+      "other": "{count} errors found"
+    },
+    "warningsFound": {
+      "one": "1 warning",
+      "other": "{count} warnings"
+    },
+    "conflictsNeedResolution": {
+      "one": "1 conflict needs resolution",
+      "other": "{count} conflicts need resolution"
+    },
+    "fieldsAffected": {
+      "one": "1 field affected",
+      "other": "{count} fields affected"
+    },
+    "projectsImportedSuccessfully": {
+      "one": "1 project imported successfully.",
+      "other": "{count} projects imported successfully."
+    },
+    "changesWaitingToSync": {
+      "one": "You have 1 change waiting to sync.",
+      "other": "You have {count} changes waiting to sync."
+    },
+    "activeTasks": {
+      "one": "1 active task",
+      "other": "{count} active tasks"
+    },
+    "newItemsSinceLastView": {
+      "one": "1 new item since last view",
+      "other": "{count} new items since last view"
+    },
+    "guidesAvailable": {
+      "one": "1 guide available",
+      "other": "{count} guides available"
+    },
+    "anomaliesDetected": {
+      "one": "1 anomaly detected",
+      "other": "{count} anomalies detected"
+    },
+    "suspiciousActivitiesDetected": {
+      "one": "1 suspicious activity detected",
+      "other": "{count} suspicious activities detected"
+    },
+    "justNow": "just now",
+    "minutesAgo": {
+      "one": "{count} minute ago",
+      "other": "{count} minutes ago"
+    },
+    "hoursAgo": {
+      "one": "{count} hour ago",
+      "other": "{count} hours ago"
+    },
+    "daysAgo": {
+      "one": "{count} day ago",
+      "other": "{count} days ago"
+    },
+    "weeksAgo": {
+      "one": "{count} week ago",
+      "other": "{count} weeks ago"
+    },
+    "monthsAgo": {
+      "one": "{count} month ago",
+      "other": "{count} months ago"
+    },
+    "yearsAgo": {
+      "one": "{count} year ago",
+      "other": "{count} years ago"
+    },
+    "days": {
+      "one": "{count} day",
+      "other": "{count} days"
+    },
+    "weeks": {
+      "one": "{count} week",
+      "other": "{count} weeks"
+    },
+    "importantSuffix": " (important)",
+    "recentNewSuffix": " ({count} new)",
+    "severityAnomaliesDetected": {
+      "one": "{count} {severity} severity anomaly detected",
+      "other": "{count} {severity} severity anomalies detected"
     }
   },
   "dataImport": {
@@ -379,6 +564,7 @@
     "title": "AI Help Assistant"
   },
   "helpChat": {
+    "sendButtonLabel": "Send message",
     "placeholder": "Ask me something about PPM...",
     "welcome": "Welcome to AI Help Assistant!",
     "welcomeMessage": "Ask me anything about the PPM platform features and I'll help you out.",

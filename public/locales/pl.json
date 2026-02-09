@@ -258,7 +258,76 @@
     "alerts": {
       "one": "{count} alert",
       "other": "{count} alertów"
-    }
+    },
+    "errors": {
+      "one": "{count} błąd",
+      "other": "{count} błędów"
+    },
+    "warnings": {
+      "one": "{count} ostrzeżenie",
+      "other": "{count} ostrzeżeń"
+    },
+    "conflicts": {
+      "one": "{count} konflikt",
+      "other": "{count} konfliktów"
+    },
+    "approvals": {
+      "one": "{count} oczekująca zatwierdzenie",
+      "other": "{count} oczekujących zatwierdzeń"
+    },
+    "approvalsFromYou": {
+      "one": "{count} oczekująca zatwierdzenie od Ciebie",
+      "other": "{count} oczekujących zatwierdzeń od Ciebie"
+    },
+    "approvers": {
+      "one": "{count} zatwierdzający",
+      "other": "{count} zatwierdzających"
+    },
+    "changes": {
+      "one": "{count} zmiana",
+      "other": "{count} zmian"
+    },
+    "vendors": {
+      "one": "{count} dostawca",
+      "other": "{count} dostawców"
+    },
+    "transactions": {
+      "one": "{count} transakcja",
+      "other": "{count} transakcji"
+    },
+    "comments": { "one": "{count} komentarz", "other": "{count} komentarzy" },
+    "guides": { "one": "{count} przewodnik", "other": "{count} przewodników" },
+    "fields": { "one": "{count} pole", "other": "{count} pól" },
+    "typesSelected": { "one": "{count} typ wybrany", "other": "{count} typów wybranych" },
+    "replies": { "one": "{count} odpowiedź", "other": "{count} odpowiedzi" },
+    "permissions": { "one": "{count} uprawnienie", "other": "{count} uprawnień" },
+    "activities": { "one": "{count} aktywność", "other": "{count} aktywności" },
+    "anomalies": { "one": "{count} anomalia", "other": "{count} anomalii" },
+    "tasks": { "one": "{count} zadanie", "other": "{count} zadań" },
+    "widgets": { "one": "{count} widget", "other": "{count} widgetów" },
+    "showingVendors": { "one": "Wyświetlanie 1 dostawcy", "other": "Wyświetlanie {count} dostawców" },
+    "showingTransactions": { "one": "Wyświetlanie 1 transakcji", "other": "Wyświetlanie {count} transakcji" },
+    "changesPending": { "one": "1 zmiana oczekuje", "other": "{count} zmian oczekuje" },
+    "errorsFound": { "one": "Znaleziono 1 błąd", "other": "Znaleziono {count} błędów" },
+    "warningsFound": { "one": "1 ostrzeżenie", "other": "{count} ostrzeżeń" },
+    "conflictsNeedResolution": { "one": "1 konflikt wymaga rozwiązania", "other": "{count} konfliktów wymaga rozwiązania" },
+    "fieldsAffected": { "one": "1 pole dotknięte", "other": "{count} pól dotkniętych" },
+    "projectsImportedSuccessfully": { "one": "1 projekt zaimportowany pomyślnie.", "other": "{count} projektów zaimportowanych pomyślnie." },
+    "changesWaitingToSync": { "one": "Masz 1 zmianę do synchronizacji.", "other": "Masz {count} zmian do synchronizacji." },
+    "activeTasks": { "one": "1 aktywne zadanie", "other": "{count} aktywnych zadań" },
+    "newItemsSinceLastView": { "one": "1 nowy element od ostatniego podglądu", "other": "{count} nowych elementów od ostatniego podglądu" },
+    "guidesAvailable": { "one": "1 przewodnik dostępny", "other": "{count} przewodników dostępnych" },
+    "anomaliesDetected": { "one": "1 anomalia wykryta", "other": "{count} anomalii wykrytych" },
+    "suspiciousActivitiesDetected": { "one": "1 podejrzana aktywność wykryta", "other": "{count} podejrzanych aktywności wykrytych" },
+    "justNow": "właśnie teraz",
+    "minutesAgo": { "one": "{count} minutę temu", "other": "{count} minut temu" },
+    "hoursAgo": { "one": "{count} godzinę temu", "other": "{count} godzin temu" },
+    "daysAgo": { "one": "{count} dzień temu", "other": "{count} dni temu" },
+    "weeksAgo": { "one": "{count} tydzień temu", "other": "{count} tygodni temu" },
+    "monthsAgo": { "one": "{count} miesiąc temu", "other": "{count} miesięcy temu" },
+    "yearsAgo": { "one": "{count} rok temu", "other": "{count} lat temu" },
+    "days": { "one": "{count} dzień", "other": "{count} dni" },
+    "weeks": { "one": "{count} tydzień", "other": "{count} tygodni" }
   },
   "shared": {
     "shareableUrl": {
@@ -311,6 +380,7 @@
     "title": "Asystent Pomocy AI"
   },
   "helpChat": {
+    "sendButtonLabel": "Wyślij wiadomość",
     "placeholder": "Zapytaj mnie o coś związanego z PPM...",
     "welcome": "Witamy w Asystencie Pomocy AI!",
     "welcomeMessage": "Zapytaj mnie o cokolwiek związanego z funkcjami platformy PPM, a ja Ci pomogę.",

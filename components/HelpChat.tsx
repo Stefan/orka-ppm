@@ -508,7 +508,7 @@ export function HelpChat({ className, onOpenModal }: HelpChatProps) {
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder={t('helpChat.placeholder')}
-                    className="w-full resize-none rounded-lg border-2 border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none min-h-[40px] max-h-32 dark:placeholder-slate-400"
+                    className="w-full resize-none rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-0 min-h-[40px] max-h-32 dark:placeholder-slate-400 outline-none ring-0 shadow-none appearance-none"
                     rows={1}
                     disabled={!canSendMessage}
                     aria-label={ARIA_LABELS.messageInput}
@@ -536,14 +536,9 @@ export function HelpChat({ className, onOpenModal }: HelpChatProps) {
                 <button
                   type="submit"
                   disabled={!canSendMessage || !inputValue.trim()}
-                  className={cn(
-                    'px-3 py-2 rounded-lg font-medium transition-colors min-h-[40px] min-w-[40px] focus:outline-none focus:ring-2 focus:ring-offset-2',
-                    canSendMessage && inputValue.trim()
-                      ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
-                      : 'bg-gray-300 dark:bg-slate-600 text-gray-700 dark:text-slate-300 cursor-not-allowed focus:ring-gray-300 dark:ring-slate-600 dark:focus:ring-slate-600'
-                  )}
-                  aria-label={ARIA_LABELS.sendButton}
-                  title={ARIA_LABELS.sendButton}
+                  className="inline-flex items-center justify-center min-h-[40px] min-w-[40px] px-4 py-2 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  aria-label={t('helpChat.sendButtonLabel')}
+                  title={t('helpChat.sendButtonLabel')}
                 >
                   {state.isLoading ? (
                     <Loader2
@@ -746,7 +741,7 @@ export function HelpChat({ className, onOpenModal }: HelpChatProps) {
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder={t('helpChat.placeholder')}
-                    className="w-full resize-none rounded-lg border-2 border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none min-h-[40px] max-h-32 dark:placeholder-slate-400"
+                    className="w-full resize-none rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-0 min-h-[40px] max-h-32 dark:placeholder-slate-400 outline-none ring-0 shadow-none appearance-none"
                     rows={1}
                     disabled={!canSendMessage}
                     aria-label={ARIA_LABELS.messageInput}
@@ -775,23 +770,18 @@ export function HelpChat({ className, onOpenModal }: HelpChatProps) {
                   <button
                     type="submit"
                     disabled={!canSendMessage || !inputValue.trim()}
-                    className={cn(
-                      'flex-1 px-3 py-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
-                      canSendMessage && inputValue.trim()
-                        ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
-                        : 'bg-gray-300 dark:bg-slate-600 text-gray-700 dark:text-slate-300 cursor-not-allowed focus:ring-gray-300 dark:ring-slate-600 dark:focus:ring-slate-600'
-                    )}
-                    aria-label={ARIA_LABELS.sendButton}
-                    title={ARIA_LABELS.sendButton}
+                    className="inline-flex flex-1 items-center justify-center gap-2 min-h-[40px] px-4 py-2 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    aria-label={t('helpChat.sendButtonLabel')}
+                    title={t('helpChat.sendButtonLabel')}
                   >
                     {state.isLoading ? (
                       <Loader2
-                        className="h-4 w-4 animate-spin mx-auto"
+                        className="h-4 w-4 animate-spin"
                         aria-hidden="true"
                       />
                     ) : (
                       <>
-                        <Send className="h-4 w-4 mr-2" aria-hidden="true" />
+                        <Send className="h-4 w-4 shrink-0" aria-hidden="true" />
                         {getSendButtonText()}
                       </>
                     )}

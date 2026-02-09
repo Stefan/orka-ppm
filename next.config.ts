@@ -230,6 +230,11 @@ const nextConfig: NextConfig = {
           source: '/api/admin/:path*',
           destination: '/api/admin/:path*',
         },
+        // Registers: handle in Next.js API route so proxy sends /api/registers/:path to backend
+        {
+          source: '/api/registers/:path*',
+          destination: '/api/registers/:path*',
+        },
       // Rewrite all other /api calls to local backend (no /api prefix on backend)
         {
           source: '/api/:path*',
@@ -257,6 +262,11 @@ const nextConfig: NextConfig = {
       {
         source: '/api/admin/:path*',
         destination: '/api/admin/:path*',
+      },
+      // Registers: handle in Next.js API route so proxy can send full /api/registers/:path to backend
+      {
+        source: '/api/registers/:path*',
+        destination: '/api/registers/:path*',
       },
       // Rewrite all other /api calls to backend (no /api prefix on backend)
       {

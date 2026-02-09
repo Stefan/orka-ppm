@@ -315,7 +315,7 @@ class RiskRegisterImporter:
         include_closed: bool = False
     ) -> List[RiskRegisterEntry]:
         """
-        Fetch risk data from the risk register database.
+        Fetch risk data from the unified registers table (type='risk').
         
         Args:
             project_id: ID of the project
@@ -328,36 +328,44 @@ class RiskRegisterImporter:
             raise RuntimeError("Database service unavailable")
         
         try:
-            # Build query
-            query = supabase.table("risks").select("*").eq("project_id", project_id)
-            
+            query = (
+                supabase.table("registers")
+                .select("*")
+                .eq("type", "risk")
+                .eq("project_id", project_id)
+            )
             if not include_closed:
                 query = query.neq("status", "closed")
-            
-            # Execute query
             response = query.order("created_at", desc=False).execute()
             
             if not response.data:
                 logger.info(f"No risks found for project {project_id}")
                 return []
             
-            # Transform database records to RiskRegisterEntry objects
             risk_entries = []
             for record in response.data:
+                data = record.get("data") or {}
+                raw_due = data.get("due_date") or record.get("due_date")
+                due_date = None
+                if raw_due:
+                    try:
+                        due_date = datetime.fromisoformat(str(raw_due).replace("Z", "+00:00"))
+                    except (TypeError, ValueError):
+                        pass
                 entry = RiskRegisterEntry(
-                    id=record['id'],
-                    project_id=record['project_id'],
-                    title=record['title'],
-                    description=record.get('description'),
-                    category=record['category'],
-                    probability=float(record['probability']),
-                    impact=float(record['impact']),
-                    status=record['status'],
-                    mitigation=record.get('mitigation'),
-                    owner_id=record.get('owner_id'),
-                    due_date=datetime.fromisoformat(record['due_date']) if record.get('due_date') else None,
-                    created_at=datetime.fromisoformat(record['created_at']),
-                    updated_at=datetime.fromisoformat(record['updated_at'])
+                    id=str(record["id"]),
+                    project_id=str(record["project_id"]) if record.get("project_id") else project_id,
+                    title=data.get("title") or data.get("name") or "Untitled risk",
+                    description=data.get("description"),
+                    category=data.get("category") or "technical",
+                    probability=float(data.get("probability", 0.5)),
+                    impact=float(data.get("impact", 0.5)),
+                    status=record.get("status") or "open",
+                    mitigation=data.get("mitigation"),
+                    owner_id=data.get("owner_id"),
+                    due_date=due_date,
+                    created_at=datetime.fromisoformat(record["created_at"].replace("Z", "+00:00")),
+                    updated_at=datetime.fromisoformat(record["updated_at"].replace("Z", "+00:00")),
                 )
                 risk_entries.append(entry)
             
@@ -729,11 +737,11 @@ class RiskRegisterImporter:
         update_data: Dict[str, Any]
     ) -> bool:
         """
-        Update a risk register entry with simulation results.
+        Update a unified register entry (registers.data) with simulation results.
         
         Args:
-            risk_id: ID of the risk to update
-            update_data: Data to update
+            risk_id: ID of the register entry to update
+            update_data: Fields to merge into data (e.g. simulation_contribution, last_simulation_date)
             
         Returns:
             True if successful, False otherwise
@@ -742,12 +750,28 @@ class RiskRegisterImporter:
             if supabase is None:
                 logger.error("Database service unavailable")
                 return False
-            
-            # Update the risk register entry
-            response = supabase.table("risks").update(update_data).eq("id", risk_id).execute()
-            
+            row = (
+                supabase.table("registers")
+                .select("data")
+                .eq("id", risk_id)
+                .limit(1)
+                .execute()
+            )
+            if not row.data or len(row.data) == 0:
+                return False
+            current_data = dict(row.data[0].get("data") or {})
+            current_data.update(update_data)
+            response = (
+                supabase.table("registers")
+                .update({"data": current_data})
+                .eq("id", risk_id)
+                .execute()
+            )
             return bool(response.data)
-            
         except Exception as e:
             logger.error(f"Failed to update risk register entry {risk_id}: {str(e)}")
             return False
+
+
+# Alias for backward compatibility (e.g. test_complete_monte_carlo_integration)
+RiskRegisterIntegrator = RiskRegisterImporter

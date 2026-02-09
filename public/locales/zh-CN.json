@@ -261,7 +261,76 @@
     "alerts": {
       "one": "{count} 个警报",
       "other": "{count} 个警报"
-    }
+    },
+    "errors": {
+      "one": "{count} 个错误",
+      "other": "{count} 个错误"
+    },
+    "warnings": {
+      "one": "{count} 个警告",
+      "other": "{count} 个警告"
+    },
+    "conflicts": {
+      "one": "{count} 个冲突",
+      "other": "{count} 个冲突"
+    },
+    "approvals": {
+      "one": "{count} 项待批准",
+      "other": "{count} 项待批准"
+    },
+    "approvalsFromYou": {
+      "one": "{count} 项待您批准",
+      "other": "{count} 项待您批准"
+    },
+    "approvers": {
+      "one": "{count} 个批准人",
+      "other": "{count} 个批准人"
+    },
+    "changes": {
+      "one": "{count} 项变更",
+      "other": "{count} 项变更"
+    },
+    "vendors": {
+      "one": "{count} 个供应商",
+      "other": "{count} 个供应商"
+    },
+    "transactions": {
+      "one": "{count} 笔交易",
+      "other": "{count} 笔交易"
+    },
+    "comments": { "one": "{count} 条评论", "other": "{count} 条评论" },
+    "guides": { "one": "{count} 个指南", "other": "{count} 个指南" },
+    "fields": { "one": "{count} 个字段", "other": "{count} 个字段" },
+    "typesSelected": { "one": "{count} 个类型已选", "other": "{count} 个类型已选" },
+    "replies": { "one": "{count} 条回复", "other": "{count} 条回复" },
+    "permissions": { "one": "{count} 项权限", "other": "{count} 项权限" },
+    "activities": { "one": "{count} 项活动", "other": "{count} 项活动" },
+    "anomalies": { "one": "{count} 个异常", "other": "{count} 个异常" },
+    "tasks": { "one": "{count} 个任务", "other": "{count} 个任务" },
+    "widgets": { "one": "{count} 个小部件", "other": "{count} 个小部件" },
+    "showingVendors": { "one": "显示 1 个供应商", "other": "显示 {count} 个供应商" },
+    "showingTransactions": { "one": "显示 1 笔交易", "other": "显示 {count} 笔交易" },
+    "changesPending": { "one": "1 项变更待处理", "other": "{count} 项变更待处理" },
+    "errorsFound": { "one": "发现 1 个错误", "other": "发现 {count} 个错误" },
+    "warningsFound": { "one": "1 个警告", "other": "{count} 个警告" },
+    "conflictsNeedResolution": { "one": "1 个冲突待解决", "other": "{count} 个冲突待解决" },
+    "fieldsAffected": { "one": "1 个字段受影响", "other": "{count} 个字段受影响" },
+    "projectsImportedSuccessfully": { "one": "已成功导入 1 个项目。", "other": "已成功导入 {count} 个项目。" },
+    "changesWaitingToSync": { "one": "您有 1 项变更待同步。", "other": "您有 {count} 项变更待同步。" },
+    "activeTasks": { "one": "1 个活动任务", "other": "{count} 个活动任务" },
+    "newItemsSinceLastView": { "one": "自上次查看以来 1 个新项目", "other": "自上次查看以来 {count} 个新项目" },
+    "guidesAvailable": { "one": "1 个指南可用", "other": "{count} 个指南可用" },
+    "anomaliesDetected": { "one": "检测到 1 个异常", "other": "检测到 {count} 个异常" },
+    "suspiciousActivitiesDetected": { "one": "检测到 1 项可疑活动", "other": "检测到 {count} 项可疑活动" },
+    "justNow": "刚刚",
+    "minutesAgo": { "one": "{count} 分钟前", "other": "{count} 分钟前" },
+    "hoursAgo": { "one": "{count} 小时前", "other": "{count} 小时前" },
+    "daysAgo": { "one": "{count} 天前", "other": "{count} 天前" },
+    "weeksAgo": { "one": "{count} 周前", "other": "{count} 周前" },
+    "monthsAgo": { "one": "{count} 个月前", "other": "{count} 个月前" },
+    "yearsAgo": { "one": "{count} 年前", "other": "{count} 年前" },
+    "days": { "one": "{count} 天", "other": "{count} 天" },
+    "weeks": { "one": "{count} 周", "other": "{count} 周" }
   },
   "dataImport": {
     "title": "数据导入",
@@ -368,6 +437,7 @@
     "title": "AI 帮助助手"
   },
   "helpChat": {
+    "sendButtonLabel": "发送消息",
     "placeholder": "询问我有关 PPM 的问题...",
     "welcome": "欢迎使用 AI 帮助助手！",
     "welcomeMessage": "询问我有关 PPM 平台功能的任何问题，我会为您提供帮助。",

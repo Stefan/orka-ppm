@@ -10,6 +10,9 @@ system integration.
 """
 
 import pytest
+
+pytest.importorskip("psutil")
+
 import time
 from hypothesis import given, settings, strategies as st, assume
 from typing import List, Dict, Any

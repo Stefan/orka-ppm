@@ -14,7 +14,14 @@ from uuid import UUID, uuid4
 from datetime import datetime
 import json
 
-from main import app, UserRole, UserStatus, UserCreateRequest, UserUpdateRequest, UserResponse, UserListResponse, UserDeactivationRequest, get_current_user, require_admin, rbac
+from main import app
+from models.users import (
+    UserRole, UserStatus, UserCreateRequest, UserUpdateRequest,
+    UserResponse, UserListResponse, UserDeactivationRequest,
+)
+from auth.dependencies import get_current_user
+from auth.rbac import require_admin
+from routers.rbac import router as rbac
 
 # Create test client
 client = TestClient(app)

@@ -51,16 +51,16 @@ with patch.dict('sys.modules', {
          patch('main.PerformanceMonitor') as mock_perf_monitor, \
          patch('main.BulkOperationManager') as mock_bulk_manager, \
          patch('main.limiter') as mock_limiter, \
-         patch('main.cached') as mock_cached, \
+         patch('main.cached', create=True) as mock_cached, \
          patch('main.performance_middleware') as mock_perf_middleware, \
          patch('main.version_middleware') as mock_version_middleware, \
          patch('main.APIVersionManager') as mock_api_version, \
-         patch('main.BulkOperationsService') as mock_bulk_service, \
-         patch('main.setup_api_documentation') as mock_setup_docs, \
+         patch('main.BulkOperationsService', create=True) as mock_bulk_service, \
+         patch('main.setup_api_documentation', create=True) as mock_setup_docs, \
          patch('main._rate_limit_exceeded_handler') as mock_rate_handler, \
          patch('main.RateLimitExceeded') as mock_rate_exceeded, \
          patch('main.SlowAPIMiddleware') as mock_slow_middleware, \
-         patch('main.generate_latest') as mock_prometheus:
+         patch('main.generate_latest', create=True) as mock_prometheus:
         
         # Setup mocks
         mock_create_ai_agents.return_value = None

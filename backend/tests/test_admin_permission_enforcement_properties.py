@@ -18,16 +18,16 @@ import uuid
 import asyncio
 import json
 
-# Import components from main.py
-from main import (
-    app,
+# Import from main (app only) and auth/models
+from main import app
+from auth.rbac import (
     require_admin,
     Permission,
     UserRole,
     DEFAULT_ROLE_PERMISSIONS,
     RoleBasedAccessControl,
-    get_current_user
 )
+from auth.dependencies import get_current_user
 
 # Test data strategies for property-based testing
 @st.composite

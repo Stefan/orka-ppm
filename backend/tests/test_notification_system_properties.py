@@ -18,8 +18,9 @@ from services.change_notification_system import (
     ChangeNotificationSystem, NotificationType, DeliveryMethod, DeliveryStatus
 )
 from models.change_management import (
-    ChangeStatus, ChangeType, PriorityLevel, ApprovalDecision, NotificationPreferences
+    ChangeStatus, ChangeType, PriorityLevel, ApprovalDecision
 )
+from models.workflow_notification import NotificationPreferences
 
 # Test data generators
 @st.composite

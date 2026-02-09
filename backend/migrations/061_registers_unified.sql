@@ -1,7 +1,32 @@
 -- Migration 061: Unified Registers (Register-Arten)
 -- Spec: .kiro/specs/registers-unified/
 -- Table: registers (type, project_id, organization_id, data jsonb, status)
--- RLS: organization-scoped (depends on 058 for get_user_visible_org_ids, is_org_admin)
+-- RLS: organization-scoped (uses get_user_visible_org_ids, is_org_admin from 058 or stubs below)
+
+-- Provide is_org_admin() and get_user_visible_org_ids() if not already present (e.g. migration 058 not applied).
+-- Stubs use only user_roles + roles (005); no scope_type/scope_id/is_active (030). Apply 058 later to replace with full RLS.
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'public' AND p.proname = 'is_org_admin') THEN
+    CREATE FUNCTION is_org_admin(uid UUID DEFAULT auth.uid())
+    RETURNS BOOLEAN AS $inner$
+      SELECT EXISTS (
+        SELECT 1 FROM user_roles ur
+        JOIN roles r ON r.id = ur.role_id
+        WHERE ur.user_id = uid AND r.name IN ('super_admin', 'admin')
+      );
+    $inner$ LANGUAGE sql STABLE SECURITY DEFINER;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid WHERE n.nspname = 'public' AND p.proname = 'get_user_visible_org_ids') THEN
+    -- Stub: no scope_id in user_roles; return all orgs so RLS allows access until 058/030 applied.
+    CREATE FUNCTION get_user_visible_org_ids(uid UUID DEFAULT auth.uid())
+    RETURNS SETOF UUID AS $inner$
+    BEGIN
+      RETURN QUERY SELECT id FROM organizations;
+    END;
+    $inner$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+  END IF;
+END $$;
 
 CREATE TABLE IF NOT EXISTS registers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

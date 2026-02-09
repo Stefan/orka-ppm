@@ -99,12 +99,12 @@ class MockSupabaseClient:
     def table(self, table_name):
         return self.tables.get(table_name, MockSupabaseTable())
 
-# Import financial functions from main.py
-from main import (
-    get_exchange_rate, 
-    convert_currency, 
+# Import financial functions from services
+from services.financial_calculations import (
+    get_exchange_rate,
+    convert_currency,
     calculate_project_budget_variance,
-    BASE_EXCHANGE_RATES
+    BASE_EXCHANGE_RATES,
 )
 
 # Test data strategies for property-based testing

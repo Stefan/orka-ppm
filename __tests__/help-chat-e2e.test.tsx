@@ -61,6 +61,17 @@ jest.mock('next/router', () => ({
   useRouter: () => mockRouter
 }))
 
+jest.mock('../contexts/PortfolioContext', () => ({
+  usePortfolio: () => ({
+    currentPortfolioId: null,
+    currentPortfolio: null,
+    setCurrentPortfolioId: jest.fn(),
+    portfolios: [],
+    setPortfolios: jest.fn(),
+  }),
+  PortfolioProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}))
+
 // Test wrapper component
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (

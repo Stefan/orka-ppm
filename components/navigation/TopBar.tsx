@@ -34,7 +34,9 @@ import {
   PanelRightOpen,
   PanelRightClose,
   Lightbulb,
+  FolderOpen,
 } from 'lucide-react'
+import { usePortfolio } from '@/contexts/PortfolioContext'
 import { useAuth } from '../../app/providers/SupabaseAuthProvider'
 import { useTheme } from '@/app/providers/ThemeProvider'
 import { prefetchDashboardData } from '@/lib/api/dashboard-loader'
@@ -98,8 +100,10 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
     return () => workflowNotifications.cleanup()
   }, [userId, workflowNotifications])
 
+  const { currentPortfolioId, currentPortfolio, setCurrentPortfolioId, portfolios, setPortfolios } = usePortfolio()
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [moreMenuOpen, setMoreMenuOpen] = useState(false)
+  const [portfolioMenuOpen, setPortfolioMenuOpen] = useState(false)
   const [projectsMenuOpen, setProjectsMenuOpen] = useState(false)
   const [financialsMenuOpen, setFinancialsMenuOpen] = useState(false)
   const [analysisMenuOpen, setAnalysisMenuOpen] = useState(false)
@@ -108,12 +112,27 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const notificationsRef = useRef<HTMLDivElement>(null)
+  const portfolioMenuRef = useRef<HTMLDivElement>(null)
   const moreMenuRef = useRef<HTMLDivElement>(null)
   const projectsMenuRef = useRef<HTMLDivElement>(null)
   const financialsMenuRef = useRef<HTMLDivElement>(null)
   const analysisMenuRef = useRef<HTMLDivElement>(null)
   const managementMenuRef = useRef<HTMLDivElement>(null)
   const adminMenuRef = useRef<HTMLDivElement>(null)
+
+  // Load portfolios for selector (and sync to context)
+  useEffect(() => {
+    if (!session?.access_token) return
+    fetch('/api/portfolios', {
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    })
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('Failed to fetch portfolios'))))
+      .then((data) => {
+        const list = Array.isArray(data) ? data : data?.items ?? data?.portfolios ?? []
+        setPortfolios(list.map((p: { id: string; name: string; description?: string; owner_id: string }) => ({ id: p.id, name: p.name, description: p.description, owner_id: p.owner_id })))
+      })
+      .catch(() => {})
+  }, [session?.access_token, setPortfolios])
 
   const handleLogout = async () => {
     try {
@@ -131,6 +150,9 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
   // Close menus when clicking outside (use 'click' so the same gesture that opened the menu doesn't close it)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      if (portfolioMenuRef.current && !portfolioMenuRef.current.contains(event.target as Node)) {
+        setPortfolioMenuOpen(false)
+      }
       if (projectsMenuRef.current && !projectsMenuRef.current.contains(event.target as Node)) {
         setProjectsMenuOpen(false)
       }
@@ -157,14 +179,14 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
       }
     }
 
-    if (projectsMenuOpen || financialsMenuOpen || analysisMenuOpen || managementMenuOpen || adminMenuOpen || userMenuOpen || notificationsOpen || moreMenuOpen) {
+    if (portfolioMenuOpen || projectsMenuOpen || financialsMenuOpen || analysisMenuOpen || managementMenuOpen || adminMenuOpen || userMenuOpen || notificationsOpen || moreMenuOpen) {
       document.addEventListener('click', handleClickOutside)
     }
 
     return () => {
       document.removeEventListener('click', handleClickOutside)
     }
-  }, [projectsMenuOpen, financialsMenuOpen, analysisMenuOpen, managementMenuOpen, adminMenuOpen, userMenuOpen, notificationsOpen, moreMenuOpen])
+  }, [portfolioMenuOpen, projectsMenuOpen, financialsMenuOpen, analysisMenuOpen, managementMenuOpen, adminMenuOpen, userMenuOpen, notificationsOpen, moreMenuOpen])
 
   const userEmail = session?.user?.email || 'User'
   const userName = session?.user?.user_metadata?.full_name || userEmail.split('@')[0]
@@ -180,6 +202,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
 
   // Close all dropdown menus
   const closeAllDropdowns = () => {
+    setPortfolioMenuOpen(false)
     setProjectsMenuOpen(false)
     setFinancialsMenuOpen(false)
     setAnalysisMenuOpen(false)
@@ -216,7 +239,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
 
   // Position portaled dropdown under the open menu's trigger (so it isn't clipped by topbar overflow)
   useEffect(() => {
-    const ref = projectsMenuOpen ? projectsMenuRef : financialsMenuOpen ? financialsMenuRef : analysisMenuOpen ? analysisMenuRef : managementMenuOpen ? managementMenuRef : adminMenuOpen ? adminMenuRef : null
+    const ref = portfolioMenuOpen ? portfolioMenuRef : projectsMenuOpen ? projectsMenuRef : financialsMenuOpen ? financialsMenuRef : analysisMenuOpen ? analysisMenuRef : managementMenuOpen ? managementMenuRef : adminMenuOpen ? adminMenuRef : null
     if (!ref?.current) {
       setDropdownAnchor(null)
       return
@@ -234,12 +257,12 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
       window.removeEventListener('scroll', update, true)
       window.removeEventListener('resize', update)
     }
-  }, [projectsMenuOpen, financialsMenuOpen, analysisMenuOpen, managementMenuOpen, adminMenuOpen])
+  }, [portfolioMenuOpen, projectsMenuOpen, financialsMenuOpen, analysisMenuOpen, managementMenuOpen, adminMenuOpen])
 
   return (
     <header ref={headerRef} data-testid="top-bar" className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 w-full max-w-full overflow-visible" style={{ position: 'sticky', top: 0, zIndex: 9999, flexShrink: 0, minHeight: '64px', boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06)' }}>
       <div className="relative flex items-center h-16 px-6 lg:px-8 w-full min-w-0 max-w-full overflow-visible">
-        {/* Left + Center: reserve space for actions; overflow-x-auto so nav scrolls instead of clipping profile */}
+        {/* Left + Center: logo, search (always visible), nav (scrolls if needed); reserve space for right actions */}
         <div className="flex items-center flex-1 min-w-0 gap-1 pr-[220px] sm:pr-[260px] overflow-x-auto overflow-y-hidden">
         {/* Left Section: Logo + Menu Button */}
         <div data-testid="top-bar-logo" className="flex items-center space-x-5 flex-shrink-0">
@@ -265,6 +288,22 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           </Link>
         </div>
 
+        {/* Portfolio selector – current context */}
+        {portfolios.length > 0 && (
+          <div className="relative hidden sm:block flex-shrink-0" ref={portfolioMenuRef}>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); toggleDropdown(setPortfolioMenuOpen, portfolioMenuOpen) }}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${portfolioMenuOpen ? 'bg-blue-50 dark:bg-slate-700 text-blue-700 dark:text-blue-300 ring-1 ring-blue-200 dark:ring-slate-600' : 'text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700'}`}
+              title={t('topbar.currentPortfolio')}
+            >
+              <FolderOpen className="h-4 w-4 text-gray-500 dark:text-slate-400" />
+              <span className="max-w-[140px] truncate">{currentPortfolio?.name ?? t('topbar.allPortfolios')}</span>
+              <ChevronDown className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
         {/* Left-aligned Navigation Links – min-w-0 so nav can shrink in landscape */}
         <nav
           data-testid="top-bar-nav"
@@ -274,7 +313,7 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           <Link
             href="/dashboards"
             className={`${navLinkBase} ${pathname === '/dashboards' ? navLinkActive : navLinkInactive}`}
-            onMouseEnter={() => session?.access_token && prefetchDashboardData(session.access_token)}
+            onMouseEnter={() => session?.access_token && prefetchDashboardData(session.access_token, { portfolioId: currentPortfolioId ?? undefined })}
           >
             {t('nav.dashboards')}
           </Link>
@@ -373,11 +412,29 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
         </nav>
 
         {/* Portaled dropdown panels (so they are not clipped by topbar overflow) */}
-        {(projectsMenuOpen || financialsMenuOpen || analysisMenuOpen || managementMenuOpen || adminMenuOpen) && dropdownAnchor && typeof document !== 'undefined' && createPortal(
+        {(portfolioMenuOpen || projectsMenuOpen || financialsMenuOpen || analysisMenuOpen || managementMenuOpen || adminMenuOpen) && dropdownAnchor && typeof document !== 'undefined' && createPortal(
           <div
             className="w-64 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-3 animate-in fade-in slide-in-from-top-2 duration-200"
             style={{ position: 'fixed', top: dropdownAnchor.top, left: dropdownAnchor.left, zIndex: 10050, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
           >
+            {portfolioMenuOpen && (
+              <>
+                <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{t('topbar.currentPortfolio')}</h3>
+                </div>
+                <button type="button" className={`${dropdownItemBase} w-full text-left ${!currentPortfolioId ? dropdownItemActive : dropdownItemInactive}`} onClick={() => { setCurrentPortfolioId(null); setPortfolioMenuOpen(false) }}>
+                  <FolderOpen className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('topbar.allPortfolios')}</span>
+                </button>
+                {portfolios.map((p) => (
+                  <button key={p.id} type="button" className={`${dropdownItemBase} w-full text-left ${currentPortfolioId === p.id ? dropdownItemActive : dropdownItemInactive}`} onClick={() => { setCurrentPortfolioId(p.id); setPortfolioMenuOpen(false) }}>
+                    <FolderOpen className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium truncate block">{p.name}</span>
+                  </button>
+                ))}
+                <Link href="/portfolios" className={`${dropdownItemBase} block border-t border-gray-100 dark:border-slate-700 mt-2 pt-2`} onClick={() => setPortfolioMenuOpen(false)}>
+                  <Layers className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.portfolios')}</span>
+                </Link>
+              </>
+            )}
             {projectsMenuOpen && (
               <>
                 <div className="px-3 pb-2 mb-2 border-b border-gray-100 dark:border-slate-700">
@@ -385,6 +442,9 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
                 </div>
                 <Link href="/projects" className={`${dropdownItemBase} ${pathname === '/projects' || pathname.startsWith('/projects/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setProjectsMenuOpen(false)}>
                   <GitBranch className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.allProjects')}</span>
+                </Link>
+                <Link href="/portfolios" className={`${dropdownItemBase} ${pathname === '/portfolios' || pathname.startsWith('/portfolios/') ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setProjectsMenuOpen(false)}>
+                  <FolderOpen className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.portfolios')}</span>
                 </Link>
                 <Link href="/resources" className={`${dropdownItemBase} ${pathname === '/resources' ? dropdownItemActive : dropdownItemInactive}`} onClick={() => setProjectsMenuOpen(false)}>
                   <Users className="h-5 w-5 mr-3 flex-shrink-0" /><span className="font-medium">{t('nav.resourceManagement')}</span>
@@ -448,12 +508,12 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           document.body
         )}
 
-        {/* Topbar Unified Search */}
-        <TopbarSearch />
         </div>
 
-        {/* Right Section: fixed at right so profile always visible in landscape */}
-        <div ref={actionsRef} data-testid="top-bar-actions" className="absolute right-0 top-0 bottom-0 flex items-center space-x-2 sm:space-x-3 flex-shrink-0 z-10 pr-6 lg:pr-8 bg-white dark:bg-slate-900">
+        {/* Right Section: search, theme, language, notifications, user – always visible */}
+        <div ref={actionsRef} data-testid="top-bar-actions" className="absolute right-0 top-0 bottom-0 flex items-center space-x-2 sm:space-x-3 flex-shrink-0 z-10 pl-4 pr-6 lg:pr-8 bg-white dark:bg-slate-900">
+          {/* Topbar Unified Search – directly before theme switcher */}
+          <TopbarSearch />
           {/* Theme Toggle (Light / Dark / System) */}
           <button
             data-testid="top-bar-theme-toggle"

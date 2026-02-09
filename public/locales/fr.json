@@ -258,7 +258,79 @@
     "alerts": {
       "one": "{count} alerte",
       "other": "{count} alertes"
-    }
+    },
+    "errors": {
+      "one": "{count} erreur",
+      "other": "{count} erreurs"
+    },
+    "warnings": {
+      "one": "{count} avertissement",
+      "other": "{count} avertissements"
+    },
+    "conflicts": {
+      "one": "{count} conflit",
+      "other": "{count} conflits"
+    },
+    "approvals": {
+      "one": "{count} approbation en attente",
+      "other": "{count} approbations en attente"
+    },
+    "approvalsFromYou": {
+      "one": "{count} approbation en attente de votre part",
+      "other": "{count} approbations en attente de votre part"
+    },
+    "approvers": {
+      "one": "{count} approbateur",
+      "other": "{count} approbateurs"
+    },
+    "changes": {
+      "one": "{count} modification",
+      "other": "{count} modifications"
+    },
+    "vendors": {
+      "one": "{count} fournisseur",
+      "other": "{count} fournisseurs"
+    },
+    "transactions": {
+      "one": "{count} transaction",
+      "other": "{count} transactions"
+    },
+    "comments": { "one": "{count} commentaire", "other": "{count} commentaires" },
+    "guides": { "one": "{count} guide", "other": "{count} guides" },
+    "fields": { "one": "{count} champ", "other": "{count} champs" },
+    "typesSelected": { "one": "{count} type sélectionné", "other": "{count} types sélectionnés" },
+    "replies": { "one": "{count} réponse", "other": "{count} réponses" },
+    "permissions": { "one": "{count} permission", "other": "{count} permissions" },
+    "activities": { "one": "{count} activité", "other": "{count} activités" },
+    "anomalies": { "one": "{count} anomalie", "other": "{count} anomalies" },
+    "tasks": { "one": "{count} tâche", "other": "{count} tâches" },
+    "widgets": { "one": "{count} widget", "other": "{count} widgets" },
+    "showingVendors": { "one": "Affichage de 1 fournisseur", "other": "Affichage de {count} fournisseurs" },
+    "showingTransactions": { "one": "Affichage de 1 transaction", "other": "Affichage de {count} transactions" },
+    "changesPending": { "one": "1 modification en attente", "other": "{count} modifications en attente" },
+    "errorsFound": { "one": "1 erreur trouvée", "other": "{count} erreurs trouvées" },
+    "warningsFound": { "one": "1 avertissement", "other": "{count} avertissements" },
+    "conflictsNeedResolution": { "one": "1 conflit à résoudre", "other": "{count} conflits à résoudre" },
+    "fieldsAffected": { "one": "1 champ concerné", "other": "{count} champs concernés" },
+    "projectsImportedSuccessfully": { "one": "1 projet importé avec succès.", "other": "{count} projets importés avec succès." },
+    "changesWaitingToSync": { "one": "Vous avez 1 modification en attente de synchronisation.", "other": "Vous avez {count} modifications en attente de synchronisation." },
+    "activeTasks": { "one": "1 tâche active", "other": "{count} tâches actives" },
+    "newItemsSinceLastView": { "one": "1 nouvel élément depuis la dernière vue", "other": "{count} nouveaux éléments depuis la dernière vue" },
+    "guidesAvailable": { "one": "1 guide disponible", "other": "{count} guides disponibles" },
+    "anomaliesDetected": { "one": "1 anomalie détectée", "other": "{count} anomalies détectées" },
+    "suspiciousActivitiesDetected": { "one": "1 activité suspecte détectée", "other": "{count} activités suspectes détectées" },
+    "justNow": "à l'instant",
+    "minutesAgo": { "one": "il y a {count} minute", "other": "il y a {count} minutes" },
+    "hoursAgo": { "one": "il y a {count} heure", "other": "il y a {count} heures" },
+    "daysAgo": { "one": "il y a {count} jour", "other": "il y a {count} jours" },
+    "weeksAgo": { "one": "il y a {count} semaine", "other": "il y a {count} semaines" },
+    "monthsAgo": { "one": "il y a {count} mois", "other": "il y a {count} mois" },
+    "yearsAgo": { "one": "il y a {count} an", "other": "il y a {count} ans" },
+    "days": { "one": "{count} jour", "other": "{count} jours" },
+    "weeks": { "one": "{count} semaine", "other": "{count} semaines" },
+    "importantSuffix": " (important)",
+    "recentNewSuffix": " ({count} nouveau(x))",
+    "severityAnomaliesDetected": { "one": "{count} anomalie de gravité {severity} détectée", "other": "{count} anomalies de gravité {severity} détectées" }
   },
   "shared": {
     "shareableUrl": {
@@ -311,6 +383,7 @@
     "title": "Assistant d'aide IA"
   },
   "helpChat": {
+    "sendButtonLabel": "Envoyer le message",
     "placeholder": "Posez-moi une question sur PPM...",
     "welcome": "Bienvenue dans l'Assistant d'aide IA !",
     "welcomeMessage": "Posez-moi des questions sur les fonctionnalités de la plateforme PPM et je vous aiderai.",

@@ -8,7 +8,8 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from main import rbac, Permission, UserRole, DEFAULT_ROLE_PERMISSIONS
+from routers.rbac import router as rbac
+from auth.rbac import Permission, UserRole, DEFAULT_ROLE_PERMISSIONS
 
 async def test_rbac_system():
     """Test the RBAC system functionality"""

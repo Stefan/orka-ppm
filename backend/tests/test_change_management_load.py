@@ -5,6 +5,10 @@ Stress tests the system under realistic load conditions with multiple concurrent
 high data volumes, and sustained operations over time.
 """
 
+import pytest
+
+pytest.importorskip("aiohttp")
+
 import asyncio
 import aiohttp
 import time

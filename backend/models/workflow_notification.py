@@ -6,7 +6,7 @@ Models for workflow notification tracking and history.
 
 from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from uuid import UUID
 from enum import Enum
 
@@ -66,6 +66,10 @@ class NotificationPreferences(BaseModel):
     email_notifications: bool = Field(default=True, description="Enable email notifications")
     workflow_notifications: bool = Field(default=True, description="Enable workflow notifications")
     reminder_notifications: bool = Field(default=True, description="Enable reminder notifications")
+    sms_notifications: bool = Field(default=False, description="Enable SMS notifications")
+    notification_types: List[str] = Field(default_factory=list, description="Enabled notification types")
+    escalation_enabled: bool = Field(default=True, description="Enable escalation")
+    reminder_frequency_hours: int = Field(default=24, ge=0, description="Reminder frequency in hours")
     created_at: Optional[datetime] = Field(None, description="Creation timestamp")
     updated_at: Optional[datetime] = Field(None, description="Last update timestamp")
 
