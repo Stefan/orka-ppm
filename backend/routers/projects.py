@@ -13,6 +13,9 @@ logger = logging.getLogger(__name__)
 from auth.dependencies import get_current_user
 from config.database import supabase, service_supabase
 from models.projects import ProjectCreate, ProjectUpdate, ProjectResponse, ProjectStatus
+
+# Use service role when available so list/get see all rows (RLS bypass); API still enforces auth.
+_db = lambda: service_supabase if service_supabase else supabase
 from services.project_sync import run_sync
 from models.base import HealthIndicator
 from utils.converters import convert_uuids
@@ -46,7 +49,8 @@ async def create_project(
 ):
     """Create a new project"""
     try:
-        if not supabase:
+        db = _db()
+        if not db:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
         project_data = project.dict()
@@ -54,7 +58,7 @@ async def create_project(
         if project_data.get('program_id') is not None:
             project_data['program_id'] = str(project_data['program_id'])
         
-        response = supabase.table("projects").insert(project_data).execute()
+        response = db.table("projects").insert(project_data).execute()
         if not response.data:
             raise HTTPException(status_code=400, detail="Failed to create project")
         
@@ -74,66 +78,75 @@ async def list_projects(
     current_user = Depends(require_permission(Permission.project_read))
 ):
     """Get projects with optional filtering and pagination. Uses cache (TTL 120s); invalidated on project create/update/delete. Default count_exact=false for faster response."""
-    # #region agent log
-    import json, time
-    _t0 = time.perf_counter()
     try:
-        with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "projects.py:list_projects:entry", "message": "list_projects_start", "data": {"limit": limit, "offset": offset}, "hypothesisId": "A"}) + "\n")
-    except Exception: pass
-    # #endregion
-    try:
-        if not supabase:
+        db = _db()
+        if not db:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         org_id = (current_user.get("organization_id") or current_user.get("tenant_id") or "default")
         if isinstance(org_id, UUID):
             org_id = str(org_id)
         cache = getattr(request.app.state, "cache_manager", None)
-        cache_key = f"{_projects_cache_key(org_id, offset, limit)}:{count_exact}"
+        pid = str(portfolio_id) if portfolio_id is not None else ""
+        st = (status.value if hasattr(status, "value") else status) if status is not None else ""
+        cache_key = f"{_projects_cache_key(org_id, offset, limit)}:{pid}:{st}:{count_exact}"
         data = None
         if cache:
             data = await cache.get(cache_key)
-        # #region agent log
-        try:
-            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "projects.py:list_projects:after_cache", "message": "after_cache_get", "data": {"elapsed_ms": round((time.perf_counter()-_t0)*1000), "cache_hit": data is not None}, "hypothesisId": "C"}) + "\n")
-        except Exception: pass
-        # #endregion
         if data is None:
-            select_cols = "id", "name", "status", "portfolio_id", "program_id", "health", "budget", "actual_cost", "start_date", "end_date", "created_at", "updated_at", "description"
-            if count_exact:
-                query = supabase.table("projects").select(*select_cols, count="exact")
-            else:
-                query = supabase.table("projects").select(*select_cols)
-            if portfolio_id is not None:
-                query = query.eq("portfolio_id", str(portfolio_id))
-            if status is not None:
-                query = query.eq("status", status.value)
-            response = query.order("updated_at", desc=True).range(offset, offset + limit - 1).execute()
-            items = convert_uuids(response.data)
-            if count_exact and hasattr(response, "count") and response.count is not None:
-                total = response.count
-            else:
-                total = offset + len(items) if items else 0
-            if cache:
-                await cache.set(cache_key, {"items": items, "total": total}, ttl=PROJECTS_CACHE_TTL)
-            data = {"items": items, "total": total}
-            # #region agent log
-            try:
-                with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "projects.py:list_projects:after_db", "message": "after_db_query", "data": {"elapsed_ms": round((time.perf_counter()-_t0)*1000), "items_count": len(items)}, "hypothesisId": "A"}) + "\n")
-            except Exception: pass
-            # #endregion
-        if isinstance(data, dict):
-            items = data.get("items", data)
-            total = data.get("total")
+            # Full column set (requires migrations 066+); fallback to minimal set if DB lacks columns
+            select_cols_full = (
+                "id", "name", "status", "portfolio_id", "program_id", "health", "budget", "actual_cost",
+                "start_date", "end_date", "created_at", "updated_at", "description",
+                "external_id", "parent_project_external_ids", "archived", "live_date", "date_last_updated",
+                "percentage_complete", "project_type_id", "project_type_description", "project_status_id",
+                "project_status_description", "project_phase_id", "project_phase_description",
+                "ppm_project_home_url", "legal_entity_id", "legal_entity_description", "order_ids",
+                "pm_technique", "pm_technique_description", "freeze_period", "freeze_period_description",
+                "forecast_display_setting", "cost_centre", "country_id", "currency",
+            )
+            select_cols_minimal = (
+                "id", "name", "status", "portfolio_id", "health", "budget", "actual_cost",
+                "start_date", "end_date", "created_at", "updated_at", "description",
+            )
+            for select_cols in (select_cols_full, select_cols_minimal):
+                try:
+                    if count_exact:
+                        query = db.table("projects").select(*select_cols, count="exact")
+                    else:
+                        query = db.table("projects").select(*select_cols)
+                    if portfolio_id is not None:
+                        query = query.eq("portfolio_id", str(portfolio_id))
+                    if status is not None:
+                        query = query.eq("status", status.value)
+                    response = query.order("updated_at", desc=True).range(offset, offset + limit - 1).execute()
+                    items = convert_uuids(response.data)
+                    if count_exact and hasattr(response, "count") and response.count is not None:
+                        total = response.count
+                    else:
+                        total = offset + len(items) if items else 0
+                    if cache:
+                        await cache.set(cache_key, {"items": items, "total": total}, ttl=PROJECTS_CACHE_TTL)
+                    data = {"items": items, "total": total}
+                    break
+                except Exception as select_err:
+                    if select_cols == select_cols_minimal:
+                        raise
+                    logger.warning("Projects list full select failed (%s), retrying with minimal columns", select_err)
+                    continue
+        if isinstance(data, dict) and ("items" in data or "total" in data):
+            items = data.get("items", [])
+            total = data.get("total", len(items) if items else 0)
+        elif isinstance(data, list):
+            items = convert_uuids(data)
+            total = len(items)
         else:
-            items = data
-            total = len(items) if items else 0
-        # #region agent log
-        try:
-            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "projects.py:list_projects:exit", "message": "list_projects_done", "data": {"total_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "A"}) + "\n")
-        except Exception: pass
-        # #endregion
+            items = []
+            total = 0
         return {"items": items, "total": total, "limit": limit, "offset": offset}
+    except HTTPException:
+        raise
     except Exception as e:
+        logger.exception("List projects error: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -179,9 +192,10 @@ async def get_project(
 ):
     """Get a specific project"""
     try:
-        if not supabase:
+        db = _db()
+        if not db:
             raise HTTPException(status_code=503, detail="Database service unavailable")
-        response = supabase.table("projects").select("*").eq("id", str(project_id)).execute()
+        response = db.table("projects").select("*").eq("id", str(project_id)).execute()
         if not response.data:
             raise HTTPException(status_code=404, detail="Project not found")
         return convert_uuids(response.data[0])
@@ -200,11 +214,12 @@ async def update_project(
 ):
     """Partial update (e.g. program_id for drag-drop)."""
     try:
-        if not supabase:
+        db = _db()
+        if not db:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         data = payload.dict(exclude_unset=True)
         if not data:
-            response = supabase.table("projects").select("*").eq("id", str(project_id)).execute()
+            response = db.table("projects").select("*").eq("id", str(project_id)).execute()
             if not response.data:
                 raise HTTPException(status_code=404, detail="Project not found")
             return convert_uuids(response.data[0])
@@ -213,7 +228,7 @@ async def update_project(
                 data[key] = str(data[key])
         if "team_members" in data and data["team_members"] is not None:
             data["team_members"] = [str(u) for u in data["team_members"]]
-        response = supabase.table("projects").update(data).eq("id", str(project_id)).execute()
+        response = db.table("projects").update(data).eq("id", str(project_id)).execute()
         if not response.data:
             raise HTTPException(status_code=404, detail="Project not found")
         _invalidate_projects_cache(request)

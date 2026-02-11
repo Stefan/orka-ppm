@@ -41,10 +41,7 @@ export async function GET(request: NextRequest) {
     const data = await response.json()
     return NextResponse.json(data)
   } catch (error) {
-    console.error('Error proxying notifications request:', error)
-    return NextResponse.json(
-      { error: 'Failed to get notifications', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    )
+    console.warn('Notifications: backend unreachable', error instanceof Error ? error.message : error)
+    return NextResponse.json({ notifications: [] }, { status: 200 })
   }
 }

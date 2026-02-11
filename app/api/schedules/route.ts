@@ -50,8 +50,7 @@ export async function GET(request: NextRequest) {
       headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
     })
   } catch (error) {
-    console.error('Schedules API error:', error)
-    // Backend unreachable (e.g. not running): return empty list so page still loads
+    console.warn('Schedules API: backend unreachable', error instanceof Error ? error.message : error)
     return NextResponse.json(
       { schedules: [], total: 0, page: 1, page_size: 50 },
       { status: 200, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
@@ -94,10 +93,10 @@ export async function POST(request: NextRequest) {
     const data = await response.json()
     return NextResponse.json(data, { status: 201 })
   } catch (error) {
-    console.error('Schedules create API error:', error)
+    console.warn('Schedules create: backend unreachable', error instanceof Error ? error.message : error)
     return NextResponse.json(
-      { error: 'Failed to create schedule' },
-      { status: 500 }
+      { error: 'Backend unreachable' },
+      { status: 503 }
     )
   }
 }

@@ -1,22 +1,23 @@
 'use client'
 
 import { useTranslations } from '../../../../lib/i18n/context'
-import { useCommitmentsActualsData } from '../../hooks/useCommitmentsActualsData'
+import type { CommitmentsActualsSummary, CommitmentsActualsAnalytics } from '../../hooks/useCommitmentsActualsData'
 
 interface CommitmentsActualsVarianceTableProps {
-  accessToken?: string
   selectedCurrency: string
+  /** From shared Financials data context; when provided, no internal fetch. */
+  summary?: CommitmentsActualsSummary | null
+  analytics?: CommitmentsActualsAnalytics | null
+  loading?: boolean
 }
 
-export default function CommitmentsActualsVarianceTable({ 
-  accessToken,
-  selectedCurrency
+export default function CommitmentsActualsVarianceTable({
+  selectedCurrency,
+  summary = null,
+  analytics = null,
+  loading = false
 }: CommitmentsActualsVarianceTableProps) {
   const { t } = useTranslations()
-  const { analytics, summary, loading } = useCommitmentsActualsData({
-    accessToken,
-    selectedCurrency
-  })
 
   if (loading) {
     return (

@@ -340,6 +340,8 @@
     "dropzonePrompt": "将文件拖放此处，或点击选择",
     "dropzoneActive": "在此处放置文件...",
     "acceptedFormats": "接受格式：.csv, .json",
+    "assignToPortfolio": "将所有项目分配到组合",
+    "selectPortfolio": "选择组合",
     "importButton": "导入数据",
     "clear": "清除",
     "processing": "处理中...",
@@ -360,7 +362,7 @@
     "template": "模板",
     "dropzoneFilePrompt": "将文件拖放到此处，或点击选择",
     "selectFile": "选择文件",
-    "maxFileSize": "最大文件大小：50MB",
+    "maxFileSize": "最大文件大小：80MB",
     "columnsCommitments": "列：采购订单号、金额、货币、项目、WBS",
     "columnsActuals": "列：财务凭证、金额、货币、项目、WBS",
     "importHistory": "导入历史",
@@ -384,7 +386,9 @@
     "warnings": "警告",
     "rowLabel": "行 {row}",
     "moreErrors": "... 以及 {count} 个其他错误",
-    "moreWarnings": "... 以及 {count} 个其他警告"
+    "moreWarnings": "... 以及 {count} 个其他警告",
+    "anonymizeData": "匿名化数据（供应商、项目、金额等）",
+    "clearBeforeImport": "导入前清空目标表（删除现有数据）"
   },
   "shared": {
     "shareableUrl": {
@@ -490,6 +494,8 @@
     "lastYear": "去年",
     "budgetStatus": "预算状态",
     "allProjects": "所有项目",
+    "portfolio": "组合",
+    "allPortfolios": "全部组合",
     "overBudgetOnly": "仅超预算",
     "underBudgetOnly": "仅低于预算",
     "onBudget": "按预算",

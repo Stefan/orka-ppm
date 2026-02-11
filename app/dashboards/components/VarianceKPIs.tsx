@@ -209,7 +209,7 @@ function VarianceKPIs({ session, selectedCurrency = 'USD', showDetailedMetrics, 
                   : `${t('variance.noData')} ${t('variance.importCsvToSee')}`}
               </p>
               <Link
-                href="/financials?tab=csv-import"
+                href="/import"
                 className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded"
               >
                 <Upload className="h-4 w-4" aria-hidden />

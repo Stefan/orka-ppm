@@ -244,7 +244,7 @@ export function HelpDialog({
                 CES Tree
               </h4>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Cost Element Structure view groups spending by cost category and vendor.
+                Cost Element Structure view groups spending by project → cost category → vendor (so vendors are grouped per project and category, not in one flat list).
               </p>
             </div>
 

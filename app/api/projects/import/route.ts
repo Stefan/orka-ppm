@@ -70,11 +70,13 @@ export async function POST(request: NextRequest) {
     
     // Determine import type based on content type
     const isCSV = isCSVUpload(request)
-    
-    // Build backend URL based on import type
-    const backendUrl = isCSV 
-      ? `${BACKEND_URL}/api/projects/import/csv`
-      : `${BACKEND_URL}/api/projects/import`
+    const searchParams = new URL(request.url).searchParams
+    const queryString = searchParams.toString()
+
+    // Build backend URL based on import type (forward query params: anonymize, clear_before_import)
+    const backendUrl = isCSV
+      ? `${BACKEND_URL}/api/projects/import/csv${queryString ? `?${queryString}` : ''}`
+      : `${BACKEND_URL}/api/projects/import${queryString ? `?${queryString}` : ''}`
     
     // Prepare headers for backend request
     const backendHeaders: HeadersInit = {

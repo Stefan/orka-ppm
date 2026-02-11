@@ -5,8 +5,8 @@ Property 3: Missing required fields are rejected
 
 **Validates: Requirements 3.1, 8.4**
 
-Requirements 3.1: WHEN a project record is missing required fields (name, budget, status), 
-THE Validation_Engine SHALL reject that record
+Requirements 3.1: WHEN a project record is missing required fields (name, status), 
+THE Validation_Engine SHALL reject that record (budget is optional).
 
 Requirements 8.4: WHEN a required field is empty or null, THE Validation_Engine SHALL reject the record
 """
@@ -29,33 +29,25 @@ from models.base import ProjectStatus
 def project_with_missing_required_field(draw):
     """
     Generate project data with at least one required field missing or empty.
-    Required fields: name, budget, status
+    Required fields: name, status (budget is optional).
     
-    For string fields (name, status): can be None, empty string, or whitespace-only
-    For numeric fields (budget): can only be None (empty/whitespace don't apply)
+    For string fields (name, status): can be None, empty string, or whitespace-only.
     """
     # Decide which required field to make invalid
-    missing_field = draw(st.sampled_from(["name", "budget", "status"]))
-    
-    # For budget, only None is a valid "missing" state
-    # For string fields, we can have None, empty, or whitespace
-    if missing_field == "budget":
-        invalid_type = "none"  # Budget can only be None to be invalid
-    else:
-        invalid_type = draw(st.sampled_from(["none", "empty", "whitespace"]))
+    missing_field = draw(st.sampled_from(["name", "status"]))
+    invalid_type = draw(st.sampled_from(["none", "empty", "whitespace"]))
     
     # Generate valid values for other fields
     valid_name = draw(st.text(min_size=1, max_size=100, alphabet=st.characters(
         whitelist_categories=('L', 'N', 'P', 'S'),
         blacklist_characters='\x00'
     )).filter(lambda x: x.strip()))
-    valid_budget = draw(st.floats(min_value=0.01, max_value=1e9, allow_nan=False, allow_infinity=False))
     valid_status = draw(st.sampled_from([s.value for s in ProjectStatus]))
     
-    # Create project data with one invalid field
+    # Create project data with one invalid field (budget optional, can be None)
     project_data = {
         "name": valid_name,
-        "budget": valid_budget,
+        "budget": None,  # optional
         "status": valid_status,
     }
     
@@ -67,10 +59,7 @@ def project_with_missing_required_field(draw):
             project_data["name"] = ""
         else:  # whitespace
             project_data["name"] = "   "
-    elif missing_field == "budget":
-        # Budget is numeric, so only None makes it invalid
-        project_data["budget"] = None
-    elif missing_field == "status":
+    else:  # status
         if invalid_type == "none":
             project_data["status"] = None
         elif invalid_type == "empty":

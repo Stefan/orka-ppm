@@ -340,6 +340,8 @@
     "dropzonePrompt": "ファイルをここにドラッグ＆ドロップするか、クリックして選択してください",
     "dropzoneActive": "ここにファイルをドロップ...",
     "acceptedFormats": "対応形式: .csv, .json",
+    "assignToPortfolio": "すべてのプロジェクトをポートフォリオに割り当て",
+    "selectPortfolio": "ポートフォリオを選択",
     "importButton": "データのインポート",
     "clear": "クリア",
     "processing": "処理中...",
@@ -360,7 +362,7 @@
     "template": "テンプレート",
     "dropzoneFilePrompt": "ファイルをここにドロップするか、クリックして選択",
     "selectFile": "ファイルを選択",
-    "maxFileSize": "最大ファイルサイズ: 50MB",
+    "maxFileSize": "最大ファイルサイズ: 80MB",
     "columnsCommitments": "列: 発注番号、金額、通貨、プロジェクト、WBS",
     "columnsActuals": "列: FI文書、金額、通貨、プロジェクト、WBS",
     "importHistory": "インポート履歴",
@@ -384,7 +386,9 @@
     "warnings": "警告",
     "rowLabel": "行 {row}",
     "moreErrors": "... さらに {count} 件のエラー",
-    "moreWarnings": "... さらに {count} 件の警告"
+    "moreWarnings": "... さらに {count} 件の警告",
+    "anonymizeData": "データを匿名化（ベンダー、プロジェクト、金額など）",
+    "clearBeforeImport": "インポート前にターゲットテーブルをクリア（既存データを削除）"
   },
   "shared": {
     "shareableUrl": {
@@ -490,6 +494,8 @@
     "lastYear": "過去1年",
     "budgetStatus": "予算状況",
     "allProjects": "すべてのプロジェクト",
+    "portfolio": "ポートフォリオ",
+    "allPortfolios": "すべてのポートフォリオ",
     "overBudgetOnly": "予算超過のみ",
     "underBudgetOnly": "予算未達のみ",
     "onBudget": "予算通り",

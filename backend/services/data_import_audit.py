@@ -3,16 +3,41 @@ Write data import events (projects, commitments, actuals) to the central audit t
 
 Used so imports appear in the Audit Trail UI alongside other events.
 Failures are logged but do not fail the import.
+
+Import history (import_audit_logs) is trimmed to the last 10 entries per user after each write.
 """
 
 import logging
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Optional, Any
 from uuid import uuid4
 
 from config.database import service_supabase
 
 logger = logging.getLogger(__name__)
+
+IMPORT_HISTORY_KEEP_LAST = 10
+
+
+def trim_import_history(user_id: str, db_client: Optional[Any] = None, keep: int = IMPORT_HISTORY_KEEP_LAST) -> None:
+    """
+    Keep only the last `keep` import_audit_logs entries per user; delete older ones.
+    Call after inserting a new row so the history does not grow indefinitely.
+    """
+    db = db_client or service_supabase
+    if not db or not user_id:
+        return
+    try:
+        # Fetch ids of all entries for this user, newest first
+        r = db.table("import_audit_logs").select("id").eq("user_id", str(user_id)).order("created_at", desc=True).execute()
+        ids = [row["id"] for row in (r.data or []) if row.get("id")]
+        if len(ids) <= keep:
+            return
+        to_delete = ids[keep:]
+        db.table("import_audit_logs").delete().in_("id", to_delete).execute()
+        logger.debug("Trimmed import history for user %s: removed %d old entries", user_id, len(to_delete))
+    except Exception as e:
+        logger.warning("Failed to trim import history: %s", e, exc_info=True)
 
 # Event type for all data imports in the central audit trail
 DATA_IMPORT_EVENT_TYPE = "data_import"
@@ -87,7 +112,7 @@ def log_data_import_to_audit_trail(
         if import_id:
             event["entity_id"] = import_id
 
-        service_supabase.table("audit_logs").insert(event).execute()
+        service_supabase.table("audit_logs").insert(event, returning="minimal").execute()
         logger.debug("Logged data import to audit_logs: type=%s success=%s", import_type, success)
     except Exception as e:
         logger.warning(

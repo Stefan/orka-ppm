@@ -30,7 +30,8 @@ export default function ProjectsPage() {
   const currentUserId = session?.user?.id ?? undefined
   const accessToken = session?.access_token ?? undefined
   const { currentPortfolioId } = usePortfolio()
-  const { data: projectsData, isLoading: loading, error: queryError, refetch } = useProjectsQuery(accessToken, currentUserId, currentPortfolioId)
+  // "Alle Projekte" page: always load all projects (no portfolio filter) so imported projects and details are visible
+  const { data: projectsData, isLoading: loading, error: queryError, refetch } = useProjectsQuery(accessToken, currentUserId, null)
   const invalidateProjects = useInvalidateProjects()
   const projects: Project[] = (projectsData ?? []).map((p) => ({ ...p, description: p.description ?? '' }))
   const error = queryError ? (queryError instanceof Error ? queryError.message : 'An error occurred') : null

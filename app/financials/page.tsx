@@ -1,9 +1,9 @@
 'use client'
 
-import React, { lazy, Suspense, useEffect } from 'react'
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { usePortfolio } from '@/contexts/PortfolioContext'
+import { usePortfolioOptional } from '@/contexts/PortfolioContext'
 import { AlertTriangle } from 'lucide-react'
 import AppLayout from '../../components/shared/AppLayout'
 import { ResponsiveContainer } from '../../components/ui/molecules/ResponsiveContainer'
@@ -16,13 +16,11 @@ import OverviewView from './components/views/OverviewView'
 import AnalysisView from './components/views/AnalysisView'
 import DetailedView from './components/views/DetailedView'
 import TrendsView from './components/views/TrendsView'
-import CSVImportView from './components/views/CSVImportView'
 import POBreakdownView from './components/views/POBreakdownView'
 import BudgetVarianceTable from './components/tables/BudgetVarianceTable'
 
-// Import hooks
-import { useFinancialData } from './hooks/useFinancialData'
-import { useAnalytics } from './hooks/useAnalytics'
+// Import context and hooks
+import { FinancialsDataProvider, useFinancialsData } from './context/FinancialsDataContext'
 import { useFeatureFlag } from '../../contexts/FeatureFlagContext'
 
 // Import types
@@ -33,11 +31,20 @@ import { GuidedTour, useGuidedTour, TourTriggerButton, financialsTourSteps } fro
 const CommitmentsActualsView = lazy(() => import('./components/CommitmentsActualsView'))
 const Costbook = lazy(() => import('../../components/costbook/Costbook'))
 
-const TAB_PARAM_VALID: ViewMode[] = ['overview', 'detailed', 'trends', 'analysis', 'po-breakdown', 'csv-import', 'commitments-actuals', 'costbook']
+const TAB_PARAM_VALID: ViewMode[] = ['overview', 'detailed', 'trends', 'analysis', 'po-breakdown', 'commitments-actuals', 'costbook']
 
 function getInitialViewMode(searchParams: ReturnType<typeof useSearchParams>): ViewMode {
   const tab = searchParams.get('tab')
   return (tab && TAB_PARAM_VALID.includes(tab as ViewMode)) ? (tab as ViewMode) : 'overview'
+}
+
+/** Lazy main tabs: mount a tab's content only when first visited, then keep mounted and hide with CSS. */
+function useVisitedViewModes(viewMode: ViewMode) {
+  const [visited, setVisited] = useState<Set<ViewMode>>(() => new Set([viewMode]))
+  useEffect(() => {
+    setVisited((prev) => (prev.has(viewMode) ? prev : new Set(prev).add(viewMode)))
+  }, [viewMode])
+  return visited
 }
 
 function FinancialsFallback() {
@@ -52,7 +59,7 @@ function FinancialsFallback() {
 
 function FinancialsContent() {
   const { session } = useAuth()
-  const { currentPortfolioId, portfolios } = usePortfolio()
+  const { currentPortfolioId, portfolios } = usePortfolioOptional()
   const searchParams = useSearchParams()
   const { t } = useTranslations()
   const [selectedCurrency, setSelectedCurrency] = React.useState('USD')
@@ -60,6 +67,7 @@ function FinancialsContent() {
   const [showFilters, setShowFilters] = React.useState(false)
   const [portfolioFilterId, setPortfolioFilterId] = React.useState<string | null>(null)
   const [viewMode, setViewMode] = React.useState<ViewMode>(() => getInitialViewMode(searchParams))
+  const prevPortfolioIdRef = useRef<string | undefined>(undefined)
   const { isOpen, startTour, closeTour, completeTour, resetAndStartTour, hasCompletedTour } = useGuidedTour('financials-v1')
 
   const effectivePortfolioId =
@@ -85,29 +93,110 @@ function FinancialsContent() {
     }
   }, [viewMode, costbookEnabled])
 
-  // Use custom hooks for data management (optional portfolio scope)
+  return (
+    <FinancialsDataProvider
+      accessToken={session?.access_token ?? undefined}
+      selectedCurrency={selectedCurrency}
+      portfolioId={effectivePortfolioId}
+    >
+      <FinancialsContentInner
+        session={session}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        selectedCurrency={selectedCurrency}
+        setSelectedCurrency={setSelectedCurrency}
+        showFilters={showFilters}
+        setShowFilters={setShowFilters}
+        portfolioFilterId={portfolioFilterId}
+        setPortfolioFilterId={setPortfolioFilterId}
+        currentPortfolioId={currentPortfolioId}
+        portfolios={portfolios}
+        costbookEnabled={costbookEnabled}
+        effectivePortfolioId={effectivePortfolioId}
+        dateRange={dateRange}
+        setDateRange={setDateRange}
+        isOpen={isOpen}
+        startTour={startTour}
+        closeTour={closeTour}
+        completeTour={completeTour}
+        resetAndStartTour={resetAndStartTour}
+        hasCompletedTour={hasCompletedTour}
+      />
+    </FinancialsDataProvider>
+  )
+}
+
+function FinancialsContentInner({
+  session,
+  viewMode,
+  setViewMode,
+  selectedCurrency,
+  setSelectedCurrency,
+  showFilters,
+  setShowFilters,
+  portfolioFilterId,
+  setPortfolioFilterId,
+  currentPortfolioId,
+  portfolios,
+  costbookEnabled,
+  effectivePortfolioId,
+  dateRange,
+  setDateRange,
+  isOpen,
+  startTour,
+  closeTour,
+  completeTour,
+  resetAndStartTour,
+  hasCompletedTour
+}: {
+  session: { access_token?: string } | null
+  viewMode: ViewMode
+  setViewMode: (m: ViewMode) => void
+  selectedCurrency: string
+  setSelectedCurrency: (c: string) => void
+  showFilters: boolean
+  setShowFilters: (s: boolean) => void
+  portfolioFilterId: string | null
+  setPortfolioFilterId: (id: string | null) => void
+  currentPortfolioId: string | undefined
+  portfolios: Array<{ id: string; name: string }>
+  costbookEnabled: boolean
+  effectivePortfolioId: string | undefined
+  dateRange: string
+  setDateRange: (v: string) => void
+  isOpen: boolean
+  startTour: () => void
+  closeTour: () => void
+  completeTour: () => void
+  resetAndStartTour: () => void
+  hasCompletedTour: boolean
+}) {
+  const { t } = useTranslations()
+  const data = useFinancialsData()
+  const visitedViewModes = useVisitedViewModes(viewMode)
   const {
     projects,
     budgetVariances,
     financialAlerts,
     metrics,
     comprehensiveReport,
-    costAnalysis,
     budgetPerformance,
     loading,
     error,
-    refetch
-  } = useFinancialData({
-    accessToken: session?.access_token || undefined,
-    selectedCurrency,
-    portfolioId: effectivePortfolioId
-  })
+    refetch,
+    analyticsData,
+    costAnalysis,
+    commitmentsSummary,
+    commitmentsAnalytics,
+    trendsMonthlyData,
+    trendsSummary,
+    commitmentsLoading,
+    refetchCommitmentsActuals,
+    portfolioActualsTotal
+  } = data
 
-  const analyticsData = useAnalytics({
-    budgetVariances,
-    projects,
-    financialAlerts
-  })
+  const hasData = projects.length > 0 || metrics != null
+  const showContentSkeleton = loading && !hasData
 
   const exportFinancialData = () => {
     const exportData = {
@@ -120,7 +209,6 @@ function FinancialsContent() {
       view_mode: viewMode,
       exported_at: new Date().toISOString()
     }
-    
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -131,14 +219,6 @@ function FinancialsContent() {
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
   }
-
-  if (loading) return (
-    <AppLayout>
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    </AppLayout>
-  )
 
   if (error) return (
     <AppLayout>
@@ -170,21 +250,10 @@ function FinancialsContent() {
             onToggleFilters={() => setShowFilters(!showFilters)}
             onExport={exportFinancialData}
             onEditBudget={() => setViewMode('detailed')}
+            portfolios={portfolios}
+            selectedPortfolioId={portfolioFilterId !== null ? portfolioFilterId : (currentPortfolioId ?? '')}
+            onPortfolioChange={(id) => setPortfolioFilterId(id === '' ? '' : id)}
           />
-          <div className="mt-2 flex items-center gap-2">
-            <label htmlFor="financials-portfolio-filter" className="text-sm font-medium text-gray-700 dark:text-slate-300">{t('financials.portfolio') || 'Portfolio'}:</label>
-            <select
-              id="financials-portfolio-filter"
-              value={portfolioFilterId !== null ? portfolioFilterId : (currentPortfolioId ?? '')}
-              onChange={(e) => setPortfolioFilterId(e.target.value === '' ? '' : e.target.value)}
-              className="px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm text-gray-900 dark:text-slate-100 bg-white dark:bg-slate-800"
-            >
-              <option value="">{t('financials.allPortfolios') || 'All portfolios'}</option>
-              {portfolios.map((p) => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </select>
-          </div>
         </div>
 
         {/* Navigation Tabs */}
@@ -199,17 +268,34 @@ function FinancialsContent() {
           />
         </div>
 
-        {/* View-specific Content (EAC, Variance, etc.) */}
+        {/* View-specific Content (EAC, Variance, etc.) – skeleton only on initial load */}
         <div data-tour="financials-content" className="space-y-6">
+        {showContentSkeleton ? (
+          <div className="animate-pulse space-y-6">
+            <div className="h-24 bg-gray-100 dark:bg-slate-700 rounded-lg" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="h-20 bg-gray-100 dark:bg-slate-700 rounded-lg" />
+              ))}
+            </div>
+            <div className="h-64 bg-gray-100 dark:bg-slate-700 rounded-lg" />
+            <div className="h-96 bg-gray-100 dark:bg-slate-700 rounded-lg" />
+          </div>
+        ) : (
+          <>
         {/* Overview: KPI card, then Financial Metrics (Gesamtbudget etc.), then charts */}
-        {viewMode === 'overview' && (
-          <div data-testid="financials-overview-view">
+        {visitedViewModes.has('overview') && (
+          <div data-testid="financials-overview-view" className={viewMode === 'overview' ? 'block' : 'hidden'}>
             <OverviewView
               analyticsData={analyticsData}
               selectedCurrency={selectedCurrency}
               accessToken={session?.access_token}
               totalProjectBudget={metrics?.total_budget}
               metrics={metrics ?? undefined}
+              portfolioId={effectivePortfolioId}
+              commitmentsSummary={commitmentsSummary}
+              commitmentsAnalytics={commitmentsAnalytics}
+              portfolioActualsTotal={portfolioActualsTotal}
             />
           </div>
         )}
@@ -293,49 +379,49 @@ function FinancialsContent() {
           </div>
         )}
 
-        {/* View-specific Content */}
-        {viewMode === 'analysis' && (
-          <div data-testid="financials-analysis-view">
+        {/* View-specific Content (lazy-mount: only mount when first visited, then hide with CSS) */}
+        {visitedViewModes.has('analysis') && (
+          <div data-testid="financials-analysis-view" className={viewMode === 'analysis' ? 'block' : 'hidden'}>
             <AnalysisView
               budgetPerformance={budgetPerformance}
               costAnalysis={costAnalysis}
               analyticsData={analyticsData}
               selectedCurrency={selectedCurrency}
               accessToken={session?.access_token}
+              commitmentsSummary={commitmentsSummary}
+              commitmentsAnalytics={commitmentsAnalytics}
             />
           </div>
         )}
 
-        {viewMode === 'trends' && (
-          <div data-testid="financials-trends-view">
+        {visitedViewModes.has('trends') && (
+          <div data-testid="financials-trends-view" className={viewMode === 'trends' ? 'block' : 'hidden'}>
             <TrendsView
               comprehensiveReport={comprehensiveReport}
               selectedCurrency={selectedCurrency}
               accessToken={session?.access_token}
+              monthlyData={trendsMonthlyData}
+              trendsSummary={trendsSummary}
+              trendsLoading={commitmentsLoading}
             />
           </div>
         )}
 
-        {viewMode === 'detailed' && (
-          <div data-testid="financials-detailed-view">
+        {visitedViewModes.has('detailed') && (
+          <div data-testid="financials-detailed-view" className={viewMode === 'detailed' ? 'block' : 'hidden'}>
             <DetailedView
               comprehensiveReport={comprehensiveReport}
               selectedCurrency={selectedCurrency}
               accessToken={session?.access_token}
+              commitmentsSummary={commitmentsSummary}
+              commitmentsAnalytics={commitmentsAnalytics}
+              commitmentsLoading={commitmentsLoading}
             />
           </div>
         )}
 
-        {viewMode === 'csv-import' && (
-          <div data-testid="financials-csv-import-view">
-            <CSVImportView
-              accessToken={session?.access_token}
-            />
-          </div>
-        )}
-
-        {viewMode === 'po-breakdown' && (
-          <div data-testid="financials-po-breakdown-view">
+        {visitedViewModes.has('po-breakdown') && (
+          <div data-testid="financials-po-breakdown-view" className={viewMode === 'po-breakdown' ? 'block' : 'hidden'}>
             <POBreakdownView
               accessToken={session?.access_token}
               projectId={projects[0]?.id}
@@ -343,31 +429,34 @@ function FinancialsContent() {
           </div>
         )}
 
-        {viewMode === 'commitments-actuals' && (
-          <div data-testid="financials-commitments-actuals-view">
+        {visitedViewModes.has('commitments-actuals') && (
+          <div data-testid="financials-commitments-actuals-view" className={viewMode === 'commitments-actuals' ? 'block' : 'hidden'}>
             <Suspense fallback={
               <div className="flex items-center justify-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
               </div>
             }>
-              <CommitmentsActualsView 
+              <CommitmentsActualsView
                 session={session}
                 selectedCurrency={selectedCurrency}
                 onRefresh={refetch}
+                commitmentsSummary={commitmentsSummary}
+                commitmentsAnalytics={commitmentsAnalytics}
+                commitmentsLoading={commitmentsLoading}
+                onRefreshCommitmentsActuals={refetchCommitmentsActuals}
               />
             </Suspense>
           </div>
         )}
 
-        {viewMode === 'costbook' && (
-          <div data-testid="financials-costbook-view">
+        {visitedViewModes.has('costbook') && (
+          <div data-testid="financials-costbook-view" className={viewMode === 'costbook' ? 'block' : 'hidden'}>
             <Suspense fallback={
               <div className="flex items-center justify-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
               </div>
             }>
               <Costbook
-                useMockData={true}
                 initialCurrency={selectedCurrency as import('@/types/costbook').Currency}
                 showTourButton={false}
               />
@@ -385,6 +474,8 @@ function FinancialsContent() {
               analyticsData={analyticsData}
             />
           </div>
+        )}
+          </>
         )}
         </div>
       </ResponsiveContainer>

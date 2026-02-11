@@ -12,10 +12,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { ProjectWithFinancials, Currency, KPIMetrics } from '@/types/costbook'
 import { calculateKPIs } from '@/lib/costbook-calculations'
 import { convertCurrency } from '@/lib/currency-utils'
-import {
-  getMockProjectsWithFinancials,
-  fetchProjectsWithFinancials
-} from '@/lib/costbook/supabase-queries'
+import { fetchProjectsWithFinancials } from '@/lib/costbook/supabase-queries'
 
 // Phase 1: Core UI
 import { CostbookErrorBoundary } from './CostbookErrorBoundary'
@@ -29,8 +26,6 @@ import { LoadingSpinner } from './LoadingSpinner'
 import { ErrorDisplay } from './ErrorDisplay'
 
 export interface CostbookRoadmapProps {
-  /** Use mock data instead of Supabase */
-  useMockData?: boolean
   /** Initial currency */
   initialCurrency?: Currency
   /** Handler for project selection */
@@ -42,7 +37,6 @@ export interface CostbookRoadmapProps {
 }
 
 function CostbookRoadmapInner({
-  useMockData = false,
   initialCurrency = Currency.USD,
   onProjectSelect,
   className = '',
@@ -62,16 +56,14 @@ function CostbookRoadmapInner({
     setIsLoading(true)
     setError(null)
     try {
-      const data = useMockData
-        ? await Promise.resolve(getMockProjectsWithFinancials())
-        : await fetchProjectsWithFinancials()
+      const data = await fetchProjectsWithFinancials()
       setProjects(data)
     } catch (e) {
       setError(e instanceof Error ? e : new Error('Failed to load Costbook data'))
     } finally {
       setIsLoading(false)
     }
-  }, [useMockData])
+  }, [])
 
   useEffect(() => {
     fetchData()

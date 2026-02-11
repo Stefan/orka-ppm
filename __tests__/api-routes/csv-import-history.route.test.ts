@@ -6,7 +6,22 @@
 
 import { createMockNextRequest, parseJsonResponse } from './helpers'
 
+const mockHistoryPayload = (overrides: Record<string, unknown> = {}) => ({
+  data: [] as Array<Record<string, unknown>>,
+  pagination: { limit: 50, offset: 0 },
+  summary: { totalImports: 0, completed: 0, failed: 0 },
+  ...overrides,
+})
+
 describe('GET /api/csv-import/history', () => {
+  beforeEach(() => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => mockHistoryPayload(),
+    }) as jest.Mock
+  })
+
   it('returns 200 with data, pagination and summary', async () => {
     const { GET } = await import('@/app/api/csv-import/history/route')
     const request = createMockNextRequest({
@@ -31,6 +46,11 @@ describe('GET /api/csv-import/history', () => {
   })
 
   it('filters by userId when provided', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => mockHistoryPayload({ data: [{ userId: 'user-123' }, { userId: 'user-123' }] }),
+    }) as jest.Mock
     const { GET } = await import('@/app/api/csv-import/history/route')
     const request = createMockNextRequest({
       url: 'http://localhost:3000/api/csv-import/history?userId=user-123',
@@ -45,6 +65,11 @@ describe('GET /api/csv-import/history', () => {
   })
 
   it('filters by status when provided', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => mockHistoryPayload({ data: [{ status: 'completed' }, { status: 'completed' }] }),
+    }) as jest.Mock
     const { GET } = await import('@/app/api/csv-import/history/route')
     const request = createMockNextRequest({
       url: 'http://localhost:3000/api/csv-import/history?status=completed',
@@ -59,6 +84,11 @@ describe('GET /api/csv-import/history', () => {
   })
 
   it('filters by importType when provided', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => mockHistoryPayload({ data: [{ importType: 'projects' }, { importType: 'projects' }] }),
+    }) as jest.Mock
     const { GET } = await import('@/app/api/csv-import/history/route')
     const request = createMockNextRequest({
       url: 'http://localhost:3000/api/csv-import/history?importType=projects',
@@ -73,6 +103,11 @@ describe('GET /api/csv-import/history', () => {
   })
 
   it('applies limit and offset', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => mockHistoryPayload({ pagination: { limit: 2, offset: 1 }, data: [{ id: '1' }] }),
+    }) as jest.Mock
     const { GET } = await import('@/app/api/csv-import/history/route')
     const request = createMockNextRequest({
       url: 'http://localhost:3000/api/csv-import/history?limit=2&offset=1',
@@ -105,7 +140,7 @@ describe('DELETE /api/csv-import/history', () => {
     expect((data as Record<string, unknown>).error).toBe('Missing required parameter: importId')
   })
 
-  it('returns 404 when import record not found', async () => {
+  it('returns 501 when delete is requested (not implemented)', async () => {
     const { DELETE } = await import('@/app/api/csv-import/history/route')
     const request = createMockNextRequest({
       url: 'http://localhost:3000/api/csv-import/history?importId=non-existent-id',
@@ -114,11 +149,11 @@ describe('DELETE /api/csv-import/history', () => {
     const response = await DELETE(request as any)
     const data = await parseJsonResponse(response)
 
-    expect(response.status).toBe(404)
-    expect((data as Record<string, unknown>).error).toBe('Import record not found')
+    expect(response.status).toBe(501)
+    expect((data as Record<string, unknown>).error).toBe('Import history deletion is not implemented')
   })
 
-  it('returns 200 and deletes when importId exists', async () => {
+  it('returns 501 for any delete (backend has no delete endpoint)', async () => {
     const { DELETE } = await import('@/app/api/csv-import/history/route')
     const request = createMockNextRequest({
       url: 'http://localhost:3000/api/csv-import/history?importId=import-004',
@@ -127,8 +162,7 @@ describe('DELETE /api/csv-import/history', () => {
     const response = await DELETE(request as any)
     const data = await parseJsonResponse(response)
 
-    expect(response.status).toBe(200)
-    expect((data as Record<string, unknown>).message).toBe('Import record deleted successfully')
-    expect((data as Record<string, unknown>).deletedId).toBe('import-004')
+    expect(response.status).toBe(501)
+    expect((data as Record<string, unknown>).error).toBe('Import history deletion is not implemented')
   })
 })

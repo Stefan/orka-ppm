@@ -329,7 +329,7 @@ export function HierarchyTreeView({
       </div>
 
       {/* Tree content */}
-      <div className="max-h-96 overflow-y-auto">
+      <div className="min-h-[50px] max-h-[1000px] overflow-y-auto">
         {data.map(node => (
           <TreeNode
             key={node.id}

@@ -22,6 +22,15 @@ export interface PortfolioContextType {
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined)
 
+const DEFAULT_PORTFOLIO_CONTEXT: PortfolioContextType = {
+  currentPortfolioId: null,
+  currentPortfolio: null,
+  setCurrentPortfolioId: () => {},
+  portfolios: [],
+  setPortfolios: () => {},
+}
+
+/** Use portfolio context; throws if used outside PortfolioProvider. */
 export function usePortfolio(): PortfolioContextType {
   const ctx = useContext(PortfolioContext)
   // #region agent log
@@ -31,6 +40,12 @@ export function usePortfolio(): PortfolioContextType {
   }
   // #endregion
   return ctx
+}
+
+/** Use portfolio context if available; returns defaults when outside PortfolioProvider (e.g. during refresh/streaming). */
+export function usePortfolioOptional(): PortfolioContextType {
+  const ctx = useContext(PortfolioContext)
+  return ctx ?? DEFAULT_PORTFOLIO_CONTEXT
 }
 
 export function PortfolioProvider({ children }: { children: React.ReactNode }) {

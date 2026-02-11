@@ -24,14 +24,23 @@ async function proxy(
     body = undefined
   }
 
-  const response = await fetch(url, {
-    method: request.method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(authHeader && { Authorization: authHeader }),
-    },
-    ...(body && body.length > 0 && { body }),
-  })
+  let response: Response
+  try {
+    response = await fetch(url, {
+      method: request.method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authHeader && { Authorization: authHeader }),
+      },
+      ...(body && body.length > 0 && { body }),
+    })
+  } catch (e) {
+    console.warn('Schedules proxy: backend unreachable', (e as Error)?.message ?? e)
+    return NextResponse.json(
+      request.method === 'GET' ? { schedules: [], total: 0 } : { error: 'Backend unreachable' },
+      { status: request.method === 'GET' ? 200 : 503 }
+    )
+  }
 
   const contentType = response.headers.get('content-type')
   if (contentType?.includes('application/json')) {

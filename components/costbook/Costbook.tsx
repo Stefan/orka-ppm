@@ -2,14 +2,14 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { Layers, Zap, X } from 'lucide-react'
+import { Layers, Zap, X, ChevronLeft, ChevronRight, LayoutGrid, TrendingUp } from 'lucide-react'
 import { ProjectWithFinancials, Currency, KPIMetrics } from '@/types/costbook'
 import { calculateKPIs } from '@/lib/costbook-calculations'
 import { convertCurrency } from '@/lib/currency-utils'
 import { useFeatureFlag } from '@/contexts/FeatureFlagContext'
 import {
-  getMockProjectsWithFinancials,
-  fetchProjectsWithFinancials
+  fetchProjectsWithFinancials,
+  fetchProjectsWithFinancialsFromApi
 } from '@/lib/costbook/supabase-queries'
 import {
   detectAnomalies,
@@ -51,21 +51,18 @@ import { CSVImportDialog } from './CSVImportDialog'
 import { MobileAccordion, AccordionSection } from './MobileAccordion'
 import { HierarchyTreeView, ViewType as HierarchyViewType } from './HierarchyTreeView'
 import { VirtualizedTransactionTable } from './VirtualizedTransactionTable'
-import { CollapsiblePanel } from './CollapsiblePanel'
 import { CashOutGantt } from './CashOutGantt'
 import { buildCESHierarchy, buildWBSHierarchy } from '@/lib/costbook/hierarchy-builders'
 
-import { getMockTransactions, TransactionFilters as TxFilters, filterTransactions, sortTransactions, TransactionSortField, SortDirection } from '@/lib/costbook/transaction-queries'
+import { TransactionFilters as TxFilters, filterTransactions, sortTransactions, TransactionSortField, SortDirection } from '@/lib/costbook/transaction-queries'
 import { fetchCommentsCountBatch } from '@/lib/comments-service'
-import { CSVImportResult, Commitment, Actual, HierarchyNode, Transaction, DistributionSettings, DistributionRule, CostbookRow } from '@/types/costbook'
+import { CSVImportResult, Commitment, Actual, HierarchyNode, Transaction, DistributionSettings, DistributionRule, CostbookRow, Currency as CostbookCurrency, POStatus } from '@/types/costbook'
 import { getApiUrl } from '@/lib/api'
 import { useAuth } from '@/app/providers/SupabaseAuthProvider'
 import { useToast } from '@/components/shared/Toast'
 import { triggerSync } from '@/lib/integrations/ErpAdapter'
 
 export interface CostbookProps {
-  /** Use mock data instead of fetching from Supabase */
-  useMockData?: boolean
   /** Initial currency */
   initialCurrency?: Currency
   /** Handler for project selection */
@@ -80,6 +77,9 @@ export interface CostbookProps {
 
 import { DistributionSettingsDialog } from './DistributionSettingsDialog'
 import { DistributionRulesPanel } from './DistributionRulesPanel'
+import { CostbookSettingsDialog } from './CostbookSettingsDialog'
+import { getCostbookSettings, type CostbookSettings } from '@/lib/costbook/costbook-settings'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { GuidedTour, useGuidedTour, TourTriggerButton, costbookTourSteps } from '@/components/guided-tour'
 
 /**
@@ -87,7 +87,6 @@ import { GuidedTour, useGuidedTour, TourTriggerButton, costbookTourSteps } from 
  * Integrates all subcomponents into a cohesive financial dashboard
  */
 function CostbookInner({
-  useMockData = false,
   initialCurrency = Currency.USD,
   onProjectSelect,
   showTourButton = true,
@@ -107,8 +106,11 @@ function CostbookInner({
   const [error, setError] = useState<Error | null>(null)
   const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null)
   const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>()
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [costbookSettings, setCostbookSettingsState] = useState<CostbookSettings>(() => getCostbookSettings())
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => getCostbookSettings().defaultView)
   const [searchTerm, setSearchTerm] = useState('')
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false)
+  const [costbookMainTab, setCostbookMainTab] = useState<'overview' | 'forecast' | 'cost-structure'>('overview')
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({})
   const [parseResult, setParseResult] = useState<ParseResult | null>(null)
   const [isMobile, setIsMobile] = useState(false)
@@ -166,7 +168,8 @@ function CostbookInner({
     direction: 'desc'
   })
 
-  // Hierarchy state
+  // Hierarchy state (real commitments from API for CES/WBS when not using mock)
+  const [hierarchyCommitments, setHierarchyCommitments] = useState<Commitment[]>([])
   const [hierarchyViewType, setHierarchyViewType] = useState<HierarchyViewType>('ces')
   const [selectedHierarchyNode, setSelectedHierarchyNode] = useState<HierarchyNode | null>(null)
 
@@ -190,10 +193,14 @@ function CostbookInner({
     try {
       let data: ProjectWithFinancials[]
       
-      if (useMockData) {
-        // Simulate network delay for mock data
-        await new Promise(resolve => setTimeout(resolve, 500))
-        data = getMockProjectsWithFinancials()
+      if (session?.access_token) {
+        // Prefer backend API so commitments/actuals from CSV import are included (avoids empty data when Supabase RLS blocks direct read)
+        try {
+          data = await fetchProjectsWithFinancialsFromApi(session.access_token)
+          if (!data?.length) data = await fetchProjectsWithFinancials()
+        } catch {
+          data = await fetchProjectsWithFinancials()
+        }
       } else {
         data = await fetchProjectsWithFinancials()
         // Enrich with costbook rows (Cost Book columns) when API is available
@@ -243,9 +250,55 @@ function CostbookInner({
 
       setLastRefreshTime(new Date())
 
-      // Load mock transactions
-      const mockTx = getMockTransactions()
-      setTransactions(mockTx)
+      // Load transactions and hierarchy commitments from API when authenticated
+      let committedTx: Transaction[] = []
+      if (session?.access_token) {
+        try {
+          const res = await fetch(getApiUrl('/csv-import/commitments?limit=5000&offset=0'), {
+            headers: { Authorization: `Bearer ${session.access_token}` },
+            credentials: 'include'
+          })
+          if (res.ok) {
+            const json = (await res.json()) as { commitments?: Record<string, unknown>[] }
+            const rows = json.commitments ?? []
+            const commitments: Commitment[] = rows.map((row: Record<string, unknown>, idx: number) => {
+              const amount = Number(row.total_amount ?? row.po_net_amount ?? 0)
+              const vendor = String(row.vendor ?? '')
+              const currency = (row.currency as CostbookCurrency) ?? CostbookCurrency.USD
+              const poStatus = (row.po_status as string) ?? 'approved'
+              const issueDate = typeof row.po_date === 'string' ? row.po_date : (row.created_at as string) ?? new Date().toISOString()
+              const desc = [row.vendor_description, row.wbs_element].filter(Boolean).join(' ') || ' '
+              return {
+                id: (row.id as string) ?? `c-${idx}`,
+                project_id: (row.project_id as string) ?? (row.project_nr as string) ?? '',
+                po_number: String(row.po_number ?? ''),
+                vendor_id: vendor ? `vendor-${String(idx)}` : 'vendor-unknown',
+                vendor_name: vendor || 'Unknown',
+                description: (desc.trim() || (row.po_number as string)) ?? '',
+                amount,
+                currency,
+                status: (['draft', 'approved', 'issued', 'received', 'cancelled'].includes(poStatus) ? poStatus : 'approved') as POStatus,
+                issue_date: issueDate,
+                created_at: String(row.created_at ?? issueDate),
+                updated_at: String(row.updated_at ?? row.created_at ?? issueDate)
+              }
+            })
+            setHierarchyCommitments(commitments)
+            const { commitmentToTransaction } = await import('@/lib/costbook/transaction-queries')
+            committedTx = commitments.map(commitmentToTransaction)
+            setTransactions(committedTx)
+          } else {
+            setHierarchyCommitments([])
+            setTransactions(committedTx)
+          }
+        } catch (_) {
+          setHierarchyCommitments([])
+          setTransactions(committedTx)
+        }
+      } else {
+        setHierarchyCommitments([])
+        setTransactions(committedTx)
+      }
 
       // Track performance
       const queryTime = performance.now() - startTime
@@ -255,9 +308,9 @@ function CostbookInner({
         transformTime: 10,
         totalTime: Math.round(performance.now() - startTime),
         projectCount: data.length,
-        commitmentCount: mockTx.filter(t => t.type === 'commitment').length,
-        actualCount: mockTx.filter(t => t.type === 'actual').length,
-        totalRecords: data.length + mockTx.length,
+        commitmentCount: committedTx.filter(t => t.type === 'commitment').length,
+        actualCount: committedTx.filter(t => t.type === 'actual').length,
+        totalRecords: data.length + committedTx.length,
         cacheHitRate: 85,
         errorCount: 0,
         lastRefresh: new Date().toISOString()
@@ -265,33 +318,10 @@ function CostbookInner({
     } catch (err) {
       console.error('Failed to fetch projects:', err)
       setError(err instanceof Error ? err : new Error('Failed to load data'))
-      
-      // Fall back to mock data on error
-      if (!useMockData) {
-        try {
-          const mockData = getMockProjectsWithFinancials()
-          setProjects(mockData)
-
-          // Detect anomalies in mock data
-          const detectedAnomalies = detectAnomalies(mockData)
-          setAnomalies(detectedAnomalies)
-          
-          // Generate recommendations for mock data
-          const userContext = typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_TENANT_NAME
-            ? { tenantName: process.env.NEXT_PUBLIC_TENANT_NAME }
-            : undefined
-          const generatedRecommendations = generateRecommendations(mockData, detectedAnomalies, { userContext })
-          setRecommendations(generatedRecommendations)
-
-          setLastRefreshTime(new Date())
-        } catch {
-          // If even mock data fails, keep the error state
-        }
-      }
     } finally {
       setIsLoading(false)
     }
-  }, [useMockData])
+  }, [session?.access_token])
 
   // Initial data fetch
   useEffect(() => {
@@ -353,6 +383,37 @@ function CostbookInner({
   const kpis = useMemo(() => {
     return calculateKPIs(filteredProjects)
   }, [filteredProjects])
+
+  // Pagination: use costbook settings (projects per page)
+  const projectsPerPage = costbookSettings.projectsPerPage
+  const [projectsPage, setProjectsPage] = useState(0)
+  const totalProjectPages = Math.max(1, Math.ceil(filteredProjects.length / projectsPerPage))
+  const paginatedProjects = useMemo(
+    () =>
+      filteredProjects.slice(
+        projectsPage * projectsPerPage,
+        (projectsPage + 1) * projectsPerPage
+      ),
+    [filteredProjects, projectsPage, projectsPerPage]
+  )
+  useEffect(() => {
+    setProjectsPage(0)
+  }, [filteredProjects.length])
+
+  // Forecast date range from settings
+  const forecastDateRange = useMemo(() => {
+    const now = new Date()
+    const start = new Date(now.getFullYear(), now.getMonth(), 1)
+    const end = new Date(now.getFullYear(), now.getMonth() + costbookSettings.forecastMonthsAhead, 0)
+    return { start, end }
+  }, [costbookSettings.forecastMonthsAhead])
+
+  // Sync costbook settings from storage (e.g. another tab or dialog save)
+  useEffect(() => {
+    const handler = () => setCostbookSettingsState(getCostbookSettings())
+    window.addEventListener('costbook-settings-changed', handler)
+    return () => window.removeEventListener('costbook-settings-changed', handler)
+  }, [])
 
   // Handlers
   const handleCurrencyChange = useCallback((currency: Currency) => {
@@ -453,33 +514,34 @@ function CostbookInner({
     return sortTransactions(filtered, transactionSort.field, transactionSort.direction)
   }, [transactions, transactionFilters, transactionSort])
 
-  // Build hierarchy data
+  // Build hierarchy data: use real commitments from API when available, else from transactions (incl. mock)
   const hierarchyData = useMemo(() => {
-    // In a real app, this would use actual commitment data
-    // For now, we use mock data
-    const mockCommitments: Commitment[] = transactions
-      .filter(t => t.type === 'commitment')
-      .map(t => ({
-        id: t.id,
-        project_id: t.project_id,
-        po_number: t.po_number || '',
-        vendor_id: 'vendor-1',
-        vendor_name: t.vendor_name,
-        description: t.description,
-        amount: t.amount,
-        currency: t.currency,
-        status: t.status as any,
-        issue_date: t.date,
-        created_at: t.date,
-        updated_at: t.date
-      }))
+    const commitments: Commitment[] =
+      hierarchyCommitments.length > 0
+        ? hierarchyCommitments
+        : transactions
+            .filter(t => t.type === 'commitment')
+            .map(t => ({
+              id: t.id,
+              project_id: t.project_id,
+              po_number: t.po_number || '',
+              vendor_id: 'vendor-1',
+              vendor_name: t.vendor_name,
+              description: t.description,
+              amount: t.amount,
+              currency: t.currency,
+              status: t.status as POStatus,
+              issue_date: t.date,
+              created_at: t.date,
+              updated_at: t.date
+            }))
 
+    const projectNames = Object.fromEntries(filteredProjects.map(p => [p.id, p.name]))
     if (hierarchyViewType === 'ces') {
-      return buildCESHierarchy(mockCommitments, selectedCurrency)
-    } else {
-      return buildWBSHierarchy(mockCommitments, selectedCurrency)
+      return buildCESHierarchy(commitments, selectedCurrency, projectNames)
     }
-  }, [transactions, hierarchyViewType, selectedCurrency])
+    return buildWBSHierarchy(commitments, selectedCurrency)
+  }, [hierarchyCommitments, transactions, hierarchyViewType, selectedCurrency, filteredProjects])
 
   const handleExport = useCallback(() => {
     console.log('Export clicked')
@@ -492,8 +554,12 @@ function CostbookInner({
   }, [])
 
   const handleSettings = useCallback(() => {
-    console.log('Settings clicked')
-    // TODO: Implement settings dialog
+    setShowSettingsDialog(true)
+  }, [])
+
+  const handleCostbookSettingsSave = useCallback((settings: CostbookSettings) => {
+    setCostbookSettingsState(settings)
+    setViewMode(settings.defaultView)
   }, [])
 
   const handlePerformance = useCallback(() => {
@@ -683,34 +749,85 @@ function CostbookInner({
                 onSuggestionSelect={handleSearch}
               />
             ) : (
-              <ProjectsGrid
-                projects={filteredProjects}
-                currency={selectedCurrency}
-                selectedProjectId={selectedProjectId}
-                onProjectSelect={handleProjectClick}
-                viewMode="list"
-                searchTerm={searchTerm}
-                isLoading={isLoading}
-                commentCounts={commentCounts}
-                onCommentsClick={handleCommentsClick}
-              />
+              <>
+                <ProjectsGrid
+                  projects={paginatedProjects}
+                  currency={selectedCurrency}
+                  selectedProjectId={selectedProjectId}
+                  onProjectSelect={handleProjectClick}
+                  viewMode="list"
+                  searchTerm={searchTerm}
+                  isLoading={isLoading}
+                  commentCounts={commentCounts}
+                  onCommentsClick={handleCommentsClick}
+                />
+                {totalProjectPages > 1 && (
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 dark:border-slate-600">
+                    <span className="text-sm text-gray-600 dark:text-slate-400">
+                      Page {projectsPage + 1} of {totalProjectPages} ({projectsPerPage} per page)
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setProjectsPage((p) => Math.max(0, p - 1))}
+                        disabled={projectsPage === 0}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-slate-700"
+                      >
+                        <ChevronLeft className="h-4 w-4" /> Previous
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setProjectsPage((p) => Math.min(totalProjectPages - 1, p + 1))}
+                        disabled={projectsPage >= totalProjectPages - 1}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-slate-700"
+                      >
+                        Next <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </section>
 
-          {/* Compact Visualization - Second on mobile */}
+          {/* Compact Visualization - Second on mobile (same page as Projects) */}
           <section className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
             <CompactVisualizationPanel
-              projects={filteredProjects}
+              projects={paginatedProjects}
               kpis={kpis}
               currency={selectedCurrency}
             />
+            {totalProjectPages > 1 && (
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 dark:border-slate-600">
+                <span className="text-sm text-gray-600 dark:text-slate-400">
+                  Page {projectsPage + 1} of {totalProjectPages} ({projectsPerPage} per page)
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setProjectsPage((p) => Math.max(0, p - 1))}
+                    disabled={projectsPage === 0}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-slate-700"
+                  >
+                    <ChevronLeft className="h-4 w-4" /> Previous
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setProjectsPage((p) => Math.min(totalProjectPages - 1, p + 1))}
+                    disabled={projectsPage >= totalProjectPages - 1}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-slate-700"
+                  >
+                    Next <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            )}
           </section>
         </main>
 
         {/* Mobile Footer */}
         <CompactCostbookFooter
           onReports={handleReports}
-          onCSVImport={handleCSVImport}
           onExport={handleExport}
           onSettings={handleSettings}
           className="flex-shrink-0"
@@ -719,12 +836,13 @@ function CostbookInner({
     )
   }
 
-  // Render desktop layout: Unified No-Scroll View (grid-rows-[auto_1fr_auto])
+  // Render desktop layout: Unified No-Scroll View (grid-rows-[auto_1fr_auto]); footer is fixed via portal
   return (
+    <>
     <div
-      className={`grid grid-rows-[auto_1fr_auto] bg-gray-50 dark:bg-slate-900 min-h-[800px] p-4 gap-0 ${className}`}
+      className={`grid grid-rows-[auto_1fr_auto] bg-gray-50 dark:bg-slate-900 min-h-[800px] max-h-[calc(100vh-8rem)] p-4 gap-0 pb-20 overflow-hidden ${className}`}
       data-testid={testId}
-      style={{ minHeight: 'calc(100vh - 8rem)' }}
+      style={{ minHeight: 'calc(100vh - 8rem)', maxHeight: 'calc(100vh - 8rem)' }}
     >
       {/* Row 1: Header (auto) */}
       <div className="flex-shrink-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
@@ -759,99 +877,179 @@ function CostbookInner({
         )}
       </div>
 
-      {/* Row 2: Main content – Overview / Forecast / List (1fr, scroll inside only) */}
-      <main className="min-h-0 overflow-auto flex flex-col gap-4">
-        {/* NL Search */}
-        <section data-tour="costbook-nl-search" className="flex-shrink-0 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
+      {/* Row 2: Main content – one row: Overview | Forecast | Cost Structure (scroll inside each column) */}
+      <main className="min-h-0 flex flex-col flex-1 gap-3">
+        {/* NL Search – compact single row */}
+        <section data-tour="costbook-nl-search" className="flex-shrink-0 flex flex-wrap items-center gap-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 px-3 py-2">
           <NLSearchInput
             value={searchTerm}
             onChange={handleSearch}
-            placeholder="Search projects... (e.g., 'over budget', 'high variance', 'vendor Acme')"
-            className="max-w-2xl"
+            placeholder="Search projects... (e.g., 'over budget', 'high variance')"
+            className="flex-1 min-w-[200px] max-w-xl"
           />
           {parseResult && searchTerm && (
-            <p className="mt-2 text-sm text-gray-700 dark:text-slate-300">
+            <span className="text-sm text-gray-600 dark:text-slate-400">
               {parseResult.interpretation}
               {filteredProjects.length !== convertedProjects.length && (
-                <span className="ml-2 text-blue-600 dark:text-blue-400">
-                  ({filteredProjects.length} of {convertedProjects.length} projects)
+                <span className="ml-1 text-blue-600 dark:text-blue-400">
+                  ({filteredProjects.length} of {convertedProjects.length})
                 </span>
               )}
-            </p>
+            </span>
           )}
         </section>
 
-        {/* Panel: Overview (Projects Grid) + Forecast (Gantt/Rules) side by side on large screens */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
-          {/* Overview: Projects Grid (left, 2 cols on lg) */}
-          <section className="lg:col-span-2 flex flex-col min-h-0">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-2 p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100 whitespace-nowrap">Overview – Projects ({filteredProjects.length})</h2>
-              <div className="flex items-center gap-2" data-tour="costbook-ai-optimize">
-                <button
-                  type="button"
-                  onClick={handleOptimizeCostbook}
-                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors"
-                  aria-label="AI Optimize Costbook"
-                >
-                  <Zap className="w-4 h-4" />
-                  AI Optimize Costbook
-                </button>
-                <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
-              </div>
-            </div>
-            <div className="flex-1 min-h-[280px] overflow-auto bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
-              {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {[1, 2, 3, 4, 5, 6].map((i) => <CardSkeleton key={i} />)}
+        {/* Tabs: Overview | Forecast | Cost Structure (CES/WBS) */}
+        <Tabs
+          value={costbookMainTab}
+          onValueChange={(v) => setCostbookMainTab(v as 'overview' | 'forecast' | 'cost-structure')}
+          className="flex-1 min-h-0 flex flex-col"
+        >
+          <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 bg-gray-200 dark:bg-slate-700 rounded-lg border border-gray-200 dark:border-slate-600 shrink-0">
+            <TabsTrigger
+              value="overview"
+              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:dark:bg-slate-800 data-[state=active]:shadow-sm"
+            >
+              <LayoutGrid className="w-4 h-4" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger
+              value="forecast"
+              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:dark:bg-slate-800 data-[state=active]:shadow-sm"
+            >
+              <TrendingUp className="w-4 h-4" />
+              Forecast
+            </TabsTrigger>
+            <TabsTrigger
+              value="cost-structure"
+              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:dark:bg-slate-800 data-[state=active]:shadow-sm"
+            >
+              <Layers className="w-4 h-4" />
+              Cost Structure (CES/WBS)
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="flex-1 min-h-0 mt-3 flex flex-col data-[state=inactive]:hidden">
+            <section className="flex flex-col flex-1 min-h-0">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2 p-2 bg-white dark:bg-slate-800 rounded-t-lg border border-gray-200 dark:border-slate-700 border-b-0 shrink-0">
+                <h2 className="text-base font-bold text-gray-900 dark:text-slate-100 whitespace-nowrap">Projects ({filteredProjects.length})</h2>
+                <div className="flex items-center gap-2" data-tour="costbook-ai-optimize">
+                  <button
+                    type="button"
+                    onClick={handleOptimizeCostbook}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors"
+                    aria-label="AI Optimize Costbook"
+                  >
+                    <Zap className="w-3.5 h-3.5" />
+                    AI Optimize
+                  </button>
+                  <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
                 </div>
+              </div>
+              <div className="flex-1 min-h-0 flex flex-col bg-white dark:bg-slate-800 rounded-b-lg border border-gray-200 dark:border-slate-700 border-t-0 p-4">
+              {isLoading ? (
+                viewMode === 'list' ? (
+                  <div className="space-y-0 border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700">
+                      <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-24 animate-pulse" />
+                      <div className="flex gap-4">
+                        <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-16 animate-pulse" />
+                        <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-16 animate-pulse" />
+                        <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-20 animate-pulse" />
+                      </div>
+                    </div>
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                      <div key={i} className="h-14 px-4 flex items-center gap-4 border-b border-gray-100 dark:border-slate-700 last:border-b-0">
+                        <div className="h-4 bg-gray-100 dark:bg-slate-700 rounded w-48 animate-pulse flex-1" />
+                        <div className="h-4 bg-gray-100 dark:bg-slate-700 rounded w-20 animate-pulse" />
+                        <div className="h-4 bg-gray-100 dark:bg-slate-700 rounded w-20 animate-pulse" />
+                        <div className="h-4 bg-gray-100 dark:bg-slate-700 rounded w-16 animate-pulse" />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {[1, 2, 3, 4, 5, 6].map((i) => <CardSkeleton key={i} />)}
+                  </div>
+                )
               ) : filteredProjects.length === 0 && searchTerm ? (
                 <NoResults query={searchTerm} onSuggestionSelect={handleSearch} />
               ) : (
-                <div className="min-h-0">
-                  <ProjectsGrid
-                  projects={filteredProjects}
-                  currency={selectedCurrency}
-                  selectedProjectId={selectedProjectId}
-                  onProjectSelect={handleProjectClick}
-                  viewMode={viewMode}
-                  searchTerm={searchTerm}
-                  anomalies={anomalyDetectionEnabled ? anomalies : []}
-                  onAnomalyClick={anomalyDetectionEnabled ? handleAnomalyClick : undefined}
-                  commentCounts={commentCounts}
-                  onCommentsClick={handleCommentsClick}
-                />
+                <div className="flex-1 min-h-0 flex flex-col min-w-0">
+                  <div className="flex-1 min-h-0 min-w-0 flex flex-col">
+                    <ProjectsGrid
+                    projects={paginatedProjects}
+                    currency={selectedCurrency}
+                    selectedProjectId={selectedProjectId}
+                    onProjectSelect={handleProjectClick}
+                    viewMode={viewMode}
+                    searchTerm={searchTerm}
+                    anomalies={anomalyDetectionEnabled ? anomalies : []}
+                    onAnomalyClick={anomalyDetectionEnabled ? handleAnomalyClick : undefined}
+                    commentCounts={commentCounts}
+                    onCommentsClick={handleCommentsClick}
+                  />
+                  </div>
+                  {totalProjectPages > 1 && (
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 dark:border-slate-600">
+                      <span className="text-sm text-gray-600 dark:text-slate-400">
+                        Page {projectsPage + 1} of {totalProjectPages} ({projectsPerPage} per page)
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setProjectsPage((p) => Math.max(0, p - 1))}
+                          disabled={projectsPage === 0}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-slate-700"
+                        >
+                          <ChevronLeft className="h-4 w-4" /> Previous
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setProjectsPage((p) => Math.min(totalProjectPages - 1, p + 1))}
+                          disabled={projectsPage >= totalProjectPages - 1}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-slate-700"
+                        >
+                          Next <ChevronRight className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
-          </section>
+              </div>
+            </section>
+          </TabsContent>
 
-          {/* Forecast: Gantt + Distribution Rules (right, 1 col on lg) */}
-          <section data-tour="costbook-distribution" className="lg:col-span-1 flex flex-col min-h-0">
-            <div className="flex justify-between items-center mb-2 p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100">Forecast</h2>
+          <TabsContent value="forecast" className="flex-1 min-h-0 mt-3 overflow-auto data-[state=inactive]:hidden">
+            <section data-tour="costbook-distribution" className="flex flex-col min-h-full">
+            <div className="flex justify-between items-center mb-1 p-2 bg-white dark:bg-slate-800 rounded-t-lg border border-gray-200 dark:border-slate-700 border-b-0 shrink-0">
+              <h2 className="text-base font-bold text-gray-900 dark:text-slate-100">Forecast</h2>
               <button
                 type="button"
                 onClick={() => setShowDistributionRules(true)}
-                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
               >
                 Distribution Rules
               </button>
             </div>
-            <div className="flex-1 min-h-[280px] overflow-auto bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4 space-y-4">
+            <div className="flex-1 min-h-0 overflow-auto bg-white dark:bg-slate-800 rounded-b-lg border border-gray-200 dark:border-slate-700 border-t-0 p-4 space-y-3">
               <CashOutGantt
-                projects={filteredProjects}
+                projects={paginatedProjects}
                 currency={selectedCurrency}
+                startDate={forecastDateRange.start}
+                endDate={forecastDateRange.end}
                 distributionSettingsByProject={distributionSettings}
                 onOpenDistributionSettings={costbookPhase2Enabled ? handleDistributionSettings : undefined}
               />
               <VisualizationPanel
-                projects={filteredProjects}
+                projects={paginatedProjects}
                 kpis={kpis}
                 currency={selectedCurrency}
                 onProjectClick={handleProjectClick}
                 isLoading={isLoading}
               />
+              {costbookSettings.showRecommendationsPanel && (
               <div data-tour="costbook-recommendations">
                 <RecommendationsPanel
                   recommendations={recommendations}
@@ -864,39 +1062,40 @@ function CostbookInner({
                   initialLimit={2}
                 />
               </div>
+              )}
             </div>
-          </section>
-        </div>
+            </section>
+          </TabsContent>
 
-        {/* Panel: List (CES/WBS Tree) */}
-        <section data-tour="costbook-hierarchy" className="flex-shrink-0">
-          <CollapsiblePanel
-            title="List – Cost Structure (CES/WBS)"
-            icon={<Layers className="w-5 h-5 text-blue-600 dark:text-blue-400" />}
-            defaultOpen={false}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
-          >
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">View:</span>
-                  <div className="flex bg-gray-100 dark:bg-gray-700 rounded-md p-1">
-                    <button
-                      onClick={() => setHierarchyViewType('ces')}
-                      className={`px-3 py-1 text-xs font-medium rounded ${hierarchyViewType === 'ces' ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-400'}`}
-                    >
-                      CES
-                    </button>
-                    <button
-                      onClick={() => setHierarchyViewType('wbs')}
-                      className={`px-3 py-1 text-xs font-medium rounded ${hierarchyViewType === 'wbs' ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-400'}`}
-                    >
-                      WBS
-                    </button>
-                  </div>
+          <TabsContent value="cost-structure" className="flex-1 min-h-0 mt-3 overflow-auto data-[state=inactive]:hidden">
+            <section data-tour="costbook-hierarchy" className="flex flex-col min-h-full">
+            <div className="flex items-center gap-2 mb-1 p-2 bg-white dark:bg-slate-800 rounded-t-lg border border-gray-200 dark:border-slate-700 border-b-0 shrink-0">
+              <Layers className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" aria-hidden />
+              <h2 className="text-base font-bold text-gray-900 dark:text-slate-100 whitespace-nowrap">
+                Cost Structure (CES/WBS)
+              </h2>
+            </div>
+            <div className="flex-1 min-h-0 overflow-auto bg-white dark:bg-slate-800 rounded-b-lg border border-gray-200 dark:border-slate-700 border-t-0 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-gray-700 dark:text-slate-300">View:</span>
+                <div className="flex bg-gray-100 dark:bg-slate-700 rounded-md p-1">
+                  <button
+                    type="button"
+                    onClick={() => setHierarchyViewType('ces')}
+                    className={`px-3 py-1 text-xs font-medium rounded ${hierarchyViewType === 'ces' ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-slate-400'}`}
+                  >
+                    CES
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setHierarchyViewType('wbs')}
+                    className={`px-3 py-1 text-xs font-medium rounded ${hierarchyViewType === 'wbs' ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-slate-400'}`}
+                  >
+                    WBS
+                  </button>
                 </div>
               </div>
-              <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+              <div className="border border-gray-200 dark:border-slate-600 rounded-lg overflow-hidden">
                 <HierarchyTreeView
                   data={hierarchyData}
                   viewType={hierarchyViewType}
@@ -906,33 +1105,19 @@ function CostbookInner({
                   showBudget={true}
                   showSpend={true}
                   showVariance={true}
-                  className="max-h-96"
+                  className="min-h-[600px]"
                 />
               </div>
               {hierarchyData.length === 0 && (
-                <div className="text-center py-6 text-gray-700 dark:text-slate-300 text-sm">
+                <div className="text-center py-6 text-gray-600 dark:text-slate-400 text-sm">
                   No {hierarchyViewType === 'ces' ? 'CES' : 'WBS'} data for current filters
                 </div>
               )}
             </div>
-          </CollapsiblePanel>
-        </section>
+            </section>
+          </TabsContent>
+        </Tabs>
       </main>
-
-      {/* Row 3: Footer (auto) */}
-      <CostbookFooter
-        onScenarios={() => console.log('Scenarios - Phase 2')}
-        onResources={handleResources}
-        onReports={handleReports}
-        onPOBreakdown={handlePOBreakdown}
-        onCSVImport={handleCSVImport}
-        onForecast={() => setShowDistributionRules(true)} // Open Distribution Rules
-        onVendorScore={() => console.log('Vendor Score - Phase 3')}
-        onSettings={handleSettings}
-        onExport={handleExport}
-        currentPhase={costbookPhase2Enabled ? 2 : 1}
-        className="flex-shrink-0 mt-3"
-      />
 
       {/* Performance Dialog */}
       <PerformanceDialog
@@ -956,6 +1141,13 @@ function CostbookInner({
         onClose={() => setShowCSVImportDialog(false)}
         onImport={handleCSVImportComplete}
         data-testid="csv-import-dialog"
+      />
+
+      <CostbookSettingsDialog
+        isOpen={showSettingsDialog}
+        onClose={() => setShowSettingsDialog(false)}
+        onSave={handleCostbookSettingsSave}
+        data-testid="costbook-settings-dialog"
       />
 
       {/* Anomaly Detail Dialog */}
@@ -1099,6 +1291,26 @@ function CostbookInner({
         tourId="costbook-v1"
       />
     </div>
+    {typeof document !== 'undefined' && createPortal(
+      <div className="fixed bottom-0 left-0 right-0 z-[100] bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 shadow-lg" data-testid="costbook-footer-bar">
+        <div className="max-w-[1600px] mx-auto p-1">
+          <CostbookFooter
+            onScenarios={() => console.log('Scenarios - Phase 2')}
+            onResources={handleResources}
+            onReports={handleReports}
+            onPOBreakdown={handlePOBreakdown}
+            onForecast={() => setShowDistributionRules(true)}
+            onVendorScore={() => console.log('Vendor Score - Phase 3')}
+            onSettings={handleSettings}
+            onExport={handleExport}
+            currentPhase={costbookPhase2Enabled ? 2 : 1}
+            className="flex-shrink-0"
+          />
+        </div>
+      </div>,
+      document.body
+    )}
+  </>
   )
 }
 

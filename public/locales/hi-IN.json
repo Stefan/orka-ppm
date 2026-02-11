@@ -340,6 +340,8 @@
     "dropzonePrompt": "अपनी फ़ाइल यहाँ खींचें और छोड़ें, या चयन करने के लिए क्लिक करें",
     "dropzoneActive": "फ़ाइल यहाँ छोड़ें...",
     "acceptedFormats": "स्वीकृत: .csv, .json",
+    "assignToPortfolio": "सभी प्रोजेक्ट पोर्टफोलियो में असाइन करें",
+    "selectPortfolio": "पोर्टफोलियो चुनें",
     "importButton": "डेटा आयात करें",
     "clear": "साफ़ करें",
     "processing": "प्रसंस्करण...",
@@ -360,7 +362,7 @@
     "template": "टेम्पलेट",
     "dropzoneFilePrompt": "फ़ाइल यहाँ ड्रॉप करें या चयन के लिए क्लिक करें",
     "selectFile": "फ़ाइल चुनें",
-    "maxFileSize": "अधिकतम फ़ाइल आकार: 50MB",
+    "maxFileSize": "अधिकतम फ़ाइल आकार: 80MB",
     "columnsCommitments": "कॉलम: PO नंबर, राशि, मुद्रा, प्रोजेक्ट, WBS",
     "columnsActuals": "कॉलम: FI दस्तावेज़, राशि, मुद्रा, प्रोजेक्ट, WBS",
     "importHistory": "आयात इतिहास",
@@ -384,7 +386,9 @@
     "warnings": "चेतावनियाँ",
     "rowLabel": "पंक्ति {row}",
     "moreErrors": "... और {count} और त्रुटियाँ",
-    "moreWarnings": "... और {count} और चेतावनियाँ"
+    "moreWarnings": "... और {count} और चेतावनियाँ",
+    "anonymizeData": "डेटा अनामित करें (विक्रेता, परियोजना, राशि आदि)",
+    "clearBeforeImport": "आयात से पहले लक्ष्य तालिका साफ़ करें (मौजूदा डेटा हटाएं)"
   },
   "shared": {
     "shareableUrl": {
@@ -490,6 +494,8 @@
     "lastYear": "पिछला वर्ष",
     "budgetStatus": "बजट स्थिति",
     "allProjects": "सभी प्रोजेक्ट",
+    "portfolio": "पोर्टफोलियो",
+    "allPortfolios": "सभी पोर्टफोलियो",
     "overBudgetOnly": "केवल बजट से अधिक",
     "underBudgetOnly": "केवल बजट से कम",
     "onBudget": "बजट पर",

@@ -161,8 +161,7 @@ export async function GET(request: NextRequest) {
     
     if (!response.ok) {
       console.error('Backend API error:', response.status)
-      // Return fallback mock data if backend is unavailable
-      return NextResponse.json(getMockDashboardData(kpiSettings), { 
+      return NextResponse.json(getEmptyDashboardData(kpiSettings), { 
         status: 200,
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -236,9 +235,8 @@ export async function GET(request: NextRequest) {
     })
     
   } catch (error) {
-    console.error('Dashboard API error:', error)
-    // Return fallback mock data on error
-    return NextResponse.json(getMockDashboardData(DEFAULT_KPI_SETTINGS), { 
+    console.warn('Dashboard quick-stats: backend unreachable', error instanceof Error ? error.message : error)
+    return NextResponse.json(getEmptyDashboardData(DEFAULT_KPI_SETTINGS), { 
       status: 200,
       headers: {
         'X-Data-Source': 'fallback-mock'
@@ -270,76 +268,30 @@ function generateBudgetData(projects: any[]) {
   })
 }
 
-function getMockDashboardData(kpiSettings: DashboardKPIs) {
-  // Mock data with configurable KPIs
-  const totalProjects = 12
-  const activeProjects = 8
-  const completedProjects = 4
-  const healthDistribution = { green: 6, yellow: 4, red: 2 }
-  const totalBudget = 2500000
-  const spentBudget = 1800000
-
-  const kpis = calculateKPIs(
-    kpiSettings,
-    totalProjects,
-    activeProjects,
-    completedProjects,
-    healthDistribution,
-    totalBudget,
-    spentBudget
-  )
-
+/** Empty dashboard structure when backend is unavailable (no mock data). */
+function getEmptyDashboardData(kpiSettings: DashboardKPIs) {
+  const healthDistribution = { green: 0, yellow: 0, red: 0 }
+  const kpis = calculateKPIs(kpiSettings, 0, 0, 0, healthDistribution, 0, 0)
   return {
     quick_stats: {
-      total_projects: totalProjects,
-      active_projects: activeProjects,
-      completed_projects: completedProjects,
+      total_projects: 0,
+      active_projects: 0,
+      completed_projects: 0,
       health_distribution: healthDistribution,
-      critical_alerts: 2,
-      at_risk_projects: 4,
-      total_budget: totalBudget,
-      spent_budget: spentBudget,
-      team_members: 24,
-      pending_tasks: 156,
-      overdue_tasks: 12
+      critical_alerts: 0,
+      at_risk_projects: 0,
+      total_budget: 0,
+      spent_budget: 0,
+      team_members: 0,
+      pending_tasks: 0,
+      overdue_tasks: 0
     },
     kpis,
     kpi_settings: kpiSettings,
-    recent_activity: [
-      {
-        id: 1,
-        type: 'project_update',
-        message: 'Project Alpha milestone completed',
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        id: 2,
-        type: 'budget_alert',
-        message: 'Project Beta approaching budget limit',
-        timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        id: 3,
-        type: 'team_update',
-        message: 'New team member joined Project Gamma',
-        timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString()
-      }
-    ],
+    recent_activity: [],
     charts: {
-      project_timeline: [
-        { month: 'Jan', planned: 10, actual: 8 },
-        { month: 'Feb', planned: 12, actual: 11 },
-        { month: 'Mar', planned: 15, actual: 14 },
-        { month: 'Apr', planned: 18, actual: 16 },
-        { month: 'May', planned: 20, actual: 19 },
-        { month: 'Jun', planned: 22, actual: 21 }
-      ],
-      budget_utilization: [
-        { category: 'Development', budget: 800000, spent: 650000 },
-        { category: 'Design', budget: 300000, spent: 280000 },
-        { category: 'Testing', budget: 200000, spent: 150000 },
-        { category: 'Infrastructure', budget: 400000, spent: 320000 }
-      ]
+      project_timeline: [],
+      budget_utilization: []
     }
   }
 }

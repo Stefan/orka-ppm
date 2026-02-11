@@ -27,14 +27,23 @@ async function proxy(request: NextRequest, pathSegments: string[]) {
     body = undefined
   }
 
-  const response = await fetch(url, {
-    method: request.method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(authHeader && { Authorization: authHeader }),
-    },
-    ...(body && body.length > 0 && { body }),
-  })
+  let response: Response
+  try {
+    response = await fetch(url, {
+      method: request.method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authHeader && { Authorization: authHeader }),
+      },
+      ...(body && body.length > 0 && { body }),
+    })
+  } catch (e) {
+    console.warn('Registers proxy: backend unreachable', (e as Error)?.message ?? e)
+    return NextResponse.json(
+      request.method === 'GET' ? { items: [], total: 0 } : { error: 'Backend unreachable' },
+      { status: request.method === 'GET' ? 200 : 503 }
+    )
+  }
 
   // #region agent log
   debugIngest({ location: 'registers/route.ts:proxy', message: 'backend response', data: { backendStatus: response.status, requestUrl: url }, hypothesisId: 'B' })

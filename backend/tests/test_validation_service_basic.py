@@ -36,7 +36,7 @@ class TestValidationService:
         return uuid4()
     
     def test_validate_project_success(self, validation_service, mock_db, portfolio_id):
-        """Test validation of a valid project"""
+        """Test validation of a valid project (with budget)"""
         # Arrange
         project = ProjectCreate(
             portfolio_id=portfolio_id,
@@ -56,6 +56,50 @@ class TestValidationService:
         
         # Assert
         assert error is None
+
+    def test_validate_project_success_without_budget(self, validation_service, mock_db, portfolio_id):
+        """Test validation passes when budget is None (budget is optional)"""
+        # Arrange
+        project = ProjectCreate(
+            portfolio_id=portfolio_id,
+            name="Test Project No Budget",
+            budget=None,
+            status=ProjectStatus.planning
+        )
+        
+        # Mock no duplicate name
+        mock_response = Mock()
+        mock_response.data = []
+        mock_db.table.return_value.select.return_value.eq.return_value.execute.return_value = mock_response
+        
+        # Act
+        error = validation_service.validate_project(project, 0)
+        
+        # Assert
+        assert error is None
+
+    def test_validate_project_invalid_budget_value(self, validation_service, mock_db, portfolio_id):
+        """Test validation fails when budget is provided but not numeric"""
+        # Arrange - use Mock to pass non-numeric budget (Pydantic would reject it on ProjectCreate)
+        project = Mock()
+        project.name = "Test Project"
+        project.budget = "not_a_number"
+        project.status = ProjectStatus.planning
+        project.start_date = None
+        project.end_date = None
+        
+        # Mock no duplicate name
+        mock_response = Mock()
+        mock_response.data = []
+        mock_db.table.return_value.select.return_value.eq.return_value.execute.return_value = mock_response
+        
+        # Act
+        error = validation_service.validate_project(project, 0)
+        
+        # Assert
+        assert error is not None
+        assert error["field"] == "budget"
+        assert "numeric" in error["error"].lower()
     
     def test_validate_project_missing_name(self, validation_service, mock_db, portfolio_id):
         """Test validation fails when name is missing"""
@@ -74,23 +118,6 @@ class TestValidationService:
         assert error is not None
         assert error["field"] == "name"
         assert "missing or empty" in error["error"]
-    
-    def test_validate_project_missing_budget(self, validation_service, mock_db, portfolio_id):
-        """Test validation fails when budget is missing"""
-        # Arrange
-        project = ProjectCreate(
-            portfolio_id=portfolio_id,
-            name="Test Project",
-            budget=None,
-            status=ProjectStatus.planning
-        )
-        
-        # Act
-        error = validation_service.validate_project(project, 0)
-        
-        # Assert
-        assert error is not None
-        assert error["field"] == "budget"
     
     def test_validate_project_invalid_status(self, validation_service, mock_db, portfolio_id):
         """Test validation fails with invalid status"""
@@ -191,8 +218,8 @@ class TestValidationService:
         assert validation_service._validate_status(None) is False
     
     def test_check_required_fields(self, validation_service, portfolio_id):
-        """Test required fields checking"""
-        # Test with all required fields present
+        """Test required fields checking (required: name, status; budget is optional)"""
+        # Test with all required fields present (with budget)
         project = ProjectCreate(
             portfolio_id=portfolio_id,
             name="Test Project",
@@ -200,6 +227,15 @@ class TestValidationService:
             status=ProjectStatus.planning
         )
         assert validation_service._check_required_fields(project) is None
+
+        # Test with required fields present but no budget (budget optional)
+        project_no_budget = ProjectCreate(
+            portfolio_id=portfolio_id,
+            name="Test Project",
+            budget=None,
+            status=ProjectStatus.planning
+        )
+        assert validation_service._check_required_fields(project_no_budget) is None
         
         # Test with missing name
         project_no_name = ProjectCreate(

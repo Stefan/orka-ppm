@@ -117,31 +117,12 @@ export function ViewModeToggle({
   return (
     <div className={`flex rounded-md shadow-sm ${className}`}>
       <button
-        onClick={() => onViewModeChange('grid')}
+        onClick={() => onViewModeChange('list')}
         className={`
           flex items-center justify-center
           px-3 py-2
           border border-gray-300 dark:border-slate-600
           rounded-l-md
-          text-sm font-medium
-          transition-colors
-          ${viewMode === 'grid' 
-            ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-300' 
-            : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700'
-          }
-        `}
-        title="Grid view"
-        aria-pressed={viewMode === 'grid'}
-      >
-        <LayoutGrid className="w-4 h-4" />
-      </button>
-      <button
-        onClick={() => onViewModeChange('list')}
-        className={`
-          flex items-center justify-center
-          px-3 py-2
-          border border-l-0 border-gray-300 dark:border-slate-600
-          rounded-r-md
           text-sm font-medium
           transition-colors
           ${viewMode === 'list' 
@@ -153,6 +134,25 @@ export function ViewModeToggle({
         aria-pressed={viewMode === 'list'}
       >
         <List className="w-4 h-4" />
+      </button>
+      <button
+        onClick={() => onViewModeChange('grid')}
+        className={`
+          flex items-center justify-center
+          px-3 py-2
+          border border-l-0 border-gray-300 dark:border-slate-600
+          rounded-r-md
+          text-sm font-medium
+          transition-colors
+          ${viewMode === 'grid' 
+            ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-300' 
+            : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700'
+          }
+        `}
+        title="Grid view"
+        aria-pressed={viewMode === 'grid'}
+      >
+        <LayoutGrid className="w-4 h-4" />
       </button>
     </div>
   )
@@ -211,12 +211,13 @@ export function ProjectsGrid({
           rounded-lg
           shadow-md
           overflow-hidden
+          flex flex-col flex-1 min-h-0
           ${className}
         `}
         data-testid={testId}
       >
         <ListHeader showEac={showEac} />
-        <div className="overflow-y-auto">
+        <div className="flex-1 min-h-0 overflow-y-auto">
           {filteredProjects.map((project) => (
             <ProjectRow
               key={project.id}

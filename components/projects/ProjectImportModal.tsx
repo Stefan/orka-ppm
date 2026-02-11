@@ -49,6 +49,8 @@ export default function ProjectImportModal({
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<ImportResult | null>(null)
   const [copied, setCopied] = useState(false)
+  const [anonymize, setAnonymize] = useState(true)
+  const [clearBeforeImport, setClearBeforeImport] = useState(false)
 
   // Handle CSV file drop
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -103,7 +105,10 @@ export default function ProjectImportModal({
         return
       }
 
-      const response = await fetch('/api/projects/import', {
+      const params = new URLSearchParams()
+      params.set('anonymize', String(anonymize))
+      params.set('clear_before_import', String(clearBeforeImport))
+      const response = await fetch(`/api/projects/import?${params.toString()}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -130,9 +135,20 @@ export default function ProjectImportModal({
     }
   }
 
+  const MAX_CSV_BYTES = 80 * 1024 * 1024 // 80 MB, must match backend
+
   // Handle CSV import
   const handleCsvImport = async () => {
     if (!csvFile) return
+    if (csvFile.size > MAX_CSV_BYTES) {
+      setResult({
+        success: false,
+        count: 0,
+        errors: [{ index: 0, field: 'file', value: csvFile.name, error: t('dataImport.fileTooLarge') || 'File too large. Max. 80 MB.' }],
+        message: t('dataImport.fileTooLarge') || 'File too large. Maximum size is 80 MB.'
+      })
+      return
+    }
 
     setLoading(true)
     setResult(null)
@@ -141,13 +157,18 @@ export default function ProjectImportModal({
       const formData = new FormData()
       formData.append('file', csvFile)
 
-      const response = await fetch(`/api/projects/import/csv?portfolio_id=${portfolioId}`, {
+      const params = new URLSearchParams()
+      if (portfolioId) params.set('portfolio_id', portfolioId)
+      params.set('anonymize', String(anonymize))
+      params.set('clear_before_import', String(clearBeforeImport))
+      const response = await fetch(`/api/projects/import/csv?${params.toString()}`, {
         method: 'POST',
         body: formData,
       })
 
       const data = await response.json()
-      setResult(data)
+      const resultData = response.ok ? data : (data.detail && typeof data.detail === 'object' ? data.detail : { success: false, count: 0, errors: [{ index: 0, field: 'server', value: null, error: data.detail?.message || data.detail || 'Import failed' }], message: data.detail?.message || data.detail || 'Import failed' })
+      setResult(resultData)
     } catch (error) {
       setResult({
         success: false,
@@ -214,6 +235,28 @@ export default function ProjectImportModal({
       size="lg"
     >
       <div className="space-y-6 pt-4">
+        {/* Import options */}
+        <div className="flex flex-wrap gap-6 p-3 rounded-lg bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-600">
+          <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-slate-300">
+            <input
+              type="checkbox"
+              checked={anonymize}
+              onChange={(e) => setAnonymize(e.target.checked)}
+              className="rounded border-gray-300 dark:border-slate-500 text-blue-600 focus:ring-blue-500"
+            />
+            <span>{t('dataImport.anonymizeData') ?? 'Anonymize data (names, descriptions, budgets)'}</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-slate-300">
+            <input
+              type="checkbox"
+              checked={clearBeforeImport}
+              onChange={(e) => setClearBeforeImport(e.target.checked)}
+              className="rounded border-gray-300 dark:border-slate-500 text-blue-600 focus:ring-blue-500"
+            />
+            <span>{t('dataImport.clearBeforeImport') ?? 'Clear projects table before import'}</span>
+          </label>
+        </div>
+
         {/* Method Selection Tabs - Req 6.2 */}
         <div className="flex border-b border-gray-200 dark:border-slate-700">
           <button

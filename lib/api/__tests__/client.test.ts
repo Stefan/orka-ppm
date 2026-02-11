@@ -46,23 +46,13 @@ describe('apiRequest', () => {
     )
   })
 
-  it('uses mock data fallback for /projects when fetch fails', async () => {
+  it('throws when fetch fails (no mock fallback)', async () => {
     global.fetch = jest.fn().mockRejectedValue(new Error('Network error'))
 
-    const result = await apiRequest('/projects')
-    expect(Array.isArray(result)).toBe(true)
-    expect((result as any[]).length).toBeGreaterThan(0)
+    await expect(apiRequest('/projects')).rejects.toThrow()
   })
 
-  it('uses mock data fallback for /optimized/dashboard/quick-stats when fetch fails', async () => {
-    global.fetch = jest.fn().mockRejectedValue(new Error('Network error'))
-
-    const result = await apiRequest('/optimized/dashboard/quick-stats')
-    expect(result).toBeDefined()
-    expect((result as Record<string, unknown>).quick_stats).toBeDefined()
-  })
-
-  it('throws when response not ok and no mock data', async () => {
+  it('throws when response not ok', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
       status: 500,

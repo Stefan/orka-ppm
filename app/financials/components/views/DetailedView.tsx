@@ -3,31 +3,30 @@
 import { useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { ComprehensiveFinancialReport } from '../../types'
-import { useCommitmentsActualsData } from '../../hooks/useCommitmentsActualsData'
+import type { CommitmentsActualsSummary, CommitmentsActualsAnalytics } from '../../hooks/useCommitmentsActualsData'
 import { useTranslations } from '../../../../lib/i18n/context'
 
 interface DetailedViewProps {
   comprehensiveReport: ComprehensiveFinancialReport | null
   selectedCurrency: string
   accessToken?: string
+  commitmentsSummary?: CommitmentsActualsSummary | null
+  commitmentsAnalytics?: CommitmentsActualsAnalytics | null
+  commitmentsLoading?: boolean
 }
 
-export default function DetailedView({ 
-  comprehensiveReport, 
+export default function DetailedView({
+  comprehensiveReport,
   selectedCurrency,
-  accessToken 
+  accessToken,
+  commitmentsSummary: summary = null,
+  commitmentsAnalytics: analytics = null,
+  commitmentsLoading: loading = false
 }: DetailedViewProps) {
   const { t } = useTranslations()
   const [sortBy, setSortBy] = useState<'name' | 'commitments' | 'actuals' | 'variance'>('variance')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [filterStatus, setFilterStatus] = useState<'all' | 'over' | 'under' | 'on'>('all')
-  
-  // Fetch commitments & actuals after first paint so tab shows immediately
-  const { analytics, summary, loading } = useCommitmentsActualsData({
-    accessToken,
-    selectedCurrency,
-    deferMs: 150
-  })
 
   if (loading) {
     return (

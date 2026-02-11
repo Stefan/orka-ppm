@@ -403,6 +403,8 @@
     "dropzonePrompt": "Arrastra el archivo aquí o haz clic para seleccionar",
     "dropzoneActive": "Suelta el archivo aquí...",
     "acceptedFormats": "Aceptado: .csv, .json",
+    "assignToPortfolio": "Asignar todos los proyectos al portafolio",
+    "selectPortfolio": "Seleccionar portafolio",
     "importButton": "Importar datos",
     "clear": "Limpiar",
     "processing": "Procesando...",
@@ -423,7 +425,7 @@
     "template": "Plantilla",
     "dropzoneFilePrompt": "Suelta el archivo aquí o haz clic para seleccionar",
     "selectFile": "Seleccionar archivo",
-    "maxFileSize": "Tamaño máx.: 50 MB",
+    "maxFileSize": "Tamaño máx.: 80 MB",
     "columnsCommitments": "Columnas: nº PO, importe, moneda, proyecto, WBS",
     "columnsActuals": "Columnas: documento FI, importe, moneda, proyecto, WBS",
     "importHistory": "Historial de importaciones",
@@ -447,7 +449,9 @@
     "warnings": "Advertencias",
     "rowLabel": "Fila {row}",
     "moreErrors": "... y {count} errores más",
-    "moreWarnings": "... y {count} advertencias más"
+    "moreWarnings": "... y {count} advertencias más",
+    "anonymizeData": "Anonimizar datos (proveedor, proyecto, importes, etc.)",
+    "clearBeforeImport": "Vaciar tabla de destino antes del import (eliminar datos existentes)"
   },
   "variance": {
     "trends": "Tendencias de Variación",
@@ -491,6 +495,8 @@
     "lastYear": "Último Año",
     "budgetStatus": "Estado del Presupuesto",
     "allProjects": "Todos los Proyectos",
+    "portfolio": "Portafolio",
+    "allPortfolios": "Todos los portafolios",
     "overBudgetOnly": "Sobre Presupuesto",
     "underBudgetOnly": "Bajo Presupuesto",
     "onBudget": "En Presupuesto",

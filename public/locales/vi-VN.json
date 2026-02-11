@@ -340,6 +340,8 @@
     "dropzonePrompt": "Kéo & thả file vào đây, hoặc nhấp để chọn",
     "dropzoneActive": "Thả file vào đây...",
     "acceptedFormats": "Định dạng chấp nhận: .csv, .json",
+    "assignToPortfolio": "Gán tất cả dự án vào danh mục",
+    "selectPortfolio": "Chọn danh mục",
     "importButton": "Nhập dữ liệu",
     "clear": "Xóa",
     "processing": "Đang xử lý...",
@@ -360,7 +362,7 @@
     "template": "Mẫu",
     "dropzoneFilePrompt": "Thả tệp vào đây hoặc nhấp để chọn",
     "selectFile": "Chọn tệp",
-    "maxFileSize": "Kích thước tệp tối đa: 50MB",
+    "maxFileSize": "Kích thước tệp tối đa: 80MB",
     "columnsCommitments": "Cột: Số PO, số tiền, tiền tệ, dự án, WBS",
     "columnsActuals": "Cột: Tài liệu FI, số tiền, tiền tệ, dự án, WBS",
     "importHistory": "Lịch sử nhập",
@@ -384,7 +386,9 @@
     "warnings": "Cảnh báo",
     "rowLabel": "Dòng {row}",
     "moreErrors": "... và {count} lỗi khác",
-    "moreWarnings": "... và {count} cảnh báo khác"
+    "moreWarnings": "... và {count} cảnh báo khác",
+    "anonymizeData": "Ẩn danh hóa dữ liệu (nhà cung cấp, dự án, số tiền, v.v.)",
+    "clearBeforeImport": "Xóa bảng đích trước khi nhập (xóa dữ liệu hiện có)"
   },
   "shared": {
     "shareableUrl": {
@@ -490,6 +494,8 @@
     "lastYear": "Năm qua",
     "budgetStatus": "Trạng thái ngân sách",
     "allProjects": "Tất cả dự án",
+    "portfolio": "Danh mục",
+    "allPortfolios": "Tất cả danh mục",
     "overBudgetOnly": "Chỉ vượt ngân sách",
     "underBudgetOnly": "Chỉ dưới ngân sách",
     "onBudget": "Đúng ngân sách",

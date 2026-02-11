@@ -35,17 +35,17 @@ BEGIN
         ALTER TABLE commitments ADD COLUMN investment_profile VARCHAR(50);
     END IF;
     
-    -- Add account_group_level1 column (Cora Level 1)
+    -- Add account_group_level1 column (Orka Level 1)
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'commitments' AND column_name = 'account_group_level1') THEN
         ALTER TABLE commitments ADD COLUMN account_group_level1 VARCHAR(100);
     END IF;
     
-    -- Add account_subgroup_level2 column (Cora Level 2)
+    -- Add account_subgroup_level2 column (Orka Level 2)
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'commitments' AND column_name = 'account_subgroup_level2') THEN
         ALTER TABLE commitments ADD COLUMN account_subgroup_level2 VARCHAR(100);
     END IF;
     
-    -- Add account_level3 column (Cora Level 3)
+    -- Add account_level3 column (Orka Level 3)
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'commitments' AND column_name = 'account_level3') THEN
         ALTER TABLE commitments ADD COLUMN account_level3 VARCHAR(100);
     END IF;
@@ -105,9 +105,9 @@ COMMENT ON COLUMN commitments.shopping_cart_number IS 'Shopping cart reference n
 COMMENT ON COLUMN commitments.document_currency_code IS 'Currency code in the original document';
 COMMENT ON COLUMN commitments.value_in_document_currency IS 'Value in the original document currency';
 COMMENT ON COLUMN commitments.investment_profile IS 'Investment profile classification (capex/opex)';
-COMMENT ON COLUMN commitments.account_group_level1 IS 'Account group at Cora Level 1';
-COMMENT ON COLUMN commitments.account_subgroup_level2 IS 'Account subgroup at Cora Level 2';
-COMMENT ON COLUMN commitments.account_level3 IS 'Account at Cora Level 3';
+COMMENT ON COLUMN commitments.account_group_level1 IS 'Account group at Orka Level 1';
+  COMMENT ON COLUMN commitments.account_subgroup_level2 IS 'Account subgroup at Orka Level 2';
+  COMMENT ON COLUMN commitments.account_level3 IS 'Account at Orka Level 3';
 COMMENT ON COLUMN commitments.change_date IS 'Date when the commitment was last changed';
 COMMENT ON COLUMN commitments.purchase_requisition IS 'Purchase requisition number';
 COMMENT ON COLUMN commitments.procurement_plant IS 'Procurement plant identifier';

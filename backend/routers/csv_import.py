@@ -2,13 +2,21 @@
 CSV import functionality endpoints
 """
 
+import logging
+import os
 from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Query, Request
+from fastapi.responses import StreamingResponse
 from uuid import UUID
 from typing import Optional, Dict, Any, List
 import csv
 import io
 import json
+import re
+import asyncio
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
+_DEBUG_LOG = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".cursor", "debug.log"))
 
 from pydantic import BaseModel
 
@@ -22,6 +30,9 @@ from services.csv_mapping_suggestions import suggest_mapping
 from models.csv_import_mappings import CsvImportMappingCreate, CsvImportMappingResponse
 
 router = APIRouter(prefix="/csv-import", tags=["csv-import"])
+
+# Max upload size for commitments/actuals CSV (avoids OOM and timeouts; see docs on large imports)
+MAX_CSV_UPLOAD_BYTES = 80 * 1024 * 1024  # 80 MB
 
 
 class SuggestMappingBody(BaseModel):
@@ -37,248 +48,72 @@ def map_csv_columns(rows: List[Dict[str, Any]], import_type: str) -> List[Dict[s
     and maps them to the standardized field names expected by the Pydantic models.
     """
     if import_type == "commitments":
-        # Mapping for commitments CSV columns
+        # Canonical commitments CSV columns (Orka). Cora in headers is mapped to Orka at lookup.
+        # One canonical header per target; variants (case, spaces, underscores) matched via _normalize_header.
         column_mapping = {
-            'PO Number': 'po_number',
-            'PO_Number': 'po_number',
-            'po_number': 'po_number',
-            'PO Date': 'po_date',
-            'PO_Date': 'po_date',
-            'po_date': 'po_date',
-            'Vendor': 'vendor',
-            'vendor': 'vendor',
-            'Vendor Description': 'vendor_description',
-            'Vendor_Description': 'vendor_description',
-            'vendor_description': 'vendor_description',
-            'Requester': 'requester',
-            'requester': 'requester',
-            'PO Created By': 'po_created_by',
-            'PO_Created_By': 'po_created_by',
-            'po_created_by': 'po_created_by',
-            'Shopping Cart Number': 'shopping_cart_number',
-            'Shopping_Cart_Number': 'shopping_cart_number',
-            'shopping_cart_number': 'shopping_cart_number',
-            'Project': 'project_nr',
-            'Project Nr': 'project_nr',
-            'Project_Nr': 'project_nr',
-            'project_nr': 'project_nr',
-            'Project Description': 'project_description',
-            'Project_Description': 'project_description',
-            'project_description': 'project_description',
-            'WBS Element': 'wbs_element',
-            'WBS_Element': 'wbs_element',
-            'wbs_element': 'wbs_element',
-            'WBS Element Description': 'wbs_description',
-            'WBS_Element_Description': 'wbs_description',
-            'wbs_description': 'wbs_description',
-            'Cost Center': 'cost_center',
-            'Cost_Center': 'cost_center',
-            'cost_center': 'cost_center',
-            'Cost Center Description': 'cost_center_description',
-            'Cost_Center_Description': 'cost_center_description',
-            'cost_center_description': 'cost_center_description',
-            'PO Net Amount': 'po_net_amount',
-            'PO_Net_Amount': 'po_net_amount',
-            'po_net_amount': 'po_net_amount',
-            'Tax Amount': 'tax_amount',
-            'Tax_Amount': 'tax_amount',
-            'tax_amount': 'tax_amount',
-            'Total Amount Legal Entity Currency': 'total_amount',
-            'Total Amount': 'total_amount',
-            'Total_Amount': 'total_amount',
-            'total_amount': 'total_amount',
-            'Legal Entity Currency Code': 'currency',
-            'Currency': 'currency',
-            'currency': 'currency',
-            'PO Status': 'po_status',
-            'PO_Status': 'po_status',
-            'po_status': 'po_status',
-            'PO Line Nr.': 'po_line_nr',
-            'PO Line Nr': 'po_line_nr',
-            'PO_Line_Nr': 'po_line_nr',
-            'po_line_nr': 'po_line_nr',
-            'PO Line Text': 'po_line_text',
-            'PO_Line_Text': 'po_line_text',
-            'po_line_text': 'po_line_text',
-            'Delivery Date': 'delivery_date',
-            'Delivery_Date': 'delivery_date',
-            'delivery_date': 'delivery_date',
-            'Value in document currency': 'value_in_document_currency',
-            'Value_in_document_currency': 'value_in_document_currency',
-            'value_in_document_currency': 'value_in_document_currency',
-            'Document currency code': 'document_currency_code',
-            'Document_currency_code': 'document_currency_code',
-            'document_currency_code': 'document_currency_code',
-            'Investment Profile': 'investment_profile',
-            'Investment_Profile': 'investment_profile',
-            'investment_profile': 'investment_profile',
-            'Account Group (Cora Level 1)': 'account_group_level1',
-            'Account_Group_(Cora_Level_1)': 'account_group_level1',
-            'account_group_level1': 'account_group_level1',
-            'Account Sub Group (Cora Level 2)': 'account_subgroup_level2',
-            'Account_Sub_Group_(Cora_Level_2)': 'account_subgroup_level2',
-            'account_subgroup_level2': 'account_subgroup_level2',
-            'Account (Cora Level 3)': 'account_level3',
-            'Account_(Cora_Level_3)': 'account_level3',
-            'account_level3': 'account_level3',
-            'Change Date': 'change_date',
-            'Change_Date': 'change_date',
-            'change_date': 'change_date',
-            'Purchase requisition': 'purchase_requisition',
-            'Purchase_requisition': 'purchase_requisition',
-            'purchase_requisition': 'purchase_requisition',
-            'Procurement Plant': 'procurement_plant',
-            'Procurement_Plant': 'procurement_plant',
-            'procurement_plant': 'procurement_plant',
-            'Contract #': 'contract_number',
-            'Contract_#': 'contract_number',
-            'contract_number': 'contract_number',
-            'Joint Commodity Code': 'joint_commodity_code',
-            'Joint_Commodity_Code': 'joint_commodity_code',
-            'joint_commodity_code': 'joint_commodity_code',
-            'PO Title': 'po_title',
-            'PO_Title': 'po_title',
-            'po_title': 'po_title',
-            'Version': 'version',
-            'version': 'version',
-            'FI Doc No': 'fi_doc_no',
-            'FI_Doc_No': 'fi_doc_no',
-            'fi_doc_no': 'fi_doc_no',
+            'PO Number': 'po_number', 'PO Date': 'po_date', 'Vendor': 'vendor', 'Vendor Description': 'vendor_description',
+            'Requester': 'requester', 'PO Created By': 'po_created_by', 'Shopping Cart Number': 'shopping_cart_number',
+            'Project': 'project_nr', 'Project Description': 'project_description', 'WBS Element': 'wbs_element',
+            'WBS Element Description': 'wbs_description', 'Cost Center': 'cost_center', 'Cost Center Description': 'cost_center_description',
+            'PO Net Amount': 'po_net_amount', 'Tax Amount': 'tax_amount', 'Total Amount Legal Entity Currency': 'total_amount',
+            'Total Amount Legal Entity currency': 'total_amount', 'PO Line Nr.': 'po_line_nr', 'PO Line Nr': 'po_line_nr',
+            'PO Status': 'po_status', 'PO Line Text': 'po_line_text', 'Delivery Date': 'delivery_date',
+            'Legal Entity Currency Code': 'currency', 'Value in document currency': 'value_in_document_currency',
+            'Document currency code': 'document_currency_code', 'Investment Profile': 'investment_profile',
+            'Account Group (Orka Level 1)': 'account_group_level1', 'Account Sub Group (Orka Level 2)': 'account_subgroup_level2',
+            'Account (Orka Level 3)': 'account_level3', 'Change Date': 'change_date', 'Purchase requisition': 'purchase_requisition',
+            'Procurement Plant': 'procurement_plant', 'Contract #': 'contract_number', 'Joint Commodity Code': 'joint_commodity_code',
+            'PO Title': 'po_title', 'Version': 'version', 'FI Doc No': 'fi_doc_no', 'FI Doc No.': 'fi_doc_no',
         }
     else:  # actuals
-        # Mapping for actuals CSV columns
+        # Canonical actuals CSV columns (Orka). Cora in headers is mapped to Orka at lookup.
         column_mapping = {
-            'FI Doc No': 'fi_doc_no',
-            'FI_Doc_No': 'fi_doc_no',
-            'fi_doc_no': 'fi_doc_no',
-            'FI Doc Date': 'document_date',
-            'FI_Doc_Date': 'document_date',
-            'Posting Date': 'posting_date',
-            'Posting_Date': 'posting_date',
-            'posting_date': 'posting_date',
-            'Document Date': 'document_date',
-            'Document_Date': 'document_date',
-            'document_date': 'document_date',
-            'Document Type': 'document_type',
-            'Document_Type': 'document_type',
-            'document_type': 'document_type',
-            'Document Type Desc': 'document_type_desc',
-            'Document_Type_Desc': 'document_type_desc',
-            'PO No': 'po_no',
-            'PO_No': 'po_no',
-            'po_no': 'po_no',
-            'PO Line No': 'po_line_no',
-            'PO_Line_No': 'po_line_no',
-            'po_line_no': 'po_line_no',
-            'Vendor': 'vendor',
-            'vendor': 'vendor',
-            'Vendor Description': 'vendor_description',
-            'Vendor_Description': 'vendor_description',
-            'vendor_description': 'vendor_description',
-            'Vendor Invoice No': 'vendor_invoice_no',
-            'Vendor_Invoice_No': 'vendor_invoice_no',
-            'vendor_invoice_no': 'vendor_invoice_no',
-            'Project': 'project_nr',
-            'Project Nr': 'project_nr',
-            'Project Nr.': 'project_nr',
-            'Project_Nr': 'project_nr',
-            'project_nr': 'project_nr',
-            'Project Description': 'project_description',
-            'Project_Description': 'project_description',
-            'project_description': 'project_description',
-            'WBS': 'wbs_element',
-            'WBS Element': 'wbs_element',
-            'WBS_Element': 'wbs_element',
-            'wbs_element': 'wbs_element',
-            'wbs': 'wbs_element',
-            'WBS Description': 'wbs_description',
-            'WBS_Description': 'wbs_description',
-            'wbs_description': 'wbs_description',
-            'G/L Account': 'gl_account',
-            'GL_Account': 'gl_account',
-            'gl_account': 'gl_account',
-            'G/L Account Desc': 'gl_account_desc',
-            'GL_Account_Desc': 'gl_account_desc',
-            'gl_account_desc': 'gl_account_desc',
-            'Cost Center': 'cost_center',
-            'Cost_Center': 'cost_center',
-            'cost_center': 'cost_center',
-            'Cost Center Desc': 'cost_center_desc',
-            'Cost_Center_Desc': 'cost_center_desc',
-            'cost_center_desc': 'cost_center_desc',
-            'Product Desc': 'product_desc',
-            'Product_Desc': 'product_desc',
-            'product_desc': 'product_desc',
-            'Item Text': 'item_text',
-            'Item_Text': 'item_text',
-            'item_text': 'item_text',
-            'Document Header Text': 'document_header_text',
-            'Document_Header_Text': 'document_header_text',
-            'document_header_text': 'document_header_text',
-            'Payment Terms': 'payment_terms',
-            'Payment_Terms': 'payment_terms',
-            'payment_terms': 'payment_terms',
-            'Net Due Date': 'net_due_date',
-            'Net_Due_Date': 'net_due_date',
-            'net_due_date': 'net_due_date',
-            'Amount': 'amount',
-            'amount': 'amount',
-            'Invoice Amount Legal Entity currency': 'amount',
-            'Invoice Amount': 'amount',
-            'invoice_amount': 'amount',
-            'Creation date': 'creation_date',
-            'Creation_date': 'creation_date',
-            'creation_date': 'creation_date',
-            'SAP Invoice No.': 'sap_invoice_no',
-            'SAP_Invoice_No': 'sap_invoice_no',
-            'sap_invoice_no': 'sap_invoice_no',
-            'Investment Profile': 'investment_profile',
-            'Investment_Profile': 'investment_profile',
-            'investment_profile': 'investment_profile',
-            'Account Group (Cora Level 1)': 'account_group_level1',
-            'Account_Group_(Cora_Level_1)': 'account_group_level1',
-            'account_group_level1': 'account_group_level1',
-            'Account Sub Group (Cora Level 2)': 'account_subgroup_level2',
-            'Account_Sub_Group_(Cora_Level_2)': 'account_subgroup_level2',
-            'account_subgroup_level2': 'account_subgroup_level2',
-            'Account (Cora Level 3)': 'account_level3',
-            'Account_(Cora_Level_3)': 'account_level3',
-            'account_level3': 'account_level3',
-            'Legal Entity Currency Code': 'currency',
-            'Currency': 'currency',
-            'currency': 'currency',
-            'Value in document currency': 'value_in_document_currency',
-            'Value_in_document_currency': 'value_in_document_currency',
-            'value_in_document_currency': 'value_in_document_currency',
-            'Document currency Code': 'document_currency_code',
-            'Document_currency_Code': 'document_currency_code',
-            'document_currency_code': 'document_currency_code',
-            'Quantity': 'quantity',
-            'quantity': 'quantity',
-            'Personnel Number': 'personnel_number',
-            'Personnel_Number': 'personnel_number',
-            'personnel_number': 'personnel_number',
-            'PO Final Invoice indicator': 'po_final_invoice_indicator',
-            'PO_Final_Invoice_indicator': 'po_final_invoice_indicator',
-            'po_final_invoice_indicator': 'po_final_invoice_indicator',
-            'Value Type': 'value_type',
-            'Value_Type': 'value_type',
-            'value_type': 'value_type',
-            'Miro Invoice #': 'miro_invoice_no',
-            'Miro_Invoice_#': 'miro_invoice_no',
-            'miro_invoice_no': 'miro_invoice_no',
-            'Goods Received Value': 'goods_received_value',
-            'Goods_Received_Value': 'goods_received_value',
-            'goods_received_value': 'goods_received_value',
+            'FI Doc No': 'fi_doc_no', 'FI Doc No.': 'fi_doc_no', 'FI Doc Date': 'document_date', 'Posting Date': 'posting_date',
+            'Document Date': 'document_date', 'Document Type': 'document_type', 'Document Type Desc': 'document_type_desc',
+            'PO No': 'po_no', 'PO Line No': 'po_line_no', 'Vendor': 'vendor', 'Vendor Description': 'vendor_description',
+            'Vendor Invoice No': 'vendor_invoice_no', 'Project': 'project_nr', 'Project Nr': 'project_nr', 'Project Nr.': 'project_nr',
+            'Project Description': 'project_description', 'WBS': 'wbs_element', 'WBS Element': 'wbs_element', 'WBS Description': 'wbs_description',
+            'G/L Account': 'gl_account', 'G/L Account Desc': 'gl_account_desc', 'Cost Center': 'cost_center', 'Cost Center Desc': 'cost_center_desc',
+            'Product Desc': 'product_desc', 'Item Text': 'item_text', 'Document Header Text': 'document_header_text',
+            'Payment Terms': 'payment_terms', 'Net Due Date': 'net_due_date', 'Amount': 'amount',
+            'Invoice Amount Legal Entity currency': 'amount', 'Invoice Amount': 'amount', 'Creation date': 'creation_date',
+            'SAP Invoice No.': 'sap_invoice_no', 'Investment Profile': 'investment_profile',
+            'Account Group (Orka Level 1)': 'account_group_level1', 'Account Sub Group (Orka Level 2)': 'account_subgroup_level2',
+            'Account (Orka Level 3)': 'account_level3', 'Legal Entity Currency Code': 'currency',
+            'Value in document currency': 'value_in_document_currency', 'Document currency Code': 'document_currency_code',
+            'Quantity': 'quantity', 'Personnel Number': 'personnel_number', 'PO Final Invoice indicator': 'po_final_invoice_indicator',
+            'Value Type': 'value_type', 'Miro Invoice #': 'miro_invoice_no', 'Goods Received Value': 'goods_received_value',
         }
-    
-    # Map each row
+
+    # Normalize header for matching: lowercase, non-word chars to underscore, collapse underscores
+    def _normalize_header(h: str) -> str:
+        s = (h or "").strip().lower()
+        s = re.sub(r"[^\w\s]", " ", s)
+        s = re.sub(r"\s+", "_", s).strip("_")
+        return s or h
+
+    normalized_lookup = {_normalize_header(k): v for k, v in column_mapping.items()}
+
+    def _lookup_key(key: str) -> str:
+        if not key:
+            return key
+        if key in column_mapping:
+            return column_mapping[key]
+        orka_key = key.replace("Cora", "Orka").replace("cora", "orka")
+        if orka_key in column_mapping:
+            return column_mapping[orka_key]
+        norm = _normalize_header(key)
+        if norm in normalized_lookup:
+            return normalized_lookup[norm]
+        if _normalize_header(orka_key) in normalized_lookup:
+            return normalized_lookup[_normalize_header(orka_key)]
+        return _normalize_header(orka_key)
+
     mapped_rows = []
     for row in rows:
         mapped_row = {}
         for csv_col, value in row.items():
-            # Find the mapped column name
-            mapped_col = column_mapping.get(csv_col, csv_col.lower().replace(' ', '_'))
+            mapped_col = _lookup_key(csv_col)
             mapped_row[mapped_col] = value
         mapped_rows.append(mapped_row)
     
@@ -291,7 +126,7 @@ async def post_suggest_mapping(
     current_user=Depends(get_current_user),
 ):
     """
-    Suggest PPM field mapping for CSV headers (Cora-Surpass Phase 2.2).
+    Suggest PPM field mapping for CSV headers (Orka-Surpass Phase 2.2).
     Returns list of { source_header, target_field, confidence } for each header.
     """
     if body.import_type not in ("actuals", "commitments"):
@@ -368,18 +203,111 @@ async def delete_csv_import_mapping(
         raise HTTPException(status_code=500, detail="Failed to delete mapping")
 
 
+def _clear_table_before_import(db_client, table_name: str) -> int:
+    """Delete all rows from the given table. Prefer RPC (server-side) to avoid timeouts and large responses."""
+    # #region agent log
+    try:
+        with open(_DEBUG_LOG, "a") as _f:
+            _f.write(json.dumps({"location": "csv_import:_clear_table_before_import:entry", "message": "clear started", "data": {"table_name": table_name}, "timestamp": datetime.utcnow().isoformat(), "hypothesisId": "H1"}) + "\n")
+    except Exception:
+        pass
+    # #endregion
+    rpc_name = f"clear_{table_name}_for_import"
+    if table_name in ("commitments", "actuals"):
+        try:
+            total_deleted = 0
+            max_iterations = 2000  # 2000 * 500 = 1M rows max
+            for iteration in range(max_iterations):
+                # #region agent log
+                try:
+                    with open(_DEBUG_LOG, "a") as _f:
+                        _f.write(json.dumps({"location": "csv_import:rpc_call", "message": "calling RPC", "data": {"rpc_name": rpc_name, "iteration": iteration}, "timestamp": datetime.utcnow().isoformat(), "hypothesisId": "H2"}) + "\n")
+                except Exception:
+                    pass
+                # #endregion
+                r = db_client.rpc(rpc_name).execute()
+                raw = r.data
+                if raw is None:
+                    n = 0
+                elif isinstance(raw, (int, float)):
+                    n = int(raw)
+                elif isinstance(raw, list) and len(raw) > 0:
+                    row = raw[0]
+                    if isinstance(row, dict):
+                        val = row.get(rpc_name) or next(iter(row.values()), 0)
+                    else:
+                        val = row
+                    n = int(val) if val is not None else 0
+                else:
+                    n = 0
+                total_deleted += n
+                if n == 0:
+                    break
+                # #region agent log
+                try:
+                    with open(_DEBUG_LOG, "a") as _f:
+                        _f.write(json.dumps({"location": "csv_import:rpc_ok", "message": "RPC batch returned", "data": {"rpc_name": rpc_name, "deleted": n, "total_so_far": total_deleted}, "timestamp": datetime.utcnow().isoformat(), "hypothesisId": "H3"}) + "\n")
+                except Exception:
+                    pass
+                # #endregion
+            logger.info("Clear table via RPC %s: deleted %d rows total", rpc_name, total_deleted)
+            return total_deleted
+        except Exception as e:
+            # #region agent log
+            try:
+                with open(_DEBUG_LOG, "a") as _f:
+                    _f.write(json.dumps({"location": "csv_import:rpc_failed", "message": "RPC exception", "data": {"rpc_name": rpc_name, "error": str(e), "type": type(e).__name__}, "timestamp": datetime.utcnow().isoformat(), "hypothesisId": "H2"}) + "\n")
+            except Exception:
+                pass
+            # #endregion
+            logger.warning("Clear table RPC %s failed (%s), using fallback delete", rpc_name, e)
+    # Fallback: client-side chunked delete (can timeout or hit response size limits)
+    # #region agent log
+    try:
+        with open(_DEBUG_LOG, "a") as _f:
+            _f.write(json.dumps({"location": "csv_import:fallback_delete", "message": "using fallback chunked delete", "data": {"table_name": table_name}, "timestamp": datetime.utcnow().isoformat(), "hypothesisId": "H4"}) + "\n")
+    except Exception:
+        pass
+    # #endregion
+    total_deleted = 0
+    select_chunk = 200
+    delete_batch = 25
+    while True:
+        r = db_client.table(table_name).select("id").limit(select_chunk).execute()
+        ids = [row["id"] for row in (r.data or []) if row.get("id") is not None]
+        if not ids:
+            break
+        for i in range(0, len(ids), delete_batch):
+            batch = ids[i : i + delete_batch]
+            db_client.table(table_name).delete().in_("id", batch).execute()
+            total_deleted += len(batch)
+    # #region agent log
+    try:
+        with open(_DEBUG_LOG, "a") as _f:
+            _f.write(json.dumps({"location": "csv_import:fallback_done", "message": "fallback delete completed", "data": {"table_name": table_name, "total_deleted": total_deleted}, "timestamp": datetime.utcnow().isoformat(), "hypothesisId": "H4"}) + "\n")
+    except Exception:
+        pass
+    # #endregion
+    return total_deleted
+
+
 @router.post("/upload")
 async def upload_csv_file(
     request: Request,
     file: UploadFile = File(...),
     import_type: str = Query(...),  # "actuals" or "commitments"
+    anonymize: bool = Query(True, description="Anonymize sensitive data (vendor, project_nr, amounts, etc.)"),
+    clear_before_import: bool = Query(False, description="Delete all existing rows in the target table before importing"),
+    stream: bool = Query(False, description="Stream progress as NDJSON (progress events + final result)"),
     current_user = Depends(require_permission(Permission.data_import)),
 ):
     """
     Upload and process CSV file for actuals or commitments import.
     
     This endpoint handles CSV imports for financial data (actuals and commitments).
-    The data is validated, anonymized, and linked to projects automatically.
+    The data is validated, optionally anonymized, and linked to projects automatically.
+    If clear_before_import=True, the target table (actuals or commitments) is emptied before import.
+    Max file size: 80 MB (larger files may cause timeouts; split by period or use multiple uploads).
     """
     try:
         if not file.filename or not file.filename.lower().endswith('.csv'):
@@ -394,6 +322,11 @@ async def upload_csv_file(
         
         # Read CSV content
         content = await file.read()
+        if len(content) > MAX_CSV_UPLOAD_BYTES:
+            raise HTTPException(
+                status_code=413,
+                detail=f"File too large. Maximum size is {MAX_CSV_UPLOAD_BYTES // (1024*1024)} MB. Split the file or use multiple uploads."
+            )
         try:
             csv_content = content.decode('utf-8')
         except UnicodeDecodeError:
@@ -428,13 +361,107 @@ async def upload_csv_file(
         if not db_client:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
-        import_service = ActualsCommitmentsImportService(db_client, user_id)
+        # Optionally clear target table before import
+        if clear_before_import:
+            table_name = "actuals" if import_type == "actuals" else "commitments"
+            # #region agent log
+            try:
+                with open(_DEBUG_LOG, "a") as _f:
+                    _f.write(json.dumps({"location": "csv_import:upload:before_clear", "message": "clear_before_import True", "data": {"import_type": import_type, "table_name": table_name}, "timestamp": datetime.utcnow().isoformat(), "hypothesisId": "H1"}) + "\n")
+            except Exception:
+                pass
+            # #endregion
+            try:
+                _clear_table_before_import(db_client, table_name)
+            except Exception as clear_err:
+                err_str = str(clear_err)
+                if "statement timeout" in err_str.lower() or "57014" in err_str:
+                    raise HTTPException(
+                        status_code=504,
+                        detail=f"Clearing the {table_name} table timed out. Try again without 'Clear before import', or clear the table first (e.g. via script or SQL).",
+                    ) from clear_err
+                raise
         
-        # Process import based on type
+        import_service = ActualsCommitmentsImportService(db_client, user_id)
+
+        if stream:
+            async def stream_body():
+                progress = {"inserted": 0, "total": 0}
+
+                def on_progress(inserted: int, total: int) -> None:
+                    progress["inserted"] = inserted
+                    progress["total"] = total
+
+                async def run_import():
+                    if import_type == "actuals":
+                        return await import_service.import_actuals(
+                            rows, anonymize=anonymize, progress_callback=on_progress
+                        )
+                    return await import_service.import_commitments(
+                        rows, anonymize=anonymize, progress_callback=on_progress
+                    )
+
+                task = asyncio.create_task(run_import())
+                try:
+                    while not task.done():
+                        if progress["total"] > 0:
+                            yield json.dumps({
+                                "type": "progress",
+                                "inserted": progress["inserted"],
+                                "total": progress["total"],
+                            }) + "\n"
+                        await asyncio.sleep(0.15)
+                    result = task.result()
+                except Exception as e:
+                    yield json.dumps({
+                        "type": "result",
+                        "success": False,
+                        "records_processed": 0,
+                        "records_imported": 0,
+                        "errors": [{"row": 0, "field": "import", "message": str(e)}],
+                        "warnings": [],
+                        "import_id": "",
+                    }) + "\n"
+                    return
+                try:
+                    ip = request.client.host if request.client else None
+                    EnterpriseAuditService().log(
+                        user_id=str(user_id),
+                        action="CREATE",
+                        entity=f"csv_import_{import_type}",
+                        new_value=json.dumps({
+                            "import_id": result.import_id,
+                            "total_records": result.total_records,
+                            "success_count": result.success_count,
+                            "error_count": len(result.errors),
+                        }, default=str),
+                        ip=ip,
+                    )
+                except Exception as e:
+                    print(f"Enterprise audit log failed: {e}")
+                yield json.dumps({
+                    "type": "result",
+                    "success": result.success,
+                    "records_processed": result.total_records,
+                    "records_imported": result.success_count,
+                    "errors": [
+                        {"row": err.row, "field": err.field, "message": err.error}
+                        for err in result.errors
+                    ],
+                    "warnings": [],
+                    "import_id": result.import_id,
+                }) + "\n"
+
+            return StreamingResponse(
+                stream_body(),
+                media_type="application/x-ndjson",
+            )
+
+        # Process import based on type (non-streaming)
         if import_type == "actuals":
-            result = await import_service.import_actuals(rows, anonymize=True)
-        else:  # commitments
-            result = await import_service.import_commitments(rows, anonymize=True)
+            result = await import_service.import_actuals(rows, anonymize=anonymize)
+        else:
+            result = await import_service.import_commitments(rows, anonymize=anonymize)
 
         # Phase 1: SOX audit log
         try:
@@ -454,26 +481,27 @@ async def upload_csv_file(
         except Exception as e:
             print(f"Enterprise audit log failed: {e}")
 
-        # Return result in format expected by frontend
         return {
             "success": result.success,
             "records_processed": result.total_records,
             "records_imported": result.success_count,
             "errors": [
-                {
-                    "row": err.row,
-                    "field": err.field,
-                    "message": err.error
-                }
+                {"row": err.row, "field": err.field, "message": err.error}
                 for err in result.errors
             ],
-            "warnings": [],  # Can be extended if needed
+            "warnings": [],
             "import_id": result.import_id
         }
         
     except HTTPException:
         raise
     except Exception as e:
+        err_str = str(e)
+        if "statement timeout" in err_str.lower() or "57014" in err_str:
+            raise HTTPException(
+                status_code=504,
+                detail="Import timed out (database statement limit). Try a smaller file, or split the CSV and import in parts.",
+            ) from e
         print(f"CSV upload error: {e}")
         raise HTTPException(
             status_code=500,
@@ -492,49 +520,110 @@ async def get_csv_template(
     Returns the column headers and an example row for the specified import type.
     """
     try:
+        # Templates aligned with models/imports.py (ActualCreate, CommitmentCreate) and DB columns.
+        # Headers use canonical names from map_csv_columns so downloaded CSV maps without custom mapping.
         templates = {
             "actuals": {
                 "headers": [
-                    "fi_doc_no", "posting_date", "document_date", "vendor",
-                    "vendor_description", "project_nr", "wbs_element", "amount",
-                    "currency", "item_text", "document_type"
+                    "FI Doc No", "Posting Date", "Document Date", "Document Type", "Document Type Desc",
+                    "Vendor", "Vendor Description", "Vendor Invoice No", "Project Nr", "Project Description",
+                    "WBS Element", "WBS Description", "G/L Account", "G/L Account Desc", "Cost Center", "Cost Center Desc",
+                    "Item Text", "Amount", "Legal Entity Currency Code", "Value in document currency", "Document currency code",
+                    "PO No", "PO Line No", "Product Desc", "Document Header Text", "Payment Terms", "Net Due Date",
+                    "Creation date", "SAP Invoice No.", "Investment Profile",
+                    "Account Group (Orka Level 1)", "Account Sub Group (Orka Level 2)", "Account (Orka Level 3)",
+                    "Quantity", "Personnel Number", "PO Final Invoice indicator", "Value Type", "Miro Invoice #", "Goods Received Value"
                 ],
                 "example": {
-                    "fi_doc_no": "FI-2024-001234",
-                    "posting_date": "2024-01-15",
-                    "document_date": "2024-01-14",
-                    "vendor": "ACME Corp",
-                    "vendor_description": "ACME Corporation Ltd",
-                    "project_nr": "PRJ-2024-001",
-                    "wbs_element": "WBS-001",
-                    "amount": "12345.67",
-                    "currency": "EUR",
-                    "item_text": "Consulting services for Q1",
-                    "document_type": "Invoice"
+                    "FI Doc No": "FI-2024-001234",
+                    "Posting Date": "2024-01-15",
+                    "Document Date": "2024-01-14",
+                    "Document Type": "Invoice",
+                    "Document Type Desc": "Vendor Invoice",
+                    "Vendor": "ACME Corp",
+                    "Vendor Description": "ACME Corporation Ltd",
+                    "Vendor Invoice No": "INV-ACME-001",
+                    "Project Nr": "PRJ-2024-001",
+                    "Project Description": "Project Alpha",
+                    "WBS Element": "WBS-001",
+                    "WBS Description": "Work package 1",
+                    "G/L Account": "400000",
+                    "G/L Account Desc": "Cost of materials",
+                    "Cost Center": "CC-1000",
+                    "Cost Center Desc": "IT",
+                    "Item Text": "Consulting services for Q1",
+                    "Amount": "12345.67",
+                    "Legal Entity Currency Code": "EUR",
+                    "Value in document currency": "12345.67",
+                    "Document currency code": "EUR",
+                    "PO No": "PO-2024-001234",
+                    "PO Line No": "1",
+                    "Product Desc": "",
+                    "Document Header Text": "",
+                    "Payment Terms": "30 days",
+                    "Net Due Date": "2024-02-14",
+                    "Creation date": "2024-01-10",
+                    "SAP Invoice No.": "",
+                    "Investment Profile": "Capex",
+                    "Account Group (Orka Level 1)": "Materials",
+                    "Account Sub Group (Orka Level 2)": "Services",
+                    "Account (Orka Level 3)": "Consulting",
+                    "Quantity": "1",
+                    "Personnel Number": "",
+                    "PO Final Invoice indicator": "",
+                    "Value Type": "",
+                    "Miro Invoice #": "",
+                    "Goods Received Value": ""
                 },
-                "description": "Import financial actuals (actual costs incurred)"
+                "description": "Import financial actuals (actual costs incurred). Aligned with actuals table and ActualCreate model."
             },
             "commitments": {
                 "headers": [
-                    "po_number", "po_date", "vendor", "vendor_description",
-                    "project_nr", "wbs_element", "po_net_amount", "total_amount",
-                    "currency", "po_status", "po_line_nr", "delivery_date"
+                    "PO Number", "PO Date", "Vendor", "Vendor Description", "Requester", "PO Created By", "Shopping Cart Number",
+                    "Project", "Project Description", "WBS Element", "WBS Element Description", "Cost Center", "Cost Center Description",
+                    "PO Net Amount", "Tax Amount", "Total Amount Legal Entity Currency", "PO Line Nr.", "PO Status", "PO Line Text", "Delivery Date",
+                    "Legal Entity Currency Code", "Value in document currency", "Document currency code", "Investment Profile",
+                    "Account Group (Orka Level 1)", "Account Sub Group (Orka Level 2)", "Account (Orka Level 3)",
+                    "Change Date", "Purchase requisition", "Procurement Plant", "Contract #", "Joint Commodity Code", "PO Title", "Version", "FI Doc No"
                 ],
                 "example": {
-                    "po_number": "PO-2024-001234",
-                    "po_date": "2024-01-15",
-                    "vendor": "XYZ Ltd",
-                    "vendor_description": "XYZ Limited",
-                    "project_nr": "PRJ-2024-002",
-                    "wbs_element": "WBS-002",
-                    "po_net_amount": "10000.00",
-                    "total_amount": "11900.00",
-                    "currency": "EUR",
-                    "po_status": "Open",
-                    "po_line_nr": "1",
-                    "delivery_date": "2024-02-15"
+                    "PO Number": "PO-2024-001234",
+                    "PO Date": "2024-01-15",
+                    "Vendor": "XYZ Ltd",
+                    "Vendor Description": "XYZ Limited",
+                    "Requester": "John Doe",
+                    "PO Created By": "jane@example.com",
+                    "Shopping Cart Number": "SC-12345",
+                    "Project": "PRJ-2024-002",
+                    "Project Description": "Project Beta",
+                    "WBS Element": "WBS-002",
+                    "WBS Element Description": "Work package 2",
+                    "Cost Center": "CC-2000",
+                    "Cost Center Description": "Construction",
+                    "PO Net Amount": "10000.00",
+                    "Tax Amount": "1900.00",
+                    "Total Amount Legal Entity Currency": "11900.00",
+                    "PO Line Nr.": "1",
+                    "PO Status": "Open",
+                    "PO Line Text": "Equipment and services",
+                    "Delivery Date": "2024-02-15",
+                    "Legal Entity Currency Code": "EUR",
+                    "Value in document currency": "10000.00",
+                    "Document currency code": "EUR",
+                    "Investment Profile": "Capex",
+                    "Account Group (Orka Level 1)": "Equipment",
+                    "Account Sub Group (Orka Level 2)": "Machinery",
+                    "Account (Orka Level 3)": "Heavy equipment",
+                    "Change Date": "2024-01-14",
+                    "Purchase requisition": "PR-001",
+                    "Procurement Plant": "1000",
+                    "Contract #": "CON-2024-01",
+                    "Joint Commodity Code": "JCC-123",
+                    "PO Title": "Q1 equipment order",
+                    "Version": "1",
+                    "FI Doc No": ""
                 },
-                "description": "Import financial commitments (purchase orders)"
+                "description": "Import financial commitments (purchase orders). Aligned with commitments table and CommitmentCreate model."
             }
         }
         
@@ -582,13 +671,15 @@ async def get_import_history(
     Get import history for the current user.
     
     Returns a list of past import operations with statistics.
+    Uses service role when available so RLS does not hide rows written by import.
     """
     try:
-        if supabase is None:
+        db = service_supabase if service_supabase else supabase
+        if db is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
         user_id = current_user.get("user_id") or current_user.get("id")
-        query = supabase.table("import_audit_logs").select("*").eq("user_id", user_id)
+        query = db.table("import_audit_logs").select("*").eq("user_id", user_id)
         
         if import_type:
             query = query.eq("import_type", import_type)
@@ -628,11 +719,12 @@ async def get_import_status(
 ):
     """Get status of a specific import operation."""
     try:
-        if supabase is None:
+        db = service_supabase if service_supabase else supabase
+        if db is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
         
         user_id = current_user.get("user_id") or current_user.get("id")
-        response = supabase.table("import_audit_logs").select("*").eq(
+        response = db.table("import_audit_logs").select("*").eq(
             "import_id", import_id
         ).eq("user_id", user_id).execute()
         
@@ -678,10 +770,10 @@ async def get_financial_variances(
                 "filters": {"organization_id": organization_id, "project_id": project_id, "status": status, "limit": limit},
             }
 
-        # Actuals table: project_nr, wbs, invoice_amount (not wbs_element/amount)
+        # Actuals: use amount (Invoice Amount Legal Entity), else value_in_document_currency, else invoice_amount
         try:
             actuals_response = supabase.table("actuals").select(
-                "project_nr, wbs, invoice_amount"
+                "project_nr, wbs, wbs_element, amount, invoice_amount, value_in_document_currency"
             ).execute()
             actuals = actuals_response.data or []
         except Exception as db_error:
@@ -692,7 +784,8 @@ async def get_financial_variances(
             return row.get("wbs") or row.get("wbs_element") or ""
 
         def _actual_amount(row):
-            return float(row.get("invoice_amount") or row.get("amount") or 0)
+            v = row.get("amount") or row.get("invoice_amount") or row.get("value_in_document_currency")
+            return float(v) if v is not None else 0.0
 
         # Group commitments by (project_nr, wbs_element)
         commitment_groups = {}
@@ -829,13 +922,6 @@ async def get_commitments(
     Get imported commitments data with pagination. Response cached (TTL 60s).
     Default count_exact=false to avoid slow COUNT; pass count_exact=true only for first page when you need exact total.
     """
-    # #region agent log
-    import json, time
-    _t0 = time.perf_counter()
-    try:
-        with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:commitments:entry", "message": "commitments_start", "data": {"limit": limit}, "hypothesisId": "A"}) + "\n")
-    except Exception: pass
-    # #endregion
     try:
         org_id = (current_user.get("organization_id") or current_user.get("tenant_id") or "default")
         if isinstance(org_id, UUID):
@@ -845,17 +931,7 @@ async def get_commitments(
         if cache:
             data = await cache.get(cache_key)
             if data is not None:
-                # #region agent log
-                try:
-                    with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:commitments:exit", "message": "commitments_cache_hit", "data": {"total_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "C"}) + "\n")
-                except Exception: pass
-                # #endregion
                 return data
-        # #region agent log
-        try:
-            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:commitments:after_cache", "message": "commitments_cache_miss", "data": {"elapsed_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "C"}) + "\n")
-        except Exception: pass
-        # #endregion
         db_client = service_supabase if service_supabase else supabase
         if db_client is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
@@ -867,11 +943,6 @@ async def get_commitments(
             query = query.eq("project_nr", project_nr)
         query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
         response = query.execute()
-        # #region agent log
-        try:
-            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:commitments:after_db", "message": "commitments_after_db", "data": {"elapsed_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "A"}) + "\n")
-        except Exception: pass
-        # #endregion
         data_list = response.data or []
         if count_exact and hasattr(response, "count") and response.count is not None:
             total = response.count
@@ -888,11 +959,6 @@ async def get_commitments(
         }
         if cache:
             await cache.set(cache_key, result, ttl=COMMITMENTS_CACHE_TTL)
-        # #region agent log
-        try:
-            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:commitments:exit", "message": "commitments_done", "data": {"total_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "A"}) + "\n")
-        except Exception: pass
-        # #endregion
         return result
     except Exception as e:
         print(f"Get commitments error: {e}")
@@ -924,13 +990,6 @@ async def get_actuals(
     Get imported actuals data with pagination. Response cached (TTL 60s).
     Default count_exact=false to avoid slow COUNT; pass count_exact=true only for first page when you need exact total.
     """
-    # #region agent log
-    import json, time
-    _t0 = time.perf_counter()
-    try:
-        with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:actuals:entry", "message": "actuals_start", "data": {"limit": limit}, "hypothesisId": "A"}) + "\n")
-    except Exception: pass
-    # #endregion
     try:
         org_id = (current_user.get("organization_id") or current_user.get("tenant_id") or "default")
         if isinstance(org_id, UUID):
@@ -940,13 +999,7 @@ async def get_actuals(
         if cache:
             data = await cache.get(cache_key)
             if data is not None:
-                try:
-                    with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:actuals:exit", "message": "actuals_cache_hit", "data": {"total_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "C"}) + "\n")
-                except Exception: pass
                 return data
-        try:
-            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:actuals:after_cache", "message": "actuals_cache_miss", "data": {"elapsed_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "C"}) + "\n")
-        except Exception: pass
         db_client = service_supabase if service_supabase else supabase
         if db_client is None:
             raise HTTPException(status_code=503, detail="Database service unavailable")
@@ -958,9 +1011,6 @@ async def get_actuals(
             query = query.eq("project_nr", project_nr)
         query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
         response = query.execute()
-        try:
-            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:actuals:after_db", "message": "actuals_after_db", "data": {"elapsed_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "A"}) + "\n")
-        except Exception: pass
         data_list = response.data or []
         if count_exact and hasattr(response, "count") and response.count is not None:
             total = response.count
@@ -977,9 +1027,6 @@ async def get_actuals(
         }
         if cache:
             await cache.set(cache_key, result, ttl=ACTUALS_CACHE_TTL)
-        try:
-            with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as _f: _f.write(json.dumps({"timestamp": int(time.time()*1000), "location": "csv_import.py:actuals:exit", "message": "actuals_done", "data": {"total_ms": round((time.perf_counter()-_t0)*1000)}, "hypothesisId": "A"}) + "\n")
-        except Exception: pass
         return result
     except Exception as e:
         print(f"Get actuals error: {e}")
@@ -1028,10 +1075,10 @@ async def get_financial_variances(
                 }
             }
         
-        # Get actuals grouped by project_nr and wbs
+        # Get actuals: amount = Invoice Amount Legal Entity currency, fallback value_in_document_currency / invoice_amount
         try:
             actuals_response = supabase.table("actuals").select(
-                "project_nr, wbs_element, amount"
+                "project_nr, wbs_element, wbs, amount, invoice_amount, value_in_document_currency"
             ).execute()
             actuals = actuals_response.data or []
         except Exception as db_error:
@@ -1055,15 +1102,19 @@ async def get_financial_variances(
             except (ValueError, TypeError):
                 pass
         
-        # Group actuals by (project_nr, wbs_element)
+        def _actual_amount_val(row):
+            v = row.get("amount") or row.get("invoice_amount") or row.get("value_in_document_currency")
+            return float(v) if v is not None else 0.0
+
+        # Group actuals by (project_nr, wbs_element or wbs)
         actual_groups = {}
         for actual in actuals:
-            key = (actual.get('project_nr'), actual.get('wbs_element'))
+            wbs = actual.get("wbs_element") or actual.get("wbs") or ""
+            key = (actual.get("project_nr"), wbs)
             if key not in actual_groups:
                 actual_groups[key] = 0
             try:
-                amount = float(actual.get('amount', 0))
-                actual_groups[key] += amount
+                actual_groups[key] += _actual_amount_val(actual)
             except (ValueError, TypeError):
                 pass
         

@@ -6,7 +6,6 @@ import {
   Users, 
   FileText, 
   FileSpreadsheet, 
-  Upload, 
   TrendingUp, 
   Award,
   Settings,
@@ -23,8 +22,6 @@ export interface CostbookFooterProps {
   onReports?: () => void
   /** Handler for PO Breakdown button */
   onPOBreakdown?: () => void
-  /** Handler for CSV Import button */
-  onCSVImport?: () => void
   /** Handler for Forecast button */
   onForecast?: () => void
   /** Handler for Vendor Score button */
@@ -71,9 +68,9 @@ function FooterButton({
       aria-label={label}
       data-testid={testId}
       className={`
-        flex flex-col items-center gap-1
-        px-3 py-2
-        rounded-lg
+        flex flex-row items-center gap-1
+        px-2 py-1
+        rounded-md
         transition-all
         ${disabled 
           ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed' 
@@ -81,8 +78,8 @@ function FooterButton({
         }
       `}
     >
-      <span className="text-lg">{icon}</span>
-      <span className="text-xs font-medium">{label}</span>
+      <span className="shrink-0 [&_svg]:w-4 [&_svg]:h-4">{icon}</span>
+      <span className="text-[11px] font-medium whitespace-nowrap">{label}</span>
     </button>
   )
 }
@@ -91,7 +88,7 @@ function FooterButton({
  * Divider between button groups
  */
 function FooterDivider() {
-  return <div className="h-8 w-px bg-gray-200 dark:bg-slate-600 mx-1" />
+  return <div className="h-4 w-px bg-gray-200 dark:bg-slate-600 mx-0.5" />
 }
 
 /**
@@ -104,7 +101,6 @@ export function CostbookFooter({
   onResources,
   onReports,
   onPOBreakdown,
-  onCSVImport,
   onForecast,
   onVendorScore,
   onSettings,
@@ -126,10 +122,10 @@ export function CostbookFooter({
 
   return (
     <footer 
-      className={`bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-2 ${className}`}
+      className={`bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-1 ${className}`}
       data-testid={testId}
     >
-      <div className="flex items-center justify-center gap-1 flex-wrap">
+      <div className="flex items-center justify-center gap-0.5 flex-wrap">
         {/* Primary Actions Group */}
         <FooterButton
           icon={<FileText className="w-5 h-5" />}
@@ -143,13 +139,6 @@ export function CostbookFooter({
           label="PO Breakdown"
           onClick={onPOBreakdown}
           testId={`${testId}-po-breakdown`}
-        />
-        
-        <FooterButton
-          icon={<Upload className="w-5 h-5" />}
-          label="CSV Import"
-          onClick={onCSVImport}
-          testId={`${testId}-csv-import`}
         />
 
         <FooterButton
@@ -215,13 +204,11 @@ export function CostbookFooter({
  */
 export function CompactCostbookFooter({
   onReports,
-  onCSVImport,
   onExport,
   onSettings,
   className = ''
 }: {
   onReports?: () => void
-  onCSVImport?: () => void
   onExport?: () => void
   onSettings?: () => void
   className?: string
@@ -233,12 +220,6 @@ export function CompactCostbookFooter({
           icon={<FileText className="w-5 h-5" />}
           label="Reports"
           onClick={onReports}
-        />
-        
-        <FooterButton
-          icon={<Upload className="w-5 h-5" />}
-          label="Import"
-          onClick={onCSVImport}
         />
 
         <FooterButton

@@ -4,6 +4,11 @@ import { FinancialMetrics, AnalyticsData } from '../types'
 import { useTranslations } from '../../../lib/i18n/context'
 import PermissionGuard from '../../../components/auth/PermissionGuard'
 
+export interface PortfolioOption {
+  id: string
+  name: string
+}
+
 interface FinancialHeaderProps {
   metrics: FinancialMetrics | null
   analyticsData: AnalyticsData | null
@@ -13,6 +18,10 @@ interface FinancialHeaderProps {
   onToggleFilters: () => void
   onExport?: () => void
   onEditBudget?: () => void
+  /** Portfolios for scope filter; when provided, a portfolio dropdown is shown. */
+  portfolios?: PortfolioOption[]
+  selectedPortfolioId?: string | null
+  onPortfolioChange?: (portfolioId: string | '') => void
 }
 
 export default function FinancialHeader({
@@ -23,7 +32,10 @@ export default function FinancialHeader({
   onCurrencyChange,
   onToggleFilters,
   onExport,
-  onEditBudget
+  onEditBudget,
+  portfolios = [],
+  selectedPortfolioId = null,
+  onPortfolioChange
 }: FinancialHeaderProps) {
   const { t } = useTranslations()
   
@@ -50,7 +62,24 @@ export default function FinancialHeader({
         </div>
       </div>
       
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center flex-wrap gap-2">
+        {onPortfolioChange && (
+          <div className="flex items-center gap-1.5">
+            <label htmlFor="financials-portfolio-filter" className="text-sm font-medium text-gray-700 dark:text-slate-300 sr-only sm:not-sr-only sm:whitespace-nowrap">{t('financials.portfolio') || 'Portfolio'}:</label>
+            <select
+              id="financials-portfolio-filter"
+              value={selectedPortfolioId ?? ''}
+              onChange={(e) => onPortfolioChange(e.target.value)}
+              className="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-slate-100 bg-white dark:bg-slate-800 text-sm min-w-[140px]"
+              title={t('financials.portfolio') || 'Portfolio'}
+            >
+              <option value="">{t('financials.allPortfolios') || 'All portfolios'}</option>
+              {portfolios.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
         <select
           value={selectedCurrency}
           onChange={(e) => onCurrencyChange(e.target.value)}

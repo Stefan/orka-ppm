@@ -9,11 +9,25 @@ import CommitmentsTable from './tables/CommitmentsTable'
 import ActualsTable from './tables/ActualsTable'
 import { SavedViewsDropdown } from '@/components/saved-views/SavedViewsDropdown'
 import type { SavedViewDefinition } from '@/lib/saved-views-api'
+import type { CommitmentsActualsSummary, CommitmentsActualsAnalytics } from '../hooks/useCommitmentsActualsData'
+
+/** Lazy sub-tabs: mount a tab's content only when first visited, then keep mounted and hide with CSS. Avoids re-fetch and full re-render when switching back. */
+function useVisitedSubTabs(initialTab: SubTabType) {
+  const [visited, setVisited] = useState<Set<SubTabType>>(() => new Set([initialTab]))
+  const addVisited = useCallback((tab: SubTabType) => {
+    setVisited((prev) => (prev.has(tab) ? prev : new Set(prev).add(tab)))
+  }, [])
+  return [visited, addVisited] as const
+}
 
 interface CommitmentsActualsViewProps {
   session: any
   selectedCurrency: string
   onRefresh?: () => void
+  commitmentsSummary?: CommitmentsActualsSummary | null
+  commitmentsAnalytics?: CommitmentsActualsAnalytics | null
+  commitmentsLoading?: boolean
+  onRefreshCommitmentsActuals?: () => Promise<void>
 }
 
 // Define ref methods for child components
@@ -21,13 +35,18 @@ interface RefreshableComponent {
   refresh: () => void
 }
 
-export default function CommitmentsActualsView({ 
-  session, 
-  selectedCurrency, 
-  onRefresh 
+export default function CommitmentsActualsView({
+  session,
+  selectedCurrency,
+  onRefresh,
+  commitmentsSummary,
+  commitmentsAnalytics,
+  commitmentsLoading,
+  onRefreshCommitmentsActuals
 }: CommitmentsActualsViewProps) {
   const t = useTranslations('financials')
   const [activeSubTab, setActiveSubTab] = useState<SubTabType>('variance-analysis')
+  const [visitedSubTabs, addVisitedSubTab] = useVisitedSubTabs('variance-analysis')
   const [projectFilter, setProjectFilter] = useState<string>('')
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [appliedView, setAppliedView] = useState<SavedViewDefinition | null>(null)
@@ -43,6 +62,11 @@ export default function CommitmentsActualsView({
   const varianceAnalysisRef = useRef<RefreshableComponent>(null)
   const commitmentsTableRef = useRef<RefreshableComponent>(null)
   const actualsTableRef = useRef<RefreshableComponent>(null)
+
+  const handleSubTabChange = useCallback((tab: SubTabType) => {
+    setActiveSubTab(tab)
+    addVisitedSubTab(tab)
+  }, [addVisitedSubTab])
 
   const handleProjectClick = (projectNr: string) => {
     // Switch to variance analysis tab and filter by project
@@ -68,9 +92,8 @@ export default function CommitmentsActualsView({
       }
       
       await Promise.all(refreshPromises)
-      
-      // Also trigger parent refresh if provided
       onRefresh?.()
+      await onRefreshCommitmentsActuals?.()
     } catch (error) {
       console.error('Error during unified refresh:', error)
     } finally {
@@ -78,50 +101,12 @@ export default function CommitmentsActualsView({
     }
   }
 
-  const renderSubTabContent = () => {
-    switch (activeSubTab) {
-      case 'variance-analysis':
-        return (
-          <VarianceAnalysisView
-            ref={varianceAnalysisRef}
-            session={session}
-            selectedCurrency={selectedCurrency}
-            onRefresh={onRefresh}
-            projectFilter={projectFilter}
-            onClearProjectFilter={() => setProjectFilter('')}
-          />
-        )
-      case 'commitments':
-        return (
-          <CommitmentsTable
-            ref={commitmentsTableRef}
-            accessToken={session?.access_token}
-            onProjectClick={handleProjectClick}
-            initialView={appliedView}
-            onDefinitionChange={handleDefinitionChange}
-          />
-        )
-      case 'actuals':
-        return (
-          <ActualsTable
-            ref={actualsTableRef}
-            accessToken={session?.access_token}
-            onProjectClick={handleProjectClick}
-            initialView={appliedView}
-            onDefinitionChange={handleDefinitionChange}
-          />
-        )
-      default:
-        return null
-    }
-  }
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <SubTabNavigation 
-          activeTab={activeSubTab} 
-          onTabChange={setActiveSubTab} 
+        <SubTabNavigation
+          activeTab={activeSubTab}
+          onTabChange={handleSubTabChange}
         />
         <div className="flex items-center gap-2">
           <SavedViewsDropdown
@@ -145,8 +130,41 @@ export default function CommitmentsActualsView({
           </button>
         </div>
       </div>
-      
-      {renderSubTabContent()}
+
+      {visitedSubTabs.has('variance-analysis') && (
+        <div className={activeSubTab === 'variance-analysis' ? 'block' : 'hidden'}>
+          <VarianceAnalysisView
+            ref={varianceAnalysisRef}
+            session={session}
+            selectedCurrency={selectedCurrency}
+            onRefresh={onRefresh}
+            projectFilter={projectFilter}
+            onClearProjectFilter={() => setProjectFilter('')}
+          />
+        </div>
+      )}
+      {visitedSubTabs.has('commitments') && (
+        <div className={activeSubTab === 'commitments' ? 'block' : 'hidden'}>
+          <CommitmentsTable
+            ref={commitmentsTableRef}
+            accessToken={session?.access_token}
+            onProjectClick={handleProjectClick}
+            initialView={appliedView}
+            onDefinitionChange={handleDefinitionChange}
+          />
+        </div>
+      )}
+      {visitedSubTabs.has('actuals') && (
+        <div className={activeSubTab === 'actuals' ? 'block' : 'hidden'}>
+          <ActualsTable
+            ref={actualsTableRef}
+            accessToken={session?.access_token}
+            onProjectClick={handleProjectClick}
+            initialView={appliedView}
+            onDefinitionChange={handleDefinitionChange}
+          />
+        </div>
+      )}
     </div>
   )
 }

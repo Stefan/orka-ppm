@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useEffect } from 'react'
 import { 
-  BarChart3, TrendingUp, PieChart, Target, Upload, FileText, 
-  CheckCircle, FolderTree, BookOpen 
+  BarChart3, TrendingUp, PieChart, Target, FileText, 
+  FolderTree, BookOpen 
 } from 'lucide-react'
 import { ViewMode } from '../types'
 import { useTranslations } from '../../../lib/i18n/context'
@@ -56,7 +56,6 @@ export default function TabNavigation({ viewMode, onViewModeChange }: TabNavigat
       { key: 'trends', label: t('financials.tabs.trends'), icon: PieChart, description: t('financials.descriptions.trends') },
       { key: 'analysis', label: t('financials.tabs.analysis'), icon: Target, description: t('financials.descriptions.analysis') },
       { key: 'po-breakdown', label: t('financials.tabs.poBreakdown'), icon: FolderTree, description: t('financials.descriptions.poBreakdown') },
-      { key: 'csv-import', label: t('financials.tabs.csvImport'), icon: Upload, description: t('financials.descriptions.csvImport') },
       { key: 'commitments-actuals', label: t('financials.tabs.commitmentsActuals'), icon: FileText, description: t('financials.descriptions.commitmentsActuals') }
     ]
 
@@ -99,19 +98,6 @@ export default function TabNavigation({ viewMode, onViewModeChange }: TabNavigat
         ))}
       </div>
       
-      {/* Context hints only when relevant (e.g. CSV import); no fake "last updated" (was just current time) */}
-      {(viewMode === 'csv-import') && (
-        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100 dark:border-slate-700 text-sm text-gray-600 dark:text-slate-300">
-          <div className="flex items-center text-green-600 dark:text-green-400">
-            <Upload className="h-3 w-3 mr-1" />
-            <span className="text-xs">{t('financials.dragDropCSV')}</span>
-          </div>
-          <div className="flex items-center space-x-1 text-xs text-gray-500 dark:text-slate-400">
-            <CheckCircle className="h-3 w-3 text-green-500 dark:text-green-400" />
-            <span>{t('financials.supportedFormats')}</span>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

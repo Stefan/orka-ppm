@@ -11,6 +11,8 @@ import {
   FileText,
   Filter
 } from 'lucide-react'
+import { useTableColumnSettings } from '../../hooks/useTableColumnSettings'
+import TableColumnPicker from './TableColumnPicker'
 import { getApiUrl } from '../../../../lib/api'
 import { useDateFormatter } from '@/hooks/useDateFormatter'
 import { useTranslations } from '@/lib/i18n/context'
@@ -25,13 +27,30 @@ interface Actual {
   vendor_description?: string
   project_nr: string
   wbs_element?: string
-  amount: number
+  amount?: number | null
+  invoice_amount?: number | null
+  value_in_document_currency?: number | null
   currency: string
   item_text?: string
   document_type?: string
   created_at: string
   updated_at: string
   [key: string]: any // For additional columns
+}
+
+/** Resolve display amount: Invoice Amount Legal Entity (amount) first, else value_in_document_currency. */
+function getActualAmountInfo(actual: Actual): { displayAmount: number; isFromDocumentCurrency: boolean } {
+  const amount = actual.amount ?? actual.invoice_amount ?? null
+  const docCurr = actual.value_in_document_currency ?? null
+  const amountValid = amount != null && (typeof amount !== 'string' || amount !== '')
+  const docCurrValid = docCurr != null && (typeof docCurr !== 'string' || docCurr !== '')
+  if (amountValid) {
+    return { displayAmount: Number(amount), isFromDocumentCurrency: false }
+  }
+  if (docCurrValid) {
+    return { displayAmount: Number(docCurr), isFromDocumentCurrency: true }
+  }
+  return { displayAmount: 0, isFromDocumentCurrency: false }
 }
 
 interface ActualsTableProps {
@@ -145,11 +164,11 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
       }
     })
     
-    // Apply sorting
+    // Apply sorting (for amount use resolved display amount)
     if (sortField && sortDirection) {
       result.sort((a, b) => {
-        const aValue = a[sortField]
-        const bValue = b[sortField]
+        const aValue = sortField === 'amount' ? getActualAmountInfo(a).displayAmount : a[sortField]
+        const bValue = sortField === 'amount' ? getActualAmountInfo(b).displayAmount : b[sortField]
         
         if (aValue === null || aValue === undefined) return 1
         if (bValue === null || bValue === undefined) return -1
@@ -189,31 +208,73 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
     }))
   }
 
-  // Column definitions (used for table headers and CSV export)
-  const columns: Array<{
-    key: keyof Actual
-    labelKey: string
-    width?: string
-    format?: (value: any) => string
-  }> = [
-    { key: 'fi_doc_no', labelKey: 'columns.fiDocNo', width: 'w-32' },
-    { key: 'posting_date', labelKey: 'columns.postingDate', width: 'w-28', format: (v) => v ? formatDate(new Date(v)) : '' },
-    { key: 'document_date', labelKey: 'columns.documentDate', width: 'w-28', format: (v) => v ? formatDate(new Date(v)) : '' },
-    { key: 'vendor', labelKey: 'columns.vendor', width: 'w-32' },
-    { key: 'vendor_description', labelKey: 'columns.vendorDescription', width: 'w-48' },
-    { key: 'project_nr', labelKey: 'columns.projectNr', width: 'w-28' },
-    { key: 'wbs_element', labelKey: 'columns.wbsElement', width: 'w-32' },
-    { key: 'amount', labelKey: 'columns.amount', width: 'w-28', format: (v) => v?.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00' },
-    { key: 'currency', labelKey: 'columns.currency', width: 'w-20' },
-    { key: 'item_text', labelKey: 'columns.itemText', width: 'w-48' },
-    { key: 'document_type', labelKey: 'columns.documentType', width: 'w-28' },
+  // Column definitions (default order; visibility/order from useTableColumnSettings). Aligned with DB/API columns.
+  const defaultColumns = [
+    { key: 'fi_doc_no' as const, labelKey: 'columns.fiDocNo', width: 'w-32' },
+    { key: 'posting_date' as const, labelKey: 'columns.postingDate', width: 'w-28', format: (v: unknown) => (v ? formatDate(new Date(v as string)) : '') },
+    { key: 'document_date' as const, labelKey: 'columns.documentDate', width: 'w-28', format: (v: unknown) => (v ? formatDate(new Date(v as string)) : '') },
+    { key: 'vendor' as const, labelKey: 'columns.vendor', width: 'w-32' },
+    { key: 'vendor_description' as const, labelKey: 'columns.vendorDescription', width: 'w-48' },
+    { key: 'project_nr' as const, labelKey: 'columns.projectNr', width: 'w-28' },
+    { key: 'project_description' as const, labelKey: 'columns.projectDescription', width: 'w-40' },
+    { key: 'wbs_element' as const, labelKey: 'columns.wbsElement', width: 'w-32' },
+    { key: 'wbs_description' as const, labelKey: 'columns.wbsDescription', width: 'w-40' },
+    { key: 'amount' as const, labelKey: 'columns.amount', width: 'w-28', format: (v: unknown) => (v != null ? Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00') },
+    { key: 'currency' as const, labelKey: 'columns.currency', width: 'w-20' },
+    { key: 'item_text' as const, labelKey: 'columns.itemText', width: 'w-48' },
+    { key: 'document_type' as const, labelKey: 'columns.documentType', width: 'w-28' },
+    { key: 'document_type_desc' as const, labelKey: 'columns.documentTypeDesc', width: 'w-32' },
+    { key: 'po_no' as const, labelKey: 'columns.poNo', width: 'w-28' },
+    { key: 'po_line_no' as const, labelKey: 'columns.poLineNo', width: 'w-20' },
+    { key: 'vendor_invoice_no' as const, labelKey: 'columns.vendorInvoiceNo', width: 'w-28' },
+    { key: 'gl_account' as const, labelKey: 'columns.glAccount', width: 'w-24' },
+    { key: 'gl_account_desc' as const, labelKey: 'columns.glAccountDesc', width: 'w-40' },
+    { key: 'cost_center' as const, labelKey: 'columns.costCenter', width: 'w-24' },
+    { key: 'cost_center_desc' as const, labelKey: 'columns.costCenterDesc', width: 'w-40' },
+    { key: 'product_desc' as const, labelKey: 'columns.productDesc', width: 'w-40' },
+    { key: 'document_header_text' as const, labelKey: 'columns.documentHeaderText', width: 'w-48' },
+    { key: 'payment_terms' as const, labelKey: 'columns.paymentTerms', width: 'w-28' },
+    { key: 'net_due_date' as const, labelKey: 'columns.netDueDate', width: 'w-28', format: (v: unknown) => (v ? formatDate(new Date(v as string)) : '') },
+    { key: 'creation_date' as const, labelKey: 'columns.creationDate', width: 'w-28', format: (v: unknown) => (v ? formatDate(new Date(v as string)) : '') },
+    { key: 'sap_invoice_no' as const, labelKey: 'columns.sapInvoiceNo', width: 'w-28' },
+    { key: 'investment_profile' as const, labelKey: 'columns.investmentProfile', width: 'w-28' },
+    { key: 'account_group_level1' as const, labelKey: 'columns.accountGroupLevel1', width: 'w-32' },
+    { key: 'account_subgroup_level2' as const, labelKey: 'columns.accountSubgroupLevel2', width: 'w-32' },
+    { key: 'account_level3' as const, labelKey: 'columns.accountLevel3', width: 'w-32' },
+    { key: 'value_in_document_currency' as const, labelKey: 'columns.valueInDocumentCurrency', width: 'w-28', format: (v: unknown) => (v != null ? Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00') },
+    { key: 'document_currency_code' as const, labelKey: 'columns.documentCurrencyCode', width: 'w-24' },
+    { key: 'quantity' as const, labelKey: 'columns.quantity', width: 'w-24', format: (v: unknown) => (v != null ? Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00') },
+    { key: 'personnel_number' as const, labelKey: 'columns.personnelNumber', width: 'w-28' },
+    { key: 'po_final_invoice_indicator' as const, labelKey: 'columns.poFinalInvoiceIndicator', width: 'w-24' },
+    { key: 'value_type' as const, labelKey: 'columns.valueType', width: 'w-24' },
+    { key: 'miro_invoice_no' as const, labelKey: 'columns.miroInvoiceNo', width: 'w-28' },
+    { key: 'goods_received_value' as const, labelKey: 'columns.goodsReceivedValue', width: 'w-28', format: (v: unknown) => (v != null ? Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00') },
+    { key: 'created_at' as const, labelKey: 'columns.createdAt', width: 'w-28', format: (v: unknown) => (v ? formatDate(new Date(v as string)) : '') },
+    { key: 'updated_at' as const, labelKey: 'columns.updatedAt', width: 'w-28', format: (v: unknown) => (v ? formatDate(new Date(v as string)) : '') },
+    { key: 'id' as const, labelKey: 'columns.id', width: 'w-52' },
+    { key: 'project_id' as const, labelKey: 'columns.projectId', width: 'w-52' },
+    { key: 'organization_id' as const, labelKey: 'columns.organizationId', width: 'w-52' },
   ]
+  const {
+    visibleColumns,
+    allColumnsOrdered,
+    hiddenSet,
+    setColumnOrder,
+    setColumnVisible,
+    resetToDefault,
+  } = useTableColumnSettings('actuals', defaultColumns)
+  const columns = visibleColumns
 
-  // Export to CSV
+  // Export to CSV (visible columns only; use resolved amount for amount column)
   const exportToCSV = () => {
-    const headers = columns.map(c => t(c.labelKey as any))
-    const rows = filteredAndSortedActuals.map(actual =>
-      columns.map(col => {
+    const cols = visibleColumns
+    const headers = cols.map((c) => t(c.labelKey as Parameters<typeof t>[0]))
+    const rows = filteredAndSortedActuals.map((actual) =>
+      cols.map((col) => {
+        if (col.key === 'amount') {
+          const { displayAmount } = getActualAmountInfo(actual)
+          return col.format ? col.format(displayAmount) : String(displayAmount ?? '')
+        }
         const v = actual[col.key]
         return col.format ? col.format(v) : (v ?? '')
       })
@@ -288,10 +349,10 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
             No actual records have been imported yet.
           </p>
           <a
-            href="#csv-import"
+            href="/import"
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            Go to CSV Import
+            Go to Data Import
           </a>
         </div>
       </div>
@@ -316,18 +377,29 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
           </div>
           
           <div className="flex items-center space-x-2">
+            <TableColumnPicker
+              allColumnsOrdered={allColumnsOrdered}
+              hiddenSet={hiddenSet}
+              onVisibleChange={setColumnVisible}
+              onOrderChange={setColumnOrder}
+              onReset={resetToDefault}
+              label={t('columnPicker')}
+              columnsLabel={t('columnPickerTitle')}
+              resetLabel={t('columnPickerReset')}
+              hintLabel={t('columnPickerHint')}
+              t={(key) => t(key as Parameters<typeof t>[0])}
+            />
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                showFilters 
-                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700' 
+                showFilters
+                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700'
                   : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               <Filter className="h-4 w-4 mr-1" />
               {t('filters')}
             </button>
-            
             <button
               onClick={exportToCSV}
               className="flex items-center px-3 py-2 bg-green-700 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
@@ -394,6 +466,27 @@ const ActualsTable = forwardRef<{ refresh: () => void }, ActualsTableProps>(({ a
                         >
                           {actual[column.key] || '-'}
                         </button>
+                      ) : column.key === 'amount' ? (
+                        (() => {
+                          const { displayAmount, isFromDocumentCurrency } = getActualAmountInfo(actual)
+                          const formatted = column.format ? column.format(displayAmount) : String(displayAmount ?? '0.00')
+                          return (
+                            <span
+                              className={isFromDocumentCurrency ? 'inline-flex items-center gap-1' : undefined}
+                              title={isFromDocumentCurrency ? t('amountFromDocumentCurrency') : undefined}
+                            >
+                              {formatted}
+                              {isFromDocumentCurrency && (
+                                <span
+                                  className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200"
+                                  title={t('amountFromDocumentCurrency')}
+                                >
+                                  Doc
+                                </span>
+                              )}
+                            </span>
+                          )
+                        })()
                       ) : (
                         <span>
                           {column.format 

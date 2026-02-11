@@ -395,6 +395,8 @@
     "dropzonePrompt": "Datei do aalegge oder klicke zum Uswähle",
     "dropzoneActive": "Datei do aalegge...",
     "acceptedFormats": "Akzeptiert: .csv, .json",
+    "assignToPortfolio": "Alli Projäkt em Portfolio zueordne",
+    "selectPortfolio": "Portfolio uuswähle",
     "importButton": "Date importiere",
     "clear": "Zruggsetze",
     "processing": "Wird verarbeitet...",
@@ -415,7 +417,7 @@
     "template": "Vorlag",
     "dropzoneFilePrompt": "Datei do aalegge oder klicke zum Uswähle",
     "selectFile": "Datei uuswähle",
-    "maxFileSize": "Max. Dateigröössi: 50 MB",
+    "maxFileSize": "Max. Dateigröössi: 80 MB",
     "columnsCommitments": "Spalte: PO-Nr., Betrag, Währig, Projekt, WBS",
     "columnsActuals": "Spalte: FI-Dokumänt, Betrag, Währig, Projekt, WBS",
     "importHistory": "Import-Verlauf",
@@ -439,7 +441,9 @@
     "warnings": "Warnige",
     "rowLabel": "Zyle {row}",
     "moreErrors": "... und {count} witeri Fehler",
-    "moreWarnings": "... und {count} witeri Warnige"
+    "moreWarnings": "... und {count} witeri Warnige",
+    "anonymizeData": "Date anonymisiere (Lieferant, Projekt, Beträg usw.)",
+    "clearBeforeImport": "Ziiltabelle vor em Import läere (bestehendi Date lösche)"
   },
   "variance": {
     "trends": "Abwyychigs-Trends",
@@ -483,6 +487,8 @@
     "lastYear": "Letschts Joor",
     "budgetStatus": "Budget-Status",
     "allProjects": "Alli Projäkt",
+    "portfolio": "Portfolio",
+    "allPortfolios": "Alli Portfolio",
     "overBudgetOnly": "Über Budget",
     "underBudgetOnly": "Under Budget",
     "onBudget": "Im Budget",

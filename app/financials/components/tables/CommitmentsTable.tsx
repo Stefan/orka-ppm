@@ -1,16 +1,18 @@
 'use client'
 
 import React, { useState, useEffect, useMemo, forwardRef, useImperativeHandle } from 'react'
-import { 
-  ArrowUpDown, 
-  ArrowUp, 
-  ArrowDown, 
-  Download, 
-  ChevronLeft, 
+import {
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Download,
+  ChevronLeft,
   ChevronRight,
   FileText,
   Filter
 } from 'lucide-react'
+import { useTableColumnSettings } from '../../hooks/useTableColumnSettings'
+import TableColumnPicker from './TableColumnPicker'
 import { getApiUrl } from '../../../../lib/api'
 import { useDateFormatter } from '@/hooks/useDateFormatter'
 import { useTranslations } from '@/lib/i18n/context'
@@ -194,32 +196,65 @@ const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTablePro
     }))
   }
 
-  // Column definitions (used for table headers and CSV export)
-  const columns: Array<{
-    key: keyof Commitment
-    labelKey: string
-    width?: string
-    format?: (value: any) => string
-  }> = [
-    { key: 'po_number', labelKey: 'columns.poNumber', width: 'w-32' },
-    { key: 'po_line_nr', labelKey: 'columns.line', width: 'w-16' },
-    { key: 'po_date', labelKey: 'columns.poDate', width: 'w-28', format: (v) => v ? formatDate(new Date(v)) : '' },
-    { key: 'vendor', labelKey: 'columns.vendor', width: 'w-32' },
-    { key: 'vendor_description', labelKey: 'columns.vendorDescription', width: 'w-48' },
-    { key: 'project_nr', labelKey: 'columns.projectNr', width: 'w-28' },
-    { key: 'wbs_element', labelKey: 'columns.wbsElement', width: 'w-32' },
-    { key: 'po_net_amount', labelKey: 'columns.netAmount', width: 'w-28', format: (v) => v?.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00' },
-    { key: 'total_amount', labelKey: 'columns.totalAmount', width: 'w-28', format: (v) => v?.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00' },
-    { key: 'currency', labelKey: 'columns.currency', width: 'w-20' },
-    { key: 'po_status', labelKey: 'columns.status', width: 'w-24' },
-    { key: 'delivery_date', labelKey: 'columns.deliveryDate', width: 'w-28', format: (v) => v ? formatDate(new Date(v)) : '' },
+  // Column definitions (default order; visibility/order from useTableColumnSettings). Aligned with DB/API columns.
+  const defaultColumns = [
+    { key: 'po_number' as const, labelKey: 'columns.poNumber', width: 'w-32' },
+    { key: 'po_line_nr' as const, labelKey: 'columns.line', width: 'w-16' },
+    { key: 'po_date' as const, labelKey: 'columns.poDate', width: 'w-28', format: (v: unknown) => (v ? formatDate(new Date(v as string)) : '') },
+    { key: 'vendor' as const, labelKey: 'columns.vendor', width: 'w-32' },
+    { key: 'vendor_description' as const, labelKey: 'columns.vendorDescription', width: 'w-48' },
+    { key: 'requester' as const, labelKey: 'columns.requester', width: 'w-28' },
+    { key: 'po_created_by' as const, labelKey: 'columns.poCreatedBy', width: 'w-32' },
+    { key: 'shopping_cart_number' as const, labelKey: 'columns.shoppingCartNumber', width: 'w-28' },
+    { key: 'project_nr' as const, labelKey: 'columns.projectNr', width: 'w-28' },
+    { key: 'project_description' as const, labelKey: 'columns.projectDescription', width: 'w-40' },
+    { key: 'wbs_element' as const, labelKey: 'columns.wbsElement', width: 'w-32' },
+    { key: 'wbs_description' as const, labelKey: 'columns.wbsDescription', width: 'w-40' },
+    { key: 'cost_center' as const, labelKey: 'columns.costCenter', width: 'w-24' },
+    { key: 'cost_center_description' as const, labelKey: 'columns.costCenterDescription', width: 'w-40' },
+    { key: 'po_net_amount' as const, labelKey: 'columns.netAmount', width: 'w-28', format: (v: unknown) => (v != null ? Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00') },
+    { key: 'tax_amount' as const, labelKey: 'columns.taxAmount', width: 'w-24', format: (v: unknown) => (v != null ? Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00') },
+    { key: 'total_amount' as const, labelKey: 'columns.totalAmount', width: 'w-28', format: (v: unknown) => (v != null ? Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00') },
+    { key: 'currency' as const, labelKey: 'columns.currency', width: 'w-20' },
+    { key: 'po_status' as const, labelKey: 'columns.status', width: 'w-24' },
+    { key: 'po_line_text' as const, labelKey: 'columns.poLineText', width: 'w-48' },
+    { key: 'delivery_date' as const, labelKey: 'columns.deliveryDate', width: 'w-28', format: (v: unknown) => (v ? formatDate(new Date(v as string)) : '') },
+    { key: 'document_currency_code' as const, labelKey: 'columns.documentCurrencyCode', width: 'w-24' },
+    { key: 'value_in_document_currency' as const, labelKey: 'columns.valueInDocumentCurrency', width: 'w-28', format: (v: unknown) => (v != null ? Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00') },
+    { key: 'investment_profile' as const, labelKey: 'columns.investmentProfile', width: 'w-28' },
+    { key: 'account_group_level1' as const, labelKey: 'columns.accountGroupLevel1', width: 'w-32' },
+    { key: 'account_subgroup_level2' as const, labelKey: 'columns.accountSubgroupLevel2', width: 'w-32' },
+    { key: 'account_level3' as const, labelKey: 'columns.accountLevel3', width: 'w-32' },
+    { key: 'change_date' as const, labelKey: 'columns.changeDate', width: 'w-28', format: (v: unknown) => (v ? formatDate(new Date(v as string)) : '') },
+    { key: 'purchase_requisition' as const, labelKey: 'columns.purchaseRequisition', width: 'w-28' },
+    { key: 'procurement_plant' as const, labelKey: 'columns.procurementPlant', width: 'w-24' },
+    { key: 'contract_number' as const, labelKey: 'columns.contractNumber', width: 'w-28' },
+    { key: 'joint_commodity_code' as const, labelKey: 'columns.jointCommodityCode', width: 'w-28' },
+    { key: 'po_title' as const, labelKey: 'columns.poTitle', width: 'w-40' },
+    { key: 'version' as const, labelKey: 'columns.version', width: 'w-20' },
+    { key: 'fi_doc_no' as const, labelKey: 'columns.fiDocNo', width: 'w-28' },
+    { key: 'created_at' as const, labelKey: 'columns.createdAt', width: 'w-28', format: (v: unknown) => (v ? formatDate(new Date(v as string)) : '') },
+    { key: 'updated_at' as const, labelKey: 'columns.updatedAt', width: 'w-28', format: (v: unknown) => (v ? formatDate(new Date(v as string)) : '') },
+    { key: 'id' as const, labelKey: 'columns.id', width: 'w-52' },
+    { key: 'project_id' as const, labelKey: 'columns.projectId', width: 'w-52' },
+    { key: 'organization_id' as const, labelKey: 'columns.organizationId', width: 'w-52' },
   ]
+  const {
+    visibleColumns,
+    allColumnsOrdered,
+    hiddenSet,
+    setColumnOrder,
+    setColumnVisible,
+    resetToDefault,
+  } = useTableColumnSettings('commitments', defaultColumns)
+  const columns = visibleColumns
 
-  // Export to CSV
+  // Export to CSV (visible columns only)
   const exportToCSV = () => {
-    const headers = columns.map(c => t(c.labelKey as any))
-    const rows = filteredAndSortedCommitments.map(commitment =>
-      columns.map(col => {
+    const cols = visibleColumns
+    const headers = cols.map((c) => t(c.labelKey as Parameters<typeof t>[0]))
+    const rows = filteredAndSortedCommitments.map((commitment) =>
+      cols.map((col) => {
         const v = commitment[col.key]
         return col.format ? col.format(v) : (v ?? '')
       })
@@ -294,10 +329,10 @@ const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTablePro
             No commitment records have been imported yet.
           </p>
           <a
-            href="#csv-import"
+            href="/import"
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            Go to CSV Import
+            Go to Data Import
           </a>
         </div>
       </div>
@@ -322,18 +357,29 @@ const CommitmentsTable = forwardRef<{ refresh: () => void }, CommitmentsTablePro
           </div>
           
           <div className="flex items-center space-x-2">
+            <TableColumnPicker
+              allColumnsOrdered={allColumnsOrdered}
+              hiddenSet={hiddenSet}
+              onVisibleChange={setColumnVisible}
+              onOrderChange={setColumnOrder}
+              onReset={resetToDefault}
+              label={t('columnPicker')}
+              columnsLabel={t('columnPickerTitle')}
+              resetLabel={t('columnPickerReset')}
+              hintLabel={t('columnPickerHint')}
+              t={(key) => t(key as Parameters<typeof t>[0])}
+            />
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                showFilters 
-                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700' 
+                showFilters
+                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700'
                   : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               <Filter className="h-4 w-4 mr-1" />
               {t('filters')}
             </button>
-            
             <button
               onClick={exportToCSV}
               className="flex items-center px-3 py-2 bg-green-700 text-white rounded-lg hover:bg-green-700 text-sm font-medium"

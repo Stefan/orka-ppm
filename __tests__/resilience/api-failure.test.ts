@@ -48,15 +48,13 @@ describe('Resilience: API failure and timeout', () => {
       expect((err as Error).message).toMatch(/Network error|Unknown API error/)
     })
 
-    it('uses mock fallback for /projects when API returns 503', async () => {
+    it('throws when /projects API returns 503 (apiRequest has no fallback)', async () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: false,
         status: 503,
         statusText: 'Service Unavailable',
       })
-      const data = await apiRequest<unknown[]>('/projects')
-      expect(Array.isArray(data)).toBe(true)
-      expect((data as unknown[]).length).toBeGreaterThan(0)
+      await expect(apiRequest<unknown[]>('/projects')).rejects.toThrow(/503|Service Unavailable/)
     })
   })
 

@@ -145,7 +145,7 @@ export default function SettingsPage() {
                   {t('settings.organizationTitle') || 'Organization'}
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-slate-400">
-                  {t('settings.organizationDescription') || 'View and edit your organization name and logo (org_admin or super_admin).'}
+                  {t('settings.organizationDescription') || 'View and edit your organization name and logo (admin, org_admin or super_admin).'}
                 </p>
               </CardHeader>
               <CardContent>

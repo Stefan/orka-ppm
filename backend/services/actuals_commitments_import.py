@@ -6,7 +6,7 @@ including validation, duplicate detection, anonymization, project linking,
 and audit logging.
 
 PERFORMANCE OPTIMIZATIONS FOR 100K+ RECORDS:
-- Larger batch sizes (500 records per batch)
+- Larger batch sizes (10000 records per batch)
 - Parallel validation using multiprocessing
 - Bulk duplicate checking with single query
 - Project pre-caching to eliminate repeated lookups
@@ -17,7 +17,7 @@ Requirements: 2.1, 2.2, 3.1, 3.2, 4.1, 4.2, 4.3, 4.4, 4.5, 5.4
 """
 
 import logging
-from typing import List, Dict, Any, Tuple, Set
+from typing import List, Dict, Any, Tuple, Set, Optional, Callable
 from uuid import uuid4
 from datetime import datetime
 from decimal import Decimal
@@ -32,15 +32,16 @@ from models.imports import (
 )
 from .anonymizer import AnonymizerService
 from .project_linker import ProjectLinker
-from .data_import_audit import log_data_import_to_audit_trail
+from .data_import_audit import log_data_import_to_audit_trail, trim_import_history
 
 logger = logging.getLogger(__name__)
 
-# Performance tuning constants - ULTRA FAST MODE
-BATCH_SIZE = 1000  # Increased from 500 for maximum throughput
-MAX_ERRORS_TO_COLLECT = 50  # Reduced to 50 for faster processing
-VALIDATION_CHUNK_SIZE = 5000  # Process validation in chunks
-PROJECT_CACHE_PRELOAD = True  # Always preload project cache
+# Performance tuning constants
+BATCH_SIZE = 500  # Fallback insert chunk when not using RPC (trigger per row = slow)
+BATCH_SIZE_RPC = 4000  # Chunk size for insert_*_batch RPC (trigger disabled = fast; actuals & commitments)
+MAX_ERRORS_TO_COLLECT = 50
+VALIDATION_CHUNK_SIZE = 5000
+PROJECT_CACHE_PRELOAD = True
 
 
 class ActualsCommitmentsImportService:
@@ -48,7 +49,7 @@ class ActualsCommitmentsImportService:
     Service for importing actuals and commitments financial data.
     
     BLAZING FAST OPTIMIZATIONS:
-    - Batch processing with 500 records per batch
+    - Batch processing with 10000 records per batch
     - Single bulk duplicate check query
     - Project pre-caching (load all projects once)
     - Minimal error collection (first 100 errors)
@@ -105,9 +106,10 @@ class ActualsCommitmentsImportService:
             
             if response.data:
                 for project in response.data:
-                    # Cache by name (which contains the project_nr)
-                    cache_key = f"{project['name']}:"
-                    self._project_cache[cache_key] = project['id']
+                    # Cache by name (project_nr) so lookup by project_nr hits without DB
+                    name = (project.get("name") or "").strip()
+                    if name:
+                        self._project_cache[name] = project["id"]
                 
                 elapsed = (datetime.now() - start).total_seconds()
                 logger.info(f"⚡ Loaded {len(self._project_cache)} projects in {elapsed:.2f}s")
@@ -132,19 +134,21 @@ class ActualsCommitmentsImportService:
         Returns:
             Project ID (UUID)
         """
+        # Check cache: one project per project_nr (preload keys by name = project_nr)
+        if project_nr in self._project_cache:
+            return self._project_cache[project_nr]
         cache_key = f"{project_nr}:{wbs_element}"
-        
-        # Check cache first
         if cache_key in self._project_cache:
             return self._project_cache[cache_key]
         
-        # Not in cache - create new project
+        # Not in cache - resolve or create project (one DB round-trip per unique project_nr)
         project_id = await self.project_linker.get_or_create_project(
             project_nr,
             wbs_element
         )
         
-        # Add to cache
+        # Cache by project_nr and by full key so both lookups hit next time
+        self._project_cache[project_nr] = project_id
         self._project_cache[cache_key] = project_id
         
         return project_id
@@ -207,7 +211,8 @@ class ActualsCommitmentsImportService:
     async def import_actuals(
         self,
         records: List[Dict[str, Any]],
-        anonymize: bool = True
+        anonymize: bool = True,
+        progress_callback: Optional[Callable[[int, int], None]] = None,
     ) -> ImportResult:
         """
         Import actuals records with BLAZING FAST validation and duplicate detection.
@@ -215,7 +220,7 @@ class ActualsCommitmentsImportService:
         OPTIMIZATIONS:
         - Pre-load project cache (eliminates repeated lookups)
         - Bulk duplicate check (single query for all records)
-        - Large batch inserts (500 records per batch)
+        - Large batch inserts (10000 records per batch)
         - Limited error collection (first 100 errors only)
         - Optimized memory usage
         
@@ -223,8 +228,8 @@ class ActualsCommitmentsImportService:
         1. Pre-load project cache
         2. Validate and anonymize all records
         3. Bulk check for duplicates (single query)
-        4. Prepare records for batch insert
-        5. Insert in large batches (500 records)
+    4. Prepare records for batch insert
+    5. Insert in large batches (10000 records)
         6. Log import operation
         
         Args:
@@ -388,35 +393,49 @@ class ActualsCommitmentsImportService:
         
         logger.info(f"✅ Prepared {len(records_to_insert)} records for insert")
         
-        # Step 4: Batch insert records (LARGE BATCHES = BLAZING FAST!)
+        # Step 4: Batch insert (prefer RPC with trigger disabled for speed)
+        total_to_insert = len(records_to_insert)
+        if progress_callback and total_to_insert:
+            progress_callback(0, total_to_insert)
         if records_to_insert:
-            logger.info(f"Step 4/4: Batch inserting {len(records_to_insert)} records (batches of {BATCH_SIZE})...")
-            
-            for i in range(0, len(records_to_insert), BATCH_SIZE):
-                chunk = records_to_insert[i:i + BATCH_SIZE]
+            use_rpc = True
+            batch_size = BATCH_SIZE_RPC
+            logger.info(f"Step 4/4: Batch inserting {total_to_insert} records (batches of {batch_size}, RPC preferred)...")
+            i = 0
+            while i < len(records_to_insert):
+                chunk = records_to_insert[i:i + batch_size]
                 chunk_data = [data for _, data in chunk]
-                
                 try:
-                    response = self.supabase.table("actuals").insert(chunk_data).execute()
-                    
-                    if response.data:
-                        chunk_success = len(response.data)
-                        success_count += chunk_success
-                        logger.info(f"✅ Inserted batch {i//BATCH_SIZE + 1}: {chunk_success} records")
+                    if use_rpc:
+                        r = self.supabase.rpc("insert_actuals_batch", {"records": chunk_data}).execute()
+                        raw = r.data
+                        if isinstance(raw, (int, float)):
+                            n = int(raw)
+                        elif isinstance(raw, list) and len(raw) > 0:
+                            row = raw[0]
+                            if isinstance(row, (int, float)):
+                                n = int(row)
+                            elif isinstance(row, dict):
+                                n = int(row.get("insert_actuals_batch") or 0)
+                            else:
+                                n = len(chunk_data)
+                        else:
+                            n = len(chunk_data)
+                        chunk_success = n
                     else:
-                        # If batch insert fails, mark all records in chunk as errors
-                        for row_idx, data in chunk:
-                            error_count += 1
-                            if collect_errors and len(errors) < MAX_ERRORS_TO_COLLECT:
-                                errors.append(ImportError(
-                                    row=row_idx,
-                                    field="database",
-                                    value=data["fi_doc_no"],
-                                    error="Failed to insert record into database"
-                                ))
-                        
+                        self.supabase.table("actuals").insert(chunk_data, returning="minimal").execute()
+                        chunk_success = len(chunk_data)
+                    success_count += chunk_success
+                    if progress_callback and total_to_insert:
+                        progress_callback(success_count, total_to_insert)
+                    if (i // batch_size + 1) % 5 == 0 or i + batch_size >= len(records_to_insert):
+                        logger.info(f"✅ Inserted through batch {i // batch_size + 1}: {success_count} total")
                 except Exception as e:
-                    # If batch insert fails, mark all records in chunk as errors
+                    if use_rpc:
+                        logger.warning("insert_actuals_batch RPC failed (%s), falling back to table insert", e)
+                        use_rpc = False
+                        batch_size = BATCH_SIZE
+                        continue  # retry same chunk with table insert
                     logger.error(f"Batch insert error: {e}", exc_info=True)
                     for row_idx, data in chunk:
                         error_count += 1
@@ -427,6 +446,9 @@ class ActualsCommitmentsImportService:
                                 value=data["fi_doc_no"],
                                 error=f"Batch insert failed: {str(e)}"
                             ))
+                    i += len(chunk)
+                    continue
+                i += len(chunk)
         
         # Calculate performance metrics
         elapsed_time = (datetime.now() - start_time).total_seconds()
@@ -464,7 +486,8 @@ class ActualsCommitmentsImportService:
     async def import_commitments(
         self,
         records: List[Dict[str, Any]],
-        anonymize: bool = True
+        anonymize: bool = True,
+        progress_callback: Optional[Callable[[int, int], None]] = None,
     ) -> ImportResult:
         """
         Import commitments records with BLAZING FAST validation and duplicate detection.
@@ -472,7 +495,7 @@ class ActualsCommitmentsImportService:
         OPTIMIZATIONS:
         - Pre-load project cache (eliminates repeated lookups)
         - Bulk duplicate check (single query for all records)
-        - Large batch inserts (500 records per batch)
+        - Large batch inserts (10000 records per batch)
         - Limited error collection (first 100 errors only)
         - Optimized memory usage
         
@@ -480,8 +503,8 @@ class ActualsCommitmentsImportService:
         1. Pre-load project cache
         2. Validate and anonymize all records
         3. Bulk check for duplicates (single query)
-        4. Prepare records for batch insert
-        5. Insert in large batches (500 records)
+    4. Prepare records for batch insert
+    5. Insert in large batches (10000 records)
         6. Log import operation
         
         Args:
@@ -642,35 +665,49 @@ class ActualsCommitmentsImportService:
         
         logger.info(f"✅ Prepared {len(records_to_insert)} records for insert")
         
-        # Step 4: Batch insert records (LARGE BATCHES = BLAZING FAST!)
+        # Step 4: Batch insert (prefer RPC with trigger disabled for speed)
+        total_to_insert = len(records_to_insert)
+        if progress_callback and total_to_insert:
+            progress_callback(0, total_to_insert)
         if records_to_insert:
-            logger.info(f"Step 4/4: Batch inserting {len(records_to_insert)} records (batches of {BATCH_SIZE})...")
-            
-            for i in range(0, len(records_to_insert), BATCH_SIZE):
-                chunk = records_to_insert[i:i + BATCH_SIZE]
+            use_rpc = True
+            batch_size = BATCH_SIZE_RPC
+            logger.info(f"Step 4/4: Batch inserting {total_to_insert} records (batches of {batch_size}, RPC preferred)...")
+            i = 0
+            while i < len(records_to_insert):
+                chunk = records_to_insert[i:i + batch_size]
                 chunk_data = [data for _, data in chunk]
-                
                 try:
-                    response = self.supabase.table("commitments").insert(chunk_data).execute()
-                    
-                    if response.data:
-                        chunk_success = len(response.data)
-                        success_count += chunk_success
-                        logger.info(f"✅ Inserted batch {i//BATCH_SIZE + 1}: {chunk_success} records")
+                    if use_rpc:
+                        r = self.supabase.rpc("insert_commitments_batch", {"records": chunk_data}).execute()
+                        raw = r.data
+                        if isinstance(raw, (int, float)):
+                            n = int(raw)
+                        elif isinstance(raw, list) and len(raw) > 0:
+                            row = raw[0]
+                            if isinstance(row, (int, float)):
+                                n = int(row)
+                            elif isinstance(row, dict):
+                                n = int(row.get("insert_commitments_batch") or 0)
+                            else:
+                                n = len(chunk_data)
+                        else:
+                            n = len(chunk_data)
+                        chunk_success = n
                     else:
-                        # If batch insert fails, mark all records in chunk as errors
-                        for row_idx, data in chunk:
-                            error_count += 1
-                            if collect_errors and len(errors) < MAX_ERRORS_TO_COLLECT:
-                                errors.append(ImportError(
-                                    row=row_idx,
-                                    field="database",
-                                    value=f"{data['po_number']}-{data['po_line_nr']}",
-                                    error="Failed to insert record into database"
-                                ))
-                        
+                        self.supabase.table("commitments").insert(chunk_data, returning="minimal").execute()
+                        chunk_success = len(chunk_data)
+                    success_count += chunk_success
+                    if progress_callback and total_to_insert:
+                        progress_callback(success_count, total_to_insert)
+                    if (i // batch_size + 1) % 5 == 0 or i + batch_size >= len(records_to_insert):
+                        logger.info(f"✅ Inserted through batch {i // batch_size + 1}: {success_count} total")
                 except Exception as e:
-                    # If batch insert fails, mark all records in chunk as errors
+                    if use_rpc:
+                        logger.warning("insert_commitments_batch RPC failed (%s), falling back to table insert", e)
+                        use_rpc = False
+                        batch_size = BATCH_SIZE
+                        continue
                     logger.error(f"Batch insert error: {e}", exc_info=True)
                     for row_idx, data in chunk:
                         error_count += 1
@@ -681,6 +718,9 @@ class ActualsCommitmentsImportService:
                                 value=f"{data['po_number']}-{data['po_line_nr']}",
                                 error=f"Batch insert failed: {str(e)}"
                             ))
+                    i += len(chunk)
+                    continue
+                i += len(chunk)
         
         # Calculate performance metrics
         elapsed_time = (datetime.now() - start_time).total_seconds()
@@ -715,12 +755,14 @@ class ActualsCommitmentsImportService:
         
         return result
     
+    DUPLICATE_CHECK_CHUNK = 2000  # PostgREST/URL limit; chunk to avoid timeouts
+
     async def batch_check_duplicate_actuals(self, fi_doc_nos: List[str]) -> set:
         """
         ULTRA FAST batch check if actuals with given fi_doc_nos already exist.
         
         Optimizations:
-        - Single query with IN clause
+        - Chunked queries (2000 per request) to avoid URL/request size limits
         - Only select fi_doc_no field (minimal data transfer)
         - Uses database index for maximum speed
         
@@ -735,20 +777,18 @@ class ActualsCommitmentsImportService:
         if not fi_doc_nos:
             return set()
         
+        existing: Set[str] = set()
         try:
-            # ULTRA FAST: Query only the field we need, use index
-            response = self.supabase.table("actuals").select("fi_doc_no").in_(
-                "fi_doc_no", fi_doc_nos
-            ).execute()
-            
-            # Return set for O(1) lookup
-            if response.data:
-                return {record["fi_doc_no"] for record in response.data}
-            return set()
-            
+            for i in range(0, len(fi_doc_nos), self.DUPLICATE_CHECK_CHUNK):
+                chunk = fi_doc_nos[i : i + self.DUPLICATE_CHECK_CHUNK]
+                response = self.supabase.table("actuals").select("fi_doc_no").in_(
+                    "fi_doc_no", chunk
+                ).execute()
+                if response.data:
+                    existing.update(record["fi_doc_no"] for record in response.data)
+            return existing
         except Exception as e:
             logger.error(f"Error batch checking duplicate actuals: {e}")
-            # On error, assume no duplicates to allow processing
             return set()
     
     async def batch_check_duplicate_commitments(
@@ -916,12 +956,10 @@ class ActualsCommitmentsImportService:
                 "completed_at": datetime.now().isoformat()
             }
             
-            response = self.supabase.table("import_audit_logs").insert(audit_data).execute()
-            
-            if response.data:
-                logger.info(f"Logged import {import_id} to audit table")
-            else:
-                logger.warning(f"Failed to log import {import_id} to audit table")
+            self.supabase.table("import_audit_logs").insert(audit_data, returning="minimal").execute()
+            logger.info(f"Logged import {import_id} to audit table")
+
+            trim_import_history(self.user_id, self.supabase)
 
             # Also write to central audit trail (audit_logs) for Audit Trail UI
             log_data_import_to_audit_trail(

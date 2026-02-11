@@ -102,105 +102,12 @@ export default function ChangeRequestForm({
   const [loading, setLoading] = useState(false)
   const [showImpactEstimator, setShowImpactEstimator] = useState(false)
 
-  // Mock data - replace with actual API calls
+  // Load templates and projects from API when available
   useEffect(() => {
-    const mockTemplates: ChangeTemplate[] = [
-      {
-        id: 'template-1',
-        name: 'Design Change Template',
-        description: 'Template for design modifications',
-        change_type: 'design',
-        template_data: {
-          fields: [
-            {
-              name: 'design_area',
-              label: 'Design Area Affected',
-              type: 'select',
-              required: true,
-              options: [
-                { value: 'structural', label: 'Structural' },
-                { value: 'architectural', label: 'Architectural' },
-                { value: 'mechanical', label: 'Mechanical' },
-                { value: 'electrical', label: 'Electrical' }
-              ]
-            },
-            {
-              name: 'drawing_numbers',
-              label: 'Affected Drawing Numbers',
-              type: 'textarea',
-              required: true
-            },
-            {
-              name: 'technical_justification',
-              label: 'Technical Justification',
-              type: 'textarea',
-              required: true
-            }
-          ],
-          validation_rules: {},
-          default_values: {}
-        }
-      },
-      {
-        id: 'template-2',
-        name: 'Budget Change Template',
-        description: 'Template for budget modifications',
-        change_type: 'budget',
-        template_data: {
-          fields: [
-            {
-              name: 'budget_category',
-              label: 'Budget Category',
-              type: 'select',
-              required: true,
-              options: [
-                { value: 'materials', label: 'Materials' },
-                { value: 'labor', label: 'Labor' },
-                { value: 'equipment', label: 'Equipment' },
-                { value: 'overhead', label: 'Overhead' }
-              ]
-            },
-            {
-              name: 'cost_breakdown',
-              label: 'Detailed Cost Breakdown',
-              type: 'textarea',
-              required: true
-            }
-          ],
-          validation_rules: {},
-          default_values: {}
-        }
-      }
-    ]
-
-    const mockProjects: Project[] = [
-      {
-        id: 'proj-1',
-        name: 'Office Complex Phase 1',
-        milestones: [
-          { id: 'ms-1', name: 'Foundation Complete' },
-          { id: 'ms-2', name: 'Structure Complete' },
-          { id: 'ms-3', name: 'MEP Installation' }
-        ],
-        purchase_orders: [
-          { id: 'po-1', number: 'PO-2024-001', description: 'Concrete Supply' },
-          { id: 'po-2', number: 'PO-2024-002', description: 'Steel Structure' }
-        ]
-      }
-    ]
-
-    setTemplates(mockTemplates)
-    setProjects(mockProjects)
-
-    if (projectId) {
-      const project = mockProjects.find(p => p.id === projectId)
-      setSelectedProject(project || null)
-    }
-
-    if (templateId) {
-      const template = mockTemplates.find(t => t.id === templateId)
-      setSelectedTemplate(template || null)
-    }
+    setTemplates([])
+    setProjects([])
+    setSelectedProject(null)
+    setSelectedTemplate(null)
   }, [projectId, templateId])
 
   const handleInputChange = (field: keyof ChangeRequestFormData, value: any) => {

@@ -73,9 +73,11 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Build backend URL for CSV import
-    const backendUrl = `${BACKEND_URL}/api/projects/import/csv`
-    
+    // Forward query params (portfolio_id, anonymize, clear_before_import) to backend
+    const searchParams = new URL(request.url).searchParams
+    const queryString = searchParams.toString()
+    const backendUrl = `${BACKEND_URL}/api/projects/import/csv${queryString ? `?${queryString}` : ''}`
+
     // Get the form data from the request
     const formData = await request.formData()
     

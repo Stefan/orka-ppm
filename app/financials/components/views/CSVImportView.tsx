@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Upload, Download, CheckCircle, XCircle, Clock, RefreshCw, FileText, History, Map } from 'lucide-react'
 import { CSVImportHistory, CSVUploadResult } from '../../types'
 import { getApiUrl } from '../../../../lib/api'
@@ -8,37 +8,61 @@ import { fetchSavedCsvMappings, saveCsvMapping, type SavedCsvMapping } from '../
 import { logger } from '@/lib/monitoring/logger'
 import { useTranslations } from '@/lib/i18n/context'
 import { useDateFormatter } from '@/hooks/useDateFormatter'
+import { LinearProgress } from '@/components/ui/ProgressIndicator'
 
-/** Read first line of CSV as headers (simple comma split; handles quoted commas roughly). */
+const DELIMITERS = [',', ';', '\t'] as const
+
+/** Split first line by delimiter, respecting quoted fields. */
+function splitByDelimiter(line: string, delimiter: string): string[] {
+  const headers: string[] = []
+  let i = 0
+  while (i < line.length) {
+    if (line[i] === '"') {
+      let end = i + 1
+      while (end < line.length && (line[end] !== '"' || line[end + 1] === '"')) {
+        if (line[end] === '"' && line[end + 1] === '"') end += 2
+        else end += 1
+      }
+      headers.push(line.slice(i + 1, end).replace(/""/g, '"').trim())
+      i = end + 1
+      if (line[i] === delimiter) i += 1
+      continue
+    }
+    const next = line.indexOf(delimiter, i)
+    if (next === -1) {
+      headers.push(line.slice(i).trim())
+      break
+    }
+    headers.push(line.slice(i, next).trim())
+    i = next + 1
+  }
+  return headers.filter(Boolean)
+}
+
+/** Detect delimiter: use the one that yields the most columns (≥2). */
+function detectDelimiter(firstLine: string): string {
+  let bestDelimiter = ','
+  let bestCount = 1
+  for (const d of DELIMITERS) {
+    const count = splitByDelimiter(firstLine, d).length
+    if (count >= 2 && count > bestCount) {
+      bestCount = count
+      bestDelimiter = d
+    }
+  }
+  return bestDelimiter
+}
+
+/** Read first line of CSV as headers; auto-detects comma, semicolon, or tab. */
 function readCsvHeaders(file: File): Promise<string[]> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => {
       const text = (reader.result as string) || ''
       const firstLine = text.split(/\r?\n/)[0] || ''
-      const headers: string[] = []
-      let i = 0
-      while (i < firstLine.length) {
-        if (firstLine[i] === '"') {
-          let end = i + 1
-          while (end < firstLine.length && (firstLine[end] !== '"' || firstLine[end + 1] === '"')) {
-            if (firstLine[end] === '"' && firstLine[end + 1] === '"') end += 2
-            else end += 1
-          }
-          headers.push(firstLine.slice(i + 1, end).replace(/""/g, '"').trim())
-          i = end + 1
-          if (firstLine[i] === ',') i += 1
-          continue
-        }
-        const comma = firstLine.indexOf(',', i)
-        if (comma === -1) {
-          headers.push(firstLine.slice(i).trim())
-          break
-        }
-        headers.push(firstLine.slice(i, comma).trim())
-        i = comma + 1
-      }
-      resolve(headers.filter(Boolean))
+      const delimiter = detectDelimiter(firstLine)
+      const headers = splitByDelimiter(firstLine, delimiter)
+      resolve(headers)
     }
     reader.onerror = () => reject(reader.error)
     reader.readAsText(file.slice(0, 8192), 'utf-8')
@@ -64,6 +88,10 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
   const [loadingSuggestions, setLoadingSuggestions] = useState(false)
   const [savedMappings, setSavedMappings] = useState<SavedCsvMapping[]>([])
   const [savingMapping, setSavingMapping] = useState(false)
+  const [anonymize, setAnonymize] = useState(true)
+  const [clearBeforeImport, setClearBeforeImport] = useState(false)
+  const [importProgress, setImportProgress] = useState(0)
+  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
     if (!accessToken) return
@@ -137,21 +165,40 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
     }
   }
 
+  const MAX_CSV_BYTES = 80 * 1024 * 1024 // 80 MB, must match backend MAX_CSV_UPLOAD_BYTES
+
   const handleFileUpload = async (file: File, importType: 'commitments' | 'actuals') => {
     if (!accessToken) return
-    
+    if (file.size > MAX_CSV_BYTES) {
+      setUploadResult({
+        success: false,
+        records_processed: 0,
+        records_imported: 0,
+        errors: [{ row: 0, field: 'file', message: t('fileTooLarge') || `File too large. Max. ${MAX_CSV_BYTES / (1024 * 1024)} MB.` }],
+        warnings: [],
+        import_id: ''
+      })
+      return
+    }
     setUploadingFile(true)
     setUploadResult(null)
-    
+    setImportProgress(0)
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current)
+      progressIntervalRef.current = null
+    }
     try {
       const formData = new FormData()
       formData.append('file', file)
-      
-      // Create abort controller for timeout (5 minutes for large imports)
+
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 300000) // 5 minutes
-      
-      const response = await fetch(getApiUrl(`/csv-import/upload?import_type=${importType}`), {
+      const timeoutId = setTimeout(() => controller.abort(), 900000)
+
+      const params = new URLSearchParams({ import_type: importType })
+      params.set('anonymize', String(anonymize))
+      params.set('clear_before_import', String(clearBeforeImport))
+      params.set('stream', 'true')
+      const response = await fetch(getApiUrl(`/csv-import/upload?${params.toString()}`), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -159,21 +206,69 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
         body: formData,
         signal: controller.signal
       })
-      
+
       clearTimeout(timeoutId)
-      
-      if (response.ok) {
-        const result = await response.json()
+
+      const contentType = response.headers.get('content-type') ?? ''
+      const isNdjson = contentType.includes('ndjson') || contentType.includes('x-ndjson')
+
+      if (response.ok && isNdjson && response.body) {
+        const reader = response.body.getReader()
+        const decoder = new TextDecoder()
+        let buffer = ''
+        let lastResult: CSVUploadResult | null = null
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          buffer += decoder.decode(value, { stream: true })
+          const lines = buffer.split('\n')
+          buffer = lines.pop() ?? ''
+          for (const line of lines) {
+            if (!line.trim()) continue
+            try {
+              const obj = JSON.parse(line) as { type?: string; inserted?: number; total?: number }
+              if (obj.type === 'progress' && typeof obj.inserted === 'number' && typeof obj.total === 'number' && obj.total > 0) {
+                setImportProgress(Math.min(99, Math.round(100 * obj.inserted / obj.total)))
+              } else if (obj.type === 'result') {
+                lastResult = {
+                  success: !!obj.success,
+                  records_processed: Number(obj.records_processed) ?? 0,
+                  records_imported: Number(obj.records_imported) ?? 0,
+                  errors: Array.isArray(obj.errors) ? obj.errors : [],
+                  warnings: Array.isArray(obj.warnings) ? obj.warnings : [],
+                  import_id: String(obj.import_id ?? '')
+                }
+              }
+            } catch {
+              // ignore malformed lines
+            }
+          }
+        }
+        if (lastResult) {
+          setUploadResult(lastResult)
+          fetchCSVImportHistory()
+        } else {
+          setUploadResult({
+            success: false,
+            records_processed: 0,
+            records_imported: 0,
+            errors: [{ row: 0, field: 'file', message: 'Import response had no result' }],
+            warnings: [],
+            import_id: ''
+          })
+        }
+      } else if (response.ok) {
+        const result = await response.json() as CSVUploadResult
         setUploadResult(result)
-        fetchCSVImportHistory() // Refresh history
+        fetchCSVImportHistory()
       } else {
         const error = await response.json()
-        const errorMessage = typeof error.detail === 'string' 
-          ? error.detail 
+        const errorMessage = typeof error.detail === 'string'
+          ? error.detail
           : Array.isArray(error.detail)
-            ? error.detail.map((e: any) => e.msg || JSON.stringify(e)).join(', ')
+            ? error.detail.map((e: { msg?: string }) => e.msg || JSON.stringify(e)).join(', ')
             : 'Upload failed'
-        
+
         setUploadResult({
           success: false,
           records_processed: 0,
@@ -199,7 +294,13 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
         import_id: ''
       })
     } finally {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current)
+        progressIntervalRef.current = null
+      }
+      setImportProgress(100)
       setUploadingFile(false)
+      setTimeout(() => setImportProgress(0), 1200)
     }
   }
 
@@ -311,6 +412,27 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
             <FileText className="h-4 w-4" />
             <span>{t('formatSpreadsheet')}</span>
           </div>
+        </div>
+
+        <div className="flex flex-wrap gap-6 mb-4 p-3 rounded-lg bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-600">
+          <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-slate-300">
+            <input
+              type="checkbox"
+              checked={anonymize}
+              onChange={(e) => setAnonymize(e.target.checked)}
+              className="rounded border-gray-300 dark:border-slate-500 text-blue-600 focus:ring-blue-500"
+            />
+            <span>{t('anonymizeData') ?? 'Daten anonymisieren (Vendor, Projekt, Beträge, etc.)'}</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-slate-300">
+            <input
+              type="checkbox"
+              checked={clearBeforeImport}
+              onChange={(e) => setClearBeforeImport(e.target.checked)}
+              className="rounded border-gray-300 dark:border-slate-500 text-blue-600 focus:ring-blue-500"
+            />
+            <span>{t('clearBeforeImport') ?? 'Zieltabelle vor Import leeren (bestehende Daten löschen)'}</span>
+          </label>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -524,12 +646,22 @@ export default function CSVImportView({ accessToken }: CSVImportViewProps) {
       )}
 
       {/* Upload Progress */}
-      {uploadingFile && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-          <div className="flex items-center">
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
-            <span className="text-blue-800 dark:text-blue-300">{t('processingFile')}</span>
+      {(uploadingFile || importProgress > 0) && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-blue-800 dark:text-blue-300 font-medium">{t('processingFile')}</span>
+            {importProgress > 0 && (
+              <span className="text-sm text-blue-700 dark:text-blue-400 tabular-nums">{importProgress}%</span>
+            )}
           </div>
+          <LinearProgress
+            value={uploadingFile ? importProgress : 100}
+            max={100}
+            showPercentage={false}
+            size="md"
+            variant="default"
+            className="flex-1"
+          />
         </div>
       )}
 

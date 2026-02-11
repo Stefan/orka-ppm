@@ -1107,9 +1107,35 @@ async def get_my_organization(request: Request, current_user=Depends(require_org
         cached = await cache.get(cache_key)
         if cached is not None:
             return cached
+    # Use service role so RLS does not hide the org row (user is already checked as admin/org_admin/super_admin)
+    db = service_supabase if service_supabase else supabase
+    if not db:
+        raise HTTPException(status_code=503, detail="Database service unavailable")
     try:
-        r = supabase.table("organizations").select("*").eq("id", str(org_id)).limit(1).execute()
+        r = db.table("organizations").select("*").eq("id", str(org_id)).limit(1).execute()
         if not r.data or len(r.data) == 0:
+            # Auto-create organization when missing (only with service role; anon would fail RLS)
+            if service_supabase:
+                try:
+                    insert_r = service_supabase.table("organizations").insert({
+                        "id": str(org_id),
+                        "name": "My Organization",
+                        "is_active": True,
+                        "settings": {},
+                    }).execute()
+                    if insert_r.data and len(insert_r.data) > 0:
+                        result = insert_r.data[0]
+                        if cache:
+                            await cache.set(cache_key, result, ttl=ADMIN_ORG_ME_CACHE_TTL)
+                        return result
+                    r2 = service_supabase.table("organizations").select("*").eq("id", str(org_id)).limit(1).execute()
+                    if r2.data and len(r2.data) > 0:
+                        result = r2.data[0]
+                        if cache:
+                            await cache.set(cache_key, result, ttl=ADMIN_ORG_ME_CACHE_TTL)
+                        return result
+                except Exception:
+                    pass
             raise HTTPException(status_code=404, detail="Organization not found")
         result = r.data[0]
         if cache:
@@ -1124,11 +1150,16 @@ async def get_my_organization(request: Request, current_user=Depends(require_org
 class OrganizationMeUpdate(BaseModel):
     name: Optional[str] = None
     logo_url: Optional[str] = None
+    settings: Optional[Dict[str, Any]] = None  # e.g. {"audit": {"actuals_commitments": False}}
 
 
 @router.patch("/organizations/me")
-async def update_my_organization(body: OrganizationMeUpdate, current_user=Depends(require_org_admin_or_super())):
-    """Update current user's organization (org_admin: name, logo only; super_admin: full)."""
+async def update_my_organization(
+    request: Request,
+    body: OrganizationMeUpdate,
+    current_user=Depends(require_org_admin_or_super()),
+):
+    """Update current user's organization (org_admin: name, logo, settings.audit; super_admin: full)."""
     if not supabase:
         raise HTTPException(status_code=503, detail="Database service unavailable")
     org_id = current_user.get("organization_id") or current_user.get("tenant_id")
@@ -1137,17 +1168,33 @@ async def update_my_organization(body: OrganizationMeUpdate, current_user=Depend
     roles = current_user.get("roles") or []
     payload = body.model_dump(exclude_unset=True)
     if "super_admin" not in roles and payload:
-        allowed = {"name", "logo_url"}
+        allowed = {"name", "logo_url", "settings"}
         payload = {k: v for k, v in payload.items() if k in allowed}
+        if "settings" in payload and isinstance(payload["settings"], dict):
+            # Org-admin may only change settings.audit.actuals_commitments
+            _db = service_supabase if service_supabase else supabase
+            current_r = _db.table("organizations").select("settings").eq("id", str(org_id)).limit(1).execute()
+            current = (current_r.data or [{}])[0].get("settings") or {}
+            incoming = payload["settings"]
+            merged = dict(current)
+            if "audit" in incoming and isinstance(incoming["audit"], dict):
+                merged["audit"] = {**(merged.get("audit") or {}), **incoming["audit"]}
+            payload["settings"] = merged
+    _db = service_supabase if service_supabase else supabase
+    if not _db:
+        raise HTTPException(status_code=503, detail="Database service unavailable")
     if not payload:
-        r = supabase.table("organizations").select("*").eq("id", str(org_id)).limit(1).execute()
+        r = _db.table("organizations").select("*").eq("id", str(org_id)).limit(1).execute()
         if not r.data:
             raise HTTPException(status_code=404, detail="Organization not found")
         return r.data[0]
     try:
-        r = supabase.table("organizations").update(payload).eq("id", str(org_id)).execute()
+        r = _db.table("organizations").update(payload).eq("id", str(org_id)).execute()
         if not r.data or len(r.data) == 0:
             raise HTTPException(status_code=404, detail="Organization not found")
+        cache = getattr(request.app.state, "cache_manager", None)
+        if cache:
+            await cache.delete(f"admin:organizations_me:{org_id}")
         return r.data[0]
     except HTTPException:
         raise

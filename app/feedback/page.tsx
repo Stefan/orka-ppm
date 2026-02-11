@@ -144,54 +144,11 @@ export default function Feedback() {
         setFeatures(data)
       } else {
         console.error(`Failed to fetch features: ${response.status} ${response.statusText}`)
-        // Use mock data as fallback
-        setFeatures([
-          {
-            id: 'mock-1',
-            title: 'Enhanced Dashboard Analytics',
-            description: 'Add more detailed analytics and visualizations to the dashboard',
-            status: 'in_progress',
-            priority: 'high',
-            votes_count: 15,
-            comments_count: 3,
-            submitted_by: session.user?.email || 'unknown',
-            tags: ['analytics', 'dashboard'],
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-          {
-            id: 'mock-2',
-            title: 'Mobile App Support',
-            description: 'Develop native mobile applications for iOS and Android',
-            status: 'pending',
-            priority: 'medium',
-            votes_count: 23,
-            comments_count: 5,
-            submitted_by: session.user?.email || 'unknown',
-            tags: ['mobile', 'ios', 'android'],
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ])
+        setFeatures([])
       }
     } catch (error) {
       console.error('Failed to fetch features:', error)
-      // Use mock data as fallback
-      setFeatures([
-        {
-          id: 'mock-1',
-          title: 'Enhanced Dashboard Analytics',
-          description: 'Add more detailed analytics and visualizations to the dashboard',
-          status: 'in_progress',
-          priority: 'high',
-          votes_count: 15,
-          comments_count: 3,
-          submitted_by: session.user?.email || 'unknown',
-          tags: ['analytics', 'dashboard'],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ])
+      setFeatures([])
     }
   }
 
@@ -217,39 +174,11 @@ export default function Feedback() {
         setBugs(data)
       } else {
         console.error(`Failed to fetch bugs: ${response.status} ${response.statusText}`)
-        // Use mock data as fallback
-        setBugs([
-          {
-            id: 'bug-mock-1',
-            title: 'Dashboard loading slowly',
-            description: 'The dashboard takes more than 5 seconds to load',
-            status: 'open',
-            priority: 'high',
-            severity: 'high',
-            category: 'performance',
-            submitted_by: session.user?.email || 'unknown',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ])
+        setBugs([])
       }
     } catch (error) {
       console.error('Failed to fetch bugs:', error)
-      // Use mock data as fallback
-      setBugs([
-        {
-          id: 'bug-mock-1',
-          title: 'Dashboard loading slowly',
-          description: 'The dashboard takes more than 5 seconds to load',
-          status: 'open',
-          priority: 'high',
-          severity: 'high',
-          category: 'performance',
-          submitted_by: session.user?.email || 'unknown',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ])
+      setBugs([])
     }
   }
 

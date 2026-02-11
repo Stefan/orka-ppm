@@ -22,6 +22,54 @@ import {
   type KPIs,
   type Project
 } from '../../lib/api/dashboard-loader'
+
+const DASHBOARD_KPI_CACHE_KEY = 'orka-ppm-dashboard-kpis-prev'
+const KPI_CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
+
+function getStoredKpis(): { kpis: KPIs; at: number } | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = localStorage.getItem(DASHBOARD_KPI_CACHE_KEY)
+    if (!raw) return null
+    const { kpis, at } = JSON.parse(raw) as { kpis: KPIs; at: number }
+    if (!kpis || typeof at !== 'number') return null
+    if (Date.now() - at > KPI_CACHE_MAX_AGE_MS) return null
+    return { kpis, at }
+  } catch {
+    return null
+  }
+}
+
+function storeKpis(kpis: KPIs): void {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem(DASHBOARD_KPI_CACHE_KEY, JSON.stringify({ kpis, at: Date.now() }))
+  } catch {
+    // ignore
+  }
+}
+
+/** Compute KPI change in percentage points (current - previous). */
+function computeKpiChanges(current: KPIs, previous: KPIs | null): Record<keyof KPIs, number> {
+  if (!previous) {
+    return {
+      project_success_rate: 0,
+      budget_performance: 0,
+      timeline_performance: 0,
+      average_health_score: 0,
+      resource_efficiency: 0,
+      active_projects_ratio: 0,
+    }
+  }
+  return {
+    project_success_rate: Math.round((current.project_success_rate ?? 0) - (previous.project_success_rate ?? 0)),
+    budget_performance: Math.round((current.budget_performance ?? 0) - (previous.budget_performance ?? 0)),
+    timeline_performance: Math.round((current.timeline_performance ?? 0) - (previous.timeline_performance ?? 0)),
+    average_health_score: Math.round(((current.average_health_score ?? 0) - (previous.average_health_score ?? 0)) * 10) / 10,
+    resource_efficiency: Math.round((current.resource_efficiency ?? 0) - (previous.resource_efficiency ?? 0)),
+    active_projects_ratio: Math.round((current.active_projects_ratio ?? 0) - (previous.active_projects_ratio ?? 0)),
+  }
+}
 import { 
   TrendingUp, TrendingDown, AlertTriangle, DollarSign, Clock, RefreshCw, 
   BarChart3, Users, FileText, ChevronDown, X, Filter, Upload, Sparkles 
@@ -263,10 +311,12 @@ export default function CompactDashboard() {
   const router = useRouter()
   const [quickStats, setQuickStats] = useState<QuickStats | null>(null)
   const [kpis, setKPIs] = useState<KPIs | null>(null)
+  const [kpiChanges, setKpiChanges] = useState<Record<keyof KPIs, number> | null>(null)
   const [recentProjects, setRecentProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [varianceAlertCount, setVarianceAlertCount] = useState(0)
   const [timeFilter, setTimeFilter] = useState('last30Days')
+  const [insight, setInsight] = useState<{ title: string; content: string } | null>(null)
   const [alerts, setAlerts] = useState<DashboardAlert[]>([
     { id: '1', titleKey: 'dashboard.alerts.budgetOverrunTitle', descKey: 'dashboard.alerts.budgetOverrunDesc', severity: 'critical' },
     { id: '2', titleKey: 'dashboard.alerts.scheduleDelayRiskTitle', descKey: 'dashboard.alerts.scheduleDelayRiskDesc', severity: 'high' },
@@ -287,8 +337,11 @@ export default function CompactDashboard() {
         session.access_token,
         (criticalData) => {
           hasCriticalDataRef.current = true
+          const prev = getStoredKpis()
+          setKpiChanges(computeKpiChanges(criticalData.kpis, prev?.kpis ?? null))
           setQuickStats(criticalData.quickStats)
           setKPIs(criticalData.kpis)
+          storeKpis(criticalData.kpis)
           setLoading(false)
         },
         (projects) => {
@@ -323,6 +376,26 @@ export default function CompactDashboard() {
     }
   }, [session, loadOptimizedData])
 
+  // Fetch AI insight (dashboard tip) when session is available
+  useEffect(() => {
+    if (!session?.access_token) return
+    let cancelled = false
+    fetch('/api/tips?context=/dashboard')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { tips?: Array<{ title?: string; content?: string }> } | null) => {
+        if (cancelled || !data?.tips?.length) return
+        const first = data.tips[0]
+        if (first?.content) {
+          setInsight({
+            title: first.title || 'Insight',
+            content: first.content,
+          })
+        }
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [session?.access_token])
+
   const quickRefresh = useCallback(async () => {
     if (!session?.access_token) return
     try {
@@ -342,21 +415,31 @@ export default function CompactDashboard() {
     setAlerts(prev => prev.filter(alert => alert.id !== id))
   }, [])
 
-  // Loading State - Mobile-first responsive
+  // Loading State – Projects section uses list-style placeholders (no tiles)
   if (loading) {
     return (
       <AppLayout>
         <div className="max-w-[1600px] mx-auto p-3 sm:p-4 md:p-6">
           <div className="animate-pulse space-y-3 md:space-y-4">
-            <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-1/3"></div>
+            <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-1/3" />
+            {/* KPI row */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-20 md:h-24 bg-gray-200 dark:bg-slate-700 rounded"></div>
+                <div key={i} className="h-20 md:h-24 bg-gray-200 dark:bg-slate-700 rounded" />
               ))}
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
-              <div className="lg:col-span-2 h-48 md:h-64 bg-gray-200 dark:bg-slate-700 rounded"></div>
-              <div className="h-48 md:h-64 bg-gray-200 dark:bg-slate-700 rounded"></div>
+              <div className="lg:col-span-2 h-48 md:h-64 bg-gray-200 dark:bg-slate-700 rounded" />
+              <div className="h-48 md:h-64 bg-gray-200 dark:bg-slate-700 rounded" />
+            </div>
+            {/* Projects: list-style placeholders instead of tiles */}
+            <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4">
+              <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-40 mb-3" />
+              <div className="space-y-2">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="h-12 bg-gray-100 dark:bg-slate-700 rounded" />
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -366,8 +449,8 @@ export default function CompactDashboard() {
 
   return (
     <AppLayout>
-      {/* Compact container with reduced spacing; pb for Quick Actions bar so content is not hidden when scrolling */}
-      <div className="max-w-[1600px] mx-auto p-3 sm:p-4 md:p-6 space-y-2 md:space-y-3 pb-20">
+      {/* Compact container with reduced spacing; pb for fixed Quick Actions bar so content is not hidden when scrolling */}
+      <div className="max-w-[1600px] mx-auto p-3 sm:p-4 md:p-6 space-y-2 md:space-y-3 pb-14">
         
         {/* Header - Row 1: Title + stats + actions */}
         <div data-testid="dashboard-header" data-tour="dashboard-header" className="flex items-center justify-between gap-3 flex-wrap">
@@ -402,14 +485,14 @@ export default function CompactDashboard() {
           </div>
         )}
 
-        {/* TOP: KPI Cards - Responsive Grid (2→3→5 columns) */}
+        {/* TOP: KPI Cards - Responsive Grid (2→3→5 columns); change vs. last visit (cached) */}
         {kpis && (
           <div data-testid="dashboard-kpi-section" data-tour="dashboard-kpis" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-3">
             <KPICard
               testId="kpi-card-success-rate"
               label={t('kpi.successRate')}
               value={kpis.project_success_rate || 0}
-              change={5.2}
+              change={kpiChanges?.project_success_rate ?? 0}
               icon={TrendingUp}
               color="text-green-600 dark:text-green-400"
             />
@@ -417,7 +500,7 @@ export default function CompactDashboard() {
               testId="kpi-card-budget-performance"
               label={t('kpi.budgetPerformance')}
               value={kpis.budget_performance || 0}
-              change={-2.1}
+              change={kpiChanges?.budget_performance ?? 0}
               icon={DollarSign}
               color="text-blue-600 dark:text-blue-400"
             />
@@ -425,7 +508,7 @@ export default function CompactDashboard() {
               testId="kpi-card-timeline-performance"
               label={t('kpi.timelinePerformance')}
               value={kpis.timeline_performance || 0}
-              change={3.7}
+              change={kpiChanges?.timeline_performance ?? 0}
               icon={Clock}
               color="text-purple-600 dark:text-purple-400"
             />
@@ -433,7 +516,7 @@ export default function CompactDashboard() {
               testId="kpi-card-active-projects"
               label={t('kpi.activeProjects')}
               value={kpis.active_projects_ratio || 0}
-              change={1.2}
+              change={kpiChanges?.active_projects_ratio ?? 0}
               icon={BarChart3}
               color="text-indigo-600 dark:text-indigo-400"
             />
@@ -441,7 +524,7 @@ export default function CompactDashboard() {
               testId="kpi-card-resources"
               label={t('resources.title')}
               value={kpis.resource_efficiency || 0}
-              change={0.8}
+              change={kpiChanges?.resource_efficiency ?? 0}
               icon={Users}
               color="text-teal-600 dark:text-teal-400"
             />
@@ -457,10 +540,10 @@ export default function CompactDashboard() {
             <Sparkles className="h-5 w-5 text-blue-500 dark:text-indigo-400 flex-shrink-0 mt-0.5" aria-hidden />
             <div className="min-w-0">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100">
-                {t('dashboard.aiInsightsTitle')}
+                {insight?.title ?? t('dashboard.aiInsightsTitle')}
               </h3>
               <p className="text-sm text-gray-700 dark:text-slate-300 mt-0.5">
-                {t('dashboard.aiInsightsSummary')}
+                {insight?.content ?? t('dashboard.aiInsightsSummary')}
               </p>
             </div>
           </div>
@@ -554,39 +637,39 @@ export default function CompactDashboard() {
         </div>
       </div>
 
-      {/* Quick Actions: rendered via portal so it stays fixed at viewport bottom when scrolling */}
+      {/* Quick Actions: fixed at viewport bottom via portal – always visible when scrolling, minimal height */}
       {typeof document !== 'undefined' && createPortal(
-        <div data-testid="dashboard-quick-actions" className="fixed bottom-0 left-0 right-0 border-t-2 border-gray-300 dark:border-slate-700 py-2 px-3 shadow-2xl z-[100] bg-white/95 dark:bg-slate-800 backdrop-blur-sm">
+        <div data-testid="dashboard-quick-actions" className="fixed bottom-0 left-0 right-0 border-t border-gray-300 dark:border-slate-700 py-1 px-2 shadow-lg z-[100] bg-white/95 dark:bg-slate-800 backdrop-blur-sm min-h-0 flex-shrink-0">
           <div className="max-w-[1600px] mx-auto">
-            <div className="flex items-center gap-2 overflow-x-auto pb-1">
-              <span className="text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap mr-1">{t('actions.quickActions')}:</span>
-              <button data-testid="action-scenarios" onClick={() => router.push('/scenarios')} className="flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-700 dark:border dark:border-blue-600 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-600 transition-all whitespace-nowrap shadow-md hover:shadow-lg text-white [&_svg]:text-white [&_span]:text-white">
-                <BarChart3 size={18} className="shrink-0" aria-hidden />
-                <span className="text-sm font-medium">{t('actions.scenarios')}</span>
+            <div className="flex items-center gap-1.5 overflow-x-auto min-h-[36px]">
+              <span className="text-[11px] font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap mr-0.5 shrink-0">{t('actions.quickActions')}:</span>
+              <button data-testid="action-scenarios" onClick={() => router.push('/scenarios')} className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 dark:bg-blue-700 dark:border dark:border-blue-600 rounded-md hover:bg-blue-600 dark:hover:bg-blue-600 transition-all whitespace-nowrap shadow-sm hover:shadow text-white text-xs font-medium [&_svg]:text-white [&_span]:text-white shrink-0">
+                <BarChart3 size={14} className="shrink-0" aria-hidden />
+                <span>{t('actions.scenarios')}</span>
               </button>
-              <button data-testid="action-resources" onClick={() => router.push('/resources')} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
-                <Users size={18} className="shrink-0" aria-hidden />
-                <span className="text-sm font-medium">{t('actions.resources')}</span>
+              <button data-testid="action-resources" onClick={() => router.push('/resources')} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-slate-700 border border-gray-400 dark:border-slate-600 rounded-md hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap text-xs font-medium text-gray-800 dark:text-white [&_svg]:text-inherit shrink-0">
+                <Users size={14} className="shrink-0" aria-hidden />
+                <span>{t('actions.resources')}</span>
               </button>
-              <button data-testid="action-financials" onClick={() => router.push('/financials')} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
-                <DollarSign size={18} className="shrink-0" aria-hidden />
-                <span className="text-sm font-medium">{t('actions.financials')}</span>
+              <button data-testid="action-financials" onClick={() => router.push('/financials')} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-slate-700 border border-gray-400 dark:border-slate-600 rounded-md hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap text-xs font-medium text-gray-800 dark:text-white [&_svg]:text-inherit shrink-0">
+                <DollarSign size={14} className="shrink-0" aria-hidden />
+                <span>{t('actions.financials')}</span>
               </button>
-              <button data-testid="action-reports" onClick={() => router.push('/reports')} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
-                <FileText size={18} className="shrink-0" aria-hidden />
-                <span className="text-sm font-medium">{t('actions.reports')}</span>
+              <button data-testid="action-reports" onClick={() => router.push('/reports')} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-slate-700 border border-gray-400 dark:border-slate-600 rounded-md hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap text-xs font-medium text-gray-800 dark:text-white [&_svg]:text-inherit shrink-0">
+                <FileText size={14} className="shrink-0" aria-hidden />
+                <span>{t('actions.reports')}</span>
               </button>
-              <button data-testid="action-timeline" onClick={() => router.push('/schedules')} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
-                <Clock size={18} className="shrink-0" aria-hidden />
-                <span className="text-sm font-medium">{t('actions.timeline')}</span>
+              <button data-testid="action-timeline" onClick={() => router.push('/schedules')} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-slate-700 border border-gray-400 dark:border-slate-600 rounded-md hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap text-xs font-medium text-gray-800 dark:text-white [&_svg]:text-inherit shrink-0">
+                <Clock size={14} className="shrink-0" aria-hidden />
+                <span>{t('actions.timeline')}</span>
               </button>
-              <button data-testid="action-analytics" onClick={() => router.push('/reports')} className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-700 border-2 border-gray-400 dark:border-slate-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap shadow-sm text-gray-800 dark:text-white [&_svg]:text-inherit">
-                <TrendingUp size={18} className="shrink-0" aria-hidden />
-                <span className="text-sm font-medium">{t('actions.analytics')}</span>
+              <button data-testid="action-analytics" onClick={() => router.push('/reports')} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-slate-700 border border-gray-400 dark:border-slate-600 rounded-md hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-slate-600 transition-all whitespace-nowrap text-xs font-medium text-gray-800 dark:text-white [&_svg]:text-inherit shrink-0">
+                <TrendingUp size={14} className="shrink-0" aria-hidden />
+                <span>{t('actions.analytics')}</span>
               </button>
-              <button data-testid="action-import" onClick={() => router.push('/import')} className="flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-700 dark:border dark:border-blue-600 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-all whitespace-nowrap shadow-md hover:shadow-lg text-white [&_svg]:text-white [&_span]:text-white">
-                <Upload size={18} className="shrink-0" aria-hidden />
-                <span className="text-sm font-medium">{t('actions.importProjects')}</span>
+              <button data-testid="action-import" onClick={() => router.push('/import')} className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 dark:bg-blue-700 dark:border dark:border-blue-600 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-all whitespace-nowrap shadow-sm hover:shadow text-white text-xs font-medium [&_svg]:text-white [&_span]:text-white shrink-0">
+                <Upload size={14} className="shrink-0" aria-hidden />
+                <span>{t('actions.importProjects')}</span>
               </button>
             </div>
           </div>

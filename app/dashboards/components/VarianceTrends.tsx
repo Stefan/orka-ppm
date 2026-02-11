@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect, memo, useRef } from 'react'
-import { Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Bar, ComposedChart } from 'recharts'
+import { useState, useEffect, memo, useRef, useCallback } from 'react'
+import { Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Bar, ComposedChart } from 'recharts'
 import { Calendar, Filter } from 'lucide-react'
 import { useTranslations } from '../../../lib/i18n/context'
 import { ChartSkeleton } from '../../../components/ui/Skeleton'
+import { getApiUrl } from '../../../lib/api'
 
 interface VarianceTrend {
   date: string
@@ -55,69 +56,122 @@ function VarianceTrends({ session, selectedCurrency = 'USD' }: VarianceTrendsPro
     }
   }, [loading, trendData.length])
 
-  useEffect(() => {
-    if (session) {
-      // Defer non-critical data fetching to avoid blocking main thread
-      const timeoutId = setTimeout(() => {
-        fetchVarianceTrends()
-      }, 100)
-      
-      return () => clearTimeout(timeoutId)
-    }
-  }, [session, timeRange])
-
-  const fetchVarianceTrends = async () => {
+  const fetchVarianceTrends = useCallback(async () => {
     if (!session?.access_token) return
-    
+
     setLoading(true)
     setError(null)
-    
+
     try {
-      // Generate data in smaller batches to avoid blocking main thread
-      const mockTrendData: VarianceTrend[] = []
+      const limit = 5000
+      const [commitmentsRes, actualsRes] = await Promise.all([
+        fetch(getApiUrl(`/csv-import/commitments?limit=${limit}&count_exact=false`), {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+        }),
+        fetch(getApiUrl(`/csv-import/actuals?limit=${limit}&count_exact=false`), {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+        }),
+      ])
+
+      if (!commitmentsRes.ok || !actualsRes.ok) throw new Error('Failed to fetch data')
+
+      const commitmentsData = await commitmentsRes.json()
+      const actualsData = await actualsRes.json()
+      const commitments = commitmentsData.commitments || []
+      const actuals = actualsData.actuals || []
+
       const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90
-      const batchSize = 10
-      
-      for (let batch = 0; batch < Math.ceil(days / batchSize); batch++) {
-        // Yield to main thread between batches
-        await new Promise(resolve => {
-          if ('requestIdleCallback' in window) {
-            requestIdleCallback(() => resolve(undefined))
-          } else {
-            setTimeout(() => resolve(undefined), 0)
-          }
-        })
-        
-        const startIdx = batch * batchSize
-        const endIdx = Math.min(startIdx + batchSize, days)
-        
-        for (let i = days - 1 - startIdx; i >= days - endIdx; i--) {
-          const date = new Date()
-          date.setDate(date.getDate() - i)
-          
-          // Simulate variance trends with some randomness
-          const baseVariance = -5000 + (Math.random() - 0.5) * 20000
-          const variancePercentage = (Math.random() - 0.5) * 20
-          
-          mockTrendData.push({
-            date: date.toISOString().split('T')[0]!,
-            total_variance: baseVariance,
-            variance_percentage: variancePercentage,
-            projects_over_budget: Math.floor(Math.random() * 5),
-            projects_under_budget: Math.floor(Math.random() * 8)
-          })
+      const byWeek = timeRange === '90d'
+
+      const toDateStr = (d: Date) =>
+        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
+      const bucketKey = (dateStr: string): string => {
+        const s = dateStr.substring(0, 10)
+        if (!byWeek) return s
+        const d = new Date(s)
+        const start = new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay())
+        return toDateStr(start)
+      }
+
+      const now = new Date()
+      const periodStart = new Date(now)
+      periodStart.setDate(periodStart.getDate() - days)
+
+      const buckets = new Map<string, { commitments: number; actuals: number }>()
+
+      commitments.forEach((c: { po_date?: string; total_amount?: number }) => {
+        if (!c.po_date) return
+        const key = bucketKey(c.po_date)
+        const t = new Date(key)
+        if (t < periodStart) return
+        const b = buckets.get(key) || { commitments: 0, actuals: 0 }
+        b.commitments += Number(c.total_amount) || 0
+        buckets.set(key, b)
+      })
+
+      actuals.forEach((a: { posting_date?: string; amount?: number }) => {
+        if (!a.posting_date) return
+        const key = bucketKey(a.posting_date)
+        const t = new Date(key)
+        if (t < periodStart) return
+        const b = buckets.get(key) || { commitments: 0, actuals: 0 }
+        b.actuals += Number(a.amount) || 0
+        buckets.set(key, b)
+      })
+
+      // One point per period (unique dates, chronological order)
+      const dateKeys: string[] = []
+      if (byWeek) {
+        const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay())
+        for (let w = 0; w < Math.ceil(days / 7); w++) {
+          const d = new Date(weekStart)
+          d.setDate(d.getDate() - w * 7)
+          if (d < periodStart) break
+          dateKeys.push(toDateStr(d))
+        }
+        dateKeys.reverse()
+      } else {
+        for (let i = 0; i < days; i++) {
+          const d = new Date(now)
+          d.setDate(d.getDate() - (days - 1 - i))
+          dateKeys.push(toDateStr(d))
         }
       }
-      
-      setTrendData(mockTrendData)
-      
-    } catch (error: unknown) {
-      console.error('Error fetching variance trends:', error)
-      setError(error instanceof Error ? error.message : 'Failed to fetch variance trends')
+
+      const trendData: VarianceTrend[] = dateKeys.map((key) => {
+        const b = buckets.get(key) || { commitments: 0, actuals: 0 }
+        const totalVariance = b.actuals - b.commitments
+        const variancePct = b.commitments ? (totalVariance / b.commitments) * 100 : 0
+        return {
+          date: key,
+          total_variance: Math.round(totalVariance * 100) / 100,
+          variance_percentage: Math.round(variancePct * 10) / 10,
+          projects_over_budget: 0,
+          projects_under_budget: 0,
+        }
+      })
+
+      setTrendData(trendData)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch variance trends')
     } finally {
       setLoading(false)
     }
-  }
+  }, [session?.access_token, timeRange])
+
+  useEffect(() => {
+    if (session) {
+      const timeoutId = setTimeout(() => fetchVarianceTrends(), 100)
+      return () => clearTimeout(timeoutId)
+    }
+  }, [session, fetchVarianceTrends])
 
   if (loading) {
     return (

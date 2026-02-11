@@ -1,11 +1,17 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getApiUrl } from '../../../lib/api'
 
+/** Max number of projects to use for overview charts/summary (by total spend). Rest are summarized as "of N total". */
+const OVERVIEW_TOP_PROJECTS = 100
+
 export interface CommitmentsActualsSummary {
   totalCommitments: number
   totalActuals: number
   totalSpend: number
+  /** Number of projects used in charts (capped to OVERVIEW_TOP_PROJECTS) */
   projectCount: number
+  /** Total distinct projects with activity (may be > projectCount) */
+  totalProjectsWithActivity: number
   overBudgetCount: number
   underBudgetCount: number
   onBudgetCount: number
@@ -112,52 +118,48 @@ export function useCommitmentsActualsData({
         projectSpend.set(projectKey, existing)
       })
 
-      // For now, we'll just count projects
-      // In a real implementation, you'd compare against project budgets
-      const projectCount = projectSpend.size
+      const totalProjectsWithActivity = projectSpend.size
+      // Use top N projects by spend for overview so charts stay readable
+      const projectEntriesSorted = Array.from(projectSpend.entries())
+        .map(([projectNr, data]) => ({ projectNr, ...data, total: (data.commitments || 0) + (data.actuals || 0) }))
+        .sort((a, b) => b.total - a.total)
+      const topProjectEntries = projectEntriesSorted.slice(0, OVERVIEW_TOP_PROJECTS)
+      const projectCount = topProjectEntries.length
 
       setSummary({
         totalCommitments,
         totalActuals,
         totalSpend: totalCommitments + totalActuals,
         projectCount,
-        overBudgetCount: 0, // Will be calculated when we have budget data
+        totalProjectsWithActivity,
+        overBudgetCount: 0,
         underBudgetCount: 0,
         onBudgetCount: projectCount,
         currency: selectedCurrency
       })
 
-      // Calculate analytics data
-      
-      // 1. Category breakdown (group by WBS or cost center)
+      // Calculate analytics from top projects only
       const categoryMap = new Map<string, { commitments: number; actuals: number }>()
+      const topProjectNrs = new Set(topProjectEntries.map(e => e.projectNr))
       
       commitments.forEach((c: any) => {
-        // Try multiple field names for WBS (with and without space)
+        if (!topProjectNrs.has(c.project_nr || c.project || 'Unknown')) return
         const category = c.wbs_element || c.wbs || c.cost_center || 'Uncategorized'
         const existing = categoryMap.get(category) || { commitments: 0, actuals: 0 }
         existing.commitments += c.total_amount || 0
         categoryMap.set(category, existing)
       })
-      
       actuals.forEach((a: any) => {
-        // Try multiple field names for WBS (with and without space)
+        if (!topProjectNrs.has(a.project_nr || a.project || 'Unknown')) return
         const category = a.wbs_element || a.wbs || a.cost_center || 'Uncategorized'
         const existing = categoryMap.get(category) || { commitments: 0, actuals: 0 }
         existing.actuals += a.invoice_amount || a.amount || 0
         categoryMap.set(category, existing)
       })
 
-      // Debug: Log first few entries to see what's happening
-      if (categoryMap.size > 0) {
-        console.log('Category Map Sample:', Array.from(categoryMap.entries()).slice(0, 3))
-        console.log('First commitment WBS:', commitments[0]?.wbs_element || commitments[0]?.wbs)
-        console.log('First actual WBS:', actuals[0]?.wbs_element || actuals[0]?.wbs)
-      }
-
       const categoryData = Array.from(categoryMap.entries())
         .map(([name, data]) => ({
-          name: name.length > 12 ? name.substring(0, 12) + '...' : name, // Truncate long names
+          name: name.length > 12 ? name.substring(0, 12) + '...' : name,
           commitments: data.commitments,
           actuals: data.actuals,
           variance: data.actuals - data.commitments,
@@ -166,34 +168,22 @@ export function useCommitmentsActualsData({
             : 0
         }))
         .sort((a, b) => (b.commitments + b.actuals) - (a.commitments + a.actuals))
-        .slice(0, 8) // Top 8 categories (better for readability)
+        .slice(0, 8)
 
-      // 2. Project performance data
-      const projectPerformanceData = Array.from(projectSpend.entries())
-        .map(([projectNr, data]) => ({
-          name: projectNr.substring(0, 15),
-          commitments: data.commitments,
-          actuals: data.actuals,
-          variance: data.actuals - data.commitments,
-          variance_percentage: data.commitments > 0 
-            ? ((data.actuals - data.commitments) / data.commitments * 100) 
-            : 0,
-          spend_percentage: data.commitments > 0 
-            ? (data.actuals / data.commitments * 100) 
-            : 0
+      const projectPerformanceData = topProjectEntries
+        .map(({ projectNr, commitments, actuals }) => ({
+          name: projectNr.length > 15 ? projectNr.substring(0, 15) + '…' : projectNr,
+          commitments,
+          actuals,
+          variance: actuals - commitments,
+          variance_percentage: commitments > 0 ? ((actuals - commitments) / commitments * 100) : 0,
+          spend_percentage: commitments > 0 ? (actuals / commitments * 100) : 0
         }))
         .sort((a, b) => Math.abs(b.variance_percentage) - Math.abs(a.variance_percentage))
 
-      // 3. Status distribution (calculate on ALL projects, not just top 10)
-      const withinBudget = projectPerformanceData.filter(p => 
-        p.spend_percentage > 50 && p.spend_percentage <= 100
-      ).length
-      const overBudget = projectPerformanceData.filter(p => 
-        p.spend_percentage > 100
-      ).length
-      const underUtilized = projectPerformanceData.filter(p => 
-        p.spend_percentage <= 50
-      ).length
+      const withinBudget = projectPerformanceData.filter(p => p.spend_percentage > 50 && p.spend_percentage <= 100).length
+      const overBudget = projectPerformanceData.filter(p => p.spend_percentage > 100).length
+      const underUtilized = projectPerformanceData.filter(p => p.spend_percentage <= 50).length
 
       const statusDistribution = [
         { name: 'Within Budget', value: withinBudget, color: '#10B981' },
@@ -203,7 +193,7 @@ export function useCommitmentsActualsData({
 
       setAnalytics({
         categoryData,
-        projectPerformanceData: projectPerformanceData.slice(0, 10), // Top 10 for display
+        projectPerformanceData, // all top projects (Overview uses paging)
         statusDistribution
       })
     } catch (err) {

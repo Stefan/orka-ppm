@@ -1,26 +1,36 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, ComposedChart } from 'recharts'
 import { ComprehensiveFinancialReport } from '../../types'
-import { useCommitmentsActualsTrends } from '../../hooks/useCommitmentsActualsTrends'
+import type { MonthlyTrendData, TrendsSummary } from '../../hooks/useCommitmentsActualsTrends'
 import { useTranslations } from '../../../../lib/i18n/context'
+
+const FORECAST_PAGE_SIZE = 12
 
 interface TrendsViewProps {
   comprehensiveReport: ComprehensiveFinancialReport | null
   selectedCurrency: string
   accessToken?: string
+  monthlyData?: MonthlyTrendData[]
+  trendsSummary?: TrendsSummary | null
+  trendsLoading?: boolean
 }
 
-export default function TrendsView({ 
-  comprehensiveReport, 
+export default function TrendsView({
+  comprehensiveReport,
   selectedCurrency,
-  accessToken 
+  accessToken,
+  monthlyData: monthlyDataProp = [],
+  trendsSummary: summary = null,
+  trendsLoading: loading = false
 }: TrendsViewProps) {
   const { t } = useTranslations()
   const [timeRange, setTimeRange] = useState<'12' | '24' | '36' | 'all'>('24')
-  
-  // Dark mode detection for Recharts tooltips
+  const [forecastPage, setForecastPage] = useState(0)
+  const monthlyData = monthlyDataProp
+
   const [isDark, setIsDark] = useState(false)
   useEffect(() => {
     const checkDarkMode = () => setIsDark(document.documentElement.classList.contains('dark'))
@@ -30,15 +40,19 @@ export default function TrendsView({
     return () => observer.disconnect()
   }, [])
 
-  const tooltipStyle = isDark 
+  const tooltipStyle = isDark
     ? { backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f1f5f9' }
     : { backgroundColor: '#ffffff', border: '1px solid #e5e7eb', color: '#111827' }
-  
-  const { monthlyData, summary, loading } = useCommitmentsActualsTrends({
-    accessToken,
-    selectedCurrency,
-    deferMs: 150
-  })
+
+  // Filter data based on selected time range (compute before any early return so hooks can depend on it)
+  const filteredData = timeRange === 'all'
+    ? monthlyData
+    : monthlyData.slice(-parseInt(timeRange))
+
+  // Reset pagination when time range or data length changes (must run before any conditional return)
+  useEffect(() => {
+    setForecastPage(0)
+  }, [timeRange, filteredData.length])
 
   if (loading) {
     return (
@@ -58,10 +72,12 @@ export default function TrendsView({
     )
   }
 
-  // Filter data based on selected time range
-  const filteredData = timeRange === 'all' 
-    ? monthlyData 
-    : monthlyData.slice(-parseInt(timeRange))
+  // Pagination for forecast/trend charts
+  const totalForecastPages = Math.max(1, Math.ceil(filteredData.length / FORECAST_PAGE_SIZE))
+  const paginatedFiltered = filteredData.slice(
+    forecastPage * FORECAST_PAGE_SIZE,
+    (forecastPage + 1) * FORECAST_PAGE_SIZE
+  )
 
   // Format month for display (YYYY-MM -> MMM YYYY)
   const formatMonth = (month: string) => {
@@ -69,15 +85,19 @@ export default function TrendsView({
     return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
   }
 
-  const chartData = filteredData.map(m => ({
-    month: formatMonth(m.month),
-    commitments: m.commitments,
-    actuals: m.actuals,
-    cumulativeCommitments: m.cumulativeCommitments,
-    cumulativeActuals: m.cumulativeActuals,
-    variance: m.variance,
-    spendRate: m.spendRate
-  }))
+  const chartData = paginatedFiltered.map(m => {
+    const idx = filteredData.findIndex(d => d.month === m.month)
+    const full = filteredData[idx]
+    return {
+      month: formatMonth(m.month),
+      commitments: m.commitments,
+      actuals: m.actuals,
+      cumulativeCommitments: full?.cumulativeCommitments ?? m.cumulativeCommitments,
+      cumulativeActuals: full?.cumulativeActuals ?? m.cumulativeActuals,
+      variance: m.variance,
+      spendRate: m.spendRate
+    }
+  })
 
   return (
     <div className="w-full max-w-full space-y-4">
@@ -246,7 +266,7 @@ export default function TrendsView({
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-base font-semibold text-gray-900 dark:text-slate-100">{t('financials.cumulativeTrend')}</h3>
             <div className="text-xs text-gray-700 dark:text-slate-300 truncate ml-2">
-              {formatMonth(filteredData[0].month)} – {formatMonth(filteredData[filteredData.length - 1].month)}
+              {paginatedFiltered.length ? `${formatMonth(paginatedFiltered[0].month)} – ${formatMonth(paginatedFiltered[paginatedFiltered.length - 1].month)}` : ''}
             </div>
           </div>
           <ResponsiveContainer width="100%" height={300}>
@@ -284,6 +304,32 @@ export default function TrendsView({
         </ResponsiveContainer>
         </div>
       </div>
+
+      {totalForecastPages > 1 && (
+        <div className="flex items-center justify-between px-2 py-2 rounded-lg bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-600">
+          <span className="text-sm text-gray-600 dark:text-slate-400">
+            {t('financials.months')} {forecastPage * FORECAST_PAGE_SIZE + 1}–{Math.min((forecastPage + 1) * FORECAST_PAGE_SIZE, filteredData.length)} of {filteredData.length} (page {forecastPage + 1} of {totalForecastPages})
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setForecastPage(p => Math.max(0, p - 1))}
+              disabled={forecastPage === 0}
+              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-slate-700"
+            >
+              <ChevronLeft className="h-4 w-4" /> {t('financials.previous') ?? 'Previous'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setForecastPage(p => Math.min(totalForecastPages - 1, p + 1))}
+              disabled={forecastPage >= totalForecastPages - 1}
+              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-slate-700"
+            >
+              {t('financials.next') ?? 'Next'} <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Variance Trend */}
       <div className="bg-white dark:bg-slate-800 p-3 xl:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">

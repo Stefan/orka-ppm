@@ -2,6 +2,7 @@
 // Handles all data access for projects, commitments, and actuals
 
 import { supabase } from '@/lib/api/supabase-minimal'
+import { getApiUrl } from '@/lib/api'
 import {
   Project,
   Commitment,
@@ -52,24 +53,22 @@ export async function fetchProjectsWithFinancials(): Promise<ProjectWithFinancia
       return []
     }
 
-    // Fetch all commitments
-    const { data: commitments, error: commitmentsError } = await supabase
-      .from('commitments')
-      .select('*')
-      .in('project_id', projects.map(p => p.id))
+    const projectIds = projects.map(p => p.id)
+    // Chunk project_id list to avoid 400 Bad Request from URL length limits (PostgREST/Supabase)
+    const CHUNK = 80
+    let commitments: any[] = []
+    let actuals: any[] = []
 
-    if (commitmentsError) {
-      console.warn('Failed to fetch commitments:', commitmentsError.message)
-    }
-
-    // Fetch all actuals
-    const { data: actuals, error: actualsError } = await supabase
-      .from('actuals')
-      .select('*')
-      .in('project_id', projects.map(p => p.id))
-
-    if (actualsError) {
-      console.warn('Failed to fetch actuals:', actualsError.message)
+    for (let i = 0; i < projectIds.length; i += CHUNK) {
+      const chunk = projectIds.slice(i, i + CHUNK)
+      const [cRes, aRes] = await Promise.all([
+        supabase.from('commitments').select('*').in('project_id', chunk),
+        supabase.from('actuals').select('*').in('project_id', chunk)
+      ])
+      if (!cRes.error) commitments = commitments.concat(cRes.data ?? [])
+      else if (i === 0) console.warn('Failed to fetch commitments:', cRes.error.message)
+      if (!aRes.error) actuals = actuals.concat(aRes.data ?? [])
+      else if (i === 0) console.warn('Failed to fetch actuals:', aRes.error.message)
     }
 
     // Group commitments and actuals by project
@@ -107,6 +106,113 @@ export async function fetchProjectsWithFinancials(): Promise<ProjectWithFinancia
       error instanceof Error ? error.message : String(error)
     )
   }
+}
+
+/**
+ * Fetches projects with financials from the backend API (commitments/actuals).
+ * Use this when direct Supabase returns empty financials (e.g. RLS or no data).
+ * Requires access token.
+ */
+export async function fetchProjectsWithFinancialsFromApi(
+  accessToken: string
+): Promise<ProjectWithFinancials[]> {
+  const limit = 5000
+  const [projectsRes, commitmentsRes, actualsRes] = await Promise.all([
+    fetch(
+      typeof window !== 'undefined' ? '/api/projects' : getApiUrl('/projects'),
+      { headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' } }
+    ),
+    fetch(getApiUrl(`/csv-import/commitments?limit=${limit}&count_exact=false`), {
+      headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' }
+    }),
+    fetch(getApiUrl(`/csv-import/actuals?limit=${limit}&count_exact=false`), {
+      headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' }
+    })
+  ])
+
+  if (!projectsRes.ok) return []
+  const projectsData = await projectsRes.json()
+  const projectList = Array.isArray(projectsData) ? projectsData : (projectsData?.items ?? projectsData?.projects ?? [])
+
+  const commitmentsData = commitmentsRes.ok ? await commitmentsRes.json() : { commitments: [] }
+  const actualsData = actualsRes.ok ? await actualsRes.json() : { actuals: [] }
+  const commitmentsRows = commitmentsData.commitments ?? []
+  const actualsRows = actualsData.actuals ?? []
+
+  const commitmentsByProject = new Map<string, Commitment[]>()
+  for (let i = 0; i < commitmentsRows.length; i++) {
+    const row = commitmentsRows[i] as Record<string, unknown>
+    const projectId = String(row.project_id ?? row.project_nr ?? '')
+    if (!projectId) continue
+    const amount = Number(row.total_amount ?? row.po_net_amount ?? 0)
+    const existing = commitmentsByProject.get(projectId) ?? []
+    existing.push({
+      id: String(row.id ?? `c-${i}`),
+      project_id: projectId,
+      po_number: String(row.po_number ?? ''),
+      vendor_id: '',
+      vendor_name: String(row.vendor ?? row.vendor_name ?? ''),
+      description: String(row.vendor_description ?? row.wbs_element ?? ''),
+      amount,
+      currency: mapToCurrency(row.currency as string),
+      status: POStatus.APPROVED,
+      issue_date: typeof row.po_date === 'string' ? row.po_date : String(row.created_at ?? ''),
+      created_at: String(row.created_at ?? ''),
+      updated_at: String(row.updated_at ?? row.created_at ?? '')
+    })
+    commitmentsByProject.set(projectId, existing)
+  }
+
+  const actualsByProject = new Map<string, Actual[]>()
+  for (let i = 0; i < actualsRows.length; i++) {
+    const row = actualsRows[i] as Record<string, unknown>
+    const projectId = String(row.project_id ?? row.project_nr ?? '')
+    if (!projectId) continue
+    const amount = Number(row.invoice_amount ?? row.amount ?? 0)
+    const existing = actualsByProject.get(projectId) ?? []
+    existing.push({
+      id: String(row.id ?? `a-${i}`),
+      project_id: projectId,
+      vendor_id: '',
+      vendor_name: String(row.vendor ?? ''),
+      description: String(row.wbs ?? row.description ?? ''),
+      amount,
+      currency: mapToCurrency(row.currency as string),
+      status: ActualStatus.APPROVED,
+      invoice_date: typeof row.invoice_date === 'string' ? row.invoice_date : String(row.created_at ?? ''),
+      created_at: String(row.created_at ?? ''),
+      updated_at: String(row.updated_at ?? row.created_at ?? '')
+    })
+    actualsByProject.set(projectId, existing)
+  }
+
+  const projectIdToNr = new Map<string, string>()
+  projectList.forEach((p: Record<string, unknown>) => {
+    const id = String(p.id ?? '')
+    const name = String(p.name ?? '')
+    projectIdToNr.set(id, id)
+    if (name && !projectIdToNr.has(name)) projectIdToNr.set(name, id)
+  })
+
+  return projectList.map((row: Record<string, unknown>) => {
+    const id = String(row.id ?? '')
+    const name = String(row.name ?? '')
+    const project: Project = {
+      id,
+      name,
+      description: row.description as string | undefined,
+      status: mapToProjectStatus(row.status as string),
+      budget: Number(row.budget ?? 0),
+      currency: mapToCurrency(row.currency as string),
+      start_date: String(row.start_date ?? ''),
+      end_date: String(row.end_date ?? ''),
+      created_at: String(row.created_at ?? ''),
+      updated_at: String(row.updated_at ?? '')
+    }
+    const projectCommitments = commitmentsByProject.get(id) ?? commitmentsByProject.get(name) ?? []
+    const projectActuals = actualsByProject.get(id) ?? actualsByProject.get(name) ?? []
+    return enrichProjectWithFinancials(project, projectCommitments, projectActuals)
+  })
 }
 
 /**

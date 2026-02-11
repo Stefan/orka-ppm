@@ -492,7 +492,6 @@ test.describe('Financials Page Structure - Detailed Tests', () => {
       'financials-analysis-view',
       'financials-trends-view',
       'financials-detailed-view',
-      'financials-csv-import-view',
       'financials-po-breakdown-view',
       'financials-commitments-actuals-view',
     ];

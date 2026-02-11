@@ -10,7 +10,7 @@ for PO breakdown management with Supabase integration.
 import logging
 from datetime import datetime
 from decimal import Decimal, ROUND_HALF_UP
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional, Tuple, Union
 from uuid import UUID, uuid4
 
 from supabase import Client

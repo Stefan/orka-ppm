@@ -286,6 +286,9 @@ export async function fetchCommentCount(projectId: string): Promise<number> {
   return mockComments.filter(c => c.project_id === projectId).length
 }
 
+/** Chunk size for .in() queries to stay under URL length limits (PostgREST/Supabase) */
+const COMMENTS_BATCH_CHUNK = 80
+
 /**
  * Fetch comments count for multiple projects
  */
@@ -298,17 +301,20 @@ export async function fetchCommentsCountBatch(
   const auth = await getSupabaseAuth()
   if (auth) {
     try {
-      const { data, error } = await auth.supabase
-        .from('costbook_comments')
-        .select('project_id')
-        .in('project_id', projectIds)
-      if (!error && data) {
-        for (const pid of projectIds) counts.set(pid, 0)
-        for (const row of data as { project_id: string }[]) {
-          counts.set(row.project_id, (counts.get(row.project_id) ?? 0) + 1)
+      for (const pid of projectIds) counts.set(pid, 0)
+      for (let i = 0; i < projectIds.length; i += COMMENTS_BATCH_CHUNK) {
+        const chunk = projectIds.slice(i, i + COMMENTS_BATCH_CHUNK)
+        const { data, error } = await auth.supabase
+          .from('costbook_comments')
+          .select('project_id')
+          .in('project_id', chunk)
+        if (!error && data) {
+          for (const row of data as { project_id: string }[]) {
+            counts.set(row.project_id, (counts.get(row.project_id) ?? 0) + 1)
+          }
         }
-        return counts
       }
+      return counts
     } catch {
       // fall through to mock
     }

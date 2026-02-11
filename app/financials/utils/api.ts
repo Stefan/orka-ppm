@@ -52,14 +52,12 @@ export async function fetchProjects(accessToken: string, portfolioId?: string | 
     const err = error instanceof Error ? error : new Error(error != null && typeof error === 'object' && 'message' in error ? String((error as Error).message) : String(error))
     const msg = err.message.toLowerCase()
     if (err.name === 'AbortError' || msg.includes('aborted')) {
-      console.warn('⏰ REQUEST TIMEOUT: Projects request timed out. Using mock data.')
-      return getMockProjects()
+      console.warn('⏰ REQUEST TIMEOUT: Projects request timed out.')
+    } else if ((err.name === 'TypeError' && msg.includes('fetch')) || msg === 'failed to fetch') {
+      console.warn('🚨 NETWORK ERROR: Backend not reachable.')
+    } else {
+      console.error('Failed to fetch projects:', err)
     }
-    if ((err.name === 'TypeError' && msg.includes('fetch')) || msg === 'failed to fetch') {
-      console.warn('🚨 NETWORK ERROR: Backend not reachable. Using mock data.')
-      return getMockProjects()
-    }
-    console.error('Failed to fetch projects:', err)
     return []
   }
 }
@@ -139,13 +137,18 @@ export async function fetchFinancialAlerts(accessToken: string): Promise<Financi
     if (response.ok) {
       const data = await response.json()
       if (isDev) console.log('Financial alerts data:', data)
-      // Handle both response formats
-      if (data.alerts) {
-        return data.alerts
-      } else if (Array.isArray(data)) {
-        return data
-      }
-      return []
+      // Handle both response formats; normalize backend shape (budget_amount, spent_amount, current_percentage) to FinancialAlert
+      const raw = data.alerts ?? (Array.isArray(data) ? data : [])
+      return raw.map((a: Record<string, unknown>) => ({
+        project_id: a.project_id ?? '',
+        project_name: a.project_name ?? '',
+        budget: Number(a.budget ?? a.budget_amount ?? 0),
+        actual_cost: Number(a.actual_cost ?? a.spent_amount ?? 0),
+        utilization_percentage: Number(a.utilization_percentage ?? a.current_percentage ?? 0),
+        variance_amount: Number(a.variance_amount ?? a.variance ?? 0),
+        alert_level: (a.alert_level === 'critical' ? 'critical' : 'warning') as 'warning' | 'critical',
+        message: typeof a.message === 'string' ? a.message : `Budget utilization at ${Number(a.current_percentage ?? a.utilization_percentage ?? 0).toFixed(1)}%`
+      })) as FinancialAlert[]
     } else {
       console.error('Financial alerts request failed:', response.status, response.statusText)
       try {
@@ -160,84 +163,14 @@ export async function fetchFinancialAlerts(accessToken: string): Promise<Financi
     const err = error instanceof Error ? error : new Error(error != null && typeof error === 'object' && 'message' in error ? String((error as Error).message) : String(error))
     const msg = err.message.toLowerCase()
     if (err.name === 'AbortError' || msg.includes('aborted')) {
-      console.warn('⏰ REQUEST TIMEOUT: Financial alerts timed out. Using mock data.')
-      return getMockFinancialAlerts()
+      console.warn('⏰ REQUEST TIMEOUT: Financial alerts timed out.')
+    } else if ((err.name === 'TypeError' && msg.includes('fetch')) || msg === 'failed to fetch') {
+      console.warn('🚨 NETWORK ERROR: Backend not reachable.')
+    } else {
+      console.error('Failed to fetch financial alerts:', err)
     }
-    if ((err.name === 'TypeError' && msg.includes('fetch')) || msg === 'failed to fetch') {
-      console.warn('🚨 NETWORK ERROR: Backend not reachable. Using mock data.')
-      return getMockFinancialAlerts()
-    }
-    console.error('Failed to fetch financial alerts:', err)
     return []
   }
-}
-
-/**
- * Mock projects for development when backend is not available
- */
-function getMockProjects(): Project[] {
-  return [
-    {
-      id: 'mock-project-1',
-      name: 'Project Alpha',
-      budget: 50000,
-      actual_cost: 45000,
-      status: 'active',
-      health: 'yellow'
-    },
-    {
-      id: 'mock-project-2',
-      name: 'Project Beta',
-      budget: 75000,
-      actual_cost: 78000,
-      status: 'active',
-      health: 'red'
-    },
-    {
-      id: 'mock-project-3',
-      name: 'Project Gamma',
-      budget: 30000,
-      actual_cost: 25000,
-      status: 'active',
-      health: 'green'
-    },
-    {
-      id: 'mock-project-4',
-      name: 'Project Delta',
-      budget: 100000,
-      actual_cost: null,
-      status: 'planning',
-      health: 'green'
-    }
-  ]
-}
-
-/**
- * Mock financial alerts for development when backend is not available
- */
-function getMockFinancialAlerts(): FinancialAlert[] {
-  return [
-    {
-      project_id: 'mock-project-1',
-      project_name: 'Project Alpha',
-      budget: 50000,
-      actual_cost: 45000,
-      utilization_percentage: 90,
-      variance_amount: -5000,
-      alert_level: 'warning',
-      message: 'Budget utilization approaching 90% threshold'
-    },
-    {
-      project_id: 'mock-project-2',
-      project_name: 'Project Beta',
-      budget: 75000,
-      actual_cost: 78000,
-      utilization_percentage: 104,
-      variance_amount: 3000,
-      alert_level: 'critical',
-      message: 'Project is over budget by 4%'
-    }
-  ]
 }
 
 export async function fetchComprehensiveReport(

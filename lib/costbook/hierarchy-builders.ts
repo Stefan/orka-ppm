@@ -5,60 +5,72 @@ import { Commitment, HierarchyNode, Currency } from '@/types/costbook'
 import { roundToDecimal } from '../costbook-calculations'
 
 /**
- * Builds a CES (Cost Element Structure) hierarchy from commitments
- * Groups commitments by cost center and GL account
+ * Builds a CES (Cost Element Structure) hierarchy from commitments.
+ * Structure: Project → Cost category → Vendor (so vendors are grouped by project and category, not one flat list).
+ * @param projectNames optional map project_id → project name for root labels
  */
 export function buildCESHierarchy(
   commitments: Commitment[],
-  currency: Currency
+  currency: Currency,
+  projectNames?: Record<string, string>
 ): HierarchyNode[] {
-  // Group by a cost element structure (simulated)
-  // In real implementation, this would use actual CES data
-  const rootNodes: Map<string, HierarchyNode> = new Map()
+  // Level 0: Project, Level 1: Category (cost element), Level 2: Vendor
+  const projectNodes: Map<string, HierarchyNode> = new Map()
 
   commitments.forEach(commitment => {
-    // Extract category from description or use default
-    const category = extractCategory(commitment.description) || 'General'
-    
-    if (!rootNodes.has(category)) {
-      rootNodes.set(category, {
-        id: `ces-${category.toLowerCase().replace(/\s+/g, '-')}`,
-        name: category,
+    const projectId = commitment.project_id || 'unknown'
+    const projectLabel = projectNames?.[projectId] ?? projectId
+
+    if (!projectNodes.has(projectId)) {
+      projectNodes.set(projectId, {
+        id: `ces-project-${projectId}`,
+        name: projectLabel,
         level: 0,
         total_budget: 0,
-        total_spend: commitment.amount,
+        total_spend: 0,
         variance: 0,
         children: []
       })
     }
+    const projectNode = projectNodes.get(projectId)!
+    projectNode.total_spend += commitment.amount
 
-    const rootNode = rootNodes.get(category)!
-    rootNode.total_spend += commitment.amount
-
-    // Create child node for vendor
-    let vendorNode = rootNode.children.find(c => c.name === commitment.vendor_name)
-    
-    if (!vendorNode) {
-      vendorNode = {
-        id: `ces-${category.toLowerCase()}-${commitment.vendor_id}`,
-        name: commitment.vendor_name,
+    const category = extractCategory(commitment.description) || 'General'
+    let categoryNode = projectNode.children.find(c => c.name === category)
+    if (!categoryNode) {
+      categoryNode = {
+        id: `ces-${projectId}-${category.toLowerCase().replace(/\s+/g, '-')}`,
+        name: category,
         level: 1,
-        parent_id: rootNode.id,
+        parent_id: projectNode.id,
         total_budget: 0,
         total_spend: 0,
         variance: 0,
         children: []
       }
-      rootNode.children.push(vendorNode)
+      projectNode.children.push(categoryNode)
     }
+    categoryNode.total_spend += commitment.amount
 
+    let vendorNode = categoryNode.children.find(c => c.name === commitment.vendor_name)
+    if (!vendorNode) {
+      vendorNode = {
+        id: `ces-${projectId}-${category.toLowerCase()}-${commitment.vendor_id}`,
+        name: commitment.vendor_name,
+        level: 2,
+        parent_id: categoryNode.id,
+        total_budget: 0,
+        total_spend: 0,
+        variance: 0,
+        children: []
+      }
+      categoryNode.children.push(vendorNode)
+    }
     vendorNode.total_spend += commitment.amount
   })
 
-  // Calculate variances
-  const result = Array.from(rootNodes.values())
+  const result = Array.from(projectNodes.values())
   result.forEach(calculateVariances)
-
   return result
 }
 

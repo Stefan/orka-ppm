@@ -1,12 +1,21 @@
 """
-Anonymizer Service for Import Actuals and Commitments
+Anonymizer Service for Import Actuals, Commitments, and Projects
 
 This service anonymizes sensitive information in financial data imports,
 replacing vendor names, project numbers, personnel numbers, and descriptive
 text with generic placeholders while maintaining referential integrity.
+
+- Project numbers use deterministic hashing so that the same project_nr
+  always maps to the same Pxxxx across project import and commitments/actuals
+  import (enables correct linking).
+- Amounts are obfuscated by a per-session scale factor so they are not
+  traceable but ratios and totals remain meaningful in PPM context.
 """
 
-from typing import Dict, Any
+import hashlib
+import random
+from datetime import date, timedelta
+from typing import Dict, Any, Optional
 
 
 class AnonymizerService:
@@ -26,14 +35,18 @@ class AnonymizerService:
     - Document types
     """
     
-    def __init__(self):
-        """Initialize anonymizer with empty mapping dictionaries."""
+    def __init__(self, amount_factor: Optional[float] = None, date_days_shift: Optional[int] = None):
+        """Initialize anonymizer with empty mapping dictionaries and optional obfuscation parameters."""
         self.vendor_map: Dict[str, str] = {}
         self.project_map: Dict[str, str] = {}
         self.personnel_map: Dict[str, str] = {}
         self.vendor_counter = 0
         self.project_counter = 0
         self.personnel_counter = 0
+        # Per-session amount obfuscation: scale factor so amounts are not traceable but ratios stay meaningful
+        self._amount_factor: float = amount_factor if amount_factor is not None else round(random.uniform(0.82, 1.18), 4)
+        # Optional date shift (days) so dates are not traceable
+        self._date_days_shift: int = date_days_shift if date_days_shift is not None else random.randint(-200, 200)
         
         # Generic descriptions for anonymization
         self.generic_descriptions = {
@@ -132,35 +145,36 @@ class AnonymizerService:
         
         return self.vendor_map[vendor]
     
+    def _project_nr_deterministic(self, project_nr: str) -> str:
+        """
+        Map project number to P0001–P9999 deterministically (same input → same output across imports).
+        Ensures projects and commitments/actuals link correctly when both are anonymized.
+        """
+        normalized = (project_nr or "").strip()
+        if not normalized:
+            return project_nr or ""
+        h = hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+        slot = (int(h[:8], 16) % 9999) + 1
+        return f"P{slot:04d}"
+
     def anonymize_project_nr(self, project_nr: str) -> str:
         """
-        Replace project number with fictitious format.
+        Replace project number with fictitious format (deterministic).
         
-        Uses format P0001, P0002, P0003, etc.
-        Maintains consistent mapping within import session.
+        Same project_nr always maps to the same Pxxxx so that project import and
+        commitments/actuals import stay linked (projects.name and commitment/actual
+        project_nr match after anonymization).
         
         Args:
             project_nr: Original project number
             
         Returns:
-            Anonymized project number (e.g., "P0001", "P0002")
-            
-        Example:
-            >>> anonymizer = AnonymizerService()
-            >>> anonymizer.anonymize_project_nr("PRJ-2024-001")
-            "P0001"
-            >>> anonymizer.anonymize_project_nr("PRJ-2024-001")
-            "P0001"
-            >>> anonymizer.anonymize_project_nr("PRJ-2024-002")
-            "P0002"
+            Anonymized project number (e.g., "P0042", "P1234")
         """
         if not project_nr:
             return project_nr
-            
         if project_nr not in self.project_map:
-            self.project_counter += 1
-            self.project_map[project_nr] = f"P{self.project_counter:04d}"
-        
+            self.project_map[project_nr] = self._project_nr_deterministic(project_nr)
         return self.project_map[project_nr]
     
     def anonymize_personnel(self, personnel_nr: str) -> str:
@@ -239,7 +253,58 @@ class AnonymizerService:
         self.description_counters[category] += 1
         
         return description
-    
+
+    def obfuscate_amount(self, value: Optional[float]) -> Optional[float]:
+        """
+        Scale monetary values so they are not traceable but ratios remain meaningful.
+        Uses a per-session factor (set at init). None and zero are preserved.
+        """
+        if value is None:
+            return None
+        try:
+            v = float(value)
+            if v == 0:
+                return 0.0
+            return round(v * self._amount_factor, 2)
+        except (TypeError, ValueError):
+            return value
+
+    def obfuscate_date(self, d: Optional[date]) -> Optional[date]:
+        """Shift date by session offset so dates are not traceable."""
+        if d is None:
+            return None
+        if isinstance(d, str):
+            try:
+                d = date.fromisoformat(d[:10])
+            except (ValueError, TypeError):
+                return d
+        return d + timedelta(days=self._date_days_shift)
+
+    def anonymize_project(self, project: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Anonymize a project record for project import.
+        
+        - name: Replaced with deterministic Pxxxx (same as project_nr in commitments/actuals).
+        - description: Replaced with generic project description.
+        - budget: Obfuscated with session amount factor.
+        - start_date / end_date: Optional shift by session offset (if obfuscation desired).
+        
+        Other fields (portfolio_id, status, priority, manager_id, etc.) are preserved.
+        """
+        out = dict(project)
+        name = (project.get("name") or "").strip()
+        if name:
+            out["name"] = self._project_nr_deterministic(name)
+        if project.get("description"):
+            out["description"] = self.get_generic_description("project", project.get("description"))
+        if project.get("budget") is not None:
+            out["budget"] = self.obfuscate_amount(float(project["budget"]))
+        if project.get("start_date"):
+            out["start_date"] = self.obfuscate_date(project["start_date"])
+        if project.get("end_date"):
+            out["end_date"] = self.obfuscate_date(project["end_date"])
+        return out
+
     def anonymize_actual(self, record: Dict[str, Any]) -> Dict[str, Any]:
         """
         Anonymize a single actual record.
@@ -282,6 +347,11 @@ class AnonymizerService:
         # Anonymize item text (if present and not empty)
         if "item_text" in anonymized and anonymized["item_text"]:
             anonymized["item_text"] = self.anonymize_text(anonymized["item_text"])
+        
+        # Obfuscate amounts so they are not traceable but ratios remain meaningful
+        for key in ("amount", "value_in_document_currency", "tax_amount"):
+            if key in anonymized and anonymized[key] is not None:
+                anonymized[key] = self.obfuscate_amount(anonymized[key])
         
         return anonymized
     
@@ -361,5 +431,10 @@ class AnonymizerService:
         # Anonymize PO created by
         if "po_created_by" in anonymized and anonymized["po_created_by"]:
             anonymized["po_created_by"] = self.anonymize_personnel(anonymized["po_created_by"])
+        
+        # Obfuscate amounts so they are not traceable but ratios remain meaningful
+        for key in ("po_net_amount", "total_amount", "tax_amount", "value_in_document_currency"):
+            if key in anonymized and anonymized[key] is not None:
+                anonymized[key] = self.obfuscate_amount(anonymized[key])
         
         return anonymized

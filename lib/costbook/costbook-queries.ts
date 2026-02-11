@@ -10,12 +10,9 @@ import {
   fetchAllCommitments,
   fetchAllActuals,
   createCommitment,
-  createActual,
-  getMockProjectsWithFinancials,
-  getMockCommitments,
-  getMockActuals
+  createActual
 } from './supabase-queries'
-import { fetchTransactionsWithPOJoin, getMockTransactions, TransactionFilters } from './transaction-queries'
+import { fetchTransactionsWithPOJoin, TransactionFilters } from './transaction-queries'
 import { ProjectWithFinancials, Commitment, Actual, Transaction, Currency } from '@/types/costbook'
 import { calculateKPIs } from '@/lib/costbook-calculations'
 import { convertCurrency } from '@/lib/currency-utils'
@@ -31,22 +28,14 @@ const DEFAULT_CACHE_TIME = 30 * 60 * 1000 // 30 minutes
  * Hook to fetch all projects with financial data
  */
 export function useProjectsWithFinancials(options?: {
-  useMockData?: boolean
   enabled?: boolean
   staleTime?: number
 }) {
-  const { useMockData = false, enabled = true, staleTime = DEFAULT_STALE_TIME } = options || {}
+  const { enabled = true, staleTime = DEFAULT_STALE_TIME } = options || {}
 
   return useQuery({
     queryKey: costbookKeys.projectsWithFinancials(),
-    queryFn: async () => {
-      if (useMockData) {
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 300))
-        return getMockProjectsWithFinancials()
-      }
-      return fetchProjectsWithFinancials()
-    },
+    queryFn: () => fetchProjectsWithFinancials(),
     enabled,
     staleTime,
     gcTime: DEFAULT_CACHE_TIME
@@ -59,22 +48,14 @@ export function useProjectsWithFinancials(options?: {
 export function useProjectWithFinancials(
   projectId: string,
   options?: {
-    useMockData?: boolean
     enabled?: boolean
   }
 ) {
-  const { useMockData = false, enabled = true } = options || {}
+  const { enabled = true } = options || {}
 
   return useQuery({
     queryKey: costbookKeys.project(projectId),
-    queryFn: async () => {
-      if (useMockData) {
-        await new Promise(resolve => setTimeout(resolve, 200))
-        const projects = getMockProjectsWithFinancials()
-        return projects.find(p => p.id === projectId) || null
-      }
-      return fetchProjectWithFinancials(projectId)
-    },
+    queryFn: () => fetchProjectWithFinancials(projectId),
     enabled: enabled && !!projectId,
     staleTime: DEFAULT_STALE_TIME,
     gcTime: DEFAULT_CACHE_TIME
@@ -87,21 +68,14 @@ export function useProjectWithFinancials(
 export function useCommitmentsByProject(
   projectId: string,
   options?: {
-    useMockData?: boolean
     enabled?: boolean
   }
 ) {
-  const { useMockData = false, enabled = true } = options || {}
+  const { enabled = true } = options || {}
 
   return useQuery({
     queryKey: costbookKeys.commitmentsByProject(projectId),
-    queryFn: async () => {
-      if (useMockData) {
-        await new Promise(resolve => setTimeout(resolve, 200))
-        return getMockCommitments().filter(c => c.project_id === projectId)
-      }
-      return fetchCommitmentsByProject(projectId)
-    },
+    queryFn: () => fetchCommitmentsByProject(projectId),
     enabled: enabled && !!projectId,
     staleTime: DEFAULT_STALE_TIME,
     gcTime: DEFAULT_CACHE_TIME
@@ -114,21 +88,14 @@ export function useCommitmentsByProject(
 export function useActualsByProject(
   projectId: string,
   options?: {
-    useMockData?: boolean
     enabled?: boolean
   }
 ) {
-  const { useMockData = false, enabled = true } = options || {}
+  const { enabled = true } = options || {}
 
   return useQuery({
     queryKey: costbookKeys.actualsByProject(projectId),
-    queryFn: async () => {
-      if (useMockData) {
-        await new Promise(resolve => setTimeout(resolve, 200))
-        return getMockActuals().filter(a => a.project_id === projectId)
-      }
-      return fetchActualsByProject(projectId)
-    },
+    queryFn: () => fetchActualsByProject(projectId),
     enabled: enabled && !!projectId,
     staleTime: DEFAULT_STALE_TIME,
     gcTime: DEFAULT_CACHE_TIME
@@ -139,20 +106,13 @@ export function useActualsByProject(
  * Hook to fetch all commitments
  */
 export function useAllCommitments(options?: {
-  useMockData?: boolean
   enabled?: boolean
 }) {
-  const { useMockData = false, enabled = true } = options || {}
+  const { enabled = true } = options || {}
 
   return useQuery({
     queryKey: costbookKeys.commitments(),
-    queryFn: async () => {
-      if (useMockData) {
-        await new Promise(resolve => setTimeout(resolve, 300))
-        return getMockCommitments()
-      }
-      return fetchAllCommitments()
-    },
+    queryFn: () => fetchAllCommitments(),
     enabled,
     staleTime: DEFAULT_STALE_TIME,
     gcTime: DEFAULT_CACHE_TIME
@@ -163,20 +123,13 @@ export function useAllCommitments(options?: {
  * Hook to fetch all actuals
  */
 export function useAllActuals(options?: {
-  useMockData?: boolean
   enabled?: boolean
 }) {
-  const { useMockData = false, enabled = true } = options || {}
+  const { enabled = true } = options || {}
 
   return useQuery({
     queryKey: costbookKeys.actuals(),
-    queryFn: async () => {
-      if (useMockData) {
-        await new Promise(resolve => setTimeout(resolve, 300))
-        return getMockActuals()
-      }
-      return fetchAllActuals()
-    },
+    queryFn: () => fetchAllActuals(),
     enabled,
     staleTime: DEFAULT_STALE_TIME,
     gcTime: DEFAULT_CACHE_TIME
@@ -189,21 +142,14 @@ export function useAllActuals(options?: {
 export function useTransactions(
   filters?: TransactionFilters,
   options?: {
-    useMockData?: boolean
     enabled?: boolean
   }
 ) {
-  const { useMockData = false, enabled = true } = options || {}
+  const { enabled = true } = options || {}
 
   return useQuery({
     queryKey: costbookKeys.transactions(filters),
-    queryFn: async () => {
-      if (useMockData) {
-        await new Promise(resolve => setTimeout(resolve, 300))
-        return getMockTransactions()
-      }
-      return fetchTransactionsWithPOJoin(filters)
-    },
+    queryFn: () => fetchTransactionsWithPOJoin(filters),
     enabled,
     staleTime: DEFAULT_STALE_TIME,
     gcTime: DEFAULT_CACHE_TIME

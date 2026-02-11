@@ -1279,6 +1279,7 @@ export type TranslationKey =
   | 'financials.actualsData'
   | 'financials.actualsMinusCommitments'
   | 'financials.actualsVsCommitments'
+  | 'financials.amountFromDocumentCurrency'
   | 'financials.allAmountsIn'
   | 'financials.allLevels'
   | 'financials.allProjects'
@@ -2043,6 +2044,9 @@ export type TranslationKey =
   | 'settings.organization'
   | 'settings.organizationDescription'
   | 'settings.organizationTitle'
+  | 'settings.auditSection'
+  | 'settings.auditActualsCommitments'
+  | 'settings.auditActualsCommitmentsDesc'
   | 'settings.predictiveText'
   | 'settings.predictiveTextDesc'
   | 'settings.privacy'
@@ -3425,6 +3429,7 @@ export const ALL_TRANSLATION_KEYS: TranslationKey[] = [
   'financials.actualsData',
   'financials.actualsMinusCommitments',
   'financials.actualsVsCommitments',
+  'financials.amountFromDocumentCurrency',
   'financials.allAmountsIn',
   'financials.allLevels',
   'financials.allProjects',
@@ -4189,6 +4194,9 @@ export const ALL_TRANSLATION_KEYS: TranslationKey[] = [
   'settings.organization',
   'settings.organizationDescription',
   'settings.organizationTitle',
+  'settings.auditSection',
+  'settings.auditActualsCommitments',
+  'settings.auditActualsCommitmentsDesc',
   'settings.predictiveText',
   'settings.predictiveTextDesc',
   'settings.privacy',

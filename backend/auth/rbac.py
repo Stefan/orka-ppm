@@ -774,14 +774,27 @@ def require_super_admin():
 
 
 def require_org_admin_or_super():
-    """Dependency to require org_admin or super_admin (for 'my organization' endpoints)."""
+    """Dependency to require org_admin, admin, or super_admin (for 'my organization' endpoints).
+    DB and is_org_admin() use 'admin' for org-level admin; we accept org_admin and admin."""
     async def checker(current_user=Depends(get_current_user)):
         user_id = current_user.get("user_id")
         if not user_id:
             raise HTTPException(status_code=401, detail="Authentication required")
         roles = current_user.get("roles") or []
-        if "super_admin" not in roles and "org_admin" not in roles:
-            raise HTTPException(status_code=403, detail="Org-admin or super-admin required")
+        if "super_admin" not in roles and "org_admin" not in roles and "admin" not in roles:
+            # If roles were empty (e.g. JWT had no roles and bridge didn't run), try loading from DB once
+            try:
+                from uuid import UUID
+                from .supabase_rbac_bridge import get_supabase_rbac_bridge
+                bridge = get_supabase_rbac_bridge()
+                enhanced = await bridge.get_enhanced_user_info(UUID(user_id))
+                if enhanced:
+                    roles = enhanced.get("roles") or []
+                    current_user["roles"] = roles
+            except Exception:
+                pass
+            if "super_admin" not in roles and "org_admin" not in roles and "admin" not in roles:
+                raise HTTPException(status_code=403, detail="Org-admin or super-admin required")
         return current_user
     return checker
 

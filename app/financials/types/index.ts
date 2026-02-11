@@ -141,7 +141,7 @@ export interface CSVUploadResult {
   import_id: string
 }
 
-export type ViewMode = 'overview' | 'detailed' | 'trends' | 'analysis' | 'csv-import' | 'commitments-actuals' | 'po-breakdown' | 'costbook'
+export type ViewMode = 'overview' | 'detailed' | 'trends' | 'analysis' | 'commitments-actuals' | 'po-breakdown' | 'costbook'
 
 export interface AnalyticsData {
   budgetStatusData: Array<{

@@ -17,14 +17,14 @@ class ValidationService:
     Service for validating project data against business rules.
     
     Validation rules:
-    - Required fields must be present and non-empty
-    - Budget must be numeric
-    - Dates must be ISO 8601 format
+    - Required fields (name, status) must be present and non-empty
+    - Budget is optional; when provided must be numeric
+    - Dates must be ISO 8601 format when provided
     - Status must be in allowed values
     - Name must not duplicate existing project
     """
     
-    REQUIRED_FIELDS = ["name", "budget", "status"]
+    REQUIRED_FIELDS = ["name", "status"]
     VALID_STATUSES = [status.value for status in ProjectStatus]
     
     def __init__(self, db_client: Client):
@@ -45,9 +45,9 @@ class ValidationService:
         Validate a single project record.
         
         Validation rules:
-        - Required fields must be present and non-empty
-        - Budget must be numeric
-        - Dates must be ISO 8601 format
+        - Required fields (name, status) must be present and non-empty
+        - Budget is optional; when provided must be numeric
+        - Dates must be ISO 8601 format when provided
         - Status must be in allowed values
         - Name must not duplicate existing project
         
@@ -74,8 +74,8 @@ class ValidationService:
                 "error": f"Required field '{required_error}' is missing or empty"
             }
         
-        # Validate budget
-        if not self._validate_budget(project.budget):
+        # Validate budget only when provided (budget is optional)
+        if project.budget is not None and not self._validate_budget(project.budget):
             return {
                 "index": index,
                 "field": "budget",

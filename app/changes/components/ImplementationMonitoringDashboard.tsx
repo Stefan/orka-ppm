@@ -97,120 +97,23 @@ export default function ImplementationMonitoringDashboard({
   const [showLessonsModal, setShowLessonsModal] = useState(false)
   const [selectedLesson, setSelectedLesson] = useState<LessonsLearned | null>(null)
 
-  // Mock data for development - replace with actual API calls
+  // Load metrics, alerts, deviations, and lessons from API when available
   useEffect(() => {
-    const mockMetrics: ImplementationMetrics = {
-      total_implementations: 24,
-      active_implementations: 8,
-      completed_implementations: 14,
-      overdue_implementations: 2,
-      average_completion_time_days: 18.5,
-      success_rate_percentage: 87.5,
-      total_cost_variance_percentage: -3.2,
-      total_schedule_variance_days: 4.2
-    }
-
-    const mockAlerts: ImplementationAlert[] = [
-      {
-        id: 'alert-1',
-        type: 'schedule_overrun',
-        severity: 'high',
-        title: 'Implementation Behind Schedule',
-        description: 'Foundation work implementation is 5 days behind planned schedule',
-        implementation_plan_id: 'impl-1',
-        task_id: 'task-2',
-        detected_at: '2024-01-24T10:30:00Z',
-        acknowledged: false,
-        resolved: false,
-        recommended_action: 'Review resource allocation and consider adding additional crew'
-      },
-      {
-        id: 'alert-2',
-        type: 'resource_overload',
-        severity: 'medium',
-        title: 'Resource Overallocation',
-        description: 'John Smith is assigned to 4 concurrent implementations',
-        implementation_plan_id: 'impl-2',
-        detected_at: '2024-01-24T09:15:00Z',
-        acknowledged: true,
-        resolved: false,
-        recommended_action: 'Redistribute workload or adjust implementation timelines'
-      },
-      {
-        id: 'alert-3',
-        type: 'cost_variance',
-        severity: 'critical',
-        title: 'Significant Cost Overrun',
-        description: 'Material costs exceeded budget by 25% due to price increases',
-        implementation_plan_id: 'impl-3',
-        detected_at: '2024-01-24T08:45:00Z',
-        acknowledged: false,
-        resolved: false,
-        recommended_action: 'Review budget allocation and seek approval for additional funding'
-      }
-    ]
-
-    const mockDeviations: DeviationAlert[] = [
-      {
-        id: 'dev-1',
-        deviation_type: 'schedule',
-        severity: 'high',
-        description: 'Concrete pouring delayed due to weather conditions',
-        root_cause: 'Unexpected heavy rainfall during critical construction phase',
-        corrective_action: 'Adjusted schedule to account for weather delays, added protective measures',
-        impact_assessment: 'Project completion delayed by 3 days, minimal cost impact',
-        detected_date: '2024-01-22',
-        status: 'in_progress',
-        implementation_plan_id: 'impl-1'
-      },
-      {
-        id: 'dev-2',
-        deviation_type: 'cost',
-        severity: 'medium',
-        description: 'Equipment rental costs higher than estimated',
-        root_cause: 'Market rate increases not accounted for in initial estimates',
-        corrective_action: 'Negotiated better rates with alternative suppliers',
-        impact_assessment: 'Budget variance of 8%, within acceptable limits',
-        detected_date: '2024-01-20',
-        resolved_date: '2024-01-23',
-        status: 'resolved',
-        implementation_plan_id: 'impl-2'
-      }
-    ]
-
-    const mockLessonsLearned: LessonsLearned[] = [
-      {
-        id: 'lesson-1',
-        implementation_plan_id: 'impl-1',
-        change_request_id: 'cr-1',
-        lessons_learned: 'Weather contingency planning is crucial for outdoor construction activities. Need to build in buffer time for weather delays.',
-        category: 'planning',
-        impact_on_future_changes: 'All future construction changes should include weather risk assessment and contingency time',
-        created_by: 'user-1',
-        created_by_name: 'John Smith',
-        created_at: '2024-01-23T16:30:00Z'
-      },
-      {
-        id: 'lesson-2',
-        implementation_plan_id: 'impl-2',
-        change_request_id: 'cr-2',
-        lessons_learned: 'Early supplier engagement and price confirmation prevents cost overruns during implementation.',
-        category: 'procurement',
-        impact_on_future_changes: 'Implement supplier confirmation process before implementation starts',
-        created_by: 'user-2',
-        created_by_name: 'Sarah Wilson',
-        created_at: '2024-01-22T14:15:00Z'
-      }
-    ]
-
-    setTimeout(() => {
-      setMetrics(mockMetrics)
-      setAlerts(mockAlerts)
-      setDeviations(mockDeviations)
-      setLessonsLearned(mockLessonsLearned)
-      setLoading(false)
-      setLastRefresh(new Date())
-    }, 1000)
+    setMetrics({
+      total_implementations: 0,
+      active_implementations: 0,
+      completed_implementations: 0,
+      overdue_implementations: 0,
+      average_completion_time_days: 0,
+      success_rate_percentage: 0,
+      total_cost_variance_percentage: 0,
+      total_schedule_variance_days: 0
+    })
+    setAlerts([])
+    setDeviations([])
+    setLessonsLearned([])
+    setLoading(false)
+    setLastRefresh(new Date())
   }, [projectId])
 
   // Auto-refresh functionality

@@ -6,12 +6,15 @@ interface UseAnalyticsProps {
   budgetVariances: BudgetVariance[]
   projects: Project[]
   financialAlerts: FinancialAlert[]
+  /** When set, used as totalProjects for overview display (e.g. capped at 250). */
+  totalProjectsOverride?: number
 }
 
-export function useAnalytics({ budgetVariances, projects, financialAlerts }: UseAnalyticsProps) {
+export function useAnalytics({ budgetVariances, projects, financialAlerts, totalProjectsOverride }: UseAnalyticsProps) {
   const analyticsData = useMemo(() => {
     const data = calculateAnalyticsData(budgetVariances, projects, financialAlerts)
-    
+    const totalProjects = totalProjectsOverride ?? data?.totalProjects ?? projects.length
+
     // Provide default structure if no data is available
     if (!data) {
       return {
@@ -22,7 +25,7 @@ export function useAnalytics({ budgetVariances, projects, financialAlerts }: Use
         ],
         categoryData: [],
         projectPerformanceData: [],
-        totalProjects: projects.length,
+        totalProjects,
         criticalAlerts: 0,
         warningAlerts: 0,
         totalSavings: 0,
@@ -31,9 +34,9 @@ export function useAnalytics({ budgetVariances, projects, financialAlerts }: Use
         netVariance: 0
       }
     }
-    
-    return data
-  }, [budgetVariances, projects, financialAlerts])
+
+    return { ...data, totalProjects }
+  }, [budgetVariances, projects, financialAlerts, totalProjectsOverride])
 
   return analyticsData
 }

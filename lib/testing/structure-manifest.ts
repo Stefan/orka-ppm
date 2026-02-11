@@ -676,18 +676,6 @@ const financialsStructure: PageStructure = {
       ]
     },
     {
-      condition: 'CSV import view is active',
-      sections: [
-        {
-          name: 'CSV Import View',
-          testId: 'financials-csv-import-view',
-          required: false,
-          description: 'CSV import interface',
-          elements: []
-        }
-      ]
-    },
-    {
       condition: 'PO breakdown view is active',
       sections: [
         {

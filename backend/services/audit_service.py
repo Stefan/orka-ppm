@@ -84,9 +84,8 @@ class AuditService:
                 "error_message": None
             }
             
-            # Insert audit log entry
-            self.db.table("admin_audit_log").insert(audit_entry).execute()
-            
+            # Insert audit log entry (minimal response to avoid PostgREST "JSON could not be generated")
+            self.db.table("admin_audit_log").insert(audit_entry, returning="minimal").execute()
             self.logger.info(
                 f"Audit log created: user={user_id}, method={import_method}, "
                 f"records={record_count}, audit_id={audit_id}"
@@ -139,7 +138,6 @@ class AuditService:
             try:
                 # Fetch existing entry to merge action_details
                 existing = self.db.table("admin_audit_log").select("action_details").eq("id", audit_id).execute()
-                
                 if existing.data and len(existing.data) > 0:
                     existing_details = json.loads(existing.data[0].get("action_details", "{}"))
                     existing_details.update({
@@ -169,9 +167,8 @@ class AuditService:
             if error_message:
                 update_data["error_message"] = error_message
             
-            # Update audit log entry
-            self.db.table("admin_audit_log").update(update_data).eq("id", audit_id).execute()
-            
+            # Update audit log entry (minimal response to avoid PostgREST "JSON could not be generated")
+            self.db.table("admin_audit_log").update(update_data, returning="minimal").eq("id", audit_id).execute()
             status = "succeeded" if success else "failed"
             self.logger.info(
                 f"Audit log updated: audit_id={audit_id}, status={status}, "

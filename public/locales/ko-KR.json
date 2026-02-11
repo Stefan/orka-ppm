@@ -340,6 +340,8 @@
     "dropzonePrompt": "파일을 여기에 드래그 앤 드롭하거나 클릭하여 선택하세요",
     "dropzoneActive": "여기에 파일을 놓으세요...",
     "acceptedFormats": "지원 형식: .csv, .json",
+    "assignToPortfolio": "모든 프로젝트를 포트폴리오에 할당",
+    "selectPortfolio": "포트폴리오 선택",
     "importButton": "데이터 가져오기",
     "clear": "지우기",
     "processing": "처리 중...",
@@ -360,7 +362,7 @@
     "template": "템플릿",
     "dropzoneFilePrompt": "파일을 여기에 드롭하거나 클릭하여 선택",
     "selectFile": "파일 선택",
-    "maxFileSize": "최대 파일 크기: 50MB",
+    "maxFileSize": "최대 파일 크기: 80MB",
     "columnsCommitments": "열: PO 번호, 금액, 통화, 프로젝트, WBS",
     "columnsActuals": "열: FI 문서, 금액, 통화, 프로젝트, WBS",
     "importHistory": "가져오기 기록",
@@ -384,7 +386,9 @@
     "warnings": "경고",
     "rowLabel": "행 {row}",
     "moreErrors": "... 및 {count}개 더 오류",
-    "moreWarnings": "... 및 {count}개 더 경고"
+    "moreWarnings": "... 및 {count}개 더 경고",
+    "anonymizeData": "데이터 익명화(공급업체, 프로젝트, 금액 등)",
+    "clearBeforeImport": "가져오기 전 대상 테이블 비우기(기존 데이터 삭제)"
   },
   "shared": {
     "shareableUrl": {
@@ -490,6 +494,8 @@
     "lastYear": "작년",
     "budgetStatus": "예산 상태",
     "allProjects": "전체 프로젝트",
+    "portfolio": "포트폴리오",
+    "allPortfolios": "모든 포트폴리오",
     "overBudgetOnly": "예산 초과만",
     "underBudgetOnly": "예산 미달만",
     "onBudget": "예산 준수",

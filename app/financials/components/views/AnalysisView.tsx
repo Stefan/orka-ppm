@@ -7,7 +7,7 @@ import {
   LineChart, Line, Legend
 } from 'recharts'
 import { BudgetPerformanceMetrics, CostAnalysis, AnalyticsData } from '../../types'
-import { useCommitmentsActualsData } from '../../hooks/useCommitmentsActualsData'
+import type { CommitmentsActualsSummary, CommitmentsActualsAnalytics } from '../../hooks/useCommitmentsActualsData'
 import { useTranslations } from '../../../../lib/i18n/context'
 
 interface AnalysisViewProps {
@@ -16,19 +16,22 @@ interface AnalysisViewProps {
   analyticsData: AnalyticsData | null
   selectedCurrency: string
   accessToken?: string
+  commitmentsSummary?: CommitmentsActualsSummary | null
+  commitmentsAnalytics?: CommitmentsActualsAnalytics | null
 }
 
-export default function AnalysisView({ 
-  budgetPerformance, 
-  costAnalysis, 
-  analyticsData, 
+export default function AnalysisView({
+  budgetPerformance,
+  costAnalysis,
+  analyticsData,
   selectedCurrency,
-  accessToken
+  accessToken,
+  commitmentsSummary: summary = null,
+  commitmentsAnalytics: analytics = null
 }: AnalysisViewProps) {
   const { t } = useTranslations()
   const [viewMode, setViewMode] = useState<'project-budgets' | 'commitments-actuals'>('commitments-actuals')
-  
-  // Dark mode detection for Recharts tooltips
+
   const [isDark, setIsDark] = useState(false)
   useEffect(() => {
     const checkDarkMode = () => setIsDark(document.documentElement.classList.contains('dark'))
@@ -38,16 +41,9 @@ export default function AnalysisView({
     return () => observer.disconnect()
   }, [])
 
-  const tooltipStyle = isDark 
+  const tooltipStyle = isDark
     ? { backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f1f5f9' }
     : { backgroundColor: '#ffffff', border: '1px solid #e5e7eb', color: '#111827' }
-
-  // Fetch commitments & actuals after first paint so tab shows immediately
-  const { summary, analytics } = useCommitmentsActualsData({
-    accessToken,
-    selectedCurrency,
-    deferMs: 150
-  })
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {

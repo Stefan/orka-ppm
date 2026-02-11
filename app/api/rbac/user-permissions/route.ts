@@ -39,10 +39,7 @@ export async function GET(request: NextRequest) {
     const data = await response.json()
     return NextResponse.json(data)
   } catch (error) {
-    console.error('Error proxying user-permissions request:', error)
-    return NextResponse.json(
-      { error: 'Failed to get user permissions', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    )
+    console.warn('User permissions: backend unreachable', error instanceof Error ? error.message : error)
+    return NextResponse.json({ roles: [], scopes: [], role_names: [], organization_scopes: [] }, { status: 200 })
   }
 }

@@ -72,9 +72,9 @@ class ActualCreate(BaseModel):
     creation_date: Optional[date] = Field(None, description="Creation date")
     sap_invoice_no: Optional[str] = Field(None, description="SAP invoice number", max_length=100)
     investment_profile: Optional[str] = Field(None, description="Investment profile", max_length=50)
-    account_group_level1: Optional[str] = Field(None, description="Account group (Cora Level 1)", max_length=100)
-    account_subgroup_level2: Optional[str] = Field(None, description="Account subgroup (Cora Level 2)", max_length=100)
-    account_level3: Optional[str] = Field(None, description="Account (Cora Level 3)", max_length=100)
+    account_group_level1: Optional[str] = Field(None, description="Account group (Orka Level 1)", max_length=100)
+    account_subgroup_level2: Optional[str] = Field(None, description="Account subgroup (Orka Level 2)", max_length=100)
+    account_level3: Optional[str] = Field(None, description="Account (Orka Level 3)", max_length=100)
     value_in_document_currency: Optional[Decimal] = Field(None, description="Value in document currency")
     document_currency_code: Optional[str] = Field(None, description="Document currency code", max_length=3)
     quantity: Optional[Decimal] = Field(None, description="Quantity")
@@ -177,10 +177,10 @@ class CommitmentCreate(BaseModel):
     
     Requirements: 3.3
     """
-    # Required fields
+    # Required fields (vendor optional: CSV often has empty vendor; po_number/project_nr normalized if empty)
     po_number: str = Field(..., description="Purchase Order Number", min_length=1, max_length=50)
     po_date: date = Field(..., description="Purchase Order date")
-    vendor: str = Field(..., description="Vendor name", min_length=1, max_length=255)
+    vendor: Optional[str] = Field(None, description="Vendor name", max_length=255)
     vendor_description: Optional[str] = Field(None, description="Vendor description", max_length=500)
     project_nr: str = Field(..., description="Project number", min_length=1, max_length=50)
     wbs_element: Optional[str] = Field(None, description="Work Breakdown Structure element", max_length=100)
@@ -204,9 +204,9 @@ class CommitmentCreate(BaseModel):
     document_currency_code: Optional[str] = Field(None, description="Currency code in original document", max_length=3)
     value_in_document_currency: Optional[Decimal] = Field(None, description="Value in original document currency")
     investment_profile: Optional[str] = Field(None, description="Investment profile (capex/opex)", max_length=50)
-    account_group_level1: Optional[str] = Field(None, description="Account group at Cora Level 1", max_length=100)
-    account_subgroup_level2: Optional[str] = Field(None, description="Account subgroup at Cora Level 2", max_length=100)
-    account_level3: Optional[str] = Field(None, description="Account at Cora Level 3", max_length=100)
+    account_group_level1: Optional[str] = Field(None, description="Account group at Orka Level 1", max_length=100)
+    account_subgroup_level2: Optional[str] = Field(None, description="Account subgroup at Orka Level 2", max_length=100)
+    account_level3: Optional[str] = Field(None, description="Account at Orka Level 3", max_length=100)
     change_date: Optional[date] = Field(None, description="Date when commitment was last changed")
     purchase_requisition: Optional[str] = Field(None, description="Purchase requisition number", max_length=100)
     procurement_plant: Optional[str] = Field(None, description="Procurement plant identifier", max_length=100)
@@ -215,6 +215,15 @@ class CommitmentCreate(BaseModel):
     po_title: Optional[str] = Field(None, description="Purchase order title/description")
     version: Optional[str] = Field(None, description="Version number", max_length=50)
     fi_doc_no: Optional[str] = Field(None, description="Financial document number", max_length=50)
+
+    @field_validator('po_number', 'project_nr', mode='before')
+    @classmethod
+    def empty_string_to_placeholder(cls, v: Any) -> str:
+        """Allow empty CSV cells for required string fields; use placeholder so row imports."""
+        if v is None:
+            return "-"
+        s = str(v).strip() if v else ""
+        return s if s else "-"
 
     @field_validator('po_net_amount', 'total_amount', 'tax_amount', 'value_in_document_currency', mode='before')
     @classmethod
