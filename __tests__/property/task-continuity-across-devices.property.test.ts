@@ -32,22 +32,31 @@ const mockSessionStorage = {
 }
 Object.defineProperty(window, 'sessionStorage', { value: mockSessionStorage })
 
-// Mock window properties with proper JSDOM handling
+// Mock window.location - JSDOM logs "navigation not implemented" on assign; suppress for this test
 const originalLocation = window.location
+const mockLocation = {
+  href: 'http://localhost:3000/dashboard',
+  pathname: '/dashboard',
+  search: '',
+  assign: jest.fn(),
+  replace: jest.fn(),
+  reload: jest.fn()
+}
 
 beforeAll(() => {
-  // Mock location
-  delete (window as any).location
-  ;(window as any).location = {
-    href: 'http://localhost:3000/dashboard',
-    pathname: '/dashboard',
-    search: '',
-    assign: jest.fn(),
-    replace: jest.fn(),
-    reload: jest.fn()
+  const origError = console.error
+  console.error = ((...args: any[]) => {
+    const msg = args[0]
+    const str = typeof msg === 'string' ? msg : msg?.message ?? ''
+    if (str.includes('Not implemented: navigation')) return
+    origError.apply(console, args)
+  }) as any
+  try {
+    delete (window as any).location
+    ;(window as any).location = mockLocation
+  } finally {
+    console.error = origError
   }
-  
-  // Mock pageYOffset
   Object.defineProperty(window, 'pageYOffset', {
     value: 0,
     writable: true,
@@ -56,7 +65,6 @@ beforeAll(() => {
 })
 
 afterAll(() => {
-  // Restore original location
   ;(window as any).location = originalLocation
 })
 

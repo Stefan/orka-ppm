@@ -10,6 +10,11 @@ import type { VisualGuide, VisualGuideStep, ScreenshotAnnotation } from '../../c
 
 // Mock the entire screenshot service module
 jest.mock('../screenshot-service', () => {
+  // Mock canvas.getContext before requireActual (JSDOM doesn't implement it)
+  if (typeof HTMLCanvasElement !== 'undefined') {
+    HTMLCanvasElement.prototype.getContext = jest.fn(() => ({} as any))
+  }
+
   const mockScreenshotResult: ScreenshotResult = {
     dataUrl: 'data:image/png;base64,mock-screenshot',
     blob: new Blob(['mock-blob'], { type: 'image/png' }),

@@ -1,6 +1,16 @@
 import '@testing-library/jest-dom'
 import 'jest-axe/extend-expect'
 
+// Reduce CI noise: suppress known React act() warnings from async i18n/context loading
+// and similar async state updates that complete after test assertions
+const originalError = console.error
+console.error = (...args) => {
+  const msg = args[0]
+  if (typeof msg === 'string' && msg.includes('Not wrapped in act')) return
+  if (args.some(a => typeof a === 'string' && a.includes('Not wrapped in act'))) return
+  originalError.apply(console, args)
+}
+
 // Ensure Request/Response/Headers exist for Next.js API route tests (workers may not inherit from jest.env.js)
 if (typeof global.Request === 'undefined') {
   try {

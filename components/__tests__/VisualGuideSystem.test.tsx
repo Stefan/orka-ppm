@@ -5,7 +5,7 @@
  */
 
 import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { VisualGuideSystem } from '../help-chat/VisualGuideSystem'
 import type { VisualGuide, VisualGuideStep, ScreenshotAnnotation } from '../help-chat/VisualGuideSystem'
@@ -285,7 +285,10 @@ describe('VisualGuideSystem', () => {
       fireEvent.click(playButton)
 
       // Fast-forward time to trigger auto-advance (step 1 has 3 second duration)
-      jest.advanceTimersByTime(3000)
+      // Wrap in act() to avoid "Not wrapped in act" warning
+      await act(async () => {
+        jest.advanceTimersByTime(3000)
+      })
 
       await waitFor(() => {
         expect(onStepChange).toHaveBeenCalledWith(1)

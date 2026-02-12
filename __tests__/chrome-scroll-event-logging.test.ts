@@ -467,6 +467,13 @@ describe('ChromeScrollLogger', () => {
   })
 
   describe('Error Handling', () => {
+    beforeEach(() => {
+      jest.spyOn(console, 'error').mockImplementation(() => {})
+    })
+    afterEach(() => {
+      ;(console.error as jest.Mock).mockRestore()
+    })
+
     it('should handle localStorage errors gracefully', () => {
       mockLocalStorage.setItem.mockImplementation(() => {
         throw new Error('Storage quota exceeded')

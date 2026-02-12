@@ -83,6 +83,7 @@ describe('Predictive Analytics Engine', () => {
     })
 
     it('should handle prediction errors gracefully', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
       ;(fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 500,
@@ -92,6 +93,7 @@ describe('Predictive Analytics Engine', () => {
       await expect(engine.generateCapacityPredictions()).rejects.toThrow(
         'Failed to generate capacity predictions'
       )
+      consoleErrorSpy.mockRestore()
     })
   })
 
