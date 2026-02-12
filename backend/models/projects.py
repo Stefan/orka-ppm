@@ -53,7 +53,7 @@ class ProjectPpmInput(BaseModel):
 
 
 class ProjectCreate(BaseModel):
-    portfolio_id: UUID
+    portfolio_id: Optional[UUID] = None  # Optional for import; single-project create may require it via API
     program_id: Optional[UUID] = None
     name: str
     description: Optional[str] = None

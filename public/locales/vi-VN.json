@@ -518,7 +518,7 @@
       "detailed": "Phân tích chi tiết theo hạng mục",
       "trends": "Phát triển theo thời gian và dự báo",
       "analysis": "Phân tích chi phí nâng cao",
-      "poBreakdown": "Cấu trúc phân cấp Purchase Order SAP",
+      "poBreakdown": "Chi tiết đơn hàng",
       "csvImport": "Nhập dữ liệu",
       "commitmentsActuals": "So sánh Kế hoạch vs. Thực tế"
     },

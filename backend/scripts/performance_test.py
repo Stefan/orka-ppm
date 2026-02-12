@@ -87,7 +87,7 @@ class PerformanceTester:
             "timestamp": time.time()
         }
 
-        logger.info(".2f"        logger.info(".2f"        logger.info(f"Target met (95th < 3s): {results['target_met']}")
+        logger.info(f"Target met (95th < 3s): {results['target_met']}")
 
         return results
 
@@ -234,7 +234,10 @@ class PerformanceTester:
                 report.append("RESPONSE TIME TEST")
                 report.append("-" * 20)
                 report.append(f"Requests: {result['num_requests']}")
-                report.append(".2f"                report.append(".2f"                report.append(".2f"                report.append(".2f"                report.append(f"Target Met (95th < 3s): {'✅' if result['target_met'] else '❌'}")
+                report.append(f"Avg: {result.get('average_response_time_ms', 0):.2f}ms")
+                report.append(f"P95: {result.get('p95_response_time_ms', 0):.2f}ms")
+                report.append(f"P99: {result.get('p99_response_time_ms', 0):.2f}ms")
+                report.append(f"Target Met (95th < 3s): {'✅' if result['target_met'] else '❌'}")
                 report.append("")
 
             elif test_type == "load_test":
@@ -243,8 +246,10 @@ class PerformanceTester:
                 report.append(f"Concurrent Users: {result['concurrent_users']}")
                 report.append(f"Duration: {result['duration_seconds']}s")
                 report.append(f"Total Requests: {result['total_requests']}")
-                report.append(".2f"                report.append(f"Errors: {result['error_count']}")
-                report.append(".1%"                report.append(".2f"                report.append("")
+                report.append(f"Requests/sec: {result.get('requests_per_second', 0):.2f}")
+                report.append(f"Errors: {result.get('errors', 0)}")
+                report.append(f"Error rate: {result.get('error_rate', 0):.1%}")
+                report.append("")
 
             elif test_type == "scalability_test":
                 report.append("SCALABILITY TEST")
@@ -252,7 +257,10 @@ class PerformanceTester:
                 report.append("Documents | Avg Time | P95 Time | Scaling")
                 report.append("-" * 45)
                 for r in result["results"]:
-                    report.append("8")
+                    report.append(
+                        f"{r.get('document_count', 0)} | {r.get('average_response_time_ms', 0):.2f}ms | "
+                        f"{r.get('p95_response_time_ms', 0):.2f}ms | {r.get('scaling_factor', 0):.2f}"
+                    )
                 report.append("")
 
         # Overall assessment

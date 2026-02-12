@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { Layers, Zap, X, ChevronLeft, ChevronRight, LayoutGrid, TrendingUp } from 'lucide-react'
 import { ProjectWithFinancials, Currency, KPIMetrics } from '@/types/costbook'
@@ -65,6 +65,8 @@ import { triggerSync } from '@/lib/integrations/ErpAdapter'
 export interface CostbookProps {
   /** Initial currency */
   initialCurrency?: Currency
+  /** When set, Costbook shows only this project's data (single-project view). When unset, shows empty state. */
+  projectId?: string | null
   /** Handler for project selection */
   onProjectSelect?: (project: ProjectWithFinancials) => void
   /** Show "Start Tour" button (set false when embedded e.g. in Financials to avoid duplicate) */
@@ -88,11 +90,13 @@ import { GuidedTour, useGuidedTour, TourTriggerButton, costbookTourSteps } from 
  */
 function CostbookInner({
   initialCurrency = Currency.USD,
+  projectId: projectIdProp = null,
   onProjectSelect,
   showTourButton = true,
   className = '',
   'data-testid': testId = 'costbook'
 }: CostbookProps) {
+  const projectId = projectIdProp ?? undefined
   // Feature flag checks
   const { enabled: anomalyDetectionEnabled } = useFeatureFlag('ai_anomaly_detection')
   const { enabled: costbookPhase2Enabled } = useFeatureFlag('costbook_phase2')
@@ -184,8 +188,19 @@ function CostbookInner({
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Fetch data
+  // Track which projectId we're fetching for so we ignore stale results when user switches project
+  const fetchProjectIdRef = useRef<string | undefined>(undefined)
+
+  // Fetch data (when projectId set: fetch then filter to that project; when not set: show empty state)
   const fetchData = useCallback(async () => {
+    if (!projectId) {
+      setProjects([])
+      setIsLoading(false)
+      setError(null)
+      return
+    }
+    const currentFetchId = projectId
+    fetchProjectIdRef.current = currentFetchId
     const startTime = performance.now()
     setIsLoading(true)
     setError(null)
@@ -235,17 +250,21 @@ function CostbookInner({
         }
       }
 
-      setProjects(data)
+      const dataToSet = currentFetchId ? data.filter(p => p.id === currentFetchId) : data
+      if (fetchProjectIdRef.current !== currentFetchId) return
+      setProjects(dataToSet)
 
-      // Detect anomalies
-      const detectedAnomalies = detectAnomalies(data)
+      // Detect anomalies (on the data we display)
+      const detectedAnomalies = detectAnomalies(dataToSet)
+      if (fetchProjectIdRef.current !== currentFetchId) return
       setAnomalies(detectedAnomalies)
       
       // Generate recommendations (with optional user/tenant context for personalization)
       const userContext = typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_TENANT_NAME
         ? { tenantName: process.env.NEXT_PUBLIC_TENANT_NAME }
         : undefined
-      const generatedRecommendations = generateRecommendations(data, detectedAnomalies, { userContext })
+      const generatedRecommendations = generateRecommendations(dataToSet, detectedAnomalies, { userContext })
+      if (fetchProjectIdRef.current !== currentFetchId) return
       setRecommendations(generatedRecommendations)
 
       setLastRefreshTime(new Date())
@@ -270,7 +289,7 @@ function CostbookInner({
               const desc = [row.vendor_description, row.wbs_element].filter(Boolean).join(' ') || ' '
               return {
                 id: (row.id as string) ?? `c-${idx}`,
-                project_id: (row.project_id as string) ?? (row.project_nr as string) ?? '',
+                project_id: String(row.project_id ?? row.project_nr ?? ''),
                 po_number: String(row.po_number ?? ''),
                 vendor_id: vendor ? `vendor-${String(idx)}` : 'vendor-unknown',
                 vendor_name: vendor || 'Unknown',
@@ -283,24 +302,29 @@ function CostbookInner({
                 updated_at: String(row.updated_at ?? row.created_at ?? issueDate)
               }
             })
+            if (fetchProjectIdRef.current !== currentFetchId) return
             setHierarchyCommitments(commitments)
             const { commitmentToTransaction } = await import('@/lib/costbook/transaction-queries')
             committedTx = commitments.map(commitmentToTransaction)
             setTransactions(committedTx)
           } else {
+            if (fetchProjectIdRef.current !== currentFetchId) return
             setHierarchyCommitments([])
             setTransactions(committedTx)
           }
         } catch (_) {
+          if (fetchProjectIdRef.current !== currentFetchId) return
           setHierarchyCommitments([])
           setTransactions(committedTx)
         }
       } else {
+        if (fetchProjectIdRef.current !== currentFetchId) return
         setHierarchyCommitments([])
         setTransactions(committedTx)
       }
 
       // Track performance
+      if (fetchProjectIdRef.current !== currentFetchId) return
       const queryTime = performance.now() - startTime
       setPerformanceMetrics({
         queryTime: Math.round(queryTime),
@@ -316,17 +340,26 @@ function CostbookInner({
         lastRefresh: new Date().toISOString()
       })
     } catch (err) {
-      console.error('Failed to fetch projects:', err)
-      setError(err instanceof Error ? err : new Error('Failed to load data'))
+      if (fetchProjectIdRef.current === currentFetchId) {
+        console.error('Failed to fetch projects:', err)
+        setError(err instanceof Error ? err : new Error('Failed to load data'))
+      }
     } finally {
-      setIsLoading(false)
+      if (fetchProjectIdRef.current === currentFetchId) {
+        setIsLoading(false)
+      }
     }
-  }, [session?.access_token])
+  }, [session?.access_token, projectId])
 
-  // Initial data fetch
+  // Run fetch when projectId or fetchData changes. Array length must stay constant (React rule).
+  const effectProjectId = projectId ?? ''
   useEffect(() => {
+    if (projectId) {
+      setProjects([])
+      setError(null)
+    }
     fetchData()
-  }, [fetchData])
+  }, [fetchData, effectProjectId])
 
   // Convert projects to selected currency
   const convertedProjects = useMemo(() => {
@@ -515,8 +548,9 @@ function CostbookInner({
   }, [transactions, transactionFilters, transactionSort])
 
   // Build hierarchy data: use real commitments from API when available, else from transactions (incl. mock)
+  // When projectId is set (single-project view), only include commitments for the selected project
   const hierarchyData = useMemo(() => {
-    const commitments: Commitment[] =
+    let rawCommitments: Commitment[] =
       hierarchyCommitments.length > 0
         ? hierarchyCommitments
         : transactions
@@ -535,13 +569,18 @@ function CostbookInner({
               created_at: t.date,
               updated_at: t.date
             }))
+    if (projectId) {
+      const pid = String(projectId)
+      rawCommitments = rawCommitments.filter(c => String(c.project_id ?? '') === pid)
+    }
+    const commitments = rawCommitments
 
     const projectNames = Object.fromEntries(filteredProjects.map(p => [p.id, p.name]))
     if (hierarchyViewType === 'ces') {
       return buildCESHierarchy(commitments, selectedCurrency, projectNames)
     }
     return buildWBSHierarchy(commitments, selectedCurrency)
-  }, [hierarchyCommitments, transactions, hierarchyViewType, selectedCurrency, filteredProjects])
+  }, [hierarchyCommitments, transactions, hierarchyViewType, selectedCurrency, filteredProjects, projectId])
 
   const handleExport = useCallback(() => {
     console.log('Export clicked')
@@ -708,6 +747,44 @@ function CostbookInner({
     console.log('Applied distribution rule to projects:', ruleId, targetProjects.length)
     // In real app: API call to apply rule
   }, [distributionRules, projects, handleUpdateRule])
+
+  // Empty state when no project selected (single-project Costbook mode)
+  if (!projectId) {
+    return (
+      <CostbookErrorBoundary>
+        <div
+          className={`flex flex-col bg-gray-50 dark:bg-slate-900 min-h-[400px] p-4 ${className}`}
+          data-testid={testId}
+        >
+          <div className="flex flex-col items-center justify-center flex-1 min-h-[360px] text-center text-gray-600 dark:text-slate-400 px-4">
+            <p className="text-lg font-medium text-gray-900 dark:text-slate-100">Select a project</p>
+            <p className="text-sm mt-2 max-w-md">
+              Use the project dropdown in the header above to view commitments and actuals for a project.
+            </p>
+          </div>
+        </div>
+      </CostbookErrorBoundary>
+    )
+  }
+
+  // Project selected but no data (e.g. project not in list or no access)
+  if (projectId && !isLoading && projects.length === 0) {
+    return (
+      <CostbookErrorBoundary>
+        <div
+          className={`flex flex-col bg-gray-50 dark:bg-slate-900 min-h-[400px] p-4 ${className}`}
+          data-testid={testId}
+        >
+          <div className="flex flex-col items-center justify-center flex-1 min-h-[360px] text-center text-gray-600 dark:text-slate-400 px-4">
+            <p className="text-lg font-medium text-gray-900 dark:text-slate-100">Project not found</p>
+            <p className="text-sm mt-2 max-w-md">
+              No financial data for the selected project. Try another project or refresh.
+            </p>
+          </div>
+        </div>
+      </CostbookErrorBoundary>
+    )
+  }
 
   // Render mobile layout
   if (isMobile) {

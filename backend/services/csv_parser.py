@@ -6,7 +6,7 @@ Handles column mapping, validation, and type conversion.
 """
 
 import pandas as pd
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from io import BytesIO
 from uuid import UUID
 from datetime import date
@@ -47,27 +47,27 @@ class CSVParser:
     REQUIRED_COLUMNS = ["name", "budget", "status"]
     
     def parse_csv(
-        self, 
+        self,
         file_content: bytes,
-        portfolio_id: UUID
+        portfolio_id: Optional[UUID] = None
     ) -> List[ProjectCreate]:
         """
         Parse CSV file into list of ProjectCreate objects.
-        
+
         Process:
         1. Read CSV with pandas (auto-detect delimiter)
         2. Validate header columns
         3. Map columns to project fields
         4. Convert each row to ProjectCreate
         5. Return list of projects
-        
+
         Args:
             file_content: Raw CSV file bytes
-            portfolio_id: Portfolio ID to assign to all imported projects
-            
+            portfolio_id: Optional portfolio ID to assign to all imported projects; None = no portfolio
+
         Returns:
             List of ProjectCreate objects
-            
+
         Raises:
             CSVParseError: If CSV cannot be parsed or has invalid structure
         """
@@ -134,22 +134,22 @@ class CSVParser:
             )
     
     def _row_to_project(
-        self, 
-        row: pd.Series, 
+        self,
+        row: pd.Series,
         index: int,
-        portfolio_id: UUID
+        portfolio_id: Optional[UUID] = None
     ) -> ProjectCreate:
         """
         Convert DataFrame row to ProjectCreate object.
-        
+
         Args:
             row: Pandas Series representing one CSV row
             index: Row index for error reporting
-            portfolio_id: Portfolio ID to assign to project
-            
+            portfolio_id: Optional portfolio ID to assign to project; None = no portfolio
+
         Returns:
             ProjectCreate object
-            
+
         Raises:
             CSVParseError: If row cannot be converted
         """
@@ -195,7 +195,7 @@ class CSVParser:
                 except ValueError:
                     raise CSVParseError(f"Invalid manager_id UUID: {manager_id_str}")
             
-            # Create ProjectCreate object
+            # Create ProjectCreate object (portfolio_id optional)
             return ProjectCreate(
                 portfolio_id=portfolio_id,
                 name=name,

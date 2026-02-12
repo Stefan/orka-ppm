@@ -38,6 +38,11 @@ tiktoken==0.5.2
 # CSV parsing for project imports
 pandas==2.2.0
 
+# Monte Carlo visualization (routers/simulations -> monte_carlo/visualization)
+matplotlib>=3.7.0
+seaborn>=0.12.0
+scipy>=1.11.0
+
 # Encoding detection for file imports
 chardet==5.2.0
 

@@ -146,7 +146,14 @@ class ImportService:
         # If validation failed, reject entire batch (Requirement 3.6)
         if validation_errors:
             error_message = f"Validation failed for {len(validation_errors)} records"
-            
+            # #region agent log
+            try:
+                import json
+                with open("/Users/stefan/Projects/orka-ppm/.cursor/debug.log", "a") as f:
+                    f.write(json.dumps({"timestamp": __import__("datetime").datetime.utcnow().isoformat(), "location": "import_service.import_projects", "message": "validation_failed", "data": {"count": len(validation_errors), "errors": validation_errors, "hypothesisId": "V"}}) + "\n")
+            except Exception:
+                pass
+            # #endregion
             # Log audit completion with failure
             await self.auditor.log_import_complete(
                 audit_id=audit_id,
@@ -282,7 +289,7 @@ class ImportService:
                 budget_safe = _sanitize_number(project.budget)
                 record = {
                     "id": str(uuid4()),
-                    "portfolio_id": str(project.portfolio_id),
+                    "portfolio_id": str(project.portfolio_id) if project.portfolio_id else None,
                     "name": str(project.name) if project.name is not None else "",
                     "description": str(project.description) if project.description is not None else None,
                     "status": _status_for_db(status_val),
@@ -339,7 +346,7 @@ class ImportService:
     async def import_projects_from_ppm(
         self,
         projects_ppm: List[ProjectPpmInput],
-        portfolio_id: str,
+        portfolio_id: Optional[str] = None,
         anonymize: bool = False,
     ) -> ImportResult:
         """

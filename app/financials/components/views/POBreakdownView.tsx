@@ -72,7 +72,7 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
       
       if (!response.ok) {
         // Don't throw, just set error message
-        setError('PO Breakdown feature is not yet configured. This requires SAP integration setup.')
+        setError('PO Breakdown is not configured yet.')
         setLoading(false)
         return
       }
@@ -81,7 +81,7 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
       setBreakdowns(buildHierarchy(data))
     } catch (err) {
       logger.error('PO Breakdown fetch error', { err }, 'POBreakdownView')
-      setError('PO Breakdown feature is not yet configured. This requires SAP integration setup.')
+      setError('PO Breakdown is not configured yet.')
     } finally {
       setLoading(false)
     }
@@ -462,7 +462,7 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
           <div className="text-center py-12">
             <div className="text-gray-500 dark:text-slate-400 mb-4">
               <p className="text-lg font-medium">No PO breakdowns found</p>
-              <p className="text-sm mt-2">This feature requires SAP Purchase Order data</p>
+              <p className="text-sm mt-2">Select a project to view its PO breakdown.</p>
             </div>
             <div className="mt-6 space-y-2 text-sm text-gray-600 dark:text-slate-400">
               <p>To get started:</p>
@@ -492,7 +492,7 @@ export default function POBreakdownView({ accessToken, projectId }: POBreakdownV
       {showUploadModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-slate-800 rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-slate-100">Import SAP PO Breakdown CSV</h3>
+            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-slate-100">Import PO Breakdown CSV</h3>
             
             {!importResult ? (
               <div>

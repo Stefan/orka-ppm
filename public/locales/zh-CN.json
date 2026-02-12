@@ -520,7 +520,7 @@
       "detailed": "详细类别分析",
       "trends": "时间发展趋势和预测",
       "analysis": "高级成本分析",
-      "poBreakdown": "SAP采购订单层级",
+      "poBreakdown": "订单明细",
       "csvImport": "导入数据",
       "commitmentsActuals": "计划与实际对比",
       "costbook": "全面的预算跟踪、成本管理和财务监督，含详细项目分析"

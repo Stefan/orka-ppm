@@ -8,7 +8,7 @@ CSVParser for file parsing, and enforces authentication and authorization.
 Requirements: 1.3, 1.4, 1.5, 2.4, 2.5, 4.1, 4.2, 4.3, 4.4, 4.5
 """
 
-from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Query, status
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Query, Request, status
 from typing import List, Dict, Any, Optional
 from uuid import UUID, uuid4
 from datetime import datetime
@@ -22,6 +22,7 @@ from services.csv_parser import CSVParser, CSVParseError
 from services.anonymizer import AnonymizerService
 from config.database import get_db, service_supabase
 from services.data_import_audit import log_data_import_to_audit_trail, trim_import_history
+from routers.projects import _invalidate_projects_cache
 
 router = APIRouter(prefix="/api/projects", tags=["import"])
 logger = logging.getLogger(__name__)
@@ -108,8 +109,7 @@ def _make_names_unique_in_batch(projects: List[ProjectCreate]) -> List[ProjectCr
 
 
 def _clear_projects_before_import(db) -> int:
-    """Delete all rows from the projects table. Tries RPC first (server-side batches), then client-side chunks."""
-    # Prefer RPC so clearing runs server-side in small batches; one round trip, no large response.
+    """Delete all rows from the projects table. Tries RPC first (server-side batches), then client-side single-row deletes."""
     try:
         r = db.rpc("clear_projects_for_import").execute()
         if r.data and len(r.data) > 0:
@@ -122,27 +122,37 @@ def _clear_projects_before_import(db) -> int:
         return 0
     except Exception as e:
         logger.warning(
-            "clear_projects_for_import RPC failed (run migration 067 to enable server-side clear): %s",
+            "clear_projects_for_import RPC failed (run migration 067; if timeout, increase DB statement_timeout): %s",
             e,
         )
-    # Fallback: client-side chunked delete (can timeout or hit response size limits with many rows)
+    # Fallback: single-row SELECT and DELETE to stay under strict server statement_timeout
     total_deleted = 0
-    select_chunk = 50
-    delete_batch = 10
+    select_chunk = 5
+
+    def _is_statement_timeout(exc: Exception) -> bool:
+        err_str = str(exc)
+        return "57014" in err_str or "statement timeout" in err_str.lower()
+
     while True:
-        r = db.table("projects").select("id").limit(select_chunk).execute()
+        try:
+            r = db.table("projects").select("id").limit(select_chunk).execute()
+        except Exception as select_exc:
+            if _is_statement_timeout(select_exc) and select_chunk > 1:
+                select_chunk = 1
+                continue
+            raise
         ids = [row["id"] for row in (r.data or []) if row.get("id") is not None]
         if not ids:
             break
-        for i in range(0, len(ids), delete_batch):
-            batch = ids[i : i + delete_batch]
-            db.table("projects").delete().in_("id", batch).execute()
-            total_deleted += len(batch)
+        for one_id in ids:
+            db.table("projects").delete().eq("id", one_id).execute()
+            total_deleted += 1
     return total_deleted
 
 
 @router.post("/import", status_code=status.HTTP_200_OK)
 async def import_projects_json(
+    request: Request,
     projects: List[ProjectCreate],
     anonymize: bool = Query(True, description="Daten anonymisieren (Vendor, Projekt, Beträge, etc.) / Anonymize names, descriptions, budgets"),
     clear_before_import: bool = Query(False, description="Zieltabelle vor Import leeren (bestehende Daten löschen) / Clear target table before import"),
@@ -187,9 +197,10 @@ async def import_projects_json(
             def _to_dict(p: ProjectCreate) -> Dict[str, Any]:
                 return p.model_dump() if hasattr(p, "model_dump") else p.dict()
             projects = [ProjectCreate(**anonymizer.anonymize_project(_to_dict(p))) for p in projects]
-            # Ensure names are unique within batch (anonymizer can produce same name for different sources)
+        # Always ensure names are unique within batch (anonymizer can produce duplicates; non-anonymized imports can also have duplicate names)
+        if projects:
             projects = _make_names_unique_in_batch(projects)
-        
+
         # Extract user ID for audit logging
         user_id = current_user.get("user_id", "")
         
@@ -205,18 +216,19 @@ async def import_projects_json(
         if clear_before_import:
             try:
                 _clear_projects_before_import(db)
+                _invalidate_projects_cache(request)
             except Exception as clear_err:
                 err_str = str(clear_err)
                 if "statement timeout" in err_str.lower() or "57014" in err_str:
                     raise HTTPException(
                         status_code=status.HTTP_504_GATEWAY_TIMEOUT,
                         detail=_create_error_response(
-                            message="Clearing the table timed out. Run migration 067_clear_projects_for_import_rpc.sql so clearing runs server-side, or use 'Clear before import' off and import, or clear via script: backend/scripts/clear_projects_actuals_commitments.py",
+                            message="Clearing timed out: database statement_timeout is too low. In Supabase: Project Settings → Database → set 'Statement timeout' to 300000 ms, then retry. Or disable 'Clear before import' and import without clearing, or run: python backend/scripts/clear_projects_actuals_commitments.py",
                             errors=[{"index": -1, "field": "server", "value": None, "error": "Statement timeout during clear"}],
                         ),
                     ) from clear_err
                 raise
-        
+
         # Initialize import service with user context
         import_service = ImportService(db_session=db, user_id=user_id)
         # Process the import
@@ -238,9 +250,10 @@ async def import_projects_json(
             duplicate_count=0,
             tenant_id=tenant_id,
         )
-        
+
         # Return appropriate response based on result
         if result.success:
+            _invalidate_projects_cache(request)
             return result.to_dict()
         else:
             # Validation failed - return 400 with error details
@@ -248,7 +261,7 @@ async def import_projects_json(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=result.to_dict()
             )
-            
+
     except HTTPException:
         # Re-raise HTTP exceptions as-is
         raise
@@ -271,8 +284,9 @@ async def import_projects_json(
 
 @router.post("/import/ppm", status_code=status.HTTP_200_OK)
 async def import_projects_ppm(
+    request: Request,
     body: List[ProjectPpmInput],
-    portfolio_id: str = Query(..., description="Portfolio ID to assign to all imported projects"),
+    portfolio_id: Optional[str] = Query(None, description="Portfolio ID to assign to imported projects (optional; omit to import without portfolio)"),
     anonymize: bool = Query(True, description="Daten anonymisieren (Vendor, Projekt, Beträge, etc.) / Anonymize names, descriptions, amounts"),
     clear_before_import: bool = Query(False, description="Zieltabelle vor Import leeren (bestehende Daten löschen) / Clear target table before import"),
     current_user: Dict[str, Any] = Depends(get_current_user),
@@ -284,24 +298,17 @@ async def import_projects_ppm(
     Name is derived from orderIds[0], description, or id. All PPM fields are stored.
     Supports anonymize (names, descriptions, amounts) and clear_before_import (delete existing projects).
     """
-    if not portfolio_id:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=_create_error_response(
-                message="portfolio_id query parameter is required for PPM import",
-                errors=[{"index": -1, "field": "portfolio_id", "value": None, "error": "Missing required parameter"}],
-            ),
-        )
-    try:
-        UUID(portfolio_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=_create_error_response(
-                message="Invalid portfolio_id format",
-                errors=[{"index": -1, "field": "portfolio_id", "value": portfolio_id, "error": "Must be a valid UUID"}],
-            ),
-        )
+    if portfolio_id is not None:
+        try:
+            UUID(portfolio_id)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=_create_error_response(
+                    message="Invalid portfolio_id format",
+                    errors=[{"index": -1, "field": "portfolio_id", "value": portfolio_id, "error": "Must be a valid UUID"}],
+                ),
+            )
     if not body:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -319,13 +326,14 @@ async def import_projects_ppm(
     if clear_before_import:
         try:
             _clear_projects_before_import(db)
+            _invalidate_projects_cache(request)
         except Exception as clear_err:
             err_str = str(clear_err)
             if "statement timeout" in err_str.lower() or "57014" in err_str:
                 raise HTTPException(
                     status_code=status.HTTP_504_GATEWAY_TIMEOUT,
                     detail=_create_error_response(
-                        message="Clearing the table timed out. Run migration 067_clear_projects_for_import_rpc.sql, or use 'Clear before import' off, or clear via script: backend/scripts/clear_projects_actuals_commitments.py",
+                        message="Clearing timed out: database statement_timeout is too low. In Supabase: Project Settings → Database → set 'Statement timeout' to 300000 ms, then retry. Or disable 'Clear before import' and import without clearing, or run: python backend/scripts/clear_projects_actuals_commitments.py",
                         errors=[{"index": -1, "field": "server", "value": None, "error": "Statement timeout during clear"}],
                     ),
                 ) from clear_err
@@ -348,12 +356,14 @@ async def import_projects_ppm(
         tenant_id=tenant_id,
     )
     if result.success:
+        _invalidate_projects_cache(request)
         return result.to_dict()
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=result.to_dict())
 
 
 @router.post("/import/csv", status_code=status.HTTP_200_OK)
 async def import_projects_csv(
+    request: Request,
     file: UploadFile = File(..., description="CSV file containing project data"),
     portfolio_id: str = None,
     anonymize: bool = Query(True, description="Daten anonymisieren (Vendor, Projekt, Beträge, etc.) / Anonymize names, descriptions, budgets"),
@@ -400,37 +410,24 @@ async def import_projects_csv(
     Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 4.1, 4.2, 4.3, 4.4, 4.5, 10.1-10.5
     """
     try:
-        # Validate portfolio_id is provided
-        if not portfolio_id:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=_create_error_response(
-                    message="portfolio_id query parameter is required for CSV imports",
-                    errors=[{
-                        "index": -1,
-                        "field": "portfolio_id",
-                        "value": None,
-                        "error": "Missing required parameter: portfolio_id"
-                    }]
+        # portfolio_id is optional; if provided, must be a valid UUID
+        portfolio_uuid = None
+        if portfolio_id:
+            try:
+                portfolio_uuid = UUID(portfolio_id)
+            except ValueError:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=_create_error_response(
+                        message="Invalid portfolio_id format",
+                        errors=[{
+                            "index": -1,
+                            "field": "portfolio_id",
+                            "value": portfolio_id,
+                            "error": "portfolio_id must be a valid UUID"
+                        }]
+                    )
                 )
-            )
-        
-        # Validate portfolio_id is a valid UUID
-        try:
-            portfolio_uuid = UUID(portfolio_id)
-        except ValueError:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=_create_error_response(
-                    message="Invalid portfolio_id format",
-                    errors=[{
-                        "index": -1,
-                        "field": "portfolio_id",
-                        "value": portfolio_id,
-                        "error": "portfolio_id must be a valid UUID"
-                    }]
-                )
-            )
         
         # Validate file type
         if file.filename:
@@ -480,7 +477,7 @@ async def import_projects_csv(
                 )
             )
         
-        # Parse CSV file
+        # Parse CSV file (portfolio_uuid optional; None = import without portfolio)
         csv_parser = CSVParser()
         try:
             projects = csv_parser.parse_csv(
@@ -524,8 +521,10 @@ async def import_projects_csv(
             def _to_dict(p: ProjectCreate) -> Dict[str, Any]:
                 return p.model_dump() if hasattr(p, "model_dump") else p.dict()
             projects = [ProjectCreate(**anonymizer.anonymize_project(_to_dict(p))) for p in projects]
+        # Always ensure names are unique within batch (anonymizer can produce duplicates; non-anonymized imports can also have duplicate names)
+        if projects:
             projects = _make_names_unique_in_batch(projects)
-        
+
         # Extract user ID for audit logging
         user_id = current_user.get("user_id", "")
         
@@ -541,27 +540,28 @@ async def import_projects_csv(
         if clear_before_import:
             try:
                 _clear_projects_before_import(db)
+                _invalidate_projects_cache(request)
             except Exception as clear_err:
                 err_str = str(clear_err)
                 if "statement timeout" in err_str.lower() or "57014" in err_str:
                     raise HTTPException(
                         status_code=status.HTTP_504_GATEWAY_TIMEOUT,
                         detail=_create_error_response(
-                            message="Clearing the table timed out. Run migration 067_clear_projects_for_import_rpc.sql, or use 'Clear before import' off, or clear via script: backend/scripts/clear_projects_actuals_commitments.py",
+                            message="Clearing timed out: database statement_timeout is too low. In Supabase: Project Settings → Database → set 'Statement timeout' to 300000 ms, then retry. Or disable 'Clear before import' and import without clearing, or run: python backend/scripts/clear_projects_actuals_commitments.py",
                             errors=[{"index": -1, "field": "server", "value": None, "error": "Statement timeout during clear"}],
                         ),
                     ) from clear_err
                 raise
-        
+
         # Initialize import service with user context
         import_service = ImportService(db_session=db, user_id=user_id)
-        
+
         # Process the import
         result: ImportResult = await import_service.import_projects(
             projects=projects,
             import_method="csv"
         )
-        
+
         # Log to import_audit_logs so it appears in Data Import history
         _log_project_import_to_history(user_id, result, total_records=len(projects))
         # Also write to central audit trail (audit_logs)
@@ -576,9 +576,10 @@ async def import_projects_csv(
             duplicate_count=0,
             tenant_id=tenant_id,
         )
-        
+
         # Return appropriate response based on result
         if result.success:
+            _invalidate_projects_cache(request)
             return result.to_dict()
         else:
             # Validation failed - return 400 with error details
@@ -586,7 +587,7 @@ async def import_projects_csv(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=result.to_dict()
             )
-            
+
     except HTTPException:
         # Re-raise HTTP exceptions as-is
         raise

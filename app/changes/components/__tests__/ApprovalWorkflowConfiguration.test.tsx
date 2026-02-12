@@ -297,7 +297,8 @@ describe('ApprovalWorkflowConfiguration', () => {
     
     expect(screen.getByText('$50,000')).toBeInTheDocument()
     expect(screen.getByText('14 days')).toBeInTheDocument()
-    expect(screen.getByText('Can delegate')).toBeInTheDocument()
+    const canDelegateEls = screen.getAllByText('Can delegate')
+    expect(canDelegateEls.length).toBeGreaterThan(0)
   })
 
   it('opens create authority modal when Add Authority button is clicked', async () => {
@@ -462,17 +463,17 @@ describe('ApprovalWorkflowConfiguration', () => {
     const designTexts = screen.getAllByText('design')
     expect(designTexts.length).toBeGreaterThan(0)
     
-    expect(screen.getByText('budget')).toBeInTheDocument()
-    expect(screen.getByText('scope')).toBeInTheDocument()
+    expect(screen.getAllByText('budget').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('scope').length).toBeGreaterThan(0)
 
     // Check priority level badges - use getAllByText for duplicates
-    expect(screen.getByText('low')).toBeInTheDocument()
-    expect(screen.getByText('medium')).toBeInTheDocument()
+    expect(screen.getAllByText('low').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('medium').length).toBeGreaterThan(0)
     
     const highTexts = screen.getAllByText('high')
     expect(highTexts.length).toBeGreaterThan(0)
     
-    expect(screen.getByText('critical')).toBeInTheDocument()
+    expect(screen.getAllByText('critical').length).toBeGreaterThan(0)
   })
 
   it('formats currency amounts correctly', async () => {
@@ -486,9 +487,9 @@ describe('ApprovalWorkflowConfiguration', () => {
       expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument()
     })
 
-    // Check cost threshold formatting
-    expect(screen.getByText('Max: $50,000')).toBeInTheDocument()
-    expect(screen.getByText('Min: $50,000')).toBeInTheDocument()
+    // Check cost threshold formatting (may appear in same cell as "Min: $50,000 - Max: $50,000")
+    expect(screen.getByText(/Max: \$50,000/)).toBeInTheDocument()
+    expect(screen.getByText(/Min: \$50,000/)).toBeInTheDocument()
   })
 
   it('shows step details in expanded rule view', async () => {

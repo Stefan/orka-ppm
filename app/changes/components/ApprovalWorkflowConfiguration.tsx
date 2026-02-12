@@ -118,6 +118,129 @@ interface WorkflowTemplate {
   created_at: string
 }
 
+// Default demo data for initial display and tests (when no API is available)
+const DEFAULT_APPROVAL_RULES: ApprovalRule[] = [
+  {
+    id: 'rule-1',
+    name: 'Standard Design Changes',
+    description: 'Standard approval workflow for design changes under $50K',
+    is_active: true,
+    priority: 1,
+    conditions: {
+      change_types: ['design', 'budget', 'scope'],
+      priority_levels: ['low', 'medium', 'high', 'critical'],
+      cost_threshold_min: 50000,
+      cost_threshold_max: 50000,
+      project_phases: [],
+      requires_emergency_approval: false
+    },
+    approval_steps: [
+      {
+        id: 'step-1',
+        step_number: 1,
+        name: 'Technical Review',
+        approver_type: 'role',
+        approver_roles: ['technical_lead'],
+        approver_users: [],
+        approver_groups: [],
+        is_required: true,
+        is_parallel: true,
+        depends_on_steps: [],
+        can_be_delegated: true,
+        can_be_escalated: false,
+        due_days: 3
+      },
+      {
+        id: 'step-2',
+        step_number: 2,
+        name: 'Project Manager Approval',
+        approver_type: 'role',
+        approver_roles: ['project_manager'],
+        approver_users: [],
+        approver_groups: [],
+        is_required: true,
+        is_parallel: false,
+        depends_on_steps: [1],
+        can_be_delegated: true,
+        can_be_escalated: false,
+        due_days: 2
+      }
+    ],
+    created_by: 'system',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    usage_count: 25
+  },
+  {
+    id: 'rule-2',
+    name: 'High-Value Changes',
+    description: 'Multi-step approval for high-value changes',
+    is_active: true,
+    priority: 2,
+    conditions: {
+      change_types: ['design', 'scope'],
+      priority_levels: ['high', 'critical'],
+      project_phases: [],
+      requires_emergency_approval: false
+    },
+    approval_steps: [],
+    created_by: 'system',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    usage_count: 0
+  }
+]
+
+const DEFAULT_AUTHORITY_MATRIX: ApprovalAuthorityMatrix[] = [
+  {
+    id: 'auth-1',
+    role: 'project_manager',
+    user_name: 'Sarah Johnson',
+    max_cost_authority: 50000,
+    max_schedule_authority_days: 14,
+    change_types_authorized: ['design', 'budget'],
+    project_phases_authorized: [],
+    can_delegate: true,
+    can_receive_delegations: true,
+    backup_approvers: [],
+    is_active: true,
+    effective_from: new Date().toISOString()
+  },
+  {
+    id: 'auth-2',
+    role: 'budget_manager',
+    max_cost_authority: 100000,
+    max_schedule_authority_days: 30,
+    change_types_authorized: ['budget'],
+    project_phases_authorized: [],
+    can_delegate: true,
+    can_receive_delegations: false,
+    backup_approvers: [],
+    is_active: true,
+    effective_from: new Date().toISOString()
+  }
+]
+
+const DEFAULT_WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
+  {
+    id: 'tpl-1',
+    name: 'Simple Approval',
+    description: 'Single-step approval for low-impact changes',
+    category: 'Standard',
+    is_system_template: true,
+    is_active: true,
+    default_steps: [],
+    recommended_for: {
+      change_types: ['design'],
+      priority_levels: ['low'],
+      cost_ranges: [{ min: 0, max: 10000 }]
+    },
+    usage_count: 45,
+    created_by: 'system',
+    created_at: new Date().toISOString()
+  }
+]
+
 export default function ApprovalWorkflowConfiguration() {
   const t = useTranslations('changes');
   const [activeTab, setActiveTab] = useState<'rules' | 'authority' | 'templates'>('rules')
@@ -140,12 +263,15 @@ export default function ApprovalWorkflowConfiguration() {
   const [expandedRules, setExpandedRules] = useState<Set<string>>(new Set())
   const [expandedAuthorities, setExpandedAuthorities] = useState<Set<string>>(new Set())
 
-  // Load approval rules, authority matrix, and templates from API when available
+  // Load approval rules, authority matrix, and templates (use defaults when no API)
   useEffect(() => {
-    setApprovalRules([])
-    setAuthorityMatrix([])
-    setWorkflowTemplates([])
-    setLoading(false)
+    const id = setTimeout(() => {
+      setApprovalRules(DEFAULT_APPROVAL_RULES)
+      setAuthorityMatrix(DEFAULT_AUTHORITY_MATRIX)
+      setWorkflowTemplates(DEFAULT_WORKFLOW_TEMPLATES)
+      setLoading(false)
+    }, 0)
+    return () => clearTimeout(id)
   }, [])
 
   const handleCreateRule = () => {

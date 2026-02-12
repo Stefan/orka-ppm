@@ -4,9 +4,18 @@
 
 This implementation plan breaks down the Costbook feature into discrete, incremental coding tasks. The focus is on Phase 1 (Basis) functionality, which establishes core financial tracking with real Supabase integration, KPI calculations, and interactive visualizations. Each task builds on previous work, with property-based tests integrated throughout to validate correctness early.
 
+**Scope:** Costbook shows commitments and actuals **per selected project**. The user selects a project on the Financials page (dropdown with filter); the Costbook tab displays that project's data only. **Portfolio and Program levels are deferred and hidden** until project-level functionality is stable.
+
 The implementation follows a bottom-up approach: data layer → business logic → UI components → integration → testing. All code will be functional TypeScript with no placeholders.
 
 ## Tasks
+
+- [ ] 0. Project selector on Financials and single-project Costbook view
+  - [ ] 0.1 Add project selector (dropdown with optional search/filter) to Financials page; state `selectedProjectId`; hide Portfolio dropdown (deferred).
+  - [ ] 0.2 Pass `selectedProjectId` from Financials page to Costbook component (and optionally to FinancialsDataProvider).
+  - [ ] 0.3 Costbook: accept `projectId?: string` prop; when `projectId` is set, fetch and display that project only (one ProjectCard, charts for that project); when not set, show empty state "Select a project above".
+  - [ ] 0.4 Project list for selector: use projects from Financials data (e.g. `useFinancialData` / commitments-actuals project list) or Costbook projects API so selector is populated.
+  - _Requirements: 6 (Project Selector and Single-Project View), 4 (KPIs for selected project)_
 
 - [x] 1. Set up TypeScript interfaces and data models
   - Create `types/costbook.ts` with all TypeScript interfaces: Project, Commitment, Actual, ProjectWithFinancials, KPIMetrics, Currency enum, ProjectStatus enum, POStatus enum, ActualStatus enum

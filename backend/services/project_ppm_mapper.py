@@ -45,10 +45,11 @@ def _ppm_status_to_internal(ppm_status: Optional[str]) -> str:
     return ProjectStatus.planning.value
 
 
-def ppm_input_to_project_record(ppm: ProjectPpmInput, portfolio_id: str) -> Dict[str, Any]:
+def ppm_input_to_project_record(ppm: ProjectPpmInput, portfolio_id: Optional[str] = None) -> Dict[str, Any]:
     """
     Build project record for DB insert from PPM payload.
     name: first order_ids entry, or first line of description, or "Project {id}".
+    portfolio_id: optional; when None, project is not linked to a portfolio.
     """
     # Derive name for display and for linking commitments/actuals (project_nr)
     if ppm.order_ids:
@@ -65,7 +66,7 @@ def ppm_input_to_project_record(ppm: ProjectPpmInput, portfolio_id: str) -> Dict
 
     record: Dict[str, Any] = {
         "id": str(uuid4()),
-        "portfolio_id": portfolio_id,
+        "portfolio_id": portfolio_id,  # None allowed: project not linked to portfolio
         "name": name,
         "description": ppm.description,
         "status": status,

@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Costbook is a sophisticated financial management dashboard for project management applications that provides real-time visibility into project budgets, commitments, actuals, and variances. The system integrates with Supabase to aggregate financial data across projects and presents it through an interactive, no-scroll dashboard with KPI metrics, project cards, and visual analytics. The feature will be delivered in three phases: Phase 1 (Basis) establishes core financial tracking, Phase 2 (AI) adds intelligent anomaly detection and natural language capabilities, and Phase 3 (Extended) introduces earned value management and collaborative features.
+Costbook is a financial management view that shows commitments and actuals **per project**. The user selects a project on the Financials page (e.g. via a dropdown with filter); the Costbook tab then displays that project's budget, commitments, actuals, variances, and visualizations. The system integrates with Supabase (and backend API for commitments/actuals) and presents data for the selected project only. Portfolio and Program levels are deferred; the app is project-level first. The feature is delivered in three phases: Phase 1 (Basis) establishes core financial tracking per project, Phase 2 (AI) adds anomaly detection and natural language, Phase 3 (Extended) adds EVM and collaboration.
 
 ## Glossary
 
@@ -13,9 +13,10 @@ Costbook is a sophisticated financial management dashboard for project managemen
 - **Total_Spend**: The sum of all commitments and actuals for a project
 - **Variance**: The difference between project budget and total spend
 - **EAC**: Estimate at Completion - projected final cost of a project
-- **KPI**: Key Performance Indicator - aggregate financial metrics across all projects
+- **KPI**: Key Performance Indicator - financial metrics for the selected project (or aggregate when viewing multiple)
 - **Currency_Selector**: UI component allowing users to view financials in different currencies
-- **Projects_Grid**: Visual display of project cards with financial summaries
+- **Project_Selector**: Dropdown (with optional search/filter) on the Financials page to choose the project whose Costbook data is displayed
+- **Costbook_Project_View**: Main Costbook content showing commitments, actuals, and visualizations for the selected project
 - **Variance_Waterfall**: Chart showing budget breakdown and variance components
 - **Health_Bubble_Chart**: Scatter plot showing project health vs variance
 - **Trend_Sparkline**: Line chart showing spending trends over time
@@ -54,7 +55,7 @@ Costbook is a sophisticated financial management dashboard for project managemen
 
 1. WHEN calculating total spend, THE Costbook_System SHALL compute Total_Spend as SUM(commitments.total_amount) + SUM(actuals.amount) for each project
 2. WHEN calculating variance, THE Costbook_System SHALL compute Variance as projects.budget - Total_Spend for each project
-3. WHEN calculating aggregate KPIs, THE Costbook_System SHALL sum values across all projects
+3. WHEN displaying KPIs for a single selected project, THE Costbook_System SHALL show that project's budget, commitments, actuals, total spend, and variance; WHEN displaying multiple projects (future), aggregate KPIs SHALL sum values across the displayed projects
 4. THE Costbook_System SHALL calculate EAC using the formula: VOWD + ETC + Trends (with placeholder logic for Phase 1)
 5. WHEN a project has no commitments or actuals, THE Costbook_System SHALL treat missing values as zero in calculations
 6. THE Costbook_System SHALL preserve numeric precision to two decimal places for all currency values
@@ -73,13 +74,13 @@ Costbook is a sophisticated financial management dashboard for project managemen
 
 ### Requirement 4: Header Section with KPIs
 
-**User Story:** As a financial manager, I want to see aggregate KPI metrics in the header, so that I can understand overall portfolio health at a glance.
+**User Story:** As a financial manager, I want to see KPI metrics for the selected project in the header, so that I can understand that project's financial health at a glance.
 
 #### Acceptance Criteria
 
 1. THE Costbook_System SHALL display a header row with flex justify-between layout
 2. WHEN rendering the header left section, THE Costbook_System SHALL display an h1 "Costbook" title and Currency_Selector component
-3. THE Costbook_System SHALL display KPI badges in the center section showing: Total Budget, Commitments, Actuals, Total Spend, Net Variance, Over Count, and Under Count
+3. THE Costbook_System SHALL display KPI badges for the selected project: Total Budget, Commitments, Actuals, Total Spend, Net Variance (and when multiple projects are shown: Over Count, Under Count)
 4. WHEN displaying Net Variance, THE Costbook_System SHALL apply color coding (green for positive, red for negative)
 5. THE Costbook_System SHALL display Refresh, Performance, and Help buttons in the header right section
 6. THE Costbook_System SHALL update all KPI values when the Refresh button is clicked
@@ -96,29 +97,29 @@ Costbook is a sophisticated financial management dashboard for project managemen
 4. WHEN displaying currency values, THE Costbook_System SHALL include the currency symbol or code
 5. THE Costbook_System SHALL maintain the selected currency preference during the user session
 
-### Requirement 6: Projects Grid Display
+### Requirement 6: Project Selector and Single-Project View
 
-**User Story:** As a financial manager, I want to see individual project cards with financial summaries, so that I can identify which projects need attention.
+**User Story:** As a financial manager, I want to select a project on the Financials page and see that project's commitments and actuals in the Costbook, so that I can work at project level.
 
 #### Acceptance Criteria
 
-1. THE Costbook_System SHALL render a Projects_Grid in the left section (col-span-8) of the main content area
-2. THE Costbook_System SHALL display project cards in a responsive grid (grid-cols-1 md:2 lg:3) with minmax(250px, 1fr) sizing
-3. WHEN rendering a project card, THE Costbook_System SHALL display: project name, status dot, budget, commitments, actuals, total spend, variance, and progress bar
-4. THE Costbook_System SHALL apply max-h-[calc(100vh-220px)] overflow-y-auto to the Projects_Grid for scrolling when needed
-5. WHEN a user hovers over a project card, THE Costbook_System SHALL display additional details
-6. WHEN displaying variance on a project card, THE Costbook_System SHALL apply color coding based on positive or negative values
+1. THE Financials page SHALL provide a Project_Selector (dropdown with optional search/filter) so the user can choose which project's financial data is displayed
+2. WHEN a project is selected, THE Costbook_System SHALL display that project's data only: project summary (name, status, budget, commitments, actuals, total spend, variance, progress), Commitments and Actuals detail, and visualizations (waterfall, trends) for that project
+3. WHEN no project is selected, THE Costbook_System SHALL show an empty state instructing the user to select a project (e.g. "Select a project above")
+4. WHEN rendering the selected project, THE Costbook_System SHALL display: project name, status dot, budget, commitments, actuals, total spend, variance, and progress bar
+5. THE Project_Selector SHALL support filtering or search (e.g. by project name) when the project list is large
+6. WHEN displaying variance, THE Costbook_System SHALL apply color coding based on positive or negative values
 
 ### Requirement 7: Visualization Charts
 
-**User Story:** As a financial manager, I want visual charts showing variance breakdown, project health, and spending trends, so that I can identify patterns and outliers.
+**User Story:** As a financial manager, I want visual charts showing variance breakdown and spending trends for the selected project, so that I can identify patterns and outliers.
 
 #### Acceptance Criteria
 
-1. THE Costbook_System SHALL render three charts in the right section (col-span-4) of the main content area, each occupying h-1/3 height
-2. THE Costbook_System SHALL display a Variance_Waterfall chart using Recharts showing budget breakdown components
-3. THE Costbook_System SHALL display a Health_Bubble_Chart using Recharts ScatterChart plotting project health vs variance
-4. THE Costbook_System SHALL display a Trend_Sparkline using Recharts LineChart showing spending trends over time
+1. THE Costbook_System SHALL render charts in the main content area for the selected project (e.g. variance waterfall, trend sparkline)
+2. THE Costbook_System SHALL display a Variance_Waterfall chart using Recharts showing budget breakdown for the selected project
+3. WHEN multiple projects are shown (future), THE Costbook_System MAY display a Health_Bubble_Chart; for single-project view, health/variance is shown in the project summary
+4. THE Costbook_System SHALL display a Trend_Sparkline or line chart showing spending trends over time for the selected project
 5. WHEN chart data updates, THE Costbook_System SHALL re-render charts with smooth transitions
 6. THE Costbook_System SHALL use consistent color schemes across all visualizations
 
@@ -142,8 +143,8 @@ Costbook is a sophisticated financial management dashboard for project managemen
 
 1. THE Costbook_System SHALL implement a "Costbook" tab within the Financials page at /app/financials/page.tsx
 2. THE Costbook_System SHALL implement the complete wireframe layout with real Supabase joins on project_id and po_no
-3. THE Costbook_System SHALL calculate all KPI metrics using SUM aggregations from commitments and actuals tables
-4. THE Costbook_System SHALL display all three financial values (Budget, Commitments, Actuals) in the Projects_Grid
+3. THE Costbook_System SHALL calculate KPI metrics for the selected project from commitments and actuals (SUM by project_id)
+4. THE Costbook_System SHALL display Budget, Commitments, and Actuals for the selected project in the Costbook_Project_View
 5. THE Costbook_System SHALL contain no placeholder code - all functionality must be fully implemented
 6. THE Costbook_System SHALL use functional React components with TypeScript
 7. THE Costbook_System SHALL use react-query for data fetching with caching and automatic refetching
@@ -254,7 +255,7 @@ Costbook is a sophisticated financial management dashboard for project managemen
 
 1. THE Costbook_System SHALL be implemented as a Costbook4_0.tsx component
 2. THE Costbook_System SHALL be integrated into /app/financials/page.tsx as a tab
-3. THE Costbook_System SHALL separate concerns into sub-components for header, projects grid, charts, and footer
+3. THE Costbook_System SHALL separate concerns into sub-components for header, project selector (on Financials page), project view (summary + commitments/actuals + charts), and footer
 4. THE Costbook_System SHALL use TypeScript for type safety
 5. THE Costbook_System SHALL follow React best practices including hooks for state management
 6. THE Costbook_System SHALL implement proper error boundaries for graceful error handling

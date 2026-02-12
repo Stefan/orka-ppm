@@ -2,9 +2,9 @@
 
 ## Overview
 
-Costbook is a React-based financial management dashboard that provides real-time visibility into project budgets, commitments, and actuals. The system integrates with Supabase for data persistence and uses Recharts for data visualization. The architecture follows a component-based design with clear separation between data fetching, business logic, and presentation layers.
+Costbook is a financial view that shows commitments and actuals for a **selected project**. The user selects a project on the Financials page (via a dropdown with optional search); the Costbook tab then displays that project's budget, commitments, actuals, and visualizations. The system integrates with Supabase and backend API for data and uses Recharts for charts. Portfolio and Program levels are deferred; the app is project-level first.
 
-The implementation uses Next.js with TypeScript, Tailwind CSS for styling, and follows React best practices including hooks for state management. The dashboard is designed as a no-scroll interface that fits all key information on a single screen, with scrolling only within the projects grid when necessary.
+The implementation uses Next.js with TypeScript, Tailwind CSS, and React best practices. The Costbook layout shows the selected project's summary, detail tables, and charts; when no project is selected, an empty state is shown.
 
 ### Key Design Principles
 
@@ -23,20 +23,21 @@ The implementation uses Next.js with TypeScript, Tailwind CSS for styling, and f
 │                    Financials Page                          │
 │                  (/app/financials/page.tsx)                 │
 │  ┌───────────────────────────────────────────────────────┐  │
-│  │              Tab Navigation                           │  │
-│  │  [Overview] [Costbook] [Invoices] [Reports]          │  │
+│  │  Project Selector (dropdown + filter)  [Currency]     │  │
 │  └───────────────────────────────────────────────────────┘  │
 │  ┌───────────────────────────────────────────────────────┐  │
-│  │           Costbook4_0 Component                       │  │
+│  │  Tab Navigation [Overview] [Costbook] [Invoices] ...  │  │
+│  └───────────────────────────────────────────────────────┘  │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │           Costbook Component (projectId from page)    │  │
 │  │  ┌─────────────────────────────────────────────────┐  │  │
-│  │  │  Header (KPIs, Currency Selector, Actions)      │  │  │
+│  │  │  Header (KPIs for selected project, Actions)    │  │  │
 │  │  ├─────────────────────────────────────────────────┤  │  │
-│  │  │  Main Content                                   │  │  │
+│  │  │  Main Content (single project)                  │  │  │
 │  │  │  ┌──────────────┬──────────────────────────┐   │  │  │
-│  │  │  │ Projects     │  Visualizations          │   │  │  │
-│  │  │  │ Grid         │  - Variance Waterfall    │   │  │  │
-│  │  │  │ (Scrollable) │  - Health Bubble Chart   │   │  │  │
-│  │  │  │              │  - Trend Sparkline       │   │  │  │
+│  │  │  │ Project      │  Visualizations          │   │  │  │
+│  │  │  │ Summary Card │  - Variance Waterfall    │   │  │  │
+│  │  │  │ + Details    │  - Trend Sparkline        │   │  │  │
 │  │  │  └──────────────┴──────────────────────────┘   │  │  │
 │  │  ├─────────────────────────────────────────────────┤  │  │
 │  │  │  Footer (Action Buttons)                        │  │  │
@@ -59,10 +60,11 @@ The implementation uses Next.js with TypeScript, Tailwind CSS for styling, and f
 
 ### Data Flow
 
-1. **Initial Load**: Component mounts → fetch projects with aggregated commitments/actuals → calculate KPIs → render UI
-2. **Currency Change**: User selects currency → convert all values → re-render
-3. **Refresh**: User clicks refresh → re-fetch data → recalculate → update UI
-4. **Hover Interaction**: User hovers project card → show additional details
+1. **Project Selection**: User selects project in Financials page dropdown → projectId passed to Costbook → Costbook fetches that project's commitments/actuals and renders
+2. **Initial Load**: When projectId is set, Costbook fetches single project with financials → calculate KPIs for that project → render project summary, charts, and detail
+3. **No Project Selected**: Costbook shows empty state "Select a project above"
+4. **Currency Change**: User selects currency → convert values → re-render
+5. **Refresh**: User clicks refresh → re-fetch project data → update UI
 
 ### Technology Stack
 
@@ -81,27 +83,21 @@ The implementation uses Next.js with TypeScript, Tailwind CSS for styling, and f
 ### Component Hierarchy
 
 ```
-Costbook4_0
-├── CostbookHeader
-│   ├── CurrencySelector
-│   ├── KPIBadges
-│   └── ActionButtons
-├── CostbookMain
-│   ├── ProjectsGrid
-│   │   └── ProjectCard (multiple instances)
-│   ├── VisualizationPanel
-│   │   ├── VarianceWaterfall
-│   │   ├── HealthBubbleChart
-│   │   └── TrendSparkline
-│   ├── CollapsiblePanel (Cash Out Forecast)
-│   │   └── CashOutGantt
-│   ├── CollapsiblePanel (Transaction List)
-│   │   ├── TransactionFilters
-│   │   └── VirtualizedTransactionTable
-│   └── CollapsiblePanel (CES/WBS Tree)
-│       └── HierarchyTreeView
-└── CostbookFooter
-    └── FooterActionButtons
+Financials Page
+├── ProjectSelector (dropdown with filter; selects projectId)
+├── TabNavigation
+└── Costbook (receives projectId)
+    ├── CostbookHeader (KPIs for selected project)
+    │   ├── CurrencySelector
+    │   ├── KPIBadges
+    │   └── ActionButtons
+    ├── CostbookMain (when projectId set)
+    │   ├── ProjectCard (single: selected project summary)
+    │   ├── VisualizationPanel (VarianceWaterfall, TrendSparkline for that project)
+    │   ├── CollapsiblePanel (Transaction List filtered by project)
+    │   └── CollapsiblePanel (CES/WBS Tree)
+    └── CostbookFooter
+        └── FooterActionButtons
 ```
 
 ### Core Component: Costbook4_0
@@ -110,10 +106,12 @@ Costbook4_0
 
 **Props**: None (top-level component)
 
+**Props**: `projectId?: string` (from Financials page selector); when set, Costbook shows single-project view.
+
 **State**:
 ```typescript
 interface CostbookState {
-  projects: ProjectWithFinancials[];
+  projects: ProjectWithFinancials[];  // one item when projectId set, else []
   selectedCurrency: Currency;
   isLoading: boolean;
   error: Error | null;
@@ -122,10 +120,10 @@ interface CostbookState {
 ```
 
 **Key Methods**:
-- `fetchProjectData()`: Fetches projects with aggregated financial data
+- `fetchProjectData()`: When projectId set, fetches that project with financials; else fetches all (for future multi-project) or shows empty state
 - `handleCurrencyChange(currency: Currency)`: Updates selected currency and converts values
-- `handleRefresh()`: Re-fetches all data from Supabase
-- `calculateKPIs()`: Computes aggregate metrics across all projects
+- `handleRefresh()`: Re-fetches data for the selected project (or all)
+- `calculateKPIs()`: Computes metrics for the selected project (or aggregate when multiple)
 
 ### Component: CostbookHeader
 
@@ -168,9 +166,25 @@ interface KPIBadgesProps {
 - Net Variance uses conditional styling: `text-green-600` if positive, `text-red-600` if negative
 - Values formatted with currency symbol and 2 decimal places
 
-### Component: ProjectsGrid
+### Component: ProjectSelector (Financials page)
 
-**Purpose**: Displays scrollable grid of project cards.
+**Purpose**: Dropdown (with optional search/filter) to select the project whose Costbook data is displayed.
+
+**Props**:
+```typescript
+interface ProjectSelectorProps {
+  projects: { id: string; name: string }[];
+  selectedProjectId: string | null;
+  onProjectChange: (projectId: string | null) => void;
+  placeholder?: string;
+}
+```
+
+**Behaviour**: Filter by project name when list is long; clear selection option ("All" or empty) can show empty Costbook state.
+
+### Component: ProjectsGrid (optional / future multi-project)
+
+**Purpose**: When multiple projects are shown (future), displays scrollable grid of project cards.
 
 **Props**:
 ```typescript

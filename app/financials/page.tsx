@@ -1,9 +1,8 @@
 'use client'
 
-import React, { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import React, { lazy, Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useAuth } from '../providers/SupabaseAuthProvider'
-import { usePortfolioOptional } from '@/contexts/PortfolioContext'
 import { AlertTriangle } from 'lucide-react'
 import AppLayout from '../../components/shared/AppLayout'
 import { ResponsiveContainer } from '../../components/ui/molecules/ResponsiveContainer'
@@ -59,21 +58,17 @@ function FinancialsFallback() {
 
 function FinancialsContent() {
   const { session } = useAuth()
-  const { currentPortfolioId, portfolios } = usePortfolioOptional()
   const searchParams = useSearchParams()
   const { t } = useTranslations()
   const [selectedCurrency, setSelectedCurrency] = React.useState('USD')
   const [dateRange, setDateRange] = React.useState('all')
   const [showFilters, setShowFilters] = React.useState(false)
-  const [portfolioFilterId, setPortfolioFilterId] = React.useState<string | null>(null)
+  const [selectedProjectId, setSelectedProjectId] = React.useState<string | null>(null)
   const [viewMode, setViewMode] = React.useState<ViewMode>(() => getInitialViewMode(searchParams))
-  const prevPortfolioIdRef = useRef<string | undefined>(undefined)
   const { isOpen, startTour, closeTour, completeTour, resetAndStartTour, hasCompletedTour } = useGuidedTour('financials-v1')
 
-  const effectivePortfolioId =
-    portfolioFilterId === ''
-      ? undefined
-      : (portfolioFilterId || currentPortfolioId || undefined)
+  // Portfolio deferred: always pass undefined so projects are not filtered by portfolio
+  const effectivePortfolioId = undefined
 
   // Feature flag checks
   const { enabled: costbookEnabled } = useFeatureFlag('costbook_phase1')
@@ -107,12 +102,9 @@ function FinancialsContent() {
         setSelectedCurrency={setSelectedCurrency}
         showFilters={showFilters}
         setShowFilters={setShowFilters}
-        portfolioFilterId={portfolioFilterId}
-        setPortfolioFilterId={setPortfolioFilterId}
-        currentPortfolioId={currentPortfolioId}
-        portfolios={portfolios}
+        selectedProjectId={selectedProjectId}
+        setSelectedProjectId={setSelectedProjectId}
         costbookEnabled={costbookEnabled}
-        effectivePortfolioId={effectivePortfolioId}
         dateRange={dateRange}
         setDateRange={setDateRange}
         isOpen={isOpen}
@@ -121,6 +113,7 @@ function FinancialsContent() {
         completeTour={completeTour}
         resetAndStartTour={resetAndStartTour}
         hasCompletedTour={hasCompletedTour}
+        portfolioId={effectivePortfolioId}
       />
     </FinancialsDataProvider>
   )
@@ -134,12 +127,9 @@ function FinancialsContentInner({
   setSelectedCurrency,
   showFilters,
   setShowFilters,
-  portfolioFilterId,
-  setPortfolioFilterId,
-  currentPortfolioId,
-  portfolios,
+  selectedProjectId,
+  setSelectedProjectId,
   costbookEnabled,
-  effectivePortfolioId,
   dateRange,
   setDateRange,
   isOpen,
@@ -147,7 +137,8 @@ function FinancialsContentInner({
   closeTour,
   completeTour,
   resetAndStartTour,
-  hasCompletedTour
+  hasCompletedTour,
+  portfolioId: effectivePortfolioId
 }: {
   session: { access_token?: string } | null
   viewMode: ViewMode
@@ -156,12 +147,9 @@ function FinancialsContentInner({
   setSelectedCurrency: (c: string) => void
   showFilters: boolean
   setShowFilters: (s: boolean) => void
-  portfolioFilterId: string | null
-  setPortfolioFilterId: (id: string | null) => void
-  currentPortfolioId: string | undefined
-  portfolios: Array<{ id: string; name: string }>
+  selectedProjectId: string | null
+  setSelectedProjectId: (id: string | null) => void
   costbookEnabled: boolean
-  effectivePortfolioId: string | undefined
   dateRange: string
   setDateRange: (v: string) => void
   isOpen: boolean
@@ -170,6 +158,7 @@ function FinancialsContentInner({
   completeTour: () => void
   resetAndStartTour: () => void
   hasCompletedTour: boolean
+  portfolioId?: string | undefined
 }) {
   const { t } = useTranslations()
   const data = useFinancialsData()
@@ -250,9 +239,9 @@ function FinancialsContentInner({
             onToggleFilters={() => setShowFilters(!showFilters)}
             onExport={exportFinancialData}
             onEditBudget={() => setViewMode('detailed')}
-            portfolios={portfolios}
-            selectedPortfolioId={portfolioFilterId !== null ? portfolioFilterId : (currentPortfolioId ?? '')}
-            onPortfolioChange={(id) => setPortfolioFilterId(id === '' ? '' : id)}
+            projects={projects.map((p) => ({ id: p.id, name: p.name }))}
+            selectedProjectId={selectedProjectId}
+            onProjectChange={setSelectedProjectId}
           />
         </div>
 
@@ -424,7 +413,7 @@ function FinancialsContentInner({
           <div data-testid="financials-po-breakdown-view" className={viewMode === 'po-breakdown' ? 'block' : 'hidden'}>
             <POBreakdownView
               accessToken={session?.access_token}
-              projectId={projects[0]?.id}
+              projectId={selectedProjectId ?? undefined}
             />
           </div>
         )}
@@ -459,6 +448,7 @@ function FinancialsContentInner({
               <Costbook
                 initialCurrency={selectedCurrency as import('@/types/costbook').Currency}
                 showTourButton={false}
+                projectId={selectedProjectId ?? undefined}
               />
             </Suspense>
           </div>

@@ -95,7 +95,7 @@ describe('GET /api/notifications', () => {
     expect((data as Record<string, unknown>).details).toBe('Backend error')
   })
 
-  it('returns 500 when fetch throws', async () => {
+  it('returns 200 with empty notifications when fetch throws (graceful degradation)', async () => {
     global.fetch = jest.fn().mockRejectedValueOnce(new Error('Network error'))
 
     const { GET } = await import('@/app/api/notifications/route')
@@ -103,8 +103,7 @@ describe('GET /api/notifications', () => {
     const response = await GET(request as any)
     const data = await parseJsonResponse(response)
 
-    expect(response.status).toBe(500)
-    expect((data as Record<string, unknown>).error).toContain('Failed to get notifications')
-    expect((data as Record<string, unknown>).details).toBe('Network error')
+    expect(response.status).toBe(200)
+    expect((data as Record<string, unknown>).notifications).toEqual([])
   })
 })

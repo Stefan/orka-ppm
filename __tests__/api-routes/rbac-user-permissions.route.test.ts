@@ -74,7 +74,7 @@ describe('GET /api/rbac/user-permissions', () => {
     expect((data as Record<string, unknown>).details).toBe('Access denied')
   })
 
-  it('returns 500 when fetch throws', async () => {
+  it('returns 200 with empty data when fetch throws (graceful degradation)', async () => {
     global.fetch = jest.fn().mockRejectedValueOnce(new Error('Network error'))
 
     const { GET } = await import('@/app/api/rbac/user-permissions/route')
@@ -82,8 +82,10 @@ describe('GET /api/rbac/user-permissions', () => {
     const response = await GET(request as any)
     const data = await parseJsonResponse(response)
 
-    expect(response.status).toBe(500)
-    expect((data as Record<string, unknown>).error).toContain('Failed to get user permissions')
-    expect((data as Record<string, unknown>).details).toBe('Network error')
+    expect(response.status).toBe(200)
+    expect((data as Record<string, unknown>).roles).toEqual([])
+    expect((data as Record<string, unknown>).scopes).toEqual([])
+    expect((data as Record<string, unknown>).role_names).toEqual([])
+    expect((data as Record<string, unknown>).organization_scopes).toEqual([])
   })
 })

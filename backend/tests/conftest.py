@@ -10,10 +10,15 @@ Provides:
 """
 
 import os
+import warnings
 import pytest
 from unittest.mock import Mock, MagicMock, AsyncMock
 from uuid import uuid4
 from datetime import datetime
+
+# Suppress Pydantic deprecation warnings during test collection (avoids collection errors)
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="pydantic")
+warnings.filterwarnings("ignore", message=".*deprecated.*", category=UserWarning)
 
 # Hypothesis settings for property-based tests (Task 1.1)
 def pytest_configure(config):

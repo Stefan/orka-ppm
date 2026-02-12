@@ -43,9 +43,9 @@ function normalizeStatus(item: Record<string, unknown>): string {
   return 'planning'
 }
 
-function normalizeProjectForApi(item: Record<string, unknown>, defaultPortfolioId: string, index: number): Record<string, unknown> {
+function normalizeProjectForApi(item: Record<string, unknown>, defaultPortfolioId: string | null, index: number): Record<string, unknown> {
   const name = pickName(item) ?? `Project ${index + 1}`
-  const portfolio_id = (item.portfolio_id as string) ?? defaultPortfolioId
+  const portfolio_id = (item.portfolio_id as string) ?? defaultPortfolioId ?? null
   const startRaw = item.start_date ?? item.start ?? item.startDate
   const endRaw = item.end_date ?? item.end ?? item.finishDate
   const startStr = startRaw != null ? String(startRaw).slice(0, 10) : null
@@ -176,9 +176,6 @@ export default function ImportPage() {
       let response: Response
 
       if (isJson) {
-        if (!defaultPortfolioId) {
-          throw new Error('Select a portfolio to assign projects to (required for JSON import).')
-        }
         const text = await selectedFile.text()
         let raw: unknown
         try {
@@ -190,7 +187,7 @@ export default function ImportPage() {
           throw new Error('JSON file must contain an array of projects')
         }
         const projects = raw.map((item: Record<string, unknown>, index: number) =>
-          normalizeProjectForApi(item, defaultPortfolioId, index)
+          normalizeProjectForApi(item, defaultPortfolioId || null, index)
         )
         const params = new URLSearchParams()
         params.set('anonymize', String(anonymize))
@@ -255,7 +252,7 @@ export default function ImportPage() {
           if (detail.length > maxShow) {
             message += ` (and ${detail.length - maxShow} more). `
           }
-          message += ' Required: each project needs "portfolio_id" (UUID) and "name" (string).'
+          message += ' Required: each project needs "name" (string). "portfolio_id" is optional.'
         } else if (detail && typeof detail === 'object') {
           message = (detail as { message?: string }).message ?? JSON.stringify(detail)
         } else {
@@ -269,7 +266,7 @@ export default function ImportPage() {
         success_count: data.count ?? 0,
         error_count: Array.isArray(data.errors) ? data.errors.length : 0,
         errors: Array.isArray(data.errors)
-          ? data.errors.map((e: { index?: number; field?: string; error?: string; value?: unknown }) => ({
+          ? data.errors.map((e: { index?: number; field?: string; error?: string; message?: string; value?: unknown }) => ({
               line_number: (e.index ?? 0) + 1,
               field: e.field ?? 'unknown',
               message: e.error ?? e.message ?? 'Error',
@@ -391,7 +388,7 @@ export default function ImportPage() {
               {selectedFile && selectedFile.name.toLowerCase().endsWith('.json') && (
                 <div className="mt-4">
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-                    {t('assignToPortfolio')}
+                    {t('assignToPortfolio')} <span className="text-gray-500 dark:text-slate-400 font-normal">({t('optional')})</span>
                   </label>
                   <select
                     value={defaultPortfolioId}
@@ -399,7 +396,7 @@ export default function ImportPage() {
                     className="w-full max-w-md rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 px-3 py-2"
                     data-testid="import-portfolio-select"
                   >
-                    <option value="">{t('selectPortfolio')}</option>
+                    <option value="">{t('noPortfolio')}</option>
                     {portfolios.map(p => (
                       <option key={p.id} value={p.id}>{p.name}</option>
                     ))}
@@ -410,7 +407,7 @@ export default function ImportPage() {
                 <div className="mt-4 flex gap-3" data-tour="import-start">
                   <button
                     onClick={handleUpload}
-                    disabled={uploading || (selectedFile.name.toLowerCase().endsWith('.json') && !defaultPortfolioId)}
+                    disabled={uploading}
                     className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                   >
                     {uploading ? t('processing') : t('importButton')}

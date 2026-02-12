@@ -518,7 +518,7 @@
       "detailed": "詳細カテゴリ分析",
       "trends": "時間的推移と予測",
       "analysis": "高度なコスト分析",
-      "poBreakdown": "SAP発注書階層",
+      "poBreakdown": "発注内訳",
       "csvImport": "データのインポート",
       "commitmentsActuals": "計画値対実績値比較"
     },

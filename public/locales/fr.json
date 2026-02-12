@@ -518,7 +518,7 @@
       "detailed": "Analyse détaillée par catégorie",
       "trends": "Évolution temporelle et prévisions",
       "analysis": "Analyse avancée des coûts",
-      "poBreakdown": "Hiérarchie des bons de commande SAP",
+      "poBreakdown": "Répartition des commandes",
       "csvImport": "Importer des données",
       "commitmentsActuals": "Comparaison planifié vs réel"
     },

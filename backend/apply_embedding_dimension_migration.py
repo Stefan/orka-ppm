@@ -10,22 +10,29 @@ sys.path.append(str(Path(__file__).parent))
 
 from config.database import supabase
 
+
 def apply_migration():
     """Apply the embedding dimension migration"""
-    
+
     print("🔄 Applying embedding dimension migration...")
-    
+
     # Read migration file
-    migration_file = Path(__file__).parent / "migrations" / "027_update_embedding_dimension.sql"
-    
-    with open(migration_file, 'r') as f:
+    migration_file = (
+        Path(__file__).parent / "migrations" / "027_update_embedding_dimension.sql"
+    )
+
+    with open(migration_file, "r") as f:
         sql = f.read()
-    
+
     # Split into individual statements
-    statements = [s.strip() for s in sql.split(';') if s.strip() and not s.strip().startswith('--')]
-    
+    statements = [
+        s.strip()
+        for s in sql.split(";")
+        if s.strip() and not s.strip().startswith("--")
+    ]
+
     print(f"📝 Found {len(statements)} SQL statements to execute")
-    
+
     # Execute each statement
     for i, statement in enumerate(statements, 1):
         try:
@@ -36,7 +43,7 @@ def apply_migration():
         except Exception as e:
             print(f"❌ Error executing statement {i}: {e}")
             return False
-    
+
     print("\n⚠️  IMPORTANT: This migration must be run manually in Supabase SQL Editor")
     print("   1. Go to your Supabase project dashboard")
     print("   2. Navigate to SQL Editor")
@@ -44,8 +51,9 @@ def apply_migration():
     print("   4. Execute the SQL")
     print("\n   Or run this command if you have psql access:")
     print(f"   psql $DATABASE_URL < {migration_file}")
-    
+
     return True
+
 
 if __name__ == "__main__":
     apply_migration()
